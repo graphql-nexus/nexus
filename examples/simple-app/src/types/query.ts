@@ -1,0 +1,1 @@
+// export const Query = GQLitQuery();

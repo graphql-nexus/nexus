@@ -1,0 +1,10 @@
+{
+  "name": "gqlit-simple-app",
+  "dependencies": {
+    "express": "^4.16.4",
+    "apollo-server-express": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.0"
+  }
+}
