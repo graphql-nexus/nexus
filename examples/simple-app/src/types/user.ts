@@ -1,5 +1,5 @@
-import { GQLitObject } from "../../../../src";
+import { GQLiteralObject } from "../../../../src";
 
-export const User = GQLitObject("User", t => {
+export const User = GQLiteralObject("User", t => {
   t.mix("Node");
 });

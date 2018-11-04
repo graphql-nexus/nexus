@@ -1,6 +1,8 @@
 export enum NodeType {
   MIX = "MIX",
+  MIX_ABSTRACT = "MIX_ABSTRACT",
   LIST = "LIST",
   FIELD = "FIELD",
   ENUM_MEMBER = "ENUM_MEMBER",
+  UNION_MEMBER = "UNION_MEMBER",
 }

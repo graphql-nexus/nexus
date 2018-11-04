@@ -1,10 +1,10 @@
 export {
-  GQLitAbstract,
-  GQLitScalar,
-  GQLitEnum,
-  GQLitInputObject,
-  GQLitInterface,
-  GQLitObject,
-  GQLitUnion,
-  GQLitSchema,
+  GQLiteralAbstractType,
+  GQLiteralScalar,
+  GQLiteralEnum,
+  GQLiteralInputObject,
+  GQLiteralInterface,
+  GQLiteralObject,
+  GQLiteralUnion,
+  GQLiteralSchema,
 } from "./definitions";

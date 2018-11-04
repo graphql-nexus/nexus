@@ -1,5 +1,5 @@
-import { GQLitObject } from '../../../../src';
+import { GQLiteralObject } from "../../../../src";
 
-export const Post = GQLitObject('Post', t => {
-  t.implements('Node');
+export const Post = GQLiteralObject("Post", t => {
+  t.implements("Node");
 });

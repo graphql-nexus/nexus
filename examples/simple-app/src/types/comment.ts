@@ -1,9 +1,12 @@
-import { GQLitObject, GQLitInputObject } from "../../../../src";
+import { GQLiteralObject, GQLiteralInputObject } from "../../../../src";
 
-export const Comment = GQLitObject("Comment", t => {
+export const Comment = GQLiteralObject("Comment", t => {
   t.field("id", "ID");
 });
 
-export const CreateCommentInput = GQLitInputObject("CreateCommentInput", t => {
-  t.mix("Comment");
-});
+export const CreateCommentInput = GQLiteralInputObject(
+  "CreateCommentInput",
+  t => {
+    t.mix("Comment");
+  }
+);

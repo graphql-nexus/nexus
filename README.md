@@ -1,28 +1,34 @@
-## GQLit
+## GQLiteral
 
-Literate, strongly typed GraphQL schema construction for JavaScript.
+Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript
 
-Combines the best practices in building out a GraphQL server layer without the boilerplate.
+Combines the best practices from building real-world GraphQL servers without the boilerplate or excessive imports. Compose types with [abstract types](#GQLiteralAbstractType) and [type mixing](#Type-combination).
 
-Inspired by real-world use of graphql-js, apollo, graphene, and graphql-ruby.
+Inspired by use of [graphql-tools](https://github.com/apollographql/graphql-tools), [graphene](https://docs.graphene-python.org/en/latest/), and [graphql-ruby](https://github.com/rmosolgo/graphql-ruby).
 
 Provides full control of your schema, with added benefits like dynamic schemas based on user permissions. Check out the `/examples` for some sample uses.
 
+### Installation
+
+```
+yarn install gqliteral
+```
+
 ### Features:
 
-**_ Type combination _**
+##### Type combination
 
 Ever have a situation where your input types look eerily simliar to your output types, yet you need to define them both by hand in the schema? Or maybe you have an interface shared by several types, and each time you add a field to the interface you need to remember to add it to the types.
 
-**_ No circular reference issues _**
+##### No circular reference issues
 
 One of the problems with GraphQL construction is the self-referential types and the
 
-**_ Awesome intellisense _**
+##### Awesome intellisense
 
 Leverages type generation internally so you don't have to.
 
-**_ Great error messages _**
+##### Great error messages
 
 We want you to know where things went wrong, not spend time trying to figure out cryptic error messages.
 
@@ -36,8 +42,20 @@ Ever notice that your input types and output types are usually fairly similar? M
 
 ### API:
 
-#### GQLitType
+#### GQLiteralObject
 
-#### GQLitInputType
+#### GQLiteralInputObject
 
-####
+#### GQLiteralInterface
+
+#### GQLiteralObject
+
+#### GQLiteralUnion
+
+#### GQLiteralSchema
+
+#### GQLiteralEnum
+
+#### GQLiteralAbstractType
+
+### License

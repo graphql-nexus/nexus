@@ -1,19 +1,19 @@
 import {
   GraphQLSchema,
-  isNamedType,
   GraphQLNamedType,
+  isNamedType,
   isObjectType,
 } from "graphql";
 import * as Types from "./types";
 import * as Factories from "./factories";
 
 /**
- * Wraps a GQLitType object, since all GQLit types have a
+ * Wraps a GQLiteralType object, since all GQLiteral types have a
  * name, but that name isn't relevant to the type object until it's
  * constructed so we don't want it as a public member, purely for
  * intellisense/cosmetic purposes :)
  */
-export class GQLitTypeWrapper<T extends Factories.GQLitType> {
+export class GQLiteralTypeWrapper<T extends Factories.GQLiteralType> {
   constructor(readonly name: string, readonly type: T) {}
 }
 
@@ -23,8 +23,14 @@ export class GQLitTypeWrapper<T extends Factories.GQLitType> {
  * @param {string} name
  * @param {object} options
  */
-export function GQLitScalar(name: string, options: Types.GQLitScalarOptions) {
-  return new GQLitTypeWrapper(name, new Factories.GQLitScalarType(options));
+export function GQLiteralScalar(
+  name: string,
+  options: Types.GQLiteralScalarOptions
+) {
+  return new GQLiteralTypeWrapper(
+    name,
+    new Factories.GQLiteralScalarType(name, options)
+  );
 }
 
 /**
@@ -32,65 +38,65 @@ export function GQLitScalar(name: string, options: Types.GQLitScalarOptions) {
  *
  * @param {string}
  */
-export function GQLitObject<Root = any, Schema = any>(
+export function GQLiteralObject<Root = any, Schema = any>(
   name: string,
-  fn: (arg: Factories.GQLitObjectType<Root, Schema>) => void
+  fn: (arg: Factories.GQLiteralObjectType<Root, Schema>) => void
 ) {
-  const factory = new Factories.GQLitObjectType<Root, Schema>();
+  const factory = new Factories.GQLiteralObjectType<Root, Schema>(name);
   fn(factory);
-  return new GQLitTypeWrapper(name, factory);
+  return new GQLiteralTypeWrapper(name, factory);
 }
 
 /**
  * Define a GraphQL interface type
  */
-export function GQLitInterface<Root = any, Schema = any>(
+export function GQLiteralInterface<Root = any, Schema = any>(
   name: string,
-  fn: (arg: Factories.GQLitInterfaceType<Root, Schema>) => void
+  fn: (arg: Factories.GQLiteralInterfaceType<Root, Schema>) => void
 ) {
-  const factory = new Factories.GQLitInterfaceType();
+  const factory = new Factories.GQLiteralInterfaceType(name);
   fn(factory);
-  return new GQLitTypeWrapper(name, factory);
+  return new GQLiteralTypeWrapper(name, factory);
 }
 
 /**
  * Union types are very similar to interfaces, but they don't get to specify
  * any common fields between the types.
  *
- * There are two ways to create a GraphQLUnionType with GQLitUnion:
+ * There are two ways to create a GraphQLUnionType with GQLiteralUnion:
  *
  * As an array of types to satisfy the union:
  *
- * const SearchResult = GQLitUnion('SearchResult', ['Human', 'Droid', 'Starship'])
+ * const SearchResult = GQLiteralUnion('SearchResult', ['Human', 'Droid', 'Starship'])
  *
  * As a function, where other unions can be mixed in:
  *
- * const CombinedResult = GQLitUnion('CombinedResult', t => {
+ * const CombinedResult = GQLiteralUnion('CombinedResult', t => {
  *   t.mix('SearchResult')
- *   t.types()
+ *   t.members('OtherType', 'AnotherType')
  * })
  */
-export function GQLitUnion(
+export function GQLiteralUnion(
   name: string,
-  fn: (arg: Factories.GQLitUnionType) => void
+  fn: (arg: Factories.GQLiteralUnionType) => void
 ) {
-  const factory = new Factories.GQLitUnionType();
+  const factory = new Factories.GQLiteralUnionType(name);
   fn(factory);
-  return new GQLitTypeWrapper(name, factory);
+  return new GQLiteralTypeWrapper(name, factory);
 }
 
 /**
  * A Enum is a special GraphQL type that represents a set of symbolic names (members)
  * bound to unique, constant values. There are three ways to create a GraphQLEnumType
- * with GQLitEnum:
+ * with GQLiteralEnum:
  *
  * As an array of enum values:
  *
- * const Episode = GQLitEnum('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
+ * const Episode = GQLiteralEnum('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
  *
  * As an object, with a mapping of enum values to internal values:
  *
- * const Episode = GQLitEnum('Episode', {
+ * const Episode = GQLiteralEnum('Episode', {
  *   NEWHOPE: 4,
  *   EMPIRE: 5,
  *   JEDI: 6
@@ -98,7 +104,7 @@ export function GQLitUnion(
  *
  * As a function, where other enums can be mixed in:
  *
- * const Episode = GQLitEnum('Episode', (t) => {
+ * const Episode = GQLiteralEnum('Episode', (t) => {
  *   t.mix('OneThroughThree')
  *   t.mix('FourThroughSix')
  *   t.mix('SevenThroughNine')
@@ -106,21 +112,24 @@ export function GQLitUnion(
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
  */
-export function GQLitEnum(
+export function GQLiteralEnum(
   name: string,
-  fn: ((arg: Factories.GQLitEnumType) => void) | string[] | Record<string, any>
+  fn:
+    | ((arg: Factories.GQLiteralEnumType) => void)
+    | string[]
+    | Record<string, any>
 ) {
   const toCall = typeof fn === "function" ? fn : addEnumValue(fn);
-  const factory = new Factories.GQLitEnumType();
+  const factory = new Factories.GQLiteralEnumType(name);
   toCall(factory);
-  return new GQLitTypeWrapper(name, factory);
+  return new GQLiteralTypeWrapper(name, factory);
 }
 
 /**
  * Handles the shorhand syntax for creating the GraphQL schema
  */
 const addEnumValue = (arg: string[] | Record<string, any>) => (
-  f: Factories.GQLitEnumType
+  f: Factories.GQLiteralEnumType
 ) => {
   if (Array.isArray(arg)) {
     arg.forEach(value => {
@@ -136,27 +145,29 @@ const addEnumValue = (arg: string[] | Record<string, any>) => (
 /**
  *
  */
-export function GQLitInputObject(
+export function GQLiteralInputObject(
   name: string,
-  fn: (arg: Factories.GQLitInputObjectType) => void
+  fn: (arg: Factories.GQLiteralInputObjectType) => void
 ) {
-  const factory = new Factories.GQLitInputObjectType();
+  const factory = new Factories.GQLiteralInputObjectType(name);
   fn(factory);
-  return new GQLitTypeWrapper(name, factory);
+  return new GQLiteralTypeWrapper(name, factory);
 }
 
 /**
- * A `GQLitAbstract` object contains fields that can be shared among
- * `GQLitObject`, `GQLitInterface`, `GQLitInputObject` or other `GQLitAbstract` types.
+ * A `GQLiteralAbstractType` object contains fields that can be shared among
+ * `GQLiteralObject`, `GQLiteralInterface`, `GQLiteralInputObject` or other `GQLiteralAbstractType` types.
  *
  * Unlike concrete GraphQL types (types that show up in the generated schema),
- * GQLitAbstract types must be mixed in using the actual JS object returned by this
+ * GQLiteralAbstractType types must be mixed in using the actual JS object returned by this
  * function rather than a string "name" representing the type.
  *
- * @return GQLitAbstractType
+ * @return GQLiteralAbstractType
  */
-export function GQLitAbstract(fn: (arg: Factories.GQLitAbstractType) => void) {
-  const factory = new Factories.GQLitAbstractType();
+export function GQLiteralAbstractType(
+  fn: (arg: Factories.GQLiteralAbstractType) => void
+) {
+  const factory = new Factories.GQLiteralAbstractType();
   fn(factory);
 
   // This is not wrapped in a type, since it's not actually a concrete type.
@@ -165,16 +176,16 @@ export function GQLitAbstract(fn: (arg: Factories.GQLitAbstractType) => void) {
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the GQLit layer or any manually defined GraphQLType objects.
+ * by the GQLiteral layer or any manually defined GraphQLType objects.
  *
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function GQLitSchema(options: Types.GQLitSchemaConfig) {
-  const typeMap = gqlitBuildTypes(options.types);
+export function GQLiteralSchema(options: Types.GQLiteralSchemaConfig) {
+  const typeMap = gqliteralBuildTypes(options.types);
 
   if (!isObjectType(typeMap["Query"])) {
-    throw new Error("Missing a Query type.");
+    throw new Error("Missing a Query type");
   }
 
   const schema = new GraphQLSchema({
@@ -197,7 +208,7 @@ export function GQLitSchema(options: Types.GQLitSchemaConfig) {
  * Builds all of the types, properly accounts for any enums using "mix".
  * Since the enum types are resolved synchronously, these need to guard for circular references.
  */
-export function gqlitBuildTypes(
+export function gqliteralBuildTypes(
   types: any[]
 ): Record<string, GraphQLNamedType> {
   const finalTypeMap: Record<string, GraphQLNamedType> = {};
@@ -207,9 +218,9 @@ export function gqlitBuildTypes(
   > = {};
 
   types.forEach(typeDef => {
-    if (typeDef instanceof GQLitTypeWrapper) {
+    if (typeDef instanceof GQLiteralTypeWrapper) {
       pendingTypeMap[typeDef.name] = currentlyBuilding => {
-        finalTypeMap[typeDef.name] = Factories.buildGQLitType(
+        finalTypeMap[typeDef.name] = Factories.buildGQLiteralType(
           typeDef.name,
           typeDef.type,
           {

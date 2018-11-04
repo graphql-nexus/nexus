@@ -1,5 +1,5 @@
 {
-  "name": "gqlit-simple-app",
+  "name": "gqliteral-simple-app",
   "dependencies": {
     "express": "^4.16.4",
     "apollo-server-express": "^2.1.0"

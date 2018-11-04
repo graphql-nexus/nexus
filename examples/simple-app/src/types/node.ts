@@ -1,5 +1,5 @@
-import { GQLitInterface } from "../../../../src";
+import { GQLiteralInterface } from "../../../../src";
 
-export const Node = GQLitInterface("Node", t => {
+export const Node = GQLiteralInterface("Node", t => {
   t.resolveType(() => {});
 });

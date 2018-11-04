@@ -1,6 +1,6 @@
-import { GQLitObject } from "../../../../src";
+import { GQLiteralObject } from "../../../../src";
 
-export const Blog = GQLitObject("Blog", t => {
+export const Blog = GQLiteralObject("Blog", t => {
   t.field("id", "ID");
   t.field("title", "String", { description: "The title of the blog" });
   t.list("posts", "Post");
