@@ -40,22 +40,4 @@ Opinions on resolvers.
 
 Ever notice that your input types and output types are usually fairly similar? Maybe the
 
-### API:
-
-#### GQLiteralObject
-
-#### GQLiteralInputObject
-
-#### GQLiteralInterface
-
-#### GQLiteralObject
-
-#### GQLiteralUnion
-
-#### GQLiteralSchema
-
-#### GQLiteralEnum
-
-#### GQLiteralAbstractType
-
 ### License

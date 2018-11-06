@@ -1,0 +1,23 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "examples": "docusaurus-examples",
+    "start": "docusaurus-start",
+    "build": "docusaurus-build",
+    "publish-gh-pages": "docusaurus-publish",
+    "write-translations": "docusaurus-write-translations",
+    "version": "docusaurus-version",
+    "rename-version": "docusaurus-rename-version"
+  },
+  "dependencies": {
+    "clipboard": "^2.0.1",
+    "codemirror": "^5.41.0",
+    "codemirror-graphql": "^0.8.3",
+    "react": "^16.7.0-alpha.0",
+    "react-dom": "^16.7.0-alpha.0",
+    "graphql": "^14.0.2"
+  },
+  "devDependencies": {
+    "docusaurus": "^1.5.1"
+  }
+}

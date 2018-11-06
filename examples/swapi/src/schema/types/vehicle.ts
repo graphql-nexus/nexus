@@ -1,6 +1,6 @@
 import { GQLiteralObject } from "../../../../../src";
 
-export const Vehicle = GQLiteralObject("Vehicle", t => {
+export const Vehicle = GQLiteralObject("Vehicle", (t) => {
   t.description(
     "A single transport craft that does not have hyperdrive capability"
   );
@@ -17,8 +17,9 @@ export const Vehicle = GQLiteralObject("Vehicle", t => {
     description:
       'The class of this vehicle, such as "Wheeled" or "Repulsorcraft".',
   });
-  t.list("manufacturers", "String", {
+  t.field("manufacturers", "String", {
     // resolve: () => {},
+    list: true,
     description: "The manufacturers of this vehicle.",
   });
 });

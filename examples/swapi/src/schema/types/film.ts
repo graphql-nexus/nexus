@@ -1,6 +1,6 @@
 import { GQLiteralObject } from "../../../../../src";
 
-export const Film = GQLiteralObject("Film", t => {
+export const Film = GQLiteralObject("Film", (t) => {
   t.description("A single film");
   t.string("title", { description: "The title of the film" });
   t.int("episodeID", {
@@ -13,9 +13,10 @@ export const Film = GQLiteralObject("Film", t => {
   t.string("director", {
     description: "The name of the director of this film.",
   });
-  t.list("producers", "String", {
+  t.field("producers", "String", {
+    list: true,
     description: "The name(s) of the producer(s) of this film.",
-    resolve: film => {
+    resolve: (film) => {
       return film.producer.split(",").map((s: string) => s.trim());
     },
   });

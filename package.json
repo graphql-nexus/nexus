@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "graphql-code-generator": "^0.12.6",
-    "graphql-codegen-typescript-template": "^0.12.6"
+    "graphql-code-generator": "^0.13.0",
+    "graphql-codegen-typescript-template": "^0.13.0"
   },
   "devDependencies": {
     "@types/jest": "^23.3.7",
@@ -20,7 +20,7 @@
     "ts-jest": "^23.10.4"
   },
   "peerDependencies": {
-    "graphql": "^14.0.2"
+    "graphql": "^0.12.0 || ^0.13.0 || ^14.0.0"
   },
   "husky": {
     "hooks": {

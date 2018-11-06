@@ -1,0 +1,41 @@
+import {
+  GQLiteralObject,
+  GQLiteralInterface,c
+  GQLiteralEnum,
+  GQLiteralSchema,
+} from "gqliteral";
+
+const Node = GQLiteralInterface("Node", t => {
+  t.id("id", { description: "ID of the Resource" });
+  t.resolveType(obj => obj.type);
+});
+
+const User = GQLiteralObject("User", t => {
+  t.interface("Node");
+  t.string("firstName", { property: "first_name" });
+  t.string("lastName", { property: "last_name" });
+});
+
+const Post = GQLiteralObject("Post", t => {
+  t.interface("Node");
+  t.field("status", "PostStatus", { description: "Status of the post" });
+  t.string("content", { description: "Content of the post" });
+});
+
+const Comment = GQLiteralObject("Comment", t => {
+  t.interface("Node");
+  t.description("A comment is created by a User and is associated with a Post");
+  t.id("id", { description: "ID of the Comment" });
+  t.field("author", "User", { description: "Author of the post" });
+});
+
+const PostStatus = GQLiteralEnum("PostStatus", ["DRAFT", "PUBLISHED"]);
+
+const CommentStatus = GQLiteralEnum("CommentStatus", t => {
+  t.mix("PostStatus");
+  t.members("MODERATED", "PINNED");
+});
+
+const schema = GQLiteralSchema({
+  types: [User, Post, Comment, PostStatus, CommentStatus],
+});

@@ -1,0 +1,10 @@
+{
+  "docs": {
+    "Documentation": [
+      "getting-started",
+      "best-practices",
+      "typescript-setup",
+      "api-reference"
+    ]
+  }
+}

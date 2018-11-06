@@ -1,10 +1,11 @@
 export {
-  GQLiteralAbstractType,
-  GQLiteralScalar,
-  GQLiteralEnum,
-  GQLiteralInputObject,
-  GQLiteralInterface,
+  GQLiteralArgument,
   GQLiteralObject,
+  GQLiteralInputObject,
+  GQLiteralEnum,
+  GQLiteralInterface,
   GQLiteralUnion,
   GQLiteralSchema,
+  GQLiteralScalar,
+  GQLiteralAbstractType,
 } from "./definitions";

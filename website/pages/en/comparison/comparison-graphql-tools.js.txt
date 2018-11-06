@@ -1,0 +1,13 @@
+import {  } from 'graphql-tools'
+
+const schema = `...`;
+
+const resolvers: {
+  User: {
+    firstName: root => root.first_name,
+    lastName: root => root.last_name,
+  },
+  Post: {
+
+  }
+}

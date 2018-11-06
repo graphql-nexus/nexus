@@ -1,5 +1,4 @@
-import * as E from "./enums";
-import * as T from "./types";
+import * as Types from "./types";
 import {
   isEnumType,
   GraphQLNamedType,
@@ -21,22 +20,26 @@ import {
   GraphQLNonNull,
   GraphQLField,
   isInterfaceType,
-  isObjectType,
   GraphQLFieldConfigMap,
+  isOutputType,
+  isInputType,
+  isNamedType,
+  GraphQLInputFieldConfigMap,
 } from "graphql";
+import { GQLiteralArgument } from "./definitions";
 
 export type GQLiteralType =
   | GQLiteralScalarType
   | GQLiteralEnumType
   | GQLiteralObjectType<any>
-  | GQLiteralInterfaceType<any>
+  | GQLiteralInterfaceType
   | GQLiteralUnionType
   | GQLiteralInputObjectType;
 
 export class GQLiteralScalarType {
   constructor(
     protected readonly name: string,
-    readonly options: T.GQLiteralScalarOptions
+    readonly options: Types.GQLiteralScalarOptions
   ) {}
   /**
    * Internal use only. Creates the configuration to create
@@ -54,15 +57,15 @@ export class GQLiteralScalarType {
 /**
  * Backing type for an enum member.
  */
-export class GQLiteralEnumType {
-  protected meta: T.GQLiteralTypeMetadata = {};
-  protected members: T.EnumDefType[] = [];
+export class GQLiteralEnumType<GenTypes> {
+  protected meta: Types.GQLiteralTypeMetadata = {};
+  protected members: Types.EnumDefType[] = [];
 
   constructor(protected readonly name: string) {}
 
-  mix(typeName: string, mixOptions?: T.GQLiteralMixOptions) {
+  mix<T extends string>(typeName: T, mixOptions?: Types.GQLiteralMixOptions<>) {
     this.members.push({
-      type: E.NodeType.MIX,
+      item: Types.NodeType.MIX,
       typeName,
       mixOptions: mixOptions || {},
     });
@@ -79,7 +82,7 @@ export class GQLiteralEnumType {
           ? info.value
           : info.internalValue,
     };
-    this.members.push({ type: E.NodeType.ENUM_MEMBER, info: memberInfo });
+    this.members.push({ item: Types.NodeType.ENUM_MEMBER, info: memberInfo });
   }
 
   /**
@@ -101,15 +104,15 @@ export class GQLiteralEnumType {
     ensureBuilding();
     let values: GraphQLEnumValueConfigMap = {},
       description;
-    this.members.forEach(member => {
-      switch (member.type) {
-        case E.NodeType.ENUM_MEMBER:
+    this.members.forEach((member) => {
+      switch (member.item) {
+        case Types.NodeType.ENUM_MEMBER:
           values[member.info.value] = {
             value: member.info.internalValue,
             description: member.info.description,
           };
           break;
-        case E.NodeType.MIX:
+        case Types.NodeType.MIX:
           if (typeData.currentlyBuilding.has(member.typeName)) {
             throw new Error(
               `Circular dependency mixin detected when building GQLit Enum: ${
@@ -132,7 +135,7 @@ export class GQLiteralEnumType {
             );
           }
           const { pick, omit } = member.mixOptions;
-          enumToMix.getValues().forEach(val => {
+          enumToMix.getValues().forEach((val) => {
             if (pick && pick.indexOf(val.name) === -1) {
               return;
             }
@@ -163,22 +166,22 @@ export class GQLiteralEnumType {
 }
 
 export class GQLiteralUnionType {
-  protected meta: T.GQLiteralTypeMetadata = {};
-  protected unionMembers: T.UnionTypeDef[] = [];
+  protected meta: Types.GQLiteralTypeMetadata = {};
+  protected unionMembers: Types.UnionTypeDef[] = [];
 
   constructor(protected readonly name: string) {}
 
   mix(type: string) {
     this.unionMembers.push({
-      type: E.NodeType.MIX,
+      item: Types.NodeType.MIX,
       typeName: type,
       mixOptions: {},
     });
   }
 
   members(...types: string[]) {
-    types.forEach(typeName => {
-      this.unionMembers.push({ type: E.NodeType.UNION_MEMBER, typeName });
+    types.forEach((typeName) => {
+      this.unionMembers.push({ item: Types.NodeType.UNION_MEMBER, typeName });
     });
   }
 
@@ -186,7 +189,7 @@ export class GQLiteralUnionType {
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  toConfig(getType: T.GetTypeFn): GraphQLUnionTypeConfig<any, any> {
+  toConfig(getType: Types.GetTypeFn): GraphQLUnionTypeConfig<any, any> {
     ensureBuilding();
     return {
       name: this.name,
@@ -199,16 +202,16 @@ export class GQLiteralUnionType {
   }
 }
 
-abstract class GQLitWithFields<Root, Schema, Opts, ListOpts> {
-  protected fields: T.FieldDefType<Root>[] = [];
+abstract class GQLitWithFields {
+  protected fields: Types.FieldDefType[] = [];
 
   /**
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(typeName: string, mixOptions?: T.GQLiteralMixOptions) {
+  mix(typeName: string, mixOptions?: Types.GQLiteralMixOptions) {
     this.fields.push({
-      type: E.NodeType.MIX,
+      item: Types.NodeType.MIX,
       typeName,
       mixOptions: mixOptions || {},
     });
@@ -217,56 +220,48 @@ abstract class GQLitWithFields<Root, Schema, Opts, ListOpts> {
   /**
    * Add an ID field type to the object schema.
    */
-  id<O extends Opts>(name: T.FieldName<Root, O>, options?: O) {
+  id<O extends Opts>(name: Types.FieldName<Root, O>, options?: O) {
     this.field(name, "ID", options);
   }
 
   /**
    * Add an Int field type to the object schema.
    */
-  int<O extends Opts>(name: T.FieldName<Root, O>, options?: O) {
+  int<O extends Opts>(name: Types.FieldName<Root, O>, options?: O) {
     this.field(name, "Int", options);
   }
 
   /**
    * Add a Float field type to the object schema.
    */
-  float<O extends Opts>(name: T.FieldName<Root, O>, options?: O) {
+  float<O extends Opts>(name: Types.FieldName<Root, O>, options?: O) {
     this.field(name, "Float", options);
   }
 
   /**
    * Add a String field type to the object schema.
    */
-  string<O extends Opts>(name: T.FieldName<Root, O>, options?: O) {
+  string<O extends Opts>(name: Types.FieldName<Root, O>, options?: O) {
     this.field(name, "String", options);
   }
 
   /**
    * Add a Boolean field type to the object schema.
    */
-  boolean<O extends Opts>(name: T.FieldName<Root, O>, options?: O) {
+  boolean<O extends Opts>(name: Types.FieldName<Root, O>, options?: O) {
     this.field(name, "Boolean", options);
   }
 
   /**
-   * Adds a new field to the object type.
+   * Adds a new field to the object type
    */
-  field(name: T.FieldName<Root, Opts>, type: T.GQLTypes, options?: Opts) {
+  field(
+    name: Types.FieldName<Root, Opts>,
+    type: Types.GQLTypes,
+    options?: Opts
+  ) {
     this.fields.push({
-      type: E.NodeType.FIELD,
-      fieldName: name,
-      fieldType: type,
-      fieldOptions: options || ({} as any),
-    });
-  }
-
-  /**
-   * Defines a field, which is actually a list of another field type
-   */
-  list(name: string, type: T.GQLTypes, options?: ListOpts) {
-    this.fields.push({
-      type: E.NodeType.LIST,
+      item: Types.NodeType.FIELD,
       fieldName: name,
       fieldType: type,
       fieldOptions: options || ({} as any),
@@ -274,20 +269,60 @@ abstract class GQLitWithFields<Root, Schema, Opts, ListOpts> {
   }
 }
 
-export class GQLiteralObjectType<Root, Schema = any> extends GQLitWithFields<
-  Root,
-  Schema,
-  T.GQLiteralFieldOptions<Root>,
-  T.GQLiteralListOptions<Root>
-> {
+export class GQLiteralOutputObject extends GQLitWithFields {
+  /**
+   * Define an id argument for a field.
+   */
+  idArg(options?: Types.GQLiteralArgOptions) {
+    return this.fieldArg("ID", options);
+  }
+
+  /**
+   * Define an int argument for a field.
+   */
+  intArg(options?: Types.GQLiteralArgOptions) {
+    return this.fieldArg("Int", options);
+  }
+
+  /**
+   * Define a string argument for a field.
+   */
+  stringArg(options?: Types.GQLiteralArgOptions) {
+    return this.fieldArg("String", options);
+  }
+
+  /**
+   * Define a float argument for a field.
+   */
+  floatArg(options?: Types.GQLiteralArgOptions) {
+    return this.fieldArg("Float", options);
+  }
+
+  /**
+   * Define a boolean argument for a field.
+   */
+  booleanArg(options?: Types.GQLiteralArgOptions) {
+    return this.fieldArg("Boolean", options);
+  }
+
+  /**
+   * Define a field argument for a field.
+   */
+  fieldArg(type: Types.GQLArgTypes, options?: Types.GQLArgOpts) {
+    return GQLiteralArgument(type, options);
+  }
+}
+
+export class GQLiteralObjectType<GenTypes, ObjTypes> extends GQLitWithFields {
   /**
    * Metadata about the object type
    */
-  protected meta: T.GQLiteralTypeMetadata = {};
+  protected meta: Types.GQLiteralTypeMetadata = {};
+
   /**
    * All interfaces the object implements.
    */
-  protected interfaces: string[] = [];
+  protected interfaces: Types.InterfaceNames<GenTypes>[] = [];
 
   constructor(protected readonly name: string) {
     super();
@@ -297,7 +332,7 @@ export class GQLiteralObjectType<Root, Schema = any> extends GQLitWithFields<
    * Declare that an object type implements a particular interface,
    * by providing the name of the interface
    */
-  implements(interfaceName: T.InterfaceNames<Schema>) {
+  implements(interfaceName: Types.InterfaceNames<GenTypes>) {
     this.interfaces.push(interfaceName);
   }
 
@@ -319,7 +354,7 @@ export class GQLiteralObjectType<Root, Schema = any> extends GQLitWithFields<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  toConfig(getType: T.GetTypeFn): GraphQLObjectTypeConfig<any, any> {
+  toConfig(getType: Types.GetTypeFn): GraphQLObjectTypeConfig<any, any> {
     ensureBuilding();
     const additional: Partial<GraphQLObjectTypeConfig<any, any>> = {};
     if (this.meta.description) {
@@ -328,14 +363,16 @@ export class GQLiteralObjectType<Root, Schema = any> extends GQLitWithFields<
     return {
       name: this.name,
       interfaces: () => {
-        return this.interfaces.map(i => {
-          const iface = getType(i);
-          if (!isInterfaceType(iface)) {
+        return this.interfaces.map((i) => {
+          const interfaceType = getType(i);
+          if (!isInterfaceType(interfaceType)) {
             throw new Error(
-              `Expected ${this.name} - ${i} to be an interface, saw ${iface}`
+              `Expected ${
+                this.name
+              } - ${i} to be an interface, saw ${interfaceType}`
             );
           }
-          return iface;
+          return interfaceType;
         });
       },
       fields: () => {
@@ -344,25 +381,19 @@ export class GQLiteralObjectType<Root, Schema = any> extends GQLitWithFields<
           GraphQLFieldConfig<any, any>
         > = {};
         const typeFields: Record<string, GraphQLFieldConfig<any, any>> = {};
-        this.fields.forEach(field => {
-          switch (field.type) {
-            case E.NodeType.FIELD: {
-              typeFields[field.fieldName] = buildGraphQLField(
+        this.fields.forEach((field) => {
+          switch (field.item) {
+            case Types.NodeType.FIELD: {
+              typeFields[field.fieldName] = buildGraphQLField<Root>(
                 this.name,
-                field,
+                field.fieldName,
+                field.fieldType,
+                field.fieldOptions,
                 getType
               );
               break;
             }
-            case E.NodeType.LIST: {
-              typeFields[field.fieldName] = buildGraphQLList(
-                this.name,
-                field,
-                getType
-              );
-              break;
-            }
-            case E.NodeType.MIX: {
+            case Types.NodeType.MIX: {
               //
               break;
             }
@@ -378,16 +409,14 @@ export class GQLiteralObjectType<Root, Schema = any> extends GQLitWithFields<
   }
 }
 
-export class GQLiteralInterfaceType<Root, Schema = any> extends GQLitWithFields<
-  Root,
-  Schema,
-  T.GQLiteralFieldOptions<Root>,
-  T.GQLiteralListOptions<Root>
-> {
+export class GQLiteralInterfaceType<
+  GenTypes,
+  InterfaceTypes
+> extends GQLitWithFields {
   /**
    * Metadata about the object type
    */
-  protected meta: T.GQLiteralInterfaceMetadata = {};
+  protected meta: Types.GQLiteralInterfaceMetadata = {};
 
   constructor(protected readonly name: string) {
     super();
@@ -413,18 +442,12 @@ export class GQLiteralInterfaceType<Root, Schema = any> extends GQLitWithFields<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  toConfig(getType: T.GetTypeFn): GraphQLInterfaceTypeConfig<any, any> {
+  toConfig(getType: Types.GetTypeFn): GraphQLInterfaceTypeConfig<any, any> {
     ensureBuilding();
     let description;
     return {
       name: this.name,
-      fields: () => {
-        const interfaceFields: GraphQLFieldConfigMap<any, any> = {};
-        this.fields.forEach(field =>
-          buildObjectField(interfaceFields, this.name, field)
-        );
-        return interfaceFields;
-      },
+      fields: () => buildObjectFields(this.name, this.fields),
       resolveType: this.meta.resolveType,
       description,
       // astNode?: Maybe<InterfaceTypeDefinitionNode>;
@@ -433,13 +456,8 @@ export class GQLiteralInterfaceType<Root, Schema = any> extends GQLitWithFields<
   }
 }
 
-export class GQLiteralInputObjectType extends GQLitWithFields<
-  any,
-  any,
-  any,
-  any
-> {
-  protected meta: T.GQLiteralTypeMetadata = {};
+export class GQLiteralInputObjectType extends GQLitWithFields {
+  protected meta: Types.GQLiteralTypeMetadata = {};
 
   constructor(protected readonly name: string) {
     super();
@@ -453,13 +471,12 @@ export class GQLiteralInputObjectType extends GQLitWithFields<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  toConfig(getType: T.GetTypeFn): GraphQLInputObjectTypeConfig {
+  toConfig(getType: Types.GetTypeFn): GraphQLInputObjectTypeConfig {
     ensureBuilding();
     return {
       name: this.name,
-      fields: () => {
-        return {};
-      },
+      fields: () => buildInputObjectFields(this.name, this.fields),
+      description: this.meta.description,
     };
   }
 }
@@ -470,17 +487,12 @@ export class GQLiteralInputObjectType extends GQLitWithFields<
  *
  * Use the `.mix` to mixin the abstract type fields.
  */
-export class GQLiteralAbstractType extends GQLitWithFields<
-  any,
-  any,
-  any,
-  any
-> {}
+export class GQLiteralAbstract extends GQLiteralOutputObject {}
 
 // Ignoring these, since they're only provided for a better developer experience,
 // we don't want these to actually be picked up by intellisense.
 // @ts-ignore
-GQLiteralAbstractType.prototype.implements = function() {
+GQLiteralAbstract.prototype.implements = function() {
   throw new Error(`
     Oops, looks like you are trying to call "implements" on an abstract type definition.
     Abstract types cannot implement interfaces, as they are not concrete types.
@@ -488,31 +500,67 @@ GQLiteralAbstractType.prototype.implements = function() {
   `);
 };
 
-function buildObjectField(
-  targetObject: GraphQLFieldConfigMap<any, any>,
+function buildObjectFields(
   typeName: string,
-  field: T.FieldDefType
-) {
-  switch (field.type) {
-    case E.NodeType.MIX: {
+  fields: Types.FieldDefType<any>[]
+): GraphQLFieldConfigMap<any, any> {
+  const fieldMap: GraphQLFieldConfigMap<any, any> = {};
+  fields.forEach((field) => {
+    switch (field.item) {
+      case Types.NodeType.MIX: {
+        break;
+      }
+      case Types.NodeType.MIX_ABSTRACT: {
+        break;
+      }
+      case Types.NodeType.FIELD: {
+        break;
+      }
     }
-    case E.NodeType.MIX_ABSTRACT: {
+  });
+  return fieldMap;
+}
+
+function buildInputObjectFields(
+  typeName: string,
+  fields: Types.FieldDefType<any>[]
+): GraphQLInputFieldConfigMap {
+  const fieldMap: GraphQLInputFieldConfigMap = {};
+  fields.forEach((field) => {
+    switch (field.item) {
+      case Types.NodeType.MIX: {
+        break;
+      }
+      case Types.NodeType.MIX_ABSTRACT: {
+        break;
+      }
+      case Types.NodeType.FIELD: {
+        break;
+      }
     }
-  }
+  });
+  return fieldMap;
 }
 
 function buildGraphQLField(
-  name: string,
-  field: T.FieldDef<any>,
-  getType: T.GetTypeFn
+  typeName: string,
+  fieldName: string,
+  fieldType: string,
+  fieldOptions: Types.GQLiteralOutputFieldOptions<any>,
+  getType: Types.GetTypeFn
 ): GraphQLFieldConfig<any, any> {
-  const nullItem = Boolean(field.fieldOptions.nullable);
-  const fieldType = getType(field.fieldType);
-  if (!isObjectType(fieldType)) {
+  const type = getType(fieldType);
+  const nullable = Boolean(fieldOptions.nullable);
+  if (typeof fieldOptions.listItemNullable === "boolean") {
+    console.warn("listItemNullable should ");
+  }
+  const nullItem = Boolean(fieldOptions.listItemNullable);
+  if (!isNamedType(fieldType)) {
+    throw new Error("");
+  }
+  if (!isOutputType(fieldType)) {
     throw new Error(
-      `Expected ${name} - ${
-        field.fieldName
-      } to be an object type, saw ${fieldType}`
+      `Expected ${typeName} - ${fieldName} to be an object type, saw ${fieldType}`
     );
   }
   let args;
@@ -527,25 +575,12 @@ function buildGraphQLField(
   };
 }
 
-function buildGraphQLList(
-  name: string,
-  list: T.ListDef<any>,
-  getType: T.GetTypeFn
-): GraphQLFieldConfig<any, any> {
-  const nullList = Boolean(list.fieldOptions.nullable);
-  const nullItem = Boolean(list.fieldOptions.itemNull);
-  const fieldType = getType(list.fieldType);
-  let args;
-  const type = GraphQLList(nullItem ? fieldType : GraphQLNonNull(fieldType));
-  return {
-    type: nullList ? type : GraphQLNonNull(type),
-    // args?: GraphQLFieldConfigArgumentMap;
-    // resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
-    // subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
-    // deprecationReason?: Maybe<string>;
-    // description?: Maybe<string>;
-    // astNode?: Maybe<FieldDefinitionNode>;
-  };
+function buildGraphQLArgument() {
+  const requiredArg = Boolean();
+  // if (!isNamedType()) {
+  // }
+  // if (!isInputType()) {
+  // }
 }
 
 interface TypeDataArg {
@@ -571,10 +606,10 @@ export function buildGQLiteralType(
   name: string,
   type: GQLiteralType,
   typeData: TypeDataArg,
-  getType?: T.GetTypeFn
+  getType?: Types.GetTypeFn
 ): GraphQLNamedType {
   isBuilding += 1;
-  const getTypeFn: T.GetTypeFn =
+  const getTypeFn: Types.GetTypeFn =
     getType ||
     ((typeName: string) => {
       const t = typeData.finalTypeMap[typeName];
@@ -612,7 +647,7 @@ let isBuilding = 0;
 function ensureBuilding() {
   if (isBuilding === 0) {
     throw new Error(
-      ".toConfig should only be called internally, while constructing the schema types"
+      ".toConfig should only be called internally, while GQLiteral is constructing the schema types"
     );
   }
 }
