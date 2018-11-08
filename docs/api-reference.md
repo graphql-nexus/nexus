@@ -68,7 +68,7 @@ type EnumMemberList = ["", "", ""];
 
 ### `GQLiteralScalar(typeName, GraphQLScalarTypeConfig)`
 
-The `GQLiteralScalar` doesn't provide much added value over the graphql-js `GraphQLScalarType` object, it mainly exists for consistency with the rest of the GQLiteral library.
+The `GQLiteralScalar` doesn't provide any added value over the graphql-js `GraphQLScalarType` object, it only exists for consistency with the rest of the GQLiteral library.
 
 ```js
 const DateScalar = GQLiteralScalar("Date", {
@@ -152,7 +152,7 @@ type DefinitionBlockObject = {
 
   /**
    * Specify at the type-level whether fields are considered null by default.
-   * Takes precedence over `defaultNull` if set on the schema.
+   * Takes precedence over `defaultNull` if it is set on the schema.
    */
   defaultNull(nullable: boolean): void;
 };

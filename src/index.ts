@@ -1,5 +1,5 @@
 export {
-  GQLiteralArgument,
+  GQLiteralArg,
   GQLiteralObject,
   GQLiteralInputObject,
   GQLiteralEnum,

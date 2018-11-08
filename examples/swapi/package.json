@@ -1,8 +1,0 @@
-{
-  "name": "gqliteral-swapi-example",
-  "version": "0.0.0",
-  "dependencies": {
-    "swapi-graphql": "^0.0.6"
-  },
-  "devDependencies": {}
-}

@@ -8,6 +8,7 @@
     "graphql-codegen-typescript-template": "^0.13.0"
   },
   "devDependencies": {
+    "@types/node": "^10.12.2",
     "@types/jest": "^23.3.7",
     "@types/graphql": "14.0.3",
     "graphql": "^14.0.2",

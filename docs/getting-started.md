@@ -34,28 +34,42 @@ The schema requires that an Object named `Query` be provided at the top-level.
 const Query = GQLiteralObject("Query", (t) => {
   t.field("account", "Account", {
     args: {
-      name: t.stringArg({
+      name: GQLiteralArg("String", {
         description:
           "Providing the name of the account holder will search for accounts matching that name",
       }),
-      status: t.fieldArg("StatusEnum"),
+      status: GQLiteralArg("StatusEnum"),
     },
   });
   t.field("accountsById", "Account", {
     list: true,
     args: {
-      ids: t.intArg({ list: true }),
+      ids: GQLiteralArg("Int", { list: true }),
     },
   });
   t.field("accounts", "AccountConnection", {
     args: {
-      limit: t.intArg({ required: true }),
+      limit: GQLiteralArg("Int", { required: true }),
     },
   });
 });
 
+const Node = GQLiteralObject("Node", (t) => {
+  t.id("id", { description: "Node ID" });
+});
+
+const UserFields = GQLiteralAbstractType((t) => {
+  t.string("username");
+  t.string("email");
+});
+
 const Account = GQLiteralObject("Account", (t) => {
-  t.int("id", { description: "Primary key of the account" });
+  t.implements("Node");
+  t.mix(UserFields);
+});
+
+const schema = GQLiteralSchema({
+  types: [Account, Node, Query],
 });
 ```
 
@@ -67,7 +81,7 @@ One benefit of GraphQL is the strict enforcement and guarentees of null values i
 
 `GQLiteral` breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all arguments are nullable unless `required` is set to true.
 
-The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where the schema could break in this regard.
+The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.
 
 If you find yourself wanting this the other way around, there is a `defaultNull` option for the `GQLiteralSchema` which will make all fields nullable unless `nullable: false` is specified during field definition.
 
@@ -92,7 +106,7 @@ When hand constructing schemas in a GraphQL Interface Definition Language (IDL) 
 
 Have you ever found yourself re-using the same set of fields in multiple types, but it doesn't necessarily warrant the ceremony of being a named `interface` type? Or maybe you have a set of fields that are mirrored in both the input & output.
 
-## Resolving Props
+## Resolving: Property
 
 One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GQLiteral provides a `property` option on the field configuration object, for conveniently accessing an object property without needing to define a resolver function.
 
@@ -105,6 +119,10 @@ const User = GQLiteralObject("User", (t) => {
 ```
 
 When using the TypeScript, configuring the [backing object type](typescript-setup.md) definitions will check for the existence of the property on the object, and error if a non-existent property is referenced.
+
+## Resolving: defaultResolver
+
+GQLiteral allows you to define an override to the `defaultResolver` both globally for the schema, as well as on a per-type basis. This can be quite powerful when you wish to define unique default behavior that goes beyond
 
 ## Generating the IDL file
 

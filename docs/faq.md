@@ -4,4 +4,4 @@ title: Frequently Asked Questions
 sidebar_label: FAQ
 ---
 
-## Why
+## Why isn't this a class-based API

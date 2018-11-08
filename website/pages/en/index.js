@@ -73,7 +73,9 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
-            <Button href="#try">Why GQLiteral?</Button>
+            <Button href={pageUrl("blog/2018/11/04/introducing-gqliteral")}>
+              Why GQLiteral?
+            </Button>
             <Button href={docUrl("doc2.html", language)}>API Docs</Button>
             <Button href={docUrl("getting-started.html", language)}>
               Examples

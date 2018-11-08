@@ -3,16 +3,14 @@ import {
   GraphQLScalarTypeConfig,
   GraphQLNamedType,
   GraphQLTypeResolver,
+  GraphQLIsTypeOfFn,
 } from "graphql";
-
-declare global {
-  namespace GQLiteral { export interface Context {} }
-}
+import * as Gen from "./gen";
 
 export enum NodeType {
   MIX = "MIX",
-  MIX_ABSTRACT = "MIX_ABSTRACT",
   FIELD = "FIELD",
+  MIX_ABSTRACT = "MIX_ABSTRACT",
   ENUM_MEMBER = "ENUM_MEMBER",
   UNION_MEMBER = "UNION_MEMBER",
 }
@@ -39,58 +37,42 @@ export type FieldName<Root, Opts> = Opts extends {
 
 export type GQLTypes = "ID" | "String" | "Int" | "Float" | string;
 
-export type GQLArgTypes = "ID" | "String" | "Int" | "Float" | string;
-
-export interface GQLArgOpts {
-  /**
-   * Whether
-   */
-  required?: boolean;
-  /**
-   * Whether the item in the
-   */
-  requiredItem?: boolean;
-  /**
-   *
-   */
-  list?: boolean;
-}
-
-export type MixDef<Members extends string> = {
+export type MixDef = {
   item: NodeType.MIX;
   typeName: string;
-  mixOptions: GQLiteralMixOptions<Members>;
+  mixOptions: MixOpts<any>;
 };
 
-export type MixAbstractDef<Members extends string> = {
+export type MixAbstractDef = {
   item: NodeType.MIX_ABSTRACT;
   typeName: string;
-  mixOptions: GQLiteralMixOptions<Members>;
+  mixOptions: MixOpts<any>;
 };
 
-export type FieldDef<ObjType> = {
+export type FieldDef = {
   item: NodeType.FIELD;
   fieldName: string;
   fieldType: GQLTypes;
-  fieldOptions: GQLiteralOutputFieldOptions<ObjType>;
+  fieldOptions: OutputFieldOpts;
 };
 
-export type FieldDefType<GenTypes, ObjType = any> =
-  | MixDef<GenTypes>
-  | MixAbstractDef<any>
-  | FieldDef<ObjType>;
+export type FieldDefType = MixDef | MixAbstractDef | FieldDef;
 
 export type EnumDefType =
   | MixDef
-  | { item: NodeType.ENUM_MEMBER; info: GQLiteralEnumMemberInfo };
+  | { item: NodeType.ENUM_MEMBER; info: EnumMemberInfo };
 
 export type UnionTypeDef =
   | MixDef
   | { item: NodeType.UNION_MEMBER; typeName: string };
 
-export interface GQLiteralEnumMemberInfo {
-  value: string;
-  internalValue: string;
+export interface EnumMemberOpts extends CommonOpts {
+  value?: any;
+}
+
+export interface EnumMemberInfo {
+  name: string;
+  value: any;
   description?: string;
 }
 
@@ -98,12 +80,12 @@ export interface GQLiteralEnumMemberInfo {
  * When you're mixing types/partials, you can pick or omit
  * fields from the types you're mixing in.
  */
-export interface GQLiteralMixOptions<TMembers extends string> {
+export interface MixOpts<TMembers> {
   pick?: Array<TMembers>;
   omit?: Array<TMembers>;
 }
 
-export interface GQLiteralDeprecationInfo {
+export interface DeprecationInfo {
   /**
    * Date | YYYY-MM-DD formatted date of when this field
    * became deprecated.
@@ -119,7 +101,7 @@ export interface GQLiteralDeprecationInfo {
   supersededBy?: string;
 }
 
-export interface GQLiteralCommonOptions {
+export interface CommonOpts {
   /**
    * The description of the field, as defined in the GraphQL
    * object definition
@@ -134,47 +116,15 @@ export interface GQLiteralCommonOptions {
    * Info about a field deprecation. Formatted as a string and provided with the
    * deprecated directive on field/enum types and as a comment on input fields.
    */
-  deprecation?: GQLiteralDeprecationInfo;
-  /**
-   * Default value for the field, if none is returned.
-   */
-  defaultValue?: any;
+  deprecation?: string | DeprecationInfo;
 }
 
-export interface GQLiteralArgument {
-  /**
-   * The name of the argument
-   */
-  argName: string;
-  /**
-   * The value for a field,
-   */
-  argType: string;
-  /**
-   * The "default value" for the arg, if none is passed.
-   */
-  defaultValue?: string;
-}
-
-export interface GQLiteralOutputFieldOptions<ObjType>
-  extends GQLiteralCommonOptions {
+export interface FieldOpts extends CommonOpts {
   /**
    * Whether the field can be returned or input as null
    * @default false
    */
   nullable?: boolean;
-  /**
-   * Any arguments defined
-   */
-  args?: GQLiteralArgument[];
-  /**
-   * Property to use to resolve the field. If resolve is specified, this field is ignored.
-   */
-  property?: Extract<keyof Root, string>;
-  /**
-   * Resolver for the output field
-   */
-  resolve?: GraphQLFieldResolver<Root, GQLiteral.Context>;
   /**
    * Whether the field returns a list of values, or just a single value.
    */
@@ -187,14 +137,65 @@ export interface GQLiteralOutputFieldOptions<ObjType>
   listItemNullable?: boolean;
 }
 
-export interface GQLiteralInputFieldOptions extends GQLiteralCommonOptions {
+export interface ArgOpts extends FieldOpts {
   /**
-   * Default value for the input field, if one is not provided.
+   * Whether the field is required
+   */
+  required?: boolean;
+  /**
+   * Whether the item in the list is required
+   */
+  requiredListItem?: boolean;
+}
+
+export type ArgDefinition = Readonly<
+  ArgOpts & {
+    type: any; // TODO: Make type safe
+  }
+>;
+
+export interface ObjTypeDef {
+  root: any;
+  context: any;
+  args: { [argName: string]: any };
+}
+
+type FieldResolver<
+  GenTypes,
+  TypeName,
+  FieldName
+> = GenTypes extends Gen.GenTypesShape ? any : any;
+
+export type OutputFieldArgs = Record<string, ArgDefinition>;
+
+export interface OutputFieldOpts<
+  GenTypes = any,
+  TypeName = any,
+  FieldName = any
+> extends FieldOpts {
+  /**
+   * Any arguments defined
+   */
+  args?: OutputFieldArgs;
+  /**
+   * Property to use to resolve the field. If resolve is specified, this field is ignored.
+   */
+  property?: Extract<keyof any, string>;
+  /**
+   * Resolver for the output field
+   */
+  resolve?: FieldResolver<GenTypes, TypeName, FieldName>;
+  /**
+   * Default value for the field, if none is returned.
    */
   defaultValue?: any;
 }
 
-export interface GQLiteralScalarOptions
+export interface InputFieldOpts extends FieldOpts {}
+
+export interface AllFieldOpts extends InputFieldOpts, OutputFieldOpts {}
+
+export interface ScalarOpts
   extends Omit<
       GraphQLScalarTypeConfig<any, any>,
       "name" | "astNode" | "extensionASTNodes"
@@ -202,25 +203,38 @@ export interface GQLiteralScalarOptions
   /**
    * Any deprecation info for this scalar type
    */
-  deprecation?: GQLiteralDeprecationInfo;
+  deprecation?: string | DeprecationInfo;
 }
 
-export interface GQLiteralTypeMetadata {
+interface SharedTypeConfig {
   /**
    * Description for a GraphQL type
    */
   description?: string;
   /**
-   * An (optional) isTypeOf check for the object type
+   * Info about a field deprecation. Formatted as a string and provided with the
+   * deprecated directive on field/enum types and as a comment on input fields.
    */
-  isTypeOf?: ((value: any) => boolean);
+  deprecation?: string | DeprecationInfo;
 }
 
-export interface GQLiteralInterfaceMetadata {
+interface DefaultResolver {
   /**
-   * Description for a GraphQL type
+   * Default field resolver for all members of this type
    */
-  description?: string;
+  defaultResolver?: GraphQLFieldResolver<any, any>;
+}
+
+export interface Nullability {
+  /**
+   * Configures the nullability defaults at the type-level
+   */
+  nullabilityConfig?: NullabilityConfig;
+}
+
+export interface EnumTypeConfig extends SharedTypeConfig {}
+
+export interface UnionTypeConfig extends SharedTypeConfig {
   /**
    * Optionally provide a custom type resolver function. If one is not provided,
    * the default implementation will call `isTypeOf` on each implementing
@@ -229,44 +243,107 @@ export interface GQLiteralInterfaceMetadata {
   resolveType?: GraphQLTypeResolver<any, any>;
 }
 
-export interface GQLiteralSchemaConfig {
+export interface InputTypeConfig extends SharedTypeConfig, Nullability {}
+
+export interface ObjectTypeConfig
+  extends SharedTypeConfig,
+    Nullability,
+    DefaultResolver {
+  /**
+   * An (optional) isTypeOf check for the object type
+   */
+  isTypeOf?: GraphQLIsTypeOfFn<any, any>;
+}
+
+export interface InterfaceTypeConfig extends SharedTypeConfig, Nullability {
+  /**
+   * Optionally provide a custom type resolver function. If one is not provided,
+   * the default implementation will call `isTypeOf` on each implementing
+   * Object type.
+   */
+  resolveType?: GraphQLTypeResolver<any, any>;
+}
+
+export interface SchemaConfig extends Nullability, DefaultResolver {
   /**
    * All of the GraphQL types
    */
   types: any[];
-}
-
-export interface GQLiteralArgOptions {
   /**
-   * Whether this argument should be required
+   * Absolute path to where the GraphQL IDL file should be written
    */
-  required?: boolean;
+  definitionFilePath?: string;
+  /**
+   * Generates the types for intellisense/typescript
+   */
+  typeGeneration?: (printedSchema: string) => Promise<void>;
 }
 
-/**
- * Helpers for handling the generated schema
- */
-
-export interface GenTypesShape {
-  interfaces: string;
-  enums: string;
-  enumTypes: Record<string, string>;
-  objectTypes: Record<string, object>;
-  inputObjectTypes: Record<string, object>;
-}
+export type NullabilityConfig = {
+  /**
+   * Whether non-list output fields can return null by default
+   *
+   * type Example {
+   *   field: String!
+   * }
+   *
+   * @default false
+   */
+  output?: boolean;
+  /**
+   * Whether outputs that return lists can be null by default
+   *
+   * type Example {
+   *   field: [String]!
+   * }
+   *
+   * @default false
+   */
+  outputList?: boolean;
+  /**
+   * Whether non-list output fields can return null by default
+   *
+   * type Example {
+   *   field: [String!]
+   * }
+   *
+   * @default false
+   */
+  outputListItem?: boolean;
+  /**
+   * Whether non-list input fields (field arguments, input type members) are nullable by default
+   *
+   * input Example {
+   *   field: String
+   * }
+   *
+   * @default true
+   */
+  input?: boolean;
+  /**
+   * Whether input fields that are lists are nullable by default
+   *
+   * input Example {
+   *   field: [String]
+   * }
+   *
+   * @default true
+   */
+  inputList?: boolean;
+  /**
+   * Whether any members of input list item values can be null by default
+   *
+   * input Example {
+   *   field: [String!]
+   * }
+   *
+   * @default false
+   */
+  inputListItem?: boolean;
+};
 
 export type GetTypeFn = (t: string) => GraphQLNamedType;
 
-export type FieldTypeNames<S> = S extends any ? string : string;
-
-export type InterfaceNames<S> = S extends { interfaces: string }
-  ? S["interfaces"]
-  : string;
-
-type EnumMemberFor<Schema, EnumName> = TypeName extends keyof Schema
-  ? Schema[TypeName]
-  : any;
-
-type TypeDefFor<Schema, TypeName> = TypeName extends keyof Schema
-  ? Schema[TypeName]
-  : any;
+export type ResolveType<GenTypes, TypeName> = (
+  root: Gen.RootType<GenTypes, TypeName>
+) => Gen.InterfaceName<GenTypes>;

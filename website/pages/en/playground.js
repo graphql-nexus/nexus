@@ -1,4 +1,4 @@
-import React from "react";
+const React = require("react");
 
 const Playground = (props) => {
   return <div>Hello World</div>;

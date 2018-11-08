@@ -1,47 +1,43 @@
 /// <reference types="jest" />
-import {
-  gqlitBuildTypes,
-  GQLiteralEnum,
-  GQLiteralObject,
-} from "../definitions";
+import { GQLiteralEnum, GQLiteralObject } from "../definitions";
 import { GraphQLEnumType, GraphQLObjectType } from "graphql";
+import { buildTypes } from "../utils";
 
 describe("gqlit", () => {
   describe("GQLiteralEnum", () => {
-    const PrimaryColors = GQLiteralEnum("PrimaryColors", t => {
-      t.member({ value: "RED" });
-      t.member({ value: "YELLOW" });
-      t.member({ value: "BLUE" });
+    const PrimaryColors = GQLiteralEnum("PrimaryColors", (t) => {
+      t.members(["RED", "YELLOW", "BLUE"]);
     });
 
-    const RainbowColors = GQLiteralEnum("RainbowColors", t => {
+    const RainbowColors = GQLiteralEnum("RainbowColors", (t) => {
       t.mix("PrimaryColors");
-      t.member({ value: "ORANGE" });
-      t.member({ value: "GREEN" });
-      t.member({ value: "VIOLET" });
+      t.members(["ORANGE", "GREEN", "VIOLET"]);
     });
 
-    const AdditivePrimaryColors = GQLiteralEnum("AdditivePrimaryColors", t => {
-      t.mix("PrimaryColors", { omit: ["YELLOW"] });
-      t.member({ value: "GREEN" });
-    });
+    const AdditivePrimaryColors = GQLiteralEnum(
+      "AdditivePrimaryColors",
+      (t) => {
+        t.mix("PrimaryColors", { omit: ["YELLOW"] });
+        t.members(["GREEN"]);
+      }
+    );
 
-    const CircularRefTestA = GQLiteralEnum("CircularA", t => {
+    const CircularRefTestA = GQLiteralEnum("CircularA", (t) => {
       t.mix("CircularB");
-      t.member({ value: "A" });
+      t.members(["A"]);
     });
 
-    const CircularRefTestB = GQLiteralEnum("CircularA", t => {
+    const CircularRefTestB = GQLiteralEnum("CircularA", (t) => {
       t.mix("CircularA");
-      t.member({ value: "B" });
+      t.members(["B"]);
     });
 
     it("builds an enum", () => {
-      const types: { PrimaryColors: GraphQLEnumType } = gqlitBuildTypes([
+      const types: { PrimaryColors: GraphQLEnumType } = buildTypes([
         PrimaryColors,
       ]) as any;
       expect(types.PrimaryColors).toBeInstanceOf(GraphQLEnumType);
-      expect(types.PrimaryColors.getValues().map(v => v.value)).toEqual([
+      expect(types.PrimaryColors.getValues().map((v) => v.value)).toEqual([
         "RED",
         "YELLOW",
         "BLUE",
@@ -49,12 +45,12 @@ describe("gqlit", () => {
     });
 
     it("can mix enums", () => {
-      const types: { RainbowColors: GraphQLEnumType } = gqlitBuildTypes([
+      const types: { RainbowColors: GraphQLEnumType } = buildTypes([
         PrimaryColors,
         RainbowColors,
       ]) as any;
       expect(types.RainbowColors).toBeInstanceOf(GraphQLEnumType);
-      expect(types.RainbowColors.getValues().map(v => v.value)).toEqual([
+      expect(types.RainbowColors.getValues().map((v) => v.value)).toEqual([
         "RED",
         "YELLOW",
         "BLUE",
@@ -65,41 +61,43 @@ describe("gqlit", () => {
     });
 
     it("can omit with mix", () => {
-      const types: { AdditivePrimaryColors: GraphQLEnumType } = gqlitBuildTypes(
-        [PrimaryColors, AdditivePrimaryColors]
-      ) as any;
+      const types: {
+        AdditivePrimaryColors: GraphQLEnumType;
+      } = buildTypes([PrimaryColors, AdditivePrimaryColors]) as any;
       expect(types.AdditivePrimaryColors).toBeInstanceOf(GraphQLEnumType);
-      expect(types.AdditivePrimaryColors.getValues().map(v => v.value)).toEqual(
-        ["RED", "BLUE", "GREEN"]
-      );
+      expect(
+        types.AdditivePrimaryColors.getValues().map((v) => v.value)
+      ).toEqual(["RED", "BLUE", "GREEN"]);
     });
 
     it("can pick with mix", () => {
-      const FavoriteColors = GQLiteralEnum("FavoriteColors", t => {
+      const FavoriteColors = GQLiteralEnum("FavoriteColors", (t) => {
         t.mix("RainbowColors", { pick: ["RED", "GREEN"] });
       });
-      const types: { FavoriteColors: GraphQLEnumType } = gqlitBuildTypes([
+      const types: { FavoriteColors: GraphQLEnumType } = buildTypes([
         PrimaryColors,
         RainbowColors,
         FavoriteColors,
       ]) as any;
       expect(types.FavoriteColors).toBeInstanceOf(GraphQLEnumType);
-      expect(types.FavoriteColors.getValues().map(v => v.value)).toEqual([
+      expect(types.FavoriteColors.getValues().map((v) => v.value)).toEqual([
         "RED",
         "GREEN",
       ]);
     });
 
     it("can map internal values", () => {
-      const Internal = GQLiteralEnum("Internal", t => {
-        t.member({ value: "A", internalValue: "--A--" });
-        t.member({ value: "B", internalValue: "--B--" });
+      const Internal = GQLiteralEnum("Internal", (t) => {
+        t.members([
+          { name: "A", value: "--A--" },
+          { name: "B", value: "--B--" },
+        ]);
       });
-      const types: { Internal: GraphQLEnumType } = gqlitBuildTypes([
+      const types: { Internal: GraphQLEnumType } = buildTypes([
         Internal,
       ]) as any;
-      expect(types.Internal.getValues().map(v => v.name)).toEqual(["A", "B"]);
-      expect(types.Internal.getValues().map(v => v.value)).toEqual([
+      expect(types.Internal.getValues().map((v) => v.name)).toEqual(["A", "B"]);
+      expect(types.Internal.getValues().map((v) => v.value)).toEqual([
         "--A--",
         "--B--",
       ]);
@@ -114,16 +112,22 @@ describe("gqlit", () => {
       const types: {
         MappedObj: GraphQLEnumType;
         MappedArr: GraphQLEnumType;
-      } = gqlitBuildTypes([MappedObj, MappedArr]) as any;
-      expect(types.MappedArr.getValues().map(v => v.name)).toEqual(["A", "B"]);
-      expect(types.MappedObj.getValues().map(v => v.name)).toEqual(["a", "b"]);
-      expect(types.MappedObj.getValues().map(v => v.value)).toEqual([1, 2]);
+      } = buildTypes([MappedObj, MappedArr]) as any;
+      expect(types.MappedArr.getValues().map((v) => v.name)).toEqual([
+        "A",
+        "B",
+      ]);
+      expect(types.MappedObj.getValues().map((v) => v.name)).toEqual([
+        "a",
+        "b",
+      ]);
+      expect(types.MappedObj.getValues().map((v) => v.value)).toEqual([1, 2]);
     });
 
     it("throws if the enum has no members", () => {
       const NoMembers = GQLiteralEnum("NoMembers", () => {});
       expect(() => {
-        const types: { NoMembers: GraphQLEnumType } = gqlitBuildTypes([
+        const types: { NoMembers: GraphQLEnumType } = buildTypes([
           NoMembers,
         ]) as any;
         expect(types.NoMembers.getValues()).toHaveLength(0);
@@ -132,7 +136,7 @@ describe("gqlit", () => {
 
     it("throws when building with a circular reference", () => {
       expect(() => {
-        gqlitBuildTypes([CircularRefTestA, CircularRefTestB]);
+        buildTypes([CircularRefTestA, CircularRefTestB]);
       }).toThrowError(
         "Circular dependency mixin detected when building GQLit Enum"
       );
@@ -140,16 +144,14 @@ describe("gqlit", () => {
   });
 
   describe("GQLiteralObject", () => {
-    const Account = GQLiteralObject("Account", t => {
+    const Account = GQLiteralObject("Account", (t) => {
       t.id("id", { description: "The ID of the account" });
       t.string("name", { description: "Holder of the account" });
       t.string("email", {
         description: "The email of the person whos account this is",
       });
     });
-    const type: { Account: GraphQLObjectType } = gqlitBuildTypes([
-      Account,
-    ]) as any;
+    const type: { Account: GraphQLObjectType } = buildTypes([Account]) as any;
     expect(Object.keys(type.Account.getFields()).sort()).toEqual([
       "id",
       "email",

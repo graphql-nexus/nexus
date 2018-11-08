@@ -1,14 +1,15 @@
 import {
   GraphQLSchema,
   GraphQLNamedType,
-  isNamedType,
   isObjectType,
+  lexicographicSortSchema,
+  printSchema,
+  GraphQLScalarType,
 } from "graphql";
 import * as Types from "./types";
-import { gqliteralBuildTypes } from "./utils";
+import * as Gen from "./gen";
 import {
-  GQLiteralType,
-  GQLiteralScalarType,
+  GQLiteralNamedType,
   GQLiteralObjectType,
   GQLiteralInterfaceType,
   GQLiteralEnumType,
@@ -16,7 +17,8 @@ import {
   GQLiteralAbstract,
   GQLiteralUnionType,
 } from "./objects";
-import { GeneratedSchemaTypes } from "../generatedTypes";
+import { GQLiteralGen } from "../generatedTypes";
+import { enumShorthandMembers, buildTypes } from "./utils";
 
 /**
  * Wraps a GQLiteralType object, since all GQLiteral types have a
@@ -24,7 +26,7 @@ import { GeneratedSchemaTypes } from "../generatedTypes";
  * constructed so we don't want it as a public member, purely for
  * intellisense/cosmetic purposes :)
  */
-export class GQLiteralTypeWrapper<T extends GQLiteralType> {
+export class GQLiteralTypeWrapper<T extends GQLiteralNamedType> {
   constructor(readonly name: string, readonly type: T) {}
 }
 
@@ -34,11 +36,8 @@ export class GQLiteralTypeWrapper<T extends GQLiteralType> {
  * @param {string} name
  * @param {object} options
  */
-export function GQLiteralScalar(
-  name: string,
-  options: Types.GQLiteralScalarOptions
-) {
-  return new GQLiteralTypeWrapper(name, new GQLiteralScalarType(name, options));
+export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
+  return new GraphQLScalarType({ name, ...options });
 }
 
 /**
@@ -47,18 +46,10 @@ export function GQLiteralScalar(
  * @param {string}
  */
 export function GQLiteralObject<
-  GenTypes = GeneratedSchemaTypes,
+  GenTypes = GQLiteralGen,
   TypeName extends string = any
->(
-  name: TypeName,
-  fn: (
-    arg: GQLiteralObjectType<GenTypes, TypeDefFor<GenTypes, TypeName>>
-  ) => void
-) {
-  const factory = new GQLiteralObjectType<
-    GenTypes,
-    TypeDefFor<GenTypes, TypeName>
-  >(name);
+>(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
+  const factory = new GQLiteralObjectType<GenTypes, TypeName>();
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -67,15 +58,13 @@ export function GQLiteralObject<
  * Define a GraphQL interface type
  */
 export function GQLiteralInterface<
-  GenTypes = GeneratedSchemaTypes,
+  GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(
   name: TypeName,
-  fn: (
-    arg: GQLiteralInterfaceType<GenTypes, TypeDefFor<GenTypes, TypeName>>
-  ) => void
+  fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInterfaceType(name);
+  const factory = new GQLiteralInterfaceType();
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -98,10 +87,10 @@ export function GQLiteralInterface<
  * })
  */
 export function GQLiteralUnion<
-  GenTypes = GeneratedSchemaTypes,
+  GenTypes = GQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GQLiteralUnionType) => void) {
-  const factory = new GQLiteralUnionType(name);
+>(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
+  const factory = new GQLiteralUnionType();
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -129,48 +118,37 @@ export function GQLiteralUnion<
  *   t.mix('OneThroughThree')
  *   t.mix('FourThroughSix')
  *   t.mix('SevenThroughNine')
- *   t.member({value: 'OTHER'})
+ *   t.members(['OTHER'])
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
  */
-export function GQLiteralEnum<GenTypes = GeneratedSchemaTypes>(
+export function GQLiteralEnum<GenTypes = GQLiteralGen>(
   name: string,
   fn:
     | ((arg: GQLiteralEnumType<GenTypes>) => void)
     | string[]
-    | Record<string, any>
+    | Record<string, string | number | object | boolean>
 ) {
-  const toCall = typeof fn === "function" ? fn : addEnumValue(fn);
-  const factory = new GQLiteralEnumType(name);
-  toCall(factory);
+  const factory = new GQLiteralEnumType();
+  if (typeof fn === "function") {
+    fn(factory);
+  } else {
+    factory.members(enumShorthandMembers(fn));
+  }
   return new GQLiteralTypeWrapper(name, factory);
 }
 
 /**
- * Handles the shorthand syntax for creating the GraphQLEnumType
- */
-const addEnumValue = (arg: string[] | Record<string, any>) => (
-  f: GQLiteralEnumType
-) => {
-  if (Array.isArray(arg)) {
-    arg.forEach((value) => {
-      f.member({ value });
-    });
-  } else {
-    Object.keys(arg).forEach((value) => {
-      f.member({ value: value, internalValue: arg[value] });
-    });
-  }
-};
-
-/**
  *
  */
-export function GQLiteralInputObject(
+export function GQLiteralInputObject<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+>(
   name: string,
-  fn: (arg: GQLiteralInputObjectType) => void
+  fn: (arg: GQLiteralInputObjectType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInputObjectType(name);
+  const factory = new GQLiteralInputObjectType<GenTypes>();
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -188,11 +166,12 @@ export function GQLiteralInputObject(
  *
  * @return GQLiteralAbstractType
  */
-export function GQLiteralAbstractType(fn: (arg: GQLiteralAbstract) => void) {
+export function GQLiteralAbstractType<GenTypes = GQLiteralGen>(
+  fn: (arg: GQLiteralAbstract<GenTypes>) => void
+) {
   const factory = new GQLiteralAbstract();
   fn(factory);
-
-  // This is not wrapped in a type, since it's not actually a concrete type.
+  // This is not wrapped in a type, since it's not actually a concrete (named) type.
   return factory;
 }
 
@@ -201,10 +180,16 @@ export function GQLiteralAbstractType(fn: (arg: GQLiteralAbstract) => void) {
  * This is also exposed during type definition as shorthand via the various
  * `__Arg` methods: `fieldArg`, `stringArg`, `intArg`, etc.
  */
-export function GQLiteralArgument(
-  type: Types.GQLArgTypes,
-  options?: Types.GQLArgOpts
-) {}
+export function GQLiteralArg(
+  type: any, // TODO: make type safe
+  options?: Types.ArgOpts
+): Types.ArgDefinition {
+  // This also isn't wrapped because it's also not a named type, can be reused in multiple locations
+  return {
+    type,
+    ...options,
+  };
+}
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
@@ -213,8 +198,8 @@ export function GQLiteralArgument(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function GQLiteralSchema(options: Types.GQLiteralSchemaConfig) {
-  const typeMap = gqliteralBuildTypes(options.types);
+export function GQLiteralSchema(options: Types.SchemaConfig) {
+  const typeMap = buildTypes(options.types, options);
 
   if (!isObjectType(typeMap["Query"])) {
     throw new Error("Missing a Query type");
@@ -232,6 +217,32 @@ export function GQLiteralSchema(options: Types.GQLiteralSchemaConfig) {
       [] as GraphQLNamedType[]
     ),
   });
+
+  // Only in development do we want to worry about regenerating the
+  // schema definition and/or generated types.
+  if (process.env.NODE_ENV === "development") {
+    if (options.definitionFilePath || options.typeGeneration) {
+      const sortedSchema = lexicographicSortSchema(schema);
+      const generatedSchema = printSchema(sortedSchema);
+      if (options.definitionFilePath) {
+        const fs = require("fs");
+        fs.writeFile(
+          options.definitionFilePath,
+          generatedSchema,
+          (err: Error | null) => {
+            if (err) {
+              return console.error(err);
+            }
+          }
+        );
+      }
+      if (options.typeGeneration) {
+        options.typeGeneration(generatedSchema).catch((e) => {
+          console.error(e);
+        });
+      }
+    }
+  }
 
   return schema;
 }

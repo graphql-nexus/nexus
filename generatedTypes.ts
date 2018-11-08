@@ -1,18 +1,14 @@
-import { GenTypesShape } from "./src/types";
+import { GenTypesShape } from "./src/gen";
 
-export interface GeneratedSchemaTypes extends GenTypesShape {
-  interfaces: "a" | "b";
-  enums: "One" | "Two" | "Three";
-  enumTypes: {
-    OneThroughThree: "NEWHOPE" | "EMPIRE" | "JEDI";
-  };
-  objectTypes: {
-    a: {
-      root: {
-        a: {};
-      };
-      args: {};
-    };
-  };
-  inputObjectTypes: {};
-}
+export type GQLiteralGen = any;
+
+// export interface GQLiteralGen extends GenTypesShape {
+//   enumTypes: {
+//     PostStatuse: "PENDING" | "DELETED";
+//     NewEnum: "SOMETHING";
+//   };
+//   objectTypes: {};
+//   inputObjectTypes: {};
+//   interfaceTypes: {};
+//   scalarTypes: {};
+// }
