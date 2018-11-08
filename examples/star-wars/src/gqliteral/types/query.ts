@@ -1,4 +1,4 @@
-import { GQLiteralObject, GQLiteralArg } from "../../../../../src";
+import { GQLiteralObject, GQLiteralArg } from "gqliteral";
 import { getHero, getHuman, getDroid } from "../data";
 
 const characterIdArg = GQLiteralArg("String", {

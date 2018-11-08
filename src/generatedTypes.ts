@@ -1,4 +1,4 @@
-import { GenTypesShape } from "./src/gen";
+import { GenTypesShape } from "./gen";
 
 export type GQLiteralGen = any;
 

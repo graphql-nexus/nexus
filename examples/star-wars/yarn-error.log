@@ -1,0 +1,52 @@
+Arguments: 
+  /Users/tgriesser/.nvm/versions/node/v8.10.0/bin/node /usr/local/Cellar/yarn/1.9.4/libexec/bin/yarn.js
+
+PATH: 
+  /usr/local/opt/mongodb@3.6/bin:/Users/tgriesser/.rvm/gems/ruby-2.2.3/bin:/Users/tgriesser/.rvm/gems/ruby-2.2.3@global/bin:/Users/tgriesser/.rvm/rubies/ruby-2.2.3/bin:/Users/tgriesser/.nvm/versions/node/v8.10.0/bin:/Users/tgriesser/bin:/usr/local/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/local/opt/php70:/Users/tgriesser/.composer/vendor/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/tgriesser/.rvm/bin
+
+Yarn version: 
+  1.9.4
+
+Node version: 
+  8.10.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/gqliteral: Not found
+      at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.9.4/libexec/lib/cli.js:64202:18)
+      at Request.self.callback (/usr/local/Cellar/yarn/1.9.4/libexec/lib/cli.js:137468:22)
+      at emitTwo (events.js:126:13)
+      at Request.emit (events.js:214:7)
+      at Request.<anonymous> (/usr/local/Cellar/yarn/1.9.4/libexec/lib/cli.js:138440:10)
+      at emitOne (events.js:116:13)
+      at Request.emit (events.js:211:7)
+      at IncomingMessage.<anonymous> (/usr/local/Cellar/yarn/1.9.4/libexec/lib/cli.js:138362:12)
+      at Object.onceWrapper (events.js:313:30)
+      at emitNone (events.js:111:20)
+
+npm manifest: 
+  {
+    "name": "gqliteral-swapi-example",
+    "version": "0.0.0",
+    "scripts": {
+      "start": "ts-node ./src"
+    },
+    "dependencies": {
+      "graphql": "^14.0.2",
+      "gqliteral": "1.0.0",
+      "apollo-server": "^2.2.0",
+      "ts-node": "^7.0.1"
+    },
+    "devDependencies": {
+      "jest": "^23.6.0",
+      "ts-jest": "^23.10.4"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

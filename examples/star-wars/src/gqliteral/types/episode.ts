@@ -1,4 +1,4 @@
-import { GQLiteralEnum } from "../../../../../src";
+import { GQLiteralEnum } from "gqliteral";
 
 /**
  * Note: this could also be:
@@ -30,4 +30,9 @@ export const Episode = GQLiteralEnum("Episode", (t) => {
       description: "Released in 1983",
     },
   ]);
+});
+
+export const MoreEpisodes = GQLiteralEnum("MoreEpisodes", (t) => {
+  t.mix("Episode");
+  t.members(["OTHER"]);
 });

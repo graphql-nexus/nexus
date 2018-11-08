@@ -6,6 +6,7 @@ import {
   GraphQLIsTypeOfFn,
 } from "graphql";
 import * as Gen from "./gen";
+import { GQLiteralAbstract } from "./objects";
 
 export enum NodeType {
   MIX = "MIX",
@@ -45,16 +46,19 @@ export type MixDef = {
 
 export type MixAbstractDef = {
   item: NodeType.MIX_ABSTRACT;
-  typeName: string;
+  type: GQLiteralAbstract<any>;
   mixOptions: MixOpts<any>;
 };
 
 export type FieldDef = {
   item: NodeType.FIELD;
-  fieldName: string;
-  fieldType: GQLTypes;
-  fieldOptions: OutputFieldOpts;
+  config: FieldConfig;
 };
+
+export interface FieldConfig extends OutputFieldOpts<any, any, any> {
+  name: string;
+  type: GQLTypes;
+}
 
 export type FieldDefType = MixDef | MixAbstractDef | FieldDef;
 
@@ -62,13 +66,9 @@ export type EnumDefType =
   | MixDef
   | { item: NodeType.ENUM_MEMBER; info: EnumMemberInfo };
 
-export type UnionTypeDef =
+export type UnionDefType =
   | MixDef
   | { item: NodeType.UNION_MEMBER; typeName: string };
-
-export interface EnumMemberOpts extends CommonOpts {
-  value?: any;
-}
 
 export interface EnumMemberInfo {
   name: string;
@@ -164,7 +164,9 @@ type FieldResolver<
   GenTypes,
   TypeName,
   FieldName
-> = GenTypes extends Gen.GenTypesShape ? any : any;
+> = GenTypes extends Gen.GenTypesShape
+  ? GraphQLFieldResolver<any, any>
+  : GraphQLFieldResolver<any, any>;
 
 export type OutputFieldArgs = Record<string, ArgDefinition>;
 
@@ -193,8 +195,6 @@ export interface OutputFieldOpts<
 
 export interface InputFieldOpts extends FieldOpts {}
 
-export interface AllFieldOpts extends InputFieldOpts, OutputFieldOpts {}
-
 export interface ScalarOpts
   extends Omit<
       GraphQLScalarTypeConfig<any, any>,
@@ -204,6 +204,14 @@ export interface ScalarOpts
    * Any deprecation info for this scalar type
    */
   deprecation?: string | DeprecationInfo;
+}
+
+interface HasFields {
+  fields: FieldDefType[];
+}
+
+interface Named {
+  name: string;
 }
 
 interface SharedTypeConfig {
@@ -232,9 +240,12 @@ export interface Nullability {
   nullabilityConfig?: NullabilityConfig;
 }
 
-export interface EnumTypeConfig extends SharedTypeConfig {}
+export interface EnumTypeConfig extends Named, SharedTypeConfig {
+  members: EnumDefType[];
+}
 
-export interface UnionTypeConfig extends SharedTypeConfig {
+export interface UnionTypeConfig extends Named, SharedTypeConfig {
+  members: UnionDefType[];
   /**
    * Optionally provide a custom type resolver function. If one is not provided,
    * the default implementation will call `isTypeOf` on each implementing
@@ -243,19 +254,37 @@ export interface UnionTypeConfig extends SharedTypeConfig {
   resolveType?: GraphQLTypeResolver<any, any>;
 }
 
-export interface InputTypeConfig extends SharedTypeConfig, Nullability {}
+export interface InputTypeConfig
+  extends Named,
+    HasFields,
+    SharedTypeConfig,
+    Nullability {}
 
 export interface ObjectTypeConfig
-  extends SharedTypeConfig,
+  extends Named,
+    HasFields,
+    SharedTypeConfig,
     Nullability,
     DefaultResolver {
+  /**
+   * All interfaces the object implements.
+   */
+  interfaces: Gen.InterfaceName<any>[];
+
   /**
    * An (optional) isTypeOf check for the object type
    */
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
 }
 
-export interface InterfaceTypeConfig extends SharedTypeConfig, Nullability {
+export interface AbstractTypeConfig extends HasFields {}
+
+export interface InterfaceTypeConfig
+  extends Named,
+    HasFields,
+    SharedTypeConfig,
+    Nullability,
+    DefaultResolver {
   /**
    * Optionally provide a custom type resolver function. If one is not provided,
    * the default implementation will call `isTypeOf` on each implementing
@@ -266,9 +295,11 @@ export interface InterfaceTypeConfig extends SharedTypeConfig, Nullability {
 
 export interface SchemaConfig extends Nullability, DefaultResolver {
   /**
-   * All of the GraphQL types
+   * All of the GraphQL types. This is an any for simplicity of developer experience,
+   * if it's an object we get the values, if it's an array we flatten out the
+   * valid types, ignoring invalid ones.
    */
-  types: any[];
+  types: any;
   /**
    * Absolute path to where the GraphQL IDL file should be written
    */

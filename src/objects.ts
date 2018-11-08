@@ -6,9 +6,9 @@ import {
   GraphQLUnionType,
   GraphQLEnumType,
 } from "graphql";
-import { GQLiteralGen } from "../generatedTypes";
+import { GQLiteralGen } from "./generatedTypes";
 import * as Gen from "./gen";
-import { SchemaBuilder } from "./utils";
+import { SchemaBuilder } from "./builder";
 
 export type GQLiteralNamedType =
   | GQLiteralEnumType
@@ -21,14 +21,20 @@ export type GQLiteralNamedType =
  * Backing type for an enum member.
  */
 export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
-  protected typeConfig: Types.EnumTypeConfig = {};
-  protected enumMembers: Types.EnumDefType[] = [];
+  protected typeConfig: Types.EnumTypeConfig;
+
+  constructor(protected name: string) {
+    this.typeConfig = {
+      name,
+      members: [],
+    };
+  }
 
   mix<EnumName extends string>(
     typeName: Gen.EnumName<GenTypes>,
     mixOptions?: Types.MixOpts<Gen.EnumMembers<GenTypes, EnumName>>
   ) {
-    this.enumMembers.push({
+    this.typeConfig.members.push({
       item: Types.NodeType.MIX,
       typeName,
       mixOptions: mixOptions || {},
@@ -41,12 +47,12 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
   members(info: Array<Types.EnumMemberInfo | string>) {
     info.forEach((info) => {
       if (typeof info === "string") {
-        return this.enumMembers.push({
+        return this.typeConfig.members.push({
           item: Types.NodeType.ENUM_MEMBER,
           info: { name: info, value: info },
         });
       }
-      this.enumMembers.push({
+      this.typeConfig.members.push({
         item: Types.NodeType.ENUM_MEMBER,
         info,
       });
@@ -68,12 +74,8 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
    * needs to synchronously return and therefore must check for / break
    * circular references when mixing.
    */
-  buildType(typeName: string, builder: SchemaBuilder): GraphQLEnumType {
-    return builder.enumType({
-      name: typeName,
-      members: this.enumMembers,
-      typeConfig: this.typeConfig,
-    });
+  buildType(builder: SchemaBuilder): GraphQLEnumType {
+    return builder.enumType(this.typeConfig);
   }
 }
 
@@ -81,14 +83,20 @@ export class GQLiteralUnionType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 > {
-  protected typeConfig: Types.UnionTypeConfig = {};
-  protected unionMembers: Types.UnionTypeDef[] = [];
+  protected typeConfig: Types.UnionTypeConfig;
+
+  constructor(protected name: string) {
+    this.typeConfig = {
+      name,
+      members: [],
+    };
+  }
 
   mix<UnionTypeName extends string>(
     type: UnionTypeName,
     options?: Types.MixOpts<any>
   ) {
-    this.unionMembers.push({
+    this.typeConfig.members.push({
       item: Types.NodeType.MIX,
       typeName: type,
       mixOptions: {},
@@ -97,7 +105,10 @@ export class GQLiteralUnionType<
 
   members(...types: string[]) {
     types.forEach((typeName) => {
-      this.unionMembers.push({ item: Types.NodeType.UNION_MEMBER, typeName });
+      this.typeConfig.members.push({
+        item: Types.NodeType.UNION_MEMBER,
+        typeName,
+      });
     });
   }
 
@@ -114,12 +125,8 @@ export class GQLiteralUnionType<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  buildType(typeName: string, builder: SchemaBuilder): GraphQLUnionType {
-    return builder.unionType({
-      name: typeName,
-      members: this.unionMembers,
-      typeConfig: this.typeConfig,
-    });
+  buildType(builder: SchemaBuilder): GraphQLUnionType {
+    return builder.unionType(this.typeConfig);
   }
 }
 
@@ -127,18 +134,31 @@ abstract class GQLitWithFields<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 > {
-  protected fields: Types.FieldDefType[] = [];
+  protected abstract typeConfig: {
+    fields: Types.FieldDefType[];
+  };
 
   /**
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(typeName: string, mixOptions?: Types.MixOpts<any>) {
-    this.fields.push({
-      item: Types.NodeType.MIX,
-      typeName,
-      mixOptions: mixOptions || {},
-    });
+  mix(
+    typeName: string | GQLiteralAbstract<GenTypes>,
+    mixOptions?: Types.MixOpts<any>
+  ) {
+    if (typeName instanceof GQLiteralAbstract) {
+      this.typeConfig.fields.push({
+        item: Types.NodeType.MIX_ABSTRACT,
+        type: typeName,
+        mixOptions: mixOptions || {},
+      });
+    } else {
+      this.typeConfig.fields.push({
+        item: Types.NodeType.MIX,
+        typeName,
+        mixOptions: mixOptions || {},
+      });
+    }
   }
 
   /**
@@ -199,11 +219,13 @@ abstract class GQLitWithFields<
     type: Types.GQLTypes,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.fields.push({
+    this.typeConfig.fields.push({
       item: Types.NodeType.FIELD,
-      fieldName: name,
-      fieldType: type,
-      fieldOptions: options || ({} as any),
+      config: {
+        name,
+        type,
+        ...options,
+      },
     });
   }
 }
@@ -213,21 +235,25 @@ export class GQLiteralObjectType<
   TypeName extends string = any
 > extends GQLitWithFields<GenTypes, TypeName> {
   /**
-   * Metadata about the object type
+   * All metadata about the object type
    */
-  protected typeConfig: Types.ObjectTypeConfig = {};
+  protected typeConfig: Types.ObjectTypeConfig;
 
-  /**
-   * All interfaces the object implements.
-   */
-  protected interfaces: Gen.InterfaceName<GenTypes>[] = [];
+  constructor(name: string) {
+    super();
+    this.typeConfig = {
+      name,
+      fields: [],
+      interfaces: [],
+    };
+  }
 
   /**
    * Declare that an object type implements a particular interface,
    * by providing the name of the interface
    */
   implements(...interfaceName: Gen.InterfaceName<GenTypes>[]) {
-    this.interfaces.push(...interfaceName);
+    this.typeConfig.interfaces.push(...interfaceName);
   }
 
   /**
@@ -255,13 +281,8 @@ export class GQLiteralObjectType<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  buildType(typeName: string, builder: SchemaBuilder) {
-    return builder.objectType({
-      name: typeName,
-      fields: this.fields,
-      typeConfig: this.typeConfig,
-      interfaces: this.interfaces,
-    });
+  buildType(builder: SchemaBuilder) {
+    return builder.objectType(this.typeConfig);
   }
 }
 
@@ -272,7 +293,15 @@ export class GQLiteralInterfaceType<
   /**
    * Metadata about the object type
    */
-  protected typeConfig: Types.UnionTypeConfig = {};
+  protected typeConfig: Types.InterfaceTypeConfig;
+
+  constructor(protected name: string) {
+    super();
+    this.typeConfig = {
+      name,
+      fields: [],
+    };
+  }
 
   /**
    * Adds a description to the metadata for the interface type.
@@ -294,12 +323,8 @@ export class GQLiteralInterfaceType<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  buildType(typeName: string, builder: SchemaBuilder): GraphQLInterfaceType {
-    return builder.interfaceType({
-      name: typeName,
-      fields: this.fields,
-      typeConfig: this.typeConfig,
-    });
+  buildType(builder: SchemaBuilder): GraphQLInterfaceType {
+    return builder.interfaceType(this.typeConfig);
   }
 }
 
@@ -307,7 +332,15 @@ export class GQLiteralInputObjectType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 > extends GQLitWithFields<GenTypes, TypeName> {
-  protected typeConfig: Types.InputTypeConfig = {};
+  protected typeConfig: Types.InputTypeConfig;
+
+  constructor(protected name: string) {
+    super();
+    this.typeConfig = {
+      name,
+      fields: [],
+    };
+  }
 
   description(description: string) {
     this.typeConfig.description = description;
@@ -317,12 +350,8 @@ export class GQLiteralInputObjectType<
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
-  buildType(typeName: string, builder: SchemaBuilder): GraphQLInputObjectType {
-    return builder.inputObjectType({
-      name: typeName,
-      fields: this.fields,
-      typeConfig: this.typeConfig,
-    });
+  buildType(builder: SchemaBuilder): GraphQLInputObjectType {
+    return builder.inputObjectType(this.typeConfig);
   }
 }
 
@@ -335,7 +364,16 @@ export class GQLiteralInputObjectType<
 export class GQLiteralAbstract<GenTypes> extends GQLitWithFields<
   GenTypes,
   never
-> {}
+> {
+  protected typeConfig: Types.AbstractTypeConfig;
+
+  constructor() {
+    super();
+    this.typeConfig = {
+      fields: [],
+    };
+  }
+}
 
 // Ignoring these, since they're only provided for a better developer experience,
 // we don't want these to actually be picked up by intellisense.

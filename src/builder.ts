@@ -1,62 +1,43 @@
 import {
-  isNamedType,
-  GraphQLNonNull,
-  isOutputType,
-  GraphQLFieldConfig,
-  GraphQLInputFieldConfigMap,
-  GraphQLFieldConfigMap,
-  GraphQLFieldConfigArgumentMap,
-  GraphQLInputFieldConfig,
   defaultFieldResolver,
-  isInputObjectType,
-  GraphQLNamedType,
-  GraphQLUnionType,
-  GraphQLInterfaceType,
-  GraphQLInputObjectType,
-  GraphQLObjectType,
   GraphQLEnumType,
-  GraphQLScalarType,
-  GraphQLUnionTypeConfig,
-  isUnionType,
-  isObjectType,
-  isInterfaceType,
-  isEnumType,
-  GraphQLFieldResolver,
-  isInputType,
+  GraphQLFieldConfig,
+  GraphQLFieldConfigArgumentMap,
+  GraphQLFieldConfigMap,
+  GraphQLInputFieldConfig,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
   GraphQLInputType,
+  GraphQLInterfaceType,
   GraphQLList,
+  GraphQLNamedType,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLUnionType,
+  isEnumType,
+  isInputType,
+  isInterfaceType,
+  isNamedType,
+  isObjectType,
+  isOutputType,
+  isUnionType,
+  GraphQLEnumValueConfigMap,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLBoolean,
+  GraphQLScalarType,
+  GraphQLFieldResolver,
+  GraphQLTypeResolver,
+  GraphQLOutputType,
 } from "graphql";
-import * as Types from "./types";
 import { GQLiteralTypeWrapper } from "./definitions";
+import * as Types from "./types";
+import suggestionList, { propertyFieldResolver } from "./utils";
 
-interface BuildConfig {
-  union: {
-    name: string;
-    members: Types.UnionTypeDef[];
-    typeConfig: Types.UnionTypeConfig;
-  };
-  object: {
-    name: string;
-    fields: Types.FieldDefType[];
-    interfaces: string[];
-    typeConfig: Types.ObjectTypeConfig;
-  };
-  input: {
-    name: string;
-    fields: Types.FieldDefType[];
-    typeConfig: Types.InputTypeConfig;
-  };
-  interface: {
-    name: string;
-    fields: Types.FieldDefType[];
-    typeConfig: Types.UnionTypeConfig;
-  };
-  enum: {
-    name: string;
-    members: Types.EnumDefType[];
-    typeConfig: Types.EnumTypeConfig;
-  };
-}
+const isPromise = (val: any): val is Promise<any> =>
+  Boolean(val && typeof val.then === "function");
 
 const NULL_DEFAULTS = {
   output: false,
@@ -67,6 +48,14 @@ const NULL_DEFAULTS = {
   inputListItem: false,
 };
 
+const SCALARS: Record<string, GraphQLScalarType> = {
+  String: GraphQLString,
+  Int: GraphQLInt,
+  Float: GraphQLFloat,
+  ID: GraphQLID,
+  Boolean: GraphQLBoolean,
+};
+
 /**
  * Builds all of the types, properly accounts for any using "mix".
  * Since the enum types are resolved synchronously, these need to guard for
@@ -75,13 +64,13 @@ const NULL_DEFAULTS = {
 export class SchemaBuilder {
   protected buildingTypes: Set<string> = new Set();
   protected finalTypeMap: Record<string, GraphQLNamedType> = {};
-  protected pendingTypeMap: Record<string, GQLiteralTypeWrapper<any>> = {};
+  protected pendingTypeMap: Record<string, GQLiteralTypeWrapper> = {};
 
   constructor(
     protected schemaConfig: Types.Omit<Types.SchemaConfig, "types">
   ) {}
 
-  addType(typeDef: GQLiteralTypeWrapper<any> | GraphQLNamedType) {
+  addType(typeDef: GQLiteralTypeWrapper | GraphQLNamedType) {
     if (this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name]) {
       throw new Error(`Named type ${typeDef.name} declared more than once`);
     }
@@ -102,106 +91,76 @@ export class SchemaBuilder {
       this.finalTypeMap[key] = this.getOrBuildType(key);
       this.buildingTypes.clear();
     });
-    return {};
+    return this.finalTypeMap;
   }
 
-  inputObjectType(config: BuildConfig["input"]): GraphQLInputObjectType {
-    const { name, fields, typeConfig } = config;
+  inputObjectType(config: Types.InputTypeConfig): GraphQLInputObjectType {
     return new GraphQLInputObjectType({
-      name,
-      fields: () => this.buildInputObjectFields(name, fields),
-      description: config.typeConfig.description,
+      name: config.name,
+      fields: () => this.buildInputObjectFields(config),
+      description: config.description,
     });
   }
 
-  objectType(config: BuildConfig["object"]) {
-    const { fields, interfaces, name, typeConfig } = config;
+  objectType(config: Types.ObjectTypeConfig) {
     return new GraphQLObjectType({
-      name,
-      interfaces: () => interfaces.map((i) => this.getInterface(i)),
-      fields: () => this.buildObjectFields(name, fields, typeConfig),
+      name: config.name,
+      interfaces: () => config.interfaces.map((i) => this.getInterface(i)),
+      fields: () => {
+        const interfaceFields: GraphQLFieldConfigMap<any, any> = {};
+        const allInterfaces = config.interfaces.map((i) =>
+          this.getInterface(i)
+        );
+        allInterfaces.forEach((i) => {
+          const iFields = i.getFields();
+          Object.keys(iFields).forEach((iFieldName) => {
+            const { isDeprecated, args, ...rest } = iFields[iFieldName];
+            interfaceFields[iFieldName] = {
+              ...rest,
+              args: args.reduce(
+                (result: GraphQLFieldConfigArgumentMap, arg) => {
+                  const { name, ...rest } = arg;
+                  result[name] = rest;
+                  return result;
+                },
+                {}
+              ),
+            };
+          });
+        });
+        return {
+          ...interfaceFields,
+          ...this.buildObjectFields(config),
+        };
+      },
     });
   }
 
-  interfaceType(config: BuildConfig["interface"]) {
+  interfaceType(config: Types.InterfaceTypeConfig) {
     let description;
-    const { name, fields, typeConfig } = config;
+    const { name, resolveType } = config;
     return new GraphQLInterfaceType({
       name,
-      fields: () => this.buildObjectFields(name, fields, typeConfig),
-      resolveType: typeConfig.resolveType,
+      fields: () => this.buildObjectFields(config),
+      resolveType,
       description,
       // astNode?: Maybe<InterfaceTypeDefinitionNode>;
       // extensionASTNodes?: Maybe<ReadonlyArray<InterfaceTypeExtensionNode>>;
     });
   }
 
-  enumType(config: BuildConfig["enum"]) {
-    const { name, typeConfig, members } = config;
-    let values: GraphQLEnumValueConfigMap = {},
-      description;
-    config.members.forEach((member) => {
-      switch (member.item) {
-        case Types.NodeType.ENUM_MEMBER:
-          values[member.info.name] = {
-            value: member.info.value,
-            description: member.info.description,
-          };
-          break;
-        case Types.NodeType.MIX:
-          const { pick, omit } = member.mixOptions;
-          enumToMix.getValues().forEach((val) => {
-            if (pick && pick.indexOf(val.name) === -1) {
-              return;
-            }
-            if (omit && omit.indexOf(val.name) !== -1) {
-              return;
-            }
-            values[val.name] = {
-              description: val.description,
-              deprecationReason: val.deprecationReason,
-              value: val.value,
-              astNode: val.astNode,
-            };
-          });
-          break;
-      }
-    });
-    if (Object.keys(values).length === 0) {
-      throw new Error(
-        `GQLiteralEnum ${this.name} must have at least one member`
-      );
-    }
+  enumType(config: Types.EnumTypeConfig) {
     return new GraphQLEnumType({
-      name,
-      values,
-      description,
+      name: config.name,
+      values: this.buildEnumMembers(config),
     });
   }
 
-  unionType(config: BuildConfig["union"]) {
+  unionType(config: Types.UnionTypeConfig) {
     return new GraphQLUnionType({
       name: config.name,
-      types: () => {
-        return config.members.reduce((result: GraphQLObjectType[], member) => {
-          switch (member.item) {
-            case Types.NodeType.MIX:
-              break;
-            case Types.NodeType.UNION_MEMBER:
-              const type = this.getOrBuildType(member.typeName);
-              if (!isObjectType(type)) {
-                throw new Error(
-                  `Expected ${member.typeName} to be an ObjectType, saw ${
-                    type.constructor.name
-                  }`
-                );
-              }
-              return result.concat(type);
-          }
-          return result;
-        }, []);
-      },
-      resolveType: config.typeConfig,
+      types: () => this.buildUnionMembers(config),
+      resolveType: config.resolveType,
     });
   }
 
@@ -219,20 +178,105 @@ export class SchemaBuilder {
     );
   }
 
+  protected buildEnumMembers(config: Types.EnumTypeConfig) {
+    let values: GraphQLEnumValueConfigMap = {};
+    config.members.forEach((member) => {
+      switch (member.item) {
+        case Types.NodeType.ENUM_MEMBER:
+          values[member.info.name] = {
+            value: member.info.value,
+            description: member.info.description,
+          };
+          break;
+        case Types.NodeType.MIX:
+          const {
+            mixOptions: { pick, omit },
+            typeName,
+          } = member;
+          const enumToMix = this.getEnum(typeName);
+          enumToMix.getValues().forEach((val) => {
+            if (pick && pick.indexOf(val.name) === -1) {
+              return;
+            }
+            if (omit && omit.indexOf(val.name) !== -1) {
+              return;
+            }
+            values[val.name] = {
+              description: val.description,
+              deprecationReason: val.deprecationReason,
+              value: val.value,
+              astNode: val.astNode,
+            };
+          });
+      }
+    });
+    return values;
+  }
+
+  protected buildUnionMembers(config: Types.UnionTypeConfig) {
+    const unionMembers: GraphQLObjectType[] = [];
+    config.members.forEach((member) => {
+      switch (member.item) {
+        case Types.NodeType.UNION_MEMBER:
+          unionMembers.push(this.getObjectType(member.typeName));
+          break;
+        case Types.NodeType.MIX:
+          const {
+            mixOptions: { pick, omit },
+            typeName,
+          } = member;
+          const unionToMix = this.getUnion(typeName);
+          unionToMix.getTypes().forEach((type) => {
+            if (pick && pick.indexOf(type.name) === -1) {
+              return;
+            }
+            if (omit && omit.indexOf(type.name) !== -1) {
+              return;
+            }
+            unionMembers.push(type);
+          });
+          break;
+      }
+    });
+    return unionMembers;
+  }
+
   protected buildObjectFields(
-    typeName: string,
-    fields: Types.FieldDefType[],
-    typeConfig: Types.ObjectTypeConfig
+    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ): GraphQLFieldConfigMap<any, any> {
     const fieldMap: GraphQLFieldConfigMap<any, any> = {};
-    fields.forEach((field) => {
+    typeConfig.fields.forEach((field) => {
       switch (field.item) {
         case Types.NodeType.MIX:
+          throw new Error("TODO");
         case Types.NodeType.MIX_ABSTRACT:
           throw new Error("TODO");
-          break;
         case Types.NodeType.FIELD:
-          fieldMap[field.fieldName] = this.buildObjectField(field, typeConfig);
+          fieldMap[field.config.name] = this.buildObjectField(
+            field.config,
+            typeConfig
+          );
+          break;
+      }
+    });
+    return fieldMap;
+  }
+
+  protected buildInputObjectFields(
+    typeConfig: Types.InputTypeConfig
+  ): GraphQLInputFieldConfigMap {
+    const fieldMap: GraphQLInputFieldConfigMap = {};
+    typeConfig.fields.forEach((field) => {
+      switch (field.item) {
+        case Types.NodeType.MIX:
+          throw new Error("TODO");
+        case Types.NodeType.MIX_ABSTRACT:
+          throw new Error("TODO");
+        case Types.NodeType.FIELD:
+          fieldMap[field.config.name] = this.buildInputObjectField(
+            field.config,
+            typeConfig
+          );
           break;
       }
     });
@@ -240,14 +284,19 @@ export class SchemaBuilder {
   }
 
   protected buildObjectField(
-    field: Types.FieldDef,
-    typeConfig: Types.ObjectTypeConfig
+    fieldConfig: Types.FieldConfig,
+    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ): GraphQLFieldConfig<any, any> {
     return {
-      type: this.getOutputType(field.fieldType),
-      resolve: this.getResolver(field.fieldOptions, typeConfig),
+      type: this.decorateOutputType(
+        this.getOutputType(fieldConfig.type),
+        fieldConfig,
+        // @ts-ignore
+        typeConfig
+      ),
+      resolve: this.getResolver(fieldConfig, typeConfig),
       description: typeConfig.description,
-      args: this.buildArgs(field.fieldOptions.args || {}, typeConfig),
+      args: this.buildArgs(fieldConfig.args || {}, typeConfig),
       // subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
       // deprecationReason?: Maybe<string>;
       // description?: Maybe<string>;
@@ -255,15 +304,17 @@ export class SchemaBuilder {
     };
   }
 
-  protected buildInputObjectFields(
-    typeName: string,
-    fields: Types.FieldDefType[]
-  ): GraphQLInputFieldConfigMap {
-    return {};
-  }
-
-  protected buildInputObjectField(): GraphQLInputFieldConfig<any, any> {
-    return {};
+  protected buildInputObjectField(
+    field: Types.FieldConfig,
+    typeConfig: Types.InputTypeConfig
+  ): GraphQLInputFieldConfig {
+    return {
+      type: this.decorateInputType(
+        this.getInputType(field.type),
+        field,
+        typeConfig
+      ),
+    };
   }
 
   protected buildArgs(
@@ -271,10 +322,10 @@ export class SchemaBuilder {
     typeConfig: Types.InputTypeConfig
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {};
-    Object.keys(allArgs).forEach((argName) => {
+    Object.keys(args).forEach((argName) => {
       const argDef = args[argName];
       allArgs[argName] = {
-        type: this.decorateInputType(
+        type: this.decorateArgType(
           this.getInputType(argDef.type),
           argDef,
           typeConfig
@@ -282,18 +333,27 @@ export class SchemaBuilder {
         description: argDef.description,
       };
     });
-    return {};
-  }
-
-  protected decorateOutputType(
-    type: GraphQLInputType,
-    typeOpts: Types.FieldOpts,
-    typeConfig: Types.ObjectTypeConfig
-  ) {
-    return this.decorateType(type, typeOpts, typeConfig, false);
+    return allArgs;
   }
 
   protected decorateInputType(
+    type: GraphQLInputType,
+    fieldConfig: Types.FieldConfig,
+    typeConfig: Types.InputTypeConfig
+  ) {
+    return this.decorateType(type, fieldConfig, typeConfig, true);
+  }
+
+  protected decorateOutputType(
+    type: GraphQLOutputType,
+    fieldConfig: Types.FieldConfig,
+    typeConfig: Types.ObjectTypeConfig
+  ) {
+    // @ts-ignore
+    return this.decorateType(type, fieldConfig, typeConfig, false);
+  }
+
+  protected decorateArgType(
     type: GraphQLInputType,
     argOpts: Types.ArgOpts,
     typeConfig: Types.InputTypeConfig
@@ -316,8 +376,8 @@ export class SchemaBuilder {
    */
   protected decorateType(
     type: GraphQLInputType,
-    fieldOpts: Types.FieldOpts,
-    typeConfig: Types.ObjectTypeConfig,
+    fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
+    typeConfig: Types.ObjectTypeConfig | Types.InputTypeConfig,
     isInput: boolean
   ): GraphQLInputType {
     let finalType = type;
@@ -326,7 +386,7 @@ export class SchemaBuilder {
       ...this.schemaConfig.nullabilityConfig,
       ...typeConfig.nullabilityConfig,
     };
-    const { list, nullable, listItemNullable } = fieldOpts;
+    const { list, nullable, listItemNullable } = fieldConfig;
     const isNullable =
       typeof nullable !== "undefined"
         ? nullable
@@ -346,7 +406,7 @@ export class SchemaBuilder {
           : isInput
             ? nullConfig.inputListItem
             : nullConfig.outputListItem;
-      if (nullableItem) {
+      if (!nullableItem) {
         finalType = GraphQLNonNull(finalType);
       }
       finalType = GraphQLList(finalType);
@@ -356,7 +416,7 @@ export class SchemaBuilder {
       );
     }
 
-    if (isNullable) {
+    if (!isNullable) {
       return GraphQLNonNull(finalType);
     }
     return finalType;
@@ -433,6 +493,9 @@ export class SchemaBuilder {
   }
 
   protected getOrBuildType(name: string): GraphQLNamedType {
+    if (SCALARS[name]) {
+      return SCALARS[name];
+    }
     if (this.finalTypeMap[name]) {
       return this.finalTypeMap[name];
     }
@@ -446,32 +509,53 @@ export class SchemaBuilder {
     const pendingType = this.pendingTypeMap[name];
     if (pendingType) {
       this.buildingTypes.add(name);
-      return pendingType.type.buildType(name, this);
+      return pendingType.type.buildType(this);
     }
     return this.missingType(name);
   }
 
   protected getResolver(
-    fieldOptions: Types.OutputFieldOpts,
-    typeConfig: Types.ObjectTypeConfig
+    fieldOptions: Types.FieldConfig,
+    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ) {
+    let resolver =
+      typeConfig.defaultResolver ||
+      this.schemaConfig.defaultResolver ||
+      defaultFieldResolver;
     if (fieldOptions.resolve) {
       if (typeof fieldOptions.property !== "undefined") {
         console.warn(
           `Both resolve and property should not be supplied, property will be ignored`
         );
       }
-      return fieldOptions.resolve;
+      resolver = fieldOptions.resolve;
+    } else if (fieldOptions.property) {
+      resolver = propertyFieldResolver(fieldOptions.property);
     }
-    if (fieldOptions.property) {
-      return propertyFieldResolver(fieldOptions.property);
+    if (typeof fieldOptions.defaultValue !== "undefined") {
+      resolver = withDefaultValue(resolver, fieldOptions.defaultValue);
     }
-    if (typeConfig.defaultResolver) {
-      return typeConfig.defaultResolver;
-    }
-    if (this.schemaConfig.defaultResolver) {
-      return this.schemaConfig.defaultResolver;
-    }
-    return defaultFieldResolver;
+    return resolver;
   }
+}
+
+function withDefaultValue(
+  resolver: GraphQLFieldResolver<any, any>,
+  defaultValue: any
+): GraphQLFieldResolver<any, any> {
+  return (root, args, ctx, info) => {
+    const result = resolver(root, args, ctx, info);
+    if (typeof result === "undefined" || result === null) {
+      return defaultValue;
+    }
+    if (isPromise(result)) {
+      return result.then((val: any) => {
+        if (typeof val === "undefined" || val === null) {
+          return defaultValue;
+        }
+        return val;
+      });
+    }
+    return result;
+  };
 }

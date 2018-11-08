@@ -1,4 +1,4 @@
-import { GQLiteralInterface } from "../../../../../src";
+import { GQLiteralInterface } from "gqliteral";
 import { getFriends } from "../data";
 
 export const Character = GQLiteralInterface("Character", (t) => {
@@ -14,8 +14,7 @@ export const Character = GQLiteralInterface("Character", (t) => {
   t.field("appearsIn", "Episode", {
     list: true,
     description: "Which movies they appear in.",
+    property: "appears_in",
   });
-  t.resolveType((character) => {
-    return character.type;
-  });
+  t.resolveType((character) => character.type);
 });

@@ -1,4 +1,4 @@
-import { GQLiteralObject } from "../../../../../src";
+import { GQLiteralObject } from "gqliteral";
 
 export const Human = GQLiteralObject("Human", (t) => {
   t.description("A humanoid creature in the Star Wars universe.");

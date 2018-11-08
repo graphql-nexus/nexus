@@ -1,5 +1,7 @@
 ## GQLiteral
 
+"Contract first development"
+
 Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript
 
 Combines the best practices from building real-world GraphQL servers without the boilerplate or excessive imports. Compose types with [abstract types](#GQLiteralAbstractType) and [type mixing](#Type-combination).

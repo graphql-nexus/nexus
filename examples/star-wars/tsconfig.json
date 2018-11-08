@@ -9,6 +9,5 @@
     "rootDir": "./src",
     "strict": true,
     "skipLibCheck": true
-  },
-  "exclude": ["./examples", "./dist", "./src/__tests__"]
+  }
 }

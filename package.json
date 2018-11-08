@@ -1,8 +1,12 @@
 {
   "name": "gqliteral",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
   "license": "MIT",
+  "scripts": {
+    "watch": "tsc -w"
+  },
   "dependencies": {
     "graphql-code-generator": "^0.13.0",
     "graphql-codegen-typescript-template": "^0.13.0"

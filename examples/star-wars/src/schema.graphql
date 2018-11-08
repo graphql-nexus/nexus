@@ -1,0 +1,87 @@
+interface Character {
+  """A character in the Star Wars Trilogy"""
+  appearsIn: [Episode!]!
+
+  """A character in the Star Wars Trilogy"""
+  friends: [Character!]!
+
+  """A character in the Star Wars Trilogy"""
+  id: String!
+
+  """A character in the Star Wars Trilogy"""
+  name: String!
+}
+
+type Droid implements Character {
+  """A character in the Star Wars Trilogy"""
+  appearsIn: [Episode!]!
+
+  """A character in the Star Wars Trilogy"""
+  friends: [Character!]!
+
+  """A character in the Star Wars Trilogy"""
+  id: String!
+
+  """A character in the Star Wars Trilogy"""
+  name: String!
+
+  """A mechanical creature in the Star Wars universe."""
+  primaryFunction: String!
+}
+
+enum Episode {
+  """Released in 1980."""
+  EMPIRE
+
+  """Released in 1983"""
+  JEDI
+
+  """Released in 1977."""
+  NEWHOPE
+}
+
+type Human implements Character {
+  """A character in the Star Wars Trilogy"""
+  appearsIn: [Episode!]!
+
+  """A character in the Star Wars Trilogy"""
+  friends: [Character!]!
+
+  """A humanoid creature in the Star Wars universe."""
+  homePlanet: String
+
+  """A character in the Star Wars Trilogy"""
+  id: String!
+
+  """A character in the Star Wars Trilogy"""
+  name: String!
+}
+
+enum MoreEpisodes {
+  """Released in 1980."""
+  EMPIRE
+
+  """Released in 1983"""
+  JEDI
+
+  """Released in 1977."""
+  NEWHOPE
+  OTHER
+}
+
+type Query {
+  droid(
+    """id of the character"""
+    id: String!
+  ): Droid!
+  hero(
+    """
+    If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.
+    """
+    episode: Episode
+  ): Character!
+  human(
+    """id of the character"""
+    id: String!
+  ): Human!
+}

@@ -7,7 +7,6 @@ import {
   GraphQLScalarType,
 } from "graphql";
 import * as Types from "./types";
-import * as Gen from "./gen";
 import {
   GQLiteralNamedType,
   GQLiteralObjectType,
@@ -17,7 +16,7 @@ import {
   GQLiteralAbstract,
   GQLiteralUnionType,
 } from "./objects";
-import { GQLiteralGen } from "../generatedTypes";
+import { GQLiteralGen } from "./generatedTypes";
 import { enumShorthandMembers, buildTypes } from "./utils";
 
 /**
@@ -26,7 +25,9 @@ import { enumShorthandMembers, buildTypes } from "./utils";
  * constructed so we don't want it as a public member, purely for
  * intellisense/cosmetic purposes :)
  */
-export class GQLiteralTypeWrapper<T extends GQLiteralNamedType> {
+export class GQLiteralTypeWrapper<
+  T extends GQLiteralNamedType = GQLiteralNamedType
+> {
   constructor(readonly name: string, readonly type: T) {}
 }
 
@@ -49,7 +50,7 @@ export function GQLiteralObject<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
-  const factory = new GQLiteralObjectType<GenTypes, TypeName>();
+  const factory = new GQLiteralObjectType<GenTypes, TypeName>(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -64,7 +65,7 @@ export function GQLiteralInterface<
   name: TypeName,
   fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInterfaceType();
+  const factory = new GQLiteralInterfaceType(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -90,7 +91,7 @@ export function GQLiteralUnion<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
-  const factory = new GQLiteralUnionType();
+  const factory = new GQLiteralUnionType(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -129,7 +130,7 @@ export function GQLiteralEnum<GenTypes = GQLiteralGen>(
     | string[]
     | Record<string, string | number | object | boolean>
 ) {
-  const factory = new GQLiteralEnumType();
+  const factory = new GQLiteralEnumType(name);
   if (typeof fn === "function") {
     fn(factory);
   } else {
@@ -148,7 +149,7 @@ export function GQLiteralInputObject<
   name: string,
   fn: (arg: GQLiteralInputObjectType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInputObjectType<GenTypes>();
+  const factory = new GQLiteralInputObjectType<GenTypes>(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -184,7 +185,8 @@ export function GQLiteralArg(
   type: any, // TODO: make type safe
   options?: Types.ArgOpts
 ): Types.ArgDefinition {
-  // This also isn't wrapped because it's also not a named type, can be reused in multiple locations
+  // This isn't wrapped for now because it's not a named type, it's really just an
+  // object that can be reused in multiple locations.
   return {
     type,
     ...options,
@@ -199,7 +201,7 @@ export function GQLiteralArg(
  * root query type.
  */
 export function GQLiteralSchema(options: Types.SchemaConfig) {
-  const typeMap = buildTypes(options.types, options);
+  const typeMap = buildTypes(options);
 
   if (!isObjectType(typeMap["Query"])) {
     throw new Error("Missing a Query type");
