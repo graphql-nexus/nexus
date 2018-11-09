@@ -16,7 +16,6 @@ import {
   GQLiteralAbstract,
   GQLiteralUnionType,
 } from "./objects";
-import { GQLiteralGen } from "./generatedTypes";
 import { enumShorthandMembers, buildTypes } from "./utils";
 
 /**
@@ -46,10 +45,10 @@ export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
  *
  * @param {string}
  */
-export function GQLiteralObject<
-  GenTypes = GQLiteralGen,
-  TypeName extends string = any
->(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
+export function GQLiteralObject<GenTypes, TypeName extends string = any>(
+  name: TypeName,
+  fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void
+) {
   const factory = new GQLiteralObjectType<GenTypes, TypeName>(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
@@ -58,14 +57,11 @@ export function GQLiteralObject<
 /**
  * Define a GraphQL interface type
  */
-export function GQLiteralInterface<
-  GenTypes = GQLiteralGen,
-  TypeName extends string = any
->(
+export function GQLiteralInterface<GenTypes, TypeName extends string = string>(
   name: TypeName,
   fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInterfaceType(name);
+  const factory = new GQLiteralInterfaceType<GenTypes, TypeName>(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -87,10 +83,10 @@ export function GQLiteralInterface<
  *   t.members('OtherType', 'AnotherType')
  * })
  */
-export function GQLiteralUnion<
-  GenTypes = GQLiteralGen,
-  TypeName extends string = any
->(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
+export function GQLiteralUnion<GenTypes, TypeName extends string = any>(
+  name: TypeName,
+  fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void
+) {
   const factory = new GQLiteralUnionType(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
@@ -123,7 +119,7 @@ export function GQLiteralUnion<
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
  */
-export function GQLiteralEnum<GenTypes = GQLiteralGen>(
+export function GQLiteralEnum<GenTypes>(
   name: string,
   fn:
     | ((arg: GQLiteralEnumType<GenTypes>) => void)
@@ -142,10 +138,7 @@ export function GQLiteralEnum<GenTypes = GQLiteralGen>(
 /**
  *
  */
-export function GQLiteralInputObject<
-  GenTypes = GQLiteralGen,
-  TypeName extends string = any
->(
+export function GQLiteralInputObject<GenTypes, TypeName extends string = any>(
   name: string,
   fn: (arg: GQLiteralInputObjectType<GenTypes, TypeName>) => void
 ) {
@@ -167,7 +160,7 @@ export function GQLiteralInputObject<
  *
  * @return GQLiteralAbstractType
  */
-export function GQLiteralAbstractType<GenTypes = GQLiteralGen>(
+export function GQLiteralAbstractType<GenTypes>(
   fn: (arg: GQLiteralAbstract<GenTypes>) => void
 ) {
   const factory = new GQLiteralAbstract();
@@ -239,9 +232,14 @@ export function GQLiteralSchema(options: Types.SchemaConfig) {
         );
       }
       if (options.typeGeneration) {
-        options.typeGeneration(generatedSchema).catch((e) => {
-          console.error(e);
-        });
+        options
+          .typeGeneration(sortedSchema)
+          .then((options) => {
+            console.log(options);
+          })
+          .catch((e) => {
+            console.error(e);
+          });
       }
     }
   }

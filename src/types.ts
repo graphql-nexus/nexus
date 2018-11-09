@@ -4,6 +4,7 @@ import {
   GraphQLNamedType,
   GraphQLTypeResolver,
   GraphQLIsTypeOfFn,
+  GraphQLSchema,
 } from "graphql";
 import * as Gen from "./gen";
 import { GQLiteralAbstract } from "./objects";
@@ -57,7 +58,7 @@ export type FieldDef = {
 
 export interface FieldConfig extends OutputFieldOpts<any, any, any> {
   name: string;
-  type: GQLTypes;
+  type: any;
 }
 
 export type FieldDefType = MixDef | MixAbstractDef | FieldDef;
@@ -73,6 +74,11 @@ export type UnionDefType =
 export interface EnumMemberInfo {
   name: string;
   value: any;
+  description?: string;
+}
+
+export interface EnumMemberConfig {
+  value?: any;
   description?: string;
 }
 
@@ -193,6 +199,11 @@ export interface OutputFieldOpts<
   defaultValue?: any;
 }
 
+export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = Omit<
+  OutputFieldOpts<GenTypes, TypeName, FieldName>,
+  "args" | "list" | "listItemNullable" | "nullable" | "availableIf"
+>;
+
 export interface InputFieldOpts extends FieldOpts {}
 
 export interface ScalarOpts
@@ -303,11 +314,15 @@ export interface SchemaConfig extends Nullability, DefaultResolver {
   /**
    * Absolute path to where the GraphQL IDL file should be written
    */
-  definitionFilePath?: string;
+  definitionFilePath: string | false;
   /**
    * Generates the types for intellisense/typescript
    */
-  typeGeneration?: (printedSchema: string) => Promise<void>;
+  typeGeneration?: (printedSchema: GraphQLSchema) => Promise<void>;
+  /**
+   * Forces type-safety by not falling back to strings
+   */
+  forceTypeSafety?: boolean;
 }
 
 export type NullabilityConfig = {

@@ -1,4 +1,5 @@
 import { GQLiteralEnum } from "gqliteral";
+import { Gen } from "../../generatedTypes";
 
 /**
  * Note: this could also be:
@@ -9,27 +10,13 @@ import { GQLiteralEnum } from "gqliteral";
  *   JEDI: 6
  * })
  *
- * if we chose to omit the descriptions.
+ * if we chose to omit the descriptions
  */
-export const Episode = GQLiteralEnum("Episode", (t) => {
+export const Episode = GQLiteralEnum<Gen>("Episode", (t) => {
   t.description("One of the films in the Star Wars Trilogy");
-  t.members([
-    {
-      name: "NEWHOPE",
-      value: 4,
-      description: "Released in 1977.",
-    },
-    {
-      name: "EMPIRE",
-      value: 5,
-      description: "Released in 1980.",
-    },
-    {
-      name: "JEDI",
-      value: 6,
-      description: "Released in 1983",
-    },
-  ]);
+  t.member("NEWHOPE", { value: 4, description: "Released in 1977." });
+  t.member("EMPIRE", { value: 5, description: "Released in 1980." });
+  t.member("JEDI", { value: 6, description: "Released in 1983" });
 });
 
 export const MoreEpisodes = GQLiteralEnum("MoreEpisodes", (t) => {

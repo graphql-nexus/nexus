@@ -1,6 +1,7 @@
 import * as path from "path";
-import { GQLiteralSchema } from "gqliteral";
 import * as allTypes from "./types";
+import { GQLiteralSchema } from "gqliteral";
+import { GQLiteralTypegen } from "gqliteral-typegen";
 
 /**
  * Finally, we construct our schema (whose starting query type is the query
@@ -9,4 +10,13 @@ import * as allTypes from "./types";
 export const schema = GQLiteralSchema({
   types: allTypes,
   definitionFilePath: path.join(__dirname, "../schema.graphql"),
+  typeGeneration: GQLiteralTypegen({
+    typesFilePath: path.join(__dirname, "../generatedTypes.ts"),
+    backingTypes: {
+      Query: {
+        something: 1,
+      },
+      Droid: 1,
+    },
+  }),
 });

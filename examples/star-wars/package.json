@@ -2,13 +2,14 @@
   "name": "gqliteral-swapi-example",
   "version": "0.0.0",
   "scripts": {
-    "start": "ts-node-dev --inspect --respawn ./src"
+    "start": "TS_NODE_IGNORE_DIAGNOSTICS=true ts-node-dev --no-notify --respawn ./src"
   },
   "dependencies": {
     "graphql": "^14.0.2",
     "apollo-server": "^2.2.0",
     "ts-node": "^7.0.1",
-    "ts-node-dev": "^1.0.0-pre.30"
+    "ts-node-dev": "^1.0.0-pre.30",
+    "gqliteral-typegen": "0.0.1"
   },
   "devDependencies": {
     "jest": "^23.6.0",

@@ -1,7 +1,8 @@
 import { GQLiteralInterface } from "gqliteral";
 import { getFriends } from "../data";
+import { Gen } from "../../generatedTypes";
 
-export const Character = GQLiteralInterface("Character", (t) => {
+export const Character = GQLiteralInterface<Gen>("Character", (t) => {
   t.description("A character in the Star Wars Trilogy");
   t.string("id", { description: "The id of the character" });
   t.string("name", { description: "The name of the character" });

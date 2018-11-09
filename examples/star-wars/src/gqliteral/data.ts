@@ -119,12 +119,16 @@ export function getHero(episode: number): Character {
   return artoo;
 }
 
+export const allHumans = Object.keys(humanData).map((key) => humanData[key]);
+
 /**
  * Allows us to query for the human with the given id.
  */
 export function getHuman(id: string): Human {
   return humanData[id];
 }
+
+export const allDroids = Object.keys(droidData).map((key) => droidData[key]);
 
 /**
  * Allows us to query for the droid with the given id.

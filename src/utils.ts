@@ -2,6 +2,7 @@ import { GraphQLFieldResolver, GraphQLNamedType, isNamedType } from "graphql";
 import { SchemaBuilder } from "./builder";
 import * as Types from "./types";
 import { GQLiteralTypeWrapper } from "./definitions";
+import { GQLiteralAbstract } from "./objects";
 
 /**
  * Builds the types, normalizing the "types" passed into the schema for a
@@ -17,6 +18,26 @@ export function buildTypes(
 }
 
 const isObject = (obj: any): boolean => obj !== null && typeof obj === "object";
+
+export function addMix(
+  obj: { fields: Types.FieldDefType[] },
+  typeName: string | GQLiteralAbstract<any>,
+  mixOptions?: Types.MixOpts<any>
+) {
+  if (typeName instanceof GQLiteralAbstract) {
+    obj.fields.push({
+      item: Types.NodeType.MIX_ABSTRACT,
+      type: typeName,
+      mixOptions: mixOptions || {},
+    });
+  } else {
+    obj.fields.push({
+      item: Types.NodeType.MIX,
+      typeName,
+      mixOptions: mixOptions || {},
+    });
+  }
+}
 
 function addTypes(builder: SchemaBuilder, types: any) {
   if (types instanceof GQLiteralTypeWrapper || isNamedType(types)) {
