@@ -17,6 +17,7 @@ import {
   GQLiteralUnionType,
 } from "./objects";
 import { enumShorthandMembers, buildTypes } from "./utils";
+import { typegen } from "./typegen";
 
 /**
  * Wraps a GQLiteralType object, since all GQLiteral types have a
@@ -41,11 +42,11 @@ export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
 }
 
 /**
- * Defines a GraphQL object
+ * Defines a GraphQL Object.
  *
  * @param {string}
  */
-export function GQLiteralObject<GenTypes, TypeName extends string = any>(
+export function GQLiteralObject<GenTypes, TypeName extends string>(
   name: TypeName,
   fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void
 ) {
@@ -57,7 +58,7 @@ export function GQLiteralObject<GenTypes, TypeName extends string = any>(
 /**
  * Define a GraphQL interface type
  */
-export function GQLiteralInterface<GenTypes, TypeName extends string = string>(
+export function GQLiteralInterface<GenTypes, TypeName extends string>(
   name: TypeName,
   fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
@@ -83,7 +84,7 @@ export function GQLiteralInterface<GenTypes, TypeName extends string = string>(
  *   t.members('OtherType', 'AnotherType')
  * })
  */
-export function GQLiteralUnion<GenTypes, TypeName extends string = any>(
+export function GQLiteralUnion<GenTypes, TypeName extends string>(
   name: TypeName,
   fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void
 ) {
@@ -138,7 +139,7 @@ export function GQLiteralEnum<GenTypes>(
 /**
  *
  */
-export function GQLiteralInputObject<GenTypes, TypeName extends string = any>(
+export function GQLiteralInputObject<GenTypes, TypeName extends string>(
   name: string,
   fn: (arg: GQLiteralInputObjectType<GenTypes, TypeName>) => void
 ) {
@@ -163,7 +164,7 @@ export function GQLiteralInputObject<GenTypes, TypeName extends string = any>(
 export function GQLiteralAbstractType<GenTypes>(
   fn: (arg: GQLiteralAbstract<GenTypes>) => void
 ) {
-  const factory = new GQLiteralAbstract();
+  const factory = new GQLiteralAbstract<GenTypes>();
   fn(factory);
   // This is not wrapped in a type, since it's not actually a concrete (named) type.
   return factory;
@@ -216,31 +217,22 @@ export function GQLiteralSchema(options: Types.SchemaConfig) {
   // Only in development do we want to worry about regenerating the
   // schema definition and/or generated types.
   if (process.env.NODE_ENV === "development") {
-    if (options.definitionFilePath || options.typeGeneration) {
-      const sortedSchema = lexicographicSortSchema(schema);
-      const generatedSchema = printSchema(sortedSchema);
-      if (options.definitionFilePath) {
-        const fs = require("fs");
-        fs.writeFile(
-          options.definitionFilePath,
-          generatedSchema,
-          (err: Error | null) => {
-            if (err) {
-              return console.error(err);
-            }
-          }
-        );
+    const sortedSchema = lexicographicSortSchema(schema);
+    const generatedSchema = printSchema(sortedSchema);
+    const fs = require("fs");
+    fs.writeFile(
+      options.definitionFilePath,
+      generatedSchema,
+      (err: Error | null) => {
+        if (err) {
+          return console.error(err);
+        }
       }
-      if (options.typeGeneration) {
-        options
-          .typeGeneration(sortedSchema)
-          .then((options) => {
-            console.log(options);
-          })
-          .catch((e) => {
-            console.error(e);
-          });
-      }
+    );
+    if (options.typeGeneration) {
+      typegen(options.typeGeneration, sortedSchema).catch((e) => {
+        console.error(e);
+      });
     }
   }
 

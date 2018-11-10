@@ -19,7 +19,7 @@ export const Episode = GQLiteralEnum<Gen>("Episode", (t) => {
   t.member("JEDI", { value: 6, description: "Released in 1983" });
 });
 
-export const MoreEpisodes = GQLiteralEnum("MoreEpisodes", (t) => {
+export const MoreEpisodes = GQLiteralEnum<Gen>("MoreEpisodes", (t) => {
   t.mix("Episode");
   t.members(["OTHER"]);
 });

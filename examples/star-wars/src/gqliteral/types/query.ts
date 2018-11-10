@@ -16,7 +16,7 @@ const heroArgs = {
   }),
 };
 
-export const Query = GQLiteralObject<Gen>("Query", (t) => {
+export const Query = GQLiteralObject<Gen, "Query">("Query", (t) => {
   t.field("hero", "Character", {
     args: heroArgs,
     resolve: (_, { episode }) => getHero(episode),

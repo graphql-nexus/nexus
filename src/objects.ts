@@ -7,9 +7,9 @@ import {
   GraphQLEnumType,
   GraphQLIsTypeOfFn,
 } from "graphql";
-import * as Gen from "./gen";
-import { SchemaBuilder } from "./builder";
 import { addMix } from "./utils";
+import { SchemaBuilder } from "./builder";
+import { GQLiteralArg } from "./definitions";
 
 export type GQLiteralNamedType =
   | GQLiteralEnumType
@@ -32,8 +32,8 @@ export class GQLiteralEnumType<GenTypes = any> {
   }
 
   mix<EnumName extends string>(
-    typeName: Gen.EnumName<GenTypes>,
-    mixOptions?: Types.MixOpts<Gen.EnumMembers<GenTypes, EnumName>>
+    typeName: Types.EnumName<GenTypes>,
+    mixOptions?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
   ) {
     this.typeConfig.members.push({
       item: Types.NodeType.MIX,
@@ -127,6 +127,7 @@ export class GQLiteralUnionType<GenTypes = any, TypeName extends string = any> {
    * Object type.
    */
   resolveType(typeResolver: Types.ResolveType<GenTypes, TypeName>) {
+    // @ts-ignore
     this.typeConfig.resolveType = typeResolver;
   }
 
@@ -139,22 +140,39 @@ export class GQLiteralUnionType<GenTypes = any, TypeName extends string = any> {
   }
 }
 
-abstract class GQLiteralWithFields<
-  GenTypes = any,
-  TypeName extends string = any
-> {
-  protected abstract typeConfig: {
-    fields: Types.FieldDefType[];
-  };
+abstract class FieldsArgs {
+  idArg(options?: Types.ArgOpts) {
+    return GQLiteralArg("ID", options);
+  }
+
+  intArg(options?: Types.ArgOpts) {
+    return GQLiteralArg("Int", options);
+  }
+
+  floatArg(options?: Types.ArgOpts) {
+    return GQLiteralArg("Float", options);
+  }
+
+  boolArg(options?: Types.ArgOpts) {
+    return GQLiteralArg("Bool", options);
+  }
+
+  stringArg(options?: Types.ArgOpts) {
+    return GQLiteralArg("String", options);
+  }
 }
 
-export class GQLiteralObjectType<GenTypes, TypeName extends string = any> {
+export class GQLiteralObjectType<
+  GenTypes = any,
+  TypeName extends string = any
+> extends FieldsArgs {
   /**
    * All metadata about the object type
    */
   protected typeConfig: Types.ObjectTypeConfig;
 
   constructor(name: string) {
+    super();
     this.typeConfig = {
       name,
       fields: [],
@@ -233,7 +251,7 @@ export class GQLiteralObjectType<GenTypes, TypeName extends string = any> {
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Gen.AllOutputTypes<GenTypes>,
+    type: Types.AllOutputTypes<GenTypes>,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     this.typeConfig.fields.push({
@@ -250,7 +268,7 @@ export class GQLiteralObjectType<GenTypes, TypeName extends string = any> {
    * Declare that an object type implements a particular interface,
    * by providing the name of the interface
    */
-  implements(...interfaceName: Gen.InterfaceName<GenTypes>[]) {
+  implements(...interfaceName: Types.AllInterfaces<GenTypes>[]) {
     this.typeConfig.interfaces.push(...interfaceName);
   }
 
@@ -281,7 +299,12 @@ export class GQLiteralObjectType<GenTypes, TypeName extends string = any> {
   /**
    * Supply the default field resolver for all members of this type
    */
-  defaultResolver(resolverFn: GraphQLFieldResolver<any, any>) {
+  defaultResolver(
+    resolverFn: GraphQLFieldResolver<
+      Types.RootValue<GenTypes, TypeName>,
+      Types.ContextValue<GenTypes>
+    >
+  ) {
     this.typeConfig.defaultResolver = resolverFn;
   }
 
@@ -294,7 +317,10 @@ export class GQLiteralObjectType<GenTypes, TypeName extends string = any> {
   }
 }
 
-export class GQLiteralInterfaceType<GenTypes, TypeName extends string> {
+export class GQLiteralInterfaceType<
+  GenTypes = any,
+  TypeName extends string = any
+> {
   /**
    * Metadata about the object type
    */
@@ -378,7 +404,7 @@ export class GQLiteralInterfaceType<GenTypes, TypeName extends string> {
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Gen.AllOutputTypes<GenTypes>,
+    type: Types.AllOutputTypes<GenTypes>,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     this.typeConfig.fields.push({
@@ -404,6 +430,7 @@ export class GQLiteralInterfaceType<GenTypes, TypeName extends string> {
    * Object type.
    */
   resolveType(typeResolver: Types.ResolveType<GenTypes, TypeName>) {
+    // @ts-ignore
     this.typeConfig.resolveType = typeResolver;
   }
 
@@ -436,6 +463,7 @@ export class GQLiteralInputObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    // @ts-ignore
     this.field(name, "ID", options);
   }
 
@@ -446,6 +474,7 @@ export class GQLiteralInputObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    // @ts-ignore
     this.field(name, "Int", options);
   }
 
@@ -456,6 +485,7 @@ export class GQLiteralInputObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    // @ts-ignore
     this.field(name, "Float", options);
   }
 
@@ -466,6 +496,7 @@ export class GQLiteralInputObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    // @ts-ignore
     this.field(name, "String", options);
   }
 
@@ -476,6 +507,7 @@ export class GQLiteralInputObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    // @ts-ignore
     this.field(name, "Boolean", options);
   }
 
@@ -484,7 +516,7 @@ export class GQLiteralInputObjectType<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Gen.AllInputTypes<GenTypes> | string,
+    type: Types.AllInputTypes<GenTypes>,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     this.typeConfig.fields.push({
@@ -516,10 +548,7 @@ export class GQLiteralInputObjectType<
  *
  * Use the `.mix` to mixin the abstract type fields.
  */
-export class GQLiteralAbstract<GenTypes> extends GQLiteralWithFields<
-  GenTypes,
-  never
-> {
+export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
   protected typeConfig: Types.AbstractTypeConfig;
 
   constructor() {
@@ -527,5 +556,78 @@ export class GQLiteralAbstract<GenTypes> extends GQLiteralWithFields<
     this.typeConfig = {
       fields: [],
     };
+  }
+
+  /**
+   * Add an ID field type to the object schema.
+   */
+  id<FieldName extends string>(
+    name: FieldName,
+    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
+  ) {
+    // @ts-ignore
+    this.field(name, "ID", options);
+  }
+
+  /**
+   * Add an Int field type to the object schema.
+   */
+  int<FieldName extends string>(
+    name: FieldName,
+    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
+  ) {
+    // @ts-ignore
+    this.field(name, "Int", options);
+  }
+
+  /**
+   * Add a Float field type to the object schema.
+   */
+  float<FieldName extends string>(
+    name: FieldName,
+    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
+  ) {
+    // @ts-ignore
+    this.field(name, "Float", options);
+  }
+
+  /**
+   * Add a String field type to the object schema.
+   */
+  string<FieldName extends string>(
+    name: FieldName,
+    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
+  ) {
+    // @ts-ignore
+    this.field(name, "String", options);
+  }
+
+  /**
+   * Add a Boolean field type to the object schema.
+   */
+  boolean<FieldName extends string>(
+    name: FieldName,
+    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
+  ) {
+    // @ts-ignore
+    this.field(name, "Boolean", options);
+  }
+
+  /**
+   * Adds a new field to the input object type
+   */
+  field<FieldName extends string>(
+    name: FieldName,
+    type: Types.AllInputTypes<GenTypes>,
+    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
+  ) {
+    this.typeConfig.fields.push({
+      item: Types.NodeType.FIELD,
+      config: {
+        name,
+        type,
+        ...options,
+      },
+    });
   }
 }

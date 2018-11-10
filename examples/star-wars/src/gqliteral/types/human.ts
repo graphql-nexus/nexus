@@ -1,7 +1,7 @@
 import { GQLiteralObject } from "gqliteral";
 import { Gen } from "../../generatedTypes";
 
-export const Human = GQLiteralObject<Gen>("Human", (t) => {
+export const Human = GQLiteralObject<Gen, "Human">("Human", (t) => {
   t.description("A humanoid creature in the Star Wars universe.");
   t.implements("Character");
   t.string("homePlanet", {

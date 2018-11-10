@@ -102,7 +102,9 @@ function getCharacter(id: string) {
 /**
  * Allows us to query for a character's friends.
  */
-export function getFriends(character: Character): Array<Promise<Character>> {
+export function getFriends(
+  character: Character
+): Array<Promise<Human | Droid>> {
   // Notice that GraphQL accepts Arrays of Promises.
   return character.friends.map((id) => getCharacter(id));
 }
@@ -113,10 +115,10 @@ export function getFriends(character: Character): Array<Promise<Character>> {
 export function getHero(episode: number): Character {
   if (episode === 5) {
     // Luke is the hero of Episode V.
-    return luke;
+    return luke as Human;
   }
   // Artoo is the hero otherwise.
-  return artoo;
+  return artoo as Droid;
 }
 
 export const allHumans = Object.keys(humanData).map((key) => humanData[key]);

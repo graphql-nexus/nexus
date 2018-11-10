@@ -294,7 +294,7 @@ export class SchemaBuilder {
         typeConfig
       ),
       resolve: this.getResolver(fieldConfig, typeConfig),
-      description: typeConfig.description,
+      description: fieldConfig.description,
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
       // subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
       // deprecationReason?: Maybe<string>;
@@ -382,8 +382,8 @@ export class SchemaBuilder {
     let finalType = type;
     const nullConfig = {
       ...NULL_DEFAULTS,
-      ...this.schemaConfig.nullabilityConfig,
-      ...typeConfig.nullabilityConfig,
+      ...this.schemaConfig.nullability,
+      ...typeConfig.nullability,
     };
     const { list, nullable, listItemNullable } = fieldConfig;
     const isNullable =

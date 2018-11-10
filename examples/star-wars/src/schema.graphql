@@ -1,31 +1,31 @@
 interface Character {
-  """A character in the Star Wars Trilogy"""
+  """Which movies they appear in."""
   appearsIn: [Episode!]!
 
-  """A character in the Star Wars Trilogy"""
+  """The friends of the character, or an empty list if they have none."""
   friends: [Character!]!
 
-  """A character in the Star Wars Trilogy"""
+  """The id of the character"""
   id: String!
 
-  """A character in the Star Wars Trilogy"""
+  """The name of the character"""
   name: String!
 }
 
 type Droid implements Character {
-  """A character in the Star Wars Trilogy"""
+  """Which movies they appear in."""
   appearsIn: [Episode!]!
 
-  """A character in the Star Wars Trilogy"""
+  """The friends of the character, or an empty list if they have none."""
   friends: [Character!]!
 
-  """A character in the Star Wars Trilogy"""
+  """The id of the character"""
   id: String!
 
-  """A character in the Star Wars Trilogy"""
+  """The name of the character"""
   name: String!
 
-  """A mechanical creature in the Star Wars universe."""
+  """The primary function of the droid."""
   primaryFunction: String!
 }
 
@@ -41,19 +41,19 @@ enum Episode {
 }
 
 type Human implements Character {
-  """A character in the Star Wars Trilogy"""
+  """Which movies they appear in."""
   appearsIn: [Episode!]!
 
-  """A character in the Star Wars Trilogy"""
+  """The friends of the character, or an empty list if they have none."""
   friends: [Character!]!
 
-  """A humanoid creature in the Star Wars universe."""
+  """The home planet of the human, or null if unknown."""
   homePlanet: String
 
-  """A character in the Star Wars Trilogy"""
+  """The id of the character"""
   id: String!
 
-  """A character in the Star Wars Trilogy"""
+  """The name of the character"""
   name: String!
 }
 

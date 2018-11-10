@@ -4,10 +4,10 @@ import {
   GraphQLNamedType,
   GraphQLTypeResolver,
   GraphQLIsTypeOfFn,
-  GraphQLSchema,
+  GraphQLResolveInfo,
 } from "graphql";
-import * as Gen from "./gen";
 import { GQLiteralAbstract } from "./objects";
+import { GQLiteralTypegenOptions } from "./typegen";
 
 export enum NodeType {
   MIX = "MIX",
@@ -18,24 +18,6 @@ export enum NodeType {
 }
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-/**
- * This allows us to actually use the root type when defining types.
- *
- * If the resolver and the property are both undefined, or if they don't exist at all,
- * the field name should be a key of the root value, or at least have a default value
- * otherwise it'll be undefined, which is more-often-than not user error.
- */
-export type FieldName<Root, Opts> = Opts extends {
-  resolve?: infer R;
-  property?: infer P;
-}
-  ? R extends undefined
-    ? (P extends undefined ? Extract<keyof Root, string> : string)
-    : string
-  : Opts extends { defaultValue?: string }
-    ? string
-    : Extract<keyof Root, string>;
 
 export type GQLTypes = "ID" | "String" | "Int" | "Float" | string;
 
@@ -123,6 +105,10 @@ export interface CommonOpts {
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string | DeprecationInfo;
+  /**
+   * Any directives for the type
+   */
+  directives?: any[];
 }
 
 export interface FieldOpts extends CommonOpts {
@@ -166,14 +152,6 @@ export interface ObjTypeDef {
   args: { [argName: string]: any };
 }
 
-type FieldResolver<
-  GenTypes,
-  TypeName,
-  FieldName
-> = GenTypes extends Gen.GenTypesShape
-  ? GraphQLFieldResolver<any, any>
-  : GraphQLFieldResolver<any, any>;
-
 export type OutputFieldArgs = Record<string, ArgDefinition>;
 
 export interface OutputFieldOpts<
@@ -188,16 +166,18 @@ export interface OutputFieldOpts<
   /**
    * Property to use to resolve the field. If resolve is specified, this field is ignored.
    */
-  property?: Extract<keyof any, string>;
+  property?: Extract<keyof RootValue<GenTypes, TypeName>, string>;
   /**
    * Resolver for the output field
    */
-  resolve?: FieldResolver<GenTypes, TypeName, FieldName>;
+  resolve?: GQLitFieldResolver<GenTypes, TypeName, FieldName>;
   /**
    * Default value for the field, if none is returned.
    */
   defaultValue?: any;
 }
+
+export interface AbstractFieldOpts<GenTypes, FieldName> extends FieldOpts {}
 
 export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = Omit<
   OutputFieldOpts<GenTypes, TypeName, FieldName>,
@@ -219,6 +199,10 @@ export interface ScalarOpts
 
 interface HasFields {
   fields: FieldDefType[];
+}
+
+interface HasDirectives {
+  directives: any[];
 }
 
 interface Named {
@@ -248,7 +232,7 @@ export interface Nullability {
   /**
    * Configures the nullability defaults at the type-level
    */
-  nullabilityConfig?: NullabilityConfig;
+  nullability?: NullabilityConfig;
 }
 
 export interface EnumTypeConfig extends Named, SharedTypeConfig {
@@ -280,7 +264,7 @@ export interface ObjectTypeConfig
   /**
    * All interfaces the object implements.
    */
-  interfaces: Gen.InterfaceName<any>[];
+  interfaces: string[];
 
   /**
    * An (optional) isTypeOf check for the object type
@@ -318,7 +302,7 @@ export interface SchemaConfig extends Nullability, DefaultResolver {
   /**
    * Generates the types for intellisense/typescript
    */
-  typeGeneration?: (printedSchema: GraphQLSchema) => Promise<void>;
+  typeGeneration?: GQLiteralTypegenOptions;
   /**
    * Forces type-safety by not falling back to strings
    */
@@ -391,5 +375,153 @@ export type NullabilityConfig = {
 export type GetTypeFn = (t: string) => GraphQLNamedType;
 
 export type ResolveType<GenTypes, TypeName> = (
-  root: Gen.RootType<GenTypes, TypeName>
-) => Gen.InterfaceName<GenTypes>;
+  root: RootValue<GenTypes, TypeName>
+) => InterfaceName<GenTypes, TypeName>;
+
+/**
+ * Helpers for handling the generated schema
+ */
+
+export type GenTypesShape = {
+  context: any;
+  enums: Record<string, any>;
+  objects: Record<
+    string,
+    {
+      backingType: any;
+      fields: Record<
+        string,
+        {
+          returnType: any;
+          args: any;
+        }
+      >;
+    }
+  >;
+  inputObjects: Record<string, any>;
+  unions: Record<string, any>;
+  scalars: Record<string, any>;
+  interfaces: Record<
+    string,
+    {
+      implementingTypes: string;
+      backingType: any;
+      fields: Record<
+        string,
+        {
+          returnType: any;
+          args: any;
+        }
+      >;
+    }
+  >;
+  availableInputTypes: string;
+  availableOutputTypes: string;
+};
+
+export type OutputNames<GenTypes> = GenTypes extends GenTypesShape
+  ? Extract<keyof GenTypes["objects"], string>
+  : never;
+
+export type InterfaceName<GenTypes, TypeName> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["interfaces"]
+    ? GenTypes["interfaces"][TypeName]["implementingTypes"]
+    : never
+  : never;
+
+export type EnumName<GenTypes> = GenTypes extends GenTypesShape
+  ? Extract<keyof GenTypes["enums"], string>
+  : never;
+
+export type UnionName<GenTypes> = GenTypes extends GenTypesShape
+  ? Extract<keyof GenTypes["unions"], string>
+  : never;
+
+export type EnumMembers<
+  GenTypes,
+  EnumName extends string
+> = GenTypes extends GenTypesShape
+  ? EnumName extends keyof GenTypes["enums"]
+    ? GenTypes["enums"][EnumName]
+    : never
+  : string;
+
+export type ObjectTypeDef<GenTypes, TypeName> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["objects"]
+    ? GenTypes["objects"][TypeName]["backingType"]
+    : never
+  : string;
+
+export type InputObjectTypeDef<
+  GenTypes,
+  TypeName
+> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["inputObjects"]
+    ? GenTypes["inputObjects"][TypeName]
+    : never
+  : string;
+
+export type AllInterfaces<GenTypes> = GenTypes extends GenTypesShape
+  ? Extract<keyof GenTypes["interfaces"], string>
+  : never;
+
+export type AllInputTypes<
+  GenTypes,
+  K = "availableInputTypes"
+> = K extends keyof GenTypes ? GenTypes[K] : never;
+
+export type AllOutputTypes<
+  GenTypes,
+  K = "availableOutputTypes"
+> = K extends keyof GenTypes ? GenTypes[K] : never;
+
+export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["objects"]
+    ? GenTypes["objects"][TypeName]["backingType"]
+    : TypeName extends keyof GenTypes["interfaces"]
+      ? GenTypes["interfaces"][TypeName]["backingType"]
+      : any
+  : never;
+
+export type ArgsValue<
+  GenTypes,
+  TypeName,
+  FieldName
+> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["objects"]
+    ? FieldName extends keyof GenTypes["objects"][TypeName]["fields"]
+      ? GenTypes["objects"][TypeName]["fields"][FieldName]["args"]
+      : never
+    : TypeName extends keyof GenTypes["interfaces"]
+      ? FieldName extends keyof GenTypes["interfaces"][TypeName]["fields"]
+        ? GenTypes["interfaces"][TypeName]["fields"][FieldName]["args"]
+        : never
+      : never
+  : never;
+
+export type ContextValue<GenTypes> = GenTypes extends GenTypesShape
+  ? GenTypes["context"]
+  : any;
+
+export type ResultValue<
+  GenTypes,
+  TypeName,
+  FieldName
+> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["objects"]
+    ? FieldName extends keyof GenTypes["objects"][TypeName]["fields"]
+      ? GenTypes["objects"][TypeName]["fields"][FieldName]["returnType"]
+      : never
+    : TypeName extends keyof GenTypes["interfaces"]
+      ? FieldName extends keyof GenTypes["interfaces"][TypeName]["fields"]
+        ? GenTypes["interfaces"][TypeName]["fields"][FieldName]["returnType"]
+        : never
+      : never
+  : never;
+
+export type GQLitFieldResolver<GenTypes, TypeName, FieldName> = (
+  source: RootValue<GenTypes, TypeName>,
+  args: ArgsValue<GenTypes, TypeName, FieldName>,
+  context: ContextValue<GenTypes>,
+  info: GraphQLResolveInfo
+) => ResultValue<GenTypes, TypeName, FieldName>;
