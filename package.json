@@ -8,6 +8,13 @@
     "dev": "tsc -w",
     "test": "jest"
   },
+  "files": [
+    "src",
+    "dist",
+    "LICENSE.md",
+    "README.md",
+    "yarn.lock"
+  ],
   "author": {
     "name": "Tim Griesser",
     "url": "https://github.com/tgriesser"

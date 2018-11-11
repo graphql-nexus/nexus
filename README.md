@@ -20,26 +20,12 @@ yarn install gqliteral
 
 ##### Type combination
 
-Ever have a situation where your input types look eerily simliar to your output types, yet you need to define them both by hand in the schema? Or maybe you have an interface shared by several types, and each time you add a field to the interface you need to remember to add it to the types.
-
 ##### No circular reference issues
-
-One of the problems with GraphQL construction is the self-referential types and the
 
 ##### Awesome intellisense
 
-Leverages type generation internally so you don't have to.
-
 ##### Great error messages
 
-We want you to know where things went wrong, not spend time trying to figure out cryptic error messages.
-
-### Non-goals:
-
-Opinions on resolvers.
-
-### Type combination
-
-Ever notice that your input types and output types are usually fairly similar? Maybe the
-
 ### License
+
+MIT
