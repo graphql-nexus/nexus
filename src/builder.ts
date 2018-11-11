@@ -67,7 +67,10 @@ export class SchemaBuilder {
   protected pendingTypeMap: Record<string, GQLiteralTypeWrapper> = {};
 
   constructor(
-    protected schemaConfig: Types.Omit<Types.SchemaConfig, "types">
+    protected schemaConfig: Pick<
+      Types.SchemaConfig,
+      "nullability" | "defaultResolver"
+    >
   ) {}
 
   addType(typeDef: GQLiteralTypeWrapper | GraphQLNamedType) {
@@ -210,6 +213,11 @@ export class SchemaBuilder {
           });
       }
     });
+    if (!Object.keys(values).length) {
+      throw new Error(
+        `GQLiteral: Enum ${config.name} must have at least one member`
+      );
+    }
     return values;
   }
 
@@ -238,6 +246,11 @@ export class SchemaBuilder {
           break;
       }
     });
+    if (!Object.keys(unionMembers).length) {
+      throw new Error(
+        `GQLiteral: Union ${config.name} must have at least one member type`
+      );
+    }
     return unionMembers;
   }
 

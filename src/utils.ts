@@ -9,10 +9,10 @@ import { GQLiteralAbstract } from "./objects";
  * better developer experience
  */
 export function buildTypes(
-  config: Types.SchemaConfig
+  types: any,
+  config?: Pick<Types.SchemaConfig, "nullability" | "defaultResolver">
 ): Record<string, GraphQLNamedType> {
-  const builder = new SchemaBuilder(config);
-  const { types } = config;
+  const builder = new SchemaBuilder(config || {});
   addTypes(builder, types);
   return builder.getFinalTypeMap();
 }

@@ -5,16 +5,16 @@ import { buildTypes } from "../utils";
 
 describe("gqlit", () => {
   describe("GQLiteralEnum", () => {
-    const PrimaryColors = GQLiteralEnum("PrimaryColors", (t) => {
+    const PrimaryColors = GQLiteralEnum<any>("PrimaryColors", (t) => {
       t.members(["RED", "YELLOW", "BLUE"]);
     });
 
-    const RainbowColors = GQLiteralEnum("RainbowColors", (t) => {
+    const RainbowColors = GQLiteralEnum<any>("RainbowColors", (t) => {
       t.mix("PrimaryColors");
       t.members(["ORANGE", "GREEN", "VIOLET"]);
     });
 
-    const AdditivePrimaryColors = GQLiteralEnum(
+    const AdditivePrimaryColors = GQLiteralEnum<any>(
       "AdditivePrimaryColors",
       (t) => {
         t.mix("PrimaryColors", { omit: ["YELLOW"] });
@@ -22,12 +22,12 @@ describe("gqlit", () => {
       }
     );
 
-    const CircularRefTestA = GQLiteralEnum("CircularA", (t) => {
+    const CircularRefTestA = GQLiteralEnum<any>("CircularA", (t) => {
       t.mix("CircularB");
       t.members(["A"]);
     });
 
-    const CircularRefTestB = GQLiteralEnum("CircularA", (t) => {
+    const CircularRefTestB = GQLiteralEnum<any>("CircularB", (t) => {
       t.mix("CircularA");
       t.members(["B"]);
     });
@@ -71,7 +71,7 @@ describe("gqlit", () => {
     });
 
     it("can pick with mix", () => {
-      const FavoriteColors = GQLiteralEnum("FavoriteColors", (t) => {
+      const FavoriteColors = GQLiteralEnum<any>("FavoriteColors", (t) => {
         t.mix("RainbowColors", { pick: ["RED", "GREEN"] });
       });
       const types: { FavoriteColors: GraphQLEnumType } = buildTypes([
@@ -138,7 +138,7 @@ describe("gqlit", () => {
       expect(() => {
         buildTypes([CircularRefTestA, CircularRefTestB]);
       }).toThrowError(
-        "Circular dependency mixin detected when building GQLit Enum"
+        "GQLiteral: Circular dependency detected, while building types"
       );
     });
   });
@@ -153,8 +153,8 @@ describe("gqlit", () => {
     });
     const type: { Account: GraphQLObjectType } = buildTypes([Account]) as any;
     expect(Object.keys(type.Account.getFields()).sort()).toEqual([
-      "id",
       "email",
+      "id",
       "name",
     ]);
   });

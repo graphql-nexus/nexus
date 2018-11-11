@@ -1,11 +1,16 @@
 {
   "name": "gqliteral",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "types": "src/index.ts",
   "license": "MIT",
   "scripts": {
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "test": "jest"
+  },
+  "author": {
+    "name": "Tim Griesser",
+    "url": "https://github.com/tgriesser"
   },
   "dependencies": {
     "graphql-codegen-core": "0.13.0",

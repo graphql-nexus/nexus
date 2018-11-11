@@ -204,7 +204,7 @@ export function GQLiteralArg<GenTypes = GQLiteralGen>(
  * root query type.
  */
 export function GQLiteralSchema(options: Types.SchemaConfig) {
-  const typeMap = buildTypes(options);
+  const typeMap = buildTypes(options.types, options);
 
   if (!isObjectType(typeMap["Query"])) {
     throw new Error("Missing a Query type");
@@ -214,13 +214,10 @@ export function GQLiteralSchema(options: Types.SchemaConfig) {
     query: typeMap["Query"] as any,
     mutation: typeMap["Mutation"] as any,
     subscription: typeMap["Subscription"] as any,
-    types: Object.keys(typeMap).reduce(
-      (result, key) => {
-        result.push(typeMap[key]);
-        return result;
-      },
-      [] as GraphQLNamedType[]
-    ),
+    types: Object.keys(typeMap).reduce((result: GraphQLNamedType[], key) => {
+      result.push(typeMap[key]);
+      return result;
+    }, []),
   });
 
   // Only in development do we want to worry about regenerating the
