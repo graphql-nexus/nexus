@@ -1,3 +1,4 @@
+"""A character in the Star Wars Trilogy"""
 interface Character {
   """Which movies they appear in."""
   appearsIn: [Episode!]!
@@ -12,6 +13,7 @@ interface Character {
   name: String!
 }
 
+"""A mechanical creature in the Star Wars universe."""
 type Droid implements Character {
   """Which movies they appear in."""
   appearsIn: [Episode!]!
@@ -40,6 +42,7 @@ enum Episode {
   NEWHOPE
 }
 
+"""A humanoid creature in the Star Wars universe."""
 type Human implements Character {
   """Which movies they appear in."""
   appearsIn: [Episode!]!

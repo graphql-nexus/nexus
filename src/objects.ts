@@ -6,33 +6,40 @@ import {
   GraphQLUnionType,
   GraphQLEnumType,
   GraphQLIsTypeOfFn,
+  GraphQLInputFieldConfigMap,
+  GraphQLFieldConfigMap,
+  GraphQLResolveInfo,
 } from "graphql";
-import { addMix } from "./utils";
+import { addMix, dedent } from "./utils";
 import { SchemaBuilder } from "./builder";
 import { GQLiteralArg } from "./definitions";
 
+declare global {
+  interface GQLiteralGen {}
+}
+
 export type GQLiteralNamedType =
-  | GQLiteralEnumType
+  | GQLiteralEnumType<any>
   | GQLiteralObjectType<any, any>
   | GQLiteralInterfaceType<any, any>
-  | GQLiteralUnionType
-  | GQLiteralInputObjectType;
+  | GQLiteralUnionType<any, any>
+  | GQLiteralInputObjectType<any, any>;
 
 /**
  * Backing type for an enum member.
  */
-export class GQLiteralEnumType<GenTypes = any> {
+export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
   protected typeConfig: Types.EnumTypeConfig;
 
-  constructor(protected name: string) {
+  constructor(name: string) {
     this.typeConfig = {
       name,
       members: [],
     };
   }
 
-  mix<EnumName extends string>(
-    typeName: Types.EnumName<GenTypes>,
+  mix<EnumName extends Types.EnumName<GenTypes>>(
+    typeName: EnumName,
     mixOptions?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
   ) {
     this.typeConfig.members.push({
@@ -75,7 +82,7 @@ export class GQLiteralEnumType<GenTypes = any> {
    * Any description about the enum type.
    */
   description(description: string) {
-    this.typeConfig.description = description;
+    this.typeConfig.description = dedent(description);
   }
 
   /**
@@ -91,10 +98,13 @@ export class GQLiteralEnumType<GenTypes = any> {
   }
 }
 
-export class GQLiteralUnionType<GenTypes = any, TypeName extends string = any> {
+export class GQLiteralUnionType<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+> {
   protected typeConfig: Types.UnionTypeConfig;
 
-  constructor(protected name: string) {
+  constructor(name: string) {
     this.typeConfig = {
       name,
       members: [],
@@ -140,32 +150,41 @@ export class GQLiteralUnionType<GenTypes = any, TypeName extends string = any> {
   }
 }
 
-abstract class FieldsArgs {
+abstract class FieldsArgs<GenTypes = GQLiteralGen> {
   idArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("ID", options);
+    // @ts-ignore
+    return GQLiteralArg<GenTypes>("ID", options);
   }
 
   intArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("Int", options);
+    // @ts-ignore
+    return GQLiteralArg<GenTypes>("Int", options);
   }
 
   floatArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("Float", options);
+    // @ts-ignore
+    return GQLiteralArg<GenTypes>("Float", options);
   }
 
   boolArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("Bool", options);
+    // @ts-ignore
+    return GQLiteralArg<GenTypes>("Bool", options);
   }
 
   stringArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("String", options);
+    // @ts-ignore
+    return GQLiteralArg<GenTypes>("String", options);
+  }
+
+  fieldArg(type: Types.AllInputTypes<GenTypes>, options?: Types.ArgOpts) {
+    return GQLiteralArg<GenTypes>(type, options);
   }
 }
 
 export class GQLiteralObjectType<
-  GenTypes = any,
+  GenTypes = GQLiteralGen,
   TypeName extends string = any
-> extends FieldsArgs {
+> extends FieldsArgs<GenTypes> {
   /**
    * All metadata about the object type
    */
@@ -262,6 +281,16 @@ export class GQLiteralObjectType<
         ...options,
       },
     });
+    return {
+      resolver(
+        fn: (
+          root: Types.RootValue<GenTypes, TypeName>,
+          args: Types.ArgsValue<GenTypes, TypeName, FieldName>,
+          context: Types.ContextValue<GenTypes>,
+          info: GraphQLResolveInfo
+        ) => Types.ResultValue<GenTypes, TypeName, FieldName>
+      ): void {},
+    };
   }
 
   /**
@@ -276,7 +305,7 @@ export class GQLiteralObjectType<
    * Adds a description to the metadata for the object type.
    */
   description(description: string) {
-    this.typeConfig.description = description;
+    this.typeConfig.description = dedent(description);
   }
 
   /**
@@ -287,7 +316,9 @@ export class GQLiteralObjectType<
   }
 
   /**
-   * Used to modify a field already defined on an interface.
+   * Used to modify a field already defined on an interface or
+   * abstract type.
+   *
    * At this point the type will not change, but the resolver,
    * defaultValue, property, or description fields can.
    */
@@ -318,7 +349,7 @@ export class GQLiteralObjectType<
 }
 
 export class GQLiteralInterfaceType<
-  GenTypes = any,
+  GenTypes = GQLiteralGen,
   TypeName extends string = any
 > {
   /**
@@ -326,7 +357,7 @@ export class GQLiteralInterfaceType<
    */
   protected typeConfig: Types.InterfaceTypeConfig;
 
-  constructor(protected name: string) {
+  constructor(name: string) {
     this.typeConfig = {
       name,
       fields: [],
@@ -421,7 +452,7 @@ export class GQLiteralInterfaceType<
    * Adds a description to the metadata for the interface type.
    */
   description(description: string) {
-    this.typeConfig.description = description;
+    this.typeConfig.description = dedent(description);
   }
 
   /**
@@ -444,12 +475,12 @@ export class GQLiteralInterfaceType<
 }
 
 export class GQLiteralInputObjectType<
-  GenTypes = any,
+  GenTypes = GQLiteralGen,
   TypeName extends string = any
 > {
   protected typeConfig: Types.InputTypeConfig;
 
-  constructor(protected name: string) {
+  constructor(name: string) {
     this.typeConfig = {
       name,
       fields: [],
@@ -530,7 +561,7 @@ export class GQLiteralInputObjectType<
   }
 
   description(description: string) {
-    this.typeConfig.description = description;
+    this.typeConfig.description = dedent(description);
   }
 
   /**
@@ -622,12 +653,13 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
     this.typeConfig.fields.push({
-      item: Types.NodeType.FIELD,
-      config: {
-        name,
-        type,
-        ...options,
-      },
+      name,
+      type,
+      ...options,
     });
+  }
+
+  buildType(): Types.AbstractTypeConfig {
+    return this.typeConfig;
   }
 }

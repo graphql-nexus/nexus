@@ -1,6 +1,5 @@
 import { GQLiteralObject, GQLiteralArg } from "gqliteral";
 import { getHero, getHuman, getDroid } from "../data";
-import { Gen } from "../../generatedTypes";
 
 const characterArgs = {
   id: GQLiteralArg("String", {
@@ -16,7 +15,7 @@ const heroArgs = {
   }),
 };
 
-export const Query = GQLiteralObject<Gen, "Query">("Query", (t) => {
+export const Query = GQLiteralObject("Query", (t) => {
   t.field("hero", "Character", {
     args: heroArgs,
     resolve: (_, { episode }) => getHero(episode),

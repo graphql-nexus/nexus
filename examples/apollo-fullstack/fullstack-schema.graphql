@@ -1,0 +1,66 @@
+type Launch {
+  id: ID!
+  isBooked: Boolean!
+  mission: Mission!
+  rocket: Rocket!
+  site: String
+}
+
+"""
+Simple wrapper around our list of launches that contains a cursor to the
+last item in the list. Pass this cursor to the launches query to fetch results
+after these.
+"""
+type LaunchConnection {
+  cursor: String!
+  hasMore: Boolean!
+  launches: [Launch]!
+}
+
+type Mission {
+  missionPatch(size: PatchSize): String!
+  name: String
+}
+
+type Mutation {
+  bookTrips(launchIds: [ID!]!): TripUpdateResponse!
+  cancelTrip(launchId: ID!): TripUpdateResponse!
+  login(email: String): String
+}
+
+enum PatchSize {
+  LARGE
+  SMALL
+}
+
+type Query {
+  launch(count: Int, id: ID!): Launch!
+  launches(
+    """
+    If you add a cursor here, it will only return results _after_ this cursor
+    """
+    after: String
+
+    """The number of results to show. Must be >= 1. Default = 20"""
+    pageSize: Int
+  ): LaunchConnection!
+  me: User
+}
+
+type Rocket {
+  id: ID!
+  name: String
+  type: String
+}
+
+type TripUpdateResponse {
+  launches: Launch
+  message: String
+  success: Boolean!
+}
+
+type User {
+  email: String!
+  id: ID!
+  trips: [Launch!]!
+}

@@ -1,0 +1,60 @@
+import { GQLiteralObject } from "gqliteral";
+
+export const Mutation = GQLiteralObject("Mutation", (t) => {
+  t.field("bookTrips", "TripUpdateResponse", {
+    args: { launchIds: t.idArg({ list: true, required: true }) },
+    async resolve(_, { launchIds }, { dataSources }) {
+      const results = await dataSources.userAPI.bookTrips({ launchIds });
+      const launches = await dataSources.launchAPI.getLaunchesByIds({
+        launchIds,
+      });
+      return {
+        success: results && results.length === launchIds.length,
+        message:
+          results.length === launchIds.length
+            ? "trips booked successfully"
+            : `the following launches couldn't be booked: ${launchIds.filter(
+                // @ts-ignore
+                (id) => !results.includes(id)
+              )}`,
+        launches,
+      };
+    },
+  });
+  t.field("cancelTrip", "TripUpdateResponse", {
+    args: { launchId: t.idArg({ required: true }) },
+    async resolve(_, { launchId }, { dataSources }) {
+      const result = dataSources.userAPI.cancelTrip({ launchId });
+
+      if (!result)
+        return {
+          success: false,
+          message: "failed to cancel trip",
+        };
+
+      const launch = await dataSources.launchAPI.getLaunchById({ launchId });
+      return {
+        success: true,
+        message: "trip cancelled",
+        launches: [launch],
+      };
+    },
+  });
+  t.string("login", {
+    nullable: true,
+    args: { email: t.stringArg() },
+    async resolve(_, { email }, { dataSources }) {
+      const user = await dataSources.userAPI.findOrCreateUser({ email });
+      if (user && email) {
+        return new Buffer(email).toString("base64");
+      }
+      return null;
+    },
+  });
+});
+
+export const TripUpdateResponse = GQLiteralObject("TripUpdateResponse", (t) => {
+  t.boolean("success");
+  t.string("message", { nullable: true });
+  t.field("launches", "Launch", { nullable: true });
+});

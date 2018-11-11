@@ -1,5 +1,11 @@
 // @ts-check
-const { GQLiteralEnum, GQLiteralObject, GQLiteralArg } = require("gqliteral");
+/// <reference path="../githuntTypes.ts" />
+const {
+  GQLiteralEnum,
+  GQLiteralObject,
+  GQLiteralArg,
+  GQLiteralAbstractType,
+} = require("gqliteral");
 
 exports.FeedType = GQLiteralEnum("FeedType", (t) => {
   t.description("A list of options for the sort order of the feed");
@@ -75,62 +81,114 @@ exports.Mutation = GQLiteralObject("Mutation", (t) => {
       }),
     },
   });
-  t.field("submitComment", "Comment", {});
+  t.field("submitComment", "Comment", {
+    args: {
+      repoFullName: RepoNameArg,
+      commentContent: t.stringArg({
+        required: true,
+        description: "The text content for the new comment",
+      }),
+    },
+  });
 });
 
-// type Mutation {
-//   # Comment on a repository, returns the new comment
-//   submitComment(
-//     # The full repository name from GitHub, e.g. "apollostack/GitHunt-API"
-//     repoFullName: String!
-//     # The text content for the new comment
-//     commentContent: String!
-//   ): Comment
-// }
+const CommonFields = GQLiteralAbstractType((t) => {
+  t.int("id", { description: "The SQL ID of this entry" });
+  t.field("postedBy", "User", {
+    nullable: true,
+    description: "The GitHub user who posted the comment",
+  });
+});
 
-// # A comment about an entry, submitted by a user
-// type Comment @cacheControl(maxAge: 240) {
-//   # The SQL ID of this entry
-//   id: Int!
-//   # The GitHub user who posted the comment
-//   postedBy: User
-//   # A timestamp of when the comment was posted
-//   createdAt: Float! # Actually a date
-//   # The text of the comment
-//   content: String!
-//   # The repository which this comment is about
-//   repoName: String!
-// }
+exports.Comment = GQLiteralObject("Comment", (t) => {
+  t.description("A comment about an entry, submitted by a user");
+  // t.directive("@cacheControl(maxAge: 240)");
+  t.mix(CommonFields);
+  t.float("createdAt", {
+    description: "A timestamp of when the comment was posted",
+  });
+  t.string("content", {
+    description: "The text of the comment",
+  });
+  t.string("repoName", {
+    description: "The repository which this comment is about",
+  });
+});
 
-// # XXX to be removed
-// type Vote {
-//   vote_value: Int!
-// }
+// 'XXX to be removed'
+exports.Vote = GQLiteralObject("Vote", (t) => {
+  t.int("vote_value");
+});
 
 // # Information about a GitHub repository submitted to GitHunt
-// type Entry @cacheControl(maxAge: 240) {
-//   # Information about the repository from GitHub
-//   repository: Repository
-//   # The GitHub user who submitted this entry
-//   postedBy: User
-//   # A timestamp of when the entry was submitted
-//   createdAt: Float! # Actually a date
-//   # The score of this repository, upvotes - downvotes
-//   score: Int!
-//   # The hot score of this repository
-//   hotScore: Float!
-//   # Comments posted about this repository
-//   comments(limit: Int, offset: Int): [Comment]!
-//   # The number of comments posted about this repository
-//   commentCount: Int!
-//   # The SQL ID of this entry
-//   id: Int!
-//   # XXX to be changed
-//   vote: Vote!
-// }
+exports.Entry = GQLiteralObject("Entry", (t) => {
+  t.mix(CommonFields);
+  // t.directive(@cacheControl(maxAge: 240))
+  t.field("repository", "Repository", {
+    description: "Information about the repository from GitHub",
+  });
+  t.float("createdAt", {
+    description: "A timestamp of when the entry was submitted",
+  });
+  t.int("score", {
+    description: "The score of this repository, upvotes - downvotes",
+  });
+  t.float("hotScore", { description: "The hot score of this repository" });
+  t.field("comments", "Comment", {
+    list: true,
+    args: {
+      limit: t.intArg(),
+      offset: t.intArg(),
+    },
+    description: "Comments posted about this repository",
+  });
+  t.int("commentCount", {
+    description: "The number of comments posted about this repository",
+  });
+  t.field("vote", "Vote", { description: "XXX to be changed" });
+});
 
-// schema {
-//   query: Query
-//   mutation: Mutation
-//   subscription: Subscription
-// }
+exports.Repository = GQLiteralObject("Repository", (t) => {
+  t.description(`
+    A repository object from the GitHub API. This uses the exact field names returned by the
+    GitHub API for simplicity, even though the convention for GraphQL is usually to camel case.
+  `);
+  // t.directive @cacheControl(maxAge:240)
+  t.string("name", {
+    description: "Just the name of the repository, e.g. GitHunt-API",
+  });
+  t.string("full_name", {
+    description:
+      "The full name of the repository with the username, e.g. apollostack/GitHunt-API",
+  });
+  t.string("description", {
+    nullable: true,
+    description: "The description of the repository",
+  });
+  t.string("html_url", { description: "The link to the repository on GitHub" });
+  t.int("stargazers_count", {
+    description:
+      "The number of people who have starred this repository on GitHub",
+  });
+  t.int("open_issues_count", {
+    nullable: true,
+    description: "The number of open issues on this repository on GitHub",
+  });
+  t.field("owner", "User", {
+    nullable: true,
+    description: "The owner of this repository on GitHub, e.g. apollostack",
+  });
+});
+
+exports.User = GQLiteralObject("User", (t) => {
+  t.description(
+    "A user object from the GitHub API. This uses the exact field names returned from the GitHub API."
+  );
+  // t.directive @cacheControl(maxAge:240)
+  t.string("login", { description: "The name of the user, e.g. apollostack" });
+  t.string("avatar_url", {
+    description:
+      "The URL to a directly embeddable image for this user's avatar",
+  });
+  t.string("html_url", { description: "The URL of this user's GitHub page" });
+});

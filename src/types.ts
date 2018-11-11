@@ -19,8 +19,6 @@ export enum NodeType {
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-export type GQLTypes = "ID" | "String" | "Int" | "Float" | string;
-
 export type MixDef = {
   item: NodeType.MIX;
   typeName: string;
@@ -146,12 +144,6 @@ export type ArgDefinition = Readonly<
   }
 >;
 
-export interface ObjTypeDef {
-  root: any;
-  context: any;
-  args: { [argName: string]: any };
-}
-
 export type OutputFieldArgs = Record<string, ArgDefinition>;
 
 export interface OutputFieldOpts<
@@ -170,7 +162,12 @@ export interface OutputFieldOpts<
   /**
    * Resolver for the output field
    */
-  resolve?: GQLitFieldResolver<GenTypes, TypeName, FieldName>;
+  resolve?: (
+    root: RootValue<GenTypes, TypeName>,
+    args: ArgsValue<GenTypes, TypeName, FieldName>,
+    context: ContextValue<GenTypes>,
+    info: GraphQLResolveInfo
+  ) => ResultValue<GenTypes, TypeName, FieldName>;
   /**
    * Default value for the field, if none is returned.
    */
@@ -272,7 +269,9 @@ export interface ObjectTypeConfig
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
 }
 
-export interface AbstractTypeConfig extends HasFields {}
+export interface AbstractTypeConfig {
+  fields: FieldConfig[];
+}
 
 export interface InterfaceTypeConfig
   extends Named,
@@ -378,43 +377,25 @@ export type ResolveType<GenTypes, TypeName> = (
   root: RootValue<GenTypes, TypeName>
 ) => InterfaceName<GenTypes, TypeName>;
 
+type GenTypesFieldsShape = Record<
+  string,
+  {
+    returnType: any;
+    args: any;
+  }
+>;
+
 /**
  * Helpers for handling the generated schema
  */
-
 export type GenTypesShape = {
   context: any;
   enums: Record<string, any>;
-  objects: Record<
-    string,
-    {
-      backingType: any;
-      fields: Record<
-        string,
-        {
-          returnType: any;
-          args: any;
-        }
-      >;
-    }
-  >;
+  interfaces: Record<string, any>;
+  objects: Record<string, any>;
   inputObjects: Record<string, any>;
   unions: Record<string, any>;
   scalars: Record<string, any>;
-  interfaces: Record<
-    string,
-    {
-      implementingTypes: string;
-      backingType: any;
-      fields: Record<
-        string,
-        {
-          returnType: any;
-          args: any;
-        }
-      >;
-    }
-  >;
   availableInputTypes: string;
   availableOutputTypes: string;
 };
@@ -465,15 +446,13 @@ export type AllInterfaces<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["interfaces"], string>
   : never;
 
-export type AllInputTypes<
-  GenTypes,
-  K = "availableInputTypes"
-> = K extends keyof GenTypes ? GenTypes[K] : never;
+export type AllInputTypes<GenTypes> = GenTypes extends GenTypesShape
+  ? GenTypes["availableInputTypes"]
+  : never;
 
-export type AllOutputTypes<
-  GenTypes,
-  K = "availableOutputTypes"
-> = K extends keyof GenTypes ? GenTypes[K] : never;
+export type AllOutputTypes<GenTypes> = GenTypes extends GenTypesShape
+  ? GenTypes["availableOutputTypes"]
+  : never;
 
 export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["objects"]
@@ -518,10 +497,3 @@ export type ResultValue<
         : never
       : never
   : never;
-
-export type GQLitFieldResolver<GenTypes, TypeName, FieldName> = (
-  source: RootValue<GenTypes, TypeName>,
-  args: ArgsValue<GenTypes, TypeName, FieldName>,
-  context: ContextValue<GenTypes>,
-  info: GraphQLResolveInfo
-) => ResultValue<GenTypes, TypeName, FieldName>;

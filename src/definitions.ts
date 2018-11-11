@@ -46,10 +46,10 @@ export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
  *
  * @param {string}
  */
-export function GQLiteralObject<GenTypes, TypeName extends string>(
-  name: TypeName,
-  fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void
-) {
+export function GQLiteralObject<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+>(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
   const factory = new GQLiteralObjectType<GenTypes, TypeName>(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
@@ -58,7 +58,10 @@ export function GQLiteralObject<GenTypes, TypeName extends string>(
 /**
  * Define a GraphQL interface type
  */
-export function GQLiteralInterface<GenTypes, TypeName extends string>(
+export function GQLiteralInterface<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+>(
   name: TypeName,
   fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
@@ -84,11 +87,11 @@ export function GQLiteralInterface<GenTypes, TypeName extends string>(
  *   t.members('OtherType', 'AnotherType')
  * })
  */
-export function GQLiteralUnion<GenTypes, TypeName extends string>(
-  name: TypeName,
-  fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void
-) {
-  const factory = new GQLiteralUnionType(name);
+export function GQLiteralUnion<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+>(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
+  const factory = new GQLiteralUnionType<GenTypes>(name);
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -120,14 +123,17 @@ export function GQLiteralUnion<GenTypes, TypeName extends string>(
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
  */
-export function GQLiteralEnum<GenTypes>(
-  name: string,
+export function GQLiteralEnum<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+>(
+  name: TypeName,
   fn:
     | ((arg: GQLiteralEnumType<GenTypes>) => void)
     | string[]
     | Record<string, string | number | object | boolean>
 ) {
-  const factory = new GQLiteralEnumType(name);
+  const factory = new GQLiteralEnumType<GenTypes>(name);
   if (typeof fn === "function") {
     fn(factory);
   } else {
@@ -139,8 +145,11 @@ export function GQLiteralEnum<GenTypes>(
 /**
  *
  */
-export function GQLiteralInputObject<GenTypes, TypeName extends string>(
-  name: string,
+export function GQLiteralInputObject<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+>(
+  name: TypeName,
   fn: (arg: GQLiteralInputObjectType<GenTypes, TypeName>) => void
 ) {
   const factory = new GQLiteralInputObjectType<GenTypes>(name);
@@ -161,7 +170,7 @@ export function GQLiteralInputObject<GenTypes, TypeName extends string>(
  *
  * @return GQLiteralAbstractType
  */
-export function GQLiteralAbstractType<GenTypes>(
+export function GQLiteralAbstractType<GenTypes = GQLiteralGen>(
   fn: (arg: GQLiteralAbstract<GenTypes>) => void
 ) {
   const factory = new GQLiteralAbstract<GenTypes>();
@@ -175,12 +184,12 @@ export function GQLiteralAbstractType<GenTypes>(
  * This is also exposed during type definition as shorthand via the various
  * `__Arg` methods: `fieldArg`, `stringArg`, `intArg`, etc.
  */
-export function GQLiteralArg(
-  type: any, // TODO: make type safe
+export function GQLiteralArg<GenTypes = GQLiteralGen>(
+  type: Types.AllInputTypes<GenTypes>,
   options?: Types.ArgOpts
-): Types.ArgDefinition {
-  // This isn't wrapped for now because it's not a named type, it's really just an
-  // object that can be reused in multiple locations.
+): Readonly<Types.ArgDefinition> {
+  // This isn't wrapped for now because it's not a named type, it's really
+  // just an object that can be reused in multiple locations.
   return {
     type,
     ...options,
@@ -216,7 +225,7 @@ export function GQLiteralSchema(options: Types.SchemaConfig) {
 
   // Only in development do we want to worry about regenerating the
   // schema definition and/or generated types.
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV !== "production") {
     const sortedSchema = lexicographicSortSchema(schema);
     const generatedSchema = printSchema(sortedSchema);
     const fs = require("fs");

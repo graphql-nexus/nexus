@@ -8,7 +8,7 @@ import { GQLiteralSchema } from "gqliteral";
  */
 export const schema = GQLiteralSchema({
   types: allTypes,
-  definitionFilePath: path.join(__dirname, "../schema.graphql"),
+  definitionFilePath: path.join(__dirname, "../../star-wars-schema.graphql"),
   typeGeneration: {
     typesFilePath: path.join(__dirname, "../generatedTypes.ts"),
     imports: {
