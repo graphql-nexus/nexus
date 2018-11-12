@@ -1,8 +1,15 @@
-import { GraphQLFieldResolver, GraphQLNamedType, isNamedType } from "graphql";
+import {
+  GraphQLFieldResolver,
+  isNamedType,
+  parse,
+  visit,
+  print,
+  isDirective,
+} from "graphql";
 import { SchemaBuilder } from "./builder";
 import * as Types from "./types";
 import { GQLiteralTypeWrapper } from "./definitions";
-import { GQLiteralAbstract } from "./objects";
+import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
 
 /**
  * Builds the types, normalizing the "types" passed into the schema for a
@@ -11,7 +18,7 @@ import { GQLiteralAbstract } from "./objects";
 export function buildTypes(
   types: any,
   config?: Pick<Types.SchemaConfig, "nullability" | "defaultResolver">
-): Record<string, GraphQLNamedType> {
+): Types.BuildTypes {
   const builder = new SchemaBuilder(config || {});
   addTypes(builder, types);
   return builder.getFinalTypeMap();
@@ -40,8 +47,13 @@ export function addMix(
 }
 
 function addTypes(builder: SchemaBuilder, types: any) {
+  if (!types) {
+    return;
+  }
   if (types instanceof GQLiteralTypeWrapper || isNamedType(types)) {
     builder.addType(types);
+  } else if (types instanceof GQLiteralDirectiveType || isDirective(types)) {
+    builder.addDirective(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));
   } else if (isObject(types)) {
@@ -89,6 +101,26 @@ export const propertyFieldResolver = (
       return property;
     }
   };
+
+/**
+ * If there are directives defined to be used on the types,
+ * we need to add these manually to the AST. Directives shouldn't
+ * be too common, since we're defining the schema programatically
+ * rather than by hand.
+ */
+export function addDirectives(
+  schema: string,
+  directives: Types.BuildTypesDirectives
+) {
+  if (Object.keys(directives.uses).length > 0) {
+    return print(
+      visit(parse(schema), {
+        // TODO: Add directives
+      })
+    );
+  }
+  return schema;
+}
 
 // ----------------------------
 

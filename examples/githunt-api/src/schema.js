@@ -5,7 +5,19 @@ const {
   GQLiteralObject,
   GQLiteralArg,
   GQLiteralAbstractType,
+  GQLiteralDirective,
 } = require("gqliteral");
+
+exports.CacheControl = GQLiteralDirective("cacheControl", (t) => {
+  t.int("maxAge");
+  t.field("scope", "CacheControlScope");
+  t.locations("OBJECT", "FIELD_DEFINITION");
+});
+
+exports.CacheControlScope = GQLiteralEnum("CacheControlScope", [
+  "PUBLIC",
+  "PRIVATE",
+]);
 
 exports.FeedType = GQLiteralEnum("FeedType", (t) => {
   t.description("A list of options for the sort order of the feed");
@@ -49,6 +61,14 @@ exports.Query = GQLiteralObject("Query", (t) => {
   t.field("currentUser", "User", {
     description:
       "Return the currently logged in user, or null if nobody is logged in",
+    directives: [
+      {
+        name: "cacheControl",
+        args: {
+          scope: "PRIVATE",
+        },
+      },
+    ],
   });
 });
 
@@ -102,9 +122,10 @@ const CommonFields = GQLiteralAbstractType((t) => {
 
 exports.Comment = GQLiteralObject("Comment", (t) => {
   t.description("A comment about an entry, submitted by a user");
-  // t.directive("@cacheControl(maxAge: 240)");
+  t.directive("cacheControl", { maxAge: 240 });
   t.mix(CommonFields);
   t.float("createdAt", {
+    property: "created_at",
     description: "A timestamp of when the comment was posted",
   });
   t.string("content", {
@@ -123,7 +144,7 @@ exports.Vote = GQLiteralObject("Vote", (t) => {
 // # Information about a GitHub repository submitted to GitHunt
 exports.Entry = GQLiteralObject("Entry", (t) => {
   t.mix(CommonFields);
-  // t.directive(@cacheControl(maxAge: 240))
+  t.directive("cacheControl", { maxAge: 240 });
   t.field("repository", "Repository", {
     description: "Information about the repository from GitHub",
   });
@@ -133,7 +154,10 @@ exports.Entry = GQLiteralObject("Entry", (t) => {
   t.int("score", {
     description: "The score of this repository, upvotes - downvotes",
   });
-  t.float("hotScore", { description: "The hot score of this repository" });
+  t.float("hotScore", {
+    property: "hot_score",
+    description: "The hot score of this repository",
+  });
   t.field("comments", "Comment", {
     list: true,
     args: {
@@ -153,7 +177,9 @@ exports.Repository = GQLiteralObject("Repository", (t) => {
     A repository object from the GitHub API. This uses the exact field names returned by the
     GitHub API for simplicity, even though the convention for GraphQL is usually to camel case.
   `);
-  // t.directive @cacheControl(maxAge:240)
+  t.directive("cacheControl", {
+    maxAge: 240,
+  });
   t.string("name", {
     description: "Just the name of the repository, e.g. GitHunt-API",
   });
@@ -184,7 +210,9 @@ exports.User = GQLiteralObject("User", (t) => {
   t.description(
     "A user object from the GitHub API. This uses the exact field names returned from the GitHub API."
   );
-  // t.directive @cacheControl(maxAge:240)
+  t.directive("cacheControl", {
+    maxAge: 240,
+  });
   t.string("login", { description: "The name of the user, e.g. apollostack" });
   t.string("avatar_url", {
     description:

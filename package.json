@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "types": "src/index.ts",
   "license": "MIT",
+  "description": "Scalable, strongly typed GraphQL schema development",
   "scripts": {
     "dev": "tsc -w",
     "test": "jest"

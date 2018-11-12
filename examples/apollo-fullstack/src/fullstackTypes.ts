@@ -299,15 +299,11 @@ export interface GeneratedSchema {
   unions: GeneratedUnions;
   scalars: GeneratedScalars;
   interfaces: GeneratedInterfaces;
-
-  // For simplicity in autocomplete:
-  availableInputTypes:
-    | BaseScalarNames
+  allInputTypes:
     | Extract<keyof GeneratedInputObjects, string>
     | Extract<keyof GeneratedEnums, string>
     | Extract<keyof GeneratedScalars, string>;
-  availableOutputTypes:
-    | BaseScalarNames
+  allOutputTypes:
     | Extract<keyof GeneratedObjects, string>
     | Extract<keyof GeneratedEnums, string>
     | Extract<keyof GeneratedUnions, string>

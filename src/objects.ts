@@ -6,9 +6,8 @@ import {
   GraphQLUnionType,
   GraphQLEnumType,
   GraphQLIsTypeOfFn,
-  GraphQLInputFieldConfigMap,
-  GraphQLFieldConfigMap,
   GraphQLResolveInfo,
+  DirectiveLocationEnum,
 } from "graphql";
 import { addMix, dedent } from "./utils";
 import { SchemaBuilder } from "./builder";
@@ -23,7 +22,7 @@ export type GQLiteralNamedType =
   | GQLiteralObjectType<any, any>
   | GQLiteralInterfaceType<any, any>
   | GQLiteralUnionType<any, any>
-  | GQLiteralInputObjectType<any, any>;
+  | GQLiteralInputObjectType<any>;
 
 /**
  * Backing type for an enum member.
@@ -35,6 +34,7 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
     this.typeConfig = {
       name,
       members: [],
+      directives: [],
     };
   }
 
@@ -86,6 +86,17 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
   }
 
   /**
+   * Should be used very rarely, adds a directive directly to the
+   * enum definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
+  }
+
+  /**
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    *
@@ -108,6 +119,7 @@ export class GQLiteralUnionType<
     this.typeConfig = {
       name,
       members: [],
+      directives: [],
     };
   }
 
@@ -136,9 +148,19 @@ export class GQLiteralUnionType<
    * the default implementation will call `isTypeOf` on each implementing
    * Object type.
    */
-  resolveType(typeResolver: Types.ResolveType<GenTypes, TypeName>) {
-    // @ts-ignore
+  resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
     this.typeConfig.resolveType = typeResolver;
+  }
+
+  /**
+   * Should be used very rarely, adds a directive directly to the
+   * union definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
   }
 
   /**
@@ -152,27 +174,22 @@ export class GQLiteralUnionType<
 
 abstract class FieldsArgs<GenTypes = GQLiteralGen> {
   idArg(options?: Types.ArgOpts) {
-    // @ts-ignore
     return GQLiteralArg<GenTypes>("ID", options);
   }
 
   intArg(options?: Types.ArgOpts) {
-    // @ts-ignore
     return GQLiteralArg<GenTypes>("Int", options);
   }
 
   floatArg(options?: Types.ArgOpts) {
-    // @ts-ignore
     return GQLiteralArg<GenTypes>("Float", options);
   }
 
   boolArg(options?: Types.ArgOpts) {
-    // @ts-ignore
-    return GQLiteralArg<GenTypes>("Bool", options);
+    return GQLiteralArg<GenTypes>("Boolean", options);
   }
 
   stringArg(options?: Types.ArgOpts) {
-    // @ts-ignore
     return GQLiteralArg<GenTypes>("String", options);
   }
 
@@ -196,6 +213,7 @@ export class GQLiteralObjectType<
       name,
       fields: [],
       interfaces: [],
+      directives: [],
     };
   }
 
@@ -217,7 +235,6 @@ export class GQLiteralObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "ID", options);
   }
 
@@ -228,7 +245,6 @@ export class GQLiteralObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Int", options);
   }
 
@@ -239,7 +255,6 @@ export class GQLiteralObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Float", options);
   }
 
@@ -250,7 +265,6 @@ export class GQLiteralObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "String", options);
   }
 
@@ -261,7 +275,6 @@ export class GQLiteralObjectType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Boolean", options);
   }
 
@@ -270,7 +283,7 @@ export class GQLiteralObjectType<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllOutputTypes<GenTypes>,
+    type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     this.typeConfig.fields.push({
@@ -322,10 +335,12 @@ export class GQLiteralObjectType<
    * At this point the type will not change, but the resolver,
    * defaultValue, property, or description fields can.
    */
-  modify<FieldName extends string>(
+  modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
     field: FieldName,
     options?: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName>
-  ) {}
+  ) {
+    throw new Error("TODO");
+  }
 
   /**
    * Supply the default field resolver for all members of this type
@@ -337,6 +352,17 @@ export class GQLiteralObjectType<
     >
   ) {
     this.typeConfig.defaultResolver = resolverFn;
+  }
+
+  /**
+   * Should be used very rarely, adds a directive directly to the
+   * object definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
   }
 
   /**
@@ -361,6 +387,7 @@ export class GQLiteralInterfaceType<
     this.typeConfig = {
       name,
       fields: [],
+      directives: [],
     };
   }
 
@@ -382,7 +409,6 @@ export class GQLiteralInterfaceType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "ID", options);
   }
 
@@ -393,7 +419,6 @@ export class GQLiteralInterfaceType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Int", options);
   }
 
@@ -404,7 +429,6 @@ export class GQLiteralInterfaceType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Float", options);
   }
 
@@ -415,7 +439,6 @@ export class GQLiteralInterfaceType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "String", options);
   }
 
@@ -426,7 +449,6 @@ export class GQLiteralInterfaceType<
     name: FieldName,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Boolean", options);
   }
 
@@ -435,7 +457,7 @@ export class GQLiteralInterfaceType<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllOutputTypes<GenTypes>,
+    type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
     options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     this.typeConfig.fields.push({
@@ -460,9 +482,19 @@ export class GQLiteralInterfaceType<
    * the default implementation will call `isTypeOf` on each implementing
    * Object type.
    */
-  resolveType(typeResolver: Types.ResolveType<GenTypes, TypeName>) {
-    // @ts-ignore
+  resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
     this.typeConfig.resolveType = typeResolver;
+  }
+
+  /**
+   * Should be used very rarely, adds a directive directly to the
+   * interface definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
   }
 
   /**
@@ -474,16 +506,14 @@ export class GQLiteralInterfaceType<
   }
 }
 
-export class GQLiteralInputObjectType<
-  GenTypes = GQLiteralGen,
-  TypeName extends string = any
-> {
+export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
   protected typeConfig: Types.InputTypeConfig;
 
   constructor(name: string) {
     this.typeConfig = {
       name,
       fields: [],
+      directives: [],
     };
   }
 
@@ -492,9 +522,8 @@ export class GQLiteralInputObjectType<
    */
   id<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    options?: Types.InputFieldOpts
   ) {
-    // @ts-ignore
     this.field(name, "ID", options);
   }
 
@@ -503,9 +532,8 @@ export class GQLiteralInputObjectType<
    */
   int<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    options?: Types.InputFieldOpts
   ) {
-    // @ts-ignore
     this.field(name, "Int", options);
   }
 
@@ -514,9 +542,8 @@ export class GQLiteralInputObjectType<
    */
   float<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    options?: Types.InputFieldOpts
   ) {
-    // @ts-ignore
     this.field(name, "Float", options);
   }
 
@@ -525,9 +552,8 @@ export class GQLiteralInputObjectType<
    */
   string<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    options?: Types.InputFieldOpts
   ) {
-    // @ts-ignore
     this.field(name, "String", options);
   }
 
@@ -536,9 +562,8 @@ export class GQLiteralInputObjectType<
    */
   boolean<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    options?: Types.InputFieldOpts
   ) {
-    // @ts-ignore
     this.field(name, "Boolean", options);
   }
 
@@ -547,8 +572,8 @@ export class GQLiteralInputObjectType<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllInputTypes<GenTypes>,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
+    options?: Types.InputFieldOpts
   ) {
     this.typeConfig.fields.push({
       item: Types.NodeType.FIELD,
@@ -562,6 +587,17 @@ export class GQLiteralInputObjectType<
 
   description(description: string) {
     this.typeConfig.description = dedent(description);
+  }
+
+  /**
+   * Should be used very rarely, adds a directive directly to the
+   * input object definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
   }
 
   /**
@@ -596,7 +632,6 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     name: FieldName,
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "ID", options);
   }
 
@@ -607,7 +642,6 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     name: FieldName,
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Int", options);
   }
 
@@ -618,7 +652,6 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     name: FieldName,
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Float", options);
   }
 
@@ -629,7 +662,6 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     name: FieldName,
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "String", options);
   }
 
@@ -640,7 +672,6 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     name: FieldName,
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
-    // @ts-ignore
     this.field(name, "Boolean", options);
   }
 
@@ -649,7 +680,7 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllInputTypes<GenTypes>,
+    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
     this.typeConfig.fields.push({
@@ -661,5 +692,94 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
 
   buildType(): Types.AbstractTypeConfig {
     return this.typeConfig;
+  }
+}
+
+export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
+  protected typeConfig: Types.DirectiveTypeConfig;
+
+  constructor(readonly name: string) {
+    this.typeConfig = {
+      name,
+      locations: [],
+      args: [],
+    };
+  }
+
+  description(description: string) {
+    this.typeConfig.description = dedent(description);
+  }
+
+  locations(...location: DirectiveLocationEnum[]) {
+    this.typeConfig.locations.push(...location);
+  }
+
+  /**
+   * Add an ID field type to the object schema.
+   */
+  id<FieldName extends string>(
+    name: FieldName,
+    options?: Types.InputFieldOpts
+  ) {
+    this.field(name, "ID", options);
+  }
+
+  /**
+   * Add an Int field type to the object schema.
+   */
+  int<FieldName extends string>(
+    name: FieldName,
+    options?: Types.InputFieldOpts
+  ) {
+    this.field(name, "Int", options);
+  }
+
+  /**
+   * Add a Float field type to the object schema.
+   */
+  float<FieldName extends string>(
+    name: FieldName,
+    options?: Types.InputFieldOpts
+  ) {
+    this.field(name, "Float", options);
+  }
+
+  /**
+   * Add a String field type to the object schema.
+   */
+  string<FieldName extends string>(
+    name: FieldName,
+    options?: Types.InputFieldOpts
+  ) {
+    this.field(name, "String", options);
+  }
+
+  /**
+   * Add a Boolean field type to the object schema.
+   */
+  boolean<FieldName extends string>(
+    name: FieldName,
+    options?: Types.InputFieldOpts
+  ) {
+    this.field(name, "Boolean", options);
+  }
+
+  /**
+   * Adds a new field to the input object type
+   */
+  field<FieldName extends string>(
+    name: FieldName,
+    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
+    options?: Types.InputFieldOpts
+  ) {
+    this.typeConfig.args.push({
+      name,
+      type,
+      ...options,
+    });
+  }
+
+  buildType(builder: SchemaBuilder) {
+    return builder.directiveType(this.typeConfig);
   }
 }

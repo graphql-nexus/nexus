@@ -30,11 +30,14 @@ import {
   isObjectType,
   isOutputType,
   isUnionType,
+  DirectiveLocationEnum,
+  GraphQLDirective,
+  isDirective,
 } from "graphql";
 import { GQLiteralTypeWrapper } from "./definitions";
 import * as Types from "./types";
 import suggestionList, { propertyFieldResolver } from "./utils";
-import { GQLiteralAbstract } from "./objects";
+import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
 
 const isPromise = (val: any): val is Promise<any> =>
   Boolean(val && typeof val.then === "function");
@@ -62,9 +65,32 @@ const SCALARS: Record<string, GraphQLScalarType> = {
  * circular references at this step, while fields will guard for it during lazy evaluation.
  */
 export class SchemaBuilder {
+  /**
+   * Used to check for circular references.
+   */
   protected buildingTypes = new Set();
+  /**
+   * The "final type" map contains all types as they are built.
+   */
   protected finalTypeMap: Record<string, GraphQLNamedType> = {};
+  /**
+   * The "defined type" map keeps track of all of the types that were
+   * defined directly as `GraphQL*Type` objects, so we don't accidentally
+   * overwrite any.
+   */
+  protected definedTypeMap: Record<string, GraphQLNamedType> = {};
+  /**
+   * The "pending type" map keeps track of all types that
+   */
   protected pendingTypeMap: Record<string, GQLiteralTypeWrapper> = {};
+  protected pendingDirectiveMap: Record<
+    string,
+    GQLiteralDirectiveType<any>
+  > = {};
+  protected directiveMap: Record<string, GraphQLDirective> = {};
+  protected directiveUseMap: {
+    [K in DirectiveLocationEnum]?: Types.DirectiveUse
+  } = {};
 
   constructor(
     protected schemaConfig: Pick<
@@ -84,7 +110,15 @@ export class SchemaBuilder {
     }
   }
 
-  getFinalTypeMap(): Record<string, GraphQLNamedType> {
+  addDirective(directiveDef: GQLiteralDirectiveType<any> | GraphQLDirective) {
+    if (isDirective(directiveDef)) {
+      this.directiveMap[directiveDef.name] = directiveDef;
+    } else {
+      this.pendingDirectiveMap[directiveDef.name] = directiveDef;
+    }
+  }
+
+  getFinalTypeMap(): Types.BuildTypes {
     Object.keys(this.pendingTypeMap).forEach((key) => {
       // If we've already constructed the type by this point,
       // via circular dependency resolution don't worry about building it.
@@ -94,7 +128,22 @@ export class SchemaBuilder {
       this.finalTypeMap[key] = this.getOrBuildType(key);
       this.buildingTypes.clear();
     });
-    return this.finalTypeMap;
+    Object.keys(this.pendingDirectiveMap).forEach((key) => {});
+    return {
+      types: this.finalTypeMap,
+      directives: {
+        definitions: [],
+        uses: {},
+        hasUses: false,
+      },
+    };
+  }
+
+  directiveType(config: Types.DirectiveTypeConfig) {
+    return new GraphQLDirective({
+      name: config.name,
+      locations: [],
+    });
   }
 
   inputObjectType(config: Types.InputTypeConfig): GraphQLInputObjectType {
@@ -147,8 +196,6 @@ export class SchemaBuilder {
       fields: () => this.buildObjectFields(config),
       resolveType,
       description,
-      // astNode?: Maybe<InterfaceTypeDefinitionNode>;
-      // extensionASTNodes?: Maybe<ReadonlyArray<InterfaceTypeExtensionNode>>;
     });
   }
 
@@ -262,6 +309,7 @@ export class SchemaBuilder {
       switch (field.item) {
         case Types.NodeType.MIX:
           throw new Error("TODO");
+          break;
         case Types.NodeType.MIX_ABSTRACT:
           this.mixAbstractOuput(
             typeConfig,
@@ -289,6 +337,7 @@ export class SchemaBuilder {
       switch (field.item) {
         case Types.NodeType.MIX:
           throw new Error("TODO");
+          break;
         case Types.NodeType.MIX_ABSTRACT:
           this.mixAbstractInput(
             typeConfig,
@@ -360,7 +409,6 @@ export class SchemaBuilder {
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
       // subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
       // deprecationReason?: Maybe<string>;
-      // astNode?: Maybe<FieldDefinitionNode>;
     };
   }
 

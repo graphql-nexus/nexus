@@ -5,7 +5,8 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/node_modules": true
+    "**/node_modules": true,
+    "**/dist/**": true
   },
   "typescript.tsdk": "node_modules/typescript/lib"
 }

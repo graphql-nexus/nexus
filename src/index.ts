@@ -8,4 +8,5 @@ export {
   GQLiteralSchema,
   GQLiteralScalar,
   GQLiteralAbstractType,
+  GQLiteralDirective,
 } from "./definitions";

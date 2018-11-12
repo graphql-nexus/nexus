@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "gqliteral": "^0.1.0",
     "apollo-datasource": "^0.2.0",
     "apollo-datasource-rest": "^0.2.0",
     "apollo-server": "2.2.0-alpha.2",

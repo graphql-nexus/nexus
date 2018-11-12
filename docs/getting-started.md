@@ -34,22 +34,22 @@ The schema requires that an Object named `Query` be provided at the top-level.
 const Query = GQLiteralObject("Query", (t) => {
   t.field("account", "Account", {
     args: {
-      name: GQLiteralArg("String", {
+      name: t.stringArg({
         description:
           "Providing the name of the account holder will search for accounts matching that name",
       }),
-      status: GQLiteralArg("StatusEnum"),
+      status: t.fieldArg("StatusEnum"),
     },
   });
   t.field("accountsById", "Account", {
     list: true,
     args: {
-      ids: GQLiteralArg("Int", { list: true }),
+      ids: t.intArg({ list: true }),
     },
   });
   t.field("accounts", "AccountConnection", {
     args: {
-      limit: GQLiteralArg("Int", { required: true }),
+      limit: t.intArg({ required: true }),
     },
   });
 });

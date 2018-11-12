@@ -2,9 +2,10 @@ import {
   GraphQLFieldResolver,
   GraphQLScalarTypeConfig,
   GraphQLNamedType,
-  GraphQLTypeResolver,
   GraphQLIsTypeOfFn,
   GraphQLResolveInfo,
+  DirectiveLocationEnum,
+  GraphQLDirective,
 } from "graphql";
 import { GQLiteralAbstract } from "./objects";
 import { GQLiteralTypegenOptions } from "./typegen";
@@ -18,6 +19,12 @@ export enum NodeType {
 }
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";
+
+export type MaybePromise<T> = Promise<T> | T;
+
+export type Maybe<T> = T | null;
 
 export type MixDef = {
   item: NodeType.MIX;
@@ -62,6 +69,25 @@ export interface EnumMemberConfig {
   description?: string;
 }
 
+export interface BuildTypes {
+  types: Record<string, GraphQLNamedType>;
+  directives: BuildTypesDirectives;
+}
+
+export interface BuildTypesDirectives {
+  definitions: GraphQLDirective[];
+  uses: { [K in DirectiveLocationEnum]?: DirectiveUse };
+  hasUses: boolean;
+}
+
+export interface DirectiveUse {
+  location: DirectiveLocationEnum;
+  typeName: string;
+  args: [];
+  argName?: string;
+  fieldName?: string;
+}
+
 /**
  * When you're mixing types/partials, you can pick or omit
  * fields from the types you're mixing in.
@@ -94,19 +120,19 @@ export interface CommonOpts {
    */
   description?: string;
   /**
-   * Whether the field / property is even considered to be defined on the schema.
-   * Useful if you want to feature-flag
-   */
-  availableIf?: any;
-  /**
    * Info about a field deprecation. Formatted as a string and provided with the
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string | DeprecationInfo;
   /**
-   * Any directives for the type
+   * Any directives for the field or argument
    */
-  directives?: any[];
+  directives?: DirectiveOption[];
+}
+
+export interface DirectiveOption {
+  name: string;
+  args: Record<string, any>;
 }
 
 export interface FieldOpts extends CommonOpts {
@@ -140,6 +166,13 @@ export interface ArgOpts extends FieldOpts {
 
 export type ArgDefinition = Readonly<
   ArgOpts & {
+    type: any; // TODO: Make type safe
+  }
+>;
+
+export type DirectiveArgDefinition = Readonly<
+  ArgOpts & {
+    name: string;
     type: any; // TODO: Make type safe
   }
 >;
@@ -178,7 +211,7 @@ export interface AbstractFieldOpts<GenTypes, FieldName> extends FieldOpts {}
 
 export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = Omit<
   OutputFieldOpts<GenTypes, TypeName, FieldName>,
-  "args" | "list" | "listItemNullable" | "nullable" | "availableIf"
+  "args" | "list" | "listItemNullable" | "nullable"
 >;
 
 export interface InputFieldOpts extends FieldOpts {}
@@ -199,7 +232,7 @@ interface HasFields {
 }
 
 interface HasDirectives {
-  directives: any[];
+  directives: DirectiveOption[];
 }
 
 interface Named {
@@ -232,29 +265,34 @@ export interface Nullability {
   nullability?: NullabilityConfig;
 }
 
-export interface EnumTypeConfig extends Named, SharedTypeConfig {
+export interface EnumTypeConfig extends Named, HasDirectives, SharedTypeConfig {
   members: EnumDefType[];
 }
 
-export interface UnionTypeConfig extends Named, SharedTypeConfig {
+export interface UnionTypeConfig
+  extends Named,
+    HasDirectives,
+    SharedTypeConfig {
   members: UnionDefType[];
   /**
    * Optionally provide a custom type resolver function. If one is not provided,
    * the default implementation will call `isTypeOf` on each implementing
    * Object type.
    */
-  resolveType?: GraphQLTypeResolver<any, any>;
+  resolveType?: TypeResolver<any, any>;
 }
 
 export interface InputTypeConfig
   extends Named,
     HasFields,
+    HasDirectives,
     SharedTypeConfig,
     Nullability {}
 
 export interface ObjectTypeConfig
   extends Named,
     HasFields,
+    HasDirectives,
     SharedTypeConfig,
     Nullability,
     DefaultResolver {
@@ -273,9 +311,16 @@ export interface AbstractTypeConfig {
   fields: FieldConfig[];
 }
 
+export interface DirectiveTypeConfig extends Named {
+  description?: string;
+  locations: DirectiveLocationEnum[];
+  args: DirectiveArgDefinition[];
+}
+
 export interface InterfaceTypeConfig
   extends Named,
     HasFields,
+    HasDirectives,
     SharedTypeConfig,
     Nullability,
     DefaultResolver {
@@ -284,7 +329,7 @@ export interface InterfaceTypeConfig
    * the default implementation will call `isTypeOf` on each implementing
    * Object type.
    */
-  resolveType?: GraphQLTypeResolver<any, any>;
+  resolveType?: TypeResolver<any, any>;
 }
 
 export interface SchemaConfig extends Nullability, DefaultResolver {
@@ -299,13 +344,9 @@ export interface SchemaConfig extends Nullability, DefaultResolver {
    */
   definitionFilePath: string | false;
   /**
-   * Generates the types for intellisense/typescript
+   * Generates the types for Intellisense/TypeScript
    */
   typeGeneration?: GQLiteralTypegenOptions;
-  /**
-   * Forces type-safety by not falling back to strings
-   */
-  forceTypeSafety?: boolean;
 }
 
 export type NullabilityConfig = {
@@ -371,19 +412,15 @@ export type NullabilityConfig = {
   inputListItem?: boolean;
 };
 
-export type GetTypeFn = (t: string) => GraphQLNamedType;
+/**
+ * Generated type helpers:
+ */
 
-export type ResolveType<GenTypes, TypeName> = (
-  root: RootValue<GenTypes, TypeName>
-) => InterfaceName<GenTypes, TypeName>;
-
-type GenTypesFieldsShape = Record<
-  string,
-  {
-    returnType: any;
-    args: any;
-  }
->;
+export type TypeResolver<GenTypes, TypeName> = (
+  root: RootValue<GenTypes, TypeName>,
+  context: ContextValue<GenTypes>,
+  info: GraphQLResolveInfo
+) => MaybePromise<Maybe<InterfaceName<GenTypes, TypeName>>>;
 
 /**
  * Helpers for handling the generated schema
@@ -396,8 +433,8 @@ export type GenTypesShape = {
   inputObjects: Record<string, any>;
   unions: Record<string, any>;
   scalars: Record<string, any>;
-  availableInputTypes: string;
-  availableOutputTypes: string;
+  allInputTypes: string;
+  allOutputTypes: string;
 };
 
 export type OutputNames<GenTypes> = GenTypes extends GenTypesShape
@@ -417,6 +454,15 @@ export type EnumName<GenTypes> = GenTypes extends GenTypesShape
 export type UnionName<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["unions"], string>
   : never;
+
+export type ObjectTypeFields<
+  GenTypes,
+  TypeName
+> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["objects"]
+    ? Extract<keyof GenTypes["objects"][TypeName]["fields"], string>
+    : never
+  : unknown;
 
 export type EnumMembers<
   GenTypes,
@@ -440,18 +486,18 @@ export type InputObjectTypeDef<
   ? TypeName extends keyof GenTypes["inputObjects"]
     ? GenTypes["inputObjects"][TypeName]
     : never
-  : string;
+  : unknown;
 
 export type AllInterfaces<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["interfaces"], string>
   : never;
 
 export type AllInputTypes<GenTypes> = GenTypes extends GenTypesShape
-  ? GenTypes["availableInputTypes"]
+  ? GenTypes["allInputTypes"]
   : never;
 
 export type AllOutputTypes<GenTypes> = GenTypes extends GenTypesShape
-  ? GenTypes["availableOutputTypes"]
+  ? GenTypes["allOutputTypes"]
   : never;
 
 export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
@@ -497,3 +543,8 @@ export type ResultValue<
         : never
       : never
   : never;
+
+export type DirectiveConfig<GenTypes, DirectiveName> = {
+  locations: DirectiveLocationEnum[];
+  args?: [];
+};

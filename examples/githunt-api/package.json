@@ -1,6 +1,8 @@
 {
   "name": "gqliteral-githunt-api",
   "dependencies": {
+    "gqliteral": "^0.1.0",
+    "graphql": "^14.0.2",
     "apollo-server": "2.2.0-alpha.2",
     "githunt-api": "apollographql/GitHunt-API.git"
   },
