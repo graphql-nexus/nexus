@@ -5,7 +5,7 @@
     "start": "ts-node-dev --no-notify --respawn ./src"
   },
   "dependencies": {
-    "gqliteral": "^0.1.0",
+    "gqliteral": "^0.1.1",
     "graphql": "^14.0.2",
     "apollo-server": "^2.2.0",
     "ts-node": "^7.0.1",
@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "jest": "^23.6.0",
-    "ts-jest": "^23.10.4"
+    "ts-jest": "^23.10.4",
+    "typescript": "^3.1.6"
   }
 }
