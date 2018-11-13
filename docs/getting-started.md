@@ -10,7 +10,7 @@ GQLiteral aims to combine the simplicity and ease of development of schema-first
 
 It builds upon the primitives of `graphql-js` and similar to the schema-first approach, it uses the type names rather than per-type object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
 
-GQLiteral was designed with TypeScript/JavaScript intellisense in mind, and aims to leverage generics and type generation tools to provide as much type coverage as possible to aid in development. Read more about how you can [configure](typescript-setup.md) your project to best take advantage of this.
+GQLiteral was designed with TypeScript/JavaScript intellisense in mind, and makes use of TypeScript generics, conditional types, and type merging to provide as much type coverage as possible out of the box. Read more about how you can [configure](typescript-setup.md) your project to best take advantage of this.
 
 ## Installation
 
@@ -73,7 +73,7 @@ const schema = GQLiteralSchema({
 });
 ```
 
-## Nullability & defaultValue
+## Nullability & default
 
 One benefit of GraphQL is the strict enforcement and guarentees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default. The GraphQL documentation provides [this explanation](https://graphql.org/learn/best-practices/#nullability):
 
@@ -87,13 +87,17 @@ If you find yourself wanting this the other way around, there is a `defaultNull`
 
 This can also be configured on a per-type basis, using the `defaultNull` method on the type definition object. This comes in handy where you want to "mix" an `AbstractType` into an `ObjectType` and an `InputObjectType`, and the fields should be considered nullable by default on input, and required by default on output.
 
-#### defaultValue
+```
 
-Enforcing non-null guarantees at the resolver layer can be tedious, so GQLiteral also provides a `defaultValue` option; a value used when the resolved type is otherwise `null` or `undefined`. Providing the `defaultValue` will set the schema definition for the field to non-null regardless of root schema configuration, unless `nullable: true` is set explicitly on the field.
+```
+
+#### default
+
+Enforcing non-null guarantees at the resolver layer can be tedious, so GQLiteral also provides a `default` option; a value used when the resolved type is otherwise `null` or `undefined`. Providing the `default` will set the schema definition for the field to non-null regardless of root schema configuration, unless `nullable: true` is set explicitly on the field.
 
 ```ts
 const AccountInfo = GQLiteralObject("AccountInfo", (t) => {
-  t.string("description", { defaultValue: "N/A" });
+  t.string("description", { default: "N/A" });
   t.int("linkedAccountId", { nullable: true });
 });
 ```

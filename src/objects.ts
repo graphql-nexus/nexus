@@ -38,7 +38,7 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
     };
   }
 
-  mix<EnumName extends Types.EnumName<GenTypes>>(
+  mix<EnumName extends Types.EnumNames<GenTypes>>(
     typeName: EnumName,
     mixOptions?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
   ) {
@@ -64,16 +64,16 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
    * Sets the members of the enum
    */
   members(info: Array<Types.EnumMemberInfo | string>) {
-    info.forEach((info) => {
-      if (typeof info === "string") {
+    info.forEach((member) => {
+      if (typeof member === "string") {
         return this.typeConfig.members.push({
           item: Types.NodeType.ENUM_MEMBER,
-          info: { name: info, value: info },
+          info: { name: member, value: member },
         });
       }
       this.typeConfig.members.push({
         item: Types.NodeType.ENUM_MEMBER,
-        info,
+        info: member,
       });
     });
   }
@@ -333,7 +333,7 @@ export class GQLiteralObjectType<
    * abstract type.
    *
    * At this point the type will not change, but the resolver,
-   * defaultValue, property, or description fields can.
+   * default, property, or description fields can.
    */
   modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
     field: FieldName,
@@ -363,6 +363,20 @@ export class GQLiteralObjectType<
       name,
       args: args || {},
     });
+  }
+
+  /**
+   * Set the nullability config for the type
+   */
+  nullability(nullability: Types.NullabilityConfig) {
+    if (this.typeConfig.nullability) {
+      console.warn(
+        `nullability has already been set for type ${
+          this.typeConfig.name
+        }, the previous value will be replaced`
+      );
+    }
+    this.typeConfig.nullability = nullability;
   }
 
   /**
@@ -601,6 +615,20 @@ export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
   }
 
   /**
+   * Set the nullability config for the type
+   */
+  nullability(nullability: Types.NullabilityConfig) {
+    if (this.typeConfig.nullability) {
+      console.warn(
+        `nullability has already been set for type ${
+          this.typeConfig.name
+        }, the previous value will be replaced`
+      );
+    }
+    this.typeConfig.nullability = nullability;
+  }
+
+  /**
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
@@ -702,7 +730,7 @@ export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
     this.typeConfig = {
       name,
       locations: [],
-      args: [],
+      directiveArgs: [],
     };
   }
 
@@ -772,7 +800,7 @@ export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
     type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
     options?: Types.InputFieldOpts
   ) {
-    this.typeConfig.args.push({
+    this.typeConfig.directiveArgs.push({
       name,
       type,
       ...options,

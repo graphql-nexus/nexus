@@ -6,6 +6,7 @@ import {
   printSchema,
   GraphQLScalarType,
   GraphQLObjectType,
+  assertValidName,
 } from "graphql";
 import * as Types from "./types";
 import {
@@ -45,7 +46,7 @@ export class GQLiteralTypeWrapper<
  * @param {object} options
  */
 export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
-  return new GraphQLScalarType({ name, ...options });
+  return new GraphQLScalarType({ name: assertValidName(name), ...options });
 }
 
 /**
@@ -57,7 +58,9 @@ export function GQLiteralObject<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
-  const factory = new GQLiteralObjectType<GenTypes, TypeName>(name);
+  const factory = new GQLiteralObjectType<GenTypes, TypeName>(
+    assertValidName(name)
+  );
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -72,7 +75,9 @@ export function GQLiteralInterface<
   name: TypeName,
   fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInterfaceType<GenTypes, TypeName>(name);
+  const factory = new GQLiteralInterfaceType<GenTypes, TypeName>(
+    assertValidName(name)
+  );
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -98,7 +103,7 @@ export function GQLiteralUnion<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
-  const factory = new GQLiteralUnionType<GenTypes>(name);
+  const factory = new GQLiteralUnionType<GenTypes>(assertValidName(name));
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -140,7 +145,7 @@ export function GQLiteralEnum<
     | string[]
     | Record<string, string | number | object | boolean>
 ) {
-  const factory = new GQLiteralEnumType<GenTypes>(name);
+  const factory = new GQLiteralEnumType<GenTypes>(assertValidName(name));
   if (typeof fn === "function") {
     fn(factory);
   } else {
@@ -156,7 +161,7 @@ export function GQLiteralInputObject<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralInputObjectType<GenTypes>) => void) {
-  const factory = new GQLiteralInputObjectType<GenTypes>(name);
+  const factory = new GQLiteralInputObjectType<GenTypes>(assertValidName(name));
   fn(factory);
   return new GQLiteralTypeWrapper(name, factory);
 }
@@ -213,7 +218,7 @@ export function GQLiteralDirective<
     | Types.DirectiveConfig<GenTypes, DirectiveName>
     | ((arg: GQLiteralDirectiveType<GenTypes>) => void)
 ) {
-  const directive = new GQLiteralDirectiveType<GenTypes>(name);
+  const directive = new GQLiteralDirectiveType<GenTypes>(assertValidName(name));
   if (typeof config === "function") {
     config(directive);
   } else {
@@ -232,14 +237,14 @@ export function GQLiteralDirective<
 export function GQLiteralSchema(options: Types.SchemaConfig) {
   const { types: typeMap, directives } = buildTypes(options.types, options);
 
-  if (!isObjectType(typeMap["Query"])) {
+  if (!isObjectType(typeMap.Query)) {
     throw new Error("Missing a Query type");
   }
 
   const schema = new GraphQLSchema({
-    query: typeMap["Query"] as Types.Maybe<GraphQLObjectType>,
-    mutation: typeMap["Mutation"] as Types.Maybe<GraphQLObjectType>,
-    subscription: typeMap["Subscription"] as Types.Maybe<GraphQLObjectType>,
+    query: typeMap.Query as Types.Maybe<GraphQLObjectType>,
+    mutation: typeMap.Mutation as Types.Maybe<GraphQLObjectType>,
+    subscription: typeMap.Subscription as Types.Maybe<GraphQLObjectType>,
     directives: directives.definitions,
     types: Object.keys(typeMap).reduce((result: GraphQLNamedType[], key) => {
       result.push(typeMap[key]);
@@ -250,7 +255,10 @@ export function GQLiteralSchema(options: Types.SchemaConfig) {
   // Only in development do we want to worry about regenerating the
   // schema definition and/or generated types.
   if (process.env.NODE_ENV !== "production") {
-    const sortedSchema = lexicographicSortSchema(schema);
+    let sortedSchema = schema;
+    if (typeof lexicographicSortSchema !== "undefined") {
+      sortedSchema = lexicographicSortSchema(schema);
+    }
     const generatedSchema = addDirectives(
       printSchema(sortedSchema),
       directives

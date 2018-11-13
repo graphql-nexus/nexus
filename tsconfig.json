@@ -8,7 +8,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "importHelpers": true
   },
   "exclude": ["./examples", "./dist", "./src/__tests__"]
 }

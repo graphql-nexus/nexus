@@ -290,14 +290,14 @@ function nonInterfaceFields(
   ctx: SchemaTemplateContext,
   t: SchemaTemplateContext["types"][0]
 ) {
-  const interfaceFields = new Set<string>();
+  const allInterfaceFields = new Set<string>();
   t.interfaces.forEach((name) => {
     const iface = ctx.interfaces.find((i) => i.name === name);
     if (iface) {
       iface.fields.forEach((field) => {
-        interfaceFields.add(field.name);
+        allInterfaceFields.add(field.name);
       });
     }
   });
-  return t.fields.filter((field) => !interfaceFields.has(field.name));
+  return t.fields.filter((field) => !allInterfaceFields.has(field.name));
 }

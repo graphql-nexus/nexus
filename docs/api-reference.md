@@ -19,7 +19,7 @@ const Post = GQLiteralObject("Post", (t) => {
   t.field("author", "User", { description: "Author of the field" });
   t.string("title", {
     description: "Title of the Post",
-    defaultValue: "Untitled Post",
+    default: "Untitled Post",
   });
   t.string("body", { description: "Body of the Post, formatted as Markdown" });
   t.field("status", "StatusEnum", {

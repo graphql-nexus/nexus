@@ -48,6 +48,11 @@ export interface FieldConfig extends OutputFieldOpts<any, any, any> {
   type: any;
 }
 
+export interface InputFieldConfig extends InputFieldOpts {
+  name: string;
+  type: any;
+}
+
 export type FieldDefType = MixDef | MixAbstractDef | FieldDef;
 
 export type EnumDefType =
@@ -204,7 +209,12 @@ export interface OutputFieldOpts<
   /**
    * Default value for the field, if none is returned.
    */
-  defaultValue?: any;
+  default?: any;
+  /**
+   * Synchronous validation for the field, runs just after the
+   * built-in "validate", at the root level prior to execution.
+   */
+  validate?: (info: GraphQLResolveInfo) => boolean | Error;
 }
 
 export interface AbstractFieldOpts<GenTypes, FieldName> extends FieldOpts {}
@@ -214,7 +224,16 @@ export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = Omit<
   "args" | "list" | "listItemNullable" | "nullable"
 >;
 
-export interface InputFieldOpts extends FieldOpts {}
+export interface InputFieldOpts extends FieldOpts {
+  /**
+   * Setting this to true is the same as setting `nullable: false`
+   */
+  required?: boolean;
+  /**
+   * Whether the item in the list is required
+   */
+  requiredListItem?: boolean;
+}
 
 export interface ScalarOpts
   extends Omit<
@@ -314,7 +333,7 @@ export interface AbstractTypeConfig {
 export interface DirectiveTypeConfig extends Named {
   description?: string;
   locations: DirectiveLocationEnum[];
-  args: DirectiveArgDefinition[];
+  directiveArgs: DirectiveArgDefinition[];
 }
 
 export interface InterfaceTypeConfig
@@ -420,7 +439,7 @@ export type TypeResolver<GenTypes, TypeName> = (
   root: RootValue<GenTypes, TypeName>,
   context: ContextValue<GenTypes>,
   info: GraphQLResolveInfo
-) => MaybePromise<Maybe<InterfaceName<GenTypes, TypeName>>>;
+) => MaybePromise<Maybe<InterfaceNames<GenTypes, TypeName>>>;
 
 /**
  * Helpers for handling the generated schema
@@ -441,17 +460,17 @@ export type OutputNames<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["objects"], string>
   : never;
 
-export type InterfaceName<GenTypes, TypeName> = GenTypes extends GenTypesShape
+export type InterfaceNames<GenTypes, TypeName> = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["interfaces"]
     ? GenTypes["interfaces"][TypeName]["implementingTypes"]
     : never
   : never;
 
-export type EnumName<GenTypes> = GenTypes extends GenTypesShape
+export type EnumNames<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["enums"], string>
   : never;
 
-export type UnionName<GenTypes> = GenTypes extends GenTypesShape
+export type UnionNames<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["unions"], string>
   : never;
 

@@ -36,7 +36,7 @@ import {
 } from "graphql";
 import { GQLiteralTypeWrapper } from "./definitions";
 import * as Types from "./types";
-import suggestionList, { propertyFieldResolver } from "./utils";
+import { suggestionList, propertyFieldResolver } from "./utils";
 import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
 
 const isPromise = (val: any): val is Promise<any> =>
@@ -172,8 +172,8 @@ export class SchemaBuilder {
               ...rest,
               args: args.reduce(
                 (result: GraphQLFieldConfigArgumentMap, arg) => {
-                  const { name, ...rest } = arg;
-                  result[name] = rest;
+                  const { name, ...argRest } = arg;
+                  result[name] = argRest;
                   return result;
                 },
                 {}
@@ -446,10 +446,20 @@ export class SchemaBuilder {
 
   protected decorateInputType(
     type: GraphQLInputType,
-    fieldConfig: Types.FieldConfig,
+    fieldConfig: Types.InputFieldConfig,
     typeConfig: Types.InputTypeConfig
   ) {
-    return this.decorateType(type, fieldConfig, typeConfig, true);
+    const { required: _required, requiredListItem, ...rest } = fieldConfig;
+    const newOpts = rest;
+    if (typeof _required !== "undefined") {
+      newOpts.nullable = !_required;
+    }
+    if (typeof requiredListItem !== "undefined") {
+      if (rest.list) {
+        newOpts.listItemNullable = !requiredListItem;
+      }
+    }
+    return this.decorateType(type, newOpts, typeConfig, true);
   }
 
   protected decorateOutputType(
@@ -640,8 +650,8 @@ export class SchemaBuilder {
     } else if (fieldOptions.property) {
       resolver = propertyFieldResolver(fieldOptions.property);
     }
-    if (typeof fieldOptions.defaultValue !== "undefined") {
-      resolver = withDefaultValue(resolver, fieldOptions.defaultValue);
+    if (typeof fieldOptions.default !== "undefined") {
+      resolver = withDefaultValue(resolver, fieldOptions.default);
     }
     return resolver;
   }

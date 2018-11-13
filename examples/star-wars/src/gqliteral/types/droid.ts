@@ -6,6 +6,6 @@ export const Droid = GQLiteralObject<Gen, "Droid">("Droid", (t) => {
   t.implements("Character");
   t.string("primaryFunction", {
     description: "The primary function of the droid.",
-    defaultValue: "N/A",
+    default: "N/A",
   });
 });

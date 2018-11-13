@@ -10,3 +10,5 @@ export {
   GQLiteralAbstractType,
   GQLiteralDirective,
 } from "./definitions";
+import * as GQLiteralTypes from "./types";
+export { GQLiteralTypes };
