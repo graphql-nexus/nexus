@@ -1,4 +1,3 @@
-import fs from "fs";
 import { compileTemplate } from "graphql-codegen-compiler";
 import {
   CustomProcessingFunction,
@@ -11,8 +10,6 @@ import {
 import util from "util";
 import path from "path";
 import * as Types from "./types";
-
-const writeFile = util.promisify(fs.writeFile);
 
 const SCALAR_TYPES = {
   Int: "number",
@@ -28,8 +25,10 @@ export async function typegen(
   options: GQLiteralTypegenOptions<any>,
   schema: GraphQLSchema
 ) {
+  const fs = require("fs") as typeof import("fs");
   const context = schemaToTemplateContext(schema);
   const data = await compileTemplate(makeTypes(options), context);
+  const writeFile = util.promisify(fs.writeFile);
   await Promise.all(
     data.map(async ({ filename, content }) => {
       await writeFile(filename, content);

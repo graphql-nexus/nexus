@@ -15,9 +15,24 @@
     "codemirror-graphql": "^0.8.3",
     "react": "^16.7.0-alpha.0",
     "react-dom": "^16.7.0-alpha.0",
-    "graphql": "^14.0.2"
+    "graphql": "^14.0.2",
+    "gqliteral": "^0.1.1",
+    "dedent": "^0.7.0"
   },
   "devDependencies": {
-    "docusaurus": "^1.5.1"
+    "babel-loader": "^8.0.4",
+    "@babel/core": "^7.1.5",
+    "@babel/preset-typescript": "^7.1.0",
+    "@babel/preset-env": "^7.1.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@types/react": "^16.7.3",
+    "@types/react-dom": "^16.0.9",
+    "docusaurus": "^1.5.1",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2",
+    "lodash.groupby": "^4.6.0",
+    "lz-string": "^1.4.4"
   }
 }

@@ -1,26 +1,31 @@
 "use strict";
 
+/**
+ * @type {import('webpack').WebpackOptions}
+ */
 module.exports = {
+  mode: "development",
   entry: {
-    playground: "./playground/index.js",
+    playground: "./playground/index.tsx",
   },
   output: {
     filename: "[name].js",
     path: __dirname + "/static/",
   },
+  resolve: {
+    extensions: [".ts", ".tsx", ".mjs", ".js", ".json"],
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
         loader: "babel-loader",
-        options: {
-          presets: ["env", "react"],
-        },
       },
     ],
   },
   externals: {
+    fs: "function() {}",
     clipboard: "ClipboardJS",
     codemirror: "CodeMirror",
     react: "React",

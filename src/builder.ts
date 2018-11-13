@@ -493,7 +493,7 @@ export class SchemaBuilder {
   protected decorateType(
     type: GraphQLOutputType,
     fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
-    typeConfig: Types.ObjectTypeConfig,
+    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     isInput: false
   ): GraphQLOutputType;
   protected decorateType(
@@ -503,11 +503,11 @@ export class SchemaBuilder {
     isInput: true
   ): GraphQLInputType;
   protected decorateType(
-    type: GraphQLInputType | GraphQLOutputType,
+    type: any,
     fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
-    typeConfig: Types.ObjectTypeConfig | Types.InputTypeConfig,
+    typeConfig: any,
     isInput: boolean
-  ): GraphQLInputType | GraphQLOutputType {
+  ): any {
     let finalType = type;
     const nullConfig = {
       ...NULL_DEFAULTS,
