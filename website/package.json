@@ -16,7 +16,7 @@
     "react": "^16.7.0-alpha.0",
     "react-dom": "^16.7.0-alpha.0",
     "graphql": "^14.0.2",
-    "gqliteral": "^0.1.1",
+    "gqliteral": "^0.1.2",
     "dedent": "^0.7.0"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ import dedent from "dedent";
 import { Button } from "./buttons";
 import EditorState from "./EditorState";
 import { DebugPanel, InputPanel, OutputPanel } from "./panels";
-import PrettierFormat from "./PrettierFormat";
+import { PrettierFormat } from "./PrettierFormat";
 import { shallowEqual } from "./helpers";
 import * as urlHash from "./urlHash";
 import * as util from "./util";
@@ -16,7 +16,7 @@ const originalContent = dedent`
   // Already imported / available
   // import { 
   //   GQLiteralObject, GQLiteralInterface, GQLiteralInputObject,
-  //   GQLiteralEnum, GQLiteralUnion, GQLiteralScalar
+  //   GQLiteralEnum, GQLiteralUnion, GQLiteralScalar, GQLiteralArg, GQLiteralDirective
   // } from 'gqliteral'
 
   const Node = GQLiteralInterface('Node', t => {
@@ -30,12 +30,22 @@ const originalContent = dedent`
     t.string('email');
   });
 
-  const server = GQLiteralServer({
-    types: [Node, Account] // this could also be { Node, Account }
+  const Query = GQLiteralObject('Query', t => {
+    t.field('account', 'Account', {
+      resolver: () => {
+        return { id: 1, email: 'test@example.com' }
+      }
+    })
+  });
+
+  const schema = GQLiteralSchema({
+    // this could also be { Node, Account }, types is pretty 
+    // forgiving (flattens arrays, walks objects, etc.)
+    types: [Node, Account, Query]
   })
 
-  // Keep this here so we don't need to run through an additional parsing layer
-  module.exports = server;
+  // Keep this here so we can use the schema to build the IDL
+  module.exports = schema;
 `;
 
 export class Playground extends React.Component {
@@ -118,13 +128,6 @@ export class Playground extends React.Component {
                       value={formatted}
                       ruler={options.printWidth}
                     />
-                    {editorState.showSecondFormat ? (
-                      <OutputPanel
-                        mode={util.getCodemirrorMode(options.parser)}
-                        value={getSecondFormat(formatted, debug.reformatted)}
-                        ruler={options.printWidth}
-                      />
-                    ) : null}
                   </div>
                 </div>
                 <div className="bottom-bar">
@@ -142,12 +145,4 @@ export class Playground extends React.Component {
       </EditorState>
     );
   }
-}
-
-function getSecondFormat(formatted, reformatted) {
-  return formatted === ""
-    ? ""
-    : formatted === reformatted
-      ? "✓ Second format is unchanged."
-      : reformatted;
 }

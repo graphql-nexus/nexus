@@ -4,7 +4,7 @@
  * @type {import('webpack').WebpackOptions}
  */
 module.exports = {
-  mode: "development",
+  mode: "none",
   entry: {
     playground: "./playground/index.tsx",
   },
@@ -25,7 +25,7 @@ module.exports = {
     ],
   },
   externals: {
-    fs: "function() {}",
+    fs: "{ writeFile(fileName, contents) { console.log(contents); } }",
     clipboard: "ClipboardJS",
     codemirror: "CodeMirror",
     react: "React",

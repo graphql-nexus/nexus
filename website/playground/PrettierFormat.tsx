@@ -6,11 +6,16 @@ import {
   GQLiteralUnion,
   GQLiteralEnum,
   GQLiteralScalar,
+  GQLiteralSchema,
+  GQLiteralAbstractType,
+  GQLiteralDirective,
+  GQLiteralArg,
 } from "gqliteral";
+import { printSchema } from "graphql";
 
-export default class PrettierFormat extends React.Component {
-  constructor() {
-    super();
+export class PrettierFormat extends React.Component {
+  constructor(props) {
+    super(props);
     this.state = { formatted: "", debug: {} };
   }
 
@@ -28,39 +33,54 @@ export default class PrettierFormat extends React.Component {
   }
 
   format() {
-    const fnArgs = [
-      "module",
-      "GQLiteralObject",
-      "GQLiteralInterface",
-      "GQLiteralInputObject",
-      "GQLiteralEnum",
-      "GQLiteralUnion",
-      "GQLiteralScalar",
-      this.props.code,
-    ];
-    const fn = new Function(fnArgs);
     const module = {};
-    fn(
-      module,
-      GQLiteralObject,
-      GQLiteralInterface,
-      GQLiteralInputObject,
-      GQLiteralEnum,
-      GQLiteralUnion,
-      GQLiteralScalar
-    );
-    debugger;
+    try {
+      const fn = new Function(
+        "module",
+        "GQLiteralAbstractType",
+        "GQLiteralObject",
+        "GQLiteralInterface",
+        "GQLiteralInputObject",
+        "GQLiteralEnum",
+        "GQLiteralUnion",
+        "GQLiteralScalar",
+        "GQLiteralSchema",
+        "GQLiteralDirective",
+        "GQLiteralArg",
+        `
+          "use strict";
+          ${this.props.code};
+        `
+      );
+      fn(
+        module,
+        GQLiteralAbstractType,
+        GQLiteralObject,
+        GQLiteralInterface,
+        GQLiteralInputObject,
+        GQLiteralEnum,
+        GQLiteralUnion,
+        GQLiteralScalar,
+        GQLiteralSchema,
+        GQLiteralDirective,
+        GQLiteralArg
+      );
+      if (typeof module.exports !== "undefined") {
+        this.setState({ formatted: printSchema(module.exports) });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    // const {
+    //   worker,
+    //   code,
+    //   options,
+    //   debugAst: ast,
+    //   debugDoc: doc,
+    //   reformat,
+    // } = this.props;
 
-    const {
-      worker,
-      code,
-      options,
-      debugAst: ast,
-      debugDoc: doc,
-      reformat,
-    } = this.props;
-
-    this.setState({ result: "hello" });
+    // this.setState({ result: "hello" });
     // worker
     //   .format(code, options, { ast, doc, reformat })
     //   .then(result => this.setState(result));
