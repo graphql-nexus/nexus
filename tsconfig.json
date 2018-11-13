@@ -12,5 +12,5 @@
     "declaration": true,
     "importHelpers": true
   },
-  "exclude": ["./examples", "./dist", "./src/__tests__"]
+  "exclude": ["./examples", "./dist", "./src/__tests__", "./website"]
 }
