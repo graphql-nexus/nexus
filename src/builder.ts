@@ -401,7 +401,6 @@ export class SchemaBuilder {
       type: this.decorateOutputType(
         this.getOutputType(fieldConfig.type),
         fieldConfig,
-        // @ts-ignore
         typeConfig
       ),
       resolve: this.getResolver(fieldConfig, typeConfig),
@@ -465,9 +464,8 @@ export class SchemaBuilder {
   protected decorateOutputType(
     type: GraphQLOutputType,
     fieldConfig: Types.FieldConfig,
-    typeConfig: Types.ObjectTypeConfig
+    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ) {
-    // @ts-ignore
     return this.decorateType(type, fieldConfig, typeConfig, false);
   }
 
@@ -493,11 +491,23 @@ export class SchemaBuilder {
    * Adds the null / list configuration to the type.
    */
   protected decorateType(
+    type: GraphQLOutputType,
+    fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
+    typeConfig: Types.ObjectTypeConfig,
+    isInput: false
+  ): GraphQLOutputType;
+  protected decorateType(
     type: GraphQLInputType,
+    fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
+    typeConfig: Types.InputTypeConfig,
+    isInput: true
+  ): GraphQLInputType;
+  protected decorateType(
+    type: GraphQLInputType | GraphQLOutputType,
     fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
     typeConfig: Types.ObjectTypeConfig | Types.InputTypeConfig,
     isInput: boolean
-  ): GraphQLInputType {
+  ): GraphQLInputType | GraphQLOutputType {
     let finalType = type;
     const nullConfig = {
       ...NULL_DEFAULTS,

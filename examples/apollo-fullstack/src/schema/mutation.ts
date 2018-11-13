@@ -26,12 +26,12 @@ export const Mutation = GQLiteralObject("Mutation", (t) => {
     async resolve(_, { launchId }, { dataSources }) {
       const result = dataSources.userAPI.cancelTrip({ launchId });
 
-      if (!result)
+      if (!result) {
         return {
           success: false,
           message: "failed to cancel trip",
         };
-
+      }
       const launch = await dataSources.launchAPI.getLaunchById({ launchId });
       return {
         success: true,

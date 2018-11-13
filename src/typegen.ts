@@ -281,7 +281,8 @@ function interfaceFields(prefix: string, t: SchemaTemplateContext["types"][0]) {
   if (t.interfaces.length) {
     return `extends ${map(
       t.interfaces,
-      (i) => `${prefix}_Interface_${i}_Fields`,
+      (i) => `
+      ${prefix}_Interface_${i}_Fields`,
       ", "
     )}`;
   }

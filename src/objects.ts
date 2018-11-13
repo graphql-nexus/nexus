@@ -174,27 +174,27 @@ export class GQLiteralUnionType<
 
 abstract class FieldsArgs<GenTypes = GQLiteralGen> {
   idArg(options?: Types.ArgOpts) {
-    return GQLiteralArg<GenTypes>("ID", options);
+    return GQLiteralArg("ID", options);
   }
 
   intArg(options?: Types.ArgOpts) {
-    return GQLiteralArg<GenTypes>("Int", options);
+    return GQLiteralArg("Int", options);
   }
 
   floatArg(options?: Types.ArgOpts) {
-    return GQLiteralArg<GenTypes>("Float", options);
+    return GQLiteralArg("Float", options);
   }
 
-  boolArg(options?: Types.ArgOpts) {
-    return GQLiteralArg<GenTypes>("Boolean", options);
+  booleanArg(options?: Types.ArgOpts) {
+    return GQLiteralArg("Boolean", options);
   }
 
   stringArg(options?: Types.ArgOpts) {
-    return GQLiteralArg<GenTypes>("String", options);
+    return GQLiteralArg("String", options);
   }
 
   fieldArg(type: Types.AllInputTypes<GenTypes>, options?: Types.ArgOpts) {
-    return GQLiteralArg<GenTypes>(type, options);
+    return GQLiteralArg(type, options);
   }
 }
 
