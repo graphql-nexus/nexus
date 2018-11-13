@@ -351,7 +351,7 @@ export interface InterfaceTypeConfig
   resolveType?: TypeResolver<any, any>;
 }
 
-export interface SchemaConfig extends Nullability, DefaultResolver {
+export interface SchemaConfig<GenTypes> extends Nullability, DefaultResolver {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -365,7 +365,7 @@ export interface SchemaConfig extends Nullability, DefaultResolver {
   /**
    * Generates the types for Intellisense/TypeScript
    */
-  typeGeneration?: GQLiteralTypegenOptions;
+  typeGeneration?: GQLiteralTypegenOptions<GenTypes>;
 }
 
 export type NullabilityConfig = {
@@ -456,7 +456,7 @@ export type GenTypesShape = {
   allOutputTypes: string;
 };
 
-export type OutputNames<GenTypes> = GenTypes extends GenTypesShape
+export type ObjectNames<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["objects"], string>
   : never;
 

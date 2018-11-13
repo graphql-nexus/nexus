@@ -234,7 +234,9 @@ export function GQLiteralDirective<
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function GQLiteralSchema(options: Types.SchemaConfig) {
+export function GQLiteralSchema<GenTypes = GQLiteralGen>(
+  options: Types.SchemaConfig<GenTypes>
+) {
   const { types: typeMap, directives } = buildTypes(options.types, options);
 
   if (!isObjectType(typeMap.Query)) {

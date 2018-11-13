@@ -94,7 +94,7 @@ export class SchemaBuilder {
 
   constructor(
     protected schemaConfig: Pick<
-      Types.SchemaConfig,
+      Types.SchemaConfig<any>,
       "nullability" | "defaultResolver"
     >
   ) {}

@@ -17,7 +17,7 @@ import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
  */
 export function buildTypes(
   types: any,
-  config?: Pick<Types.SchemaConfig, "nullability" | "defaultResolver">
+  config?: Pick<Types.SchemaConfig<any>, "nullability" | "defaultResolver">
 ): Types.BuildTypes {
   const builder = new SchemaBuilder(config || {});
   addTypes(builder, types);
