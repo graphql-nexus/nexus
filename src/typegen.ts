@@ -1,14 +1,10 @@
-import { compileTemplate } from "graphql-codegen-compiler";
 import {
-  CustomProcessingFunction,
   GraphQLSchema,
   schemaToTemplateContext,
   SchemaTemplateContext,
   Field,
   Argument,
 } from "graphql-codegen-core";
-import util from "util";
-import path from "path";
 import * as Types from "./types";
 
 const SCALAR_TYPES = {
@@ -22,55 +18,35 @@ const SCALAR_TYPES = {
 };
 
 export async function typegen(
-  options: GQLiteralTypegenOptions<any>,
+  options: Types.GQLiteralTypegenOptions<any>,
   schema: GraphQLSchema
 ) {
   const fs = require("fs") as typeof import("fs");
   const context = schemaToTemplateContext(schema);
-  const data = await compileTemplate(makeTypes(options), context);
-  const writeFile = util.promisify(fs.writeFile);
+  const data = await makeTypes(options, context);
   await Promise.all(
     data.map(async ({ filename, content }) => {
-      await writeFile(filename, content);
+      await new Promise((resolve, reject) => {
+        fs.writeFile(filename, content, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
     })
   );
   return options;
 }
 
-export interface GQLiteralTypegenOptions<GenTypes> {
-  /**
-   * File path where generated types should be saved
-   */
-  typesFilePath: string;
-  /**
-   * A map of all types and what fields they can resolve to
-   */
-  backingTypes?: { [K in Types.ObjectNames<GenTypes>]?: string };
-  /**
-   * Optional prefix for all fields generated, defaults to "Generated"
-   */
-  typeGenPrefix?: string;
-  /**
-   * A map of an import namespace and
-   */
-  imports?: Record<string, string>;
-  /**
-   * An array of additional strings to prefix on the header of the TS file
-   */
-  prefix?: string[];
-  /**
-   * The type of the context for the resolvers
-   */
-  contextType?: string;
-}
-
 export const makeTypes = (
-  options: GQLiteralTypegenOptions<any>
-): CustomProcessingFunction => (context) => {
+  options: Types.GQLiteralTypegenOptions<any>,
+  context: SchemaTemplateContext
+) => {
   const {
     typesFilePath,
     backingTypes: backing = {},
-    imports = {},
     typeGenPrefix: prefix = "Generated",
     prefix: headerPrefix = [],
   } = options;
@@ -85,13 +61,6 @@ export const makeTypes = (
    * Do not make changes directly
    */
   ${headerPrefix.join("\n")}
-
-  ${map(Object.keys(imports || {}), (key) => {
-    return `import * as ${key} from "${path
-      .relative(typesFilePath, imports[key])
-      .replace(/^\.\./, ".")
-      .replace(/.tsx?$/, "")}"`;
-  })}
 
   ${map(context.interfaces, (i) => {
     const typeName = `${prefix}_Interface_${i.name}`;
@@ -264,7 +233,7 @@ export const makeTypes = (
     return `${nullPrefix}${type} | PromiseLike<${nullPrefix}${type}>`;
   }
 
-  return [{ filename: options.typesFilePath, content }];
+  return [{ filename: typesFilePath, content }];
 };
 
 type Mapper<T> = (item: T, index: number) => string;

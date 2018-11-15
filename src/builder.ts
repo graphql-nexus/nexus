@@ -33,6 +33,7 @@ import {
   DirectiveLocationEnum,
   GraphQLDirective,
   isDirective,
+  GraphQLObjectTypeConfig,
 } from "graphql";
 import { GQLiteralTypeWrapper } from "./definitions";
 import * as Types from "./types";
@@ -674,12 +675,14 @@ function withDefaultValue(
   return (root, args, ctx, info) => {
     const result = resolver(root, args, ctx, info);
     if (typeof result === "undefined" || result === null) {
-      return defaultValue;
+      return typeof defaultValue === "function" ? defaultValue() : defaultValue;
     }
     if (isPromise(result)) {
       return result.then((val: any) => {
         if (typeof val === "undefined" || val === null) {
-          return defaultValue;
+          return typeof defaultValue === "function"
+            ? defaultValue()
+            : defaultValue;
         }
         return val;
       });

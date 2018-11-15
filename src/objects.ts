@@ -386,6 +386,8 @@ export class GQLiteralObjectType<
   buildType(builder: SchemaBuilder) {
     return builder.objectType(this.typeConfig);
   }
+
+  backingType(typeImport: Types.ImportedType) {}
 }
 
 export class GQLiteralInterfaceType<

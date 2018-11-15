@@ -66,7 +66,7 @@ class CodeMirrorPanel extends React.Component {
       }
       const [start, end] = getIndexPosition(this.props.value, [
         this.props.overlayStart,
-        this.props.overlayEnd
+        this.props.overlayEnd,
       ]);
       this._overlay = createOverlay(start, end);
       this._codeMirror.addOverlay(this._overlay);
@@ -89,7 +89,7 @@ class CodeMirrorPanel extends React.Component {
 
   render() {
     return (
-      <div className="editor input">
+      <div className="editor input graphql-sdl">
         <textarea ref={this._textareaRef} />
       </div>
     );
@@ -139,27 +139,12 @@ function createOverlay(start, end) {
         stream.skipToEnd();
         return "searching";
       }
-    }
+    },
   };
 }
 
 function makeRuler(props) {
   return { column: props.ruler, color: props.rulerColor };
-}
-
-export function InputPanel(props) {
-  return (
-    <CodeMirrorPanel
-      lineNumbers={true}
-      keyMap="sublime"
-      autoCloseBrackets={true}
-      matchBrackets={true}
-      showCursorWhenSelecting={true}
-      tabSize={4}
-      rulerColor="#eeeeee"
-      {...props}
-    />
-  );
 }
 
 export function OutputPanel(props) {
@@ -169,17 +154,6 @@ export function OutputPanel(props) {
       lineNumbers={true}
       rulerColor="#444444"
       {...props}
-    />
-  );
-}
-
-export function DebugPanel({ value }) {
-  return (
-    <CodeMirrorPanel
-      readOnly={true}
-      lineNumbers={false}
-      mode="jsx"
-      value={value}
     />
   );
 }

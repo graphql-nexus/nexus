@@ -35,6 +35,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.36.0/codemirror.css"
     />
 
+    <script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
+    <script src="https://unpkg.com/prettier@1.13.0/parser-typescript.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.36.0/codemirror.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.36.0/mode/javascript/javascript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.36.0/mode/xml/xml.js"></script>
@@ -54,6 +57,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.7.0-alpha.0/umd/react.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.7.0-alpha.0/umd/react-dom.development.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.12.0/graphiql.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.12.0/graphiql.css"
+    />
     <link rel="stylesheet" href="separate-css/playground.css" />
   </head>
 
@@ -78,7 +87,7 @@
 
     <div id="root" class="playground-container"></div>
 
-    <script src="playground.js"></script>
+    <script src="playground-dist/playground.js"></script>
     <!--
       <script async defer src="https://buttons.github.io/buttons.js"></script>
     -->

@@ -45,6 +45,9 @@ exports.Query = GQLiteralObject("Query", (t) => {
           "The number of items to fetch starting from the offset, for pagination",
       }),
     },
+    resolve(root, ctx, args) {
+      debugger;
+    },
   });
   t.field("entry", "Entry", {
     nullable: true,

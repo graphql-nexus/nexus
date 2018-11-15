@@ -95,7 +95,6 @@ header h1 {
 
 .editors {
   display: flex;
-  flex-flow: row wrap;
   flex: 1;
 }
 
@@ -120,11 +119,12 @@ header h1 {
   }
 }
 
-/* display as four columns */
-@media (min-width: 1200px) {
-  .editor {
-    flex-basis: 25%;
-  }
+.graphql-sdl {
+  height: 50%;
+}
+
+.graphiql-container {
+  height: 50%;
 }
 
 .editor.loading {
@@ -139,37 +139,6 @@ header h1 {
   right: 0;
   bottom: 0;
   line-height: 1.6;
-}
-
-.bottom-bar {
-  position: relative;
-}
-
-.bottom-bar-buttons {
-  z-index: 10;
-  padding: 8px;
-  display: flex;
-  float: left;
-}
-
-.bottom-bar-buttons-right {
-  float: right;
-}
-
-.bottom-bar-buttons > * + * {
-  margin-left: 9px;
-}
-
-@media (max-width: 799px) {
-  .bottom-bar-buttons {
-    top: auto;
-    bottom: 100%;
-    padding: 2px;
-  }
-
-  .bottom-bar-buttons > * + * {
-    margin-left: 2px;
-  }
 }
 
 .options-container {

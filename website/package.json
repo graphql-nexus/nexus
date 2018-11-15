@@ -7,7 +7,8 @@
     "publish-gh-pages": "docusaurus-publish",
     "write-translations": "docusaurus-write-translations",
     "version": "docusaurus-version",
-    "rename-version": "docusaurus-rename-version"
+    "rename-version": "docusaurus-rename-version",
+    "webpack": "webpack -w"
   },
   "dependencies": {
     "clipboard": "^2.0.1",
@@ -17,7 +18,9 @@
     "react-dom": "^16.7.0-alpha.0",
     "graphql": "^14.0.2",
     "gqliteral": "^0.1.2",
-    "dedent": "^0.7.0"
+    "dedent": "^0.7.0",
+    "react-monaco-editor": "^0.21.0",
+    "monaco-editor": "^0.15.1"
   },
   "devDependencies": {
     "babel-loader": "^8.0.4",
@@ -29,10 +32,19 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@types/react": "^16.7.3",
     "@types/react-dom": "^16.0.9",
+    "@types/graphql": "^14.0.3",
+    "@types/webpack": "^4.4.19",
+    "typescript": "3.1.6",
     "docusaurus": "^1.5.1",
+    "react-split-pane": "^0.1.84",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
     "lodash.groupby": "^4.6.0",
-    "lz-string": "^1.4.4"
+    "lodash.debounce": "^4.0.8",
+    "lz-string": "^1.4.4",
+    "style-loader": "^0.23.1",
+    "css-loader": "^1.0.1",
+    "raw-loader": "^0.5.1",
+    "monaco-editor-webpack-plugin": "^1.6.0"
   }
 }

@@ -26,8 +26,10 @@ export function replace(state) {
     typeof history === "object" &&
     typeof history.replaceState === "function"
   ) {
-    const url = new URL(location);
+    // @ts-ignore TODO: check on this
+    const url = new URL(window.location.href);
     url.hash = hash;
+    // @ts-ignore
     history.replaceState(null, null, url);
   } else {
     location.hash = hash;

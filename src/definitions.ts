@@ -26,6 +26,7 @@ import {
   addDirectives,
 } from "./utils";
 import { typegen } from "./typegen";
+import { TypeBuilder } from "./typebuilder";
 
 /**
  * Wraps a GQLiteralType object, since all GQLiteral types have a
@@ -41,18 +42,13 @@ export class GQLiteralTypeWrapper<
 
 /**
  * Defines a GraphQL Scalar type
- *
- * @param {string} name
- * @param {object} options
  */
 export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
   return new GraphQLScalarType({ name: assertValidName(name), ...options });
 }
 
 /**
- * Defines a GraphQL Object.
- *
- * @param {string}
+ * Defines a GraphQL Object
  */
 export function GQLiteralObject<
   GenTypes = GQLiteralGen,
@@ -282,6 +278,7 @@ export function GQLiteralSchema<GenTypes = GQLiteralGen>(
       }
     );
     if (options.typeGeneration) {
+      // console.log(new TypeBuilder(sortedSchema).generatePretty());
       typegen(options.typeGeneration, sortedSchema).catch((e) => {
         console.error(e);
       });

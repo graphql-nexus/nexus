@@ -8,7 +8,6 @@ import {
   GraphQLDirective,
 } from "graphql";
 import { GQLiteralAbstract } from "./objects";
-import { GQLiteralTypegenOptions } from "./typegen";
 
 export enum NodeType {
   MIX = "MIX",
@@ -236,9 +235,9 @@ export interface InputFieldOpts extends FieldOpts {
 }
 
 export interface ScalarOpts
-  extends Omit<
+  extends Pick<
       GraphQLScalarTypeConfig<any, any>,
-      "name" | "astNode" | "extensionASTNodes"
+      "description" | "serialize" | "parseValue" | "parseLiteral"
     > {
   /**
    * Any deprecation info for this scalar type
@@ -324,6 +323,12 @@ export interface ObjectTypeConfig
    * An (optional) isTypeOf check for the object type
    */
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
+
+  /**
+   * The backing type for this object type. This can
+   * also be set when constructing the schema.
+   */
+  backingType?: ImportedType;
 }
 
 export interface AbstractTypeConfig {
@@ -567,3 +572,39 @@ export type DirectiveConfig<GenTypes, DirectiveName> = {
   locations: DirectiveLocationEnum[];
   args?: [];
 };
+
+export interface ImportedType {
+  /**
+   * The name of the imported type
+   */
+  name: string;
+  /**
+   * The absolute path to import from
+   * if omitted it's assumed you already
+   * imported the type, or it's a global.
+   */
+  absolutePath?: string;
+}
+
+export interface GQLiteralTypegenOptions<GenTypes> {
+  /**
+   * File path where generated types should be saved
+   */
+  typesFilePath: string;
+  /**
+   * A map of all types and what fields they can resolve to
+   */
+  backingTypes?: { [K in ObjectNames<GenTypes>]?: string };
+  /**
+   * Optional prefix for all fields generated, defaults to "Generated"
+   */
+  typeGenPrefix?: string;
+  /**
+   * An array of additional strings to prefix on the header of the TS file
+   */
+  prefix?: string[];
+  /**
+   * The type of the context for the resolvers
+   */
+  contextType?: ImportedType;
+}

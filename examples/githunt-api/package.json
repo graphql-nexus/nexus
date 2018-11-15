@@ -12,6 +12,6 @@
     "prettier": "^1.15.2"
   },
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon --inspect src/index.js"
   }
 }

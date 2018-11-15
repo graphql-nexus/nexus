@@ -3,6 +3,11 @@
 ### Do not edit the contents directly
 ### ---
 
+enum CacheControlScope {
+  PRIVATE
+  PUBLIC
+}
+
 """A comment about an entry, submitted by a user"""
 type Comment {
   """The text of the comment"""

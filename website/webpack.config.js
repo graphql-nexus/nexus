@@ -1,31 +1,56 @@
 "use strict";
+/**
+ * @type {import('monaco-editor-webpack-plugin').default}
+ */
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 /**
- * @type {import('webpack').WebpackOptions}
+ * @type {import('webpack').Configuration}
  */
 module.exports = {
   mode: "none",
+  devtool: "source-map",
   entry: {
     playground: "./playground/index.tsx",
   },
   output: {
+    publicPath: "/gqliteral/playground-dist/",
     filename: "[name].js",
-    path: __dirname + "/static/",
+    path: __dirname + "/static/playground-dist",
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".mjs", ".js", ".json"],
+    alias: {
+      "monaco-editor": "monaco-editor/esm/vs/editor/editor.api.js",
+    },
+    extensions: [".ts", ".tsx", ".mjs", ".js", ".json", ".css"],
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /(^.?|\.[^d]|[^.]d|[^.][^d])\.tsx?$/,
         exclude: /node_modules/,
         loader: "babel-loader",
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
+  plugins: [
+    new MonacoWebpackPlugin({
+      languages: ["typescript"],
+    }),
+  ],
   externals: {
-    fs: "{ writeFile(fileName, contents) { console.log(contents); } }",
+    fs: `{ 
+      writeFile(fileName, contents) {
+        if (typeof window.writeFileShim !== 'undefined') {
+          window.writeFileShim(fileName, contents)
+        }
+      } 
+    }`,
+    prettier: "prettier",
     clipboard: "ClipboardJS",
     codemirror: "CodeMirror",
     react: "React",
