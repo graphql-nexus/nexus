@@ -150,11 +150,17 @@ export interface FieldOpts extends CommonOpts {
    */
   list?: boolean;
   /**
+   * Sets the list depth, for the rare cases where the depth is greater than 1
+   */
+  listDepth?: number;
+  /**
    * Whether a member of the list can be a null value. If `list` is not true,
    * this option is ignored.
-   * @default false
+   *
+   * If the listDepth is > 1, you can specify an Array of whether the
+   * list should be nullable, otherwise it's assumed to be false
    */
-  listItemNullable?: boolean;
+  listItemNullable?: boolean | boolean[];
 }
 
 export interface ArgOpts extends FieldOpts {
@@ -192,10 +198,22 @@ export interface OutputFieldOpts<
    * Any arguments defined
    */
   args?: OutputFieldArgs;
+
   /**
    * Property to use to resolve the field. If resolve is specified, this field is ignored.
    */
   property?: Extract<keyof RootValue<GenTypes, TypeName>, string>;
+
+  /**
+   * Subscription for the output field.
+   */
+  // subscribe?: (
+  //   root: RootValue<GenTypes, TypeName>,
+  //   args: ArgsValue<GenTypes, TypeName, FieldName>,
+  //   context: ContextValue<GenTypes>,
+  //   info: GraphQLResolveInfo
+  // ) => ResultValue<GenTypes, TypeName, FieldName>;
+
   /**
    * Resolver for the output field
    */
@@ -205,15 +223,21 @@ export interface OutputFieldOpts<
     context: ContextValue<GenTypes>,
     info: GraphQLResolveInfo
   ) => ResultValue<GenTypes, TypeName, FieldName>;
+
+  /**
+   * A convention for validating the field before
+   * query execution time, allowing you to do things
+   * like early-bail if arguments are incorrect.
+   */
+  validateArgs?: (
+    args: ArgsValue<GenTypes, TypeName, FieldName>,
+    info: GraphQLResolveInfo
+  ) => boolean | Error;
+
   /**
    * Default value for the field, if none is returned.
    */
   default?: any;
-  /**
-   * Synchronous validation for the field, runs just after the
-   * built-in "validate", at the root level prior to execution.
-   */
-  validate?: (info: GraphQLResolveInfo) => boolean | Error;
 }
 
 export interface AbstractFieldOpts<GenTypes, FieldName> extends FieldOpts {}
@@ -575,9 +599,15 @@ export type DirectiveConfig<GenTypes, DirectiveName> = {
 
 export interface ImportedType {
   /**
-   * The name of the imported type
+   * The name of the imported type.
    */
   name: string;
+  /**
+   * Optional alias for the type name:
+   *
+   * import { $name as $alias } from '$absolutePath';
+   */
+  alias?: string;
   /**
    * The absolute path to import from
    * if omitted it's assumed you already

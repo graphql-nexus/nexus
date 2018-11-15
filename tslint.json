@@ -2,7 +2,6 @@
   "extends": ["tslint-config-prettier"],
   "rules": {
     "ban": false,
-    "class-name": true,
     "curly": true,
     "eofline": false,
     "forin": true,

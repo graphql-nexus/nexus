@@ -11,7 +11,8 @@
     "build": "tsc",
     "lint": "tslint -p tsconfig.json",
     "clean": "rm -rf dist",
-    "prepublish": "yarn clean && yarn lint && yarn build"
+    "prepublish": "yarn clean && yarn lint && yarn build",
+    "website": "cd website && yarn start"
   },
   "files": [
     "src",

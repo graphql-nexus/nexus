@@ -8,6 +8,7 @@ import {
   GraphQLIsTypeOfFn,
   GraphQLResolveInfo,
   DirectiveLocationEnum,
+  assertValidName,
 } from "graphql";
 import { addMix, dedent } from "./utils";
 import { SchemaBuilder } from "./builder";
@@ -380,14 +381,28 @@ export class GQLiteralObjectType<
   }
 
   /**
+   * Sets the concrete "backing type" for this type, this can
+   * be a simple object, a class, a database Model, whatever
+   * you expect as the first argument to a resolver.
+   *
+   * It is highly recommended that you set this value for any types
+   * that are non-transient. If none is provided, it will default
+   * to the shape of the type.
+   *
+   * Note: This value can also be set when building the schema via
+   * the "backingTypes" option to `GQLiteralSchema`
+   */
+  backingType(typeImport: Types.ImportedType) {
+    this.typeConfig.backingType = typeImport;
+  }
+
+  /**
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    */
   buildType(builder: SchemaBuilder) {
     return builder.objectType(this.typeConfig);
   }
-
-  backingType(typeImport: Types.ImportedType) {}
 }
 
 export class GQLiteralInterfaceType<
@@ -714,7 +729,7 @@ export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
     options?: Types.AbstractFieldOpts<GenTypes, FieldName>
   ) {
     this.typeConfig.fields.push({
-      name,
+      name: assertValidName(name),
       type,
       ...options,
     });

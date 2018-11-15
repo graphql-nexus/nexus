@@ -9,14 +9,6 @@ const content = dedent`
   // All GQLiteral objects are available globally here,
   // and will automatically be added to the schema
 
-  GQLiteralObject('Query', t => {
-    t.field('account', 'Account', {
-      resolve() {
-        return { id: 1, email: 'test@example.com' }
-      }
-    });
-  });
-  
   GQLiteralObject('Account', t => {
     t.implements('Node', 'Timestamps');
     t.string('email', { nullable: true });
@@ -25,7 +17,7 @@ const content = dedent`
       default: () => [{id: 1}] 
     });
   });
-  
+
   GQLiteralObject('Post', t => {
     t.implements('Node');
     t.string('title', { default: '' });
@@ -35,17 +27,34 @@ const content = dedent`
       }
     });
   })
-  
+
+  GQLiteralObject('Query', t => {
+    t.field('account', 'Account', {
+      resolve() {
+        return { id: 1, email: 'test@example.com' }
+      }
+    });
+  });
+
   GQLiteralInterface('Node', t => {
     t.description("A Node is a resource with a globally unique identifier");
     t.id('id', { description: "PK of the resource" });
   })
-  
+
   GQLiteralInterface('Timestamps', t => {
     t.field('createdAt', 'Date', { default: () => new Date() });
     t.field('updatedAt', 'Date', { default: () => new Date() });
   });
-  
+
+  GQLiteralObject('ZZZ_AdvancedTypes', t => {
+    t.float('coordinates', {
+      list: true,
+      listDepth: 2,
+      listItemNullable: [false, true],
+      resolve: () => Promise.resolve([])
+    });  
+  })
+
   GQLiteralScalar('Date', {
     serialize: value => value.getTime(),
     parseValue: value => new Date(value),

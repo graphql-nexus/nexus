@@ -1,6 +1,8 @@
 import {
   defaultFieldResolver,
+  DirectiveLocationEnum,
   GraphQLBoolean,
+  GraphQLDirective,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
@@ -23,6 +25,7 @@ import {
   GraphQLScalarType,
   GraphQLString,
   GraphQLUnionType,
+  isDirective,
   isEnumType,
   isInputType,
   isInterfaceType,
@@ -30,15 +33,11 @@ import {
   isObjectType,
   isOutputType,
   isUnionType,
-  DirectiveLocationEnum,
-  GraphQLDirective,
-  isDirective,
-  GraphQLObjectTypeConfig,
 } from "graphql";
 import { GQLiteralTypeWrapper } from "./definitions";
-import * as Types from "./types";
-import { suggestionList, propertyFieldResolver } from "./utils";
 import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
+import * as Types from "./types";
+import { propertyFieldResolver, suggestionList } from "./utils";
 
 const isPromise = (val: any): val is Promise<any> =>
   Boolean(val && typeof val.then === "function");
@@ -407,7 +406,9 @@ export class SchemaBuilder {
       resolve: this.getResolver(fieldConfig, typeConfig),
       description: fieldConfig.description,
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
-      // subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
+      // TODO: Need to look into subscription semantics and how
+      // resolution works for them.
+      // subscribe: fieldConfig.subscribe,
       // deprecationReason?: Maybe<string>;
     };
   }
@@ -435,7 +436,7 @@ export class SchemaBuilder {
       allArgs[argName] = {
         type: this.decorateArgType(
           this.getInputType(argDef.type),
-          argDef,
+          { ...argDef, name: argName },
           typeConfig
         ),
         description: argDef.description,
@@ -472,7 +473,7 @@ export class SchemaBuilder {
 
   protected decorateArgType(
     type: GraphQLInputType,
-    argOpts: Types.ArgOpts,
+    argOpts: Types.ArgDefinition & { name: string },
     typeConfig: Types.InputTypeConfig
   ) {
     const { required: _required, requiredListItem, ...rest } = argOpts;
@@ -493,29 +494,32 @@ export class SchemaBuilder {
    */
   protected decorateType(
     type: GraphQLOutputType,
-    fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
+    fieldConfig: Types.Omit<Types.FieldConfig, "type">,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     isInput: false
   ): GraphQLOutputType;
   protected decorateType(
     type: GraphQLInputType,
-    fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
+    fieldConfig: Types.Omit<Types.FieldConfig, "type">,
     typeConfig: Types.InputTypeConfig,
     isInput: true
   ): GraphQLInputType;
   protected decorateType(
     type: any,
-    fieldConfig: Types.Omit<Types.FieldConfig, "name" | "type">,
-    typeConfig: any,
+    fieldConfig: Types.Omit<Types.FieldConfig, "type">,
+    typeConfig:
+      | Types.ObjectTypeConfig
+      | Types.InterfaceTypeConfig
+      | Types.InputTypeConfig,
     isInput: boolean
   ): any {
     let finalType = type;
-    const nullConfig = {
+    const nullConfig: typeof NULL_DEFAULTS = {
       ...NULL_DEFAULTS,
       ...this.schemaConfig.nullability,
       ...typeConfig.nullability,
     };
-    const { list, nullable, listItemNullable } = fieldConfig;
+    const { list, nullable, listDepth, listItemNullable } = fieldConfig;
     const isNullable =
       typeof nullable !== "undefined"
         ? nullable
@@ -527,18 +531,30 @@ export class SchemaBuilder {
             ? nullConfig.input
             : nullConfig.output;
 
-    // TODO: Figure out how lists of lists will be represented.
     if (list) {
+      const depth = listDepth || 1;
       const nullableItem =
         typeof listItemNullable !== "undefined"
           ? listItemNullable
           : isInput
             ? nullConfig.inputListItem
             : nullConfig.outputListItem;
-      if (!nullableItem) {
-        finalType = GraphQLNonNull(finalType);
+      if (Array.isArray(nullableItem) && nullableItem.length !== depth) {
+        throw new Error(
+          `Incorrect listItemNullable array length for ${typeConfig.name}${
+            fieldConfig.name
+          }, expected ${depth} saw ${nullableItem.length}`
+        );
       }
-      finalType = GraphQLList(finalType);
+      for (let i = 0; i < depth; i++) {
+        const isNull = Array.isArray(nullableItem)
+          ? nullableItem[i]
+          : nullableItem;
+        if (!isNull) {
+          finalType = GraphQLNonNull(finalType);
+        }
+        finalType = GraphQLList(finalType);
+      }
     } else if (typeof listItemNullable !== "undefined") {
       console.log(
         "listItemNullable should only be set with list: true, this option is ignored"
