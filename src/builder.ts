@@ -1,6 +1,5 @@
 import {
   defaultFieldResolver,
-  DirectiveLocationEnum,
   GraphQLBoolean,
   GraphQLDirective,
   GraphQLEnumType,
@@ -33,11 +32,14 @@ import {
   isObjectType,
   isOutputType,
   isUnionType,
+  GraphQLSchema,
 } from "graphql";
 import { GQLiteralTypeWrapper } from "./definitions";
+import { GQLiteralMetadata } from "./metadata";
 import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
 import * as Types from "./types";
-import { propertyFieldResolver, suggestionList } from "./utils";
+import { propertyFieldResolver, suggestionList, objValues } from "./utils";
+import { isObject } from "util";
 
 const isPromise = (val: any): val is Promise<any> =>
   Boolean(val && typeof val.then === "function");
@@ -80,7 +82,8 @@ export class SchemaBuilder {
    */
   protected definedTypeMap: Record<string, GraphQLNamedType> = {};
   /**
-   * The "pending type" map keeps track of all types that
+   * The "pending type" map keeps track of all types that were defined w/
+   * GQLiteral and haven't been processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, GQLiteralTypeWrapper> = {};
   protected pendingDirectiveMap: Record<
@@ -88,23 +91,20 @@ export class SchemaBuilder {
     GQLiteralDirectiveType<any>
   > = {};
   protected directiveMap: Record<string, GraphQLDirective> = {};
-  protected directiveUseMap: {
-    [K in DirectiveLocationEnum]?: Types.DirectiveUse
-  } = {};
 
   constructor(
-    protected schemaConfig: Pick<
-      Types.SchemaConfig<any>,
-      "nullability" | "defaultResolver"
-    >
+    protected metadata: GQLiteralMetadata,
+    protected nullability: Types.NullabilityConfig = {}
   ) {}
 
   addType(typeDef: GQLiteralTypeWrapper | GraphQLNamedType) {
     if (this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name]) {
-      throw new Error(`Named type ${typeDef.name} declared more than once`);
+      throw extendError(typeDef.name);
     }
     if (isNamedType(typeDef)) {
+      this.metadata.addExternalType(typeDef);
       this.finalTypeMap[typeDef.name] = typeDef;
+      this.definedTypeMap[typeDef.name] = typeDef;
     } else {
       this.pendingTypeMap[typeDef.name] = typeDef;
     }
@@ -125,17 +125,17 @@ export class SchemaBuilder {
       if (this.finalTypeMap[key]) {
         return;
       }
+      if (this.definedTypeMap[key]) {
+        throw extendError(key);
+      }
       this.finalTypeMap[key] = this.getOrBuildType(key);
       this.buildingTypes.clear();
     });
     Object.keys(this.pendingDirectiveMap).forEach((key) => {});
     return {
-      types: this.finalTypeMap,
-      directives: {
-        definitions: [],
-        uses: {},
-        hasUses: false,
-      },
+      typeMap: this.finalTypeMap,
+      metadata: this.metadata,
+      directiveMap: this.directiveMap,
     };
   }
 
@@ -155,6 +155,7 @@ export class SchemaBuilder {
   }
 
   objectType(config: Types.ObjectTypeConfig) {
+    this.metadata.addObjectType(config);
     return new GraphQLObjectType({
       name: config.name,
       interfaces: () => config.interfaces.map((i) => this.getInterface(i)),
@@ -166,6 +167,9 @@ export class SchemaBuilder {
         );
         allInterfaces.forEach((i) => {
           const iFields = i.getFields();
+          // We need to take the interface fields and reconstruct them
+          // this actually simplifies things becuase if we've modified
+          // the field at all it needs to happen here.
           Object.keys(iFields).forEach((iFieldName) => {
             const { isDeprecated, args, ...rest } = iFields[iFieldName];
             interfaceFields[iFieldName] = {
@@ -255,7 +259,7 @@ export class SchemaBuilder {
               description: val.description,
               deprecationReason: val.deprecationReason,
               value: val.value,
-              astNode: val.astNode,
+              // astNode: val.astNode,
             };
           });
       }
@@ -358,7 +362,7 @@ export class SchemaBuilder {
   }
 
   protected mixAbstractOuput(
-    typeConfig: Types.InputTypeConfig,
+    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     fieldMap: GraphQLFieldConfigMap<any, any>,
     type: GQLiteralAbstract<any>,
     { pick, omit }: Types.MixOpts<any>
@@ -397,6 +401,7 @@ export class SchemaBuilder {
     fieldConfig: Types.FieldConfig,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ): GraphQLFieldConfig<any, any> {
+    this.metadata.addField(typeConfig.name, fieldConfig);
     return {
       type: this.decorateOutputType(
         this.getOutputType(fieldConfig.type),
@@ -516,7 +521,7 @@ export class SchemaBuilder {
     let finalType = type;
     const nullConfig: typeof NULL_DEFAULTS = {
       ...NULL_DEFAULTS,
-      ...this.schemaConfig.nullability,
+      ...this.nullability,
       ...typeConfig.nullability,
     };
     const { list, nullable, listDepth, listItemNullable } = fieldConfig;
@@ -560,7 +565,6 @@ export class SchemaBuilder {
         "listItemNullable should only be set with list: true, this option is ignored"
       );
     }
-
     if (!isNullable) {
       return GraphQLNonNull(finalType);
     }
@@ -663,10 +667,7 @@ export class SchemaBuilder {
     fieldOptions: Types.FieldConfig,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ) {
-    let resolver =
-      typeConfig.defaultResolver ||
-      this.schemaConfig.defaultResolver ||
-      defaultFieldResolver;
+    let resolver = typeConfig.defaultResolver || defaultFieldResolver;
     if (fieldOptions.resolve) {
       if (typeof fieldOptions.property !== "undefined") {
         console.warn(
@@ -705,4 +706,84 @@ function withDefaultValue(
     }
     return result;
   };
+}
+
+function extendError(name: string) {
+  return new Error(
+    `${name} was already defined as a GraphQL type, check the docs for extending`
+  );
+}
+
+/**
+ * Builds the types, normalizing the "types" passed into the schema for a
+ * better developer experience
+ */
+export function buildTypes(
+  types: any,
+  config: Types.Omit<Types.SchemaConfig<any>, "types"> = {
+    schemaPath: false,
+    typegenPath: false,
+  }
+): Types.BuildTypes {
+  const metadata = new GQLiteralMetadata(config);
+  const builder = new SchemaBuilder(metadata, config.nullability);
+  addTypes(builder, types);
+  return builder.getFinalTypeMap();
+}
+
+function addTypes(builder: SchemaBuilder, types: any) {
+  if (!types) {
+    return;
+  }
+  if (types instanceof GQLiteralTypeWrapper || isNamedType(types)) {
+    builder.addType(types);
+  } else if (types instanceof GQLiteralDirectiveType || isDirective(types)) {
+    builder.addDirective(types);
+  } else if (Array.isArray(types)) {
+    types.forEach((typeDef) => addTypes(builder, typeDef));
+  } else if (isObject(types)) {
+    Object.keys(types).forEach((key) => addTypes(builder, types[key]));
+  }
+}
+
+/**
+ * Builds the schema, returning both the schema and metadata.
+ */
+export function buildSchemaWithMetadata<GenTypes = GQLiteralGen>(
+  options: Types.SchemaConfig<GenTypes>
+) {
+  const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
+    options.types,
+    options
+  );
+  const { Query, Mutation, Subscription } = typeMap;
+  if (!isObjectType(Query)) {
+    throw new Error("You must supply a Query type to create a valid schema");
+  }
+  if (Mutation && !isObjectType(Mutation)) {
+    throw new Error(
+      `Expected Mutation to be a GraphQLObjectType, saw ${
+        Mutation.constructor.name
+      }`
+    );
+  }
+  if (Subscription && !isObjectType(Subscription)) {
+    throw new Error(
+      `Expected Subscription to be a GraphQLObjectType, saw ${
+        Subscription.constructor.name
+      }`
+    );
+  }
+
+  const schema = new GraphQLSchema({
+    query: Query,
+    mutation: Mutation,
+    subscription: Subscription,
+    directives: objValues(directiveMap),
+    types: objValues(typeMap),
+  });
+
+  metadata.finishConstruction();
+
+  return { schema, metadata };
 }

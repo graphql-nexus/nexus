@@ -13,14 +13,14 @@ const UserApi = require("fullstack-tutorial/final/server/src/datasources/user.js
 
 const schema = GQLiteralSchema({
   types,
-  definitionFilePath: path.join(__dirname, "../fullstack-schema.graphql"),
+  schemaFilePath: path.join(__dirname, "../fullstack-schema.graphql"),
   typeGeneration: {
-    typesFilePath: path.join(__dirname, "../src/fullstackTypes.ts"),
+    outputPath: path.join(__dirname, "../src/fullstackTypes.ts"),
     imports: {
       t: path.join(__dirname, "../src/typeDefs.ts"),
     },
     contextType: "t.Context",
-    backingTypes: {
+    rootTypes: {
       Launch: "t.Launch",
       Mission: "t.Mission",
     },

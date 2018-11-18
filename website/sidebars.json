@@ -3,7 +3,7 @@
     "Documentation": [
       "getting-started",
       "best-practices",
-      "typescript-setup",
+      "type-generation-details",
       "api-reference",
       "faq"
     ]

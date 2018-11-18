@@ -6,9 +6,9 @@ const types = require("./schema");
 
 const schema = GQLiteralSchema({
   types,
-  definitionFilePath: path.join(__dirname, "../githunt-api-schema.graphql"),
+  schemaFilePath: path.join(__dirname, "../githunt-api-schema.graphql"),
   typeGeneration: {
-    typesFilePath: path.join(__dirname, "../githuntTypes.ts"),
+    outputPath: path.join(__dirname, "../githuntTypes.ts"),
   },
 });
 

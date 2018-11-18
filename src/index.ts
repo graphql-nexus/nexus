@@ -1,3 +1,5 @@
+import * as GQLiteralTypes from "./types";
+export { GQLiteralTypes };
 export {
   GQLiteralArg,
   GQLiteralObject,
@@ -10,5 +12,4 @@ export {
   GQLiteralAbstractType,
   GQLiteralDirective,
 } from "./definitions";
-import * as GQLiteralTypes from "./types";
-export { GQLiteralTypes };
+export { buildSchemaWithMetadata, buildTypes } from "./builder";

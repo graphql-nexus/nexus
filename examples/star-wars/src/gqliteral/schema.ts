@@ -8,15 +8,13 @@ import { GQLiteralSchema } from "gqliteral";
  */
 export const schema = GQLiteralSchema({
   types: allTypes,
-  definitionFilePath: path.join(__dirname, "../../star-wars-schema.graphql"),
-  typeGeneration: {
-    typesFilePath: path.join(__dirname, "../generatedTypes.ts"),
-    imports: {
-      swapi: path.join(__dirname, "backingTypes.ts"),
-    },
-    backingTypes: {
-      Droid: "swapi.Droid",
-      Human: "swapi.Human",
-    },
+  schemaPath: path.join(__dirname, "../../star-wars-schema.graphql"),
+  typegenPath: path.join(__dirname, "../generatedTypes.ts"),
+  typegenImports: {
+    swapi: path.join(__dirname, "rootTypes.ts"),
+  },
+  rootTypes: {
+    // Droid: "swapi.Droid",
+    Human: "swapi.Human",
   },
 });

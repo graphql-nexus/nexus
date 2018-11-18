@@ -126,7 +126,7 @@ When using the TypeScript, configuring the [backing object type](typescript-setu
 
 ## Resolving: defaultResolver
 
-GQLiteral allows you to define an override to the `defaultResolver` both globally for the schema, as well as on a per-type basis. This can be quite powerful when you wish to define unique default behavior that goes beyond
+GQLiteral allows you to define an override to the `defaultResolver` on a per-type basis. This can be quite powerful when you wish to define unique default behavior that goes beyond
 
 ## Generating the IDL file
 

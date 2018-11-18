@@ -8,8 +8,8 @@ export type BaseScalarNames = "String" | "Int" | "Float" | "ID" | "Boolean";
 
 export interface Generated_Type_Query_Field_launch {
   returnType:
-    | Generated_Type_Launch["backingType"]
-    | PromiseLike<Generated_Type_Launch["backingType"]>;
+    | Generated_Type_Launch["rootType"]
+    | PromiseLike<Generated_Type_Launch["rootType"]>;
   args: Generated_Type_Query_Field_launch_Args;
 }
 
@@ -20,8 +20,8 @@ export interface Generated_Type_Query_Field_launch_Args {
 
 export interface Generated_Type_Query_Field_launches {
   returnType:
-    | Generated_Type_LaunchConnection["backingType"]
-    | PromiseLike<Generated_Type_LaunchConnection["backingType"]>;
+    | Generated_Type_LaunchConnection["rootType"]
+    | PromiseLike<Generated_Type_LaunchConnection["rootType"]>;
   args: Generated_Type_Query_Field_launches_Args;
 }
 
@@ -33,8 +33,8 @@ export interface Generated_Type_Query_Field_launches_Args {
 export interface Generated_Type_Query_Field_me {
   returnType:
     | null
-    | Generated_Type_User["backingType"]
-    | PromiseLike<null | Generated_Type_User["backingType"]>;
+    | Generated_Type_User["rootType"]
+    | PromiseLike<null | Generated_Type_User["rootType"]>;
   args: {};
 }
 
@@ -45,7 +45,7 @@ export interface Generated_Type_Query_Fields {
 }
 
 export interface Generated_Type_Query {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Query_Fields;
 }
 
@@ -61,15 +61,15 @@ export interface Generated_Type_Launch_Field_isBooked {
 
 export interface Generated_Type_Launch_Field_mission {
   returnType:
-    | Generated_Type_Mission["backingType"]
-    | PromiseLike<Generated_Type_Mission["backingType"]>;
+    | Generated_Type_Mission["rootType"]
+    | PromiseLike<Generated_Type_Mission["rootType"]>;
   args: {};
 }
 
 export interface Generated_Type_Launch_Field_rocket {
   returnType:
-    | Generated_Type_Rocket["backingType"]
-    | PromiseLike<Generated_Type_Rocket["backingType"]>;
+    | Generated_Type_Rocket["rootType"]
+    | PromiseLike<Generated_Type_Rocket["rootType"]>;
   args: {};
 }
 
@@ -87,7 +87,7 @@ export interface Generated_Type_Launch_Fields {
 }
 
 export interface Generated_Type_Launch {
-  backingType: t.Launch;
+  rootType: t.Launch;
   fields: Generated_Type_Launch_Fields;
 }
 
@@ -111,7 +111,7 @@ export interface Generated_Type_Mission_Fields {
 }
 
 export interface Generated_Type_Mission {
-  backingType: t.Mission;
+  rootType: t.Mission;
   fields: Generated_Type_Mission_Fields;
 }
 
@@ -137,7 +137,7 @@ export interface Generated_Type_Rocket_Fields {
 }
 
 export interface Generated_Type_Rocket {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Rocket_Fields;
 }
 
@@ -153,9 +153,9 @@ export interface Generated_Type_LaunchConnection_Field_hasMore {
 
 export interface Generated_Type_LaunchConnection_Field_launches {
   returnType:
-    | Generated_Type_Launch["backingType"][]
-    | PromiseLike<Generated_Type_Launch["backingType"][]>
-    | PromiseLike<Generated_Type_Launch["backingType"]>[];
+    | Generated_Type_Launch["rootType"][]
+    | PromiseLike<Generated_Type_Launch["rootType"][]>
+    | PromiseLike<Generated_Type_Launch["rootType"]>[];
   args: {};
 }
 
@@ -166,7 +166,7 @@ export interface Generated_Type_LaunchConnection_Fields {
 }
 
 export interface Generated_Type_LaunchConnection {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_LaunchConnection_Fields;
 }
 
@@ -182,9 +182,9 @@ export interface Generated_Type_User_Field_id {
 
 export interface Generated_Type_User_Field_trips {
   returnType:
-    | Generated_Type_Launch["backingType"][]
-    | PromiseLike<Generated_Type_Launch["backingType"][]>
-    | PromiseLike<Generated_Type_Launch["backingType"]>[];
+    | Generated_Type_Launch["rootType"][]
+    | PromiseLike<Generated_Type_Launch["rootType"][]>
+    | PromiseLike<Generated_Type_Launch["rootType"]>[];
   args: {};
 }
 
@@ -195,14 +195,14 @@ export interface Generated_Type_User_Fields {
 }
 
 export interface Generated_Type_User {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_User_Fields;
 }
 
 export interface Generated_Type_Mutation_Field_bookTrips {
   returnType:
-    | Generated_Type_TripUpdateResponse["backingType"]
-    | PromiseLike<Generated_Type_TripUpdateResponse["backingType"]>;
+    | Generated_Type_TripUpdateResponse["rootType"]
+    | PromiseLike<Generated_Type_TripUpdateResponse["rootType"]>;
   args: Generated_Type_Mutation_Field_bookTrips_Args;
 }
 
@@ -212,8 +212,8 @@ export interface Generated_Type_Mutation_Field_bookTrips_Args {
 
 export interface Generated_Type_Mutation_Field_cancelTrip {
   returnType:
-    | Generated_Type_TripUpdateResponse["backingType"]
-    | PromiseLike<Generated_Type_TripUpdateResponse["backingType"]>;
+    | Generated_Type_TripUpdateResponse["rootType"]
+    | PromiseLike<Generated_Type_TripUpdateResponse["rootType"]>;
   args: Generated_Type_Mutation_Field_cancelTrip_Args;
 }
 
@@ -237,15 +237,15 @@ export interface Generated_Type_Mutation_Fields {
 }
 
 export interface Generated_Type_Mutation {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Mutation_Fields;
 }
 
 export interface Generated_Type_TripUpdateResponse_Field_launches {
   returnType:
     | null
-    | Generated_Type_Launch["backingType"]
-    | PromiseLike<null | Generated_Type_Launch["backingType"]>;
+    | Generated_Type_Launch["rootType"]
+    | PromiseLike<null | Generated_Type_Launch["rootType"]>;
   args: {};
 }
 
@@ -266,7 +266,7 @@ export interface Generated_Type_TripUpdateResponse_Fields {
 }
 
 export interface Generated_Type_TripUpdateResponse {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_TripUpdateResponse_Fields;
 }
 

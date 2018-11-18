@@ -21,6 +21,10 @@
         "title": "GQLiteral",
         "sidebar_label": "Getting Started"
       },
+      "type-generation-details": {
+        "title": "Type Generation Details",
+        "sidebar_label": "Type Generation Details"
+      },
       "typescript-setup": {
         "title": "TypeScript Configuration",
         "sidebar_label": "Use with TypeScript"

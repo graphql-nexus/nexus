@@ -5,16 +5,16 @@
 
 export interface Generated_Type_Query_Field_currentUser {
   returnType:
-    | Generated_Type_User["backingType"]
-    | PromiseLike<Generated_Type_User["backingType"]>;
+    | Generated_Type_User["rootType"]
+    | PromiseLike<Generated_Type_User["rootType"]>;
   args: {};
 }
 
 export interface Generated_Type_Query_Field_entry {
   returnType:
     | null
-    | Generated_Type_Entry["backingType"]
-    | PromiseLike<null | Generated_Type_Entry["backingType"]>;
+    | Generated_Type_Entry["rootType"]
+    | PromiseLike<null | Generated_Type_Entry["rootType"]>;
   args: Generated_Type_Query_Field_entry_Args;
 }
 
@@ -24,9 +24,9 @@ export interface Generated_Type_Query_Field_entry_Args {
 
 export interface Generated_Type_Query_Field_feed {
   returnType:
-    | Generated_Type_Entry["backingType"][]
-    | PromiseLike<Generated_Type_Entry["backingType"][]>
-    | PromiseLike<Generated_Type_Entry["backingType"]>[];
+    | Generated_Type_Entry["rootType"][]
+    | PromiseLike<Generated_Type_Entry["rootType"][]>
+    | PromiseLike<Generated_Type_Entry["rootType"]>[];
   args: Generated_Type_Query_Field_feed_Args;
 }
 
@@ -43,7 +43,7 @@ export interface Generated_Type_Query_Fields {
 }
 
 export interface Generated_Type_Query {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Query_Fields;
 }
 
@@ -69,7 +69,7 @@ export interface Generated_Type_User_Fields {
 }
 
 export interface Generated_Type_User {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_User_Fields;
 }
 
@@ -80,9 +80,9 @@ export interface Generated_Type_Entry_Field_commentCount {
 
 export interface Generated_Type_Entry_Field_comments {
   returnType:
-    | Generated_Type_Comment["backingType"][]
-    | PromiseLike<Generated_Type_Comment["backingType"][]>
-    | PromiseLike<Generated_Type_Comment["backingType"]>[];
+    | Generated_Type_Comment["rootType"][]
+    | PromiseLike<Generated_Type_Comment["rootType"][]>
+    | PromiseLike<Generated_Type_Comment["rootType"]>[];
   args: Generated_Type_Entry_Field_comments_Args;
 }
 
@@ -109,15 +109,15 @@ export interface Generated_Type_Entry_Field_id {
 export interface Generated_Type_Entry_Field_postedBy {
   returnType:
     | null
-    | Generated_Type_User["backingType"]
-    | PromiseLike<null | Generated_Type_User["backingType"]>;
+    | Generated_Type_User["rootType"]
+    | PromiseLike<null | Generated_Type_User["rootType"]>;
   args: {};
 }
 
 export interface Generated_Type_Entry_Field_repository {
   returnType:
-    | Generated_Type_Repository["backingType"]
-    | PromiseLike<Generated_Type_Repository["backingType"]>;
+    | Generated_Type_Repository["rootType"]
+    | PromiseLike<Generated_Type_Repository["rootType"]>;
   args: {};
 }
 
@@ -128,8 +128,8 @@ export interface Generated_Type_Entry_Field_score {
 
 export interface Generated_Type_Entry_Field_vote {
   returnType:
-    | Generated_Type_Vote["backingType"]
-    | PromiseLike<Generated_Type_Vote["backingType"]>;
+    | Generated_Type_Vote["rootType"]
+    | PromiseLike<Generated_Type_Vote["rootType"]>;
   args: {};
 }
 
@@ -146,7 +146,7 @@ export interface Generated_Type_Entry_Fields {
 }
 
 export interface Generated_Type_Entry {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Entry_Fields;
 }
 
@@ -168,8 +168,8 @@ export interface Generated_Type_Comment_Field_id {
 export interface Generated_Type_Comment_Field_postedBy {
   returnType:
     | null
-    | Generated_Type_User["backingType"]
-    | PromiseLike<null | Generated_Type_User["backingType"]>;
+    | Generated_Type_User["rootType"]
+    | PromiseLike<null | Generated_Type_User["rootType"]>;
   args: {};
 }
 
@@ -187,7 +187,7 @@ export interface Generated_Type_Comment_Fields {
 }
 
 export interface Generated_Type_Comment {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Comment_Fields;
 }
 
@@ -219,8 +219,8 @@ export interface Generated_Type_Repository_Field_open_issues_count {
 export interface Generated_Type_Repository_Field_owner {
   returnType:
     | null
-    | Generated_Type_User["backingType"]
-    | PromiseLike<null | Generated_Type_User["backingType"]>;
+    | Generated_Type_User["rootType"]
+    | PromiseLike<null | Generated_Type_User["rootType"]>;
   args: {};
 }
 
@@ -240,7 +240,7 @@ export interface Generated_Type_Repository_Fields {
 }
 
 export interface Generated_Type_Repository {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Repository_Fields;
 }
 
@@ -254,14 +254,14 @@ export interface Generated_Type_Vote_Fields {
 }
 
 export interface Generated_Type_Vote {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Vote_Fields;
 }
 
 export interface Generated_Type_Mutation_Field_submitComment {
   returnType:
-    | Generated_Type_Comment["backingType"]
-    | PromiseLike<Generated_Type_Comment["backingType"]>;
+    | Generated_Type_Comment["rootType"]
+    | PromiseLike<Generated_Type_Comment["rootType"]>;
   args: Generated_Type_Mutation_Field_submitComment_Args;
 }
 
@@ -272,8 +272,8 @@ export interface Generated_Type_Mutation_Field_submitComment_Args {
 
 export interface Generated_Type_Mutation_Field_submitRepository {
   returnType:
-    | Generated_Type_Entry["backingType"]
-    | PromiseLike<Generated_Type_Entry["backingType"]>;
+    | Generated_Type_Entry["rootType"]
+    | PromiseLike<Generated_Type_Entry["rootType"]>;
   args: Generated_Type_Mutation_Field_submitRepository_Args;
 }
 
@@ -283,8 +283,8 @@ export interface Generated_Type_Mutation_Field_submitRepository_Args {
 
 export interface Generated_Type_Mutation_Field_vote {
   returnType:
-    | Generated_Type_Entry["backingType"]
-    | PromiseLike<Generated_Type_Entry["backingType"]>;
+    | Generated_Type_Entry["rootType"]
+    | PromiseLike<Generated_Type_Entry["rootType"]>;
   args: Generated_Type_Mutation_Field_vote_Args;
 }
 
@@ -300,7 +300,7 @@ export interface Generated_Type_Mutation_Fields {
 }
 
 export interface Generated_Type_Mutation {
-  backingType: unknown;
+  rootType: unknown;
   fields: Generated_Type_Mutation_Fields;
 }
 

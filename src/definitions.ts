@@ -1,23 +1,17 @@
+import { assertValidName, GraphQLScalarType } from "graphql";
 import {
-  GraphQLSchema,
-  GraphQLNamedType,
-  isObjectType,
-  GraphQLScalarType,
-  assertValidName,
-} from "graphql";
-import * as Types from "./types";
-import {
-  GQLiteralNamedType,
-  GQLiteralObjectType,
-  GQLiteralInterfaceType,
+  GQLiteralAbstract,
+  GQLiteralDirectiveType,
   GQLiteralEnumType,
   GQLiteralInputObjectType,
-  GQLiteralAbstract,
+  GQLiteralInterfaceType,
+  GQLiteralNamedType,
+  GQLiteralObjectType,
   GQLiteralUnionType,
-  GQLiteralDirectiveType,
 } from "./objects";
-import { enumShorthandMembers, buildTypes } from "./utils";
-import { runBuildArtifacts } from "./typebuilder";
+import * as Types from "./types";
+import { enumShorthandMembers } from "./utils";
+import { buildSchemaWithMetadata } from "./builder";
 
 /**
  * Wraps a GQLiteralType object, since all GQLiteral types have a
@@ -224,40 +218,16 @@ export function GQLiteralDirective<
 export function GQLiteralSchema<GenTypes = GQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
 ) {
-  const { types: typeMap, directives } = buildTypes(options.types, options);
-  const { Query, Mutation, Subscription } = typeMap;
-  if (!isObjectType(Query)) {
-    throw new Error("You must supply a Query type to create a valid schema");
-  }
-  if (Mutation && !isObjectType(Mutation)) {
-    throw new Error(
-      `Expected Mutation to be a GraphQLObjectType, saw ${
-        Mutation.constructor.name
-      }`
-    );
-  }
-  if (Subscription && !isObjectType(Subscription)) {
-    throw new Error(
-      `Expected Subscription to be a GraphQLObjectType, saw ${
-        Subscription.constructor.name
-      }`
-    );
-  }
-  const schema = new GraphQLSchema({
-    query: Query,
-    mutation: Mutation,
-    subscription: Subscription,
-    directives: directives.definitions,
-    types: Object.keys(typeMap).reduce((result: GraphQLNamedType[], key) => {
-      result.push(typeMap[key]);
-      return result;
-    }, []),
-  });
+  const { schema, metadata } = buildSchemaWithMetadata<GenTypes>(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
-  if (process.env.NODE_ENV !== "production") {
-    runBuildArtifacts<GenTypes>(schema, options, directives);
+  const {
+    shouldGenerateArtifacts = process.env.NODE_ENV !== "production",
+  } = options;
+
+  if (shouldGenerateArtifacts) {
+    metadata.generateArtifacts(schema);
   }
 
   return schema;

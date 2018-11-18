@@ -1,30 +1,13 @@
 import {
   GraphQLFieldResolver,
   isNamedType,
-  parse,
-  visit,
-  print,
   isDirective,
+  GraphQLSchema,
+  isObjectType,
 } from "graphql";
 import { SchemaBuilder } from "./builder";
 import * as Types from "./types";
-import { GQLiteralTypeWrapper } from "./definitions";
-import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
-
-/**
- * Builds the types, normalizing the "types" passed into the schema for a
- * better developer experience
- */
-export function buildTypes(
-  types: any,
-  config?: Pick<Types.SchemaConfig<any>, "nullability" | "defaultResolver">
-): Types.BuildTypes {
-  const builder = new SchemaBuilder(config || {});
-  addTypes(builder, types);
-  return builder.getFinalTypeMap();
-}
-
-const isObject = (obj: any): boolean => obj !== null && typeof obj === "object";
+import { GQLiteralAbstract } from "./objects";
 
 export function addMix(
   obj: { fields: Types.FieldDefType[] },
@@ -42,23 +25,6 @@ export function addMix(
       item: Types.NodeType.MIX,
       typeName,
       mixOptions: mixOptions || {},
-    });
-  }
-}
-
-function addTypes(builder: SchemaBuilder, types: any) {
-  if (!types) {
-    return;
-  }
-  if (types instanceof GQLiteralTypeWrapper || isNamedType(types)) {
-    builder.addType(types);
-  } else if (types instanceof GQLiteralDirectiveType || isDirective(types)) {
-    builder.addDirective(types);
-  } else if (Array.isArray(types)) {
-    types.forEach((typeDef) => addTypes(builder, typeDef));
-  } else if (isObject(types)) {
-    Object.keys(types).forEach((key) => {
-      addTypes(builder, types[key]);
     });
   }
 }
@@ -89,8 +55,8 @@ export const enumShorthandMembers = (
  */
 export const propertyFieldResolver = (
   key: string
-): GraphQLFieldResolver<any, any> =>
-  function(source, args, contextValue, info) {
+): GraphQLFieldResolver<any, any> => {
+  return function(source, args, contextValue, info) {
     // ensure source is a value for which property access is acceptable.
     if (typeof source === "object" || typeof source === "function") {
       // TODO: Maybe warn here if key doesn't exist on source?
@@ -101,26 +67,7 @@ export const propertyFieldResolver = (
       return property;
     }
   };
-
-/**
- * If there are directives defined to be used on the types,
- * we need to add these manually to the AST. Directives shouldn't
- * be too common, since we're defining the schema programatically
- * rather than by hand.
- */
-export function addDirectives(
-  schema: string,
-  directives: Types.BuildTypesDirectives
-) {
-  if (Object.keys(directives.uses).length > 0) {
-    return print(
-      visit(parse(schema), {
-        // TODO: Add directives
-      })
-    );
-  }
-  return schema;
-}
+};
 
 // ----------------------------
 
@@ -209,6 +156,8 @@ function lexicalDistance(aStr: string, bStr: string): number {
   return d[aLength][bLength];
 }
 
+// ----------------------------
+
 // Borrowed from https://github.com/dmnd/dedent
 
 export function dedent(
@@ -260,3 +209,40 @@ export function dedent(
       .replace(/\\n/g, "\n")
   );
 }
+
+// ----------------------------
+
+// Helper Fns
+
+export function arrPush<T, O extends Record<string, T[]>>(
+  obj: O,
+  property: string,
+  value: T
+) {
+  obj[property] = obj[property] || [];
+  obj[property].push(value);
+}
+
+export function objValues<T>(obj: Record<string, T>): T[] {
+  return Object.keys(obj).reduce((result: T[], key) => {
+    result.push(obj[key]);
+    return result;
+  }, []);
+}
+
+export function mapObj<T, R>(
+  obj: Record<string, T>,
+  mapper: (val: T, key: string, index: number) => R
+) {
+  return Object.keys(obj).map((key, index) => mapper(obj[key], key, index));
+}
+
+export function eachObj<T>(
+  obj: Record<string, T>,
+  iter: (val: T, key: string, index: number) => void
+) {
+  Object.keys(obj).forEach((name, i) => iter(obj[name], name, i));
+}
+
+export const isObject = (obj: any): boolean =>
+  obj !== null && typeof obj === "object";

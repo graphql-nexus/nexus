@@ -58,11 +58,10 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
         },
         scrollBeyondLastLine: false,
       });
-      editor.onDidChangeModelContent(
-        debounce(() => {
-          setContent(editor.getValue());
-        }, 100)
-      );
+      const debouncedChange = debounce(() => {
+        setContent(editor.getValue());
+      }, 100);
+      editor.onDidChangeModelContent(debouncedChange as any);
       return () => editor.dispose();
     }
   }, []);
@@ -172,9 +171,9 @@ function getCurrentSchema(code): SchemaOrError {
     );
     const schema = GQLiteralSchema({
       types: cache,
-      definitionFilePath: false,
+      schemaFilePath: false,
       typeGeneration: {
-        typesFilePath: "file:///index.ts",
+        outputPath: "file:///index.ts",
       },
     });
     return { schema, error: null };
@@ -206,7 +205,6 @@ const allTypeDefs = [
   require("raw-loader!gqliteral/dist/definitions.d.ts"),
   require("raw-loader!gqliteral/dist/index.d.ts"),
   require("raw-loader!gqliteral/dist/objects.d.ts"),
-  require("raw-loader!gqliteral/dist/typegen.d.ts"),
   require("raw-loader!gqliteral/dist/types.d.ts"),
   require("raw-loader!gqliteral/dist/utils.d.ts"),
 ];
@@ -225,7 +223,6 @@ const files = [
   "gqliteral/definitions.d.ts",
   "gqliteral/index.d.ts",
   "gqliteral/objects.d.ts",
-  "gqliteral/typegen.d.ts",
   "gqliteral/types.d.ts",
   "gqliteral/utils.d.ts",
 ];

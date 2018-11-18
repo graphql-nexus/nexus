@@ -8,6 +8,7 @@ import {
   GraphQLDirective,
 } from "graphql";
 import { GQLiteralAbstract } from "./objects";
+import { GQLiteralMetadata } from "./metadata";
 
 export enum NodeType {
   MIX = "MIX",
@@ -74,22 +75,9 @@ export interface EnumMemberConfig {
 }
 
 export interface BuildTypes {
-  types: Record<string, GraphQLNamedType>;
-  directives: BuildTypesDirectives;
-}
-
-export interface BuildTypesDirectives {
-  definitions: GraphQLDirective[];
-  uses: { [K in DirectiveLocationEnum]?: DirectiveUse };
-  hasUses: boolean;
-}
-
-export interface DirectiveUse {
-  location: DirectiveLocationEnum;
-  typeName: string;
-  args: [];
-  argName?: string;
-  fieldName?: string;
+  typeMap: Record<string, GraphQLNamedType>;
+  metadata: GQLiteralMetadata;
+  directiveMap: Record<string, GraphQLDirective>;
 }
 
 /**
@@ -264,6 +252,10 @@ export interface ScalarOpts
       "description" | "serialize" | "parseValue" | "parseLiteral"
     > {
   /**
+   * Backing type for the scalar
+   */
+  typing?: string | ImportedType;
+  /**
    * Any deprecation info for this scalar type
    */
   deprecation?: string | DeprecationInfo;
@@ -344,6 +336,11 @@ export interface ObjectTypeConfig
   interfaces: string[];
 
   /**
+   * Any modifications to the field config
+   */
+  fieldModifications: Record<string, ModifyFieldOpts<any, any, any>>;
+
+  /**
    * An (optional) isTypeOf check for the object type
    */
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
@@ -352,7 +349,7 @@ export interface ObjectTypeConfig
    * The backing type for this object type. This can
    * also be set when constructing the schema.
    */
-  backingType?: ImportedType;
+  rootType?: ImportedType | string;
 }
 
 export interface AbstractTypeConfig {
@@ -380,7 +377,21 @@ export interface InterfaceTypeConfig
   resolveType?: TypeResolver<any, any>;
 }
 
-export interface SchemaConfig<GenTypes> extends Nullability, DefaultResolver {
+export interface ImportedType {
+  /**
+   * The name of the imported type. If the type is a
+   * default export, this should be "default".
+   */
+  name: string;
+  /**
+   * The absolute path to import from
+   * if omitted it's assumed you already
+   * imported the type, or it's a global.
+   */
+  importPath: string;
+}
+
+export interface SchemaConfig<GenTypes> extends Nullability {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -388,13 +399,36 @@ export interface SchemaConfig<GenTypes> extends Nullability, DefaultResolver {
    */
   types: any;
   /**
-   * Absolute path to where the GraphQL IDL file should be written
+   * Absolute path where the GraphQL IDL file should be written
    */
-  definitionFilePath: string | false;
+  schemaPath: string | false;
   /**
-   * Generates the types for Intellisense/TypeScript
+   * File path where generated types should be saved
    */
-  typeGeneration?: GQLiteralTypegenOptions<GenTypes>;
+  typegenPath: string | false;
+  /**
+   * Whether the schema & types are generated when the server
+   * starts. Default is process.env.NODE_ENV !== "production"
+   */
+  shouldGenerateArtifacts?: boolean;
+  /**
+   * A map of all types and what fields they can resolve to
+   */
+  rootTypes?: { [K in ObjectNames<GenTypes>]?: ImportedType | string };
+  /**
+   * The type of the context for the resolvers
+   */
+  contextType?: ImportedType | string;
+  /**
+   * An string or strings to prefix on the header of the TS file
+   */
+  typegenHeader?: string | string[];
+  /**
+   * If you want to glob import from a file for use in the backing types,
+   * you can use this as a convenience by specifying `{ importName: absolutePath }`
+   * and the import will automatically be resolved relative to the `typegenPath`.
+   */
+  typegenImports?: Record<string, string>;
 }
 
 export type NullabilityConfig = {
@@ -523,7 +557,7 @@ export type EnumMembers<
 
 export type ObjectTypeDef<GenTypes, TypeName> = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["objects"]
-    ? GenTypes["objects"][TypeName]["backingType"]
+    ? GenTypes["objects"][TypeName]["rootType"]
     : never
   : string;
 
@@ -550,9 +584,9 @@ export type AllOutputTypes<GenTypes> = GenTypes extends GenTypesShape
 
 export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["objects"]
-    ? GenTypes["objects"][TypeName]["backingType"]
+    ? GenTypes["objects"][TypeName]["rootType"]
     : TypeName extends keyof GenTypes["interfaces"]
-      ? GenTypes["interfaces"][TypeName]["backingType"]
+      ? GenTypes["interfaces"][TypeName]["rootType"]
       : any
   : never;
 
@@ -597,44 +631,4 @@ export type DirectiveConfig<GenTypes, DirectiveName> = {
   args?: [];
 };
 
-export interface ImportedType {
-  /**
-   * The name of the imported type.
-   */
-  name: string;
-  /**
-   * Optional alias for the type name:
-   *
-   * import { $name as $alias } from '$absolutePath';
-   */
-  alias?: string;
-  /**
-   * The absolute path to import from
-   * if omitted it's assumed you already
-   * imported the type, or it's a global.
-   */
-  absolutePath?: string;
-}
-
-export interface GQLiteralTypegenOptions<GenTypes> {
-  /**
-   * File path where generated types should be saved
-   */
-  typesFilePath: string;
-  /**
-   * A map of all types and what fields they can resolve to
-   */
-  backingTypes?: { [K in ObjectNames<GenTypes>]?: string };
-  /**
-   * Optional prefix for all fields generated, defaults to "Generated"
-   */
-  typeGenPrefix?: string;
-  /**
-   * An array of additional strings to prefix on the header of the TS file
-   */
-  prefix?: string[];
-  /**
-   * The type of the context for the resolvers
-   */
-  contextType?: ImportedType;
-}
+export type RootTypeMap = Record<string, string | ImportedType | undefined>;

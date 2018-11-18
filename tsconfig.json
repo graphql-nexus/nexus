@@ -10,7 +10,8 @@
     "strict": true,
     "skipLibCheck": true,
     "declaration": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "sourceMap": true
   },
   "exclude": ["./examples", "./dist", "./src/__tests__", "./website"]
 }

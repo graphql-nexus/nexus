@@ -6,7 +6,6 @@ import {
   GraphQLUnionType,
   GraphQLEnumType,
   GraphQLIsTypeOfFn,
-  GraphQLResolveInfo,
   DirectiveLocationEnum,
   assertValidName,
 } from "graphql";
@@ -215,6 +214,7 @@ export class GQLiteralObjectType<
       fields: [],
       interfaces: [],
       directives: [],
+      fieldModifications: {},
     };
   }
 
@@ -295,16 +295,6 @@ export class GQLiteralObjectType<
         ...options,
       },
     });
-    return {
-      resolver(
-        fn: (
-          root: Types.RootValue<GenTypes, TypeName>,
-          args: Types.ArgsValue<GenTypes, TypeName, FieldName>,
-          context: Types.ContextValue<GenTypes>,
-          info: GraphQLResolveInfo
-        ) => Types.ResultValue<GenTypes, TypeName, FieldName>
-      ): void {},
-    };
   }
 
   /**
@@ -338,9 +328,9 @@ export class GQLiteralObjectType<
    */
   modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
     field: FieldName,
-    options?: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName>
+    options: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    throw new Error("TODO");
+    this.typeConfig.fieldModifications[field as string] = options;
   }
 
   /**
@@ -390,10 +380,10 @@ export class GQLiteralObjectType<
    * to the shape of the type.
    *
    * Note: This value can also be set when building the schema via
-   * the "backingTypes" option to `GQLiteralSchema`
+   * the "rootTypes" option to `GQLiteralSchema`
    */
-  backingType(typeImport: Types.ImportedType) {
-    this.typeConfig.backingType = typeImport;
+  rootType(typeImport: Types.ImportedType) {
+    this.typeConfig.rootType = typeImport;
   }
 
   /**
@@ -526,6 +516,18 @@ export class GQLiteralInterfaceType<
       name,
       args: args || {},
     });
+  }
+
+  /**
+   * Supply the default field resolver for all members of this interface
+   */
+  defaultResolver(
+    resolverFn: GraphQLFieldResolver<
+      Types.RootValue<GenTypes, TypeName>,
+      Types.ContextValue<GenTypes>
+    >
+  ) {
+    this.typeConfig.defaultResolver = resolverFn;
   }
 
   /**
