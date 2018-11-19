@@ -1,6 +1,6 @@
-import { GQLiteralObject, GQLiteralEnum } from "gqliteral";
+import { objectType, enumType } from "gqliteral";
 
-export const Mission = GQLiteralObject("Mission", (t) => {
+export const Mission = objectType("Mission", (t) => {
   t.string("name", { nullable: true });
   t.string("missionPatch", {
     args: {
@@ -14,4 +14,4 @@ export const Mission = GQLiteralObject("Mission", (t) => {
   });
 });
 
-export const PatchSize = GQLiteralEnum("PatchSize", ["SMALL", "LARGE"]);
+export const PatchSize = enumType("PatchSize", ["SMALL", "LARGE"]);

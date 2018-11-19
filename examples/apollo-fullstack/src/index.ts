@@ -1,7 +1,7 @@
 // @ts-check
 import { ApolloServer } from "apollo-server";
 import path from "path";
-import { GQLiteralSchema } from "gqliteral";
+import { buildSchema } from "gqliteral";
 import isEmail from "isemail";
 import * as types from "./schema";
 import { Request } from "express";
@@ -11,19 +11,19 @@ const internalEngineDemo = require("fullstack-tutorial/final/server/src/engine-d
 const LaunchApi = require("fullstack-tutorial/final/server/src/datasources/launch.js");
 const UserApi = require("fullstack-tutorial/final/server/src/datasources/user.js");
 
-const schema = GQLiteralSchema({
+const schema = buildSchema({
   types,
-  schemaFilePath: path.join(__dirname, "../fullstack-schema.graphql"),
-  typeGeneration: {
-    outputPath: path.join(__dirname, "../src/fullstackTypes.ts"),
-    imports: {
-      t: path.join(__dirname, "../src/typeDefs.ts"),
-    },
-    contextType: "t.Context",
-    rootTypes: {
-      Launch: "t.Launch",
-      Mission: "t.Mission",
-    },
+  outputs: {
+    schema: path.join(__dirname, "../fullstack-schema.graphql"),
+    typegen: path.join(__dirname, "../src/fullstackTypes.ts"),
+  },
+  typegenImports: {
+    t: path.join(__dirname, "../src/typeDefs.ts"),
+  },  
+  contextType: "t.Context",
+  rootTypes: {
+    Launch: "t.Launch",
+    Mission: "t.Mission",
   },
 });
 

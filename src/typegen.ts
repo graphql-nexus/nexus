@@ -76,30 +76,25 @@ export function buildTypeDefinitions(
     [typeName: string]: [string, string][]; // fieldName, argTypeName
   } = {};
 
-  // If for some reason the user has types that conflict with the type names,
-  // rename them.
-  let MP = "MP";
-  let MPL = "MPL";
-  let MT = "MT";
-  let MTA = "MTA";
-  if (schema.getType("MP")) {
-    MP = "_MP";
-  }
-  if (schema.getType("MPL")) {
-    MPL = "_MPL";
-  }
-  if (schema.getType("MT")) {
-    MT = "_MT";
-  }
-  if (schema.getType("MTA")) {
-    MTA = "_MTA";
-  }
+  // If for some reason the user has types that conflict with these type names rename them.
+  const MP = metadata.safeTypeName(schema, "MP");
+  const MPL = metadata.safeTypeName(schema, "MPL");
+  const MT = metadata.safeTypeName(schema, "MT");
+  const MTA = metadata.safeTypeName(schema, "MTA");
+
+  function suffixed(fieldName: string, typeName: string, suffix: string) {}
 
   function argFieldName(fieldName: string, typeName: string) {
-    return `${typeName}${ucFirst(fieldName)}Args`;
+    return metadata.safeTypeName(
+      schema,
+      `${typeName}${ucFirst(fieldName)}Args`
+    );
   }
   function makeReturnTypeName(fieldName: string, typeName: string) {
-    return `${typeName}${ucFirst(fieldName)}ReturnType`;
+    return metadata.safeTypeName(
+      schema,
+      `${typeName}${ucFirst(fieldName)}ReturnType`
+    );
   }
 
   // Takes a type and turns it into a "return type", based
@@ -274,7 +269,7 @@ export function buildTypeDefinitions(
       } else {
         allTypeStrings.push(
           [
-            `interface ${type.name}ReturnType {`,
+            `export interface ${type.name}ReturnType {`,
             returnMembers.join("\n"),
             `}`,
           ].join("\n")

@@ -1,6 +1,6 @@
-import { GQLiteralObject } from "gqliteral";
+import { objectType } from "gqliteral";
 
-export const User = GQLiteralObject("User", (t) => {
+export const User = objectType("User", (t) => {
   t.id("id");
   t.string("email");
   t.field("trips", "Launch", {
@@ -8,8 +8,9 @@ export const User = GQLiteralObject("User", (t) => {
     async resolve(_, __, { dataSources }) {
       // get ids of launches by user
       const launchIds = await dataSources.userAPI.getLaunchIdsByUser();
-      if (!launchIds.length) return [];
-
+      if (!launchIds.length) {
+        return [];
+      }
       // look up those launches by their ids
       return (
         dataSources.launchAPI.getLaunchesByIds({

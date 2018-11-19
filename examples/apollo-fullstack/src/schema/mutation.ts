@@ -1,6 +1,6 @@
-import { GQLiteralObject } from "gqliteral";
+import { objectType } from "gqliteral";
 
-export const Mutation = GQLiteralObject("Mutation", (t) => {
+export const Mutation = objectType("Mutation", (t) => {
   t.field("bookTrips", "TripUpdateResponse", {
     args: { launchIds: t.idArg({ list: true, required: true }) },
     async resolve(_, { launchIds }, { dataSources }) {
@@ -53,7 +53,7 @@ export const Mutation = GQLiteralObject("Mutation", (t) => {
   });
 });
 
-export const TripUpdateResponse = GQLiteralObject("TripUpdateResponse", (t) => {
+export const TripUpdateResponse = objectType("TripUpdateResponse", (t) => {
   t.boolean("success");
   t.string("message", { nullable: true });
   t.field("launches", "Launch", { nullable: true });

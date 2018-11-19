@@ -1,10 +1,10 @@
 // @ts-check
 const { ApolloServer } = require("apollo-server");
 const path = require("path");
-const { GQLiteralSchema } = require("gqliteral");
+const { buildSchema } = require("gqliteral");
 const types = require("./schema");
 
-const schema = GQLiteralSchema({
+const schema = buildSchema({
   types,
   schemaFilePath: path.join(__dirname, "../githunt-api-schema.graphql"),
   typeGeneration: {

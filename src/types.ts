@@ -88,10 +88,13 @@ export interface EnumMemberConfig {
   description?: string;
 }
 
-export interface BuildTypes {
-  typeMap: Record<string, GraphQLNamedType>;
+export interface BuildTypes<
+  TypeMapDefs extends Record<string, GraphQLNamedType>,
+  DirectiveDefs extends Record<string, GraphQLDirective>
+> {
+  typeMap: TypeMapDefs;
   metadata: GQLiteralMetadata;
-  directiveMap: Record<string, GraphQLDirective>;
+  directiveMap: DirectiveDefs;
 }
 
 /**
@@ -413,13 +416,22 @@ export interface SchemaConfig<GenTypes> extends Nullability {
    */
   types: any;
   /**
-   * Absolute path where the GraphQL IDL file should be written
+   * When the schema starts and `process.env.NODE_ENV !== "production"`,
+   * artifact files are auto-generated containing the .graphql definitions of
+   * the schema
    */
-  schemaPath: string | false;
-  /**
-   * File path where generated types should be saved
-   */
-  typegenPath: string | false;
+  outputs:
+    | {
+        /**
+         * Absolute path where the GraphQL IDL file should be written
+         */
+        schema: string | false;
+        /**
+         * File path where generated types should be saved
+         */
+        typegen: string | false;
+      }
+    | false;
   /**
    * Whether the schema & types are generated when the server
    * starts. Default is process.env.NODE_ENV !== "production"

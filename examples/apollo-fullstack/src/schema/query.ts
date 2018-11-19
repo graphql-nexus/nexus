@@ -1,11 +1,11 @@
 /// <reference path="../fullstackTypes.ts" />
-import { GQLiteralObject } from "gqliteral";
+import { objectType } from "gqliteral";
 import { Utils } from "../typeDefs";
 const utils: Utils = require("fullstack-tutorial/final/server/src/utils.js");
 
 const dataSources: any = {};
 
-export const Query = GQLiteralObject("Query", (t) => {
+export const Query = objectType("Query", (t) => {
   t.field("launches", "LaunchConnection", {
     args: {
       pageSize: t.intArg({

@@ -13,5 +13,11 @@
     "importHelpers": true,
     "sourceMap": true
   },
-  "exclude": ["./examples", "./dist", "./src/__tests__", "./website"]
+  "exclude": [
+    "./examples",
+    "./scripts",
+    "./dist",
+    "./src/__tests__",
+    "./website"
+  ]
 }

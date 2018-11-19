@@ -7,6 +7,9 @@ import {
   parse,
   printSchema,
   GraphQLObjectType,
+  isInputObjectType,
+  isObjectType,
+  isInterfaceType,
 } from "graphql";
 import path from "path";
 import * as Types from "./types";
@@ -55,6 +58,42 @@ export class GQLiteralMetadata {
 
   finishConstruction() {
     this.completed = true;
+  }
+
+  /**
+   * Ensure the type doesn't conflict with an existing type, prefixing
+   * with a _ if it does
+   */
+  safeTypeName(schema: GraphQLSchema, typeName: string) {
+    if (!schema.getType(typeName)) {
+      return typeName;
+    }
+    return `_${typeName}`;
+  }
+
+  /**
+   * Check for the field's existence in an object type.
+   */
+  hasField(
+    schema: GraphQLSchema,
+    typeName: string,
+    fieldName: string
+  ): boolean {
+    const type = schema.getType(typeName);
+    if (!type) {
+      throw new Error(".hasField should only be called on known type names");
+    }
+    if (
+      !isInputObjectType(type) ||
+      !isObjectType(type) ||
+      !isInterfaceType(type)
+    ) {
+      throw new Error(
+        ".hasField should only be used with GraphQL types with fields"
+      );
+    }
+    const fields = type.getFields();
+    return Boolean(fields[fieldName]);
   }
 
   // Predicates:
@@ -180,19 +219,21 @@ export class GQLiteralMetadata {
    */
   generateArtifacts(schema: GraphQLSchema) {
     const sortedSchema = this.sortSchema(schema);
-    if (this.config.schemaPath) {
-      this.writeFile(
-        "schema",
-        this.generateSchemaFile(sortedSchema),
-        this.config.schemaPath
-      );
-    }
-    if (this.config.typegenPath) {
-      this.writeFile(
-        "types",
-        this.generateTypesFile(sortedSchema),
-        this.config.typegenPath
-      );
+    if (this.config.outputs) {
+      if (this.config.outputs.schema) {
+        this.writeFile(
+          "schema",
+          this.generateSchemaFile(sortedSchema),
+          this.config.outputs.schema
+        );
+      }
+      if (this.config.outputs.typegen) {
+        this.writeFile(
+          "types",
+          this.generateTypesFile(sortedSchema),
+          this.config.outputs.typegen
+        );
+      }
     }
   }
 

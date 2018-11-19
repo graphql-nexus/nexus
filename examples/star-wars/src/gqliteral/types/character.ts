@@ -1,7 +1,7 @@
-import { GQLiteralInterface, GQLiteralArg } from "gqliteral";
+import { interfaceType, arg } from "gqliteral";
 import { getFriends } from "../data";
 
-export const Character = GQLiteralInterface("Character", (t) => {
+export const Character = interfaceType("Character", (t) => {
   t.description("A character in the Star Wars Trilogy");
   t.string("id", { description: "The id of the character" });
   t.string("name", { description: "The name of the character" });
@@ -16,7 +16,7 @@ export const Character = GQLiteralInterface("Character", (t) => {
     description: "Which movies they appear in.",
     property: "appears_in",
     args: {
-      id: GQLiteralArg("ID", { required: true }),
+      id: arg("ID", { required: true }),
     },
   });
   t.resolveType((character) => character.type);

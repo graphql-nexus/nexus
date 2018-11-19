@@ -127,7 +127,7 @@ export class SchemaBuilder {
     }
   }
 
-  getFinalTypeMap(): Types.BuildTypes {
+  getFinalTypeMap(): Types.BuildTypes<any, any> {
     Object.keys(this.pendingTypeMap).forEach((key) => {
       // If we've already constructed the type by this point,
       // via circular dependency resolution don't worry about building it.
@@ -725,15 +725,16 @@ function extendError(name: string) {
 
 /**
  * Builds the types, normalizing the "types" passed into the schema for a
- * better developer experience
+ * better developer experience. This is primarily useful for testing
+ * type generation
  */
-export function buildTypes(
+export function buildTypes<
+  TypeMapDefs extends Record<string, GraphQLNamedType> = any,
+  DirectiveDefs extends Record<string, GraphQLDirective> = any
+>(
   types: any,
-  config: Types.Omit<Types.SchemaConfig<any>, "types"> = {
-    schemaPath: false,
-    typegenPath: false,
-  }
-): Types.BuildTypes {
+  config: Types.Omit<Types.SchemaConfig<any>, "types"> = { outputs: false }
+): Types.BuildTypes<TypeMapDefs, DirectiveDefs> {
   const metadata = new GQLiteralMetadata(config);
   const builder = new SchemaBuilder(metadata, config.nullability);
   addTypes(builder, types);
