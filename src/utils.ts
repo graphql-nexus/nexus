@@ -1,20 +1,13 @@
-import {
-  GraphQLFieldResolver,
-  isNamedType,
-  isDirective,
-  GraphQLSchema,
-  isObjectType,
-} from "graphql";
-import { SchemaBuilder } from "./builder";
+import { GraphQLFieldResolver } from "graphql";
+import { GQLiteralAbstractType } from "./core";
 import * as Types from "./types";
-import { GQLiteralAbstract } from "./objects";
 
 export function addMix(
   obj: { fields: Types.FieldDefType[] },
-  typeName: string | GQLiteralAbstract<any>,
+  typeName: string | GQLiteralAbstractType<any>,
   mixOptions?: Types.MixOpts<any>
 ) {
-  if (typeName instanceof GQLiteralAbstract) {
+  if (typeName instanceof GQLiteralAbstractType) {
     obj.fields.push({
       item: Types.NodeType.MIX_ABSTRACT,
       type: typeName,

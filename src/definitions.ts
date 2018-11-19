@@ -1,41 +1,27 @@
-import { assertValidName, GraphQLScalarType } from "graphql";
+import { assertValidName, GraphQLScalarType, GraphQLSchema } from "graphql";
 import {
-  GQLiteralAbstract,
+  GQLiteralAbstractType,
   GQLiteralDirectiveType,
   GQLiteralEnumType,
   GQLiteralInputObjectType,
   GQLiteralInterfaceType,
-  GQLiteralNamedType,
   GQLiteralObjectType,
   GQLiteralUnionType,
-} from "./objects";
+} from "./core";
 import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
-import { buildSchemaWithMetadata } from "./builder";
 
 /**
- * Wraps a GQLiteralType object, since all GQLiteral types have a
- * name, but that name isn't relevant to the type object until it's
- * constructed so we don't want it as a public member, purely for
- * intellisense/cosmetic purposes :)
+ * Defines a GQliteral representation of a GraphQL Scalar type.
  */
-export class GQLiteralTypeWrapper<
-  T extends GQLiteralNamedType = GQLiteralNamedType
-> {
-  constructor(readonly name: string, readonly type: T) {}
-}
-
-/**
- * Defines a GraphQL Scalar type
- */
-export function GQLiteralScalar(name: string, options: Types.ScalarOpts) {
+export function scalarType(name: string, options: Types.ScalarOpts) {
   return new GraphQLScalarType({ name: assertValidName(name), ...options });
 }
 
 /**
- * Defines a GraphQL Object
+ * Defines a GQLiteral representation of a GraphQL Object.
  */
-export function GQLiteralObject<
+export function objectType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
@@ -43,13 +29,13 @@ export function GQLiteralObject<
     assertValidName(name)
   );
   fn(factory);
-  return new GQLiteralTypeWrapper(name, factory);
+  return factory;
 }
 
 /**
- * Define a GraphQL interface type
+ * Define a GQLiteral representation of a GraphQL interface type.
  */
-export function GQLiteralInterface<
+export function interfaceType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(
@@ -60,7 +46,7 @@ export function GQLiteralInterface<
     assertValidName(name)
   );
   fn(factory);
-  return new GQLiteralTypeWrapper(name, factory);
+  return factory;
 }
 
 /**
@@ -80,13 +66,13 @@ export function GQLiteralInterface<
  *   t.members('OtherType', 'AnotherType')
  * })
  */
-export function GQLiteralUnion<
+export function unionType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
   const factory = new GQLiteralUnionType<GenTypes>(assertValidName(name));
   fn(factory);
-  return new GQLiteralTypeWrapper(name, factory);
+  return factory;
 }
 
 /**
@@ -116,7 +102,7 @@ export function GQLiteralUnion<
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
  */
-export function GQLiteralEnum<
+export function enumType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(
@@ -132,19 +118,19 @@ export function GQLiteralEnum<
   } else {
     factory.members(enumShorthandMembers(fn));
   }
-  return new GQLiteralTypeWrapper(name, factory);
+  return factory;
 }
 
 /**
  *
  */
-export function GQLiteralInputObject<
+export function inputObjectType<
   GenTypes = GQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GQLiteralInputObjectType<GenTypes>) => void) {
   const factory = new GQLiteralInputObjectType<GenTypes>(assertValidName(name));
   fn(factory);
-  return new GQLiteralTypeWrapper(name, factory);
+  return factory;
 }
 
 /**
@@ -160,10 +146,10 @@ export function GQLiteralInputObject<
  *
  * @return GQLiteralAbstractType
  */
-export function GQLiteralAbstractType<GenTypes = GQLiteralGen>(
-  fn: (arg: GQLiteralAbstract<GenTypes>) => void
+export function abstractType<GenTypes = GQLiteralGen>(
+  fn: (arg: GQLiteralAbstractType<GenTypes>) => void
 ) {
-  const factory = new GQLiteralAbstract<GenTypes>();
+  const factory = new GQLiteralAbstractType<GenTypes>();
   fn(factory);
   // This is not wrapped in a type, since it's not actually a concrete (named) type.
   return factory;
@@ -174,7 +160,7 @@ export function GQLiteralAbstractType<GenTypes = GQLiteralGen>(
  * This is also exposed during type definition as shorthand via the various
  * `__Arg` methods: `fieldArg`, `stringArg`, `intArg`, etc.
  */
-export function GQLiteralArg<GenTypes = GQLiteralGen>(
+export function arg<GenTypes = GQLiteralGen>(
   type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
   options?: Types.ArgOpts
 ): Readonly<Types.ArgDefinition> {
@@ -190,7 +176,7 @@ export function GQLiteralArg<GenTypes = GQLiteralGen>(
  * Defines a directive that can be used by the schema. Directives should
  * be rarely used, as they only function for external consumers of the schema.
  */
-export function GQLiteralDirective<
+export function directiveType<
   GenTypes = GQLiteralGen,
   DirectiveName extends string = any
 >(
@@ -206,29 +192,4 @@ export function GQLiteralDirective<
     directive.locations(...config.locations);
   }
   return directive;
-}
-
-/**
- * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the GQLiteral layer or any manually defined GraphQLType objects.
- *
- * Requires at least one type be named "Query", which will be used as the
- * root query type.
- */
-export function GQLiteralSchema<GenTypes = GQLiteralGen>(
-  options: Types.SchemaConfig<GenTypes>
-) {
-  const { schema, metadata } = buildSchemaWithMetadata<GenTypes>(options);
-
-  // Only in development envs do we want to worry about regenerating the
-  // schema definition and/or generated types.
-  const {
-    shouldGenerateArtifacts = process.env.NODE_ENV !== "production",
-  } = options;
-
-  if (shouldGenerateArtifacts) {
-    metadata.generateArtifacts(schema);
-  }
-
-  return schema;
 }

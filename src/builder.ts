@@ -34,9 +34,12 @@ import {
   isUnionType,
   GraphQLSchema,
 } from "graphql";
-import { GQLiteralTypeWrapper } from "./definitions";
 import { GQLiteralMetadata } from "./metadata";
-import { GQLiteralAbstract, GQLiteralDirectiveType } from "./objects";
+import {
+  GQLiteralAbstractType,
+  GQLiteralDirectiveType,
+  isGQLiteralNamedType,
+} from "./core";
 import * as Types from "./types";
 import { propertyFieldResolver, suggestionList, objValues } from "./utils";
 import { isObject } from "util";
@@ -85,7 +88,7 @@ export class SchemaBuilder {
    * The "pending type" map keeps track of all types that were defined w/
    * GQLiteral and haven't been processed into concrete types yet.
    */
-  protected pendingTypeMap: Record<string, GQLiteralTypeWrapper> = {};
+  protected pendingTypeMap: Record<string, Types.GQLiteralNamedType> = {};
   protected pendingDirectiveMap: Record<
     string,
     GQLiteralDirectiveType<any>
@@ -97,8 +100,14 @@ export class SchemaBuilder {
     protected nullability: Types.NullabilityConfig = {}
   ) {}
 
-  addType(typeDef: GQLiteralTypeWrapper | GraphQLNamedType) {
-    if (this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name]) {
+  addType(typeDef: Types.GQLiteralNamedType | GraphQLNamedType) {
+    const existingType =
+      this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
+    if (existingType) {
+      // Allow importing the same exact type more than once.
+      if (existingType === typeDef) {
+        return;
+      }
       throw extendError(typeDef.name);
     }
     if (isNamedType(typeDef)) {
@@ -364,7 +373,7 @@ export class SchemaBuilder {
   protected mixAbstractOuput(
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     fieldMap: GraphQLFieldConfigMap<any, any>,
-    type: GQLiteralAbstract<any>,
+    type: GQLiteralAbstractType<any>,
     { pick, omit }: Types.MixOpts<any>
   ) {
     const { fields } = type.buildType();
@@ -382,7 +391,7 @@ export class SchemaBuilder {
   protected mixAbstractInput(
     typeConfig: Types.InputTypeConfig,
     fieldMap: GraphQLInputFieldConfigMap,
-    type: GQLiteralAbstract<any>,
+    type: GQLiteralAbstractType<any>,
     { pick, omit }: Types.MixOpts<any>
   ) {
     const { fields } = type.buildType();
@@ -658,7 +667,7 @@ export class SchemaBuilder {
     const pendingType = this.pendingTypeMap[name];
     if (pendingType) {
       this.buildingTypes.add(name);
-      return pendingType.type.buildType(this);
+      return pendingType.buildType(this);
     }
     return this.missingType(name);
   }
@@ -735,7 +744,7 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
-  if (types instanceof GQLiteralTypeWrapper || isNamedType(types)) {
+  if (isGQLiteralNamedType(types) || isNamedType(types)) {
     builder.addType(types);
   } else if (types instanceof GQLiteralDirectiveType || isDirective(types)) {
     builder.addDirective(types);
@@ -751,7 +760,7 @@ function addTypes(builder: SchemaBuilder, types: any) {
  */
 export function buildSchemaWithMetadata<GenTypes = GQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
-) {
+): { metadata: GQLiteralMetadata; schema: GraphQLSchema } {
   const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
     options.types,
     options
@@ -786,4 +795,29 @@ export function buildSchemaWithMetadata<GenTypes = GQLiteralGen>(
   metadata.finishConstruction();
 
   return { schema, metadata };
+}
+
+/**
+ * Defines the GraphQL schema, by combining the GraphQL types defined
+ * by the GQLiteral layer or any manually defined GraphQLType objects.
+ *
+ * Requires at least one type be named "Query", which will be used as the
+ * root query type.
+ */
+export function buildSchema<GenTypes = GQLiteralGen>(
+  options: Types.SchemaConfig<GenTypes>
+): GraphQLSchema {
+  const { schema, metadata } = buildSchemaWithMetadata<GenTypes>(options);
+
+  // Only in development envs do we want to worry about regenerating the
+  // schema definition and/or generated types.
+  const {
+    shouldGenerateArtifacts = process.env.NODE_ENV !== "production",
+  } = options;
+
+  if (shouldGenerateArtifacts) {
+    metadata.generateArtifacts(schema);
+  }
+
+  return schema;
 }

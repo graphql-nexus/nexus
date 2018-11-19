@@ -1,15 +1,14 @@
-import * as GQLiteralTypes from "./types";
-export { GQLiteralTypes };
 export {
-  GQLiteralArg,
-  GQLiteralObject,
-  GQLiteralInputObject,
-  GQLiteralEnum,
-  GQLiteralInterface,
-  GQLiteralUnion,
-  GQLiteralSchema,
-  GQLiteralScalar,
-  GQLiteralAbstractType,
-  GQLiteralDirective,
+  arg,
+  objectType,
+  inputObjectType,
+  enumType,
+  interfaceType,
+  unionType,
+  scalarType,
+  abstractType,
+  directiveType,
 } from "./definitions";
-export { buildSchemaWithMetadata, buildTypes } from "./builder";
+import * as core from "./core";
+export { core };
+export { buildSchema, buildTypes, buildSchemaWithMetadata } from "./builder";

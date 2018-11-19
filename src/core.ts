@@ -11,7 +11,10 @@ import {
 } from "graphql";
 import { addMix, dedent } from "./utils";
 import { SchemaBuilder } from "./builder";
-import { GQLiteralArg } from "./definitions";
+import { arg } from "./definitions";
+
+// Export the ts definitions so they can be used by library authors under `core.Types`
+export { Types };
 
 declare global {
   interface GQLiteralGen {}
@@ -30,7 +33,7 @@ export type GQLiteralNamedType =
 export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
   protected typeConfig: Types.EnumTypeConfig;
 
-  constructor(name: string) {
+  constructor(readonly name: string) {
     this.typeConfig = {
       name,
       members: [],
@@ -115,7 +118,7 @@ export class GQLiteralUnionType<
 > {
   protected typeConfig: Types.UnionTypeConfig;
 
-  constructor(name: string) {
+  constructor(readonly name: string) {
     this.typeConfig = {
       name,
       members: [],
@@ -174,27 +177,27 @@ export class GQLiteralUnionType<
 
 abstract class FieldsArgs<GenTypes = GQLiteralGen> {
   idArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("ID", options);
+    return arg("ID", options);
   }
 
   intArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("Int", options);
+    return arg("Int", options);
   }
 
   floatArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("Float", options);
+    return arg("Float", options);
   }
 
   booleanArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("Boolean", options);
+    return arg("Boolean", options);
   }
 
   stringArg(options?: Types.ArgOpts) {
-    return GQLiteralArg("String", options);
+    return arg("String", options);
   }
 
   fieldArg(type: Types.AllInputTypes<GenTypes>, options?: Types.ArgOpts) {
-    return GQLiteralArg(type, options);
+    return arg(type, options);
   }
 }
 
@@ -207,7 +210,7 @@ export class GQLiteralObjectType<
    */
   protected typeConfig: Types.ObjectTypeConfig;
 
-  constructor(name: string) {
+  constructor(readonly name: string) {
     super();
     this.typeConfig = {
       name,
@@ -223,7 +226,7 @@ export class GQLiteralObjectType<
    * with the current type.
    */
   mix(
-    typeName: string | GQLiteralAbstract<GenTypes>,
+    typeName: string | GQLiteralAbstractType<GenTypes>,
     mixOptions?: Types.MixOpts<any>
   ) {
     addMix(this.typeConfig, typeName, mixOptions);
@@ -404,7 +407,7 @@ export class GQLiteralInterfaceType<
    */
   protected typeConfig: Types.InterfaceTypeConfig;
 
-  constructor(name: string) {
+  constructor(readonly name: string) {
     this.typeConfig = {
       name,
       fields: [],
@@ -417,7 +420,7 @@ export class GQLiteralInterfaceType<
    * with the current type.
    */
   mix(
-    typeName: string | GQLiteralAbstract<GenTypes>,
+    typeName: string | GQLiteralAbstractType<GenTypes>,
     mixOptions?: Types.MixOpts<any>
   ) {
     addMix(this.typeConfig, typeName, mixOptions);
@@ -542,7 +545,7 @@ export class GQLiteralInterfaceType<
 export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
   protected typeConfig: Types.InputTypeConfig;
 
-  constructor(name: string) {
+  constructor(readonly name: string) {
     this.typeConfig = {
       name,
       fields: [],
@@ -662,7 +665,7 @@ export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
  *
  * Use the `.mix` to mixin the abstract type fields.
  */
-export class GQLiteralAbstract<GenTypes> extends FieldsArgs {
+export class GQLiteralAbstractType<GenTypes> extends FieldsArgs {
   protected typeConfig: Types.AbstractTypeConfig;
 
   constructor() {
@@ -829,4 +832,16 @@ export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
   buildType(builder: SchemaBuilder) {
     return builder.directiveType(this.typeConfig);
   }
+}
+
+export function isGQLiteralNamedType(
+  obj: any
+): obj is Types.GQLiteralNamedType {
+  return (
+    obj instanceof GQLiteralObjectType ||
+    obj instanceof GQLiteralInputObjectType ||
+    obj instanceof GQLiteralEnumType ||
+    obj instanceof GQLiteralUnionType ||
+    obj instanceof GQLiteralInterfaceType
+  );
 }

@@ -7,8 +7,22 @@ import {
   DirectiveLocationEnum,
   GraphQLDirective,
 } from "graphql";
-import { GQLiteralAbstract } from "./objects";
+import {
+  GQLiteralAbstractType,
+  GQLiteralObjectType,
+  GQLiteralInputObjectType,
+  GQLiteralInterfaceType,
+  GQLiteralEnumType,
+  GQLiteralUnionType,
+} from "./core";
 import { GQLiteralMetadata } from "./metadata";
+
+export type GQLiteralNamedType =
+  | GQLiteralObjectType
+  | GQLiteralInputObjectType
+  | GQLiteralInterfaceType
+  | GQLiteralEnumType
+  | GQLiteralUnionType;
 
 export enum NodeType {
   MIX = "MIX",
@@ -34,7 +48,7 @@ export type MixDef = {
 
 export type MixAbstractDef = {
   item: NodeType.MIX_ABSTRACT;
-  type: GQLiteralAbstract<any>;
+  type: GQLiteralAbstractType<any>;
   mixOptions: MixOpts<any>;
 };
 
