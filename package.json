@@ -12,7 +12,8 @@
     "lint": "tslint -p tsconfig.json",
     "clean": "rm -rf dist",
     "prepublish": "yarn clean && yarn lint && yarn build",
-    "website": "cd website && yarn start",
+    "website": "cd website && yarn && yarn start",
+    "playground": "cd website && yarn && yarn webpack",
     "link-examples": "ts-node ./scripts/link-examples.ts",
     "unlink-examples": "ts-node ./scripts/unlink-examples.ts"
   },

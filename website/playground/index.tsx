@@ -9,7 +9,7 @@ const content = dedent`
   // All GQLiteral objects are available globally here,
   // and will automatically be added to the schema
 
-  GQLiteralObject('Account', t => {
+  objectType('Account', t => {
     t.implements('Node', 'Timestamps');
     t.string('email', { nullable: true });
     t.field('posts', 'Post', { 
@@ -18,7 +18,7 @@ const content = dedent`
     });
   });
 
-  GQLiteralObject('Post', t => {
+  objectType('Post', t => {
     t.implements('Node');
     t.string('title', { default: '' });
     t.field('owner', 'Account', {
@@ -28,7 +28,7 @@ const content = dedent`
     });
   })
 
-  GQLiteralObject('Query', t => {
+  objectType('Query', t => {
     t.field('account', 'Account', {
       resolve() {
         return { id: 1, email: 'test@example.com' }
@@ -36,17 +36,17 @@ const content = dedent`
     });
   });
 
-  GQLiteralInterface('Node', t => {
+  interfaceType('Node', t => {
     t.description("A Node is a resource with a globally unique identifier");
     t.id('id', { description: "PK of the resource" });
   })
 
-  GQLiteralInterface('Timestamps', t => {
+  interfaceType('Timestamps', t => {
     t.field('createdAt', 'Date', { default: () => new Date() });
     t.field('updatedAt', 'Date', { default: () => new Date() });
   });
 
-  GQLiteralObject('ZZZ_AdvancedTypes', t => {
+  objectType('ZZZ_AdvancedTypes', t => {
     t.float('coordinates', {
       list: true,
       listDepth: 2,
@@ -55,7 +55,7 @@ const content = dedent`
     });  
   })
 
-  GQLiteralScalar('Date', {
+  scalarType('Date', {
     serialize: value => value.getTime(),
     parseValue: value => new Date(value),
     parseLiteral: ast => ast.kind === "IntValue" ? new Date(ast.value) : null

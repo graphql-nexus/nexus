@@ -43,13 +43,7 @@ module.exports = {
     }),
   ],
   externals: {
-    fs: `{ 
-      writeFile(fileName, contents) {
-        if (typeof window.writeFileShim !== 'undefined') {
-          window.writeFileShim(fileName, contents)
-        }
-      } 
-    }`,
+    fs: "function() {}",
     prettier: "prettier",
     clipboard: "ClipboardJS",
     codemirror: "CodeMirror",

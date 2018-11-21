@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
-  GQLiteralObject,
-  GQLiteralInterface,
-  GQLiteralInputObject,
-  GQLiteralUnion,
-  GQLiteralEnum,
-  GQLiteralScalar,
-  GQLiteralSchema,
-  GQLiteralAbstractType,
-  GQLiteralDirective,
-  GQLiteralArg,
+  objectType,
+  interfaceType,
+  inputObjectType,
+  unionType,
+  enumType,
+  scalarType,
+  abstractType,
+  directiveType,
+  arg,
+  buildSchemaWithMetadata,
+  core,
 } from "gqliteral";
 import { printSchema, GraphQLSchema, graphql } from "graphql";
 import * as monaco from "monaco-editor";
 import debounce from "lodash.debounce";
 import { OutputPanel } from "./panels";
 import * as urlHash from "./urlHash";
+import { GQLiteralMetadata } from "../../dist/metadata";
 
 interface GraphiQLProps {
   fetcher: Function;
@@ -37,10 +39,13 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   const graphiqlRef = useRef(null);
   const [content, setContent] = useState(props.initialSchema);
   const [schemaError, setSchemaError] = useState<Error | null>(null);
-  const [activeSchema, setActiveSchema] = useState<GraphQLSchema | null>(null);
+  const [activeSchema, setActiveSchema] = useState<{
+    schema: GraphQLSchema;
+    metadata: GQLiteralMetadata;
+  } | null>(null);
 
   const printedSchema = useMemo(
-    () => (activeSchema ? printSchema(activeSchema) : ""),
+    () => (activeSchema ? printSchema(activeSchema.schema) : ""),
     [activeSchema]
   );
 
@@ -68,11 +73,11 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 
   useEffect(
     () => {
-      const { schema, error } = getCurrentSchema(content);
+      const { schema, metadata, error } = getCurrentSchema(content);
       if (error) {
         setSchemaError(error);
       } else {
-        setActiveSchema(schema);
+        setActiveSchema({ schema, metadata });
       }
     },
     [content]
@@ -99,7 +104,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
               key={printedSchema}
               defaultQuery={props.initialQuery}
               fetcher={(params) => {
-                return graphql(activeSchema, params.query);
+                return graphql(activeSchema.schema, params.query);
               }}
             />
           )}
@@ -110,8 +115,8 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 };
 
 type SchemaOrError =
-  | { schema: GraphQLSchema; error: null }
-  | { schema: null; error: Error };
+  | { schema: GraphQLSchema; metadata: GQLiteralMetadata; error: null }
+  | { schema: null; metadata: null; error: Error };
 
 function getCurrentSchema(code): SchemaOrError {
   const cache = [];
@@ -120,65 +125,65 @@ function getCurrentSchema(code): SchemaOrError {
     return val;
   }
   const singleton = {
-    GQLiteralObject(name: any, fn: any) {
-      return add(GQLiteralObject(name, fn));
+    objectType(name: any, fn: any) {
+      return add(objectType(name, fn));
     },
-    GQLiteralInterface(name: any, fn: any) {
-      return add(GQLiteralInterface(name, fn));
+    interfaceType(name: any, fn: any) {
+      return add(interfaceType(name, fn));
     },
-    GQLiteralInputObject(name: any, fn: any) {
-      return add(GQLiteralInputObject(name, fn));
+    inputObjectType(name: any, fn: any) {
+      return add(inputObjectType(name, fn));
     },
-    GQLiteralEnum(name: any, fn: any) {
-      return add(GQLiteralEnum(name, fn));
+    enumType(name: any, fn: any) {
+      return add(enumType(name, fn));
     },
-    GQLiteralUnion(name: any, fn: any) {
-      return add(GQLiteralUnion(name, fn));
+    unionType(name: any, fn: any) {
+      return add(unionType(name, fn));
     },
-    GQLiteralScalar(name: any, fn: any) {
-      return add(GQLiteralScalar(name, fn));
+    scalarType(name: any, fn: any) {
+      return add(scalarType(name, fn));
     },
-    GQLiteralDirective(name: any, fn: any) {
-      return add(GQLiteralDirective(name, fn));
+    directiveType(name: any, fn: any) {
+      return add(directiveType(name, fn));
     },
   };
   try {
     const fn = new Function(
-      "GQLiteralAbstractType",
-      "GQLiteralObject",
-      "GQLiteralInterface",
-      "GQLiteralInputObject",
-      "GQLiteralEnum",
-      "GQLiteralUnion",
-      "GQLiteralScalar",
-      "GQLiteralDirective",
-      "GQLiteralArg",
+      "abstractType",
+      "objectType",
+      "interfaceType",
+      "inputObjectType",
+      "enumType",
+      "unionType",
+      "scalarType",
+      "directiveType",
+      "arg",
       `
         "use strict";
         ${code};
       `
     );
     fn(
-      GQLiteralAbstractType,
-      singleton.GQLiteralObject,
-      singleton.GQLiteralInterface,
-      singleton.GQLiteralInputObject,
-      singleton.GQLiteralEnum,
-      singleton.GQLiteralUnion,
-      singleton.GQLiteralScalar,
-      singleton.GQLiteralDirective,
-      GQLiteralArg
+      abstractType,
+      singleton.objectType,
+      singleton.interfaceType,
+      singleton.inputObjectType,
+      singleton.enumType,
+      singleton.unionType,
+      singleton.scalarType,
+      singleton.directiveType,
+      arg
     );
-    const schema = GQLiteralSchema({
+    const { schema, metadata } = buildSchemaWithMetadata({
       types: cache,
-      schemaFilePath: false,
-      typeGeneration: {
-        outputPath: "file:///index.ts",
-      },
+      outputs: false,
     });
-    return { schema, error: null };
+
+    const sortedSchema = metadata.sortSchema(schema);
+
+    return { schema: sortedSchema, metadata, error: null };
   } catch (error) {
-    return { schema: null, error };
+    return { schema: null, metadata: null, error };
   }
 }
 
@@ -202,9 +207,12 @@ const allTypeDefs = [
   require("raw-loader!@types/graphql/type/schema.d.ts"),
   require("raw-loader!@types/graphql/type/validate.d.ts"),
   require("raw-loader!gqliteral/dist/builder.d.ts"),
+  require("raw-loader!gqliteral/dist/core.d.ts"),
   require("raw-loader!gqliteral/dist/definitions.d.ts"),
   require("raw-loader!gqliteral/dist/index.d.ts"),
-  require("raw-loader!gqliteral/dist/objects.d.ts"),
+  require("raw-loader!gqliteral/dist/lang.d.ts"),
+  require("raw-loader!gqliteral/dist/metadata.d.ts"),
+  require("raw-loader!gqliteral/dist/typegen.d.ts"),
   require("raw-loader!gqliteral/dist/types.d.ts"),
   require("raw-loader!gqliteral/dist/utils.d.ts"),
 ];
@@ -220,9 +228,12 @@ const files = [
   "graphql/type/schema.d.ts",
   "graphql/type/validate.d.ts",
   "gqliteral/builder.d.ts",
+  "gqliteral/core.d.ts",
   "gqliteral/definitions.d.ts",
   "gqliteral/index.d.ts",
-  "gqliteral/objects.d.ts",
+  "gqliteral/lang.d.ts",
+  "gqliteral/metadata.d.ts",
+  "gqliteral/typegen.d.ts",
   "gqliteral/types.d.ts",
   "gqliteral/utils.d.ts",
 ];
@@ -241,20 +252,15 @@ import * as gqliteral from 'gqliteral'
 // Re-export these so we can use globally in the sandbox
 // while still preserving the typegen
 declare global {
-  declare const GQLiteralArg: typeof gqliteral.GQLiteralArg;
-  declare const GQLiteralEnum: typeof gqliteral.GQLiteralEnum;
-  declare const GQLiteralUnion: typeof gqliteral.GQLiteralUnion;
-  declare const GQLiteralScalar: typeof gqliteral.GQLiteralScalar;
-  declare const GQLiteralDirective: typeof gqliteral.GQLiteralDirective;
-  declare const GQLiteralObject: typeof gqliteral.GQLiteralObject;
-  declare const GQLiteralInterface: typeof gqliteral.GQLiteralInterface;
-  declare const GQLiteralInputObject: typeof gqliteral.GQLiteralInputObject;
+  declare const arg: typeof gqliteral.arg;
+  declare const enumType: typeof gqliteral.enumType;
+  declare const unionType: typeof gqliteral.unionType;
+  declare const scalarType: typeof gqliteral.scalarType;
+  declare const directiveType: typeof gqliteral.directiveType;
+  declare const objectType: typeof gqliteral.objectType;
+  declare const interfaceType: typeof gqliteral.interfaceType;
+  declare const inputObjectType: typeof gqliteral.inputObjectType;
 }
 `,
   "file:///sandbox-globals.ts"
 );
-
-// @ts-ignore
-window.writeFileShim = function() {
-  console.log(arguments);
-};

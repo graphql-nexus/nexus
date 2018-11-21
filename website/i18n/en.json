@@ -21,7 +21,15 @@
         "title": "GQLiteral",
         "sidebar_label": "Getting Started"
       },
-      "type-generation-details": {
+      "library-authors": {
+        "title": "Library Authors",
+        "sidebar_label": "Library Authors"
+      },
+      "testing": {
+        "title": "Testing",
+        "sidebar_label": "Testing"
+      },
+      "type-generation": {
         "title": "Type Generation Details",
         "sidebar_label": "Type Generation Details"
       },
