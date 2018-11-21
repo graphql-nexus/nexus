@@ -389,7 +389,7 @@ export class GQLiteralObjectType<
    * Note: This value can also be set when building the schema via
    * the "rootTypes" option to `GQLiteralSchema`
    */
-  rootType(typeImport: Types.ImportedType) {
+  rootType(typeImport: string | Types.ImportedType) {
     this.typeConfig.rootType = typeImport;
   }
 

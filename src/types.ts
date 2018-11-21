@@ -573,8 +573,8 @@ export type ObjectTypeFields<
   GenTypes,
   TypeName
 > = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["objects"]
-    ? Extract<keyof GenTypes["objects"][TypeName]["fields"], string>
+  ? TypeName extends keyof GenTypes["returnTypes"]
+    ? Extract<keyof GenTypes["returnTypes"][TypeName], string>
     : never
   : unknown;
 

@@ -73,7 +73,7 @@ const schema = buildSchema({
 });
 ```
 
-## Nullability & default
+## Nullability & Default Values
 
 One benefit of GraphQL is the strict enforcement and guarentees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default. The GraphQL documentation provides [this explanation](https://graphql.org/learn/best-practices/#nullability):
 
