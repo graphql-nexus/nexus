@@ -31,7 +31,7 @@ As documented in the [API reference](api-reference.md) GQLiteral provides a cons
 The schema requires that an Object named `Query` be provided at the top-level.
 
 ```js
-const Query = GQLiteralObject("Query", (t) => {
+const Query = objectType("Query", (t) => {
   t.field("account", "Account", {
     args: {
       name: t.stringArg({
@@ -54,7 +54,7 @@ const Query = GQLiteralObject("Query", (t) => {
   });
 });
 
-const Node = GQLiteralObject("Node", (t) => {
+const Node = objectType("Node", (t) => {
   t.id("id", { description: "Node ID" });
 });
 
@@ -63,12 +63,12 @@ const UserFields = GQLiteralAbstractType((t) => {
   t.string("email");
 });
 
-const Account = GQLiteralObject("Account", (t) => {
+const Account = objectType("Account", (t) => {
   t.implements("Node");
   t.mix(UserFields);
 });
 
-const schema = GQLiteralSchema({
+const schema = buildSchema({
   types: [Account, Node, Query],
 });
 ```
@@ -83,7 +83,7 @@ One benefit of GraphQL is the strict enforcement and guarentees of null values i
 
 The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.
 
-If you find yourself wanting this the other way around, there is a `defaultNull` option for the `GQLiteralSchema` which will make all fields nullable unless `nullable: false` is specified during field definition.
+If you find yourself wanting this the other way around, there is a `defaultNull` option for the `buildSchema` which will make all fields nullable unless `nullable: false` is specified during field definition.
 
 This can also be configured on a per-type basis, using the `defaultNull` method on the type definition object. This comes in handy where you want to "mix" an `AbstractType` into an `ObjectType` and an `InputObjectType`, and the fields should be considered nullable by default on input, and required by default on output.
 
@@ -96,7 +96,7 @@ This can also be configured on a per-type basis, using the `defaultNull` method 
 Enforcing non-null guarantees at the resolver layer can be tedious, so GQLiteral also provides a `default` option; a value used when the resolved type is otherwise `null` or `undefined`. Providing the `default` will set the schema definition for the field to non-null regardless of root schema configuration, unless `nullable: true` is set explicitly on the field.
 
 ```ts
-const AccountInfo = GQLiteralObject("AccountInfo", (t) => {
+const AccountInfo = objectType("AccountInfo", (t) => {
   t.string("description", { default: "N/A" });
   t.int("linkedAccountId", { nullable: true });
 });
@@ -115,7 +115,7 @@ Have you ever found yourself re-using the same set of fields in multiple types, 
 One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GQLiteral provides a `property` option on the field configuration object, for conveniently accessing an object property without needing to define a resolver function.
 
 ```ts
-const User = GQLiteralObject("User", (t) => {
+const User = objectType("User", (t) => {
   t.id("id", { property: "user_id" });
   t.id("name", { property: "user_name" });
   t.id("description", { property: "user_description" });
@@ -133,7 +133,7 @@ GQLiteral allows you to define an override to the `defaultResolver` on a per-typ
 When making a change to GraphQL it is often beneficial to see how exactly this changes the output types. GQLiteral makes this simple, provide a path to where you want the schema file to be output and this file will automatically be generated when `process.env.NODE_ENV === "development"`.
 
 ```js
-const schema = GQLiteralSchema({
+const schema = buildSchema({
   types: [
     /* All schema types provided here */
   ],
