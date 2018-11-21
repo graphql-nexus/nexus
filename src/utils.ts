@@ -1,4 +1,5 @@
 import { GraphQLFieldResolver } from "graphql";
+import path from "path";
 import { GQLiteralAbstractType } from "./core";
 import * as Types from "./types";
 
@@ -239,3 +240,12 @@ export function eachObj<T>(
 
 export const isObject = (obj: any): boolean =>
   obj !== null && typeof obj === "object";
+
+export const assertAbsolutePath = (pathName: string, property: string) => {
+  if (!path.isAbsolute(pathName)) {
+    throw new Error(
+      `Expected path for ${property} to be a string, saw ${pathName}`
+    );
+  }
+  return pathName;
+};

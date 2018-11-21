@@ -1,25 +1,25 @@
 // @ts-check
-/// <reference path="../githuntTypes.ts" />
+/// <reference path="./githuntTypes.ts" />
 const {
-  GQLiteralEnum,
-  GQLiteralObject,
-  GQLiteralArg,
-  GQLiteralAbstractType,
-  GQLiteralDirective,
+  enumType,
+  objectType,
+  arg,
+  abstractType,
+  directiveType,
 } = require("gqliteral");
 
-exports.CacheControl = GQLiteralDirective("cacheControl", (t) => {
+exports.CacheControl = directiveType("cacheControl", (t) => {
   t.int("maxAge");
   t.field("scope", "CacheControlScope");
   t.locations("OBJECT", "FIELD_DEFINITION");
 });
 
-exports.CacheControlScope = GQLiteralEnum("CacheControlScope", [
+exports.CacheControlScope = enumType("CacheControlScope", [
   "PUBLIC",
   "PRIVATE",
 ]);
 
-exports.FeedType = GQLiteralEnum("FeedType", (t) => {
+exports.FeedType = enumType("FeedType", (t) => {
   t.description("A list of options for the sort order of the feed");
   t.member("HOT", {
     description:
@@ -29,25 +29,23 @@ exports.FeedType = GQLiteralEnum("FeedType", (t) => {
   t.member("TOP", { description: "Highest score entries first" });
 });
 
-exports.Query = GQLiteralObject("Query", (t) => {
+exports.Query = objectType("Query", (t) => {
   t.field("feed", "Entry", {
     list: true,
     args: {
-      type: GQLiteralArg("FeedType", {
+      type: arg("FeedType", {
         required: true,
         description: "The sort order for the feed",
       }),
-      offset: GQLiteralArg("Int", {
+      offset: arg("Int", {
         description: "The number of items to skip, for pagination",
       }),
-      limit: GQLiteralArg("Int", {
+      limit: arg("Int", {
         description:
           "The number of items to fetch starting from the offset, for pagination",
       }),
     },
-    resolve(root, ctx, args) {
-      debugger;
-    },
+    resolve(root, args, ctx) {},
   });
   t.field("entry", "Entry", {
     nullable: true,
@@ -75,18 +73,18 @@ exports.Query = GQLiteralObject("Query", (t) => {
   });
 });
 
-exports.VoteType = GQLiteralEnum("VoteType", (t) => {
+exports.VoteType = enumType("VoteType", (t) => {
   t.description("The type of vote to record, when submitting a vote");
   t.members(["UP", "DOWN", "CANCEL"]);
 });
 
-const RepoNameArg = GQLiteralArg("String", {
+const RepoNameArg = arg("String", {
   required: true,
   description:
     'The full repository name from GitHub, e.g. "apollostack/GitHunt-API"',
 });
 
-exports.Mutation = GQLiteralObject("Mutation", (t) => {
+exports.Mutation = objectType("Mutation", (t) => {
   t.field("submitRepository", "Entry", {
     description: "Submit a new repository, returns the new submission",
     args: {
@@ -98,7 +96,7 @@ exports.Mutation = GQLiteralObject("Mutation", (t) => {
       "Vote on a repository submission, returns the submission that was voted on",
     args: {
       repoFullName: RepoNameArg,
-      type: GQLiteralArg("VoteType", {
+      type: arg("VoteType", {
         required: true,
         description: "The type of vote - UP, DOWN, or CANCEL",
       }),
@@ -115,7 +113,7 @@ exports.Mutation = GQLiteralObject("Mutation", (t) => {
   });
 });
 
-const CommonFields = GQLiteralAbstractType((t) => {
+const CommonFields = abstractType((t) => {
   t.int("id", { description: "The SQL ID of this entry" });
   t.field("postedBy", "User", {
     nullable: true,
@@ -123,7 +121,7 @@ const CommonFields = GQLiteralAbstractType((t) => {
   });
 });
 
-exports.Comment = GQLiteralObject("Comment", (t) => {
+exports.Comment = objectType("Comment", (t) => {
   t.description("A comment about an entry, submitted by a user");
   t.directive("cacheControl", { maxAge: 240 });
   t.mix(CommonFields);
@@ -140,12 +138,12 @@ exports.Comment = GQLiteralObject("Comment", (t) => {
 });
 
 // 'XXX to be removed'
-exports.Vote = GQLiteralObject("Vote", (t) => {
+exports.Vote = objectType("Vote", (t) => {
   t.int("vote_value");
 });
 
 // # Information about a GitHub repository submitted to GitHunt
-exports.Entry = GQLiteralObject("Entry", (t) => {
+exports.Entry = objectType("Entry", (t) => {
   t.mix(CommonFields);
   t.directive("cacheControl", { maxAge: 240 });
   t.field("repository", "Repository", {
@@ -175,7 +173,7 @@ exports.Entry = GQLiteralObject("Entry", (t) => {
   t.field("vote", "Vote", { description: "XXX to be changed" });
 });
 
-exports.Repository = GQLiteralObject("Repository", (t) => {
+exports.Repository = objectType("Repository", (t) => {
   t.description(`
     A repository object from the GitHub API. This uses the exact field names returned by the
     GitHub API for simplicity, even though the convention for GraphQL is usually to camel case.
@@ -209,7 +207,7 @@ exports.Repository = GQLiteralObject("Repository", (t) => {
   });
 });
 
-exports.User = GQLiteralObject("User", (t) => {
+exports.User = objectType("User", (t) => {
   t.description(
     "A user object from the GitHub API. This uses the exact field names returned from the GitHub API."
   );

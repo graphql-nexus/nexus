@@ -1,8 +1,8 @@
-import { objectType, arg } from "gqliteral";
+import { objectType, arg, stringArg } from "gqliteral";
 import { getHero, getHuman, getDroid } from "../data";
 
 const characterArgs = {
-  id: arg("String", {
+  id: stringArg({
     required: true,
     description: "id of the character",
   }),

@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon --ignore fullstackTypes.js dist/index.js",
-    "start:ci": "node dist/index.js"
+    "start": "ts-node-dev --no-notify --transpileOnly --respawn src/index.ts"
   },
   "author": "",
   "license": "ISC",
@@ -30,7 +29,8 @@
     "nock": "^10.0.2",
     "node-fetch": "^2.2.1",
     "prettier": "^1.15.2",
-    "typescript": "^3.1.6"
+    "typescript": "^3.1.6",
+    "ts-node-dev": "^1.0.0-pre.30"
   },
   "jest": {
     "testPathIgnorePatterns": [

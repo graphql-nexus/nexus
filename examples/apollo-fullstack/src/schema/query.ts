@@ -3,8 +3,6 @@ import { objectType } from "gqliteral";
 import { Utils } from "../typeDefs";
 const utils: Utils = require("fullstack-tutorial/final/server/src/utils.js");
 
-const dataSources: any = {};
-
 export const Query = objectType("Query", (t) => {
   t.field("launches", "LaunchConnection", {
     args: {
@@ -17,7 +15,7 @@ export const Query = objectType("Query", (t) => {
           "If you add a cursor here, it will only return results _after_ this cursor",
       }),
     },
-    resolve: async (root, { pageSize = 20, after }, { dataSources }) => {
+    async resolve(root, { pageSize = 20, after }, { dataSources }) {
       const allLaunches = await dataSources.launchAPI.getAllLaunches();
       // we want these in reverse chronological order
       allLaunches.reverse();
@@ -45,7 +43,7 @@ export const Query = objectType("Query", (t) => {
       id: t.idArg({ required: true }),
       count: t.intArg(),
     },
-    resolve: (_, args) => {
+    resolve: (_, args, { dataSources }) => {
       return dataSources.launchAPI.getLaunchById({ launchId: args.id });
     },
   });

@@ -14,7 +14,7 @@ import {
 import path from "path";
 import * as Types from "./types";
 import { SDL_HEADER } from "./lang";
-import { eachObj } from "./utils";
+import { eachObj, assertAbsolutePath } from "./utils";
 import { buildTypeDefinitions } from "./typegen";
 
 export interface DirectiveUse {
@@ -26,16 +26,16 @@ export interface DirectiveUse {
 }
 
 /**
- * Used in the schema builder, this keeps track of any necessary
- * field / type metadata we need to be aware of when building the schema.
+ * Passed into the SchemaBuilder, this keeps track of any necessary
+ * field / type metadata we need to be aware of when building the
+ * generated types and/or SDL artifact, including but not limited to:
  *
  * - Directive usage
- * - Type backing value
+ * - The TS type backing the GraphQL type
  * - Type default resolver
- * - Field property
- * - Field resolver
- * - Field defaultValue
- * - Whether the type is outside of
+ * - Whether the field has a resolver
+ * - The property name of the field
+ * - If the field has a "default" value
  */
 export class GQLiteralMetadata {
   protected completed = false;
@@ -45,15 +45,50 @@ export class GQLiteralMetadata {
     string,
     Record<string, Types.FieldConfig>
   > = {};
-  protected metaTypeMap: Record<string, any> = {};
   protected rootTypeMap: Types.RootTypeMap = {};
   protected rootImportMapping: Record<string, [string, string]> = {}; // Typename, Alias
+  protected typeImports: string[] = [];
+  protected typegenConfig: Types.TypegenConfig<any> = {};
+  protected typegenFile: string = "";
 
   constructor(protected config: Types.Omit<Types.SchemaConfig<any>, "types">) {
-    eachObj(
-      config.rootTypes || {},
-      (val, typeName) => val && this.addRootType(typeName, val)
-    );
+    if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
+      if (config.outputs.typegen) {
+        this.typegenFile = assertAbsolutePath(
+          config.outputs.typegen,
+          "outputs.typegen"
+        );
+      }
+      let typegenConfig = config.typegen || {};
+      if (typeof typegenConfig === "function") {
+        typegenConfig = typegenConfig();
+      }
+      this.typegenConfig = typegenConfig;
+      eachObj(
+        typegenConfig.rootTypes || {},
+        (val, typeName) => val && this.addRootType(typeName, val)
+      );
+    }
+  }
+
+  getContextType() {
+    return this.typegenConfig.contextType || "unknown";
+  }
+
+  getImportStrings(): string {
+    const typeImports: string[] = [];
+    if (this.typegenFile && this.typegenConfig && this.typegenConfig.imports) {
+      eachObj(this.typegenConfig.imports, (importPath, alias) => {
+        typeImports.push(
+          `import * as ${alias} from ${JSON.stringify(
+            `./${path
+              .relative(path.dirname(this.typegenFile), importPath)
+              .replace(/(\.d)?\.ts?/, "")}`
+          )}`
+        );
+      });
+    }
+    return typeImports.join("\n");
   }
 
   finishConstruction() {
@@ -84,16 +119,16 @@ export class GQLiteralMetadata {
       throw new Error(".hasField should only be called on known type names");
     }
     if (
-      !isInputObjectType(type) ||
-      !isObjectType(type) ||
-      !isInterfaceType(type)
+      isInputObjectType(type) ||
+      isObjectType(type) ||
+      isInterfaceType(type)
     ) {
-      throw new Error(
-        ".hasField should only be used with GraphQL types with fields"
-      );
+      const fields = type.getFields();
+      return Boolean(fields[fieldName]);
     }
-    const fields = type.getFields();
-    return Boolean(fields[fieldName]);
+    throw new Error(
+      `.hasField should only be used with GraphQL types with fields, ${type}`
+    );
   }
 
   // Predicates:
@@ -118,19 +153,22 @@ export class GQLiteralMetadata {
     );
   }
 
-  hasPropertyResolver(typeName: string, fieldName: string) {
+  hasPropertyResolver(type: GraphQLObjectType, fieldName: string) {
+    if (this.isInterfaceField(type, fieldName)) {
+      //
+    }
     return Boolean(
-      this.objectFieldMeta[typeName] &&
-        this.objectFieldMeta[typeName][fieldName] &&
-        this.objectFieldMeta[typeName][fieldName].property
+      this.objectFieldMeta[type.name] &&
+        this.objectFieldMeta[type.name][fieldName] &&
+        this.objectFieldMeta[type.name][fieldName].property
     );
   }
 
-  hasDefaultValue(typeName: string, fieldName: string) {
+  hasDefaultValue(type: GraphQLObjectType, fieldName: string) {
     return Boolean(
-      this.objectFieldMeta[typeName] &&
-        this.objectFieldMeta[typeName][fieldName] &&
-        this.objectFieldMeta[typeName][fieldName].default
+      this.objectFieldMeta[type.name] &&
+        this.objectFieldMeta[type.name][fieldName] &&
+        this.objectFieldMeta[type.name][fieldName].default
     );
   }
 
@@ -167,10 +205,10 @@ export class GQLiteralMetadata {
 
   // Type Genreation Helpers:
 
-  getPropertyResolver(typeName: string, fieldName: string) {
+  getPropertyResolver(type: GraphQLObjectType, fieldName: string) {
     return (
-      this.objectFieldMeta[typeName] &&
-      this.objectFieldMeta[typeName][fieldName].property
+      this.objectFieldMeta[type.name] &&
+      this.objectFieldMeta[type.name][fieldName].property
     );
   }
 

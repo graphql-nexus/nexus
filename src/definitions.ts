@@ -172,6 +172,16 @@ export function arg<GenTypes = GQLiteralGen>(
   };
 }
 
+export const stringArg = (options?: Types.ArgOpts) => arg("String", options);
+
+export const intArg = (options?: Types.ArgOpts) => arg("String", options);
+
+export const floatArg = (options?: Types.ArgOpts) => arg("String", options);
+
+export const idArg = (options?: Types.ArgOpts) => arg("String", options);
+
+export const booleanArg = (options?: Types.ArgOpts) => arg("String", options);
+
 /**
  * Defines a directive that can be used by the schema. Directives should
  * be rarely used, as they only function for external consumers of the schema.

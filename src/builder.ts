@@ -89,6 +89,7 @@ export class SchemaBuilder {
    * GQLiteral and haven't been processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, Types.GQLiteralNamedType> = {};
+
   protected pendingDirectiveMap: Record<
     string,
     GQLiteralDirectiveType<any>

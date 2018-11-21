@@ -17,8 +17,8 @@ import {
   isUnionType,
 } from "graphql";
 import { TYPEGEN_HEADER } from "./lang";
-import { mapObj, eachObj, arrPush } from "./utils";
 import { GQLiteralMetadata } from "./metadata";
+import { arrPush, eachObj, mapObj } from "./utils";
 
 const SCALAR_TYPES = {
   Int: "number",
@@ -38,10 +38,12 @@ type AllTypes =
   | "scalars"
   | "unions";
 
-// This is intentionally concise and self contained, since it shouldn't be
-// unnecessarily abstracted and should run only with only a single iteration
+// This is intentionally concise and procedural. Didn't want to make this
+// unnecessarily abstracted and it should run only with only a single iteration
 // of the schema. The types created here are generally meant for internal use
-// by GQLiteral. If we find a need, this could be factored out into the
+// by GQLiteral anyway. If there is a need, this could be factored out into
+// something nicer, but for now let's just make it work well, however ugly it is.
+// At least it's type safe™
 export function buildTypeDefinitions(
   schema: GraphQLSchema,
   metadata: GQLiteralMetadata
@@ -63,9 +65,6 @@ export function buildTypeDefinitions(
   };
   const allTypeStrings: string[] = [];
 
-  const rootTypeImports: {
-    [importPath: string]: [string, string][]; // [importName, alias][]
-  } = {};
   const interfaceRootTypes: {
     [interfaceName: string]: string[]; // objectRootType
   } = {};
@@ -82,52 +81,62 @@ export function buildTypeDefinitions(
   const MT = metadata.safeTypeName(schema, "MT");
   const MTA = metadata.safeTypeName(schema, "MTA");
 
-  function suffixed(fieldName: string, typeName: string, suffix: string) {}
+  const maybePromiseList = (t: string) => `${MPL}<${t}>`;
+  const maybePromise = (t: string) => `${MP}<${t}>`;
+  const maybeThunk = (t: string) => `${MT}<${t}>`;
+  const maybeThunkWithArgs = (t: string, a: string) => `${MTA}<${t}, ${a}>`;
 
-  function argFieldName(fieldName: string, typeName: string) {
-    return metadata.safeTypeName(
-      schema,
-      `${typeName}${ucFirst(fieldName)}Args`
-    );
-  }
-  function makeReturnTypeName(fieldName: string, typeName: string) {
-    return metadata.safeTypeName(
-      schema,
-      `${typeName}${ucFirst(fieldName)}ReturnType`
-    );
-  }
+  type SuffixedArgs =
+    | [string, string, string] // typeName, fieldName, suffix
+    | [string, string]; // typeName, suffix
+
+  const suffixed = (...args: SuffixedArgs) => {
+    let nameStr = "";
+    if (args.length === 3) {
+      const [typeName, fieldName, suffix] = args;
+      const pascalField = pascalCase(fieldName);
+      if (metadata.hasField(schema, typeName, pascalField)) {
+        nameStr = `${typeName}${fieldName}${suffix}`;
+      } else {
+        nameStr = `${typeName}${pascalField}${suffix}`;
+      }
+    } else {
+      nameStr = `${args[0]}${args[1]}`;
+    }
+    return metadata.safeTypeName(schema, nameStr);
+  };
+
+  const argFieldName = (typeName: string, fieldName: string) =>
+    suffixed(typeName, fieldName, "Args");
+  const fieldReturnTypeName = (typeName: string, fieldName: string) =>
+    suffixed(typeName, fieldName, "ReturnType");
+  const typeReturnTypeName = (typeName: string) =>
+    suffixed(typeName, "ReturnType");
+  const typeRootTypeName = (typeName: string) => suffixed(typeName, "RootType");
+  const fieldResolverName = (typeName: string, fieldName: string) =>
+    suffixed(typeName, fieldName, "Resolver");
 
   // Takes a type and turns it into a "return type", based
   // on nullability and whether it's a list.
-  function getReturnType(fieldType: GraphQLOutputType): string {
-    let type = fieldType;
-    let typeStr = "";
-    if (isNonNullType(fieldType)) {
-      type = fieldType.ofType;
-    } else {
-      typeStr += "null | ";
-    }
+  const getReturnType = (fieldType: GraphQLOutputType): string => {
+    let { type, typeStr } = unwrapNull(fieldType);
     if (isListType(type)) {
-      return `${MP}<${typeStr}${MPL}<${getReturnType(type.ofType)}>>`;
+      return maybePromise(
+        `${typeStr}${maybePromiseList(getReturnType(type.ofType))}`
+      );
     }
     if (isObjectType(type) || isInterfaceType(type) || isUnionType(type)) {
-      typeStr += `${type.name}ReturnType`;
+      typeStr += typeReturnTypeName(type.name);
     } else if (isEnumType(type)) {
       typeStr += type.name;
     } else if (isScalarType(type)) {
       typeStr += scalarMapping[type.name];
     }
-    return `${MP}<${typeStr}>`;
-  }
+    return maybePromise(typeStr);
+  };
 
-  function printInputType(fieldType: GraphQLInputType): string {
-    let type = fieldType;
-    let typeStr = "";
-    if (isNonNullType(fieldType)) {
-      type = fieldType.ofType;
-    } else {
-      typeStr += "null | ";
-    }
+  const printInputType = (fieldType: GraphQLInputType): string => {
+    let { type, typeStr } = unwrapNull(fieldType);
     if (isListType(type)) {
       return typeStr
         ? `Array<${typeStr}${printInputType(type.ofType)}>`
@@ -140,19 +149,22 @@ export function buildTypeDefinitions(
       return scalarMapping[type.name] || "unknown";
     }
     throw new Error(`Unexpected type ${type}`);
-  }
+  };
 
-  function printArgOrFieldMember({
+  const printArgOrFieldMember = ({
     name,
     type,
-  }: GraphQLArgument | GraphQLInputField): string {
+  }: GraphQLArgument | GraphQLInputField): string => {
     if (isNonNullType(type)) {
       return `  ${name}: ${printInputType(type)};`;
     }
     return `  ${name}?: ${printInputType(type)};`;
-  }
+  };
 
-  function makeFieldArgs(argTypeName: string, field: GraphQLField<any, any>) {
+  const makeFieldArgs = (
+    argTypeName: string,
+    field: GraphQLField<any, any>
+  ) => {
     allTypeStrings.push(
       [
         `export interface ${argTypeName} {`,
@@ -160,25 +172,25 @@ export function buildTypeDefinitions(
         "}",
       ].join("\n")
     );
-  }
+  };
 
-  function processField(
+  const processField = (
     type: GraphQLObjectType | GraphQLInterfaceType,
     field: GraphQLField<any, any>
-  ) {
-    const returnTypeName = makeReturnTypeName(field.name, type.name);
+  ) => {
+    const returnTypeName = fieldReturnTypeName(type.name, field.name);
     arrPush(returnTypeFields, type.name, [field.name, returnTypeName]);
     allTypeStrings.push(
-      `type ${returnTypeName} = ${getReturnType(field.type)};`
+      `export type ${returnTypeName} = ${getReturnType(field.type)};`
     );
     if (field.args.length) {
-      const argTypeName = argFieldName(field.name, type.name);
+      const argTypeName = argFieldName(type.name, field.name);
       arrPush(argTypeFields, type.name, [field.name, argTypeName]);
       if (isObjectType(type)) {
         const interfaces = type
           .getInterfaces()
           .filter((i) => i.getFields()[field.name])
-          .map((i) => argFieldName(field.name, i.name));
+          .map((i) => argFieldName(i.name, field.name));
         if (interfaces.length) {
           allTypeStrings.push(
             `export interface ${argTypeName} extends ${interfaces.join(
@@ -192,16 +204,10 @@ export function buildTypeDefinitions(
         makeFieldArgs(argTypeName, field);
       }
     }
-  }
+  };
 
-  function fieldRootType(fieldType: GraphQLOutputType): string {
-    let type = fieldType;
-    let typeStr = "";
-    if (isNonNullType(fieldType)) {
-      type = fieldType.ofType;
-    } else {
-      typeStr += "null | ";
-    }
+  const fieldRootType = (fieldType: GraphQLOutputType): string => {
+    let { type, typeStr } = unwrapNull(fieldType);
     if (isListType(type)) {
       const toWrap = fieldRootType(type.ofType);
       return toWrap.indexOf("null | ") === 0
@@ -218,65 +224,96 @@ export function buildTypeDefinitions(
       return `${typeStr}${type.name}`;
     }
     return `${typeStr}any`;
-  }
+  };
 
-  function fieldBackingName(typeName: string, field: GraphQLField<any, any>) {
-    const colon = metadata.hasDefaultValue(typeName, field.name)
+  const fieldBackingName = (
+    type: GraphQLObjectType,
+    field: GraphQLField<any, any>
+  ) => {
+    const colon = metadata.hasDefaultValue(type, field.name)
       ? "?:"
       : isNonNullType(field.type)
         ? ":"
         : "?:";
-    if (metadata.hasPropertyResolver(typeName, field.name)) {
-      return `${metadata.getPropertyResolver(typeName, field.name)}${colon}`;
+    if (metadata.hasPropertyResolver(type, field.name)) {
+      return `${metadata.getPropertyResolver(type, field.name)}${colon}`;
     }
     return `${field.name}${colon}`;
-  }
+  };
 
-  function getOrMakeRootType(type: GraphQLObjectType) {
+  const makeRootType = (type: GraphQLObjectType) => {
     if (metadata.hasRootTyping(type.name)) {
       allTypeStrings.push(
-        `type ${type.name}RootType = ${metadata.getRootTyping(type.name)};`
-      );
-      allTypeStrings.push(
-        `type ${type.name}ReturnType = ${metadata.getRootTyping(type.name)}`
+        `export type ${typeRootTypeName(type.name)} = ${metadata.getRootTyping(
+          type.name
+        )};`
       );
     } else {
       const rootMembers = mapObj(type.getFields(), (f) => {
         if (metadata.hasResolver(type.name, f.name)) {
           return null;
         }
-        return `  ${fieldBackingName(type.name, f)} ${fieldRootType(f.type)};`;
+        return `  ${fieldBackingName(type, f)} ${fieldRootType(f.type)};`;
       }).filter((f) => f);
       if (rootMembers.length === 0) {
-        allTypeStrings.push(`type ${type.name}RootType = {};`);
+        allTypeStrings.push(`export type ${typeRootTypeName(type.name)} = {};`);
       } else {
         allTypeStrings.push(
           [
-            `interface ${type.name}RootType {`,
+            `export interface ${typeRootTypeName(type.name)} {`,
             rootMembers.join("\n"),
             `}`,
           ].join("\n")
         );
       }
+    }
+  };
+
+  // If we have a resolver, by default we assume we don't need to
+  // return something (e.g. Query type) - specify the root type if this
+  // is not the case.
+  const makeReturnType = (type: GraphQLObjectType) => {
+    if (metadata.hasRootTyping(type.name)) {
+      allTypeStrings.push(
+        `export type ${typeReturnTypeName(
+          type.name
+        )} = ${metadata.getRootTyping(type.name)}`
+      );
+    } else {
       const returnMembers = mapObj(type.getFields(), (f) => {
+        const hasArgs = f.args.length > 0;
         if (metadata.hasResolver(type.name, f.name)) {
           return null;
         }
-        return `  ${fieldBackingName(type.name, f)} ${fieldRootType(f.type)};`;
+        const rootType = fieldRootType(f.type);
+        return `  ${fieldBackingName(type, f)} ${
+          hasArgs
+            ? maybeThunkWithArgs(
+                maybePromise(rootType),
+                argFieldName(type.name, f.name)
+              )
+            : maybeThunk(maybePromise(rootType))
+        };`;
       }).filter((f) => f);
       if (returnMembers.length === 0) {
-        allTypeStrings.push(`type ${type.name}ReturnType = {};`);
+        allTypeStrings.push(
+          `export type ${typeReturnTypeName(type.name)} = {};`
+        );
       } else {
         allTypeStrings.push(
           [
-            `export interface ${type.name}ReturnType {`,
+            `export type ${typeReturnTypeName(type.name)} = {`,
             returnMembers.join("\n"),
             `}`,
           ].join("\n")
         );
       }
     }
-  }
+  };
+
+  const makeResolvers = (type: GraphQLObjectType) => {
+    // TODO
+  };
 
   Object.keys(schemaTypeMap).forEach((typeName) => {
     if (typeName.indexOf("__") === 0) {
@@ -294,7 +331,9 @@ export function buildTypeDefinitions(
       type
         .getInterfaces()
         .forEach((i) => arrPush(interfaceRootTypes, i.name, type.name));
-      getOrMakeRootType(type);
+      makeRootType(type);
+      makeReturnType(type);
+      makeResolvers(type);
     } else if (isInputObjectType(type)) {
       typeNames.inputObjects.push(type.name);
       allTypeStrings.push(
@@ -311,18 +350,18 @@ export function buildTypeDefinitions(
     } else if (isUnionType(type)) {
       typeNames.unions.push(type.name);
       allTypeStrings.push(
-        `type ${type.name}RootType = ${map(
+        `export type ${typeRootTypeName(type.name)} = ${map(
           type.getTypes(),
-          ({ name }) => `${name}RootType`,
+          ({ name }) => typeRootTypeName(name),
           " | "
-        )}`
+        )};`
       );
       allTypeStrings.push(
-        `type ${type.name}ReturnType = ${map(
+        `export type ${typeReturnTypeName(type.name)} = ${map(
           type.getTypes(),
-          ({ name }) => `${name}ReturnType`,
+          ({ name }) => typeReturnTypeName(name),
           " | "
-        )}`
+        )};`
       );
     } else if (isInterfaceType(type)) {
       typeNames.interfaces.push(type.name);
@@ -341,30 +380,82 @@ export function buildTypeDefinitions(
 
   eachObj(interfaceRootTypes, (members, interfaceName) => {
     allTypeStrings.push(
-      `type ${interfaceName}RootType = ${members
-        .map((name) => `${name}RootType`)
-        .join(" | ")}`
+      `export type ${typeRootTypeName(interfaceName)} = ${members
+        .map((name) => typeRootTypeName(name))
+        .join(" | ")};`
     );
     allTypeStrings.push(
-      `type ${interfaceName}ReturnType = ${members
-        .map((name) => `${name}ReturnType`)
-        .join(" | ")}`
+      `export type ${typeReturnTypeName(interfaceName)} = ${members
+        .map((name) => typeReturnTypeName(name))
+        .join(" | ")};`
     );
   });
 
-  const rootTypeImportStrings = Object.keys(rootTypeImports).map((path) => {
-    return `import {${map(
-      rootTypeImports[path],
-      ([importName, alias]) => `${importName} as ${alias}`,
-      ", "
-    )}} from ${path}`;
-  });
+  // We're always guarenteed to have at least one of these
+  const objectNames = () => {
+    return [
+      `{`,
+      map(typeNames.objects, (n) => `    ${n}: ${typeRootTypeName(n)};`),
+      "  }",
+    ].join("\n");
+  };
+
+  // Each interface will always have at least one member, so the interface types
+  // will just be a mapping to their members.
+  const interfacesWithMembers = () => {
+    if (typeNames.interfaces.length === 0) {
+      return "{}";
+    }
+    return [
+      `{`,
+      map(
+        typeNames.interfaces,
+        (n) => `    ${n}: ${interfaceRootTypes[n].map(stringify).join(" | ")};`
+      ),
+      "  }",
+    ].join("\n");
+  };
+
+  const enums = () => {
+    if (typeNames.enums.length === 0) {
+      return "{}";
+    }
+    return [`{`, map(typeNames.enums, (n) => `    ${n}: ${n};`), "  }"].join(
+      "\n"
+    );
+  };
+
+  const unions = () => {
+    if (typeNames.unions.length === 0) {
+      return "{}";
+    }
+    return [`{`, map(typeNames.unions, (n) => `    ${n}: any;`), "  }"].join(
+      "\n"
+    );
+  };
+
+  const scalars = () => {
+    return [`{`, map(typeNames.scalars, (n) => `    ${n}: any;`), "  }"].join(
+      "\n"
+    );
+  };
+
+  const inputObjects = () => {
+    if (typeNames.inputObjects.length === 0) {
+      return "{}";
+    }
+    return [
+      `{`,
+      map(typeNames.inputObjects, (n) => `    ${n}: any;`),
+      "  }",
+    ].join("\n");
+  };
 
   return `${TYPEGEN_HEADER}
-${rootTypeImportStrings.join("\n")}
+${metadata.getImportStrings()}
 
 // Maybe Promise
-type ${MP}<T> = PromiseLike<T> | T;
+type ${MP}<T> = T | PromiseLike<T>;
 
 // Maybe Promise List
 type ${MPL}<T> = ${MP}<T>[];
@@ -379,19 +470,36 @@ ${allTypeStrings.join("\n\n")}
 
 ${stringifyTypeFieldMapping("GQLiteralGenArgTypes", argTypeFields)}
 
-interface GQLiteralGenRootTypes {
+export interface GQLiteralGenRootTypes {
 ${map(
     typeNames.interfaces.concat(typeNames.objects),
-    (name) => `  ${name}: ${name}RootType;`
+    (name) => `  ${name}: ${typeRootTypeName(name)};`
   )}
 }
 
 ${stringifyTypeFieldMapping("GQLiteralGenReturnTypes", returnTypeFields)}
 
-interface GQLiteralGenTypes {
+export interface GQLiteralGenTypes {
   argTypes: GQLiteralGenArgTypes;
   rootTypes: GQLiteralGenRootTypes;
   returnTypes: GQLiteralGenReturnTypes;
+  context: ${metadata.getContextType()};
+  enums: ${enums()};
+  objects: ${objectNames()};
+  interfaces: ${interfacesWithMembers()};
+  unions: ${unions()};
+  scalars: ${scalars()};
+  inputObjects: ${inputObjects()};
+  allInputTypes: 
+    | Extract<keyof GQLiteralGenTypes['inputObjects'], string>
+    | Extract<keyof GQLiteralGenTypes['enums'], string>
+    | Extract<keyof GQLiteralGenTypes['scalars'], string>;
+  allOutputTypes: 
+    | Extract<keyof GQLiteralGenTypes['objects'], string>
+    | Extract<keyof GQLiteralGenTypes['enums'], string>
+    | Extract<keyof GQLiteralGenTypes['unions'], string>
+    | Extract<keyof GQLiteralGenTypes['interfaces'], string>
+    | Extract<keyof GQLiteralGenTypes['scalars'], string>;
 }
 
 export type Gen = GQLiteralGenTypes;
@@ -402,7 +510,7 @@ declare global {
 `;
 }
 
-function stringifyTypeMapping(tsInterfaceName: string) {}
+const stringify = (v: any) => JSON.stringify(v);
 
 function stringifyTypeFieldMapping(
   tsInterfaceName: string,
@@ -419,7 +527,7 @@ function stringifyTypeFieldMapping(
       .concat("  };");
   }, []);
 
-  const argTypes = [`interface ${tsInterfaceName} {`]
+  const argTypes = [`export interface ${tsInterfaceName} {`]
     .concat(argTypeLines)
     .concat("}")
     .join("\n");
@@ -437,9 +545,33 @@ function map<T>(
     .join(join);
 }
 
-function ucFirst(fieldName: string) {
-  return fieldName
+function ucFirst(str: string) {
+  return str
     .slice(0, 1)
     .toUpperCase()
-    .concat(fieldName.slice(1));
+    .concat(str.slice(1));
+}
+
+function camelize(str: string) {
+  return str.replace(/^([A-Z])|[\s-_]+(\w)/g, function(match, p1, p2, offset) {
+    if (p2) {
+      return p2.toUpperCase();
+    }
+    return p1.toLowerCase();
+  });
+}
+
+function pascalCase(str: string) {
+  return ucFirst(camelize(str));
+}
+
+function unwrapNull(fieldType: GraphQLOutputType | GraphQLInputType) {
+  let type = fieldType;
+  let typeStr = "";
+  if (isNonNullType(fieldType)) {
+    type = fieldType.ofType;
+  } else {
+    typeStr += "null | ";
+  }
+  return { type, typeStr };
 }

@@ -6,9 +6,9 @@ const types = require("./schema");
 
 const schema = buildSchema({
   types,
-  schemaFilePath: path.join(__dirname, "../githunt-api-schema.graphql"),
-  typeGeneration: {
-    outputPath: path.join(__dirname, "../githuntTypes.ts"),
+  outputs: {
+    schema: path.join(__dirname, "../githunt-api-schema.graphql"),
+    typegen: path.join(__dirname, "../githuntTypes.ts"),
   },
 });
 

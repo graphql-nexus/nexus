@@ -230,16 +230,6 @@ export interface OutputFieldOpts<
   ) => ResultValue<GenTypes, TypeName, FieldName>;
 
   /**
-   * A convention for validating the field before
-   * query execution time, allowing you to do things
-   * like early-bail if arguments are incorrect.
-   */
-  validateArgs?: (
-    args: ArgsValue<GenTypes, TypeName, FieldName>,
-    info: GraphQLResolveInfo
-  ) => boolean | Error;
-
-  /**
    * Default value for the field, if none is returned.
    */
   default?: any;
@@ -438,6 +428,13 @@ export interface SchemaConfig<GenTypes> extends Nullability {
    */
   shouldGenerateArtifacts?: boolean;
   /**
+   * Any configuration for type generation
+   */
+  typegen?: TypegenConfig<GenTypes> | (() => TypegenConfig<GenTypes>);
+}
+
+export interface TypegenConfig<GenTypes> {
+  /**
    * A map of all types and what fields they can resolve to
    */
   rootTypes?: { [K in ObjectNames<GenTypes>]?: ImportedType | string };
@@ -448,13 +445,13 @@ export interface SchemaConfig<GenTypes> extends Nullability {
   /**
    * An string or strings to prefix on the header of the TS file
    */
-  typegenHeader?: string | string[];
+  header?: string | string[];
   /**
    * If you want to glob import from a file for use in the backing types,
    * you can use this as a convenience by specifying `{ importName: absolutePath }`
    * and the import will automatically be resolved relative to the `typegenPath`.
    */
-  typegenImports?: Record<string, string>;
+  imports?: Record<string, string>;
 }
 
 export type NullabilityConfig = {
@@ -528,31 +525,38 @@ export type TypeResolver<GenTypes, TypeName> = (
   root: RootValue<GenTypes, TypeName>,
   context: ContextValue<GenTypes>,
   info: GraphQLResolveInfo
-) => MaybePromise<Maybe<InterfaceNames<GenTypes, TypeName>>>;
+) => MaybePromise<Maybe<InterfaceMembers<GenTypes, TypeName>>>;
+
+type GenTypesShapeKeys =
+  | "context"
+  | "argTypes"
+  | "rootTypes"
+  | "returnTypes"
+  | "enums"
+  | "objects"
+  | "interfaces"
+  | "unions"
+  | "scalars"
+  | "inputObjects"
+  | "allInputTypes"
+  | "allOutputTypes";
 
 /**
  * Helpers for handling the generated schema
  */
-export type GenTypesShape = {
-  context: any;
-  enums: Record<string, any>;
-  interfaces: Record<string, any>;
-  objects: Record<string, any>;
-  inputObjects: Record<string, any>;
-  unions: Record<string, any>;
-  scalars: Record<string, any>;
-  allInputTypes: string;
-  allOutputTypes: string;
-};
+export type GenTypesShape = Record<GenTypesShapeKeys, any>;
 
 export type ObjectNames<GenTypes> = GenTypes extends GenTypesShape
   ? Extract<keyof GenTypes["objects"], string>
   : never;
 
-export type InterfaceNames<GenTypes, TypeName> = GenTypes extends GenTypesShape
+export type InterfaceMembers<
+  GenTypes,
+  TypeName
+> = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["interfaces"]
-    ? GenTypes["interfaces"][TypeName]["implementingTypes"]
-    : never
+    ? GenTypes["interfaces"][TypeName]
+    : any
   : never;
 
 export type EnumNames<GenTypes> = GenTypes extends GenTypesShape
@@ -609,11 +613,9 @@ export type AllOutputTypes<GenTypes> = GenTypes extends GenTypesShape
   : never;
 
 export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["objects"]
-    ? GenTypes["objects"][TypeName]["rootType"]
-    : TypeName extends keyof GenTypes["interfaces"]
-      ? GenTypes["interfaces"][TypeName]["rootType"]
-      : any
+  ? TypeName extends keyof GenTypes["rootTypes"]
+    ? GenTypes["rootTypes"][TypeName]
+    : any
   : never;
 
 export type ArgsValue<
@@ -621,36 +623,28 @@ export type ArgsValue<
   TypeName,
   FieldName
 > = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["objects"]
-    ? FieldName extends keyof GenTypes["objects"][TypeName]["fields"]
-      ? GenTypes["objects"][TypeName]["fields"][FieldName]["args"]
-      : never
-    : TypeName extends keyof GenTypes["interfaces"]
-      ? FieldName extends keyof GenTypes["interfaces"][TypeName]["fields"]
-        ? GenTypes["interfaces"][TypeName]["fields"][FieldName]["args"]
-        : never
-      : never
+  ? TypeName extends keyof GenTypes["argTypes"]
+    ? FieldName extends keyof GenTypes["argTypes"][TypeName]
+      ? GenTypes["argTypes"][TypeName][FieldName]
+      : any
+    : {}
   : never;
-
-export type ContextValue<GenTypes> = GenTypes extends GenTypesShape
-  ? GenTypes["context"]
-  : any;
 
 export type ResultValue<
   GenTypes,
   TypeName,
   FieldName
 > = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["objects"]
-    ? FieldName extends keyof GenTypes["objects"][TypeName]["fields"]
-      ? GenTypes["objects"][TypeName]["fields"][FieldName]["returnType"]
-      : never
-    : TypeName extends keyof GenTypes["interfaces"]
-      ? FieldName extends keyof GenTypes["interfaces"][TypeName]["fields"]
-        ? GenTypes["interfaces"][TypeName]["fields"][FieldName]["returnType"]
-        : never
-      : never
+  ? TypeName extends keyof GenTypes["returnTypes"]
+    ? FieldName extends keyof GenTypes["returnTypes"][TypeName]
+      ? GenTypes["returnTypes"][TypeName][FieldName]
+      : any
+    : any
   : never;
+
+export type ContextValue<GenTypes> = GenTypes extends GenTypesShape
+  ? GenTypes["context"]
+  : any;
 
 export type DirectiveConfig<GenTypes, DirectiveName> = {
   locations: DirectiveLocationEnum[];

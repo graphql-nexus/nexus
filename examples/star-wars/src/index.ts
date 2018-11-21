@@ -1,6 +1,6 @@
 import { ApolloServer } from "apollo-server";
 
-import { schema } from "./gqliteral/schema";
+import { schema } from "./schema";
 
 const server = new ApolloServer({
   schema,

@@ -1,4 +1,4 @@
-import { Character, Human, Droid } from "./backingTypes";
+import { Character, Human, Droid } from "./types/backingTypes";
 
 /**
  * Copied from GraphQL JS:

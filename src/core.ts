@@ -133,7 +133,7 @@ export class GQLiteralUnionType<
     this.typeConfig.members.push({
       item: Types.NodeType.MIX,
       typeName: type,
-      mixOptions: {},
+      mixOptions: options || {},
     });
   }
 

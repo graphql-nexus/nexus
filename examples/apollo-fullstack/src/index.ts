@@ -17,13 +17,16 @@ const schema = buildSchema({
     schema: path.join(__dirname, "../fullstack-schema.graphql"),
     typegen: path.join(__dirname, "../src/fullstackTypes.ts"),
   },
-  typegenImports: {
-    t: path.join(__dirname, "../src/typeDefs.ts"),
-  },  
-  contextType: "t.Context",
-  rootTypes: {
-    Launch: "t.Launch",
-    Mission: "t.Mission",
+  typegen: {
+    imports: {
+      t: path.join(__dirname, "../src/typeDefs.ts"),
+    },
+    contextType: "t.Context",
+    rootTypes: {
+      User: "t.DBUser",
+      Launch: "t.Launch",
+      Mission: "t.Mission",
+    },
   },
 });
 

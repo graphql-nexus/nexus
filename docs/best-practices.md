@@ -13,7 +13,7 @@ code chunks. The most common approach is to break up types into files, either on
 
 ```sh
 /src
-  /gqliteral
+  /graphql
     user.js
     post.js
     comment.js
@@ -23,9 +23,9 @@ code chunks. The most common approach is to break up types into files, either on
 However you end up structuring your files, they ultimately all need to be imported and passed to the `GQLiteralSchema` function, and keeping a consistent approach to file naming makes it simpler
 
 ```
-import * as userTypes from './gqliteral/user'
-import * as postTypes from './gqliteral/post'
-import * as commentTypes from './gqliteral/comment'
+import * as userTypes from './graphql/user'
+import * as postTypes from './graphql/post'
+import * as commentTypes from './graphql/comment'
 ```
 
 You could also consolidate this in an `index.js` or similar export file:
@@ -39,10 +39,11 @@ export * from './comment'
 Using that file to build the schema:
 
 ```
-import * as allTypes from './gqliteral'
+import * as allTypes from './graphql'
 
 export const schema = GQLiteralSchema({
-  types: allTypes
+  types: allTypes,
+  output: { ... }
 })
 ```
 

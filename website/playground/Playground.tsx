@@ -61,7 +61,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
       const debouncedChange = debounce(() => {
         setContent(editor.getValue());
       }, 100);
-      editor.onDidChangeModelContent(debouncedChange as any);
+      editor.onDidChangeModelContent(debouncedChange);
       return () => editor.dispose();
     }
   }, []);
