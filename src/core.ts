@@ -10,11 +10,15 @@ import {
   assertValidName,
 } from "graphql";
 import { addMix, dedent } from "./utils";
-import { SchemaBuilder } from "./builder";
+import { SchemaBuilder, isGQLiteralNamedType } from "./builder";
 import { arg } from "./definitions";
+import { GQLiteralMetadata } from "./metadata";
 
 // Export the ts definitions so they can be used by library authors under `core.Types`
 export { Types };
+
+// Same as above, export all core things under the "core" namespace
+export { SchemaBuilder, isGQLiteralNamedType, GQLiteralMetadata };
 
 declare global {
   interface GQLiteralGen {}
@@ -832,16 +836,4 @@ export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
   buildType(builder: SchemaBuilder) {
     return builder.directiveType(this.typeConfig);
   }
-}
-
-export function isGQLiteralNamedType(
-  obj: any
-): obj is Types.GQLiteralNamedType {
-  return (
-    obj instanceof GQLiteralObjectType ||
-    obj instanceof GQLiteralInputObjectType ||
-    obj instanceof GQLiteralEnumType ||
-    obj instanceof GQLiteralUnionType ||
-    obj instanceof GQLiteralInterfaceType
-  );
 }

@@ -321,8 +321,11 @@ export class GQLiteralMetadata {
   /**
    * Generates the type definitions
    */
-  generateTypesFile(schema: GraphQLSchema): string {
-    return buildTypeDefinitions(schema, this);
+  generateTypesFile(
+    schema: GraphQLSchema,
+    omitHeader: boolean = false
+  ): string {
+    return buildTypeDefinitions(schema, this, omitHeader);
   }
 
   protected checkMutable() {

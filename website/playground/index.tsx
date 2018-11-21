@@ -1,7 +1,6 @@
 import dedent from "dedent";
 import React from "react";
 import ReactDOM from "react-dom";
-import "codemirror-graphql/mode";
 
 import { Playground } from "./Playground";
 
@@ -38,7 +37,12 @@ const content = dedent`
 
   interfaceType('Node', t => {
     t.description("A Node is a resource with a globally unique identifier");
-    t.id('id', { description: "PK of the resource" });
+    t.id('id', { 
+      description: "PK of the resource",
+      resolve(root, args, ctx, info) {
+        return ${"`${info.parentType.name}:${root.id}`"}
+      }
+    });
   })
 
   interfaceType('Timestamps', t => {

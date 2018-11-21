@@ -38,6 +38,8 @@ export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";
 
 export type MaybePromise<T> = Promise<T> | T;
 
+export type MaybeThunk<T> = T | (() => T);
+
 export type Maybe<T> = T | null;
 
 export type MixDef = {
@@ -227,12 +229,12 @@ export interface OutputFieldOpts<
     args: ArgsValue<GenTypes, TypeName, FieldName>,
     context: ContextValue<GenTypes>,
     info: GraphQLResolveInfo
-  ) => ResultValue<GenTypes, TypeName, FieldName>;
+  ) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName>>;
 
   /**
    * Default value for the field, if none is returned.
    */
-  default?: any;
+  default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
 }
 
 export interface AbstractFieldOpts<GenTypes, FieldName> extends FieldOpts {}

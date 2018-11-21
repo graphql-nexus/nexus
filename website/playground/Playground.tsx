@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import {
   objectType,
   interfaceType,
@@ -8,16 +14,20 @@ import {
   scalarType,
   abstractType,
   directiveType,
-  arg,
   buildSchemaWithMetadata,
+  arg,
+  intArg,
+  stringArg,
+  floatArg,
+  idArg,
+  booleanArg,
   core,
 } from "gqliteral";
-import { printSchema, GraphQLSchema, graphql } from "graphql";
+import { GraphQLSchema, graphql } from "graphql";
 import * as monaco from "monaco-editor";
+import "./monaco-config";
 import debounce from "lodash.debounce";
-import { OutputPanel } from "./panels";
 import * as urlHash from "./urlHash";
-import { GQLiteralMetadata } from "../../dist/metadata";
 
 interface GraphiQLProps {
   fetcher: Function;
@@ -33,43 +43,106 @@ interface PlaygroundProps {
   initialQuery: string;
 }
 
+const COMMON_CONFIG: monaco.editor.IEditorConstructionOptions = {
+  minimap: {
+    enabled: false,
+  },
+  scrollBeyondLastLine: false,
+  lineNumbersMinChars: 3,
+};
+const COMMON_READONLY_CONFIG: monaco.editor.IEditorConstructionOptions = {
+  ...COMMON_CONFIG,
+  readOnly: true,
+  contextmenu: false,
+  renderLineHighlight: "none",
+};
+
+function monacoRef() {
+  return useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+}
+
 export const Playground: React.SFC<PlaygroundProps> = (props) => {
   // const original = urlHash.read();
-  const editorRef = useRef(null);
+  const [codeDiv, schemaDiv, typesDiv] = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
+  const [codeEditorRef, schemaEditorRef, typesEditorRef] = [
+    monacoRef(),
+    monacoRef(),
+    monacoRef(),
+  ];
   const graphiqlRef = useRef(null);
+  const [activeEditor, setActiveEditor] = useState<"SDL" | "TYPES">("SDL");
   const [content, setContent] = useState(props.initialSchema);
   const [schemaError, setSchemaError] = useState<Error | null>(null);
   const [activeSchema, setActiveSchema] = useState<{
     schema: GraphQLSchema;
-    metadata: GQLiteralMetadata;
+    metadata: core.GQLiteralMetadata;
   } | null>(null);
 
   const printedSchema = useMemo(
-    () => (activeSchema ? printSchema(activeSchema.schema) : ""),
+    () =>
+      activeSchema
+        ? activeSchema.metadata.generateSchemaFile(activeSchema.schema)
+        : "",
     [activeSchema]
+  );
+  const generatedTypes = useMemo(
+    () =>
+      activeSchema
+        ? activeSchema.metadata.generateTypesFile(activeSchema.schema, true)
+        : "",
+    [printedSchema]
   );
 
   useEffect(() => {
-    if (editorRef.current) {
-      const editor = monaco.editor.create(editorRef.current, {
+    if (codeDiv.current) {
+      const codeEditor = monaco.editor.create(codeDiv.current, {
         language: "typescript",
         model: monaco.editor.createModel(
           content,
           "typescript",
           monaco.Uri.file("main.ts")
         ),
-        minimap: {
-          enabled: false,
-        },
-        scrollBeyondLastLine: false,
+        ...COMMON_CONFIG,
       });
+      const typesEditor = monaco.editor.create(typesDiv.current, {
+        language: "typescript",
+        model: monaco.editor.createModel(
+          generatedTypes,
+          "typescript",
+          monaco.Uri.file("generated-typings.d.ts")
+        ),
+        ...COMMON_READONLY_CONFIG,
+      });
+      const schemaEditor = monaco.editor.create(schemaDiv.current, {
+        language: "graphql",
+        model: monaco.editor.createModel(
+          printedSchema,
+          "graphql",
+          monaco.Uri.file("sdl.graphql")
+        ),
+        ...COMMON_READONLY_CONFIG,
+      });
+      codeEditorRef.current = codeEditor;
+      schemaEditorRef.current = schemaEditor;
+      typesEditorRef.current = typesEditor;
       const debouncedChange = debounce(() => {
-        setContent(editor.getValue());
+        setContent(codeEditor.getValue());
       }, 100);
-      editor.onDidChangeModelContent(debouncedChange);
-      return () => editor.dispose();
+      codeEditor.onDidChangeModelContent(debouncedChange as any);
+      return () => codeEditor.dispose();
     }
   }, []);
+
+  useEffect(
+    () => {
+      schemaEditorRef.current.setValue(printedSchema);
+    },
+    [printedSchema]
+  );
 
   useEffect(
     () => {
@@ -78,9 +151,22 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
         setSchemaError(error);
       } else {
         setActiveSchema({ schema, metadata });
+        setSchemaError(null);
       }
     },
     [content]
+  );
+
+  useEffect(
+    () => {
+      if (codeEditorRef.current) {
+        codeEditorRef.current.layout();
+      }
+      if (typesEditorRef.current) {
+        typesEditorRef.current.layout();
+      }
+    },
+    [schemaError, activeEditor]
   );
 
   useEffect(
@@ -92,12 +178,75 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
     [activeSchema, graphiqlRef.current]
   );
 
+  useEffect(
+    () => {
+      if (generatedTypes) {
+        const disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+          generatedTypes,
+          "file:///generated-types.d.ts"
+        );
+        if (typesEditorRef.current) {
+          typesEditorRef.current.setValue(generatedTypes);
+        }
+        return () => disposable.dispose();
+      }
+    },
+    [generatedTypes]
+  );
+
+  const toggleSDL = useCallback(() => setActiveEditor("SDL"), []);
+  const toggleTypings = useCallback(() => setActiveEditor("TYPES"), []);
+  const sdlButtonStyle = activeEditor === "SDL" ? { color: "#800020" } : {};
+  const typingsButtonStyle =
+    activeEditor === "TYPES" ? { color: "#800020" } : {};
+
   return (
     <div className="editors-container">
       <div className="editors">
-        <div ref={editorRef} style={{ flexBasis: "50%", height: "100%" }} />
+        <div
+          style={{ flexBasis: "50%", height: "100%", flexDirection: "column" }}
+        >
+          <div ref={codeDiv} style={{ height: schemaError ? "95%" : "100%" }} />
+          {schemaError ? (
+            <div
+              style={{
+                height: "5%",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <div style={{ color: "#FF5759", marginLeft: 10 }}>
+                {schemaError.message}
+              </div>
+            </div>
+          ) : null}
+        </div>
         <div style={{ flexDirection: "column", width: "50%", height: "100%" }}>
-          <OutputPanel mode="graphql" value={printedSchema || ""} ruler={80} />
+          <div style={{ position: "fixed", right: 14, top: 55, zIndex: 1000 }}>
+            <button onClick={toggleSDL} style={sdlButtonStyle}>
+              SDL
+            </button>
+            <button onClick={toggleTypings} style={typingsButtonStyle}>
+              typings
+            </button>
+          </div>
+          <div
+            ref={schemaDiv}
+            className="readonly-editor"
+            style={{
+              height: activeEditor === "SDL" ? "50%" : "0%",
+              display: activeEditor === "SDL" ? "block" : "none",
+            }}
+          />
+          <div
+            ref={typesDiv}
+            className="readonly-editor"
+            style={{
+              height: activeEditor === "TYPES" ? "50%" : "0%",
+              display: activeEditor === "TYPES" ? "block" : "none",
+            }}
+          />
           {activeSchema && (
             <GraphiQL
               ref={graphiqlRef}
@@ -115,7 +264,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 };
 
 type SchemaOrError =
-  | { schema: GraphQLSchema; metadata: GQLiteralMetadata; error: null }
+  | { schema: GraphQLSchema; metadata: core.GQLiteralMetadata; error: null }
   | { schema: null; metadata: null; error: Error };
 
 function getCurrentSchema(code): SchemaOrError {
@@ -158,6 +307,11 @@ function getCurrentSchema(code): SchemaOrError {
       "scalarType",
       "directiveType",
       "arg",
+      "intArg",
+      "stringArg",
+      "floatArg",
+      "idArg",
+      "booleanArg",
       `
         "use strict";
         ${code};
@@ -172,7 +326,12 @@ function getCurrentSchema(code): SchemaOrError {
       singleton.unionType,
       singleton.scalarType,
       singleton.directiveType,
-      arg
+      arg,
+      intArg,
+      stringArg,
+      floatArg,
+      idArg,
+      booleanArg
     );
     const { schema, metadata } = buildSchemaWithMetadata({
       types: cache,
@@ -186,81 +345,3 @@ function getCurrentSchema(code): SchemaOrError {
     return { schema: null, metadata: null, error };
   }
 }
-
-monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-  target: monaco.languages.typescript.ScriptTarget.ES2016,
-  // lib: ["lib", "ScriptHost", "es5", "es6"],
-  allowNonTsExtensions: true,
-  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-  module: monaco.languages.typescript.ModuleKind.CommonJS,
-  noEmit: true,
-});
-
-const allTypeDefs = [
-  require("raw-loader!@types/graphql/index.d.ts"),
-  require("raw-loader!@types/graphql/graphql.d.ts"),
-  require("raw-loader!@types/graphql/type/definition.d.ts"),
-  require("raw-loader!@types/graphql/type/directives.d.ts"),
-  require("raw-loader!@types/graphql/type/index.d.ts"),
-  require("raw-loader!@types/graphql/type/introspection.d.ts"),
-  require("raw-loader!@types/graphql/type/scalars.d.ts"),
-  require("raw-loader!@types/graphql/type/schema.d.ts"),
-  require("raw-loader!@types/graphql/type/validate.d.ts"),
-  require("raw-loader!gqliteral/dist/builder.d.ts"),
-  require("raw-loader!gqliteral/dist/core.d.ts"),
-  require("raw-loader!gqliteral/dist/definitions.d.ts"),
-  require("raw-loader!gqliteral/dist/index.d.ts"),
-  require("raw-loader!gqliteral/dist/lang.d.ts"),
-  require("raw-loader!gqliteral/dist/metadata.d.ts"),
-  require("raw-loader!gqliteral/dist/typegen.d.ts"),
-  require("raw-loader!gqliteral/dist/types.d.ts"),
-  require("raw-loader!gqliteral/dist/utils.d.ts"),
-];
-
-const files = [
-  "graphql/index.d.ts",
-  "graphql/graphql.d.ts",
-  "graphql/type/definition.d.ts",
-  "graphql/type/directives.d.ts",
-  "graphql/type/index.d.ts",
-  "graphql/type/introspection.d.ts",
-  "graphql/type/scalars.d.ts",
-  "graphql/type/schema.d.ts",
-  "graphql/type/validate.d.ts",
-  "gqliteral/builder.d.ts",
-  "gqliteral/core.d.ts",
-  "gqliteral/definitions.d.ts",
-  "gqliteral/index.d.ts",
-  "gqliteral/lang.d.ts",
-  "gqliteral/metadata.d.ts",
-  "gqliteral/typegen.d.ts",
-  "gqliteral/types.d.ts",
-  "gqliteral/utils.d.ts",
-];
-
-files.forEach((file, i) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(
-    allTypeDefs[i],
-    `file:///node_modules/${file}`
-  );
-});
-
-monaco.languages.typescript.typescriptDefaults.addExtraLib(
-  `
-import * as gqliteral from 'gqliteral'
-
-// Re-export these so we can use globally in the sandbox
-// while still preserving the typegen
-declare global {
-  declare const arg: typeof gqliteral.arg;
-  declare const enumType: typeof gqliteral.enumType;
-  declare const unionType: typeof gqliteral.unionType;
-  declare const scalarType: typeof gqliteral.scalarType;
-  declare const directiveType: typeof gqliteral.directiveType;
-  declare const objectType: typeof gqliteral.objectType;
-  declare const interfaceType: typeof gqliteral.interfaceType;
-  declare const inputObjectType: typeof gqliteral.inputObjectType;
-}
-`,
-  "file:///sandbox-globals.ts"
-);

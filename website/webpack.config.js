@@ -44,9 +44,7 @@ module.exports = {
   ],
   externals: {
     fs: "function() {}",
-    prettier: "prettier",
     clipboard: "ClipboardJS",
-    codemirror: "CodeMirror",
     react: "React",
     "react-dom": "ReactDOM",
   },

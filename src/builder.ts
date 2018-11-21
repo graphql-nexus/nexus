@@ -38,7 +38,11 @@ import { GQLiteralMetadata } from "./metadata";
 import {
   GQLiteralAbstractType,
   GQLiteralDirectiveType,
-  isGQLiteralNamedType,
+  GQLiteralObjectType,
+  GQLiteralInputObjectType,
+  GQLiteralEnumType,
+  GQLiteralUnionType,
+  GQLiteralInterfaceType,
 } from "./core";
 import * as Types from "./types";
 import { propertyFieldResolver, suggestionList, objValues } from "./utils";
@@ -822,4 +826,16 @@ export function buildSchema<GenTypes = GQLiteralGen>(
   }
 
   return schema;
+}
+
+export function isGQLiteralNamedType(
+  obj: any
+): obj is Types.GQLiteralNamedType {
+  return (
+    obj instanceof GQLiteralObjectType ||
+    obj instanceof GQLiteralInputObjectType ||
+    obj instanceof GQLiteralEnumType ||
+    obj instanceof GQLiteralUnionType ||
+    obj instanceof GQLiteralInterfaceType
+  );
 }

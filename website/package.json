@@ -11,16 +11,12 @@
     "webpack": "webpack -w"
   },
   "dependencies": {
-    "clipboard": "^2.0.1",
-    "codemirror": "^5.41.0",
-    "codemirror-graphql": "^0.8.3",
-    "react": "^16.7.0-alpha.0",
-    "react-dom": "^16.7.0-alpha.0",
+    "react": "^16.7.0-alpha.2",
+    "react-dom": "^16.7.0-alpha.2",
     "graphql": "^14.0.2",
     "gqliteral": "^0.2.0",
     "dedent": "^0.7.0",
-    "react-monaco-editor": "^0.21.0",
-    "monaco-editor": "^0.15.1"
+    "monaco-editor": "^0.15.5"
   },
   "devDependencies": {
     "babel-loader": "^8.0.4",
@@ -30,7 +26,7 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@types/react": "^16.7.3",
+    "@types/react": "^16.7.6",
     "@types/react-dom": "^16.0.9",
     "@types/graphql": "^14.0.3",
     "@types/webpack": "^4.4.19",
