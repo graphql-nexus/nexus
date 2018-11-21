@@ -1,6 +1,6 @@
 ## GQLiteral
 
-"Contract first development"
+**(Still actively WIP, any feedback appreciated!)**
 
 Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript
 
@@ -8,23 +8,16 @@ Combines the best practices from building real-world GraphQL servers without the
 
 Inspired by use of [graphql-tools](https://github.com/apollographql/graphql-tools), [graphene](https://docs.graphene-python.org/en/latest/), and [graphql-ruby](https://github.com/rmosolgo/graphql-ruby).
 
-Provides full control of your schema, with added benefits like dynamic schemas based on user permissions. Check out the `/examples` for some sample uses.
+Check out the [`/examples`](/examples) for some sample uses.
 
-### Installation
+### Docs
+
+Build them manually (for now)
 
 ```
-yarn install gqliteral
+yarn run playground # Builds the webpack for the playground
+yarn run website # Generates the docusaurus site
 ```
-
-### Features:
-
-##### Type combination
-
-##### No circular reference issues
-
-##### Awesome intellisense
-
-##### Great error messages
 
 ### License
 
