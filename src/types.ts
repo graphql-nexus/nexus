@@ -59,7 +59,9 @@ export type FieldDef = {
   config: FieldConfig;
 };
 
-export interface FieldConfig extends OutputFieldOpts<any, any, any> {
+export type FieldConfig = InputFieldConfig | OutputFieldConfig;
+
+export interface OutputFieldConfig extends OutputFieldOpts {
   name: string;
   type: any;
 }
@@ -244,7 +246,8 @@ export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = Omit<
   "args" | "list" | "listItemNullable" | "nullable"
 >;
 
-export interface InputFieldOpts extends FieldOpts {
+export interface InputFieldOpts<GenTypes = any, TypeName = any>
+  extends FieldOpts {
   /**
    * Setting this to true is the same as setting `nullable: false`
    */
@@ -253,6 +256,10 @@ export interface InputFieldOpts extends FieldOpts {
    * Whether the item in the list is required
    */
   requiredListItem?: boolean;
+  /**
+   * Set a value for the input
+   */
+  default?: InputValue<GenTypes, TypeName>;
 }
 
 export interface ScalarOpts
@@ -643,6 +650,15 @@ export type ResultValue<
       : any
     : any
   : never;
+
+export type InputValue<GenTypes, TypeName> = any;
+// GenTypes extends GenTypesShape
+// ? TypeName extends keyof GenTypes["inputTypes"]
+//   ? FieldName extends keyof GenTypes["inputTypes"][TypeName]
+//     ? GenTypes["inputTypes"][TypeName][FieldName]
+//     : any
+//   : any
+// : never;
 
 export type ContextValue<GenTypes> = GenTypes extends GenTypesShape
   ? GenTypes["context"]

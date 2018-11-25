@@ -43,7 +43,7 @@ export class GQLiteralMetadata {
   protected interfaceMeta: Record<string, Types.InterfaceTypeConfig> = {};
   protected objectFieldMeta: Record<
     string,
-    Record<string, Types.FieldConfig>
+    Record<string, Types.OutputFieldConfig>
   > = {};
   protected rootTypeMap: Types.RootTypeMap = {};
   protected rootImportMapping: Record<string, [string, string]> = {}; // Typename, Alias

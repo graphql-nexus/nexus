@@ -13,9 +13,10 @@
 const siteConfig = {
   title: "GQLiteral", // Title for your website.
   tagline:
-    "Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript",
-  url: "https://tgriesser.com", // Your website URL
+    "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
+  // url: "https://tgriesser.com", // Your website URL
   baseUrl: "/gqliteral/", // Base URL for your project */
+  noIndex: true,
 
   // Used for publishing and more
   projectName: "gqliteral",
@@ -40,8 +41,8 @@ const siteConfig = {
 
   /* Colors for website */
   colors: {
-    primaryColor: "#800020",
-    secondaryColor: "#205C3B",
+    primaryColor: "#2A6379",
+    secondaryColor: "#A3A3A3",
   },
 
   /* Custom fonts for website */

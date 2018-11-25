@@ -6,7 +6,12 @@ import util from "util";
 import path from "path";
 
 const execAsync = util.promisify(exec);
-const allExamples = ["star-wars", "githunt-api", "apollo-fullstack"];
+const allExamples = [
+  "star-wars",
+  "kitchen-sink",
+  "githunt-api",
+  "apollo-fullstack",
+];
 
 async function linkDir(dir: string, baseNodeModules: string) {
   await execAsync("yarn", {

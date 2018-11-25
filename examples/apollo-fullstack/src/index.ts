@@ -1,7 +1,7 @@
 // @ts-check
 import { ApolloServer } from "apollo-server";
 import path from "path";
-import { buildSchema } from "gqliteral";
+import { makeSchema } from "gqliteral";
 import isEmail from "isemail";
 import * as types from "./schema";
 import { Request } from "express";
@@ -11,7 +11,7 @@ const internalEngineDemo = require("fullstack-tutorial/final/server/src/engine-d
 const LaunchApi = require("fullstack-tutorial/final/server/src/datasources/launch.js");
 const UserApi = require("fullstack-tutorial/final/server/src/datasources/user.js");
 
-const schema = buildSchema({
+const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, "../fullstack-schema.graphql"),

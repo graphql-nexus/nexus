@@ -546,7 +546,10 @@ export class GQLiteralInterfaceType<
   }
 }
 
-export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
+export class GQLiteralInputObjectType<
+  GenTypes = GQLiteralGen,
+  TypeName extends string = any
+> {
   protected typeConfig: Types.InputTypeConfig;
 
   constructor(readonly name: string) {
@@ -560,50 +563,35 @@ export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
   /**
    * Add an ID field type to the object schema.
    */
-  id<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  id(name: string, options?: Types.InputFieldOpts<GenTypes, "ID">) {
     this.field(name, "ID", options);
   }
 
   /**
    * Add an Int field type to the object schema.
    */
-  int<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  int(name: string, options?: Types.InputFieldOpts<GenTypes, "Int">) {
     this.field(name, "Int", options);
   }
 
   /**
    * Add a Float field type to the object schema.
    */
-  float<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  float(name: string, options?: Types.InputFieldOpts<GenTypes, "Float">) {
     this.field(name, "Float", options);
   }
 
   /**
    * Add a String field type to the object schema.
    */
-  string<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  string(name: string, options?: Types.InputFieldOpts<GenTypes, "String">) {
     this.field(name, "String", options);
   }
 
   /**
    * Add a Boolean field type to the object schema.
    */
-  boolean<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  boolean(name: string, options?: Types.InputFieldOpts<GenTypes, "Boolean">) {
     this.field(name, "Boolean", options);
   }
 
@@ -613,7 +601,7 @@ export class GQLiteralInputObjectType<GenTypes = GQLiteralGen> {
   field<FieldName extends string>(
     name: FieldName,
     type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
-    options?: Types.InputFieldOpts
+    options?: Types.InputFieldOpts<GenTypes, TypeName>
   ) {
     this.typeConfig.fields.push({
       item: Types.NodeType.FIELD,
@@ -771,60 +759,45 @@ export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
   /**
    * Add an ID field type to the object schema.
    */
-  id<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  id(name: string, options?: Types.InputFieldOpts<GenTypes, "ID">) {
     this.field(name, "ID", options);
   }
 
   /**
    * Add an Int field type to the object schema.
    */
-  int<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  int(name: string, options?: Types.InputFieldOpts<GenTypes, "Int">) {
     this.field(name, "Int", options);
   }
 
   /**
    * Add a Float field type to the object schema.
    */
-  float<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  float(name: string, options?: Types.InputFieldOpts<GenTypes, "Float">) {
     this.field(name, "Float", options);
   }
 
   /**
    * Add a String field type to the object schema.
    */
-  string<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  string(name: string, options?: Types.InputFieldOpts<GenTypes, "String">) {
     this.field(name, "String", options);
   }
 
   /**
    * Add a Boolean field type to the object schema.
    */
-  boolean<FieldName extends string>(
-    name: FieldName,
-    options?: Types.InputFieldOpts
-  ) {
+  boolean(name: string, options?: Types.InputFieldOpts<GenTypes, "Boolean">) {
     this.field(name, "Boolean", options);
   }
 
   /**
    * Adds a new field to the input object type
    */
-  field<FieldName extends string>(
-    name: FieldName,
-    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
-    options?: Types.InputFieldOpts
+  field<TypeName extends Types.AllInputTypes<GenTypes> | Types.BaseScalars>(
+    name: string,
+    type: TypeName,
+    options?: Types.InputFieldOpts<GenTypes, TypeName>
   ) {
     this.typeConfig.directiveArgs.push({
       name,

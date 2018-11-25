@@ -3,7 +3,12 @@ import util from "util";
 import path from "path";
 
 const execAsync = util.promisify(exec);
-const allExamples = ["star-wars", "githunt-api", "apollo-fullstack"];
+const allExamples = [
+  "star-wars",
+  "kitchen-sink",
+  "githunt-api",
+  "apollo-fullstack",
+];
 
 async function unlinkDir(dir: string) {
   await execAsync("rm -rf graphql", {

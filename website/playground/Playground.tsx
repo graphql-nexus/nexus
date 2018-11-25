@@ -14,7 +14,7 @@ import {
   scalarType,
   abstractType,
   directiveType,
-  buildSchemaWithMetadata,
+  makeSchemaWithMetadata,
   arg,
   intArg,
   stringArg,
@@ -333,7 +333,7 @@ function getCurrentSchema(code): SchemaOrError {
       idArg,
       booleanArg
     );
-    const { schema, metadata } = buildSchemaWithMetadata({
+    const { schema, metadata } = makeSchemaWithMetadata({
       types: cache,
       outputs: false,
     });

@@ -96,12 +96,12 @@ Abstract types may be "mixed" into concrete types using the `.mix()` method, tho
 
 It is the only object that does not have an associated "name", because there is no associated representation in the GraphQL schema.
 
-### `buildSchema(SchemaOptions)`
+### `makeSchema(SchemaOptions)`
 
-The `buildSchema` function constructs the schema. It is a wrapper over the `GraphQLSchemaType` from `graphql-js`.
+The `makeSchema` function constructs the schema. It is a wrapper over the `GraphQLSchemaType` from `graphql-js`.
 
 ```js
-const schema = buildSchema({
+const schema = makeSchema({
   types: [
     /* 
       All GQLiteral / GraphQLJS types should be provided here.

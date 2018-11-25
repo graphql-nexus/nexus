@@ -2,3 +2,4 @@ node_modules
 dist/*
 examples/*/dist
 website/static/playground-dist
+yarn-error.log

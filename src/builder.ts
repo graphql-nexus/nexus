@@ -412,7 +412,7 @@ export class SchemaBuilder {
   }
 
   protected buildObjectField(
-    fieldConfig: Types.FieldConfig,
+    fieldConfig: Types.OutputFieldConfig,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ): GraphQLFieldConfig<any, any> {
     this.metadata.addField(typeConfig.name, fieldConfig);
@@ -433,7 +433,7 @@ export class SchemaBuilder {
   }
 
   protected buildInputObjectField(
-    field: Types.FieldConfig,
+    field: Types.InputFieldConfig,
     typeConfig: Types.InputTypeConfig
   ): GraphQLInputFieldConfig {
     return {
@@ -513,19 +513,19 @@ export class SchemaBuilder {
    */
   protected decorateType(
     type: GraphQLOutputType,
-    fieldConfig: Types.Omit<Types.FieldConfig, "type">,
+    fieldConfig: Types.Omit<Types.FieldConfig, "type" | "default">,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     isInput: false
   ): GraphQLOutputType;
   protected decorateType(
     type: GraphQLInputType,
-    fieldConfig: Types.Omit<Types.FieldConfig, "type">,
+    fieldConfig: Types.Omit<Types.FieldConfig, "type" | "default">,
     typeConfig: Types.InputTypeConfig,
     isInput: true
   ): GraphQLInputType;
   protected decorateType(
     type: any,
-    fieldConfig: Types.Omit<Types.FieldConfig, "type">,
+    fieldConfig: Types.Omit<Types.FieldConfig, "type" | "default">,
     typeConfig:
       | Types.ObjectTypeConfig
       | Types.InterfaceTypeConfig
@@ -589,9 +589,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isInterfaceType(type)) {
       throw new Error(
-        `Expected ${name} to be a GraphQLInterfaceType, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be an interfaceType, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -601,7 +599,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isEnumType(type)) {
       throw new Error(
-        `Expected ${name} to be a GraphQLEnumType, saw ${type.constructor.name}`
+        `Expected ${name} to be an enumType, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -611,9 +609,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isUnionType(type)) {
       throw new Error(
-        `Expected ${name} to be a GraphQLUnionType, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a unionType, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -647,9 +643,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isObjectType(type)) {
       throw new Error(
-        `Expected ${name} to be a GraphQLObjectType, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a objectType, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -678,7 +672,7 @@ export class SchemaBuilder {
   }
 
   protected getResolver(
-    fieldOptions: Types.FieldConfig,
+    fieldOptions: Types.OutputFieldConfig,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ) {
     let resolver = typeConfig.defaultResolver || defaultFieldResolver;
@@ -724,7 +718,7 @@ function withDefaultValue(
 
 function extendError(name: string) {
   return new Error(
-    `${name} was already defined as a GraphQL type, check the docs for extending`
+    `${name} was already defined as a type, check the docs for extending`
   );
 }
 
@@ -764,7 +758,7 @@ function addTypes(builder: SchemaBuilder, types: any) {
 /**
  * Builds the schema, returning both the schema and metadata.
  */
-export function buildSchemaWithMetadata<GenTypes = GQLiteralGen>(
+export function makeSchemaWithMetadata<GenTypes = GQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
 ): { metadata: GQLiteralMetadata; schema: GraphQLSchema } {
   const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
@@ -777,14 +771,12 @@ export function buildSchemaWithMetadata<GenTypes = GQLiteralGen>(
   }
   if (Mutation && !isObjectType(Mutation)) {
     throw new Error(
-      `Expected Mutation to be a GraphQLObjectType, saw ${
-        Mutation.constructor.name
-      }`
+      `Expected Mutation to be a objectType, saw ${Mutation.constructor.name}`
     );
   }
   if (Subscription && !isObjectType(Subscription)) {
     throw new Error(
-      `Expected Subscription to be a GraphQLObjectType, saw ${
+      `Expected Subscription to be a objectType, saw ${
         Subscription.constructor.name
       }`
     );
@@ -810,10 +802,10 @@ export function buildSchemaWithMetadata<GenTypes = GQLiteralGen>(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function buildSchema<GenTypes = GQLiteralGen>(
+export function makeSchema<GenTypes = GQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
 ): GraphQLSchema {
-  const { schema, metadata } = buildSchemaWithMetadata<GenTypes>(options);
+  const { schema, metadata } = makeSchemaWithMetadata<GenTypes>(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
