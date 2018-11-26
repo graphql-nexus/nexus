@@ -104,7 +104,7 @@ The `makeSchema` function constructs the schema. It is a wrapper over the `Graph
 const schema = makeSchema({
   types: [
     /* 
-      All GQLiteral / GraphQLJS types should be provided here.
+      All GraphQLiteral / GraphQLJS types should be provided here.
     */
   ],
 });
@@ -112,7 +112,7 @@ const schema = makeSchema({
 
 ```ts
 type SchemaOptions = {
-  types: Array<GraphQLNamedType | GQLiteralType>;
+  types: Array<GraphQLNamedType | GraphQLiteralType>;
 };
 ```
 

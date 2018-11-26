@@ -1,5 +1,5 @@
 /**
- * Links examples & website to local version of gqliteral
+ * Links examples & website to local version of graphqliteral
  */
 import { exec } from "child_process";
 import util from "util";
@@ -57,7 +57,7 @@ async function linkAll() {
 
 linkAll()
   .then(() => {
-    console.log("All examples using local gqliteral");
+    console.log("All examples using local graphqliteral");
   })
   .catch((e) => {
     console.error(e);

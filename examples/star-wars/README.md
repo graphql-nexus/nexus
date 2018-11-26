@@ -1,6 +1,6 @@
-# GQLiteral Star Wars:
+# GraphQLiteral Star Wars:
 
-This is meant to demonstrate some of the features of GQLiteral.
+This is meant to demonstrate some of the features of GraphQLiteral.
 
 ### Changes from the graphql-js example:
 

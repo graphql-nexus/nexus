@@ -34,15 +34,15 @@ import {
   isUnionType,
   GraphQLSchema,
 } from "graphql";
-import { GQLiteralMetadata } from "./metadata";
+import { GraphQLiteralMetadata } from "./metadata";
 import {
-  GQLiteralAbstractType,
-  GQLiteralDirectiveType,
-  GQLiteralObjectType,
-  GQLiteralInputObjectType,
-  GQLiteralEnumType,
-  GQLiteralUnionType,
-  GQLiteralInterfaceType,
+  GraphQLiteralAbstractType,
+  GraphQLiteralDirectiveType,
+  GraphQLiteralObjectType,
+  GraphQLiteralInputObjectType,
+  GraphQLiteralEnumType,
+  GraphQLiteralUnionType,
+  GraphQLiteralInterfaceType,
 } from "./core";
 import * as Types from "./types";
 import { propertyFieldResolver, suggestionList, objValues } from "./utils";
@@ -90,22 +90,22 @@ export class SchemaBuilder {
   protected definedTypeMap: Record<string, GraphQLNamedType> = {};
   /**
    * The "pending type" map keeps track of all types that were defined w/
-   * GQLiteral and haven't been processed into concrete types yet.
+   * GraphQLiteral and haven't been processed into concrete types yet.
    */
-  protected pendingTypeMap: Record<string, Types.GQLiteralNamedType> = {};
+  protected pendingTypeMap: Record<string, Types.GraphQLiteralNamedType> = {};
 
   protected pendingDirectiveMap: Record<
     string,
-    GQLiteralDirectiveType<any>
+    GraphQLiteralDirectiveType<any>
   > = {};
   protected directiveMap: Record<string, GraphQLDirective> = {};
 
   constructor(
-    protected metadata: GQLiteralMetadata,
+    protected metadata: GraphQLiteralMetadata,
     protected nullability: Types.NullabilityConfig = {}
   ) {}
 
-  addType(typeDef: Types.GQLiteralNamedType | GraphQLNamedType) {
+  addType(typeDef: Types.GraphQLiteralNamedType | GraphQLNamedType) {
     const existingType =
       this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
     if (existingType) {
@@ -124,7 +124,7 @@ export class SchemaBuilder {
     }
   }
 
-  addDirective(directiveDef: GQLiteralDirectiveType<any> | GraphQLDirective) {
+  addDirective(directiveDef: GraphQLiteralDirectiveType<any> | GraphQLDirective) {
     if (isDirective(directiveDef)) {
       this.directiveMap[directiveDef.name] = directiveDef;
     } else {
@@ -280,7 +280,7 @@ export class SchemaBuilder {
     });
     if (!Object.keys(values).length) {
       throw new Error(
-        `GQLiteral: Enum ${config.name} must have at least one member`
+        `GraphQLiteral: Enum ${config.name} must have at least one member`
       );
     }
     return values;
@@ -313,7 +313,7 @@ export class SchemaBuilder {
     });
     if (!Object.keys(unionMembers).length) {
       throw new Error(
-        `GQLiteral: Union ${config.name} must have at least one member type`
+        `GraphQLiteral: Union ${config.name} must have at least one member type`
       );
     }
     return unionMembers;
@@ -378,7 +378,7 @@ export class SchemaBuilder {
   protected mixAbstractOuput(
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     fieldMap: GraphQLFieldConfigMap<any, any>,
-    type: GQLiteralAbstractType<any>,
+    type: GraphQLiteralAbstractType<any>,
     { pick, omit }: Types.MixOpts<any>
   ) {
     const { fields } = type.buildType();
@@ -396,7 +396,7 @@ export class SchemaBuilder {
   protected mixAbstractInput(
     typeConfig: Types.InputTypeConfig,
     fieldMap: GraphQLInputFieldConfigMap,
-    type: GQLiteralAbstractType<any>,
+    type: GraphQLiteralAbstractType<any>,
     { pick, omit }: Types.MixOpts<any>
   ) {
     const { fields } = type.buildType();
@@ -658,7 +658,7 @@ export class SchemaBuilder {
     }
     if (this.buildingTypes.has(name)) {
       throw new Error(
-        `GQLiteral: Circular dependency detected, while building types ${Array.from(
+        `GraphQLiteral: Circular dependency detected, while building types ${Array.from(
           this.buildingTypes
         )}`
       );
@@ -734,7 +734,7 @@ export function buildTypes<
   types: any,
   config: Types.Omit<Types.SchemaConfig<any>, "types"> = { outputs: false }
 ): Types.BuildTypes<TypeMapDefs, DirectiveDefs> {
-  const metadata = new GQLiteralMetadata(config);
+  const metadata = new GraphQLiteralMetadata(config);
   const builder = new SchemaBuilder(metadata, config.nullability);
   addTypes(builder, types);
   return builder.getFinalTypeMap();
@@ -744,9 +744,9 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
-  if (isGQLiteralNamedType(types) || isNamedType(types)) {
+  if (isGraphQLiteralNamedType(types) || isNamedType(types)) {
     builder.addType(types);
-  } else if (types instanceof GQLiteralDirectiveType || isDirective(types)) {
+  } else if (types instanceof GraphQLiteralDirectiveType || isDirective(types)) {
     builder.addDirective(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));
@@ -758,9 +758,9 @@ function addTypes(builder: SchemaBuilder, types: any) {
 /**
  * Builds the schema, returning both the schema and metadata.
  */
-export function makeSchemaWithMetadata<GenTypes = GQLiteralGen>(
+export function makeSchemaWithMetadata<GenTypes = GraphQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
-): { metadata: GQLiteralMetadata; schema: GraphQLSchema } {
+): { metadata: GraphQLiteralMetadata; schema: GraphQLSchema } {
   const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
     options.types,
     options
@@ -797,12 +797,12 @@ export function makeSchemaWithMetadata<GenTypes = GQLiteralGen>(
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the GQLiteral layer or any manually defined GraphQLType objects.
+ * by the GraphQLiteral layer or any manually defined GraphQLType objects.
  *
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema<GenTypes = GQLiteralGen>(
+export function makeSchema<GenTypes = GraphQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
 ): GraphQLSchema {
   const { schema, metadata } = makeSchemaWithMetadata<GenTypes>(options);
@@ -814,20 +814,24 @@ export function makeSchema<GenTypes = GQLiteralGen>(
   } = options;
 
   if (shouldGenerateArtifacts) {
-    metadata.generateArtifacts(schema);
+    // Generating in the next tick allows us to use the schema
+    // in the optional thunk for the typegen config
+    process.nextTick(() => {
+      metadata.generateArtifacts(schema);
+    });
   }
 
   return schema;
 }
 
-export function isGQLiteralNamedType(
+export function isGraphQLiteralNamedType(
   obj: any
-): obj is Types.GQLiteralNamedType {
+): obj is Types.GraphQLiteralNamedType {
   return (
-    obj instanceof GQLiteralObjectType ||
-    obj instanceof GQLiteralInputObjectType ||
-    obj instanceof GQLiteralEnumType ||
-    obj instanceof GQLiteralUnionType ||
-    obj instanceof GQLiteralInterfaceType
+    obj instanceof GraphQLiteralObjectType ||
+    obj instanceof GraphQLiteralInputObjectType ||
+    obj instanceof GraphQLiteralEnumType ||
+    obj instanceof GraphQLiteralUnionType ||
+    obj instanceof GraphQLiteralInterfaceType
   );
 }

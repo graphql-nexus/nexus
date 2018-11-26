@@ -6,7 +6,7 @@ const {
   arg,
   abstractType,
   directiveType,
-} = require("gqliteral");
+} = require("graphqliteral");
 
 exports.CacheControl = directiveType("cacheControl", (t) => {
   t.int("maxAge");

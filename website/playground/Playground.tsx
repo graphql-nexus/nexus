@@ -79,7 +79,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   const [schemaError, setSchemaError] = useState<Error | null>(null);
   const [activeSchema, setActiveSchema] = useState<{
     schema: GraphQLSchema;
-    metadata: core.GQLiteralMetadata;
+    metadata: core.GraphQLiteralMetadata;
   } | null>(null);
 
   const printedSchema = useMemo(
@@ -264,7 +264,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 };
 
 type SchemaOrError =
-  | { schema: GraphQLSchema; metadata: core.GQLiteralMetadata; error: null }
+  | { schema: GraphQLSchema; metadata: core.GraphQLiteralMetadata; error: null }
   | { schema: null; metadata: null; error: Error };
 
 function getCurrentSchema(code): SchemaOrError {

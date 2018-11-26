@@ -8,21 +8,21 @@ import {
   GraphQLDirective,
 } from "graphql";
 import {
-  GQLiteralAbstractType,
-  GQLiteralObjectType,
-  GQLiteralInputObjectType,
-  GQLiteralInterfaceType,
-  GQLiteralEnumType,
-  GQLiteralUnionType,
+  GraphQLiteralAbstractType,
+  GraphQLiteralObjectType,
+  GraphQLiteralInputObjectType,
+  GraphQLiteralInterfaceType,
+  GraphQLiteralEnumType,
+  GraphQLiteralUnionType,
 } from "./core";
-import { GQLiteralMetadata } from "./metadata";
+import { GraphQLiteralMetadata } from "./metadata";
 
-export type GQLiteralNamedType =
-  | GQLiteralObjectType
-  | GQLiteralInputObjectType
-  | GQLiteralInterfaceType
-  | GQLiteralEnumType
-  | GQLiteralUnionType;
+export type GraphQLiteralNamedType =
+  | GraphQLiteralObjectType
+  | GraphQLiteralInputObjectType
+  | GraphQLiteralInterfaceType
+  | GraphQLiteralEnumType
+  | GraphQLiteralUnionType;
 
 export enum NodeType {
   MIX = "MIX",
@@ -50,7 +50,7 @@ export type MixDef = {
 
 export type MixAbstractDef = {
   item: NodeType.MIX_ABSTRACT;
-  type: GQLiteralAbstractType<any>;
+  type: GraphQLiteralAbstractType<any>;
   mixOptions: MixOpts<any>;
 };
 
@@ -97,7 +97,7 @@ export interface BuildTypes<
   DirectiveDefs extends Record<string, GraphQLDirective>
 > {
   typeMap: TypeMapDefs;
-  metadata: GQLiteralMetadata;
+  metadata: GraphQLiteralMetadata;
   directiveMap: DirectiveDefs;
 }
 

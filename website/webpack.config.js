@@ -14,7 +14,7 @@ module.exports = {
     playground: "./playground/index.tsx",
   },
   output: {
-    publicPath: "/gqliteral/playground-dist/",
+    publicPath: "/graphqliteral/playground-dist/",
     filename: "[name].js",
     path: __dirname + "/static/playground-dist",
   },

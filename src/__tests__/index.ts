@@ -133,7 +133,7 @@ describe("gqlit", () => {
       expect(() => {
         buildTypes([CircularRefTestA, CircularRefTestB]);
       }).toThrowError(
-        "GQLiteral: Circular dependency detected, while building types"
+        "GraphQLiteral: Circular dependency detected, while building types"
       );
     });
   });

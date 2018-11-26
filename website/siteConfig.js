@@ -1,25 +1,24 @@
 // List of projects/orgs using your project for the users page.
-// const users = [
-//   {
-//     caption: "User1",
-//     // You will need to prepend the image path with your baseUrl
-//     // if it is not '/', like: '/test-site/img/docusaurus.svg'.
-//     image: "/img/docusaurus.svg",
-//     infoLink: "https://www.facebook.com",
-//     pinned: true,
-//   },
-// ];
+const users = [
+  {
+    caption: "Prisma",
+    // You will need to prepend the image path with your baseUrl
+    image: "img/prisma.png",
+    infoLink: "https://www.prisma.io/",
+    pinned: true,
+  },
+];
 
 const siteConfig = {
-  title: "GQLiteral", // Title for your website.
+  title: "GraphQLiteral", // Title for your website.
   tagline:
     "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
   // url: "https://tgriesser.com", // Your website URL
-  baseUrl: "/gqliteral/", // Base URL for your project */
+  baseUrl: "/graphqliteral/", // Base URL for your project */
   noIndex: true,
 
   // Used for publishing and more
-  projectName: "gqliteral",
+  projectName: "graphqliteral",
   organizationName: "tgriesser",
 
   // For no header links in the top nav bar -> headerLinks: [],
@@ -35,8 +34,8 @@ const siteConfig = {
   // users,
 
   /* path to images for header/footer */
-  // headerIcon: "img/docusaurus.svg",
-  // footerIcon: "img/docusaurus.svg",
+  headerIcon: "img/graphqliteral.png",
+  footerIcon: "img/graphqliteral.png",
   favicon: "img/favicon.png",
 
   /* Colors for website */
@@ -71,10 +70,10 @@ const siteConfig = {
   scripts: [
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
-    "/gqliteral/js/code-block-buttons.js",
-    "/gqliteral/js/code-block-toggle.js",
+    "/graphqliteral/js/code-block-buttons.js",
+    "/graphqliteral/js/code-block-toggle.js",
   ],
-  stylesheets: ["/gqliteral/css/code-block-buttons.css"],
+  stylesheets: ["/graphqliteral/css/code-block-buttons.css"],
 
   // On page navigation for the current documentation page.
   onPageNav: "separate",
@@ -95,6 +94,8 @@ const siteConfig = {
   // template. For example, if you need your repo's URL...
   //   repoUrl: 'https://github.com/facebook/test-site',
   separateCss: ["static/separate-css"],
+
+  users,
 };
 
 module.exports = siteConfig;

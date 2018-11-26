@@ -4,7 +4,7 @@
  * By default this will regenerate when the server is started
  * and NODE_ENV !== "production".
  *
- * Mostly for internal use by GQLiteral unless otherwise
+ * Mostly for internal use by GraphQLiteral unless otherwise
  * documented / subject to change.
  *
  * If you want more configurable types to use elsewhere, look into one of:
@@ -225,7 +225,7 @@ export type VoteType = "CANCEL" | "DOWN" | "UP";
 
 export type CacheControlScope = "PRIVATE" | "PUBLIC";
 
-export interface GQLiteralGenArgTypes {
+export interface GraphQLiteralGenArgTypes {
   Query: {
     entry: QueryEntryArgs;
     feed: QueryFeedArgs;
@@ -240,7 +240,7 @@ export interface GQLiteralGenArgTypes {
   };
 }
 
-export interface GQLiteralGenRootTypes {
+export interface GraphQLiteralGenRootTypes {
   Query: QueryRootType;
   User: UserRootType;
   Entry: EntryRootType;
@@ -250,7 +250,7 @@ export interface GQLiteralGenRootTypes {
   Mutation: MutationRootType;
 }
 
-export interface GQLiteralGenReturnTypes {
+export interface GraphQLiteralGenReturnTypes {
   Query: {
     currentUser: QueryCurrentUserReturnType;
     entry: QueryEntryReturnType;
@@ -298,10 +298,10 @@ export interface GQLiteralGenReturnTypes {
   };
 }
 
-export interface GQLiteralGenTypes {
-  argTypes: GQLiteralGenArgTypes;
-  rootTypes: GQLiteralGenRootTypes;
-  returnTypes: GQLiteralGenReturnTypes;
+export interface GraphQLiteralGenTypes {
+  argTypes: GraphQLiteralGenArgTypes;
+  rootTypes: GraphQLiteralGenRootTypes;
+  returnTypes: GraphQLiteralGenReturnTypes;
   context: any;
   enums: {
     FeedType: FeedType;
@@ -327,19 +327,19 @@ export interface GQLiteralGenTypes {
   };
   inputObjects: {};
   allInputTypes:
-    | Extract<keyof GQLiteralGenTypes["inputObjects"], string>
-    | Extract<keyof GQLiteralGenTypes["enums"], string>
-    | Extract<keyof GQLiteralGenTypes["scalars"], string>;
+    | Extract<keyof GraphQLiteralGenTypes["inputObjects"], string>
+    | Extract<keyof GraphQLiteralGenTypes["enums"], string>
+    | Extract<keyof GraphQLiteralGenTypes["scalars"], string>;
   allOutputTypes:
-    | Extract<keyof GQLiteralGenTypes["objects"], string>
-    | Extract<keyof GQLiteralGenTypes["enums"], string>
-    | Extract<keyof GQLiteralGenTypes["unions"], string>
-    | Extract<keyof GQLiteralGenTypes["interfaces"], string>
-    | Extract<keyof GQLiteralGenTypes["scalars"], string>;
+    | Extract<keyof GraphQLiteralGenTypes["objects"], string>
+    | Extract<keyof GraphQLiteralGenTypes["enums"], string>
+    | Extract<keyof GraphQLiteralGenTypes["unions"], string>
+    | Extract<keyof GraphQLiteralGenTypes["interfaces"], string>
+    | Extract<keyof GraphQLiteralGenTypes["scalars"], string>;
 }
 
-export type Gen = GQLiteralGenTypes;
+export type Gen = GraphQLiteralGenTypes;
 
 declare global {
-  interface GQLiteralGen extends GQLiteralGenTypes {}
+  interface GraphQLiteralGen extends GraphQLiteralGenTypes {}
 }

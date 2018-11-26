@@ -37,7 +37,7 @@ export interface DirectiveUse {
  * - The property name of the field
  * - If the field has a "default" value
  */
-export class GQLiteralMetadata {
+export class GraphQLiteralMetadata {
   protected completed = false;
   protected objectMeta: Record<string, Types.ObjectTypeConfig> = {};
   protected interfaceMeta: Record<string, Types.InterfaceTypeConfig> = {};
@@ -286,7 +286,7 @@ export class GQLiteralMetadata {
   writeFile(name: string, output: string, filePath: string) {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
       throw new Error(
-        `Expected an absolute path to output the GQLiteral ${name}, saw ${filePath}`
+        `Expected an absolute path to output the GraphQLiteral ${name}, saw ${filePath}`
       );
     }
     const fs = require("fs") as typeof import("fs");

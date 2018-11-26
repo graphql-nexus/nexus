@@ -1,5 +1,5 @@
 {
-  "name": "gqliteral-githunt-api",
+  "name": "@graphqliteral/example-githunt-api",
   "dependencies": {
     "gqliteral": "^0.2.0",
     "graphql": "^14.0.2",

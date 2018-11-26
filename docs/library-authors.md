@@ -7,11 +7,11 @@ sidebar_label: Library Authors
 ## Wrapping the API
 
 If you are a library author building tools for GraphQL, we expose the core types
-It is recommended that you have `gqliteral` specified as a peer dependency rather
+It is recommended that you have `graphqliteral` specified as a peer dependency rather
 than a direct dependency of your wrapping plugin, so duplicate copies of the library are
 not installed.
 
-One example of this pattern is in `gqliteral-contrib` where functions for creating relay-style connections are constructed:
+One example of this pattern is in `graphqliteral-contrib` where functions for creating relay-style connections are constructed:
 
 ```ts
 export const UserConnectionTypes = connectionType("User");
@@ -20,12 +20,12 @@ export const UserConnectionTypes = connectionType("User");
 Where `connectionType` is really just a wrapper creating two `objectType`:
 
 ```ts
-import { core } from './gqliteral';
+import { core } from './graphqliteral';
 
 interface ConnectionConfigFn {
   (
-    connection: core.Types.GQLiteralObjectType,
-    edge: core.Types.GQLiteralObjectType
+    connection: core.Types.GraphQLiteralObjectType,
+    edge: core.Types.GraphQLiteralObjectType
   ) => void;
 }
 

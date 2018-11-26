@@ -3,7 +3,7 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript",
+    "tagline": "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
     "docs": {
       "api-reference": {
         "title": "API Reference",
@@ -18,7 +18,7 @@
         "sidebar_label": "FAQ"
       },
       "getting-started": {
-        "title": "GQLiteral",
+        "title": "GraphQLiteral",
         "sidebar_label": "Getting Started"
       },
       "library-authors": {

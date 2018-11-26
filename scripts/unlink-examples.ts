@@ -43,7 +43,7 @@ async function unlinkExamples() {
 
 unlinkExamples()
   .then(() => {
-    console.log("All examples using published gqliteral");
+    console.log("All examples using published graphqliteral");
   })
   .catch((e) => {
     console.error(e);

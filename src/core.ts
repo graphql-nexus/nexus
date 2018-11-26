@@ -10,31 +10,31 @@ import {
   assertValidName,
 } from "graphql";
 import { addMix, dedent } from "./utils";
-import { SchemaBuilder, isGQLiteralNamedType } from "./builder";
+import { SchemaBuilder, isGraphQLiteralNamedType } from "./builder";
 import { arg } from "./definitions";
-import { GQLiteralMetadata } from "./metadata";
+import { GraphQLiteralMetadata } from "./metadata";
 
 // Export the ts definitions so they can be used by library authors under `core.Types`
 export { Types };
 
 // Same as above, export all core things under the "core" namespace
-export { SchemaBuilder, isGQLiteralNamedType, GQLiteralMetadata };
+export { SchemaBuilder, isGraphQLiteralNamedType, GraphQLiteralMetadata };
 
 declare global {
-  interface GQLiteralGen {}
+  interface GraphQLiteralGen {}
 }
 
-export type GQLiteralNamedType =
-  | GQLiteralEnumType<any>
-  | GQLiteralObjectType<any, any>
-  | GQLiteralInterfaceType<any, any>
-  | GQLiteralUnionType<any, any>
-  | GQLiteralInputObjectType<any>;
+export type GraphQLiteralNamedType =
+  | GraphQLiteralEnumType<any>
+  | GraphQLiteralObjectType<any, any>
+  | GraphQLiteralInterfaceType<any, any>
+  | GraphQLiteralUnionType<any, any>
+  | GraphQLiteralInputObjectType<any>;
 
 /**
  * Backing type for an enum member.
  */
-export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
+export class GraphQLiteralEnumType<GenTypes = GraphQLiteralGen> {
   protected typeConfig: Types.EnumTypeConfig;
 
   constructor(readonly name: string) {
@@ -107,7 +107,7 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
    * Internal use only. Creates the configuration to create
    * the GraphQL named type.
    *
-   * The GQLiteralEnumType requires the typeData arg because it
+   * The GraphQLiteralEnumType requires the typeData arg because it
    * needs to synchronously return and therefore must check for / break
    * circular references when mixing.
    */
@@ -116,8 +116,8 @@ export class GQLiteralEnumType<GenTypes = GQLiteralGen> {
   }
 }
 
-export class GQLiteralUnionType<
-  GenTypes = GQLiteralGen,
+export class GraphQLiteralUnionType<
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 > {
   protected typeConfig: Types.UnionTypeConfig;
@@ -179,7 +179,7 @@ export class GQLiteralUnionType<
   }
 }
 
-abstract class FieldsArgs<GenTypes = GQLiteralGen> {
+abstract class FieldsArgs<GenTypes = GraphQLiteralGen> {
   idArg(options?: Types.ArgOpts) {
     return arg("ID", options);
   }
@@ -205,8 +205,8 @@ abstract class FieldsArgs<GenTypes = GQLiteralGen> {
   }
 }
 
-export class GQLiteralObjectType<
-  GenTypes = GQLiteralGen,
+export class GraphQLiteralObjectType<
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 > extends FieldsArgs<GenTypes> {
   /**
@@ -230,7 +230,7 @@ export class GQLiteralObjectType<
    * with the current type.
    */
   mix(
-    typeName: string | GQLiteralAbstractType<GenTypes>,
+    typeName: string | GraphQLiteralAbstractType<GenTypes>,
     mixOptions?: Types.MixOpts<any>
   ) {
     addMix(this.typeConfig, typeName, mixOptions);
@@ -387,7 +387,7 @@ export class GQLiteralObjectType<
    * to the shape of the type.
    *
    * Note: This value can also be set when building the schema via
-   * the "rootTypes" option to `GQLiteralSchema`
+   * the "rootTypes" option to `GraphQLiteralSchema`
    */
   rootType(typeImport: string | Types.ImportedType) {
     this.typeConfig.rootType = typeImport;
@@ -402,8 +402,8 @@ export class GQLiteralObjectType<
   }
 }
 
-export class GQLiteralInterfaceType<
-  GenTypes = GQLiteralGen,
+export class GraphQLiteralInterfaceType<
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 > {
   /**
@@ -424,7 +424,7 @@ export class GQLiteralInterfaceType<
    * with the current type.
    */
   mix(
-    typeName: string | GQLiteralAbstractType<GenTypes>,
+    typeName: string | GraphQLiteralAbstractType<GenTypes>,
     mixOptions?: Types.MixOpts<any>
   ) {
     addMix(this.typeConfig, typeName, mixOptions);
@@ -546,8 +546,8 @@ export class GQLiteralInterfaceType<
   }
 }
 
-export class GQLiteralInputObjectType<
-  GenTypes = GQLiteralGen,
+export class GraphQLiteralInputObjectType<
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 > {
   protected typeConfig: Types.InputTypeConfig;
@@ -651,13 +651,7 @@ export class GQLiteralInputObjectType<
   }
 }
 
-/**
- * A `GQLiteralAbstractType` contains fields that can be shared among `GQLiteralObjectType`,
- * `GQLiteralInterface`, `GQLiteralInputObjectType` or other `GQLiteralAbstractType`s
- *
- * Use the `.mix` to mixin the abstract type fields.
- */
-export class GQLiteralAbstractType<GenTypes> extends FieldsArgs {
+export class GraphQLiteralAbstractType<GenTypes> extends FieldsArgs {
   protected typeConfig: Types.AbstractTypeConfig;
 
   constructor() {
@@ -737,7 +731,7 @@ export class GQLiteralAbstractType<GenTypes> extends FieldsArgs {
   }
 }
 
-export class GQLiteralDirectiveType<GenTypes = GQLiteralGen> {
+export class GraphQLiteralDirectiveType<GenTypes = GraphQLiteralGen> {
   protected typeConfig: Types.DirectiveTypeConfig;
 
   constructor(readonly name: string) {

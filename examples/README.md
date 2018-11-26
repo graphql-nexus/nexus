@@ -1,4 +1,4 @@
-# GQLiteral Examples
+# GraphQLiteral Examples
 
 ### JavaScript:
 

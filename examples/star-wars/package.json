@@ -1,5 +1,5 @@
 {
-  "name": "gqliteral-swapi-example",
+  "name": "@graphqliteral/example-swapi-example",
   "version": "0.0.0",
   "scripts": {
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"

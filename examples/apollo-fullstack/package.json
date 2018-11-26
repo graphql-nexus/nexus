@@ -1,5 +1,5 @@
 {
-  "name": "gqliteral-fullstack-tutorial-server",
+  "name": "@graphqliteral/example-fullstack-tutorial-server",
   "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",

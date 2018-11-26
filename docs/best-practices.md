@@ -4,7 +4,7 @@ title: Best Practices
 sidebar_label: Best Practices
 ---
 
-A few tips when using GQLiteral to build out a schema
+A few tips when using GraphQLiteral to build out a schema
 
 ## Consistent file structure for GraphQL type imports
 

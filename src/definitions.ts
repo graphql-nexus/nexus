@@ -1,12 +1,12 @@
 import { assertValidName, GraphQLScalarType, GraphQLSchema } from "graphql";
 import {
-  GQLiteralAbstractType,
-  GQLiteralDirectiveType,
-  GQLiteralEnumType,
-  GQLiteralInputObjectType,
-  GQLiteralInterfaceType,
-  GQLiteralObjectType,
-  GQLiteralUnionType,
+  GraphQLiteralAbstractType,
+  GraphQLiteralDirectiveType,
+  GraphQLiteralEnumType,
+  GraphQLiteralInputObjectType,
+  GraphQLiteralInterfaceType,
+  GraphQLiteralObjectType,
+  GraphQLiteralUnionType,
 } from "./core";
 import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
@@ -19,13 +19,13 @@ export function scalarType(name: string, options: Types.ScalarOpts) {
 }
 
 /**
- * Defines a GQLiteral representation of a GraphQL Object.
+ * Defines a GraphQLiteral representation of a GraphQL Object.
  */
 export function objectType<
-  GenTypes = GQLiteralGen,
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GQLiteralObjectType<GenTypes, TypeName>) => void) {
-  const factory = new GQLiteralObjectType<GenTypes, TypeName>(
+>(name: TypeName, fn: (arg: GraphQLiteralObjectType<GenTypes, TypeName>) => void) {
+  const factory = new GraphQLiteralObjectType<GenTypes, TypeName>(
     assertValidName(name)
   );
   fn(factory);
@@ -33,16 +33,16 @@ export function objectType<
 }
 
 /**
- * Define a GQLiteral representation of a GraphQL interface type.
+ * Define a GraphQLiteral representation of a GraphQL interface type.
  */
 export function interfaceType<
-  GenTypes = GQLiteralGen,
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 >(
   name: TypeName,
-  fn: (arg: GQLiteralInterfaceType<GenTypes, TypeName>) => void
+  fn: (arg: GraphQLiteralInterfaceType<GenTypes, TypeName>) => void
 ) {
-  const factory = new GQLiteralInterfaceType<GenTypes, TypeName>(
+  const factory = new GraphQLiteralInterfaceType<GenTypes, TypeName>(
     assertValidName(name)
   );
   fn(factory);
@@ -53,24 +53,24 @@ export function interfaceType<
  * Union types are very similar to interfaces, but they don't get to specify
  * any common fields between the types.
  *
- * There are two ways to create a GraphQLUnionType with GQLiteralUnion:
+ * There are two ways to create a GraphQLUnionType with GraphQLiteralUnion:
  *
  * As an array of types to satisfy the union:
  *
- * const SearchResult = GQLiteralUnion('SearchResult', ['Human', 'Droid', 'Starship'])
+ * const SearchResult = GraphQLiteralUnion('SearchResult', ['Human', 'Droid', 'Starship'])
  *
  * As a function, where other unions can be mixed in:
  *
- * const CombinedResult = GQLiteralUnion('CombinedResult', t => {
+ * const CombinedResult = GraphQLiteralUnion('CombinedResult', t => {
  *   t.mix('SearchResult')
  *   t.members('OtherType', 'AnotherType')
  * })
  */
 export function unionType<
-  GenTypes = GQLiteralGen,
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GQLiteralUnionType<GenTypes, TypeName>) => void) {
-  const factory = new GQLiteralUnionType<GenTypes>(assertValidName(name));
+>(name: TypeName, fn: (arg: GraphQLiteralUnionType<GenTypes, TypeName>) => void) {
+  const factory = new GraphQLiteralUnionType<GenTypes>(assertValidName(name));
   fn(factory);
   return factory;
 }
@@ -78,15 +78,15 @@ export function unionType<
 /**
  * A Enum is a special GraphQL type that represents a set of symbolic names (members)
  * bound to unique, constant values. There are three ways to create a GraphQLEnumType
- * with GQLiteralEnum:
+ * with GraphQLiteralEnum:
  *
  * As an array of enum values:
  *
- * const Episode = GQLiteralEnum('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
+ * const Episode = GraphQLiteralEnum('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
  *
  * As an object, with a mapping of enum values to internal values:
  *
- * const Episode = GQLiteralEnum('Episode', {
+ * const Episode = GraphQLiteralEnum('Episode', {
  *   NEWHOPE: 4,
  *   EMPIRE: 5,
  *   JEDI: 6
@@ -94,7 +94,7 @@ export function unionType<
  *
  * As a function, where other enums can be mixed in:
  *
- * const Episode = GQLiteralEnum('Episode', (t) => {
+ * const Episode = GraphQLiteralEnum('Episode', (t) => {
  *   t.mix('OneThroughThree')
  *   t.mix('FourThroughSix')
  *   t.mix('SevenThroughNine')
@@ -103,16 +103,16 @@ export function unionType<
  * })
  */
 export function enumType<
-  GenTypes = GQLiteralGen,
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 >(
   name: TypeName,
   fn:
-    | ((arg: GQLiteralEnumType<GenTypes>) => void)
+    | ((arg: GraphQLiteralEnumType<GenTypes>) => void)
     | string[]
     | Record<string, string | number | object | boolean>
 ) {
-  const factory = new GQLiteralEnumType<GenTypes>(assertValidName(name));
+  const factory = new GraphQLiteralEnumType<GenTypes>(assertValidName(name));
   if (typeof fn === "function") {
     fn(factory);
   } else {
@@ -125,31 +125,29 @@ export function enumType<
  *
  */
 export function inputObjectType<
-  GenTypes = GQLiteralGen,
+  GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GQLiteralInputObjectType<GenTypes>) => void) {
-  const factory = new GQLiteralInputObjectType<GenTypes>(assertValidName(name));
+>(name: TypeName, fn: (arg: GraphQLiteralInputObjectType<GenTypes>) => void) {
+  const factory = new GraphQLiteralInputObjectType<GenTypes>(assertValidName(name));
   fn(factory);
   return factory;
 }
 
 /**
- * A `GQLiteralAbstractType` object contains fields that can be shared among
- * `GQLiteralObject`, `GQLiteralInterface`, `GQLiteralInputObject` or other `GQLiteralAbstractType` types.
+ * A `abstractType` object contains fields that can be shared among
+ * `GraphQLiteralObject`, `GraphQLiteralInterface`, `GraphQLiteralInputObject` or other `abstractType` types.
  *
  * Unlike concrete GraphQL types (types that show up in the generated schema),
- * GQLiteralAbstractType types must be mixed in using the actual JS object returned by this
+ * abstractType types must be mixed in using the actual JS object returned by this
  * function rather than a string "name" representing the type.
  *
- * If an AbstractType is mixed into a `GQLiteralInputObject` type, the `args` and
+ * If an AbstractType is mixed into a `GraphQLiteralInputObject` type, the `args` and
  * `resolver` fields are ignored.
- *
- * @return GQLiteralAbstractType
  */
-export function abstractType<GenTypes = GQLiteralGen>(
-  fn: (arg: GQLiteralAbstractType<GenTypes>) => void
+export function abstractType<GenTypes = GraphQLiteralGen>(
+  fn: (arg: GraphQLiteralAbstractType<GenTypes>) => void
 ) {
-  const factory = new GQLiteralAbstractType<GenTypes>();
+  const factory = new GraphQLiteralAbstractType<GenTypes>();
   fn(factory);
   // This is not wrapped in a type, since it's not actually a concrete (named) type.
   return factory;
@@ -160,7 +158,7 @@ export function abstractType<GenTypes = GQLiteralGen>(
  * This is also exposed during type definition as shorthand via the various
  * `__Arg` methods: `fieldArg`, `stringArg`, `intArg`, etc.
  */
-export function arg<GenTypes = GQLiteralGen>(
+export function arg<GenTypes = GraphQLiteralGen>(
   type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
   options?: Types.ArgOpts
 ): Readonly<Types.ArgDefinition> {
@@ -187,15 +185,15 @@ export const booleanArg = (options?: Types.ArgOpts) => arg("Boolean", options);
  * be rarely used, as they only function for external consumers of the schema.
  */
 export function directiveType<
-  GenTypes = GQLiteralGen,
+  GenTypes = GraphQLiteralGen,
   DirectiveName extends string = any
 >(
   name: DirectiveName,
   config:
     | Types.DirectiveConfig<GenTypes, DirectiveName>
-    | ((arg: GQLiteralDirectiveType<GenTypes>) => void)
+    | ((arg: GraphQLiteralDirectiveType<GenTypes>) => void)
 ) {
-  const directive = new GQLiteralDirectiveType<GenTypes>(assertValidName(name));
+  const directive = new GraphQLiteralDirectiveType<GenTypes>(assertValidName(name));
   if (typeof config === "function") {
     config(directive);
   } else {

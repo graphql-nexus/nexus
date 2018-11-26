@@ -73,8 +73,8 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
-            <Button href={pageUrl("blog/2018/11/04/introducing-gqliteral")}>
-              Why GQLiteral?
+            <Button href={pageUrl("blog/2018/11/04/introducing-graphqliteral")}>
+              Why GraphQLiteral?
             </Button>
             <Button href={docUrl("doc2.html", language)}>API Docs</Button>
             <Button href={docUrl("getting-started.html", language)}>
@@ -101,16 +101,23 @@ const Features = () => (
   <Block layout="fourColumn">
     {[
       {
-        content: "This is the content of my feature",
-        image: imgUrl("docusaurus.svg"),
+        content:
+          "Utilize the full features of the language when building your schema",
+        image: imgUrl("graphqliteral.png"),
         imageAlign: "top",
         title: "Feature One",
       },
       {
         content: "The content of my second feature",
-        image: imgUrl("docusaurus.svg"),
+        image: imgUrl("graphqliteral.png"),
         imageAlign: "top",
-        title: "Feature Two",
+        title: "Type-Safe by Default",
+      },
+      {
+        content: "The content of my second feature",
+        image: imgUrl("graphqliteral.png"),
+        imageAlign: "top",
+        title: "Type-Safe by Default",
       },
     ]}
   </Block>
@@ -143,7 +150,7 @@ const TryOut = () => (
     {[
       {
         content: "Talk about trying this out",
-        image: imgUrl("docusaurus.svg"),
+        image: imgUrl("graphqliteral.png"),
         imageAlign: "left",
         title: "Try it Out",
       },
@@ -156,7 +163,7 @@ const Description = () => (
     {[
       {
         content: "This is another description of how this project is useful",
-        image: imgUrl("docusaurus.svg"),
+        image: imgUrl("graphqliteral.png"),
         imageAlign: "right",
         title: "Description",
       },
@@ -198,12 +205,12 @@ class Index extends React.Component {
       <div>
         <HomeSplash language={language} />
         <div className="mainContainer">
-          {/* <Features /> */}
+          <Features />
           <FeatureCallout />
           <LearnHow />
           <TryOut />
           <Description />
-          {/* <Showcase language={language} /> */}
+          <Showcase language={language} />
         </div>
       </div>
     );

@@ -60,24 +60,24 @@ files.forEach((file, i) => {
 
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
   `
-import * as gqliteral from 'gqliteral'
+import * as graphqliteral from 'gqliteral'
 
 // Re-export these so we can use globally in the sandbox
 // while still preserving the typegen
 declare global {
-  declare const arg: typeof gqliteral.arg;
-  declare const intArg: typeof gqliteral.intArg;
-  declare const stringArg: typeof gqliteral.stringArg;
-  declare const floatArg: typeof gqliteral.floatArg;
-  declare const idArg: typeof gqliteral.idArg;
-  declare const booleanArg: typeof gqliteral.booleanArg;
-  declare const enumType: typeof gqliteral.enumType;
-  declare const unionType: typeof gqliteral.unionType;
-  declare const scalarType: typeof gqliteral.scalarType;
-  declare const directiveType: typeof gqliteral.directiveType;
-  declare const objectType: typeof gqliteral.objectType;
-  declare const interfaceType: typeof gqliteral.interfaceType;
-  declare const inputObjectType: typeof gqliteral.inputObjectType;
+  declare const arg: typeof graphqliteral.arg;
+  declare const intArg: typeof graphqliteral.intArg;
+  declare const stringArg: typeof graphqliteral.stringArg;
+  declare const floatArg: typeof graphqliteral.floatArg;
+  declare const idArg: typeof graphqliteral.idArg;
+  declare const booleanArg: typeof graphqliteral.booleanArg;
+  declare const enumType: typeof graphqliteral.enumType;
+  declare const unionType: typeof graphqliteral.unionType;
+  declare const scalarType: typeof graphqliteral.scalarType;
+  declare const directiveType: typeof graphqliteral.directiveType;
+  declare const objectType: typeof graphqliteral.objectType;
+  declare const interfaceType: typeof graphqliteral.interfaceType;
+  declare const inputObjectType: typeof graphqliteral.inputObjectType;
 }
 `,
   "file:///sandbox-globals.ts"

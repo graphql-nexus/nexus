@@ -40,11 +40,11 @@ class Footer extends React.Component {
             <a href={this.docUrl("doc2.html", this.props.language)}>
               Guides (or other categories)
             </a>
-            <a href={this.docUrl("doc3.html", this.props.language)}>
-              API Reference (or other categories)
+            <a href={this.docUrl("api-reference", this.props.language)}>
+              API Reference
             </a>
           </div>
-          {/* <div>
+          <div>
             <h5>Community</h5>
             <a href={this.pageUrl("users.html", this.props.language)}>
               User Showcase
@@ -64,7 +64,7 @@ class Footer extends React.Component {
             >
               Twitter
             </a>
-          </div> */}
+          </div>
           <div>
             <h5>More</h5>
             <a href={`${this.props.config.baseUrl}blog`}>Blog</a>
@@ -82,20 +82,6 @@ class Footer extends React.Component {
             </a>
           </div>
         </section>
-
-        {/* <a
-          href="https://code.facebook.com/projects/"
-          target="_blank"
-          rel="noreferrer noopener"
-          className="fbOpenSource"
-        >
-          <img
-            src={`${this.props.config.baseUrl}img/oss_logo.png`}
-            alt="Facebook Open Source"
-            width="170"
-            height="45"
-          />
-        </a> */}
         <section className="copyright">{this.props.config.copyright}</section>
       </footer>
     );

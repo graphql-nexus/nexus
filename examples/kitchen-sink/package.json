@@ -1,5 +1,5 @@
 {
-  "name": "gqliteral-kitchen-sink",
+  "name": "@graphqliteral/example-kitchen-sink",
   "version": "0.0.0",
   "scripts": {
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
