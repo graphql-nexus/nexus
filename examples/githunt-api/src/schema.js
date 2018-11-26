@@ -4,9 +4,8 @@ const {
   enumType,
   objectType,
   arg,
-  abstractType,
   directiveType,
-} = require("graphqliteral");
+} = require("gqliteral");
 
 exports.CacheControl = directiveType("cacheControl", (t) => {
   t.int("maxAge");
@@ -113,7 +112,11 @@ exports.Mutation = objectType("Mutation", (t) => {
   });
 });
 
-const CommonFields = abstractType((t) => {
+/**
+ * Example of using functions to mixin fields across types
+ * @type {(t: import('gqliteral').core.GraphQLiteralObjectType) => void}
+ */
+const commonFields = (t) => {
   t.int("id", { description: "The SQL ID of this entry" });
   t.field("postedBy", "User", {
     nullable: true,
@@ -122,9 +125,9 @@ const CommonFields = abstractType((t) => {
 });
 
 exports.Comment = objectType("Comment", (t) => {
+  commonFields(t);
   t.description("A comment about an entry, submitted by a user");
   t.directive("cacheControl", { maxAge: 240 });
-  t.mix(CommonFields);
   t.float("createdAt", {
     property: "created_at",
     description: "A timestamp of when the comment was posted",
@@ -144,7 +147,7 @@ exports.Vote = objectType("Vote", (t) => {
 
 // # Information about a GitHub repository submitted to GitHunt
 exports.Entry = objectType("Entry", (t) => {
-  t.mix(CommonFields);
+  commonFields(t)
   t.directive("cacheControl", { maxAge: 240 });
   t.field("repository", "Repository", {
     description: "Information about the repository from GitHub",

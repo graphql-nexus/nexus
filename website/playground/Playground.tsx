@@ -12,7 +12,6 @@ import {
   unionType,
   enumType,
   scalarType,
-  abstractType,
   directiveType,
   makeSchemaWithMetadata,
   arg,
@@ -298,7 +297,6 @@ function getCurrentSchema(code): SchemaOrError {
   };
   try {
     const fn = new Function(
-      "abstractType",
       "objectType",
       "interfaceType",
       "inputObjectType",
@@ -318,7 +316,6 @@ function getCurrentSchema(code): SchemaOrError {
       `
     );
     fn(
-      abstractType,
       singleton.objectType,
       singleton.interfaceType,
       singleton.inputObjectType,

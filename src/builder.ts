@@ -36,7 +36,6 @@ import {
 } from "graphql";
 import { GraphQLiteralMetadata } from "./metadata";
 import {
-  GraphQLiteralAbstractType,
   GraphQLiteralDirectiveType,
   GraphQLiteralObjectType,
   GraphQLiteralInputObjectType,
@@ -124,7 +123,9 @@ export class SchemaBuilder {
     }
   }
 
-  addDirective(directiveDef: GraphQLiteralDirectiveType<any> | GraphQLDirective) {
+  addDirective(
+    directiveDef: GraphQLiteralDirectiveType<any> | GraphQLDirective
+  ) {
     if (isDirective(directiveDef)) {
       this.directiveMap[directiveDef.name] = directiveDef;
     } else {
@@ -328,14 +329,6 @@ export class SchemaBuilder {
         case Types.NodeType.MIX:
           throw new Error("TODO");
           break;
-        case Types.NodeType.MIX_ABSTRACT:
-          this.mixAbstractOuput(
-            typeConfig,
-            fieldMap,
-            field.type,
-            field.mixOptions
-          );
-          break;
         case Types.NodeType.FIELD:
           fieldMap[field.config.name] = this.buildObjectField(
             field.config,
@@ -356,14 +349,6 @@ export class SchemaBuilder {
         case Types.NodeType.MIX:
           throw new Error("TODO");
           break;
-        case Types.NodeType.MIX_ABSTRACT:
-          this.mixAbstractInput(
-            typeConfig,
-            fieldMap,
-            field.type,
-            field.mixOptions
-          );
-          break;
         case Types.NodeType.FIELD:
           fieldMap[field.config.name] = this.buildInputObjectField(
             field.config,
@@ -373,42 +358,6 @@ export class SchemaBuilder {
       }
     });
     return fieldMap;
-  }
-
-  protected mixAbstractOuput(
-    typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
-    fieldMap: GraphQLFieldConfigMap<any, any>,
-    type: GraphQLiteralAbstractType<any>,
-    { pick, omit }: Types.MixOpts<any>
-  ) {
-    const { fields } = type.buildType();
-    fields.forEach((field) => {
-      if (pick && pick.indexOf(field.name) === -1) {
-        return;
-      }
-      if (omit && omit.indexOf(field.name) !== -1) {
-        return;
-      }
-      fieldMap[field.name] = this.buildObjectField(field, typeConfig);
-    });
-  }
-
-  protected mixAbstractInput(
-    typeConfig: Types.InputTypeConfig,
-    fieldMap: GraphQLInputFieldConfigMap,
-    type: GraphQLiteralAbstractType<any>,
-    { pick, omit }: Types.MixOpts<any>
-  ) {
-    const { fields } = type.buildType();
-    fields.forEach((field) => {
-      if (pick && pick.indexOf(field.name) === -1) {
-        return;
-      }
-      if (omit && omit.indexOf(field.name) !== -1) {
-        return;
-      }
-      fieldMap[field.name] = this.buildInputObjectField(field, typeConfig);
-    });
   }
 
   protected buildObjectField(
@@ -746,7 +695,10 @@ function addTypes(builder: SchemaBuilder, types: any) {
   }
   if (isGraphQLiteralNamedType(types) || isNamedType(types)) {
     builder.addType(types);
-  } else if (types instanceof GraphQLiteralDirectiveType || isDirective(types)) {
+  } else if (
+    types instanceof GraphQLiteralDirectiveType ||
+    isDirective(types)
+  ) {
     builder.addDirective(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));

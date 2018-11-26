@@ -10,7 +10,7 @@ GraphQLiteral aims to combine the simplicity and ease of development of schema-f
 
 It builds upon the primitives of `graphql-js` and similar to the schema-first approach, it uses the type names rather than per-type object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
 
-GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and makes use of TypeScript generics, conditional types, and type merging to provide as much type coverage as possible out of the box. Read more about how you can [configure](typescript-setup.md) your project to best take advantage of this.
+GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and makes use of TypeScript generics, conditional types, and type merging to provide full type coverage out of the box. Try it out in the [playground](/playground) to see what we mean!
 
 ## Installation
 
@@ -58,13 +58,10 @@ const Node = objectType("Node", (t) => {
   t.id("id", { description: "Unique identifier for the resource" });
 });
 
-const UserFields = abstractType((t) => {
-  t.string("username");
-  t.string("email");
-});
-
 const Account = objectType("Account", (t) => {
   t.implements("Node");
+  t.string("username");
+  t.string("email");
   t.mix(UserFields);
 });
 
@@ -85,9 +82,9 @@ The GraphQL documentation provides [this explanation](https://graphql.org/learn/
 
 The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.
 
-If you find yourself wanting this the other way around, there is a `defaultNull` option for the `makeSchema` which will make all fields nullable unless `nullable: false` is specified during field definition.
+If you find yourself wanting this the other way around, there is a `nullability` option for the `makeSchema` which will make all fields nullable unless `required: true` (an alias for `nullable: false`) is specified during field definition.
 
-This can also be configured on a per-type basis, using the `defaultNull` method on the type definition object. This comes in handy where you want to "mix" an `abstractType` into an `objectType` and an `inputObjectType`, and the fields should be considered nullable by default on input, and required by default on output.
+This can also be configured on a per-type basis, using the `nullability` method on the type definition object. This comes in handy where you know you want
 
 #### default
 

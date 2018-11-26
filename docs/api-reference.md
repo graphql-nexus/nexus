@@ -88,14 +88,6 @@ const DateScalar = scalarType("Date", {
 });
 ```
 
-### `abstractType(typeName, definitionBlock)`
-
-The `abstractType` does not have a parallel in GraphQL terminology, and can be thought of as a partial, it draws from a similar concept in the [graphene python](https://docs.graphene-python.org/en/latest/types/abstracttypes/) library.
-
-Abstract types may be "mixed" into concrete types using the `.mix()` method, though rather than mixing the type name as a string, mix is called with the object returned from `abstractType`.
-
-It is the only object that does not have an associated "name", because there is no associated representation in the GraphQL schema.
-
 ### `makeSchema(SchemaOptions)`
 
 The `makeSchema` function constructs the schema. It is a wrapper over the `GraphQLSchemaType` from `graphql-js`.

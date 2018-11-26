@@ -1,27 +1,6 @@
 import { GraphQLFieldResolver } from "graphql";
 import path from "path";
-import { GraphQLiteralAbstractType } from "./core";
 import * as Types from "./types";
-
-export function addMix(
-  obj: { fields: Types.FieldDefType[] },
-  typeName: string | GraphQLiteralAbstractType<any>,
-  mixOptions?: Types.MixOpts<any>
-) {
-  if (typeName instanceof GraphQLiteralAbstractType) {
-    obj.fields.push({
-      item: Types.NodeType.MIX_ABSTRACT,
-      type: typeName,
-      mixOptions: mixOptions || {},
-    });
-  } else {
-    obj.fields.push({
-      item: Types.NodeType.MIX,
-      typeName,
-      mixOptions: mixOptions || {},
-    });
-  }
-}
 
 export function withDeprecationComment(description?: string | null) {
   return description;

@@ -1,6 +1,5 @@
-import { assertValidName, GraphQLScalarType, GraphQLSchema } from "graphql";
+import { assertValidName, GraphQLScalarType } from "graphql";
 import {
-  GraphQLiteralAbstractType,
   GraphQLiteralDirectiveType,
   GraphQLiteralEnumType,
   GraphQLiteralInputObjectType,
@@ -24,7 +23,10 @@ export function scalarType(name: string, options: Types.ScalarOpts) {
 export function objectType<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GraphQLiteralObjectType<GenTypes, TypeName>) => void) {
+>(
+  name: TypeName,
+  fn: (arg: GraphQLiteralObjectType<GenTypes, TypeName>) => void
+) {
   const factory = new GraphQLiteralObjectType<GenTypes, TypeName>(
     assertValidName(name)
   );
@@ -33,7 +35,23 @@ export function objectType<
 }
 
 /**
- * Define a GraphQLiteral representation of a GraphQL interface type.
+ * Like many type systems, GraphQL supports interfaces. An Interface is an
+ * abstract type that includes a certain set of fields that a type must
+ * include to implement the interface.
+ *
+ * In GraphQLiteral, you do not need to redefine the interface fields on the
+ * implementing object types, instead you may use `.implements(interfaceName)`
+ * and all of the interface fields will be added to the type.
+ *
+ * const Node = interfaceType('Node', t => {
+ *   t.id('id', { description: 'GUID for a resource' });
+ * });
+ *
+ * const User = objectType('User', t => {
+ *   t.implements('Node');
+ * });
+ *
+ * @see https://graphql.github.io/learn/schema/#interfaces
  */
 export function interfaceType<
   GenTypes = GraphQLiteralGen,
@@ -65,11 +83,16 @@ export function interfaceType<
  *   t.mix('SearchResult')
  *   t.members('OtherType', 'AnotherType')
  * })
+ *
+ * @see https://graphql.org/learn/schema/#union-types
  */
 export function unionType<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GraphQLiteralUnionType<GenTypes, TypeName>) => void) {
+>(
+  name: TypeName,
+  fn: (arg: GraphQLiteralUnionType<GenTypes, TypeName>) => void
+) {
   const factory = new GraphQLiteralUnionType<GenTypes>(assertValidName(name));
   fn(factory);
   return factory;
@@ -101,6 +124,8 @@ export function unionType<
  *   t.members(['OTHER'])
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
+ *
+ * @see
  */
 export function enumType<
   GenTypes = GraphQLiteralGen,
@@ -122,34 +147,20 @@ export function enumType<
 }
 
 /**
+ * Defines a complex object which can be passed as an input value.
  *
+ * Unlike object types, input types may not
+ *
+ * @see https://graphql.org/learn/schema/#input-types
  */
 export function inputObjectType<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 >(name: TypeName, fn: (arg: GraphQLiteralInputObjectType<GenTypes>) => void) {
-  const factory = new GraphQLiteralInputObjectType<GenTypes>(assertValidName(name));
+  const factory = new GraphQLiteralInputObjectType<GenTypes>(
+    assertValidName(name)
+  );
   fn(factory);
-  return factory;
-}
-
-/**
- * A `abstractType` object contains fields that can be shared among
- * `GraphQLiteralObject`, `GraphQLiteralInterface`, `GraphQLiteralInputObject` or other `abstractType` types.
- *
- * Unlike concrete GraphQL types (types that show up in the generated schema),
- * abstractType types must be mixed in using the actual JS object returned by this
- * function rather than a string "name" representing the type.
- *
- * If an AbstractType is mixed into a `GraphQLiteralInputObject` type, the `args` and
- * `resolver` fields are ignored.
- */
-export function abstractType<GenTypes = GraphQLiteralGen>(
-  fn: (arg: GraphQLiteralAbstractType<GenTypes>) => void
-) {
-  const factory = new GraphQLiteralAbstractType<GenTypes>();
-  fn(factory);
-  // This is not wrapped in a type, since it's not actually a concrete (named) type.
   return factory;
 }
 
@@ -193,7 +204,9 @@ export function directiveType<
     | Types.DirectiveConfig<GenTypes, DirectiveName>
     | ((arg: GraphQLiteralDirectiveType<GenTypes>) => void)
 ) {
-  const directive = new GraphQLiteralDirectiveType<GenTypes>(assertValidName(name));
+  const directive = new GraphQLiteralDirectiveType<GenTypes>(
+    assertValidName(name)
+  );
   if (typeof config === "function") {
     config(directive);
   } else {

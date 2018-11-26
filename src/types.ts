@@ -8,7 +8,6 @@ import {
   GraphQLDirective,
 } from "graphql";
 import {
-  GraphQLiteralAbstractType,
   GraphQLiteralObjectType,
   GraphQLiteralInputObjectType,
   GraphQLiteralInterfaceType,
@@ -27,7 +26,6 @@ export type GraphQLiteralNamedType =
 export enum NodeType {
   MIX = "MIX",
   FIELD = "FIELD",
-  MIX_ABSTRACT = "MIX_ABSTRACT",
   ENUM_MEMBER = "ENUM_MEMBER",
   UNION_MEMBER = "UNION_MEMBER",
 }
@@ -48,12 +46,6 @@ export type MixDef = {
   mixOptions: MixOpts<any>;
 };
 
-export type MixAbstractDef = {
-  item: NodeType.MIX_ABSTRACT;
-  type: GraphQLiteralAbstractType<any>;
-  mixOptions: MixOpts<any>;
-};
-
 export type FieldDef = {
   item: NodeType.FIELD;
   config: FieldConfig;
@@ -71,7 +63,7 @@ export interface InputFieldConfig extends InputFieldOpts {
   type: any;
 }
 
-export type FieldDefType = MixDef | MixAbstractDef | FieldDef;
+export type FieldDefType = MixDef | FieldDef;
 
 export type EnumDefType =
   | MixDef

@@ -7,9 +7,8 @@ import {
   GraphQLEnumType,
   GraphQLIsTypeOfFn,
   DirectiveLocationEnum,
-  assertValidName,
 } from "graphql";
-import { addMix, dedent } from "./utils";
+import { dedent } from "./utils";
 import { SchemaBuilder, isGraphQLiteralNamedType } from "./builder";
 import { arg } from "./definitions";
 import { GraphQLiteralMetadata } from "./metadata";
@@ -229,11 +228,12 @@ export class GraphQLiteralObjectType<
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(
-    typeName: string | GraphQLiteralAbstractType<GenTypes>,
-    mixOptions?: Types.MixOpts<any>
-  ) {
-    addMix(this.typeConfig, typeName, mixOptions);
+  mix(typeName: string, mixOptions?: Types.MixOpts<any>) {
+    this.typeConfig.fields.push({
+      item: Types.NodeType.MIX,
+      typeName,
+      mixOptions: mixOptions || {},
+    });
   }
 
   /**
@@ -423,11 +423,12 @@ export class GraphQLiteralInterfaceType<
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(
-    typeName: string | GraphQLiteralAbstractType<GenTypes>,
-    mixOptions?: Types.MixOpts<any>
-  ) {
-    addMix(this.typeConfig, typeName, mixOptions);
+  mix(typeName: string, mixOptions?: Types.MixOpts<any>) {
+    this.typeConfig.fields.push({
+      item: Types.NodeType.MIX,
+      typeName,
+      mixOptions: mixOptions || {},
+    });
   }
 
   /**
@@ -648,86 +649,6 @@ export class GraphQLiteralInputObjectType<
    */
   buildType(builder: SchemaBuilder): GraphQLInputObjectType {
     return builder.inputObjectType(this.typeConfig);
-  }
-}
-
-export class GraphQLiteralAbstractType<GenTypes> extends FieldsArgs {
-  protected typeConfig: Types.AbstractTypeConfig;
-
-  constructor() {
-    super();
-    this.typeConfig = {
-      fields: [],
-    };
-  }
-
-  /**
-   * Add an ID field type to the object schema.
-   */
-  id<FieldName extends string>(
-    name: FieldName,
-    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
-  ) {
-    this.field(name, "ID", options);
-  }
-
-  /**
-   * Add an Int field type to the object schema.
-   */
-  int<FieldName extends string>(
-    name: FieldName,
-    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
-  ) {
-    this.field(name, "Int", options);
-  }
-
-  /**
-   * Add a Float field type to the object schema.
-   */
-  float<FieldName extends string>(
-    name: FieldName,
-    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
-  ) {
-    this.field(name, "Float", options);
-  }
-
-  /**
-   * Add a String field type to the object schema.
-   */
-  string<FieldName extends string>(
-    name: FieldName,
-    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
-  ) {
-    this.field(name, "String", options);
-  }
-
-  /**
-   * Add a Boolean field type to the object schema.
-   */
-  boolean<FieldName extends string>(
-    name: FieldName,
-    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
-  ) {
-    this.field(name, "Boolean", options);
-  }
-
-  /**
-   * Adds a new field to the input object type
-   */
-  field<FieldName extends string>(
-    name: FieldName,
-    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
-    options?: Types.AbstractFieldOpts<GenTypes, FieldName>
-  ) {
-    this.typeConfig.fields.push({
-      name: assertValidName(name),
-      type,
-      ...options,
-    });
-  }
-
-  buildType(): Types.AbstractTypeConfig {
-    return this.typeConfig;
   }
 }
 
