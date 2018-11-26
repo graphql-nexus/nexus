@@ -11,14 +11,21 @@ import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
 
 /**
- * Defines a GQliteral representation of a GraphQL Scalar type.
+ * A GraphQL object type has a name and fields, but at some point those fields have
+ * to resolve to some concrete data. That's where the scalar types come in:
+ * they represent the leaves of the query.
+ *
+ * @see https://graphql.github.io/learn/schema/#scalar-types
  */
 export function scalarType(name: string, options: Types.ScalarOpts) {
   return new GraphQLScalarType({ name: assertValidName(name), ...options });
 }
 
 /**
- * Defines a GraphQLiteral representation of a GraphQL Object.
+ * The most basic components of a GraphQL schema are object types, which just represent
+ * a kind of object you can fetch from your service, and what fields it has.
+ *
+ * @see https://graphql.github.io/learn/schema/#object-types-and-fields
  */
 export function objectType<
   GenTypes = GraphQLiteralGen,
@@ -125,7 +132,7 @@ export function unionType<
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
  *
- * @see
+ * @see https://graphql.github.io/learn/schema/#enumeration-types
  */
 export function enumType<
   GenTypes = GraphQLiteralGen,
@@ -168,6 +175,8 @@ export function inputObjectType<
  * Defines an argument for a field type. This argument can be reused across multiple objects or interfaces
  * This is also exposed during type definition as shorthand via the various
  * `__Arg` methods: `fieldArg`, `stringArg`, `intArg`, etc.
+ *
+ * @see https://graphql.github.io/learn/schema/#arguments
  */
 export function arg<GenTypes = GraphQLiteralGen>(
   type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
@@ -181,14 +190,29 @@ export function arg<GenTypes = GraphQLiteralGen>(
   };
 }
 
+/**
+ * Alias for arg("String", options)
+ */
 export const stringArg = (options?: Types.ArgOpts) => arg("String", options);
 
+/**
+ * Alias for arg("Int", options)
+ */
 export const intArg = (options?: Types.ArgOpts) => arg("Int", options);
 
+/**
+ * Alias for arg("Float", options)
+ */
 export const floatArg = (options?: Types.ArgOpts) => arg("Float", options);
 
+/**
+ * Alias for arg("ID", options)
+ */
 export const idArg = (options?: Types.ArgOpts) => arg("ID", options);
 
+/**
+ * Alias for arg("Boolean", options)
+ */
 export const booleanArg = (options?: Types.ArgOpts) => arg("Boolean", options);
 
 /**

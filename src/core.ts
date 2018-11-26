@@ -405,13 +405,14 @@ export class GraphQLiteralObjectType<
 export class GraphQLiteralInterfaceType<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
-> {
+> extends FieldsArgs<GenTypes> {
   /**
    * Metadata about the object type
    */
   protected typeConfig: Types.InterfaceTypeConfig;
 
   constructor(readonly name: string) {
+    super();
     this.typeConfig = {
       name,
       fields: [],

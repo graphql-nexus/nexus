@@ -4,7 +4,9 @@ const {
   enumType,
   objectType,
   arg,
+  intArg,
   directiveType,
+  stringArg,
 } = require("gqliteral");
 
 exports.CacheControl = directiveType("cacheControl", (t) => {
@@ -36,10 +38,10 @@ exports.Query = objectType("Query", (t) => {
         required: true,
         description: "The sort order for the feed",
       }),
-      offset: arg("Int", {
+      offset: intArg({
         description: "The number of items to skip, for pagination",
       }),
-      limit: arg("Int", {
+      limit: intArg({
         description:
           "The number of items to fetch starting from the offset, for pagination",
       }),
@@ -50,12 +52,11 @@ exports.Query = objectType("Query", (t) => {
     nullable: true,
     description: "A single entry",
     args: {
-      repoFullName: {
-        type: "String",
+      repoFullName: stringArg({
         required: true,
         description:
           'The full repository name from GitHub, e.g. "apollostack/GitHunt-API"',
-      },
+      }),
     },
   });
   t.field("currentUser", "User", {
@@ -77,7 +78,7 @@ exports.VoteType = enumType("VoteType", (t) => {
   t.members(["UP", "DOWN", "CANCEL"]);
 });
 
-const RepoNameArg = arg("String", {
+const RepoNameArg = stringArg({
   required: true,
   description:
     'The full repository name from GitHub, e.g. "apollostack/GitHunt-API"',

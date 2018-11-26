@@ -1,4 +1,4 @@
-import { interfaceType, arg } from "gqliteral";
+import { interfaceType, idArg } from "gqliteral";
 import { getFriends } from "../data";
 
 export const Character = interfaceType("Character", (t) => {
@@ -16,7 +16,7 @@ export const Character = interfaceType("Character", (t) => {
     description: "Which movies they appear in.",
     property: "appears_in",
     args: {
-      id: arg("ID", { required: true }),
+      id: idArg({ required: true }),
     },
   });
   t.resolveType((character) => character.type);
