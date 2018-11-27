@@ -123,11 +123,6 @@ type DefinitionBlockObject = {
   field(fieldName: string, typeName: string, fieldOptions: FieldOptions): void;
 
   /**
-   * Adds a list field to the type
-   */
-  list(fieldName: string, typeName: string, listOptions: ListOptions): void;
-
-  /**
    * Alias for .field(fieldName, "ID", fieldOptions)
    */
   id(fieldName: string, fieldOptions: FieldOptions): void;

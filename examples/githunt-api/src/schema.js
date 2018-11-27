@@ -105,7 +105,7 @@ exports.Mutation = objectType("Mutation", (t) => {
   t.field("submitComment", "Comment", {
     args: {
       repoFullName: RepoNameArg,
-      commentContent: t.stringArg({
+      commentContent: stringArg({
         required: true,
         description: "The text content for the new comment",
       }),
@@ -166,8 +166,8 @@ exports.Entry = objectType("Entry", (t) => {
   t.field("comments", "Comment", {
     list: true,
     args: {
-      limit: t.intArg(),
-      offset: t.intArg(),
+      limit: intArg(),
+      offset: intArg(),
     },
     description: "Comments posted about this repository",
   });

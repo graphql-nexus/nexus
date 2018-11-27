@@ -34,14 +34,14 @@ import {
   isUnionType,
   GraphQLSchema,
 } from "graphql";
-import { GraphQLiteralMetadata } from "./metadata";
+import { Metadata } from "./metadata";
 import {
-  GraphQLiteralDirectiveType,
-  GraphQLiteralObjectType,
-  GraphQLiteralInputObjectType,
-  GraphQLiteralEnumType,
-  GraphQLiteralUnionType,
-  GraphQLiteralInterfaceType,
+  DirectiveTypeDef,
+  ObjectTypeDef,
+  InputObjectTypeDef,
+  EnumTypeDef,
+  UnionTypeDef,
+  InterfaceTypeDef,
 } from "./core";
 import * as Types from "./types";
 import { propertyFieldResolver, suggestionList, objValues } from "./utils";
@@ -91,20 +91,17 @@ export class SchemaBuilder {
    * The "pending type" map keeps track of all types that were defined w/
    * GraphQLiteral and haven't been processed into concrete types yet.
    */
-  protected pendingTypeMap: Record<string, Types.GraphQLiteralNamedType> = {};
+  protected pendingTypeMap: Record<string, Types.NamedTypeDef> = {};
 
-  protected pendingDirectiveMap: Record<
-    string,
-    GraphQLiteralDirectiveType<any>
-  > = {};
+  protected pendingDirectiveMap: Record<string, DirectiveTypeDef<any>> = {};
   protected directiveMap: Record<string, GraphQLDirective> = {};
 
   constructor(
-    protected metadata: GraphQLiteralMetadata,
+    protected metadata: Metadata,
     protected nullability: Types.NullabilityConfig = {}
   ) {}
 
-  addType(typeDef: Types.GraphQLiteralNamedType | GraphQLNamedType) {
+  addType(typeDef: Types.NamedTypeDef | GraphQLNamedType) {
     const existingType =
       this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
     if (existingType) {
@@ -123,9 +120,7 @@ export class SchemaBuilder {
     }
   }
 
-  addDirective(
-    directiveDef: GraphQLiteralDirectiveType<any> | GraphQLDirective
-  ) {
+  addDirective(directiveDef: DirectiveTypeDef<any> | GraphQLDirective) {
     if (isDirective(directiveDef)) {
       this.directiveMap[directiveDef.name] = directiveDef;
     } else {
@@ -683,7 +678,7 @@ export function buildTypes<
   types: any,
   config: Types.Omit<Types.SchemaConfig<any>, "types"> = { outputs: false }
 ): Types.BuildTypes<TypeMapDefs, DirectiveDefs> {
-  const metadata = new GraphQLiteralMetadata(config);
+  const metadata = new Metadata(config);
   const builder = new SchemaBuilder(metadata, config.nullability);
   addTypes(builder, types);
   return builder.getFinalTypeMap();
@@ -693,12 +688,9 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
-  if (isGraphQLiteralNamedType(types) || isNamedType(types)) {
+  if (isNamedTypeDef(types) || isNamedType(types)) {
     builder.addType(types);
-  } else if (
-    types instanceof GraphQLiteralDirectiveType ||
-    isDirective(types)
-  ) {
+  } else if (types instanceof DirectiveTypeDef || isDirective(types)) {
     builder.addDirective(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));
@@ -712,7 +704,7 @@ function addTypes(builder: SchemaBuilder, types: any) {
  */
 export function makeSchemaWithMetadata<GenTypes = GraphQLiteralGen>(
   options: Types.SchemaConfig<GenTypes>
-): { metadata: GraphQLiteralMetadata; schema: GraphQLSchema } {
+): { metadata: Metadata; schema: GraphQLSchema } {
   const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
     options.types,
     options
@@ -776,14 +768,12 @@ export function makeSchema<GenTypes = GraphQLiteralGen>(
   return schema;
 }
 
-export function isGraphQLiteralNamedType(
-  obj: any
-): obj is Types.GraphQLiteralNamedType {
+export function isNamedTypeDef(obj: any): obj is Types.NamedTypeDef {
   return (
-    obj instanceof GraphQLiteralObjectType ||
-    obj instanceof GraphQLiteralInputObjectType ||
-    obj instanceof GraphQLiteralEnumType ||
-    obj instanceof GraphQLiteralUnionType ||
-    obj instanceof GraphQLiteralInterfaceType
+    obj instanceof ObjectTypeDef ||
+    obj instanceof InputObjectTypeDef ||
+    obj instanceof EnumTypeDef ||
+    obj instanceof UnionTypeDef ||
+    obj instanceof InterfaceTypeDef
   );
 }

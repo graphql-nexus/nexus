@@ -34,22 +34,22 @@ The schema requires that an Object named `Query` be provided at the top-level.
 const Query = objectType("Query", (t) => {
   t.field("account", "Account", {
     args: {
-      name: t.stringArg({
+      name: stringArg({
         description:
           "Providing the name of the account holder will search for accounts matching that name",
       }),
-      status: t.fieldArg("StatusEnum"),
+      status: fieldArg("StatusEnum"),
     },
   });
   t.field("accountsById", "Account", {
     list: true,
     args: {
-      ids: t.intArg({ list: true }),
+      ids: intArg({ list: true }),
     },
   });
   t.field("accounts", "AccountConnection", {
     args: {
-      limit: t.intArg({ required: true }),
+      limit: intArg({ required: true }),
     },
   });
 });

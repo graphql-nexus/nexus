@@ -1,10 +1,10 @@
-import { objectType, enumType } from "gqliteral";
+import { objectType, enumType, arg } from "gqliteral";
 
 export const Mission = objectType("Mission", (t) => {
   t.string("name", { nullable: true });
   t.string("missionPatch", {
     args: {
-      size: t.fieldArg("PatchSize"),
+      size: arg("PatchSize"),
     },
     resolve(mission, { size }) {
       return size === "SMALL"

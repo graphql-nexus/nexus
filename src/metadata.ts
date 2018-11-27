@@ -37,7 +37,7 @@ export interface DirectiveUse {
  * - The property name of the field
  * - If the field has a "default" value
  */
-export class GraphQLiteralMetadata {
+export class Metadata {
   protected completed = false;
   protected objectMeta: Record<string, Types.ObjectTypeConfig> = {};
   protected interfaceMeta: Record<string, Types.InterfaceTypeConfig> = {};

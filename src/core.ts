@@ -7,33 +7,27 @@ import {
   GraphQLEnumType,
   GraphQLIsTypeOfFn,
   DirectiveLocationEnum,
+  GraphQLObjectType,
+  GraphQLDirective,
 } from "graphql";
 import { dedent } from "./utils";
-import { SchemaBuilder, isGraphQLiteralNamedType } from "./builder";
-import { arg } from "./definitions";
-import { GraphQLiteralMetadata } from "./metadata";
+import { SchemaBuilder, isNamedTypeDef } from "./builder";
+import { Metadata } from "./metadata";
 
 // Export the ts definitions so they can be used by library authors under `core.Types`
 export { Types };
 
 // Same as above, export all core things under the "core" namespace
-export { SchemaBuilder, isGraphQLiteralNamedType, GraphQLiteralMetadata };
+export { SchemaBuilder, isNamedTypeDef, Metadata };
 
 declare global {
   interface GraphQLiteralGen {}
 }
 
-export type GraphQLiteralNamedType =
-  | GraphQLiteralEnumType<any>
-  | GraphQLiteralObjectType<any, any>
-  | GraphQLiteralInterfaceType<any, any>
-  | GraphQLiteralUnionType<any, any>
-  | GraphQLiteralInputObjectType<any>;
-
 /**
  * Backing type for an enum member.
  */
-export class GraphQLiteralEnumType<GenTypes = GraphQLiteralGen> {
+export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
   protected typeConfig: Types.EnumTypeConfig;
 
   constructor(readonly name: string) {
@@ -115,7 +109,7 @@ export class GraphQLiteralEnumType<GenTypes = GraphQLiteralGen> {
   }
 }
 
-export class GraphQLiteralUnionType<
+export class UnionTypeDef<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 > {
@@ -170,51 +164,23 @@ export class GraphQLiteralUnionType<
   }
 
   /**
-   * Internal use only. Creates the configuration to create
-   * the GraphQL named type.
+   * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLUnionType {
     return builder.unionType(this.typeConfig);
   }
 }
 
-abstract class FieldsArgs<GenTypes = GraphQLiteralGen> {
-  idArg(options?: Types.ArgOpts) {
-    return arg("ID", options);
-  }
-
-  intArg(options?: Types.ArgOpts) {
-    return arg("Int", options);
-  }
-
-  floatArg(options?: Types.ArgOpts) {
-    return arg("Float", options);
-  }
-
-  booleanArg(options?: Types.ArgOpts) {
-    return arg("Boolean", options);
-  }
-
-  stringArg(options?: Types.ArgOpts) {
-    return arg("String", options);
-  }
-
-  fieldArg(type: Types.AllInputTypes<GenTypes>, options?: Types.ArgOpts) {
-    return arg(type, options);
-  }
-}
-
-export class GraphQLiteralObjectType<
+export class ObjectTypeDef<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
-> extends FieldsArgs<GenTypes> {
+> {
   /**
    * All metadata about the object type
    */
   protected typeConfig: Types.ObjectTypeConfig;
 
   constructor(readonly name: string) {
-    super();
     this.typeConfig = {
       name,
       fields: [],
@@ -322,7 +288,7 @@ export class GraphQLiteralObjectType<
   /**
    * Adds an "isTypeOf" check to the object type.
    */
-  isTypeOf(fn: (value: GraphQLIsTypeOfFn<any, any>) => boolean) {
+  isTypeOf(fn: (value: GraphQLIsTypeOfFn<any, any>) => boolean): void {
     this.typeConfig.isTypeOf = fn;
   }
 
@@ -336,7 +302,7 @@ export class GraphQLiteralObjectType<
   modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
     field: FieldName,
     options: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
+  ): void {
     this.typeConfig.fieldModifications[field as string] = options;
   }
 
@@ -348,7 +314,7 @@ export class GraphQLiteralObjectType<
       Types.RootValue<GenTypes, TypeName>,
       Types.ContextValue<GenTypes>
     >
-  ) {
+  ): void {
     this.typeConfig.defaultResolver = resolverFn;
   }
 
@@ -356,7 +322,7 @@ export class GraphQLiteralObjectType<
    * Should be used very rarely, adds a directive directly to the
    * object definition - for interpretation by other schema consumers.
    */
-  directive(name: string, args?: Record<string, any>) {
+  directive(name: string, args?: Record<string, any>): void {
     this.typeConfig.directives.push({
       name,
       args: args || {},
@@ -366,7 +332,7 @@ export class GraphQLiteralObjectType<
   /**
    * Set the nullability config for the type
    */
-  nullability(nullability: Types.NullabilityConfig) {
+  nullability(nullability: Types.NullabilityConfig): void {
     if (this.typeConfig.nullability) {
       console.warn(
         `nullability has already been set for type ${
@@ -394,25 +360,23 @@ export class GraphQLiteralObjectType<
   }
 
   /**
-   * Internal use only. Creates the configuration to create
-   * the GraphQL named type.
+   * @internal
    */
-  buildType(builder: SchemaBuilder) {
+  buildType(builder: SchemaBuilder): GraphQLObjectType {
     return builder.objectType(this.typeConfig);
   }
 }
 
-export class GraphQLiteralInterfaceType<
+export class InterfaceTypeDef<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
-> extends FieldsArgs<GenTypes> {
+> {
   /**
    * Metadata about the object type
    */
   protected typeConfig: Types.InterfaceTypeConfig;
 
   constructor(readonly name: string) {
-    super();
     this.typeConfig = {
       name,
       fields: [],
@@ -540,15 +504,14 @@ export class GraphQLiteralInterfaceType<
   }
 
   /**
-   * Internal use only. Creates the configuration to create
-   * the GraphQL named type.
+   * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLInterfaceType {
     return builder.interfaceType(this.typeConfig);
   }
 }
 
-export class GraphQLiteralInputObjectType<
+export class InputObjectTypeDef<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
 > {
@@ -645,15 +608,14 @@ export class GraphQLiteralInputObjectType<
   }
 
   /**
-   * Internal use only. Creates the configuration to create
-   * the GraphQL named type.
+   * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLInputObjectType {
     return builder.inputObjectType(this.typeConfig);
   }
 }
 
-export class GraphQLiteralDirectiveType<GenTypes = GraphQLiteralGen> {
+export class DirectiveTypeDef<GenTypes = GraphQLiteralGen> {
   protected typeConfig: Types.DirectiveTypeConfig;
 
   constructor(readonly name: string) {
@@ -722,7 +684,10 @@ export class GraphQLiteralDirectiveType<GenTypes = GraphQLiteralGen> {
     });
   }
 
-  buildType(builder: SchemaBuilder) {
+  /**
+   * @internal
+   */
+  buildType(builder: SchemaBuilder): GraphQLDirective {
     return builder.directiveType(this.typeConfig);
   }
 }

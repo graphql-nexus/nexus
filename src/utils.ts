@@ -91,13 +91,13 @@ function lexicalDistance(aStr: string, bStr: string): number {
     return 0;
   }
 
-  var i;
-  var j;
-  var d = [];
-  var a = aStr.toLowerCase();
-  var b = bStr.toLowerCase();
-  var aLength = a.length;
-  var bLength = b.length; // Any case change counts as a single edit
+  let i: number;
+  let j: number;
+  const d: number[][] = [];
+  const a = aStr.toLowerCase();
+  const b = bStr.toLowerCase();
+  const aLength = a.length;
+  const bLength = b.length; // Any case change counts as a single edit
 
   if (a === b) {
     return 1;

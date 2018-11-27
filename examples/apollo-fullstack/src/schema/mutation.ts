@@ -1,8 +1,8 @@
-import { objectType } from "gqliteral";
+import { objectType, idArg, stringArg } from "gqliteral";
 
 export const Mutation = objectType("Mutation", (t) => {
   t.field("bookTrips", "TripUpdateResponse", {
-    args: { launchIds: t.idArg({ list: true, required: true }) },
+    args: { launchIds: idArg({ list: true, required: true }) },
     async resolve(_, { launchIds }, { dataSources }) {
       const results = await dataSources.userAPI.bookTrips({ launchIds });
       const launches = await dataSources.launchAPI.getLaunchesByIds({
@@ -22,7 +22,7 @@ export const Mutation = objectType("Mutation", (t) => {
     },
   });
   t.field("cancelTrip", "TripUpdateResponse", {
-    args: { launchId: t.idArg({ required: true }) },
+    args: { launchId: idArg({ required: true }) },
     async resolve(_, { launchId }, { dataSources }) {
       const result = dataSources.userAPI.cancelTrip({ launchId });
 
@@ -42,7 +42,7 @@ export const Mutation = objectType("Mutation", (t) => {
   });
   t.string("login", {
     nullable: true,
-    args: { email: t.stringArg() },
+    args: { email: stringArg() },
     async resolve(_, { email }, { dataSources }) {
       const user = await dataSources.userAPI.findOrCreateUser({ email });
       if (user && email) {

@@ -1,11 +1,11 @@
 import { assertValidName, GraphQLScalarType } from "graphql";
 import {
-  GraphQLiteralDirectiveType,
-  GraphQLiteralEnumType,
-  GraphQLiteralInputObjectType,
-  GraphQLiteralInterfaceType,
-  GraphQLiteralObjectType,
-  GraphQLiteralUnionType,
+  DirectiveTypeDef,
+  EnumTypeDef,
+  InputObjectTypeDef,
+  InterfaceTypeDef,
+  ObjectTypeDef,
+  UnionTypeDef,
 } from "./core";
 import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
@@ -17,7 +17,10 @@ import { enumShorthandMembers } from "./utils";
  *
  * @see https://graphql.github.io/learn/schema/#scalar-types
  */
-export function scalarType(name: string, options: Types.ScalarOpts) {
+export function scalarType(
+  name: string,
+  options: Types.ScalarOpts
+): GraphQLScalarType {
   return new GraphQLScalarType({ name: assertValidName(name), ...options });
 }
 
@@ -32,11 +35,9 @@ export function objectType<
   TypeName extends string = any
 >(
   name: TypeName,
-  fn: (arg: GraphQLiteralObjectType<GenTypes, TypeName>) => void
-) {
-  const factory = new GraphQLiteralObjectType<GenTypes, TypeName>(
-    assertValidName(name)
-  );
+  fn: (t: ObjectTypeDef<GenTypes, TypeName>) => void
+): ObjectTypeDef<GenTypes, TypeName> {
+  const factory = new ObjectTypeDef<GenTypes, TypeName>(assertValidName(name));
   fn(factory);
   return factory;
 }
@@ -65,9 +66,9 @@ export function interfaceType<
   TypeName extends string = any
 >(
   name: TypeName,
-  fn: (arg: GraphQLiteralInterfaceType<GenTypes, TypeName>) => void
-) {
-  const factory = new GraphQLiteralInterfaceType<GenTypes, TypeName>(
+  fn: (t: InterfaceTypeDef<GenTypes, TypeName>) => void
+): InterfaceTypeDef<GenTypes, TypeName> {
+  const factory = new InterfaceTypeDef<GenTypes, TypeName>(
     assertValidName(name)
   );
   fn(factory);
@@ -98,9 +99,9 @@ export function unionType<
   TypeName extends string = any
 >(
   name: TypeName,
-  fn: (arg: GraphQLiteralUnionType<GenTypes, TypeName>) => void
-) {
-  const factory = new GraphQLiteralUnionType<GenTypes>(assertValidName(name));
+  fn: (t: UnionTypeDef<GenTypes, TypeName>) => void
+): UnionTypeDef<GenTypes, TypeName> {
+  const factory = new UnionTypeDef<GenTypes>(assertValidName(name));
   fn(factory);
   return factory;
 }
@@ -140,11 +141,11 @@ export function enumType<
 >(
   name: TypeName,
   fn:
-    | ((arg: GraphQLiteralEnumType<GenTypes>) => void)
+    | ((arg: EnumTypeDef<GenTypes>) => void)
     | string[]
     | Record<string, string | number | object | boolean>
-) {
-  const factory = new GraphQLiteralEnumType<GenTypes>(assertValidName(name));
+): EnumTypeDef<GenTypes> {
+  const factory = new EnumTypeDef<GenTypes>(assertValidName(name));
   if (typeof fn === "function") {
     fn(factory);
   } else {
@@ -156,32 +157,35 @@ export function enumType<
 /**
  * Defines a complex object which can be passed as an input value.
  *
- * Unlike object types, input types may not
+ * Unlike object types, input types do not have arguments, and they do not
+ * have resolvers, backing types, etc.
  *
  * @see https://graphql.org/learn/schema/#input-types
  */
 export function inputObjectType<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(name: TypeName, fn: (arg: GraphQLiteralInputObjectType<GenTypes>) => void) {
-  const factory = new GraphQLiteralInputObjectType<GenTypes>(
-    assertValidName(name)
-  );
+>(
+  name: TypeName,
+  fn: (t: InputObjectTypeDef<GenTypes>) => void
+): InputObjectTypeDef<GenTypes> {
+  const factory = new InputObjectTypeDef<GenTypes>(assertValidName(name));
   fn(factory);
   return factory;
 }
 
 /**
- * Defines an argument for a field type. This argument can be reused across multiple objects or interfaces
- * This is also exposed during type definition as shorthand via the various
- * `__Arg` methods: `fieldArg`, `stringArg`, `intArg`, etc.
+ * Defines an argument that can be used in any object or interface type
+ *
+ * Takes the GraphQL type name and any options. The value returned from this
+ * argument can be reused in any valid GraphQLiteral `args` object value
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
 export function arg<GenTypes = GraphQLiteralGen>(
   type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
   options?: Types.ArgOpts
-): Readonly<Types.ArgDefinition> {
+): Types.ArgDefinition {
   // This isn't wrapped for now because it's not a named type, it's really
   // just an object that can be reused in multiple locations.
   return {
@@ -191,29 +195,39 @@ export function arg<GenTypes = GraphQLiteralGen>(
 }
 
 /**
- * Alias for arg("String", options)
+ * Alias for `arg("String", options)`
  */
-export const stringArg = (options?: Types.ArgOpts) => arg("String", options);
+export function stringArg(options?: Types.ArgOpts): Types.ArgDefinition {
+  return arg("String", options);
+}
 
 /**
- * Alias for arg("Int", options)
+ * Alias for `arg("Int", options)`
  */
-export const intArg = (options?: Types.ArgOpts) => arg("Int", options);
+export function intArg(options?: Types.ArgOpts): Types.ArgDefinition {
+  return arg("Int", options);
+}
 
 /**
- * Alias for arg("Float", options)
+ * Alias for `arg("Float", options)`
  */
-export const floatArg = (options?: Types.ArgOpts) => arg("Float", options);
+export function floatArg(options?: Types.ArgOpts): Types.ArgDefinition {
+  return arg("Float", options);
+}
 
 /**
- * Alias for arg("ID", options)
+ * Alias for `arg("ID", options)`
  */
-export const idArg = (options?: Types.ArgOpts) => arg("ID", options);
+export function idArg(options?: Types.ArgOpts): Types.ArgDefinition {
+  return arg("ID", options);
+}
 
 /**
- * Alias for arg("Boolean", options)
+ * Alias for `arg("Boolean", options)`
  */
-export const booleanArg = (options?: Types.ArgOpts) => arg("Boolean", options);
+export function booleanArg(options?: Types.ArgOpts): Types.ArgDefinition {
+  return arg("Boolean", options);
+}
 
 /**
  * Defines a directive that can be used by the schema. Directives should
@@ -226,11 +240,9 @@ export function directiveType<
   name: DirectiveName,
   config:
     | Types.DirectiveConfig<GenTypes, DirectiveName>
-    | ((arg: GraphQLiteralDirectiveType<GenTypes>) => void)
-) {
-  const directive = new GraphQLiteralDirectiveType<GenTypes>(
-    assertValidName(name)
-  );
+    | ((arg: DirectiveTypeDef<GenTypes>) => void)
+): DirectiveTypeDef<GenTypes> {
+  const directive = new DirectiveTypeDef<GenTypes>(assertValidName(name));
   if (typeof config === "function") {
     config(directive);
   } else {

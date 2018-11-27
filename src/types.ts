@@ -8,20 +8,20 @@ import {
   GraphQLDirective,
 } from "graphql";
 import {
-  GraphQLiteralObjectType,
-  GraphQLiteralInputObjectType,
-  GraphQLiteralInterfaceType,
-  GraphQLiteralEnumType,
-  GraphQLiteralUnionType,
+  ObjectTypeDef,
+  InputObjectTypeDef,
+  InterfaceTypeDef,
+  EnumTypeDef,
+  UnionTypeDef,
 } from "./core";
-import { GraphQLiteralMetadata } from "./metadata";
+import { Metadata } from "./metadata";
 
-export type GraphQLiteralNamedType =
-  | GraphQLiteralObjectType
-  | GraphQLiteralInputObjectType
-  | GraphQLiteralInterfaceType
-  | GraphQLiteralEnumType
-  | GraphQLiteralUnionType;
+export type NamedTypeDef =
+  | ObjectTypeDef
+  | InputObjectTypeDef
+  | InterfaceTypeDef
+  | EnumTypeDef
+  | UnionTypeDef;
 
 export enum NodeType {
   MIX = "MIX",
@@ -89,7 +89,7 @@ export interface BuildTypes<
   DirectiveDefs extends Record<string, GraphQLDirective>
 > {
   typeMap: TypeMapDefs;
-  metadata: GraphQLiteralMetadata;
+  metadata: Metadata;
   directiveMap: DirectiveDefs;
 }
 
@@ -175,18 +175,16 @@ export interface ArgOpts extends FieldOpts {
   requiredListItem?: boolean;
 }
 
-export type ArgDefinition = Readonly<
-  ArgOpts & {
-    type: any; // TODO: Make type safe
-  }
->;
+export interface ArgDefinition
+  extends Readonly<
+      ArgOpts & {
+        type: any;
+      }
+    > {} // TODO: Make type safe
 
-export type DirectiveArgDefinition = Readonly<
-  ArgOpts & {
-    name: string;
-    type: any; // TODO: Make type safe
-  }
->;
+export interface DirectiveArgDefinition extends ArgDefinition {
+  readonly name: string;
+}
 
 export type OutputFieldArgs = Record<string, ArgDefinition>;
 
@@ -455,7 +453,7 @@ export interface TypegenConfig<GenTypes> {
   imports?: Record<string, string>;
 }
 
-export type NullabilityConfig = {
+export interface NullabilityConfig {
   /**
    * Whether non-list output fields can return null by default
    *
@@ -516,7 +514,7 @@ export type NullabilityConfig = {
    * @default false
    */
   inputListItem?: boolean;
-};
+}
 
 /**
  * Generated type helpers:

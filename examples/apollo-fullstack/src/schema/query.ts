@@ -1,16 +1,16 @@
 /// <reference path="../fullstackTypes.ts" />
-import { objectType } from "gqliteral";
+import { objectType, idArg, intArg, stringArg } from "gqliteral";
 import { Utils } from "../typeDefs";
 const utils: Utils = require("fullstack-tutorial/final/server/src/utils.js");
 
 export const Query = objectType("Query", (t) => {
   t.field("launches", "LaunchConnection", {
     args: {
-      pageSize: t.intArg({
+      pageSize: intArg({
         description:
           "The number of results to show. Must be >= 1. Default = 20",
       }),
-      after: t.stringArg({
+      after: stringArg({
         description:
           "If you add a cursor here, it will only return results _after_ this cursor",
       }),
@@ -40,8 +40,8 @@ export const Query = objectType("Query", (t) => {
   });
   t.field("launch", "Launch", {
     args: {
-      id: t.idArg({ required: true }),
-      count: t.intArg(),
+      id: idArg({ required: true }),
+      count: intArg(),
     },
     resolve: (_, args, { dataSources }) => {
       return dataSources.launchAPI.getLaunchById({ launchId: args.id });
