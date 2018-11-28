@@ -79,7 +79,9 @@ export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
   }
 
   /**
-   * Any description about the enum type.
+   * Adds a description to the GraphQLEnum type
+   *
+   * Descriptions will be output as type annotations in the generated SDL
    */
   description(description: string) {
     this.typeConfig.description = dedent(description);
@@ -97,18 +99,16 @@ export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
   }
 
   /**
-   * Internal use only. Creates the configuration to create
-   * the GraphQL named type.
-   *
-   * The GraphQLiteralEnumType requires the typeData arg because it
-   * needs to synchronously return and therefore must check for / break
-   * circular references when mixing.
+   * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLEnumType {
     return builder.enumType(this.typeConfig);
   }
 }
 
+/**
+ * Configure the `GraphQLUnionType` definition
+ */
 export class UnionTypeDef<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
@@ -123,9 +123,16 @@ export class UnionTypeDef<
     };
   }
 
+  /**
+   * Take an existing union and base the type off of that, using the `omit`
+   * option to exclude members of the other union.
+   *
+   * Note: Circular dependencies between unions are not allowed and will
+   * trigger an error at build-time.
+   */
   mix<UnionTypeName extends string>(
     type: UnionTypeName,
-    options?: Types.MixOpts<any>
+    options?: Types.MixOmitOpts<any>
   ) {
     this.typeConfig.members.push({
       item: Types.NodeType.MIX,
@@ -134,6 +141,10 @@ export class UnionTypeDef<
     });
   }
 
+  /**
+   * Add one or more members to the GraphQLUnion. Any types provided should be valid
+   * object types available to the schema.
+   */
   members(...types: string[]) {
     types.forEach((typeName) => {
       this.typeConfig.members.push({
@@ -144,9 +155,13 @@ export class UnionTypeDef<
   }
 
   /**
-   * Optionally provide a custom type resolver function. If one is not provided,
-   * the default implementation will call `isTypeOf` on each implementing
-   * Object type.
+   * Define a type resolver function for the `GraphQLUnionType`. The Resolver should
+   * return the type name of the union member that should be fulfilled.
+   *
+   * Note: Providing this is highly recommended. If one is not provided, the
+   * default implementation will call `isTypeOf` on each implementing Object type.
+   *
+   * @see https://github.com/graphql/graphql-js/issues/876#issuecomment-304398882
    */
   resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
     this.typeConfig.resolveType = typeResolver;
@@ -279,7 +294,9 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Adds a description to the metadata for the object type.
+   * Adds a description to the GraphQLObjectType
+   *
+   * Descriptions will be output as type annotations in the generated SDL
    */
   description(description: string) {
     this.typeConfig.description = dedent(description);
@@ -330,7 +347,9 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Set the nullability config for the type
+   * Configures the nullability for the type
+   *
+   * @see nullability
    */
   nullability(nullability: Types.NullabilityConfig): void {
     if (this.typeConfig.nullability) {
@@ -594,7 +613,9 @@ export class InputObjectTypeDef<
   }
 
   /**
-   * Set the nullability config for the type
+   * Configures the nullability for the type
+   *
+   * @see nullability
    */
   nullability(nullability: Types.NullabilityConfig) {
     if (this.typeConfig.nullability) {

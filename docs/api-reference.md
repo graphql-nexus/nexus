@@ -66,28 +66,6 @@ type EnumMemberMap = {};
 type EnumMemberList = ["", "", ""];
 ```
 
-### `scalarType(typeName, GraphQLScalarTypeConfig)`
-
-The `scalarType` creates a
-
-```js
-const DateScalar = scalarType("Date", {
-  description: "Date custom scalar type",
-  parseValue(value) {
-    return new Date(value);
-  },
-  serialize(value) {
-    return value.getTime();
-  },
-  parseLiteral(ast) {
-    if (ast.kind === Kind.INT) {
-      return new Date(ast.value);
-    }
-    return null;
-  },
-});
-```
-
 ### `makeSchema(SchemaOptions)`
 
 The `makeSchema` function constructs the schema. It is a wrapper over the `GraphQLSchemaType` from `graphql-js`.

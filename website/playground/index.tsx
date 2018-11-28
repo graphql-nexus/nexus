@@ -50,15 +50,6 @@ const content = dedent`
     t.field('updatedAt', 'Date', { default: () => new Date() });
   });
 
-  objectType('ZZZ_AdvancedTypes', t => {
-    t.float('coordinates', {
-      list: true,
-      listDepth: 2,
-      listItemNullable: [false, true],
-      resolve: () => Promise.resolve([])
-    });  
-  })
-
   scalarType('Date', {
     serialize: value => value.getTime(),
     parseValue: value => new Date(value),

@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "jsx": "react",
+    "lib": ["dom", "es2015"]
+  },
+  "exclude": []
+}

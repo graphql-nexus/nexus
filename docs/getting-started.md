@@ -10,7 +10,7 @@ GraphQLiteral aims to combine the simplicity and ease of development of schema-f
 
 It builds upon the primitives of `graphql-js` and similar to the schema-first approach, it uses the type names rather than per-type object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
 
-GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and makes use of TypeScript generics, conditional types, and type merging to provide full type coverage out of the box. Try it out in the [playground](/playground) to see what we mean!
+GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and makes use of TypeScript generics, conditional types, and type merging to provide full type coverage out of the box. Try it out in the [playground](../playground) to see what we mean!
 
 ## Installation
 
@@ -28,9 +28,9 @@ npm i --save gqliteral graphql-js
 
 As documented in the [API reference](api-reference.md) GraphQLiteral provides a consistent, scalable approach to defining GraphQL types in code. Fields are referred to by their GraphQL defined name.
 
-The schema requires that an Object named `Query` be provided at the top-level.
-
 ```js
+const { objectType, stringArg, fieldArg, makeSchema } = require("gqliteral");
+
 const Query = objectType("Query", (t) => {
   t.field("account", "Account", {
     args: {
@@ -69,6 +69,8 @@ const schema = makeSchema({
   types: [Account, Node, Query],
 });
 ```
+
+> The schema expects an Object named `Query` is defined at the top-level.
 
 ## Nullability & Default Values
 

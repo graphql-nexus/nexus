@@ -2,4 +2,6 @@ node_modules
 dist/*
 examples/*/dist
 website/static/playground-dist
+website/api/dist
+website/api/src/*.json
 yarn-error.log

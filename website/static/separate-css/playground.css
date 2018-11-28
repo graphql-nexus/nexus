@@ -24,17 +24,8 @@ body {
   overflow: hidden;
 }
 
-header {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  height: 30px;
-  padding: 11px 27px;
-  background-color: #2a6379;
-  color: #e0e0e0;
-  position: relative;
-  z-index: 20;
+.fixedHeaderContainer {
+  position: static;
 }
 
 @media (max-width: 400px) {

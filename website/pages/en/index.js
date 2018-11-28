@@ -76,8 +76,8 @@ class HomeSplash extends React.Component {
             <Button href={pageUrl("blog/2018/11/04/introducing-graphqliteral")}>
               Why GraphQLiteral?
             </Button>
-            <Button href={docUrl("doc2.html", language)}>API Docs</Button>
-            <Button href={docUrl("getting-started.html", language)}>
+            <Button href={pageUrl("api-reference", language)}>API Docs</Button>
+            <Button href="https://github.com/tgriesser/gqliteral/tree/master/examples">
               Examples
             </Button>
           </PromoSection>

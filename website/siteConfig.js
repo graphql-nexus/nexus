@@ -24,9 +24,9 @@ const siteConfig = {
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     { doc: "getting-started", label: "Docs" },
+    { page: "api-reference", label: "API" },
     { page: "playground", label: "Playground" },
     { page: "comparison", label: "Compare" },
-    { page: "help", label: "Help" },
     { blog: true, label: "Blog" },
   ],
 
@@ -70,6 +70,7 @@ const siteConfig = {
   scripts: [
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
+    "/graphqliteral/js/api-docs.js",
     "/graphqliteral/js/code-block-buttons.js",
     "/graphqliteral/js/code-block-toggle.js",
   ],

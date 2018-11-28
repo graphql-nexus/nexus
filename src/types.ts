@@ -94,6 +94,14 @@ export interface BuildTypes<
 }
 
 /**
+ * The MixOmitOpts is used when mixing union types, as there is no
+ * benefit to "pick" union members vs. defining them manually.
+ */
+export interface MixOmitOpts<TMembers> {
+  omit?: Array<TMembers>;
+}
+
+/**
  * When you're mixing types/partials, you can pick or omit
  * fields from the types you're mixing in.
  */
@@ -203,9 +211,9 @@ export interface OutputFieldOpts<
    */
   property?: Extract<keyof RootValue<GenTypes, TypeName>, string>;
 
-  /**
-   * Subscription for the output field.
-   */
+  // /**
+  //  * Subscription for the output field.
+  //  */
   // subscribe?: (
   //   root: RootValue<GenTypes, TypeName>,
   //   args: ArgsValue<GenTypes, TypeName, FieldName>,

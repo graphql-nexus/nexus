@@ -1,5 +1,28 @@
 /* your custom css */
 
+.fakeContainer {
+  padding-top: 0px;
+}
+
+.codeBlock {
+  -webkit-overflow-scrolling: touch;
+  background: #fcfbfa;
+  border-left: solid 3px #eceae9;
+  box-sizing: border-box;
+  display: block;
+  font-size: 0.875em;
+  margin: 0.5rem 0;
+  overflow-y: scroll;
+  padding: 0.5rem 8px 0.5rem 12px;
+  white-space: pre;
+  position: relative;
+}
+
+.memberSignature {
+  border-left-color: #9cdae9;
+  background: #f8f9fa;
+}
+
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
 }
 

@@ -11,20 +11,6 @@ import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
 
 /**
- * A GraphQL object type has a name and fields, but at some point those fields have
- * to resolve to some concrete data. That's where the scalar types come in:
- * they represent the leaves of the query.
- *
- * @see https://graphql.github.io/learn/schema/#scalar-types
- */
-export function scalarType(
-  name: string,
-  options: Types.ScalarOpts
-): GraphQLScalarType {
-  return new GraphQLScalarType({ name: assertValidName(name), ...options });
-}
-
-/**
  * The most basic components of a GraphQL schema are object types, which just represent
  * a kind of object you can fetch from your service, and what fields it has.
  *
@@ -51,6 +37,7 @@ export function objectType<
  * implementing object types, instead you may use `.implements(interfaceName)`
  * and all of the interface fields will be added to the type.
  *
+ * ```
  * const Node = interfaceType('Node', t => {
  *   t.id('id', { description: 'GUID for a resource' });
  * });
@@ -58,6 +45,7 @@ export function objectType<
  * const User = objectType('User', t => {
  *   t.implements('Node');
  * });
+ * ```
  *
  * @see https://graphql.github.io/learn/schema/#interfaces
  */
@@ -79,18 +67,22 @@ export function interfaceType<
  * Union types are very similar to interfaces, but they don't get to specify
  * any common fields between the types.
  *
- * There are two ways to create a GraphQLUnionType with GraphQLiteralUnion:
+ * There are two ways to create a `unionType`:
  *
  * As an array of types to satisfy the union:
  *
+ * ```
  * const SearchResult = GraphQLiteralUnion('SearchResult', ['Human', 'Droid', 'Starship'])
+ * ```
  *
  * As a function, where other unions can be mixed in:
  *
+ * ```
  * const CombinedResult = GraphQLiteralUnion('CombinedResult', t => {
  *   t.mix('SearchResult')
  *   t.members('OtherType', 'AnotherType')
  * })
+ * ```
  *
  * @see https://graphql.org/learn/schema/#union-types
  */
@@ -113,18 +105,23 @@ export function unionType<
  *
  * As an array of enum values:
  *
+ * ```
  * const Episode = GraphQLiteralEnum('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
+ * ```
  *
  * As an object, with a mapping of enum values to internal values:
  *
+ * ```
  * const Episode = GraphQLiteralEnum('Episode', {
  *   NEWHOPE: 4,
  *   EMPIRE: 5,
  *   JEDI: 6
  * });
+ * ```
  *
  * As a function, where other enums can be mixed in:
  *
+ * ```
  * const Episode = GraphQLiteralEnum('Episode', (t) => {
  *   t.mix('OneThroughThree')
  *   t.mix('FourThroughSix')
@@ -132,6 +129,7 @@ export function unionType<
  *   t.members(['OTHER'])
  *   t.description('All Movies in the Skywalker saga, or OTHER')
  * })
+ * ```
  *
  * @see https://graphql.github.io/learn/schema/#enumeration-types
  */
@@ -172,6 +170,38 @@ export function inputObjectType<
   const factory = new InputObjectTypeDef<GenTypes>(assertValidName(name));
   fn(factory);
   return factory;
+}
+
+/**
+ * A GraphQL object type has a name and fields, but at some point those fields have
+ * to resolve to some concrete data. That's where the scalar types come in:
+ * they represent the leaves of the query.
+ *
+ * ```js
+ * const DateScalar = scalarType("Date", {
+ *  description: "Date custom scalar type",
+ *  parseValue(value) {
+ *    return new Date(value);
+ *  },
+ *  serialize(value) {
+ *    return value.getTime();
+ *  },
+ *  parseLiteral(ast) {
+ *    if (ast.kind === Kind.INT) {
+ *      return new Date(ast.value);
+ *    }
+ *    return null;
+ *  }
+ * });
+ * ```
+ *
+ * @see https://graphql.github.io/learn/schema/#scalar-types
+ */
+export function scalarType(
+  name: string,
+  options: Types.ScalarOpts
+): GraphQLScalarType {
+  return new GraphQLScalarType({ name: assertValidName(name), ...options });
 }
 
 /**
@@ -230,8 +260,10 @@ export function booleanArg(options?: Types.ArgOpts): Types.ArgDefinition {
 }
 
 /**
- * Defines a directive that can be used by the schema. Directives should
- * be rarely used, as they only function for external consumers of the schema.
+ * Defines a directive that can be used by the schema.
+ *
+ * > Note: Directives should be rarely used, as they only function for external
+ * > consumers of the schema.
  */
 export function directiveType<
   GenTypes = GraphQLiteralGen,

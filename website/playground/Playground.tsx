@@ -26,11 +26,15 @@ import { GraphQLSchema, graphql } from "graphql";
 import * as monaco from "monaco-editor";
 import "./monaco-config";
 import debounce from "lodash.debounce";
-import * as urlHash from "./urlHash";
+// import * as urlHash from "./urlHash";
 
 interface GraphiQLProps {
   fetcher: Function;
   defaultQuery?: string;
+}
+
+interface GraphiQLComponent extends React.Component<GraphiQLProps> {
+  handleRunQuery(): any;
 }
 
 declare global {
@@ -63,22 +67,22 @@ function monacoRef() {
 export const Playground: React.SFC<PlaygroundProps> = (props) => {
   // const original = urlHash.read();
   const [codeDiv, schemaDiv, typesDiv] = [
-    useRef(null),
-    useRef(null),
-    useRef(null),
+    useRef<null | HTMLDivElement>(null),
+    useRef<null | HTMLDivElement>(null),
+    useRef<null | HTMLDivElement>(null),
   ];
   const [codeEditorRef, schemaEditorRef, typesEditorRef] = [
     monacoRef(),
     monacoRef(),
     monacoRef(),
   ];
-  const graphiqlRef = useRef(null);
+  const graphiqlRef = useRef<null | GraphiQLComponent>(null);
   const [activeEditor, setActiveEditor] = useState<"SDL" | "TYPES">("SDL");
   const [content, setContent] = useState(props.initialSchema);
   const [schemaError, setSchemaError] = useState<Error | null>(null);
   const [activeSchema, setActiveSchema] = useState<{
     schema: GraphQLSchema;
-    metadata: core.GraphQLiteralMetadata;
+    metadata: core.Metadata;
   } | null>(null);
 
   const printedSchema = useMemo(
@@ -97,7 +101,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   );
 
   useEffect(() => {
-    if (codeDiv.current) {
+    if (codeDiv.current && typesDiv.current && schemaDiv.current) {
       const codeEditor = monaco.editor.create(codeDiv.current, {
         language: "typescript",
         model: monaco.editor.createModel(
@@ -138,7 +142,9 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 
   useEffect(
     () => {
-      schemaEditorRef.current.setValue(printedSchema);
+      if (schemaEditorRef.current) {
+        schemaEditorRef.current.setValue(printedSchema);
+      }
     },
     [printedSchema]
   );
@@ -148,7 +154,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
       const { schema, metadata, error } = getCurrentSchema(content);
       if (error) {
         setSchemaError(error);
-      } else {
+      } else if (schema && metadata) {
         setActiveSchema({ schema, metadata });
         setSchemaError(null);
       }
@@ -251,7 +257,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
               ref={graphiqlRef}
               key={printedSchema}
               defaultQuery={props.initialQuery}
-              fetcher={(params) => {
+              fetcher={(params: any) => {
                 return graphql(activeSchema.schema, params.query);
               }}
             />
@@ -263,11 +269,11 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 };
 
 type SchemaOrError =
-  | { schema: GraphQLSchema; metadata: core.GraphQLiteralMetadata; error: null }
+  | { schema: GraphQLSchema; metadata: core.Metadata; error: null }
   | { schema: null; metadata: null; error: Error };
 
-function getCurrentSchema(code): SchemaOrError {
-  const cache = [];
+function getCurrentSchema(code: string): SchemaOrError {
+  const cache: any[] = [];
   function add(val: any) {
     cache.push(val);
     return val;
