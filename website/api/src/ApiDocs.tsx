@@ -188,7 +188,7 @@ export function ApiDocs() {
           </div>
         );
       })}
-      <h2>Definition Objects:</h2>
+      <h2 id="Definition-Objects">Definition Objects:</h2>
       <p>
         Each of these objects represent the value passed to the{" "}
         <b>builder function</b>, the second argument of the main API:
@@ -273,7 +273,14 @@ export const ApiSidebar = () => {
           </ul>
         </li>
         <li>
-          <a href="#building-a-schema">Building a Schema</a>
+          <a href="#Definition-Objects">Definition Objects</a>
+          <ul className="toc-headings">
+            {coreKeys.map((key) => (
+              <li key={key}>
+                <a href={`#${key}`}>{key}</a>
+              </li>
+            ))}
+          </ul>
         </li>
         <li>
           <a href="#nullability-default-values">

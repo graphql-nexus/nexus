@@ -468,7 +468,7 @@ declare global {
 type ${MP}<T> = T | PromiseLike<T>;
 
 // Maybe Promise List
-type ${MPL}<T> = ${MP}<T>[];
+type ${MPL}<T> = Iterable<${MP}<T>>;
 
 // Maybe Thunk
 type ${MT}<T> = T | (() => T);

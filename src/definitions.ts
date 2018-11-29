@@ -68,20 +68,13 @@ export function interfaceType<
  * Union types are very similar to interfaces, but they don't get to specify
  * any common fields between the types.
  *
- * There are two ways to create a `unionType`:
- *
- * As an array of types to satisfy the union:
- *
- * ```
- * const SearchResult = unionType('SearchResult', ['Human', 'Droid', 'Starship'])
- * ```
- *
  * As a function, where other unions can be mixed in:
  *
  * ```
  * const CombinedResult = unionType('CombinedResult', t => {
  *   t.mix('SearchResult')
  *   t.members('AnotherType', 'YetAnotherType')
+ *   t.resolveType(item => item.name)
  * })
  * ```
  *
@@ -92,9 +85,7 @@ export function unionType<
   TypeName extends string = any
 >(
   name: TypeName,
-  fn:
-    | ((t: UnionTypeDef<GenTypes, TypeName>) => void)
-    | Types.ObjectNames<GenTypes>[]
+  fn: (t: UnionTypeDef<GenTypes, TypeName>) => void
 ): WrappedType {
   const factory = new UnionTypeDef<GenTypes>(assertValidName(name));
   fn(factory);
