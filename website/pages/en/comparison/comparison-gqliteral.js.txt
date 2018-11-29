@@ -1,41 +1,41 @@
 import {
-  GraphQLiteralObject,
-  GraphQLiteralInterface,
-  GraphQLiteralEnum,
-  GraphQLiteralSchema,
+  objectType,
+  interfaceType,
+  enumType,
+  makeSchema,
 } from "gqliteral";
 
-const Node = GraphQLiteralInterface("Node", t => {
+const Node = interfaceType("Node", t => {
   t.id("id", { description: "ID of the Resource" });
   t.resolveType(obj => obj.type);
 });
 
-const User = GraphQLiteralObject("User", t => {
+const User = objectType("User", t => {
   t.interface("Node");
   t.string("firstName", { property: "first_name" });
   t.string("lastName", { property: "last_name" });
 });
 
-const Post = GraphQLiteralObject("Post", t => {
+const Post = objectType("Post", t => {
   t.interface("Node");
   t.field("status", "PostStatus", { description: "Status of the post" });
   t.string("content", { description: "Content of the post" });
 });
 
-const Comment = GraphQLiteralObject("Comment", t => {
+const Comment = objectType("Comment", t => {
   t.interface("Node");
   t.description("A comment is created by a User and is associated with a Post");
   t.id("id", { description: "ID of the Comment" });
   t.field("author", "User", { description: "Author of the post" });
 });
 
-const PostStatus = GraphQLiteralEnum("PostStatus", ["DRAFT", "PUBLISHED"]);
+const PostStatus = enumType("PostStatus", ["DRAFT", "PUBLISHED"]);
 
-const CommentStatus = GraphQLiteralEnum("CommentStatus", t => {
+const CommentStatus = enumType("CommentStatus", t => {
   t.mix("PostStatus");
   t.members("MODERATED", "PINNED");
 });
 
-const schema = GraphQLiteralSchema({
+const schema = makeSchema({
   types: [User, Post, Comment, PostStatus, CommentStatus],
 });

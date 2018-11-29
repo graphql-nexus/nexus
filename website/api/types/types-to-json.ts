@@ -3,19 +3,16 @@ import { List, OrderedMap } from "immutable";
 import fs from "fs-extra";
 import path from "path";
 import {
-  TagStruct,
+  TagRecord,
   TypeVal,
-  ClassMethodStruct,
-  ParamStruct,
   ClassMethodRecord,
-  ClassStruct,
-  FuncStruct,
-  DocStruct,
+  ClassRecord,
+  FuncRecord,
+  DocRecord,
   ParamRecord,
-  InterfaceStruct,
+  InterfaceRecord,
   PropertyRecord,
-  PropertyStruct,
-  TypeWithArgsStruct,
+  TypeWithArgsRecord,
   transit,
   ParsedFiles,
 } from "../src/typedefs";
@@ -39,7 +36,7 @@ function hasJsDoc(node: any): node is { jsDoc: ts.JSDoc[] } {
 function extractTags(tags: ReadonlyArray<ts.JSDocTag> = []) {
   return tags.reduce((a, tag) => {
     return a.push(
-      TagStruct({
+      TagRecord({
         comment: tag.comment,
         name: tag.tagName.text,
       })
@@ -61,7 +58,7 @@ function parseSourceFile(source: ts.SourceFile) {
   }
 
   function typeWithArgs(text: string, arr: ts.NodeArray<ts.TypeNode>) {
-    return TypeWithArgsStruct({
+    return TypeWithArgsRecord({
       name: text,
       args: arr.reduce((a, b) => a.push(extractType(b)), List()),
     });
@@ -92,7 +89,7 @@ function parseSourceFile(source: ts.SourceFile) {
     return members.reduce((a, b) => {
       if (ts.isMethodDeclaration(b)) {
         return a.push(
-          ClassMethodStruct({
+          ClassMethodRecord({
             name: b.name.getText(source),
             params: extractParams(b.parameters),
             type: b.type ? extractType(b.type) : "unknown",
@@ -109,7 +106,7 @@ function parseSourceFile(source: ts.SourceFile) {
     return members.reduce((a, b) => {
       if (ts.isPropertySignature(b)) {
         return a.push(
-          PropertyStruct({
+          PropertyRecord({
             name: b.name.getText(source),
             type: b.type ? extractType(b.type) : null,
             doc: extractDoc(b),
@@ -122,7 +119,7 @@ function parseSourceFile(source: ts.SourceFile) {
   function extractParams(params: ts.NodeArray<ts.ParameterDeclaration>) {
     return params.reduce((a, param) => {
       return a.push(
-        ParamStruct({
+        ParamRecord({
           name: param.name.getText(source),
           type: param.type ? extractType(param.type) : "unknown",
           optional: Boolean(param.questionToken),
@@ -137,7 +134,7 @@ function parseSourceFile(source: ts.SourceFile) {
         throw new Error("Each item must have only one associated jsDoc block");
       }
       const doc = type.jsDoc[0];
-      return DocStruct({
+      return DocRecord({
         comment: doc.comment,
         tags: extractTags(doc.tags),
       });
@@ -145,7 +142,7 @@ function parseSourceFile(source: ts.SourceFile) {
     return null;
   }
   function extractFn(node: ts.FunctionDeclaration | ts.FunctionTypeNode) {
-    return FuncStruct({
+    return FuncRecord({
       name: node.name ? node.name.getText(source) : null,
       doc: extractDoc(node),
       params: extractParams(node.parameters),
@@ -153,14 +150,14 @@ function parseSourceFile(source: ts.SourceFile) {
     });
   }
   function extractClass(node: ts.ClassDeclaration) {
-    return ClassStruct({
+    return ClassRecord({
       name: node.name ? node.name.getText(source) : null,
       doc: extractDoc(node),
       members: extractMethods(node.members),
     });
   }
   function extractInterface(node: ts.InterfaceDeclaration) {
-    return InterfaceStruct({
+    return InterfaceRecord({
       name: node.name.getText(source),
       doc: extractDoc(node),
       members: extractProperties(node.members),

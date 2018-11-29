@@ -15,8 +15,7 @@ Check out the [`/examples`](/examples) for some sample uses.
 Build them manually (for now)
 
 ```
-yarn run playground # Builds the webpack for the playground
-yarn run website # Generates the docusaurus site
+yarn run website
 ```
 
 ### License

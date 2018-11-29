@@ -16,12 +16,12 @@ import {
 } from "./core";
 import { Metadata } from "./metadata";
 
-export type NamedTypeDef =
-  | ObjectTypeDef
-  | InputObjectTypeDef
-  | InterfaceTypeDef
-  | EnumTypeDef
-  | UnionTypeDef;
+export type NamedTypeDef<GenTypes = any> =
+  | ObjectTypeDef<GenTypes, any>
+  | InputObjectTypeDef<GenTypes, any>
+  | InterfaceTypeDef<GenTypes, any>
+  | EnumTypeDef<GenTypes>
+  | UnionTypeDef<GenTypes>;
 
 export enum NodeType {
   MIX = "MIX",

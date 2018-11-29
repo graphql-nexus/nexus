@@ -2,7 +2,7 @@
   "name": "@graphqliteral/website",
   "license": "MIT",
   "scripts": {
-    "start": "docusaurus-start",
+    "start": "gulp start",
     "build": "docusaurus-build",
     "publish-gh-pages": "docusaurus-publish",
     "write-translations": "docusaurus-write-translations",
@@ -34,6 +34,9 @@
     "@types/gulp": "3.8.36",
     "@types/lodash.debounce": "^4.0.4",
     "@types/dedent": "^0.7.0",
+    "@types/marked": "^0.4.2",
+    "@types/prismjs": "^1.9.0",
+    "prismjs": "^1.15.0",
     "gulp": "^3.9.1",
     "fs-extra": "^7.0.1",
     "transit-js": "^0.8.861",
@@ -51,6 +54,7 @@
     "raw-loader": "^0.5.1",
     "monaco-editor-webpack-plugin": "^1.6.0",
     "immutable": "^4.0.0-rc.12",
-    "ts-node": "^7.0.1"
+    "ts-node": "^7.0.1",
+    "marked": "^0.5.2"
   }
 }

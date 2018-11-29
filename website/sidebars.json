@@ -2,9 +2,9 @@
   "docs": {
     "Documentation": [
       "getting-started",
-      "best-practices",
-      "type-generation",
       "api-reference",
+      "type-generation",
+      "best-practices",
       "faq"
     ]
   }

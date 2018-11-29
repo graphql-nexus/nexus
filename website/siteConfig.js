@@ -17,6 +17,12 @@ const siteConfig = {
   baseUrl: "/graphqliteral/", // Base URL for your project */
   noIndex: true,
 
+  // algolia: {
+  //   apiKey: 'my-api-key',
+  //   indexName: 'my-index-name',
+  //   algoliaOptions: {} // Optional, if provided by Algolia
+  // }
+
   // Used for publishing and more
   projectName: "graphqliteral",
   organizationName: "tgriesser",
@@ -74,7 +80,10 @@ const siteConfig = {
     "/graphqliteral/js/code-block-buttons.js",
     "/graphqliteral/js/code-block-toggle.js",
   ],
-  stylesheets: ["/graphqliteral/css/code-block-buttons.css"],
+  stylesheets: [
+    "https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.css",
+    "/graphqliteral/css/code-block-buttons.css",
+  ],
 
   // On page navigation for the current documentation page.
   onPageNav: "separate",
@@ -82,8 +91,8 @@ const siteConfig = {
   cleanUrl: true,
 
   // Open Graph and Twitter card images.
-  ogImage: "img/docusaurus.png",
-  twitterImage: "img/docusaurus.png",
+  ogImage: "img/graphqliteral.png",
+  twitterImage: "img/graphqliteral.png",
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,

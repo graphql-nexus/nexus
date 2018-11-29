@@ -13,21 +13,21 @@ export type TypeWithArgsProps = {
   args: List<TypeVal>;
 };
 
-export type TypeWithArgsRecord = RecordOf<TypeWithArgsProps>;
+export interface TypeWithArgsRecord extends RecordOf<TypeWithArgsProps> {}
 
 export interface TagProps {
   name: string;
   comment: string;
 }
 
-export type TagRecord = RecordOf<TagProps>;
+export interface TagRecord extends RecordOf<TagProps> {}
 
 export interface DocProps {
   comment: string;
   tags: List<RecordOf<TagProps>>;
 }
 
-export type DocRecord = RecordOf<DocProps>;
+export interface DocRecord extends RecordOf<DocProps> {}
 
 export interface ParamProps {
   name: string;
@@ -36,7 +36,7 @@ export interface ParamProps {
   doc: Maybe<DocRecord>;
 }
 
-export type ParamRecord = RecordOf<ParamProps>;
+export interface ParamRecord extends RecordOf<ParamProps> {}
 
 export interface FuncProps {
   node: "Func";
@@ -46,7 +46,7 @@ export interface FuncProps {
   type: null | TypeVal;
 }
 
-export type FuncRecord = RecordOf<FuncProps>;
+export interface FuncRecord extends RecordOf<FuncProps> {}
 
 export interface ClassMethodProps {
   name: string;
@@ -55,7 +55,7 @@ export interface ClassMethodProps {
   doc: Maybe<DocRecord>;
 }
 
-export type ClassMethodRecord = RecordOf<ClassMethodProps>;
+export interface ClassMethodRecord extends RecordOf<ClassMethodProps> {}
 
 export interface ClassProps {
   node: "Class";
@@ -64,7 +64,7 @@ export interface ClassProps {
   doc: Maybe<DocRecord>;
 }
 
-export type ClassRecord = RecordOf<ClassProps>;
+export interface ClassRecord extends RecordOf<ClassProps> {}
 
 export interface InterfaceProps {
   node: "Interface";
@@ -74,7 +74,7 @@ export interface InterfaceProps {
   inherits: List<string>;
 }
 
-export type InterfaceRecord = RecordOf<InterfaceProps>;
+export interface InterfaceRecord extends RecordOf<InterfaceProps> {}
 
 export interface PropertyProps {
   name: string;
@@ -82,43 +82,43 @@ export interface PropertyProps {
   doc: Maybe<DocRecord>;
 }
 
-export type PropertyRecord = RecordOf<PropertyProps>;
+export interface PropertyRecord extends RecordOf<PropertyProps> {}
 
-export const TypeWithArgsStruct = Record<TypeWithArgsProps>(
+export const TypeWithArgsRecord = Record<TypeWithArgsProps>(
   {
     name: "",
     args: List(),
   },
-  "TypeWithArgsStruct"
+  "TypeWithArgsRecord"
 );
 
-export const TagStruct = Record<TagProps>(
+export const TagRecord = Record<TagProps>(
   {
     name: "",
     comment: "",
   },
-  "TagStruct"
+  "TagRecord"
 );
 
-export const DocStruct = Record<DocProps>(
+export const DocRecord = Record<DocProps>(
   {
     comment: "",
     tags: List(),
   },
-  "DocStruct"
+  "DocRecord"
 );
 
-export const ParamStruct = Record<ParamProps>(
+export const ParamRecord = Record<ParamProps>(
   {
     name: "",
     type: "",
     optional: false,
     doc: null,
   },
-  "ParamStruct"
+  "ParamRecord"
 );
 
-export const FuncStruct = Record<FuncProps>(
+export const FuncRecord = Record<FuncProps>(
   {
     node: "Func",
     name: "",
@@ -126,30 +126,30 @@ export const FuncStruct = Record<FuncProps>(
     doc: null,
     type: null,
   },
-  "FuncStruct"
+  "FuncRecord"
 );
 
-export const ClassStruct = Record<ClassProps>(
+export const ClassRecord = Record<ClassProps>(
   {
     node: "Class",
     name: "",
     members: List(),
     doc: null,
   },
-  "ClassStruct"
+  "ClassRecord"
 );
 
-export const ClassMethodStruct = Record<ClassMethodProps>(
+export const ClassMethodRecord = Record<ClassMethodProps>(
   {
     name: "",
     params: List(),
     type: null,
     doc: null,
   },
-  "ClassMethodStruct"
+  "ClassMethodRecord"
 );
 
-export const InterfaceStruct = Record<InterfaceProps>(
+export const InterfaceRecord = Record<InterfaceProps>(
   {
     node: "Interface",
     name: "",
@@ -157,16 +157,16 @@ export const InterfaceStruct = Record<InterfaceProps>(
     members: List(),
     inherits: List(),
   },
-  "InterfaceStruct"
+  "InterfaceRecord"
 );
 
-export const PropertyStruct = Record<PropertyProps>(
+export const PropertyRecord = Record<PropertyProps>(
   {
     name: "",
     type: null,
     doc: null,
   },
-  "PropertyStruct"
+  "PropertyRecord"
 );
 
 export type BaseRecords = FuncRecord | ClassRecord | InterfaceRecord;
@@ -193,14 +193,14 @@ export const isInterfaceRecord = (val: any): val is InterfaceRecord => {
 };
 
 export const transit = TransitImmutable.withRecords([
-  TagStruct,
-  ClassMethodStruct,
-  ParamStruct,
-  ClassStruct,
-  FuncStruct,
-  DocStruct,
-  InterfaceStruct,
-  PropertyStruct,
-  TypeWithArgsStruct,
+  TagRecord,
+  ClassMethodRecord,
+  ParamRecord,
+  ClassRecord,
+  FuncRecord,
+  DocRecord,
+  InterfaceRecord,
+  PropertyRecord,
+  TypeWithArgsRecord,
   ParsedFiles,
 ]);

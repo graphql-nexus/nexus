@@ -2,7 +2,7 @@ const React = require("react");
 
 const CompLibrary = require("../../core/CompLibrary.js");
 const DocsSidebar = require("../../core/DocsSidebar.js");
-const { ApiDocs } = require(`${process.cwd()}/api/dist/ApiDocs.js`);
+const { ApiDocs, ApiSidebar } = require(`${process.cwd()}/api/dist/ApiDocs.js`);
 
 const Container = CompLibrary.Container;
 
@@ -20,6 +20,7 @@ class ApiReference extends React.Component {
         <Container className="mainContainer documentContainer postContainer fakeContainer">
           <ApiDocs />
         </Container>
+        <ApiSidebar />
       </div>
     );
   }

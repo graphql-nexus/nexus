@@ -6,6 +6,7 @@ import {
   InterfaceTypeDef,
   ObjectTypeDef,
   UnionTypeDef,
+  WrappedType,
 } from "./core";
 import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
@@ -22,10 +23,10 @@ export function objectType<
 >(
   name: TypeName,
   fn: (t: ObjectTypeDef<GenTypes, TypeName>) => void
-): ObjectTypeDef<GenTypes, TypeName> {
+): WrappedType {
   const factory = new ObjectTypeDef<GenTypes, TypeName>(assertValidName(name));
   fn(factory);
-  return factory;
+  return new WrappedType(factory);
 }
 
 /**
@@ -55,12 +56,12 @@ export function interfaceType<
 >(
   name: TypeName,
   fn: (t: InterfaceTypeDef<GenTypes, TypeName>) => void
-): InterfaceTypeDef<GenTypes, TypeName> {
+): WrappedType {
   const factory = new InterfaceTypeDef<GenTypes, TypeName>(
     assertValidName(name)
   );
   fn(factory);
-  return factory;
+  return new WrappedType(factory);
 }
 
 /**
@@ -72,15 +73,15 @@ export function interfaceType<
  * As an array of types to satisfy the union:
  *
  * ```
- * const SearchResult = GraphQLiteralUnion('SearchResult', ['Human', 'Droid', 'Starship'])
+ * const SearchResult = unionType('SearchResult', ['Human', 'Droid', 'Starship'])
  * ```
  *
  * As a function, where other unions can be mixed in:
  *
  * ```
- * const CombinedResult = GraphQLiteralUnion('CombinedResult', t => {
+ * const CombinedResult = unionType('CombinedResult', t => {
  *   t.mix('SearchResult')
- *   t.members('OtherType', 'AnotherType')
+ *   t.members('AnotherType', 'YetAnotherType')
  * })
  * ```
  *
@@ -91,28 +92,30 @@ export function unionType<
   TypeName extends string = any
 >(
   name: TypeName,
-  fn: (t: UnionTypeDef<GenTypes, TypeName>) => void
-): UnionTypeDef<GenTypes, TypeName> {
+  fn:
+    | ((t: UnionTypeDef<GenTypes, TypeName>) => void)
+    | Types.ObjectNames<GenTypes>[]
+): WrappedType {
   const factory = new UnionTypeDef<GenTypes>(assertValidName(name));
   fn(factory);
-  return factory;
+  return new WrappedType(factory);
 }
 
 /**
  * A Enum is a special GraphQL type that represents a set of symbolic names (members)
  * bound to unique, constant values. There are three ways to create a GraphQLEnumType
- * with GraphQLiteralEnum:
+ * with enumType:
  *
  * As an array of enum values:
  *
  * ```
- * const Episode = GraphQLiteralEnum('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
+ * const Episode = enumType('Episode', ['NEWHOPE', 'EMPIRE', 'JEDI'])
  * ```
  *
  * As an object, with a mapping of enum values to internal values:
  *
  * ```
- * const Episode = GraphQLiteralEnum('Episode', {
+ * const Episode = enumType('Episode', {
  *   NEWHOPE: 4,
  *   EMPIRE: 5,
  *   JEDI: 6
@@ -122,7 +125,7 @@ export function unionType<
  * As a function, where other enums can be mixed in:
  *
  * ```
- * const Episode = GraphQLiteralEnum('Episode', (t) => {
+ * const Episode = enumType('Episode', (t) => {
  *   t.mix('OneThroughThree')
  *   t.mix('FourThroughSix')
  *   t.mix('SevenThroughNine')
@@ -142,14 +145,14 @@ export function enumType<
     | ((arg: EnumTypeDef<GenTypes>) => void)
     | string[]
     | Record<string, string | number | object | boolean>
-): EnumTypeDef<GenTypes> {
+): WrappedType {
   const factory = new EnumTypeDef<GenTypes>(assertValidName(name));
   if (typeof fn === "function") {
     fn(factory);
   } else {
     factory.members(enumShorthandMembers(fn));
   }
-  return factory;
+  return new WrappedType(factory);
 }
 
 /**
@@ -163,13 +166,10 @@ export function enumType<
 export function inputObjectType<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
->(
-  name: TypeName,
-  fn: (t: InputObjectTypeDef<GenTypes>) => void
-): InputObjectTypeDef<GenTypes> {
+>(name: TypeName, fn: (t: InputObjectTypeDef<GenTypes>) => void): WrappedType {
   const factory = new InputObjectTypeDef<GenTypes>(assertValidName(name));
   fn(factory);
-  return factory;
+  return new WrappedType(factory);
 }
 
 /**
@@ -179,19 +179,19 @@ export function inputObjectType<
  *
  * ```js
  * const DateScalar = scalarType("Date", {
- *  description: "Date custom scalar type",
- *  parseValue(value) {
- *    return new Date(value);
- *  },
- *  serialize(value) {
- *    return value.getTime();
- *  },
- *  parseLiteral(ast) {
- *    if (ast.kind === Kind.INT) {
- *      return new Date(ast.value);
- *    }
- *    return null;
- *  }
+ *   description: "Date custom scalar type",
+ *   parseValue(value) {
+ *     return new Date(value);
+ *   },
+ *   serialize(value) {
+ *     return value.getTime();
+ *   },
+ *   parseLiteral(ast) {
+ *     if (ast.kind === Kind.INT) {
+ *       return new Date(ast.value);
+ *     }
+ *     return null;
+ *   }
  * });
  * ```
  *
@@ -200,15 +200,18 @@ export function inputObjectType<
 export function scalarType(
   name: string,
   options: Types.ScalarOpts
-): GraphQLScalarType {
-  return new GraphQLScalarType({ name: assertValidName(name), ...options });
+): WrappedType {
+  return new WrappedType(
+    new GraphQLScalarType({ name: assertValidName(name), ...options })
+  );
 }
 
 /**
  * Defines an argument that can be used in any object or interface type
  *
- * Takes the GraphQL type name and any options. The value returned from this
- * argument can be reused in any valid GraphQLiteral `args` object value
+ * Takes the GraphQL type name and any options.
+ *
+ * The value returned from this argument can be used multiple times in any valid `args` object value
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
@@ -273,12 +276,12 @@ export function directiveType<
   config:
     | Types.DirectiveConfig<GenTypes, DirectiveName>
     | ((arg: DirectiveTypeDef<GenTypes>) => void)
-): DirectiveTypeDef<GenTypes> {
+): WrappedType {
   const directive = new DirectiveTypeDef<GenTypes>(assertValidName(name));
   if (typeof config === "function") {
     config(directive);
   } else {
     directive.locations(...config.locations);
   }
-  return directive;
+  return new WrappedType(directive);
 }

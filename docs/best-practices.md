@@ -6,6 +6,8 @@ sidebar_label: Best Practices
 
 A few tips when using GraphQLiteral to build out a schema
 
+## Configure your development server to auto-restart
+
 ## Consistent file structure for GraphQL type imports
 
 When you have a large schema you'll usually want to break it up into smaller
@@ -46,15 +48,3 @@ export const schema = makeSchema({
   output: { ... }
 })
 ```
-
-## Configuring built-in type generation, for better intellisense
-
-```ts
-const schema = makeSchema({
-  types: allTypes,
-});
-```
-
-## Using .mix to compose types
-
-One of the main features

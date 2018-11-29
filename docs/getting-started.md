@@ -8,25 +8,25 @@ Robust, composable type definition for GraphQL in TypeScript/JavaScript.
 
 GraphQLiteral aims to combine the simplicity and ease of development of schema-first development approaches (like [graphql-tools](https://www.apollographql.com/docs/graphql-tools/generate-schema.html)) with the long-term maintainability of tools like [graphene-python](https://docs.graphene-python.org/en/latest/), or [graphql-ruby](https://github.com/rmosolgo/graphql-ruby), or [graphql-js](https://github.com/graphql/graphql-js).
 
-It builds upon the primitives of `graphql-js` and similar to the schema-first approach, it uses the type names rather than per-type object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
+It builds upon the primitives of `graphql-js` and similar to the schema-first approach, utilizes the type names rather than concrete object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
 
-GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and makes use of TypeScript generics, conditional types, and type merging to provide full type coverage out of the box. Try it out in the [playground](../playground) to see what we mean!
+GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and combines TypeScript generics, conditional types, and type merging to provide full auto-generated type coverage out of the box.
+
+Try it out in the [playground](../playground) to see what we mean!
 
 ## Installation
 
 GraphQLiteral requires that `graphql` it be installed as a peer dependency. It can be installed with either `npm` or `yarn`.
 
-```sh
-yarn add gqliteral graphql-js
-```
+`yarn add gqliteral graphql`
 
-```sh
-npm i --save gqliteral graphql-js
-```
+or
+
+`npm i --save gqliteral graphql`
 
 ## Building a Schema
 
-As documented in the [API reference](api-reference.md) GraphQLiteral provides a consistent, scalable approach to defining GraphQL types in code. Fields are referred to by their GraphQL defined name.
+As documented in the [API reference](../api-reference) GraphQLiteral provides a consistent, scalable approach to defining GraphQL types in code. Fields are referred to by their GraphQL defined name.
 
 ```js
 const { objectType, stringArg, fieldArg, makeSchema } = require("gqliteral");
@@ -62,11 +62,13 @@ const Account = objectType("Account", (t) => {
   t.implements("Node");
   t.string("username");
   t.string("email");
-  t.mix(UserFields);
 });
 
 const schema = makeSchema({
   types: [Account, Node, Query],
+  // or types: { Account, Node, Query }
+  // or types: [Account, [Node], { Query }]
+  // This is intentionally a very permissive API :)
 });
 ```
 
@@ -74,13 +76,15 @@ const schema = makeSchema({
 
 ## Nullability & Default Values
 
+_tl;dr - GraphQLiteral assumes output fields are non-null by default_
+
 One benefit of GraphQL is the strict enforcement and guarentees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default.
 
 The GraphQL documentation provides [this explanation](https://graphql.org/learn/best-practices/#nullability):
 
 > ... in a GraphQL type system, every field is nullable by default. This is because there are many things which can go awry in a networked service backed by databases and other services. A database could go down, an asynchronous action could fail, an exception could be thrown. Beyond simply system failures, authorization can often be granular, where individual fields within a request can have different authorization rules.
 
-`GraphQLiteral` breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all arguments are nullable unless `required` is set to true.
+GraphQLiteral breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all arguments are nullable unless `required` is set to true.
 
 The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.
 
@@ -99,14 +103,6 @@ const AccountInfo = objectType("AccountInfo", (t) => {
 });
 ```
 
-## Type Mixing
-
-When hand constructing schemas in a GraphQL Interface Definition Language (IDL) file, one of the big pain points is making a change to multiple types at once, for instance when adding a field to an interface. Changing types, keeping consistent descriptions, field deprecation are all difficult when you're maintaining this by hand.
-
-## Abstract Type
-
-Have you ever found yourself re-using the same set of fields in multiple types, but it doesn't necessarily warrant the ceremony of being a named `interface` type? Or maybe you have a set of fields that are mirrored in both the input & output.
-
 ## Resolving: Property
 
 One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQLiteral provides a `property` option on the field configuration object, for conveniently accessing an object property without needing to define a resolver function.
@@ -119,23 +115,43 @@ const User = objectType("User", (t) => {
 });
 ```
 
-When using the TypeScript, configuring the [backing object type](typescript-setup.md) definitions will check for the existence of the property on the object, and error if a non-existent property is referenced.
+When using the TypeScript, configuring the [backing object type](type-generation.md#backing-types) definitions will check for the existence of the property on the object, and error if a non-existent property is referenced.
 
-## Resolving: defaultResolver
+## Type Mixing
 
-GraphQLiteral allows you to define an override to the `defaultResolver` on a per-type basis. This can be quite powerful when you wish to define unique default behavior that goes beyond
+When hand constructing schemas in a GraphQL Interface Definition Language (IDL) file, one of the big pain points is making a change to multiple types at once, for instance when adding a field to an interface. Changing types, keeping consistent descriptions, field deprecation are all difficult when you're maintaining this by hand.
 
-## Generating the IDL file
+## Auto-Generated Artifacts
 
-When making a change to GraphQL it is often beneficial to see how exactly this changes the output types. GraphQLiteral makes this simple, provide a path to where you want the schema file to be output and this file will automatically be generated when `process.env.NODE_ENV === "development"`.
+When you make a change to your GraphQL schema it is useful to see how exactly this changes the contract of the API, or the associated typings.
+
+GraphQLiteral takes care of this for you, simply provide a path to where you want these files to be output and it will auto-generate them when the server starts. By default, this only occurs when `process.env.NODE_ENV !== "production"`.
 
 ```js
 const schema = makeSchema({
   types: [
     /* All schema types provided here */
   ],
-  definitionFile: path.join(__dirname, "../../schema.graphql"),
+  outputs: {
+    schema: path.join(__dirname, "../../my-schema.graphql"),
+    typegen: path.join(__dirname, "../../my-generated-types.d.ts"),
+  },
 });
 ```
 
-It is recommended that although your `graphql` file is generated, you check the file into source control. This gives you visibility into how changes in type construction affect the
+Read more about how the automatic [type generation](type-generation.md) works.
+
+<blockquote class="good">
+Although your <code>.graphql</code> file is generated, we recommend you check the file into source control. This gives you visibility into how changes in type construction affect the schema consumed by the end-user.
+</blockquote>
+
+## Type-Level defaultResolver
+
+<blockquote class="warn">
+<b>Warning:</b>
+
+Specifying a defaultResolver for a type can have unintended consequences, and makes it harder to statically type. It is only recommended for advanced use-cases.
+
+</blockquote>
+
+GraphQLiteral allows you to define an override to the `defaultResolver` on a per-type basis.

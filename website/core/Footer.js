@@ -34,36 +34,9 @@ class Footer extends React.Component {
           </a>
           <div>
             <h5>Docs</h5>
-            <a href={this.docUrl("getting-started.html", this.props.language)}>
-              Getting Started (or other categories)
-            </a>
-            <a href={this.docUrl("doc2.html", this.props.language)}>
-              Guides (or other categories)
-            </a>
-            <a href={this.docUrl("api-reference", this.props.language)}>
-              API Reference
-            </a>
-          </div>
-          <div>
-            <h5>Community</h5>
-            <a href={this.pageUrl("users.html", this.props.language)}>
-              User Showcase
-            </a>
-            <a
-              href="http://stackoverflow.com/questions/tagged/"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              Stack Overflow
-            </a>
-            <a href="https://discordapp.com/">Project Chat</a>
-            <a
-              href="https://twitter.com/"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              Twitter
-            </a>
+            <a href={this.docUrl("getting-started")}>Getting Started</a>
+            <a href="api-reference">API Reference</a>
+            <a href="playground">Playground</a>
           </div>
           <div>
             <h5>More</h5>

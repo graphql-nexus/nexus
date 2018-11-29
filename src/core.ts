@@ -9,6 +9,7 @@ import {
   DirectiveLocationEnum,
   GraphQLObjectType,
   GraphQLDirective,
+  GraphQLScalarType,
 } from "graphql";
 import { dedent } from "./utils";
 import { SchemaBuilder, isNamedTypeDef } from "./builder";
@@ -25,167 +26,8 @@ declare global {
 }
 
 /**
- * Backing type for an enum member.
+ * Provided to the [objectType](#objectType) function, this
  */
-export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
-  protected typeConfig: Types.EnumTypeConfig;
-
-  constructor(readonly name: string) {
-    this.typeConfig = {
-      name,
-      members: [],
-      directives: [],
-    };
-  }
-
-  mix<EnumName extends Types.EnumNames<GenTypes>>(
-    typeName: EnumName,
-    mixOptions?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
-  ) {
-    this.typeConfig.members.push({
-      item: Types.NodeType.MIX,
-      typeName,
-      mixOptions: mixOptions || {},
-    });
-  }
-
-  member(name: string, config?: Types.EnumMemberConfig) {
-    this.typeConfig.members.push({
-      item: Types.NodeType.ENUM_MEMBER,
-      info: {
-        name,
-        value: name,
-        ...config,
-      },
-    });
-  }
-
-  /**
-   * Sets the members of the enum
-   */
-  members(info: Array<Types.EnumMemberInfo | string>) {
-    info.forEach((member) => {
-      if (typeof member === "string") {
-        return this.typeConfig.members.push({
-          item: Types.NodeType.ENUM_MEMBER,
-          info: { name: member, value: member },
-        });
-      }
-      this.typeConfig.members.push({
-        item: Types.NodeType.ENUM_MEMBER,
-        info: member,
-      });
-    });
-  }
-
-  /**
-   * Adds a description to the GraphQLEnum type
-   *
-   * Descriptions will be output as type annotations in the generated SDL
-   */
-  description(description: string) {
-    this.typeConfig.description = dedent(description);
-  }
-
-  /**
-   * Should be used very rarely, adds a directive directly to the
-   * enum definition - for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>) {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
-   * @internal
-   */
-  buildType(builder: SchemaBuilder): GraphQLEnumType {
-    return builder.enumType(this.typeConfig);
-  }
-}
-
-/**
- * Configure the `GraphQLUnionType` definition
- */
-export class UnionTypeDef<
-  GenTypes = GraphQLiteralGen,
-  TypeName extends string = any
-> {
-  protected typeConfig: Types.UnionTypeConfig;
-
-  constructor(readonly name: string) {
-    this.typeConfig = {
-      name,
-      members: [],
-      directives: [],
-    };
-  }
-
-  /**
-   * Take an existing union and base the type off of that, using the `omit`
-   * option to exclude members of the other union.
-   *
-   * Note: Circular dependencies between unions are not allowed and will
-   * trigger an error at build-time.
-   */
-  mix<UnionTypeName extends string>(
-    type: UnionTypeName,
-    options?: Types.MixOmitOpts<any>
-  ) {
-    this.typeConfig.members.push({
-      item: Types.NodeType.MIX,
-      typeName: type,
-      mixOptions: options || {},
-    });
-  }
-
-  /**
-   * Add one or more members to the GraphQLUnion. Any types provided should be valid
-   * object types available to the schema.
-   */
-  members(...types: string[]) {
-    types.forEach((typeName) => {
-      this.typeConfig.members.push({
-        item: Types.NodeType.UNION_MEMBER,
-        typeName,
-      });
-    });
-  }
-
-  /**
-   * Define a type resolver function for the `GraphQLUnionType`. The Resolver should
-   * return the type name of the union member that should be fulfilled.
-   *
-   * Note: Providing this is highly recommended. If one is not provided, the
-   * default implementation will call `isTypeOf` on each implementing Object type.
-   *
-   * @see https://github.com/graphql/graphql-js/issues/876#issuecomment-304398882
-   */
-  resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
-    this.typeConfig.resolveType = typeResolver;
-  }
-
-  /**
-   * Should be used very rarely, adds a directive directly to the
-   * union definition - for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>) {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
-   * @internal
-   */
-  buildType(builder: SchemaBuilder): GraphQLUnionType {
-    return builder.unionType(this.typeConfig);
-  }
-}
-
 export class ObjectTypeDef<
   GenTypes = GraphQLiteralGen,
   TypeName extends string = any
@@ -209,11 +51,11 @@ export class ObjectTypeDef<
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(typeName: string, mixOptions?: Types.MixOpts<any>) {
+  mix(typeName: string, options?: Types.MixOpts<any>) {
     this.typeConfig.fields.push({
       item: Types.NodeType.MIX,
       typeName,
-      mixOptions: mixOptions || {},
+      mixOptions: options || {},
     });
   }
 
@@ -294,7 +136,7 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Adds a description to the GraphQLObjectType
+   * Adds a description to the `GraphQLObjectType`
    *
    * Descriptions will be output as type annotations in the generated SDL
    */
@@ -336,8 +178,9 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Should be used very rarely, adds a directive directly to the
-   * object definition - for interpretation by other schema consumers.
+   * Adds a directive directly to the object definition
+   *
+   * > Should be used rarely, typically only for interpretation by other schema consumers.
    */
   directive(name: string, args?: Record<string, any>): void {
     this.typeConfig.directives.push({
@@ -371,8 +214,8 @@ export class ObjectTypeDef<
    * that are non-transient. If none is provided, it will default
    * to the shape of the type.
    *
-   * Note: This value can also be set when building the schema via
-   * the "rootTypes" option to `GraphQLiteralSchema`
+   * > This value can also be set when building the schema via
+   * the "rootTypes" option to `makeSchema`
    */
   rootType(typeImport: string | Types.ImportedType) {
     this.typeConfig.rootType = typeImport;
@@ -383,6 +226,168 @@ export class ObjectTypeDef<
    */
   buildType(builder: SchemaBuilder): GraphQLObjectType {
     return builder.objectType(this.typeConfig);
+  }
+}
+
+/**
+ * Backing type for an enum member.
+ */
+export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
+  protected typeConfig: Types.EnumTypeConfig;
+
+  constructor(readonly name: string) {
+    this.typeConfig = {
+      name,
+      members: [],
+      directives: [],
+    };
+  }
+
+  mix<EnumName extends Types.EnumNames<GenTypes>>(
+    typeName: EnumName,
+    options?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
+  ) {
+    this.typeConfig.members.push({
+      item: Types.NodeType.MIX,
+      typeName,
+      mixOptions: options || {},
+    });
+  }
+
+  member(name: string, config?: Types.EnumMemberConfig) {
+    this.typeConfig.members.push({
+      item: Types.NodeType.ENUM_MEMBER,
+      info: {
+        name,
+        value: name,
+        ...config,
+      },
+    });
+  }
+
+  /**
+   * Sets the members of the enum
+   */
+  members(info: Array<Types.EnumMemberInfo | string>) {
+    info.forEach((member) => {
+      if (typeof member === "string") {
+        return this.typeConfig.members.push({
+          item: Types.NodeType.ENUM_MEMBER,
+          info: { name: member, value: member },
+        });
+      }
+      this.typeConfig.members.push({
+        item: Types.NodeType.ENUM_MEMBER,
+        info: member,
+      });
+    });
+  }
+
+  /**
+   * Adds a description to the `GraphQLEnumType`
+   *
+   * Descriptions will be output as type annotations in the generated SDL
+   */
+  description(description: string) {
+    this.typeConfig.description = dedent(description);
+  }
+
+  /**
+   * Should be used very rarely, adds a directive directly to the
+   * enum definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
+  }
+
+  /**
+   * @internal
+   */
+  buildType(builder: SchemaBuilder): GraphQLEnumType {
+    return builder.enumType(this.typeConfig);
+  }
+}
+
+/**
+ * Configure the `GraphQLUnionType` definition
+ */
+export class UnionTypeDef<
+  GenTypes = GraphQLiteralGen,
+  TypeName extends string = any
+> {
+  protected typeConfig: Types.UnionTypeConfig;
+
+  constructor(readonly name: string) {
+    this.typeConfig = {
+      name,
+      members: [],
+      directives: [],
+    };
+  }
+
+  /**
+   * Take an existing union and base the type off of that, using the `omit`
+   * option to exclude members of the other union.
+   *
+   * > Note: Circular dependencies between unions are not allowed and will
+   * trigger an error at build-time.
+   */
+  mix<UnionTypeName extends string>(
+    type: UnionTypeName,
+    options?: Types.MixOmitOpts<any>
+  ) {
+    this.typeConfig.members.push({
+      item: Types.NodeType.MIX,
+      typeName: type,
+      mixOptions: options || {},
+    });
+  }
+
+  /**
+   * Add one or more members to the GraphQLUnion. Any types provided should be valid
+   * object types available to the schema.
+   */
+  members(...types: string[]) {
+    types.forEach((typeName) => {
+      this.typeConfig.members.push({
+        item: Types.NodeType.UNION_MEMBER,
+        typeName,
+      });
+    });
+  }
+
+  /**
+   * Define a type resolver function for the union type. The Resolver should
+   * return the type name of the union member that should be fulfilled.
+   *
+   * > Providing this is highly recommended. If one is not provided, the
+   * default implementation will call `isTypeOf` on each implementing Object type.
+   *
+   * @see https://github.com/graphql/graphql-js/issues/876#issuecomment-304398882
+   */
+  resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
+    this.typeConfig.resolveType = typeResolver;
+  }
+
+  /**
+   * Should be used very rarely, adds a directive directly to the
+   * union definition - for interpretation by other schema consumers.
+   */
+  directive(name: string, args?: Record<string, any>) {
+    this.typeConfig.directives.push({
+      name,
+      args: args || {},
+    });
+  }
+
+  /**
+   * @internal
+   */
+  buildType(builder: SchemaBuilder): GraphQLUnionType {
+    return builder.unionType(this.typeConfig);
   }
 }
 
@@ -407,11 +412,11 @@ export class InterfaceTypeDef<
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(typeName: string, mixOptions?: Types.MixOpts<any>) {
+  mix(typeName: string, options?: Types.MixOpts<any>) {
     this.typeConfig.fields.push({
       item: Types.NodeType.MIX,
       typeName,
-      mixOptions: mixOptions || {},
+      mixOptions: options || {},
     });
   }
 
@@ -508,18 +513,6 @@ export class InterfaceTypeDef<
       name,
       args: args || {},
     });
-  }
-
-  /**
-   * Supply the default field resolver for all members of this interface
-   */
-  defaultResolver(
-    resolverFn: GraphQLFieldResolver<
-      Types.RootValue<GenTypes, TypeName>,
-      Types.ContextValue<GenTypes>
-    >
-  ) {
-    this.typeConfig.defaultResolver = resolverFn;
   }
 
   /**
@@ -711,4 +704,15 @@ export class DirectiveTypeDef<GenTypes = GraphQLiteralGen> {
   buildType(builder: SchemaBuilder): GraphQLDirective {
     return builder.directiveType(this.typeConfig);
   }
+}
+
+/**
+ * The `WrappedType` exists purely to signify that the value returned from
+ * the type construction APIs should not be used externally outside of the
+ * builder function.
+ */
+export class WrappedType {
+  constructor(
+    readonly type: Types.NamedTypeDef | DirectiveTypeDef | GraphQLScalarType
+  ) {}
 }

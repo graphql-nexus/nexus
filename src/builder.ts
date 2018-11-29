@@ -42,6 +42,7 @@ import {
   EnumTypeDef,
   UnionTypeDef,
   InterfaceTypeDef,
+  WrappedType,
 } from "./core";
 import * as Types from "./types";
 import { propertyFieldResolver, suggestionList, objValues } from "./utils";
@@ -688,6 +689,9 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
+  if (isWrappedTypeDef(types)) {
+    types = types.type;
+  }
   if (isNamedTypeDef(types) || isNamedType(types)) {
     builder.addType(types);
   } else if (types instanceof DirectiveTypeDef || isDirective(types)) {
@@ -760,12 +764,14 @@ export function makeSchema<GenTypes = GraphQLiteralGen>(
   if (shouldGenerateArtifacts) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    process.nextTick(() => {
-      metadata.generateArtifacts(schema);
-    });
+    metadata.generateArtifacts(schema);
   }
 
   return schema;
+}
+
+export function isWrappedTypeDef(obj: any): obj is WrappedType {
+  return obj instanceof WrappedType;
 }
 
 export function isNamedTypeDef(obj: any): obj is Types.NamedTypeDef {

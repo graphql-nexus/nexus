@@ -4,7 +4,8 @@ import {
   GraphQLString,
   GraphQLID,
   GraphQLString,
-} from "graphql-js"
+} from "graphql"
+
 const Node = new GraphQLInterfaceType({
   name: "Node",
   resolveType: () => {
