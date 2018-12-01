@@ -37,7 +37,6 @@
     "@types/marked": "^0.4.2",
     "@types/prismjs": "^1.9.0",
     "@types/get-port": "^4.0.0",
-    "@types/request": "^2.48.1",
     "prismjs": "^1.15.0",
     "gulp": "^3.9.1",
     "fs-extra": "^7.0.1",
