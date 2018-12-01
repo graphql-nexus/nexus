@@ -20,3 +20,5 @@ export interface Droid extends CharacterFields {
 }
 
 export type Character = Human | Droid;
+
+export interface ContextType {}

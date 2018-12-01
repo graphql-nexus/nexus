@@ -1,5 +1,4 @@
 // @ts-check
-/// <reference path="./githuntTypes.ts" />
 const {
   enumType,
   objectType,
@@ -123,7 +122,7 @@ const commonFields = (t) => {
     nullable: true,
     description: "The GitHub user who posted the comment",
   });
-});
+};
 
 exports.Comment = objectType("Comment", (t) => {
   commonFields(t);
@@ -148,7 +147,7 @@ exports.Vote = objectType("Vote", (t) => {
 
 // # Information about a GitHub repository submitted to GitHunt
 exports.Entry = objectType("Entry", (t) => {
-  commonFields(t)
+  commonFields(t);
   t.directive("cacheControl", { maxAge: 240 });
   t.field("repository", "Repository", {
     description: "Information about the repository from GitHub",

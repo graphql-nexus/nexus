@@ -13,9 +13,11 @@ import {
 } from "graphql";
 import path from "path";
 import * as Types from "./types";
-import { SDL_HEADER } from "./lang";
-import { eachObj, assertAbsolutePath } from "./utils";
+import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
+import { assertAbsolutePath } from "./utils";
 import { buildTypeDefinitions } from "./typegen";
+import { typegenAutoConfig } from "./autoConfig";
+import { SCALAR_TYPES } from "./common";
 
 export interface DirectiveUse {
   location: DirectiveLocationEnum;
@@ -45,13 +47,10 @@ export class Metadata {
     string,
     Record<string, Types.OutputFieldConfig>
   > = {};
-  protected rootTypeMap: Types.RootTypeMap = {};
-  protected rootImportMapping: Record<string, [string, string]> = {}; // Typename, Alias
   protected typeImports: string[] = [];
-  protected typegenConfig: Types.TypegenConfig<any> = {};
   protected typegenFile: string = "";
 
-  constructor(protected config: Types.Omit<Types.SchemaConfig<any>, "types">) {
+  constructor(protected config: Types.Omit<Types.SchemaConfig, "types">) {
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
       if (config.outputs.typegen) {
         this.typegenFile = assertAbsolutePath(
@@ -59,36 +58,7 @@ export class Metadata {
           "outputs.typegen"
         );
       }
-      let typegenConfig = config.typegen || {};
-      if (typeof typegenConfig === "function") {
-        typegenConfig = typegenConfig();
-      }
-      this.typegenConfig = typegenConfig;
-      eachObj(
-        typegenConfig.rootTypes || {},
-        (val, typeName) => val && this.addRootType(typeName, val)
-      );
     }
-  }
-
-  getContextType() {
-    return this.typegenConfig.contextType || "unknown";
-  }
-
-  getImportStrings(): string {
-    const typeImports: string[] = [];
-    if (this.typegenFile && this.typegenConfig && this.typegenConfig.imports) {
-      eachObj(this.typegenConfig.imports, (importPath, alias) => {
-        typeImports.push(
-          `import * as ${alias} from ${JSON.stringify(
-            `./${path
-              .relative(path.dirname(this.typegenFile), importPath)
-              .replace(/(\.d)?\.ts?/, "")}`
-          )}`
-        );
-      });
-    }
-    return typeImports.join("\n");
   }
 
   finishConstruction() {
@@ -172,24 +142,6 @@ export class Metadata {
     );
   }
 
-  /**
-   * Whether we have a used defined type for the "rootValue" of a type
-   */
-  hasRootTyping(typeName: string) {
-    return Boolean(this.rootTypeMap[typeName]);
-  }
-
-  /**
-   * Whether we have a dedicated typing for the scalar
-   */
-  hasScalarTyping(typeName: string) {
-    return Boolean(this.rootTypeMap[typeName]);
-  }
-
-  getRootTyping(typeName: string) {
-    return this.rootTypeMap[typeName];
-  }
-
   isFieldModified(typeName: string, fieldName: string) {
     return Boolean(
       this.objectMeta[typeName] &&
@@ -213,19 +165,6 @@ export class Metadata {
   }
 
   // Schema construction helpers:
-
-  addRootType(typeName: string, val: string | Types.ImportedType) {
-    if (this.rootTypeMap[typeName]) {
-      console.warn(
-        `Root Type ${JSON.stringify(
-          this.rootTypeMap[typeName]
-        )} already exists for ${typeName} and is being replaced with ${JSON.stringify(
-          val
-        )}`
-      );
-    }
-    this.rootTypeMap[typeName] = val;
-  }
 
   addScalar(config: Types.ScalarOpts) {
     this.checkMutable();
@@ -265,12 +204,11 @@ export class Metadata {
           this.config.outputs.schema
         );
       }
-      if (this.config.outputs.typegen) {
-        this.writeFile(
-          "types",
-          this.generateTypesFile(sortedSchema),
-          this.config.outputs.typegen
-        );
+      const typegen = this.config.outputs.typegen;
+      if (typegen) {
+        this.generateTypesFile(sortedSchema).then((value) => {
+          this.writeFile("types", value, typegen);
+        });
       }
     }
   }
@@ -321,11 +259,32 @@ export class Metadata {
   /**
    * Generates the type definitions
    */
-  generateTypesFile(
-    schema: GraphQLSchema,
-    omitHeader: boolean = false
-  ): string {
-    return buildTypeDefinitions(schema, this, omitHeader);
+  async generateTypesFile(schema: GraphQLSchema): Promise<string> {
+    return buildTypeDefinitions(schema, this);
+  }
+
+  async getTypegenInfo(schema: GraphQLSchema): Promise<Types.TypegenInfo> {
+    if (this.config.typegenConfig) {
+      if (this.config.typegenAutoConfig) {
+        console.warn(
+          `Only one of typegenConfig and typegenAutoConfig should be specified, ignoring typegenConfig`
+        );
+      }
+      return this.config.typegenConfig(schema, this.typegenFile);
+    } else if (this.config.typegenAutoConfig) {
+      return typegenAutoConfig(this.config.typegenAutoConfig)(
+        schema,
+        this.typegenFile
+      );
+    }
+    return {
+      headers: [TYPEGEN_HEADER],
+      imports: [],
+      contextType: "unknown",
+      backingTypeMap: {
+        ...SCALAR_TYPES,
+      },
+    };
   }
 
   protected checkMutable() {

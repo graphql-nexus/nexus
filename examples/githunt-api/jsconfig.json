@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "strict": true,
-    "checkJs": true
+    "checkJs": true,
+    "rootDir": "./src",
+    "skipDefaultLibCheck": true
   }
 }

@@ -2,13 +2,13 @@
   "name": "@graphqliteral/ts-ast-reader",
   "version": "0.0.0",
   "scripts": {
-    "start": "ts-node-dev --inspect --no-notify --transpileOnly --respawn ./src"
+    "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
     "gqliteral": "^0.2.0",
     "graphql": "^14.0.2",
     "fs-extra": "^7.0.1",
-    "typescript": "^3.1.6",
+    "typescript": "3.2.0-rc",
     "apollo-server": "^2.2.5",
     "ts-node-dev": "1.0.0-pre.31"
   },

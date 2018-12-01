@@ -13,8 +13,9 @@
     "clean": "rm -rf dist",
     "prepublish": "yarn clean && yarn lint && yarn build",
     "website": "cd website && yarn && yarn start",
-    "link-examples": "ts-node ./scripts/link-examples.ts",
-    "unlink-examples": "ts-node ./scripts/unlink-examples.ts"
+    "run-examples": "yarn link-examples && cd website && gulp run-examples",
+    "link-examples": "cd website && yarn && gulp link-examples",
+    "unlink-examples": "cd website && yarn && gulp unlink-examples"
   },
   "files": [
     "src",

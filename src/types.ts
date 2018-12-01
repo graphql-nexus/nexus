@@ -6,6 +6,7 @@ import {
   GraphQLResolveInfo,
   DirectiveLocationEnum,
   GraphQLDirective,
+  GraphQLSchema,
 } from "graphql";
 import {
   ObjectTypeDef,
@@ -358,12 +359,6 @@ export interface ObjectTypeConfig
    * An (optional) isTypeOf check for the object type
    */
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
-
-  /**
-   * The backing type for this object type. This can
-   * also be set when constructing the schema.
-   */
-  rootType?: ImportedType | string;
 }
 
 export interface AbstractTypeConfig {
@@ -405,7 +400,7 @@ export interface ImportedType {
   importPath: string;
 }
 
-export interface SchemaConfig<GenTypes> extends Nullability {
+export interface SchemaConfig extends Nullability {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -435,30 +430,40 @@ export interface SchemaConfig<GenTypes> extends Nullability {
    */
   shouldGenerateArtifacts?: boolean;
   /**
-   * Any configuration for type generation
+   * Automatically configure type resolution for the TypeScript
+   * representations of the associated types.
+   *
+   * Alias for typegenConfig: typegenAutoConfig(options)
    */
-  typegen?: TypegenConfig<GenTypes> | (() => TypegenConfig<GenTypes>);
+  typegenAutoConfig?: TypegenAutoConfigOptions;
+  /**
+   * A configuration function for advanced cases where
+   * more control over the `TypegenInfo` is needed.
+   */
+  typegenConfig?: ((
+    schema: GraphQLSchema,
+    outputPath: string
+  ) => TypegenInfo | PromiseLike<TypegenInfo>);
 }
 
-export interface TypegenConfig<GenTypes> {
+export interface TypegenInfo<GenTypes = any> {
   /**
-   * A map of all types and what fields they can resolve to
+   * Headers attached to the generate type output
    */
-  rootTypes?: { [K in ObjectNames<GenTypes>]?: ImportedType | string };
+  headers: string[];
+  /**
+   * All imports for the backing types / context
+   */
+  imports: string[];
+  /**
+   * A map of all GraphQL types and what TypeScript types they should
+   * be represented by.
+   */
+  backingTypeMap: { [K in ObjectNames<GenTypes>]?: string };
   /**
    * The type of the context for the resolvers
    */
-  contextType?: ImportedType | string;
-  /**
-   * An string or strings to prefix on the header of the TS file
-   */
-  header?: string | string[];
-  /**
-   * If you want to glob import from a file for use in the backing types,
-   * you can use this as a convenience by specifying `{ importName: absolutePath }`
-   * and the import will automatically be resolved relative to the `typegenPath`.
-   */
-  imports?: Record<string, string>;
+  contextType: string;
 }
 
 export interface NullabilityConfig {
@@ -524,6 +529,86 @@ export interface NullabilityConfig {
   inputListItem?: boolean;
 }
 
+export interface TypegenConfigSourceModule {
+  /**
+   * The module for where to look for the types.
+   * This uses the node resolution algorthm via require.resolve,
+   * so if this lives in node_modules, you can just provide the module name
+   * otherwise you should provide the absolute path to the file.
+   */
+  module: string;
+  /**
+   * When we import the module, we use `import * as ____` to prevent
+   * conflicts. This alias should be a name that doesn't conflict with any other
+   * types, usually a short lowercase name.
+   */
+  alias: string;
+  /**
+   * Provides a custom approach to matching for the type.
+   *
+   * If not provided, the default implementation is:
+   * ```
+   * (typeName) => new RegExp('(interface|type|class)(\s+)${typeName}\W')
+   * ```
+   */
+  typeMatch?: (typeName: string) => RegExp;
+  /**
+   * A list of typesNames or regular expressions matching type names
+   * that should be resolved by this import. Provide an empty array if you
+   * wish to use the file for context and ensure no other types are matched.
+   */
+  onlyTypes?: (string | RegExp)[];
+  /**
+   * By default the import is configured `import * as alias from`, setting glob to false
+   * will change this to `import alias from`
+   */
+  glob?: false;
+}
+
+export interface TypegenAutoConfigOptions {
+  /**
+   * Any headers to prefix on the generated type file
+   */
+  headers?: string[];
+  /**
+   * Array of files to match for a type
+   *
+   * ```
+   * sources: [
+   *   { module: 'typescript', alias: 'ts' },
+   *   { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   * ]
+   * ```
+   */
+  sources: TypegenConfigSourceModule[];
+  /**
+   * Typing for the context, referencing a type defined in the aliased module
+   * provided in sources e.g. `alias.Context`
+   */
+  contextType: string;
+  /**
+   * Types that should not be matched for a backing type,
+   *
+   * By default this is set to ['Query', 'Mutation', 'Subscription']
+   *
+   * ```
+   * skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
+   * ```
+   */
+  skipTypes?: (string | RegExp)[];
+  /**
+   * If debug is set to true, this will log out info about all types
+   * found, skipped, etc. for the type generation files.
+   */
+  debug?: true;
+  /**
+   * If provided this will be used for the backing types rather than the auto-resolve
+   * mechanism above. Useful as an override for one-off cases, or for scalar
+   * backing types.
+   */
+  backingTypeMap?: Record<string, string>;
+}
+
 /**
  * Generated type helpers:
  */
@@ -537,7 +622,7 @@ export type TypeResolver<GenTypes, TypeName> = (
 type GenTypesShapeKeys =
   | "context"
   | "argTypes"
-  | "rootTypes"
+  | "backingTypes"
   | "returnTypes"
   | "enums"
   | "objects"
@@ -620,8 +705,8 @@ export type AllOutputTypes<GenTypes> = GenTypes extends GenTypesShape
   : never;
 
 export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["rootTypes"]
-    ? GenTypes["rootTypes"][TypeName]
+  ? TypeName extends keyof GenTypes["backingTypes"]
+    ? GenTypes["backingTypes"][TypeName]
     : any
   : never;
 

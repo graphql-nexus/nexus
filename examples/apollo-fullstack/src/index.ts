@@ -15,18 +15,16 @@ const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, "../fullstack-schema.graphql"),
-    typegen: path.join(__dirname, "../src/fullstackTypes.ts"),
+    typegen: path.join(__dirname, "../src/fullstack-typegen.ts"),
   },
-  typegen: {
-    imports: {
-      t: path.join(__dirname, "../src/typeDefs.ts"),
-    },
+  typegenAutoConfig: {
+    sources: [
+      {
+        module: path.join(__dirname, "./typeDefs.ts"),
+        alias: "t",
+      },
+    ],
     contextType: "t.Context",
-    rootTypes: {
-      User: "t.DBUser",
-      Launch: "t.Launch",
-      Mission: "t.Mission",
-    },
   },
 });
 
@@ -64,7 +62,7 @@ const server = new ApolloServer({
   },
 });
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 server.listen({ port }, () =>
   console.log(

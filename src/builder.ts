@@ -97,10 +97,14 @@ export class SchemaBuilder {
   protected pendingDirectiveMap: Record<string, DirectiveTypeDef<any>> = {};
   protected directiveMap: Record<string, GraphQLDirective> = {};
 
+  protected nullability: Types.NullabilityConfig = {};
+
   constructor(
     protected metadata: Metadata,
-    protected nullability: Types.NullabilityConfig = {}
-  ) {}
+    protected config: Types.Omit<Types.SchemaConfig, "types">
+  ) {
+    this.nullability = config.nullability || {};
+  }
 
   addType(typeDef: Types.NamedTypeDef | GraphQLNamedType) {
     const existingType =
@@ -677,10 +681,12 @@ export function buildTypes<
   DirectiveDefs extends Record<string, GraphQLDirective> = any
 >(
   types: any,
-  config: Types.Omit<Types.SchemaConfig<any>, "types"> = { outputs: false }
+  config: Types.Omit<Types.SchemaConfig, "types"> = { outputs: false },
+  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
+  MetadataClass: typeof Metadata = Metadata
 ): Types.BuildTypes<TypeMapDefs, DirectiveDefs> {
-  const metadata = new Metadata(config);
-  const builder = new SchemaBuilder(metadata, config.nullability);
+  const metadata = new MetadataClass(config);
+  const builder = new SchemaBuilderClass(metadata, config);
   addTypes(builder, types);
   return builder.getFinalTypeMap();
 }
@@ -706,16 +712,38 @@ function addTypes(builder: SchemaBuilder, types: any) {
 /**
  * Builds the schema, returning both the schema and metadata.
  */
-export function makeSchemaWithMetadata<GenTypes = GraphQLiteralGen>(
-  options: Types.SchemaConfig<GenTypes>
+export function makeSchemaWithMetadata(
+  options: Types.SchemaConfig,
+  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
+  MetadataClass: typeof Metadata = Metadata
 ): { metadata: Metadata; schema: GraphQLSchema } {
   const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
     options.types,
-    options
+    options,
+    SchemaBuilderClass,
+    MetadataClass
   );
-  const { Query, Mutation, Subscription } = typeMap;
+  let { Query, Mutation, Subscription } = typeMap;
+
+  if (!Query) {
+    console.warn(
+      "GQLiteral: You should define a root `Query` type for your schema"
+    );
+    Query = new GraphQLObjectType({
+      name: "Query",
+      fields: {
+        ok: {
+          type: GraphQLNonNull(GraphQLBoolean),
+          resolve: () => true,
+        },
+      },
+    });
+  }
+
   if (!isObjectType(Query)) {
-    throw new Error("You must supply a Query type to create a valid schema");
+    throw new Error(
+      `Expected Query to be a objectType, saw ${Query.constructor.name}`
+    );
   }
   if (Mutation && !isObjectType(Mutation)) {
     throw new Error(
@@ -750,10 +778,8 @@ export function makeSchemaWithMetadata<GenTypes = GraphQLiteralGen>(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema<GenTypes = GraphQLiteralGen>(
-  options: Types.SchemaConfig<GenTypes>
-): GraphQLSchema {
-  const { schema, metadata } = makeSchemaWithMetadata<GenTypes>(options);
+export function makeSchema(options: Types.SchemaConfig): GraphQLSchema {
+  const { schema, metadata } = makeSchemaWithMetadata(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.

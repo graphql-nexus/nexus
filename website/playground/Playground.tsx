@@ -24,6 +24,7 @@ import {
 } from "gqliteral";
 import { GraphQLSchema, graphql } from "graphql";
 import * as monaco from "monaco-editor";
+import { useDebounce } from "use-debounce";
 import "./monaco-config";
 import debounce from "lodash.debounce";
 // import * as urlHash from "./urlHash";
@@ -80,23 +81,33 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   const [activeEditor, setActiveEditor] = useState<"SDL" | "TYPES">("SDL");
   const [content, setContent] = useState(props.initialSchema);
   const [schemaError, setSchemaError] = useState<Error | null>(null);
+  const [generatedTypes, setGeneratedTypes] = useState("");
   const [activeSchema, setActiveSchema] = useState<{
     schema: GraphQLSchema;
     metadata: core.Metadata;
   } | null>(null);
+  const debouncedSchema = useDebounce<{
+    schema: GraphQLSchema;
+    metadata: core.Metadata;
+  } | null>(activeSchema, 100);
 
   const printedSchema = useMemo(
     () =>
-      activeSchema
-        ? activeSchema.metadata.generateSchemaFile(activeSchema.schema)
+      debouncedSchema
+        ? debouncedSchema.metadata.generateSchemaFile(debouncedSchema.schema)
         : "",
-    [activeSchema]
+    [debouncedSchema]
   );
-  const generatedTypes = useMemo(
-    () =>
-      activeSchema
-        ? activeSchema.metadata.generateTypesFile(activeSchema.schema, true)
-        : "",
+  useEffect(
+    () => {
+      if (debouncedSchema) {
+        debouncedSchema.metadata
+          .generateTypesFile(debouncedSchema.schema)
+          .then((generated) => {
+            setGeneratedTypes(generated);
+          });
+      }
+    },
     [printedSchema]
   );
 
@@ -339,6 +350,13 @@ function getCurrentSchema(code: string): SchemaOrError {
     const { schema, metadata } = makeSchemaWithMetadata({
       types: cache,
       outputs: false,
+      typegenAutoConfig: {
+        contextType: "{}",
+        sources: [],
+        backingTypeMap: {
+          Date: "Date",
+        },
+      },
     });
 
     const sortedSchema = metadata.sortSchema(schema);

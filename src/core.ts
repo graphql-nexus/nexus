@@ -21,6 +21,9 @@ export { Types };
 // Same as above, export all core things under the "core" namespace
 export { SchemaBuilder, isNamedTypeDef, Metadata };
 
+// Keeping this in core since it shouldn't be needed directly
+export { typegenAutoConfig } from "./autoConfig";
+
 declare global {
   interface GraphQLiteralGen {}
 }
@@ -190,9 +193,12 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Configures the nullability for the type
+   * Configures the nullability for the type, check the
+   * documentation's "Getting Started" section to learn
+   * more about GraphQLiteral's assumptions and configuration
+   * on nullability.
    *
-   * @see nullability
+   * @param nullability
    */
   nullability(nullability: Types.NullabilityConfig): void {
     if (this.typeConfig.nullability) {
@@ -203,22 +209,6 @@ export class ObjectTypeDef<
       );
     }
     this.typeConfig.nullability = nullability;
-  }
-
-  /**
-   * Sets the concrete "backing type" for this type, this can
-   * be a simple object, a class, a database Model, whatever
-   * you expect as the first argument to a resolver.
-   *
-   * It is highly recommended that you set this value for any types
-   * that are non-transient. If none is provided, it will default
-   * to the shape of the type.
-   *
-   * > This value can also be set when building the schema via
-   * the "rootTypes" option to `makeSchema`
-   */
-  rootType(typeImport: string | Types.ImportedType) {
-    this.typeConfig.rootType = typeImport;
   }
 
   /**
@@ -489,7 +479,9 @@ export class InterfaceTypeDef<
   }
 
   /**
-   * Adds a description to the metadata for the interface type.
+   * Adds a description to the `GraphQLInterfaceType`
+   *
+   * Descriptions will be output as type annotations in the generated SDL
    */
   description(description: string) {
     this.typeConfig.description = dedent(description);
@@ -590,6 +582,11 @@ export class InputObjectTypeDef<
     });
   }
 
+  /**
+   * Adds a description to the `GraphQLInputObjectType`
+   *
+   * Descriptions will be output as type annotations in the generated SDL
+   */
   description(description: string) {
     this.typeConfig.description = dedent(description);
   }

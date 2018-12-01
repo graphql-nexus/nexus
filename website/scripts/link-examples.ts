@@ -4,17 +4,11 @@
 import { exec } from "child_process";
 import util from "util";
 import path from "path";
+import { allExamples } from "./constants";
 
 const execAsync = util.promisify(exec);
-const allExamples = [
-  "ts-ast-reader",
-  "star-wars",
-  "kitchen-sink",
-  "githunt-api",
-  "apollo-fullstack",
-];
 
-async function linkDir(dir: string, baseNodeModules: string) {
+async function linkDir(dir: string, root: string) {
   await execAsync("yarn", {
     cwd: dir,
   });
@@ -24,13 +18,16 @@ async function linkDir(dir: string, baseNodeModules: string) {
   await execAsync("rm -rf graphql", {
     cwd: path.join(dir, "node_modules"),
   });
-  await execAsync(`ln -s ${baseNodeModules}  ./graphql`, {
-    cwd: path.join(dir, "node_modules"),
-  });
+  await execAsync(
+    `ln -s ${path.join(root, "node_modules/graphql")} ./graphql`,
+    {
+      cwd: path.join(dir, "node_modules"),
+    }
+  );
 }
 
-async function linkAll() {
-  const root = path.join(__dirname, "..");
+export async function linkExamples() {
+  const root = path.join(__dirname, "../..");
   const { stdout } = await execAsync("yarn link", {
     cwd: root,
   });
@@ -38,31 +35,17 @@ async function linkAll() {
   await Promise.all(
     allExamples
       .map(async (exampleDir) => {
-        const dir = path.join(__dirname, `../examples/${exampleDir}`);
+        const dir = path.join(root, `examples/${exampleDir}`);
         console.log(`Linking ${exampleDir}`);
-        await linkDir(dir, "../../../node_modules/graphql");
+        await linkDir(dir, root);
         console.log(`Finished linking ${exampleDir}`);
       })
       .concat(
         (async () => {
           console.log("Linking website");
-          await linkDir(
-            path.join(__dirname, "../website"),
-            "../../node_modules/graphql"
-          );
+          await linkDir(path.join(root, "website"), root);
           console.log("Finished linking website");
         })()
       )
   );
 }
-
-linkAll()
-  .then(() => {
-    console.log("All examples using local graphqliteral");
-  })
-  .catch((e) => {
-    console.error(e);
-  })
-  .then(() => {
-    process.exit();
-  });

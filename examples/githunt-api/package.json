@@ -1,5 +1,8 @@
 {
   "name": "@graphqliteral/example-githunt-api",
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
   "dependencies": {
     "gqliteral": "^0.2.0",
     "graphql": "^14.0.2",
@@ -10,8 +13,5 @@
     "nodemon": "^1.18.6",
     "typescript": "^3.1.6",
     "prettier": "^1.15.2"
-  },
-  "scripts": {
-    "dev": "nodemon --inspect src/index.js"
   }
 }

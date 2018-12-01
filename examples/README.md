@@ -1,5 +1,9 @@
 # GraphQLiteral Examples
 
+## Featured Example (TypeScript)
+
+- [ts-ast-reader](ts-ast-reader)
+
 ### JavaScript:
 
 - [githunt-api](githunt-api)
