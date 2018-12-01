@@ -7,7 +7,7 @@ const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, "../kitchen-sink-schema.graphql"),
-    typegen: path.join(__dirname, "../kitchen-sink-typegen.ts"),
+    typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
   },
 });
 
