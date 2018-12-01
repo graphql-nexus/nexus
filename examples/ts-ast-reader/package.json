@@ -5,12 +5,12 @@
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
-    "gqliteral": "^0.2.0",
-    "graphql": "^14.0.2",
-    "fs-extra": "^7.0.1",
-    "typescript": "3.2.0-rc",
     "apollo-server": "^2.2.5",
-    "ts-node-dev": "1.0.0-pre.31"
+    "fs-extra": "^7.0.1",
+    "gqliteral": "0.4.0",
+    "graphql": "^14.0.2",
+    "ts-node-dev": "1.0.0-pre.31",
+    "typescript": "3.2.0-rc"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4"

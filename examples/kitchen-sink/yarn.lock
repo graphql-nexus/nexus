@@ -1534,9 +1534,9 @@ globals@^9.18.0:
   version "9.18.0"
   resolved "https://registry.yarnpkg.com/globals/-/globals-9.18.0.tgz#aa3896b3e69b487f17e31ed2143d69a8e30c2d8a"
 
-gqliteral@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/gqliteral/-/gqliteral-0.2.0.tgz#56ff4821bd09f36df168b6e312c60c61d75cc4b0"
+gqliteral@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/gqliteral/-/gqliteral-0.4.0.tgz#450905842b6f3d40276a5f23ddee7cb66a39fc01"
   dependencies:
     tslib "^1.9.3"
 

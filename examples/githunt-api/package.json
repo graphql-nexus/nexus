@@ -4,14 +4,14 @@
     "start": "nodemon src/index.js"
   },
   "dependencies": {
-    "gqliteral": "^0.2.0",
-    "graphql": "^14.0.2",
     "apollo-server": "2.2.0-alpha.2",
-    "githunt-api": "apollographql/GitHunt-API.git"
+    "githunt-api": "apollographql/GitHunt-API.git",
+    "gqliteral": "0.4.0",
+    "graphql": "^14.0.2"
   },
   "devDependencies": {
     "nodemon": "^1.18.6",
-    "typescript": "^3.1.6",
-    "prettier": "^1.15.2"
+    "prettier": "^1.15.2",
+    "typescript": "^3.1.6"
   }
 }

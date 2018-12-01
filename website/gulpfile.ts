@@ -6,6 +6,7 @@ import http from "http";
 import { linkExamples } from "./scripts/link-examples";
 import { unlinkExamples } from "./scripts/unlink-examples";
 import { allExamples } from "./scripts/constants";
+import { upgradeDeps } from "./scripts/upgrade-deps";
 
 function requireFresh(pkg: string) {
   delete require.cache[require.resolve(pkg)];
@@ -109,4 +110,9 @@ gulp.task("link-examples", async () => {
 gulp.task("unlink-examples", async () => {
   await unlinkExamples();
   console.log("All examples unlinked");
+});
+
+gulp.task("upgrade-deps", async () => {
+  await upgradeDeps();
+  console.log("All dependencies upgraded");
 });

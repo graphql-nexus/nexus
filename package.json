@@ -15,7 +15,8 @@
     "website": "cd website && yarn && yarn start",
     "run-examples": "yarn link-examples && cd website && gulp run-examples",
     "link-examples": "cd website && yarn && gulp link-examples",
-    "unlink-examples": "cd website && yarn && gulp unlink-examples"
+    "unlink-examples": "cd website && yarn && gulp unlink-examples",
+    "upgrade-deps": "cd website && yarn && gulp upgrade-deps"
   },
   "files": [
     "src",

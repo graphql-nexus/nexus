@@ -10,12 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "gqliteral": "^0.2.0",
     "apollo-datasource": "^0.2.0",
     "apollo-datasource-rest": "^0.2.0",
     "apollo-server": "2.2.0-alpha.2",
     "apollo-server-testing": "2.2.0-alpha.2",
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
+    "gqliteral": "0.4.0",
     "graphql": "^14.0.2",
     "isemail": "^3.2.0",
     "sequelize": "^4.41.1",
@@ -29,8 +29,8 @@
     "nock": "^10.0.2",
     "node-fetch": "^2.2.1",
     "prettier": "^1.15.2",
-    "typescript": "^3.1.6",
-    "ts-node-dev": "^1.0.0-pre.30"
+    "ts-node-dev": "^1.0.0-pre.30",
+    "typescript": "^3.1.6"
   },
   "jest": {
     "testPathIgnorePatterns": [
