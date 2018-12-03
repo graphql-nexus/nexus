@@ -340,7 +340,7 @@ export class UnionTypeDef<
    * Add one or more members to the GraphQLUnion. Any types provided should be valid
    * object types available to the schema.
    */
-  members(...types: string[]) {
+  members(...types: Array<Types.ObjectNames<GenTypes>>) {
     types.forEach((typeName) => {
       this.typeConfig.members.push({
         item: Types.NodeType.UNION_MEMBER,

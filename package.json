@@ -6,7 +6,7 @@
   "license": "MIT",
   "description": "Scalable, strongly typed GraphQL schema development",
   "scripts": {
-    "dev": "tsc -w",
+    "dev": "yarn link-examples && tsc -w",
     "test": "jest",
     "build": "tsc",
     "lint": "tslint -p tsconfig.json",
@@ -16,7 +16,8 @@
     "examples": "yarn link-examples && cd website && gulp run-examples",
     "link-examples": "cd website && yarn && gulp link-examples",
     "unlink-examples": "cd website && yarn && gulp unlink-examples",
-    "upgrade-deps": "cd website && yarn && gulp upgrade-deps"
+    "upgrade-deps": "cd website && yarn && gulp upgrade-deps",
+    "ts-ast-reader": "cd examples/ts-ast-reader && yarn start"
   },
   "files": [
     "src",

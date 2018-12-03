@@ -129,9 +129,10 @@ export async function buildTypeDefinitions(
   const printInputType = (fieldType: GraphQLInputType): string => {
     let { type, typeStr } = unwrapNull(fieldType);
     if (isListType(type)) {
-      return typeStr
-        ? `Array<${typeStr}${printInputType(type.ofType)}>`
-        : `${printInputType(type.ofType)}[]`;
+      const inputTypeStr = printInputType(type.ofType);
+      return inputTypeStr.indexOf("null ") !== -1
+        ? `${typeStr}Array<${inputTypeStr}>`
+        : `${typeStr}${inputTypeStr}[]`;
     }
     if (isInputObjectType(type) || isEnumType(type)) {
       return type.name;

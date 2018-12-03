@@ -544,14 +544,17 @@ export interface TypegenConfigSourceModule {
    */
   alias: string;
   /**
-   * Provides a custom approach to matching for the type.
+   * Provides a custom approach to matching for the type
    *
    * If not provided, the default implementation is:
    * ```
-   * (typeName) => new RegExp('(interface|type|class)(\s+)${typeName}\W')
+   * (type) => new RegExp('(?:interface|type|class)\s+(${type.name})\W')
    * ```
    */
-  typeMatch?: (typeName: string) => RegExp;
+  typeMatch?: (
+    type: GraphQLNamedType,
+    defaultRegex: RegExp
+  ) => RegExp | RegExp[];
   /**
    * A list of typesNames or regular expressions matching type names
    * that should be resolved by this import. Provide an empty array if you
@@ -648,6 +651,12 @@ export type InterfaceMembers<
 > = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["interfaces"]
     ? GenTypes["interfaces"][TypeName]
+    : any
+  : never;
+
+export type UnionMembers<GenTypes, TypeName> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["unions"]
+    ? GenTypes["unions"][TypeName]
     : any
   : never;
 

@@ -1,12 +1,11 @@
-import { objectType } from "gqliteral";
-import {
-  nodeType,
-  hasJsDoc,
-  functionLikeDeclaration,
-  namedType,
-} from "./mixins";
-import typescript from "typescript";
-import { knownNodesList } from "./utils";
+import { objectType, arg } from "gqliteral";
+import { nodeType, functionLikeDeclaration, hasTypeParameters } from "./mixins";
+import { filteredNodesList } from "./utils";
+
+const nodeSkipSyntax = {
+  skip: arg("SyntaxKind", { list: true }),
+  only: arg("SyntaxKind", { list: true }),
+};
 
 export const ExportAssignment = objectType("ExportAssignment", (t) => {
   nodeType(t);
@@ -16,18 +15,19 @@ export const SourceFile = objectType("SourceFile", (t) => {
   nodeType(t);
   t.field("statements", "Node", {
     list: true,
-    resolve: knownNodesList("statements"),
+    args: nodeSkipSyntax,
+    resolve: (root, args) =>
+      filteredNodesList(args, Array.from(root.statements)),
   });
-});
-
-export const NamedDeclaration = objectType("NamedDeclaration", (t) => {
-  nodeType(t);
 });
 
 export const TypeParameterDeclaration = objectType(
   "TypeParameterDeclaration",
   (t) => {
     nodeType(t);
+    t.field("constraint", "Node");
+    t.field("default", "Node");
+    t.field("expression", "Node");
   }
 );
 
@@ -51,13 +51,17 @@ export const VariableDeclaration = objectType("VariableDeclaration", (t) => {
 
 export const ParameterDeclaration = objectType("ParameterDeclaration", (t) => {
   nodeType(t);
-  hasJsDoc(t);
-  namedType(t);
+  t.implements("HasJSDoc");
+  t.field("type", "Node", { nullable: true });
+});
+
+export const PropertySignature = objectType("PropertySignature", (t) => {
+  t.implements("Node", "HasJSDoc", "MaybeOptional");
   t.field("type", "Node", { nullable: true });
 });
 
 export const PropertyDeclaration = objectType("PropertyDeclaration", (t) => {
-  nodeType(t);
+  t.implements("Node", "HasJSDoc", "MaybeOptional");
 });
 
 export const PropertyLikeDeclaration = objectType(
@@ -69,11 +73,13 @@ export const PropertyLikeDeclaration = objectType(
 
 export const FunctionDeclaration = objectType("FunctionDeclaration", (t) => {
   nodeType(t);
+  t.implements("HasJSDoc");
   functionLikeDeclaration(t);
 });
 
 export const MethodDeclaration = objectType("MethodDeclaration", (t) => {
   nodeType(t);
+  t.implements("HasJSDoc");
   functionLikeDeclaration(t);
 });
 
@@ -81,6 +87,7 @@ export const ConstructorDeclaration = objectType(
   "ConstructorDeclaration",
   (t) => {
     nodeType(t);
+    t.implements("HasJSDoc");
     functionLikeDeclaration(t);
   }
 );
@@ -89,6 +96,7 @@ export const GetAccessorDeclaration = objectType(
   "GetAccessorDeclaration",
   (t) => {
     nodeType(t);
+    t.implements("HasJSDoc");
     functionLikeDeclaration(t);
   }
 );
@@ -97,6 +105,7 @@ export const SetAccessorDeclaration = objectType(
   "SetAccessorDeclaration",
   (t) => {
     nodeType(t);
+    t.implements("HasJSDoc");
     functionLikeDeclaration(t);
   }
 );
@@ -105,6 +114,7 @@ export const IndexSignatureDeclaration = objectType(
   "IndexSignatureDeclaration",
   (t) => {
     nodeType(t);
+    t.implements("HasJSDoc");
   }
 );
 
@@ -114,31 +124,40 @@ export const MissingDeclaration = objectType("MissingDeclaration", (t) => {
 
 export const ClassDeclaration = objectType("ClassDeclaration", (t) => {
   nodeType(t);
-  namedType(t);
+  t.implements("HasJSDoc");
   t.field("members", "Node", {
     list: true,
-    resolve: knownNodesList("members"),
+    args: nodeSkipSyntax,
+    resolve: (root, args) => filteredNodesList(args, Array.from(root.members)),
   });
 });
 
 export const InterfaceDeclaration = objectType("InterfaceDeclaration", (t) => {
   nodeType(t);
+  t.implements("HasJSDoc");
 });
 
 export const TypeAliasDeclaration = objectType("TypeAliasDeclaration", (t) => {
   nodeType(t);
+  hasTypeParameters(t);
+  t.implements("HasJSDoc");
+  t.field("type", "Node", { nullable: true });
 });
 
 export const EnumDeclaration = objectType("EnumDeclaration", (t) => {
   nodeType(t);
+  t.implements("HasJSDoc");
+  t.field("members", "Node", { list: true });
 });
 
 export const ModuleDeclaration = objectType("ModuleDeclaration", (t) => {
   nodeType(t);
+  t.implements("HasJSDoc");
 });
 
 export const NamespaceDeclaration = objectType("NamespaceDeclaration", (t) => {
   nodeType(t);
+  t.implements("HasJSDoc");
 });
 
 export const JSDocNamespaceDeclaration = objectType(

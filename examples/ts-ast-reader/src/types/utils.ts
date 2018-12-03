@@ -1,5 +1,10 @@
-import { GraphQLResolveInfo, GraphQLSchema, isObjectType } from "graphql";
+import { GraphQLSchema, isObjectType, GraphQLResolveInfo } from "graphql";
 import ts from "typescript";
+import {
+  SourceFileStatementsArgs,
+  NodeModifiersArgs,
+} from "../ts-ast-reader-typegen";
+import { ContextType } from ".";
 
 export function convertTsEnum(toConvert: any) {
   const converted: { [key: string]: number } = {};
@@ -32,16 +37,40 @@ export function allKnownNodes(schema: GraphQLSchema) {
   return knownNodes!;
 }
 
-export function knownNodesList(propertyName: string) {
-  return (root: any, args: any, ctx: any, info: GraphQLResolveInfo) => {
-    return root[propertyName]
-      ? root[propertyName].filter((node: any) => {
-          return (
-            node &&
-            node.kind &&
-            allKnownNodes(info.schema).has(ts.SyntaxKind[node.kind])
-          );
-        })
-      : null;
-  };
-}
+export const filteredNodesList = <T extends ts.Node>(
+  args: SourceFileStatementsArgs,
+  nodes: T[]
+) => {
+  const { skip, only } = args;
+  if ((skip && skip.length) || (only && only.length)) {
+    return nodes.filter((node: ts.Node) => {
+      if (skip && skip.length > 0 && skip.indexOf(node.kind) !== -1) {
+        return;
+      }
+      if (only && only.length > 0 && only.indexOf(node.kind) === -1) {
+        return;
+      }
+      return node;
+    });
+  }
+  return nodes;
+};
+
+export const syntaxKindFilter = <T extends { kind: ts.SyntaxKind }>(
+  args: NodeModifiersArgs,
+  items: T[]
+) => {
+  const { skip, only } = args;
+  if ((only && only.length) || (skip && skip.length)) {
+    return items.filter((item) => {
+      if (only && only.length && only.indexOf(item.kind) === -1) {
+        return null;
+      }
+      if (skip && skip.length && skip.indexOf(item.kind) !== -1) {
+        return null;
+      }
+      return item;
+    });
+  }
+  return items;
+};

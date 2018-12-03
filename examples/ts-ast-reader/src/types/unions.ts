@@ -1,12 +1,23 @@
 import { unionType } from "gqliteral";
 import ts from "typescript";
 
-export const PropertyName = unionType("PropertyName", (t) => {
+export const DeclarationName = unionType("DeclarationName", (t) => {
   t.members(
     "Identifier",
-    "StringLiteral",
+    "StringLiteralLike",
     "NumericLiteral",
-    "ComputedPropertyName"
+    "ComputedPropertyName",
+    "BindingPattern",
+    "UnnamedNode",
+    "QualifiedName"
   );
-  t.resolveType((obj: any) => ts.SyntaxKind[obj.kind]);
+  t.resolveType((obj) => {
+    if (obj.kind) {
+      if (obj.kind === ts.SyntaxKind.FirstNode) {
+        return "QualifiedName";
+      }
+      return ts.SyntaxKind[obj.kind];
+    }
+    return "UnnamedNode";
+  });
 });

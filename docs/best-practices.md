@@ -8,6 +8,15 @@ A few tips when using GraphQLiteral to build out a schema
 
 ## Configure your development server to auto-restart
 
+## VSCode: Configuring a keyboard shortcut for "Go to Type Definition"
+
+```
+{
+  "key": "cmd+.",
+  "command": "editor.action.goToTypeDefinition"
+}
+```
+
 ## Consistent file structure for GraphQL type imports
 
 When you have a large schema you'll usually want to break it up into smaller

@@ -2,14 +2,32 @@
 ### Do not make changes to this file directly
 
 type ArrayTypeNode implements Node {
+  elementType: Node!
   end: Int!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+}
+
+type BindingPattern implements Node {
+  end: Int!
+  flags: NodeFlags!
+  kind: SyntaxKind!
+  kindCode: Int!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type CallSignatureDeclaration implements Node {
@@ -17,23 +35,29 @@ type CallSignatureDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
-  parent: Node!
-  pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
-}
-
-type ClassDeclaration implements Node {
-  end: Int!
-  flags: NodeFlags!
-  kind: SyntaxKind!
-  kindCode: Int!
-  members: [Node!]!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+}
+
+type ClassDeclaration implements HasJSDoc & Node {
+  end: Int!
+  flags: NodeFlags!
+  jsDoc: [JSDoc!]
+  kind: SyntaxKind!
+  kindCode: Int!
+  members(only: [SyntaxKind!], skip: [SyntaxKind!]): [Node!]!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type ComputedPropertyName implements Node {
@@ -41,38 +65,51 @@ type ComputedPropertyName implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type ConditionalTypeNode implements Node {
+  checkType: Node!
   end: Int!
+  extendsType: Node!
+  falseType: Node!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  trueType: Node!
+  typeName: DeclarationName
 }
 
-type ConstructorDeclaration implements Node {
+type ConstructorDeclaration implements HasJSDoc & MaybeOptional & Node {
   asteriskToken: Token
   end: Int!
   exclamationToken: Token
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parameters: [ParameterDeclaration!]!
   parent: Node!
   pos: Int!
   questionToken: Token
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   type: Node
+  typeName: DeclarationName
   typeParameters: [TypeParameterDeclaration!]
 }
 
@@ -81,10 +118,14 @@ type ConstructorTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node!
+  typeName: DeclarationName
 }
 
 type ConstructSignatureDeclaration implements Node {
@@ -92,21 +133,31 @@ type ConstructSignatureDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type EnumDeclaration implements Node {
+union DeclarationName = BindingPattern | ComputedPropertyName | Identifier | NumericLiteral | QualifiedName | StringLiteralLike | UnnamedNode
+
+type EnumDeclaration implements HasJSDoc & Node {
   end: Int!
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  members: [Node!]!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type ExportAssignment implements Node {
@@ -114,10 +165,13 @@ type ExportAssignment implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type ExportDeclaration implements Node {
@@ -125,27 +179,33 @@ type ExportDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type FunctionDeclaration implements Node {
+type FunctionDeclaration implements HasJSDoc & MaybeOptional & Node {
   asteriskToken: Token
   end: Int!
   exclamationToken: Token
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parameters: [ParameterDeclaration!]!
   parent: Node!
   pos: Int!
   questionToken: Token
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   type: Node
+  typeName: DeclarationName
   typeParameters: [TypeParameterDeclaration!]
 }
 
@@ -154,28 +214,39 @@ type FunctionTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node!
+  typeName: DeclarationName
 }
 
-type GetAccessorDeclaration implements Node {
+type GetAccessorDeclaration implements HasJSDoc & MaybeOptional & Node {
   asteriskToken: Token
   end: Int!
   exclamationToken: Token
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parameters: [ParameterDeclaration!]!
   parent: Node!
   pos: Int!
   questionToken: Token
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   type: Node
+  typeName: DeclarationName
   typeParameters: [TypeParameterDeclaration!]
+}
+
+interface HasJSDoc {
+  jsDoc: [JSDoc!]
 }
 
 type Identifier implements Node {
@@ -183,10 +254,14 @@ type Identifier implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  text: String!
+  typeName: DeclarationName
 }
 
 type ImportDeclaration implements Node {
@@ -194,10 +269,13 @@ type ImportDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type ImportEqualsDeclaration implements Node {
@@ -205,10 +283,13 @@ type ImportEqualsDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type ImportTypeNode implements Node {
@@ -216,10 +297,13 @@ type ImportTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type IndexedAccessTypeNode implements Node {
@@ -227,21 +311,28 @@ type IndexedAccessTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type IndexSignatureDeclaration implements Node {
+type IndexSignatureDeclaration implements HasJSDoc & Node {
   end: Int!
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type InferTypeNode implements Node {
@@ -249,21 +340,29 @@ type InferTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+  typeParameter: Node!
 }
 
-type InterfaceDeclaration implements Node {
+type InterfaceDeclaration implements HasJSDoc & Node {
   end: Int!
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type IntersectionTypeNode implements Node {
@@ -271,21 +370,34 @@ type IntersectionTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+  types: [Node!]!
 }
 
-type JSDoc implements Node {
-  end: Int!
-  flags: NodeFlags!
-  kind: SyntaxKind!
-  kindCode: Int!
-  modifiers: [Token!]
-  parent: Node!
-  pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+type JSDoc {
+  comment: String
+  tags: [JSDocTag!]
+}
+
+type JSDocAugmentsTag implements JSDocTag {
+  comment: String
+  tagName: String
+}
+
+type JSDocClassTag implements JSDocTag {
+  comment: String
+  tagName: String
+}
+
+type JSDocEnumTag implements JSDocTag {
+  comment: String
+  tagName: String
 }
 
 type JSDocNamespaceDeclaration implements Node {
@@ -293,10 +405,43 @@ type JSDocNamespaceDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+}
+
+type JSDocReturnTag implements JSDocTag {
+  comment: String
+  tagName: String
+}
+
+interface JSDocTag {
+  comment: String
+  tagName: String
+}
+
+type JSDocTemplateTag implements JSDocTag {
+  comment: String
+  tagName: String
+}
+
+type JSDocThisTag implements JSDocTag {
+  comment: String
+  tagName: String
+}
+
+type JSDocTypeTag implements JSDocTag {
+  comment: String
+  tagName: String
+}
+
+type JSDocUnknownTag implements JSDocTag {
+  comment: String
+  tagName: String
 }
 
 type KeywordTypeNode implements Node {
@@ -304,21 +449,27 @@ type KeywordTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type LiteralTypeNode implements Node {
+type LiteralType implements Node {
   end: Int!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type MappedTypeNode implements Node {
@@ -326,27 +477,37 @@ type MappedTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type MethodDeclaration implements Node {
+interface MaybeOptional {
+  questionToken: Token
+}
+
+type MethodDeclaration implements HasJSDoc & MaybeOptional & Node {
   asteriskToken: Token
   end: Int!
   exclamationToken: Token
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parameters: [ParameterDeclaration!]!
   parent: Node!
   pos: Int!
   questionToken: Token
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   type: Node
+  typeName: DeclarationName
   typeParameters: [TypeParameterDeclaration!]
 }
 
@@ -355,43 +516,43 @@ type MissingDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type ModuleDeclaration implements Node {
+type ModuleDeclaration implements HasJSDoc & Node {
   end: Int!
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type NamedDeclaration implements Node {
+type NamespaceDeclaration implements HasJSDoc & Node {
   end: Int!
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
-}
-
-type NamespaceDeclaration implements Node {
-  end: Int!
-  flags: NodeFlags!
-  kind: SyntaxKind!
-  kindCode: Int!
-  modifiers: [Token!]
-  parent: Node!
-  pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type NamespaceExportDeclaration implements Node {
@@ -399,10 +560,13 @@ type NamespaceExportDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 interface Node {
@@ -410,10 +574,13 @@ interface Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 enum NodeFlags {
@@ -457,10 +624,13 @@ type NumericLiteral implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type OptionalTypeNode implements Node {
@@ -468,45 +638,61 @@ type OptionalTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
-  parent: Node!
-  pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
-}
-
-type ParameterDeclaration implements Node {
-  end: Int!
-  flags: NodeFlags!
-  kind: SyntaxKind!
-  kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node!
+  typeName: DeclarationName
+}
+
+type ParameterDeclaration implements HasJSDoc & Node {
+  end: Int!
+  flags: NodeFlags!
+  jsDoc: [JSDoc!]
+  kind: SyntaxKind!
+  kindCode: Int!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   type: Node
+  typeName: DeclarationName
 }
 
-type ParenthesizedTypeNode implements Node {
+type ParenthesizedType implements Node {
   end: Int!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node!
+  typeName: DeclarationName
 }
 
-type PropertyDeclaration implements Node {
+type PropertyDeclaration implements HasJSDoc & MaybeOptional & Node {
   end: Int!
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  questionToken: Token
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type PropertyLikeDeclaration implements Node {
@@ -514,13 +700,45 @@ type PropertyLikeDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-union PropertyName = ComputedPropertyName | Identifier | NumericLiteral | StringLiteral
+type PropertySignature implements HasJSDoc & MaybeOptional & Node {
+  end: Int!
+  flags: NodeFlags!
+  jsDoc: [JSDoc!]
+  kind: SyntaxKind!
+  kindCode: Int!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  questionToken: Token
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node
+  typeName: DeclarationName
+}
+
+type QualifiedName implements Node {
+  end: Int!
+  flags: NodeFlags!
+  kind: SyntaxKind!
+  kindCode: Int!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+}
 
 type Query {
   parseFile(file: String!): SourceFile!
@@ -531,27 +749,34 @@ type RestTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node!
+  typeName: DeclarationName
 }
 
-type SetAccessorDeclaration implements Node {
+type SetAccessorDeclaration implements HasJSDoc & MaybeOptional & Node {
   asteriskToken: Token
   end: Int!
   exclamationToken: Token
   flags: NodeFlags!
+  jsDoc: [JSDoc!]
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parameters: [ParameterDeclaration!]!
   parent: Node!
   pos: Int!
   questionToken: Token
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   type: Node
+  typeName: DeclarationName
   typeParameters: [TypeParameterDeclaration!]
 }
 
@@ -560,11 +785,14 @@ type SourceFile implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
-  statements: [Node!]!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  statements(only: [SyntaxKind!], skip: [SyntaxKind!]): [Node!]!
+  typeName: DeclarationName
 }
 
 type StringLiteral implements Node {
@@ -572,10 +800,27 @@ type StringLiteral implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+}
+
+type StringLiteralLike implements Node {
+  end: Int!
+  flags: NodeFlags!
+  kind: SyntaxKind!
+  kindCode: Int!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 enum SyntaxKind {
@@ -930,10 +1175,13 @@ type ThisTypeNode implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type Token {
@@ -941,36 +1189,66 @@ type Token {
 }
 
 type TupleTypeNode implements Node {
+  elementTypes: [Node!]!
   end: Int!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
-type TypeAliasDeclaration implements Node {
+type TypeAliasDeclaration implements HasJSDoc & Node {
+  end: Int!
+  flags: NodeFlags!
+  jsDoc: [JSDoc!]
+  kind: SyntaxKind!
+  kindCode: Int!
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
+  parent: Node!
+  pos: Int!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  type: Node
+  typeName: DeclarationName
+  typeParameters: [TypeParameterDeclaration!]
+}
+
+type TypeLiteral implements Node {
   end: Int!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type TypeParameterDeclaration implements Node {
+  constraint: Node!
+  default: Node!
   end: Int!
+  expression: Node!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }
 
 type TypeReference implements Node {
@@ -978,23 +1256,30 @@ type TypeReference implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
   nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
   text: String
+  typeArguments: [Node!]
+  typeName: DeclarationName
 }
 
-type UnionTypeNode implements Node {
+type UnionType implements Node {
   end: Int!
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+  types: [Node!]!
 }
 
 type UNKNOWN_NODE implements Node {
@@ -1002,10 +1287,17 @@ type UNKNOWN_NODE implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
+}
+
+type UnnamedNode {
+  text: String
 }
 
 type VariableDeclaration implements Node {
@@ -1013,8 +1305,11 @@ type VariableDeclaration implements Node {
   flags: NodeFlags!
   kind: SyntaxKind!
   kindCode: Int!
-  modifiers: [Token!]
+  modifiers(only: [SyntaxKind!], skip: [SyntaxKind!]): [Token!]
+  name: DeclarationName
+  nameText: String
   parent: Node!
   pos: Int!
-  rawText(skip: [SyntaxKind!]): String!
+  rawText(only: [SyntaxKind!], skip: [SyntaxKind!]): String!
+  typeName: DeclarationName
 }

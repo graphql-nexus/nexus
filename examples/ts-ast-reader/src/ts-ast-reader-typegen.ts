@@ -44,6 +44,12 @@ export type SourceFileKindCodeReturnType = number;
 
 export type SourceFileModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface SourceFileModifiersArgs extends NodeModifiersArgs {}
+
+export type SourceFileNameReturnType = null | DeclarationNameReturnType;
+
+export type SourceFileNameTextReturnType = null | string;
+
 export type SourceFileParentReturnType = NodeReturnType;
 
 export type SourceFilePosReturnType = number;
@@ -53,6 +59,13 @@ export type SourceFileRawTextReturnType = string;
 export interface SourceFileRawTextArgs extends NodeRawTextArgs {}
 
 export type SourceFileStatementsReturnType = MaybePromiseList<NodeReturnType>;
+
+export interface SourceFileStatementsArgs {
+  only?: null | SyntaxKind[];
+  skip?: null | SyntaxKind[];
+}
+
+export type SourceFileTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type SourceFileRootType = ts.SourceFile;
 
@@ -68,6 +81,15 @@ export type NodeKindCodeReturnType = number;
 
 export type NodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface NodeModifiersArgs {
+  only?: null | SyntaxKind[];
+  skip?: null | SyntaxKind[];
+}
+
+export type NodeNameReturnType = null | DeclarationNameReturnType;
+
+export type NodeNameTextReturnType = null | string;
+
 export type NodeParentReturnType = NodeReturnType;
 
 export type NodePosReturnType = number;
@@ -75,8 +97,11 @@ export type NodePosReturnType = number;
 export type NodeRawTextReturnType = string;
 
 export interface NodeRawTextArgs {
-  skip?: Array<null | SyntaxKind>;
+  only?: null | SyntaxKind[];
+  skip?: null | SyntaxKind[];
 }
+
+export type NodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type NodeFlags = 4194304 | 16384 | 3 | 2 | 64 | 12679168 | 8192 | 2048 | 32 | 512 | 262144 | 1024 | 256 | 128 | 8388608 | 65536 | 2097152 | 16777216 | 1 | 16 | 4 | 0 | 1572864 | 524288 | 1048576 | 1408 | 384 | 8 | 32768 | 131072 | 20480 | 4194816 | 4096;
 
@@ -88,6 +113,204 @@ export type TokenRootType = ts.Token<any>;
 
 export type TokenReturnType = ts.Token<any>
 
+export type DeclarationNameRootType = BindingPatternRootType | ComputedPropertyNameRootType | IdentifierRootType | NumericLiteralRootType | QualifiedNameRootType | StringLiteralLikeRootType | UnnamedNodeRootType;
+
+export type DeclarationNameReturnType = BindingPatternReturnType | ComputedPropertyNameReturnType | IdentifierReturnType | NumericLiteralReturnType | QualifiedNameReturnType | StringLiteralLikeReturnType | UnnamedNodeReturnType;
+
+export type BindingPatternEndReturnType = number;
+
+export type BindingPatternFlagsReturnType = NodeFlags;
+
+export type BindingPatternKindReturnType = SyntaxKind;
+
+export type BindingPatternKindCodeReturnType = number;
+
+export type BindingPatternModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface BindingPatternModifiersArgs extends NodeModifiersArgs {}
+
+export type BindingPatternNameReturnType = null | DeclarationNameReturnType;
+
+export type BindingPatternNameTextReturnType = null | string;
+
+export type BindingPatternParentReturnType = NodeReturnType;
+
+export type BindingPatternPosReturnType = number;
+
+export type BindingPatternRawTextReturnType = string;
+
+export interface BindingPatternRawTextArgs extends NodeRawTextArgs {}
+
+export type BindingPatternTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type BindingPatternRootType = ts.BindingPattern;
+
+export type BindingPatternReturnType = ts.BindingPattern
+
+export type ComputedPropertyNameEndReturnType = number;
+
+export type ComputedPropertyNameFlagsReturnType = NodeFlags;
+
+export type ComputedPropertyNameKindReturnType = SyntaxKind;
+
+export type ComputedPropertyNameKindCodeReturnType = number;
+
+export type ComputedPropertyNameModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface ComputedPropertyNameModifiersArgs extends NodeModifiersArgs {}
+
+export type ComputedPropertyNameNameReturnType = null | DeclarationNameReturnType;
+
+export type ComputedPropertyNameNameTextReturnType = null | string;
+
+export type ComputedPropertyNameParentReturnType = NodeReturnType;
+
+export type ComputedPropertyNamePosReturnType = number;
+
+export type ComputedPropertyNameRawTextReturnType = string;
+
+export interface ComputedPropertyNameRawTextArgs extends NodeRawTextArgs {}
+
+export type ComputedPropertyNameTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type ComputedPropertyNameRootType = ts.ComputedPropertyName;
+
+export type ComputedPropertyNameReturnType = ts.ComputedPropertyName
+
+export type IdentifierEndReturnType = number;
+
+export type IdentifierFlagsReturnType = NodeFlags;
+
+export type IdentifierKindReturnType = SyntaxKind;
+
+export type IdentifierKindCodeReturnType = number;
+
+export type IdentifierModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface IdentifierModifiersArgs extends NodeModifiersArgs {}
+
+export type IdentifierNameReturnType = null | DeclarationNameReturnType;
+
+export type IdentifierNameTextReturnType = null | string;
+
+export type IdentifierParentReturnType = NodeReturnType;
+
+export type IdentifierPosReturnType = number;
+
+export type IdentifierRawTextReturnType = string;
+
+export interface IdentifierRawTextArgs extends NodeRawTextArgs {}
+
+export type IdentifierTextReturnType = string;
+
+export type IdentifierTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type IdentifierRootType = ts.Identifier;
+
+export type IdentifierReturnType = ts.Identifier
+
+export type NumericLiteralEndReturnType = number;
+
+export type NumericLiteralFlagsReturnType = NodeFlags;
+
+export type NumericLiteralKindReturnType = SyntaxKind;
+
+export type NumericLiteralKindCodeReturnType = number;
+
+export type NumericLiteralModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface NumericLiteralModifiersArgs extends NodeModifiersArgs {}
+
+export type NumericLiteralNameReturnType = null | DeclarationNameReturnType;
+
+export type NumericLiteralNameTextReturnType = null | string;
+
+export type NumericLiteralParentReturnType = NodeReturnType;
+
+export type NumericLiteralPosReturnType = number;
+
+export type NumericLiteralRawTextReturnType = string;
+
+export interface NumericLiteralRawTextArgs extends NodeRawTextArgs {}
+
+export type NumericLiteralTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type NumericLiteralRootType = ts.NumericLiteral;
+
+export type NumericLiteralReturnType = ts.NumericLiteral
+
+export type QualifiedNameEndReturnType = number;
+
+export type QualifiedNameFlagsReturnType = NodeFlags;
+
+export type QualifiedNameKindReturnType = SyntaxKind;
+
+export type QualifiedNameKindCodeReturnType = number;
+
+export type QualifiedNameModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface QualifiedNameModifiersArgs extends NodeModifiersArgs {}
+
+export type QualifiedNameNameReturnType = null | DeclarationNameReturnType;
+
+export type QualifiedNameNameTextReturnType = null | string;
+
+export type QualifiedNameParentReturnType = NodeReturnType;
+
+export type QualifiedNamePosReturnType = number;
+
+export type QualifiedNameRawTextReturnType = string;
+
+export interface QualifiedNameRawTextArgs extends NodeRawTextArgs {}
+
+export type QualifiedNameTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type QualifiedNameRootType = ts.QualifiedName;
+
+export type QualifiedNameReturnType = ts.QualifiedName
+
+export type StringLiteralLikeEndReturnType = number;
+
+export type StringLiteralLikeFlagsReturnType = NodeFlags;
+
+export type StringLiteralLikeKindReturnType = SyntaxKind;
+
+export type StringLiteralLikeKindCodeReturnType = number;
+
+export type StringLiteralLikeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface StringLiteralLikeModifiersArgs extends NodeModifiersArgs {}
+
+export type StringLiteralLikeNameReturnType = null | DeclarationNameReturnType;
+
+export type StringLiteralLikeNameTextReturnType = null | string;
+
+export type StringLiteralLikeParentReturnType = NodeReturnType;
+
+export type StringLiteralLikePosReturnType = number;
+
+export type StringLiteralLikeRawTextReturnType = string;
+
+export interface StringLiteralLikeRawTextArgs extends NodeRawTextArgs {}
+
+export type StringLiteralLikeTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type StringLiteralLikeRootType = ts.StringLiteralLike;
+
+export type StringLiteralLikeReturnType = ts.StringLiteralLike
+
+export type UnnamedNodeTextReturnType = null | string;
+
+export interface UnnamedNodeRootType {
+  text?: null | string;
+}
+
+export type UnnamedNodeReturnType = {
+  text?: MaybeThunk<MaybePromise<null | string>>;
+}
+
+export type ArrayTypeNodeElementTypeReturnType = NodeReturnType;
+
 export type ArrayTypeNodeEndReturnType = number;
 
 export type ArrayTypeNodeFlagsReturnType = NodeFlags;
@@ -98,6 +321,12 @@ export type ArrayTypeNodeKindCodeReturnType = number;
 
 export type ArrayTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ArrayTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type ArrayTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type ArrayTypeNodeNameTextReturnType = null | string;
+
 export type ArrayTypeNodeParentReturnType = NodeReturnType;
 
 export type ArrayTypeNodePosReturnType = number;
@@ -105,6 +334,8 @@ export type ArrayTypeNodePosReturnType = number;
 export type ArrayTypeNodeRawTextReturnType = string;
 
 export interface ArrayTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type ArrayTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ArrayTypeNodeRootType = ts.ArrayTypeNode;
 
@@ -120,6 +351,12 @@ export type CallSignatureDeclarationKindCodeReturnType = number;
 
 export type CallSignatureDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface CallSignatureDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type CallSignatureDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type CallSignatureDeclarationNameTextReturnType = null | string;
+
 export type CallSignatureDeclarationParentReturnType = NodeReturnType;
 
 export type CallSignatureDeclarationPosReturnType = number;
@@ -127,6 +364,8 @@ export type CallSignatureDeclarationPosReturnType = number;
 export type CallSignatureDeclarationRawTextReturnType = string;
 
 export interface CallSignatureDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type CallSignatureDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type CallSignatureDeclarationRootType = ts.CallSignatureDeclaration;
 
@@ -136,13 +375,24 @@ export type ClassDeclarationEndReturnType = number;
 
 export type ClassDeclarationFlagsReturnType = NodeFlags;
 
+export type ClassDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type ClassDeclarationKindReturnType = SyntaxKind;
 
 export type ClassDeclarationKindCodeReturnType = number;
 
 export type ClassDeclarationMembersReturnType = MaybePromiseList<NodeReturnType>;
 
+export interface ClassDeclarationMembersArgs {
+  only?: null | SyntaxKind[];
+  skip?: null | SyntaxKind[];
+}
+
 export type ClassDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface ClassDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ClassDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type ClassDeclarationNameTextReturnType = null | string;
 
@@ -154,33 +404,33 @@ export type ClassDeclarationRawTextReturnType = string;
 
 export interface ClassDeclarationRawTextArgs extends NodeRawTextArgs {}
 
+export type ClassDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type ClassDeclarationRootType = ts.ClassDeclaration;
 
 export type ClassDeclarationReturnType = ts.ClassDeclaration
 
-export type ComputedPropertyNameEndReturnType = number;
+export type HasJSDocJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
 
-export type ComputedPropertyNameFlagsReturnType = NodeFlags;
+export type JSDocCommentReturnType = null | string;
 
-export type ComputedPropertyNameKindReturnType = SyntaxKind;
+export type JSDocTagsReturnType = null | MaybePromiseList<JSDocTagReturnType>;
 
-export type ComputedPropertyNameKindCodeReturnType = number;
+export type JSDocRootType = ts.JSDoc;
 
-export type ComputedPropertyNameModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+export type JSDocReturnType = ts.JSDoc
 
-export type ComputedPropertyNameParentReturnType = NodeReturnType;
+export type JSDocTagCommentReturnType = null | string;
 
-export type ComputedPropertyNamePosReturnType = number;
+export type JSDocTagTagNameReturnType = null | string;
 
-export type ComputedPropertyNameRawTextReturnType = string;
-
-export interface ComputedPropertyNameRawTextArgs extends NodeRawTextArgs {}
-
-export type ComputedPropertyNameRootType = ts.ComputedPropertyName;
-
-export type ComputedPropertyNameReturnType = ts.ComputedPropertyName
+export type ConditionalTypeNodeCheckTypeReturnType = NodeReturnType;
 
 export type ConditionalTypeNodeEndReturnType = number;
+
+export type ConditionalTypeNodeExtendsTypeReturnType = NodeReturnType;
+
+export type ConditionalTypeNodeFalseTypeReturnType = NodeReturnType;
 
 export type ConditionalTypeNodeFlagsReturnType = NodeFlags;
 
@@ -190,6 +440,12 @@ export type ConditionalTypeNodeKindCodeReturnType = number;
 
 export type ConditionalTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ConditionalTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type ConditionalTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type ConditionalTypeNodeNameTextReturnType = null | string;
+
 export type ConditionalTypeNodeParentReturnType = NodeReturnType;
 
 export type ConditionalTypeNodePosReturnType = number;
@@ -197,6 +453,10 @@ export type ConditionalTypeNodePosReturnType = number;
 export type ConditionalTypeNodeRawTextReturnType = string;
 
 export interface ConditionalTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type ConditionalTypeNodeTrueTypeReturnType = NodeReturnType;
+
+export type ConditionalTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ConditionalTypeNodeRootType = ts.ConditionalTypeNode;
 
@@ -210,11 +470,17 @@ export type ConstructorDeclarationExclamationTokenReturnType = null | TokenRetur
 
 export type ConstructorDeclarationFlagsReturnType = NodeFlags;
 
+export type ConstructorDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type ConstructorDeclarationKindReturnType = SyntaxKind;
 
 export type ConstructorDeclarationKindCodeReturnType = number;
 
 export type ConstructorDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface ConstructorDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ConstructorDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type ConstructorDeclarationNameTextReturnType = null | string;
 
@@ -232,21 +498,31 @@ export interface ConstructorDeclarationRawTextArgs extends NodeRawTextArgs {}
 
 export type ConstructorDeclarationTypeReturnType = null | NodeReturnType;
 
+export type ConstructorDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type ConstructorDeclarationTypeParametersReturnType = null | MaybePromiseList<TypeParameterDeclarationReturnType>;
 
 export type ConstructorDeclarationRootType = ts.ConstructorDeclaration;
 
 export type ConstructorDeclarationReturnType = ts.ConstructorDeclaration
 
+export type MaybeOptionalQuestionTokenReturnType = null | TokenReturnType;
+
 export type ParameterDeclarationEndReturnType = number;
 
 export type ParameterDeclarationFlagsReturnType = NodeFlags;
+
+export type ParameterDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
 
 export type ParameterDeclarationKindReturnType = SyntaxKind;
 
 export type ParameterDeclarationKindCodeReturnType = number;
 
 export type ParameterDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface ParameterDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ParameterDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type ParameterDeclarationNameTextReturnType = null | string;
 
@@ -260,11 +536,19 @@ export interface ParameterDeclarationRawTextArgs extends NodeRawTextArgs {}
 
 export type ParameterDeclarationTypeReturnType = null | NodeReturnType;
 
+export type ParameterDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type ParameterDeclarationRootType = ts.ParameterDeclaration;
 
 export type ParameterDeclarationReturnType = ts.ParameterDeclaration
 
+export type TypeParameterDeclarationConstraintReturnType = NodeReturnType;
+
+export type TypeParameterDeclarationDefaultReturnType = NodeReturnType;
+
 export type TypeParameterDeclarationEndReturnType = number;
+
+export type TypeParameterDeclarationExpressionReturnType = NodeReturnType;
 
 export type TypeParameterDeclarationFlagsReturnType = NodeFlags;
 
@@ -274,6 +558,12 @@ export type TypeParameterDeclarationKindCodeReturnType = number;
 
 export type TypeParameterDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface TypeParameterDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type TypeParameterDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type TypeParameterDeclarationNameTextReturnType = null | string;
+
 export type TypeParameterDeclarationParentReturnType = NodeReturnType;
 
 export type TypeParameterDeclarationPosReturnType = number;
@@ -281,6 +571,8 @@ export type TypeParameterDeclarationPosReturnType = number;
 export type TypeParameterDeclarationRawTextReturnType = string;
 
 export interface TypeParameterDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type TypeParameterDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type TypeParameterDeclarationRootType = ts.TypeParameterDeclaration;
 
@@ -296,6 +588,12 @@ export type ConstructorTypeNodeKindCodeReturnType = number;
 
 export type ConstructorTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ConstructorTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type ConstructorTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type ConstructorTypeNodeNameTextReturnType = null | string;
+
 export type ConstructorTypeNodeParentReturnType = NodeReturnType;
 
 export type ConstructorTypeNodePosReturnType = number;
@@ -303,6 +601,10 @@ export type ConstructorTypeNodePosReturnType = number;
 export type ConstructorTypeNodeRawTextReturnType = string;
 
 export interface ConstructorTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type ConstructorTypeNodeTypeReturnType = NodeReturnType;
+
+export type ConstructorTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ConstructorTypeNodeRootType = ts.ConstructorTypeNode;
 
@@ -318,6 +620,12 @@ export type ConstructSignatureDeclarationKindCodeReturnType = number;
 
 export type ConstructSignatureDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ConstructSignatureDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ConstructSignatureDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type ConstructSignatureDeclarationNameTextReturnType = null | string;
+
 export type ConstructSignatureDeclarationParentReturnType = NodeReturnType;
 
 export type ConstructSignatureDeclarationPosReturnType = number;
@@ -325,6 +633,8 @@ export type ConstructSignatureDeclarationPosReturnType = number;
 export type ConstructSignatureDeclarationRawTextReturnType = string;
 
 export interface ConstructSignatureDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type ConstructSignatureDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ConstructSignatureDeclarationRootType = ts.ConstructSignatureDeclaration;
 
@@ -334,11 +644,21 @@ export type EnumDeclarationEndReturnType = number;
 
 export type EnumDeclarationFlagsReturnType = NodeFlags;
 
+export type EnumDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type EnumDeclarationKindReturnType = SyntaxKind;
 
 export type EnumDeclarationKindCodeReturnType = number;
 
+export type EnumDeclarationMembersReturnType = MaybePromiseList<NodeReturnType>;
+
 export type EnumDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface EnumDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type EnumDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type EnumDeclarationNameTextReturnType = null | string;
 
 export type EnumDeclarationParentReturnType = NodeReturnType;
 
@@ -347,6 +667,8 @@ export type EnumDeclarationPosReturnType = number;
 export type EnumDeclarationRawTextReturnType = string;
 
 export interface EnumDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type EnumDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type EnumDeclarationRootType = ts.EnumDeclaration;
 
@@ -362,6 +684,12 @@ export type ExportAssignmentKindCodeReturnType = number;
 
 export type ExportAssignmentModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ExportAssignmentModifiersArgs extends NodeModifiersArgs {}
+
+export type ExportAssignmentNameReturnType = null | DeclarationNameReturnType;
+
+export type ExportAssignmentNameTextReturnType = null | string;
+
 export type ExportAssignmentParentReturnType = NodeReturnType;
 
 export type ExportAssignmentPosReturnType = number;
@@ -369,6 +697,8 @@ export type ExportAssignmentPosReturnType = number;
 export type ExportAssignmentRawTextReturnType = string;
 
 export interface ExportAssignmentRawTextArgs extends NodeRawTextArgs {}
+
+export type ExportAssignmentTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ExportAssignmentRootType = ts.ExportAssignment;
 
@@ -384,6 +714,12 @@ export type ExportDeclarationKindCodeReturnType = number;
 
 export type ExportDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ExportDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ExportDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type ExportDeclarationNameTextReturnType = null | string;
+
 export type ExportDeclarationParentReturnType = NodeReturnType;
 
 export type ExportDeclarationPosReturnType = number;
@@ -391,6 +727,8 @@ export type ExportDeclarationPosReturnType = number;
 export type ExportDeclarationRawTextReturnType = string;
 
 export interface ExportDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type ExportDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ExportDeclarationRootType = ts.ExportDeclaration;
 
@@ -404,11 +742,17 @@ export type FunctionDeclarationExclamationTokenReturnType = null | TokenReturnTy
 
 export type FunctionDeclarationFlagsReturnType = NodeFlags;
 
+export type FunctionDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type FunctionDeclarationKindReturnType = SyntaxKind;
 
 export type FunctionDeclarationKindCodeReturnType = number;
 
 export type FunctionDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface FunctionDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type FunctionDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type FunctionDeclarationNameTextReturnType = null | string;
 
@@ -426,6 +770,8 @@ export interface FunctionDeclarationRawTextArgs extends NodeRawTextArgs {}
 
 export type FunctionDeclarationTypeReturnType = null | NodeReturnType;
 
+export type FunctionDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type FunctionDeclarationTypeParametersReturnType = null | MaybePromiseList<TypeParameterDeclarationReturnType>;
 
 export type FunctionDeclarationRootType = ts.FunctionDeclaration;
@@ -442,6 +788,12 @@ export type FunctionTypeNodeKindCodeReturnType = number;
 
 export type FunctionTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface FunctionTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type FunctionTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type FunctionTypeNodeNameTextReturnType = null | string;
+
 export type FunctionTypeNodeParentReturnType = NodeReturnType;
 
 export type FunctionTypeNodePosReturnType = number;
@@ -449,6 +801,10 @@ export type FunctionTypeNodePosReturnType = number;
 export type FunctionTypeNodeRawTextReturnType = string;
 
 export interface FunctionTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type FunctionTypeNodeTypeReturnType = NodeReturnType;
+
+export type FunctionTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type FunctionTypeNodeRootType = ts.FunctionTypeNode;
 
@@ -462,11 +818,17 @@ export type GetAccessorDeclarationExclamationTokenReturnType = null | TokenRetur
 
 export type GetAccessorDeclarationFlagsReturnType = NodeFlags;
 
+export type GetAccessorDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type GetAccessorDeclarationKindReturnType = SyntaxKind;
 
 export type GetAccessorDeclarationKindCodeReturnType = number;
 
 export type GetAccessorDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface GetAccessorDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type GetAccessorDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type GetAccessorDeclarationNameTextReturnType = null | string;
 
@@ -484,33 +846,13 @@ export interface GetAccessorDeclarationRawTextArgs extends NodeRawTextArgs {}
 
 export type GetAccessorDeclarationTypeReturnType = null | NodeReturnType;
 
+export type GetAccessorDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type GetAccessorDeclarationTypeParametersReturnType = null | MaybePromiseList<TypeParameterDeclarationReturnType>;
 
 export type GetAccessorDeclarationRootType = ts.GetAccessorDeclaration;
 
 export type GetAccessorDeclarationReturnType = ts.GetAccessorDeclaration
-
-export type IdentifierEndReturnType = number;
-
-export type IdentifierFlagsReturnType = NodeFlags;
-
-export type IdentifierKindReturnType = SyntaxKind;
-
-export type IdentifierKindCodeReturnType = number;
-
-export type IdentifierModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
-
-export type IdentifierParentReturnType = NodeReturnType;
-
-export type IdentifierPosReturnType = number;
-
-export type IdentifierRawTextReturnType = string;
-
-export interface IdentifierRawTextArgs extends NodeRawTextArgs {}
-
-export type IdentifierRootType = ts.Identifier;
-
-export type IdentifierReturnType = ts.Identifier
 
 export type ImportDeclarationEndReturnType = number;
 
@@ -522,6 +864,12 @@ export type ImportDeclarationKindCodeReturnType = number;
 
 export type ImportDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ImportDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ImportDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type ImportDeclarationNameTextReturnType = null | string;
+
 export type ImportDeclarationParentReturnType = NodeReturnType;
 
 export type ImportDeclarationPosReturnType = number;
@@ -529,6 +877,8 @@ export type ImportDeclarationPosReturnType = number;
 export type ImportDeclarationRawTextReturnType = string;
 
 export interface ImportDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type ImportDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ImportDeclarationRootType = ts.ImportDeclaration;
 
@@ -544,6 +894,12 @@ export type ImportEqualsDeclarationKindCodeReturnType = number;
 
 export type ImportEqualsDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ImportEqualsDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ImportEqualsDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type ImportEqualsDeclarationNameTextReturnType = null | string;
+
 export type ImportEqualsDeclarationParentReturnType = NodeReturnType;
 
 export type ImportEqualsDeclarationPosReturnType = number;
@@ -551,6 +907,8 @@ export type ImportEqualsDeclarationPosReturnType = number;
 export type ImportEqualsDeclarationRawTextReturnType = string;
 
 export interface ImportEqualsDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type ImportEqualsDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ImportEqualsDeclarationRootType = ts.ImportEqualsDeclaration;
 
@@ -566,6 +924,12 @@ export type ImportTypeNodeKindCodeReturnType = number;
 
 export type ImportTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ImportTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type ImportTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type ImportTypeNodeNameTextReturnType = null | string;
+
 export type ImportTypeNodeParentReturnType = NodeReturnType;
 
 export type ImportTypeNodePosReturnType = number;
@@ -573,6 +937,8 @@ export type ImportTypeNodePosReturnType = number;
 export type ImportTypeNodeRawTextReturnType = string;
 
 export interface ImportTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type ImportTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type ImportTypeNodeRootType = ts.ImportTypeNode;
 
@@ -588,6 +954,12 @@ export type IndexedAccessTypeNodeKindCodeReturnType = number;
 
 export type IndexedAccessTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface IndexedAccessTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type IndexedAccessTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type IndexedAccessTypeNodeNameTextReturnType = null | string;
+
 export type IndexedAccessTypeNodeParentReturnType = NodeReturnType;
 
 export type IndexedAccessTypeNodePosReturnType = number;
@@ -595,6 +967,8 @@ export type IndexedAccessTypeNodePosReturnType = number;
 export type IndexedAccessTypeNodeRawTextReturnType = string;
 
 export interface IndexedAccessTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type IndexedAccessTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type IndexedAccessTypeNodeRootType = ts.IndexedAccessTypeNode;
 
@@ -604,11 +978,19 @@ export type IndexSignatureDeclarationEndReturnType = number;
 
 export type IndexSignatureDeclarationFlagsReturnType = NodeFlags;
 
+export type IndexSignatureDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type IndexSignatureDeclarationKindReturnType = SyntaxKind;
 
 export type IndexSignatureDeclarationKindCodeReturnType = number;
 
 export type IndexSignatureDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface IndexSignatureDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type IndexSignatureDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type IndexSignatureDeclarationNameTextReturnType = null | string;
 
 export type IndexSignatureDeclarationParentReturnType = NodeReturnType;
 
@@ -617,6 +999,8 @@ export type IndexSignatureDeclarationPosReturnType = number;
 export type IndexSignatureDeclarationRawTextReturnType = string;
 
 export interface IndexSignatureDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type IndexSignatureDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type IndexSignatureDeclarationRootType = ts.IndexSignatureDeclaration;
 
@@ -632,6 +1016,12 @@ export type InferTypeNodeKindCodeReturnType = number;
 
 export type InferTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface InferTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type InferTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type InferTypeNodeNameTextReturnType = null | string;
+
 export type InferTypeNodeParentReturnType = NodeReturnType;
 
 export type InferTypeNodePosReturnType = number;
@@ -639,6 +1029,10 @@ export type InferTypeNodePosReturnType = number;
 export type InferTypeNodeRawTextReturnType = string;
 
 export interface InferTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type InferTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type InferTypeNodeTypeParameterReturnType = NodeReturnType;
 
 export type InferTypeNodeRootType = ts.InferTypeNode;
 
@@ -648,11 +1042,19 @@ export type InterfaceDeclarationEndReturnType = number;
 
 export type InterfaceDeclarationFlagsReturnType = NodeFlags;
 
+export type InterfaceDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type InterfaceDeclarationKindReturnType = SyntaxKind;
 
 export type InterfaceDeclarationKindCodeReturnType = number;
 
 export type InterfaceDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface InterfaceDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type InterfaceDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type InterfaceDeclarationNameTextReturnType = null | string;
 
 export type InterfaceDeclarationParentReturnType = NodeReturnType;
 
@@ -661,6 +1063,8 @@ export type InterfaceDeclarationPosReturnType = number;
 export type InterfaceDeclarationRawTextReturnType = string;
 
 export interface InterfaceDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type InterfaceDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type InterfaceDeclarationRootType = ts.InterfaceDeclaration;
 
@@ -676,6 +1080,12 @@ export type IntersectionTypeNodeKindCodeReturnType = number;
 
 export type IntersectionTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface IntersectionTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type IntersectionTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type IntersectionTypeNodeNameTextReturnType = null | string;
+
 export type IntersectionTypeNodeParentReturnType = NodeReturnType;
 
 export type IntersectionTypeNodePosReturnType = number;
@@ -684,31 +1094,37 @@ export type IntersectionTypeNodeRawTextReturnType = string;
 
 export interface IntersectionTypeNodeRawTextArgs extends NodeRawTextArgs {}
 
+export type IntersectionTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type IntersectionTypeNodeTypesReturnType = MaybePromiseList<NodeReturnType>;
+
 export type IntersectionTypeNodeRootType = ts.IntersectionTypeNode;
 
 export type IntersectionTypeNodeReturnType = ts.IntersectionTypeNode
 
-export type JSDocEndReturnType = number;
+export type JSDocAugmentsTagCommentReturnType = null | string;
 
-export type JSDocFlagsReturnType = NodeFlags;
+export type JSDocAugmentsTagTagNameReturnType = null | string;
 
-export type JSDocKindReturnType = SyntaxKind;
+export type JSDocAugmentsTagRootType = ts.JSDocAugmentsTag;
 
-export type JSDocKindCodeReturnType = number;
+export type JSDocAugmentsTagReturnType = ts.JSDocAugmentsTag
 
-export type JSDocModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+export type JSDocClassTagCommentReturnType = null | string;
 
-export type JSDocParentReturnType = NodeReturnType;
+export type JSDocClassTagTagNameReturnType = null | string;
 
-export type JSDocPosReturnType = number;
+export type JSDocClassTagRootType = ts.JSDocClassTag;
 
-export type JSDocRawTextReturnType = string;
+export type JSDocClassTagReturnType = ts.JSDocClassTag
 
-export interface JSDocRawTextArgs extends NodeRawTextArgs {}
+export type JSDocEnumTagCommentReturnType = null | string;
 
-export type JSDocRootType = ts.JSDoc;
+export type JSDocEnumTagTagNameReturnType = null | string;
 
-export type JSDocReturnType = ts.JSDoc
+export type JSDocEnumTagRootType = ts.JSDocEnumTag;
+
+export type JSDocEnumTagReturnType = ts.JSDocEnumTag
 
 export type JSDocNamespaceDeclarationEndReturnType = number;
 
@@ -720,6 +1136,12 @@ export type JSDocNamespaceDeclarationKindCodeReturnType = number;
 
 export type JSDocNamespaceDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface JSDocNamespaceDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type JSDocNamespaceDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type JSDocNamespaceDeclarationNameTextReturnType = null | string;
+
 export type JSDocNamespaceDeclarationParentReturnType = NodeReturnType;
 
 export type JSDocNamespaceDeclarationPosReturnType = number;
@@ -728,9 +1150,51 @@ export type JSDocNamespaceDeclarationRawTextReturnType = string;
 
 export interface JSDocNamespaceDeclarationRawTextArgs extends NodeRawTextArgs {}
 
+export type JSDocNamespaceDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type JSDocNamespaceDeclarationRootType = ts.JSDocNamespaceDeclaration;
 
 export type JSDocNamespaceDeclarationReturnType = ts.JSDocNamespaceDeclaration
+
+export type JSDocReturnTagCommentReturnType = null | string;
+
+export type JSDocReturnTagTagNameReturnType = null | string;
+
+export type JSDocReturnTagRootType = ts.JSDocReturnTag;
+
+export type JSDocReturnTagReturnType = ts.JSDocReturnTag
+
+export type JSDocTemplateTagCommentReturnType = null | string;
+
+export type JSDocTemplateTagTagNameReturnType = null | string;
+
+export type JSDocTemplateTagRootType = ts.JSDocTemplateTag;
+
+export type JSDocTemplateTagReturnType = ts.JSDocTemplateTag
+
+export type JSDocThisTagCommentReturnType = null | string;
+
+export type JSDocThisTagTagNameReturnType = null | string;
+
+export type JSDocThisTagRootType = ts.JSDocThisTag;
+
+export type JSDocThisTagReturnType = ts.JSDocThisTag
+
+export type JSDocTypeTagCommentReturnType = null | string;
+
+export type JSDocTypeTagTagNameReturnType = null | string;
+
+export type JSDocTypeTagRootType = ts.JSDocTypeTag;
+
+export type JSDocTypeTagReturnType = ts.JSDocTypeTag
+
+export type JSDocUnknownTagCommentReturnType = null | string;
+
+export type JSDocUnknownTagTagNameReturnType = null | string;
+
+export type JSDocUnknownTagRootType = ts.JSDocUnknownTag;
+
+export type JSDocUnknownTagReturnType = ts.JSDocUnknownTag
 
 export type KeywordTypeNodeEndReturnType = number;
 
@@ -742,6 +1206,12 @@ export type KeywordTypeNodeKindCodeReturnType = number;
 
 export type KeywordTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface KeywordTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type KeywordTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type KeywordTypeNodeNameTextReturnType = null | string;
+
 export type KeywordTypeNodeParentReturnType = NodeReturnType;
 
 export type KeywordTypeNodePosReturnType = number;
@@ -750,31 +1220,41 @@ export type KeywordTypeNodeRawTextReturnType = string;
 
 export interface KeywordTypeNodeRawTextArgs extends NodeRawTextArgs {}
 
+export type KeywordTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type KeywordTypeNodeRootType = ts.KeywordTypeNode;
 
 export type KeywordTypeNodeReturnType = ts.KeywordTypeNode
 
-export type LiteralTypeNodeEndReturnType = number;
+export type LiteralTypeEndReturnType = number;
 
-export type LiteralTypeNodeFlagsReturnType = NodeFlags;
+export type LiteralTypeFlagsReturnType = NodeFlags;
 
-export type LiteralTypeNodeKindReturnType = SyntaxKind;
+export type LiteralTypeKindReturnType = SyntaxKind;
 
-export type LiteralTypeNodeKindCodeReturnType = number;
+export type LiteralTypeKindCodeReturnType = number;
 
-export type LiteralTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+export type LiteralTypeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
-export type LiteralTypeNodeParentReturnType = NodeReturnType;
+export interface LiteralTypeModifiersArgs extends NodeModifiersArgs {}
 
-export type LiteralTypeNodePosReturnType = number;
+export type LiteralTypeNameReturnType = null | DeclarationNameReturnType;
 
-export type LiteralTypeNodeRawTextReturnType = string;
+export type LiteralTypeNameTextReturnType = null | string;
 
-export interface LiteralTypeNodeRawTextArgs extends NodeRawTextArgs {}
+export type LiteralTypeParentReturnType = NodeReturnType;
 
-export type LiteralTypeNodeRootType = ts.LiteralTypeNode;
+export type LiteralTypePosReturnType = number;
 
-export type LiteralTypeNodeReturnType = ts.LiteralTypeNode
+export type LiteralTypeRawTextReturnType = string;
+
+export interface LiteralTypeRawTextArgs extends NodeRawTextArgs {}
+
+export type LiteralTypeTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type LiteralTypeRootType = ts.LiteralTypeNode;
+
+export type LiteralTypeReturnType = ts.LiteralTypeNode
 
 export type MappedTypeNodeEndReturnType = number;
 
@@ -786,6 +1266,12 @@ export type MappedTypeNodeKindCodeReturnType = number;
 
 export type MappedTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface MappedTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type MappedTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type MappedTypeNodeNameTextReturnType = null | string;
+
 export type MappedTypeNodeParentReturnType = NodeReturnType;
 
 export type MappedTypeNodePosReturnType = number;
@@ -793,6 +1279,8 @@ export type MappedTypeNodePosReturnType = number;
 export type MappedTypeNodeRawTextReturnType = string;
 
 export interface MappedTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type MappedTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type MappedTypeNodeRootType = ts.MappedTypeNode;
 
@@ -806,11 +1294,17 @@ export type MethodDeclarationExclamationTokenReturnType = null | TokenReturnType
 
 export type MethodDeclarationFlagsReturnType = NodeFlags;
 
+export type MethodDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type MethodDeclarationKindReturnType = SyntaxKind;
 
 export type MethodDeclarationKindCodeReturnType = number;
 
 export type MethodDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface MethodDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type MethodDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type MethodDeclarationNameTextReturnType = null | string;
 
@@ -828,6 +1322,8 @@ export interface MethodDeclarationRawTextArgs extends NodeRawTextArgs {}
 
 export type MethodDeclarationTypeReturnType = null | NodeReturnType;
 
+export type MethodDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type MethodDeclarationTypeParametersReturnType = null | MaybePromiseList<TypeParameterDeclarationReturnType>;
 
 export type MethodDeclarationRootType = ts.MethodDeclaration;
@@ -844,6 +1340,12 @@ export type MissingDeclarationKindCodeReturnType = number;
 
 export type MissingDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface MissingDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type MissingDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type MissingDeclarationNameTextReturnType = null | string;
+
 export type MissingDeclarationParentReturnType = NodeReturnType;
 
 export type MissingDeclarationPosReturnType = number;
@@ -851,6 +1353,8 @@ export type MissingDeclarationPosReturnType = number;
 export type MissingDeclarationRawTextReturnType = string;
 
 export interface MissingDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type MissingDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type MissingDeclarationRootType = ts.MissingDeclaration;
 
@@ -860,11 +1364,19 @@ export type ModuleDeclarationEndReturnType = number;
 
 export type ModuleDeclarationFlagsReturnType = NodeFlags;
 
+export type ModuleDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type ModuleDeclarationKindReturnType = SyntaxKind;
 
 export type ModuleDeclarationKindCodeReturnType = number;
 
 export type ModuleDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface ModuleDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type ModuleDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type ModuleDeclarationNameTextReturnType = null | string;
 
 export type ModuleDeclarationParentReturnType = NodeReturnType;
 
@@ -874,41 +1386,29 @@ export type ModuleDeclarationRawTextReturnType = string;
 
 export interface ModuleDeclarationRawTextArgs extends NodeRawTextArgs {}
 
+export type ModuleDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type ModuleDeclarationRootType = ts.ModuleDeclaration;
 
 export type ModuleDeclarationReturnType = ts.ModuleDeclaration
 
-export type NamedDeclarationEndReturnType = number;
-
-export type NamedDeclarationFlagsReturnType = NodeFlags;
-
-export type NamedDeclarationKindReturnType = SyntaxKind;
-
-export type NamedDeclarationKindCodeReturnType = number;
-
-export type NamedDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
-
-export type NamedDeclarationParentReturnType = NodeReturnType;
-
-export type NamedDeclarationPosReturnType = number;
-
-export type NamedDeclarationRawTextReturnType = string;
-
-export interface NamedDeclarationRawTextArgs extends NodeRawTextArgs {}
-
-export type NamedDeclarationRootType = ts.NamedDeclaration;
-
-export type NamedDeclarationReturnType = ts.NamedDeclaration
-
 export type NamespaceDeclarationEndReturnType = number;
 
 export type NamespaceDeclarationFlagsReturnType = NodeFlags;
+
+export type NamespaceDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
 
 export type NamespaceDeclarationKindReturnType = SyntaxKind;
 
 export type NamespaceDeclarationKindCodeReturnType = number;
 
 export type NamespaceDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface NamespaceDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type NamespaceDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type NamespaceDeclarationNameTextReturnType = null | string;
 
 export type NamespaceDeclarationParentReturnType = NodeReturnType;
 
@@ -917,6 +1417,8 @@ export type NamespaceDeclarationPosReturnType = number;
 export type NamespaceDeclarationRawTextReturnType = string;
 
 export interface NamespaceDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type NamespaceDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type NamespaceDeclarationRootType = ts.NamespaceDeclaration;
 
@@ -932,6 +1434,12 @@ export type NamespaceExportDeclarationKindCodeReturnType = number;
 
 export type NamespaceExportDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface NamespaceExportDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type NamespaceExportDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type NamespaceExportDeclarationNameTextReturnType = null | string;
+
 export type NamespaceExportDeclarationParentReturnType = NodeReturnType;
 
 export type NamespaceExportDeclarationPosReturnType = number;
@@ -940,31 +1448,11 @@ export type NamespaceExportDeclarationRawTextReturnType = string;
 
 export interface NamespaceExportDeclarationRawTextArgs extends NodeRawTextArgs {}
 
+export type NamespaceExportDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type NamespaceExportDeclarationRootType = ts.NamespaceExportDeclaration;
 
 export type NamespaceExportDeclarationReturnType = ts.NamespaceExportDeclaration
-
-export type NumericLiteralEndReturnType = number;
-
-export type NumericLiteralFlagsReturnType = NodeFlags;
-
-export type NumericLiteralKindReturnType = SyntaxKind;
-
-export type NumericLiteralKindCodeReturnType = number;
-
-export type NumericLiteralModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
-
-export type NumericLiteralParentReturnType = NodeReturnType;
-
-export type NumericLiteralPosReturnType = number;
-
-export type NumericLiteralRawTextReturnType = string;
-
-export interface NumericLiteralRawTextArgs extends NodeRawTextArgs {}
-
-export type NumericLiteralRootType = ts.NumericLiteral;
-
-export type NumericLiteralReturnType = ts.NumericLiteral
 
 export type OptionalTypeNodeEndReturnType = number;
 
@@ -976,6 +1464,12 @@ export type OptionalTypeNodeKindCodeReturnType = number;
 
 export type OptionalTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface OptionalTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type OptionalTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type OptionalTypeNodeNameTextReturnType = null | string;
+
 export type OptionalTypeNodeParentReturnType = NodeReturnType;
 
 export type OptionalTypeNodePosReturnType = number;
@@ -984,35 +1478,51 @@ export type OptionalTypeNodeRawTextReturnType = string;
 
 export interface OptionalTypeNodeRawTextArgs extends NodeRawTextArgs {}
 
+export type OptionalTypeNodeTypeReturnType = NodeReturnType;
+
+export type OptionalTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type OptionalTypeNodeRootType = ts.OptionalTypeNode;
 
 export type OptionalTypeNodeReturnType = ts.OptionalTypeNode
 
-export type ParenthesizedTypeNodeEndReturnType = number;
+export type ParenthesizedTypeEndReturnType = number;
 
-export type ParenthesizedTypeNodeFlagsReturnType = NodeFlags;
+export type ParenthesizedTypeFlagsReturnType = NodeFlags;
 
-export type ParenthesizedTypeNodeKindReturnType = SyntaxKind;
+export type ParenthesizedTypeKindReturnType = SyntaxKind;
 
-export type ParenthesizedTypeNodeKindCodeReturnType = number;
+export type ParenthesizedTypeKindCodeReturnType = number;
 
-export type ParenthesizedTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+export type ParenthesizedTypeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
-export type ParenthesizedTypeNodeParentReturnType = NodeReturnType;
+export interface ParenthesizedTypeModifiersArgs extends NodeModifiersArgs {}
 
-export type ParenthesizedTypeNodePosReturnType = number;
+export type ParenthesizedTypeNameReturnType = null | DeclarationNameReturnType;
 
-export type ParenthesizedTypeNodeRawTextReturnType = string;
+export type ParenthesizedTypeNameTextReturnType = null | string;
 
-export interface ParenthesizedTypeNodeRawTextArgs extends NodeRawTextArgs {}
+export type ParenthesizedTypeParentReturnType = NodeReturnType;
 
-export type ParenthesizedTypeNodeRootType = ts.ParenthesizedTypeNode;
+export type ParenthesizedTypePosReturnType = number;
 
-export type ParenthesizedTypeNodeReturnType = ts.ParenthesizedTypeNode
+export type ParenthesizedTypeRawTextReturnType = string;
+
+export interface ParenthesizedTypeRawTextArgs extends NodeRawTextArgs {}
+
+export type ParenthesizedTypeTypeReturnType = NodeReturnType;
+
+export type ParenthesizedTypeTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type ParenthesizedTypeRootType = ts.ParenthesizedTypeNode;
+
+export type ParenthesizedTypeReturnType = ts.ParenthesizedTypeNode
 
 export type PropertyDeclarationEndReturnType = number;
 
 export type PropertyDeclarationFlagsReturnType = NodeFlags;
+
+export type PropertyDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
 
 export type PropertyDeclarationKindReturnType = SyntaxKind;
 
@@ -1020,13 +1530,23 @@ export type PropertyDeclarationKindCodeReturnType = number;
 
 export type PropertyDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface PropertyDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type PropertyDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type PropertyDeclarationNameTextReturnType = null | string;
+
 export type PropertyDeclarationParentReturnType = NodeReturnType;
 
 export type PropertyDeclarationPosReturnType = number;
 
+export type PropertyDeclarationQuestionTokenReturnType = null | TokenReturnType;
+
 export type PropertyDeclarationRawTextReturnType = string;
 
 export interface PropertyDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type PropertyDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type PropertyDeclarationRootType = ts.PropertyDeclaration;
 
@@ -1042,6 +1562,12 @@ export type PropertyLikeDeclarationKindCodeReturnType = number;
 
 export type PropertyLikeDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface PropertyLikeDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type PropertyLikeDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type PropertyLikeDeclarationNameTextReturnType = null | string;
+
 export type PropertyLikeDeclarationParentReturnType = NodeReturnType;
 
 export type PropertyLikeDeclarationPosReturnType = number;
@@ -1050,35 +1576,47 @@ export type PropertyLikeDeclarationRawTextReturnType = string;
 
 export interface PropertyLikeDeclarationRawTextArgs extends NodeRawTextArgs {}
 
+export type PropertyLikeDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type PropertyLikeDeclarationRootType = ts.PropertyLikeDeclaration;
 
 export type PropertyLikeDeclarationReturnType = ts.PropertyLikeDeclaration
 
-export type PropertyNameRootType = ComputedPropertyNameRootType | IdentifierRootType | NumericLiteralRootType | StringLiteralRootType;
+export type PropertySignatureEndReturnType = number;
 
-export type PropertyNameReturnType = ComputedPropertyNameReturnType | IdentifierReturnType | NumericLiteralReturnType | StringLiteralReturnType;
+export type PropertySignatureFlagsReturnType = NodeFlags;
 
-export type StringLiteralEndReturnType = number;
+export type PropertySignatureJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
 
-export type StringLiteralFlagsReturnType = NodeFlags;
+export type PropertySignatureKindReturnType = SyntaxKind;
 
-export type StringLiteralKindReturnType = SyntaxKind;
+export type PropertySignatureKindCodeReturnType = number;
 
-export type StringLiteralKindCodeReturnType = number;
+export type PropertySignatureModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
-export type StringLiteralModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+export interface PropertySignatureModifiersArgs extends NodeModifiersArgs {}
 
-export type StringLiteralParentReturnType = NodeReturnType;
+export type PropertySignatureNameReturnType = null | DeclarationNameReturnType;
 
-export type StringLiteralPosReturnType = number;
+export type PropertySignatureNameTextReturnType = null | string;
 
-export type StringLiteralRawTextReturnType = string;
+export type PropertySignatureParentReturnType = NodeReturnType;
 
-export interface StringLiteralRawTextArgs extends NodeRawTextArgs {}
+export type PropertySignaturePosReturnType = number;
 
-export type StringLiteralRootType = ts.StringLiteral;
+export type PropertySignatureQuestionTokenReturnType = null | TokenReturnType;
 
-export type StringLiteralReturnType = ts.StringLiteral
+export type PropertySignatureRawTextReturnType = string;
+
+export interface PropertySignatureRawTextArgs extends NodeRawTextArgs {}
+
+export type PropertySignatureTypeReturnType = null | NodeReturnType;
+
+export type PropertySignatureTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type PropertySignatureRootType = ts.PropertySignature;
+
+export type PropertySignatureReturnType = ts.PropertySignature
 
 export type RestTypeNodeEndReturnType = number;
 
@@ -1090,6 +1628,12 @@ export type RestTypeNodeKindCodeReturnType = number;
 
 export type RestTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface RestTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type RestTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type RestTypeNodeNameTextReturnType = null | string;
+
 export type RestTypeNodeParentReturnType = NodeReturnType;
 
 export type RestTypeNodePosReturnType = number;
@@ -1097,6 +1641,10 @@ export type RestTypeNodePosReturnType = number;
 export type RestTypeNodeRawTextReturnType = string;
 
 export interface RestTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type RestTypeNodeTypeReturnType = NodeReturnType;
+
+export type RestTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type RestTypeNodeRootType = ts.RestTypeNode;
 
@@ -1110,11 +1658,17 @@ export type SetAccessorDeclarationExclamationTokenReturnType = null | TokenRetur
 
 export type SetAccessorDeclarationFlagsReturnType = NodeFlags;
 
+export type SetAccessorDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type SetAccessorDeclarationKindReturnType = SyntaxKind;
 
 export type SetAccessorDeclarationKindCodeReturnType = number;
 
 export type SetAccessorDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface SetAccessorDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type SetAccessorDeclarationNameReturnType = null | DeclarationNameReturnType;
 
 export type SetAccessorDeclarationNameTextReturnType = null | string;
 
@@ -1132,11 +1686,43 @@ export interface SetAccessorDeclarationRawTextArgs extends NodeRawTextArgs {}
 
 export type SetAccessorDeclarationTypeReturnType = null | NodeReturnType;
 
+export type SetAccessorDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type SetAccessorDeclarationTypeParametersReturnType = null | MaybePromiseList<TypeParameterDeclarationReturnType>;
 
 export type SetAccessorDeclarationRootType = ts.SetAccessorDeclaration;
 
 export type SetAccessorDeclarationReturnType = ts.SetAccessorDeclaration
+
+export type StringLiteralEndReturnType = number;
+
+export type StringLiteralFlagsReturnType = NodeFlags;
+
+export type StringLiteralKindReturnType = SyntaxKind;
+
+export type StringLiteralKindCodeReturnType = number;
+
+export type StringLiteralModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface StringLiteralModifiersArgs extends NodeModifiersArgs {}
+
+export type StringLiteralNameReturnType = null | DeclarationNameReturnType;
+
+export type StringLiteralNameTextReturnType = null | string;
+
+export type StringLiteralParentReturnType = NodeReturnType;
+
+export type StringLiteralPosReturnType = number;
+
+export type StringLiteralRawTextReturnType = string;
+
+export interface StringLiteralRawTextArgs extends NodeRawTextArgs {}
+
+export type StringLiteralTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type StringLiteralRootType = ts.StringLiteral;
+
+export type StringLiteralReturnType = ts.StringLiteral
 
 export type ThisTypeNodeEndReturnType = number;
 
@@ -1148,6 +1734,12 @@ export type ThisTypeNodeKindCodeReturnType = number;
 
 export type ThisTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface ThisTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type ThisTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type ThisTypeNodeNameTextReturnType = null | string;
+
 export type ThisTypeNodeParentReturnType = NodeReturnType;
 
 export type ThisTypeNodePosReturnType = number;
@@ -1156,9 +1748,13 @@ export type ThisTypeNodeRawTextReturnType = string;
 
 export interface ThisTypeNodeRawTextArgs extends NodeRawTextArgs {}
 
+export type ThisTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
+
 export type ThisTypeNodeRootType = ts.ThisTypeNode;
 
 export type ThisTypeNodeReturnType = ts.ThisTypeNode
+
+export type TupleTypeNodeElementTypesReturnType = MaybePromiseList<NodeReturnType>;
 
 export type TupleTypeNodeEndReturnType = number;
 
@@ -1170,6 +1766,12 @@ export type TupleTypeNodeKindCodeReturnType = number;
 
 export type TupleTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface TupleTypeNodeModifiersArgs extends NodeModifiersArgs {}
+
+export type TupleTypeNodeNameReturnType = null | DeclarationNameReturnType;
+
+export type TupleTypeNodeNameTextReturnType = null | string;
+
 export type TupleTypeNodeParentReturnType = NodeReturnType;
 
 export type TupleTypeNodePosReturnType = number;
@@ -1177,6 +1779,8 @@ export type TupleTypeNodePosReturnType = number;
 export type TupleTypeNodeRawTextReturnType = string;
 
 export interface TupleTypeNodeRawTextArgs extends NodeRawTextArgs {}
+
+export type TupleTypeNodeTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type TupleTypeNodeRootType = ts.TupleTypeNode;
 
@@ -1186,11 +1790,19 @@ export type TypeAliasDeclarationEndReturnType = number;
 
 export type TypeAliasDeclarationFlagsReturnType = NodeFlags;
 
+export type TypeAliasDeclarationJsDocReturnType = null | MaybePromiseList<JSDocReturnType>;
+
 export type TypeAliasDeclarationKindReturnType = SyntaxKind;
 
 export type TypeAliasDeclarationKindCodeReturnType = number;
 
 export type TypeAliasDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface TypeAliasDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type TypeAliasDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type TypeAliasDeclarationNameTextReturnType = null | string;
 
 export type TypeAliasDeclarationParentReturnType = NodeReturnType;
 
@@ -1200,9 +1812,45 @@ export type TypeAliasDeclarationRawTextReturnType = string;
 
 export interface TypeAliasDeclarationRawTextArgs extends NodeRawTextArgs {}
 
+export type TypeAliasDeclarationTypeReturnType = null | NodeReturnType;
+
+export type TypeAliasDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type TypeAliasDeclarationTypeParametersReturnType = null | MaybePromiseList<TypeParameterDeclarationReturnType>;
+
 export type TypeAliasDeclarationRootType = ts.TypeAliasDeclaration;
 
 export type TypeAliasDeclarationReturnType = ts.TypeAliasDeclaration
+
+export type TypeLiteralEndReturnType = number;
+
+export type TypeLiteralFlagsReturnType = NodeFlags;
+
+export type TypeLiteralKindReturnType = SyntaxKind;
+
+export type TypeLiteralKindCodeReturnType = number;
+
+export type TypeLiteralModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface TypeLiteralModifiersArgs extends NodeModifiersArgs {}
+
+export type TypeLiteralNameReturnType = null | DeclarationNameReturnType;
+
+export type TypeLiteralNameTextReturnType = null | string;
+
+export type TypeLiteralParentReturnType = NodeReturnType;
+
+export type TypeLiteralPosReturnType = number;
+
+export type TypeLiteralRawTextReturnType = string;
+
+export interface TypeLiteralRawTextArgs extends NodeRawTextArgs {}
+
+export type TypeLiteralTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type TypeLiteralRootType = ts.TypeLiteralNode;
+
+export type TypeLiteralReturnType = ts.TypeLiteralNode
 
 export type TypeReferenceEndReturnType = number;
 
@@ -1213,6 +1861,10 @@ export type TypeReferenceKindReturnType = SyntaxKind;
 export type TypeReferenceKindCodeReturnType = number;
 
 export type TypeReferenceModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+
+export interface TypeReferenceModifiersArgs extends NodeModifiersArgs {}
+
+export type TypeReferenceNameReturnType = null | DeclarationNameReturnType;
 
 export type TypeReferenceNameTextReturnType = null | string;
 
@@ -1226,31 +1878,45 @@ export interface TypeReferenceRawTextArgs extends NodeRawTextArgs {}
 
 export type TypeReferenceTextReturnType = null | string;
 
-export type TypeReferenceRootType = ts.TypeReference;
+export type TypeReferenceTypeArgumentsReturnType = null | MaybePromiseList<NodeReturnType>;
 
-export type TypeReferenceReturnType = ts.TypeReference
+export type TypeReferenceTypeNameReturnType = null | DeclarationNameReturnType;
 
-export type UnionTypeNodeEndReturnType = number;
+export type TypeReferenceRootType = ts.TypeReferenceNode;
 
-export type UnionTypeNodeFlagsReturnType = NodeFlags;
+export type TypeReferenceReturnType = ts.TypeReferenceNode
 
-export type UnionTypeNodeKindReturnType = SyntaxKind;
+export type UnionTypeEndReturnType = number;
 
-export type UnionTypeNodeKindCodeReturnType = number;
+export type UnionTypeFlagsReturnType = NodeFlags;
 
-export type UnionTypeNodeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
+export type UnionTypeKindReturnType = SyntaxKind;
 
-export type UnionTypeNodeParentReturnType = NodeReturnType;
+export type UnionTypeKindCodeReturnType = number;
 
-export type UnionTypeNodePosReturnType = number;
+export type UnionTypeModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
-export type UnionTypeNodeRawTextReturnType = string;
+export interface UnionTypeModifiersArgs extends NodeModifiersArgs {}
 
-export interface UnionTypeNodeRawTextArgs extends NodeRawTextArgs {}
+export type UnionTypeNameReturnType = null | DeclarationNameReturnType;
 
-export type UnionTypeNodeRootType = ts.UnionTypeNode;
+export type UnionTypeNameTextReturnType = null | string;
 
-export type UnionTypeNodeReturnType = ts.UnionTypeNode
+export type UnionTypeParentReturnType = NodeReturnType;
+
+export type UnionTypePosReturnType = number;
+
+export type UnionTypeRawTextReturnType = string;
+
+export interface UnionTypeRawTextArgs extends NodeRawTextArgs {}
+
+export type UnionTypeTypeNameReturnType = null | DeclarationNameReturnType;
+
+export type UnionTypeTypesReturnType = MaybePromiseList<NodeReturnType>;
+
+export type UnionTypeRootType = ts.UnionTypeNode;
+
+export type UnionTypeReturnType = ts.UnionTypeNode
 
 export type UNKNOWN_NODEEndReturnType = number;
 
@@ -1262,6 +1928,12 @@ export type UNKNOWN_NODEKindCodeReturnType = number;
 
 export type UNKNOWN_NODEModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface UNKNOWN_NODEModifiersArgs extends NodeModifiersArgs {}
+
+export type UNKNOWN_NODENameReturnType = null | DeclarationNameReturnType;
+
+export type UNKNOWN_NODENameTextReturnType = null | string;
+
 export type UNKNOWN_NODEParentReturnType = NodeReturnType;
 
 export type UNKNOWN_NODEPosReturnType = number;
@@ -1270,15 +1942,20 @@ export type UNKNOWN_NODERawTextReturnType = string;
 
 export interface UNKNOWN_NODERawTextArgs extends NodeRawTextArgs {}
 
+export type UNKNOWN_NODETypeNameReturnType = null | DeclarationNameReturnType;
+
 export interface UNKNOWN_NODERootType {
   end: number;
   flags: NodeFlags;
   kind: SyntaxKind;
   kindCode: number;
   modifiers?: null | any[];
+  name?: null | any;
+  nameText?: null | string;
   parent: any;
   pos: number;
   rawText: string;
+  typeName?: null | any;
 }
 
 export type UNKNOWN_NODEReturnType = {
@@ -1286,10 +1963,13 @@ export type UNKNOWN_NODEReturnType = {
   flags: MaybeThunk<MaybePromise<NodeFlags>>;
   kind: MaybeThunk<MaybePromise<SyntaxKind>>;
   kindCode: MaybeThunk<MaybePromise<number>>;
-  modifiers?: MaybeThunk<MaybePromise<null | any[]>>;
+  modifiers?: MaybeThunkArgs<MaybePromise<null | any[]>, UNKNOWN_NODEModifiersArgs>;
+  name?: MaybeThunk<MaybePromise<null | any>>;
+  nameText?: MaybeThunk<MaybePromise<null | string>>;
   parent: MaybeThunk<MaybePromise<any>>;
   pos: MaybeThunk<MaybePromise<number>>;
   rawText: MaybeThunkArgs<MaybePromise<string>, UNKNOWN_NODERawTextArgs>;
+  typeName?: MaybeThunk<MaybePromise<null | any>>;
 }
 
 export type VariableDeclarationEndReturnType = number;
@@ -1302,6 +1982,12 @@ export type VariableDeclarationKindCodeReturnType = number;
 
 export type VariableDeclarationModifiersReturnType = null | MaybePromiseList<TokenReturnType>;
 
+export interface VariableDeclarationModifiersArgs extends NodeModifiersArgs {}
+
+export type VariableDeclarationNameReturnType = null | DeclarationNameReturnType;
+
+export type VariableDeclarationNameTextReturnType = null | string;
+
 export type VariableDeclarationParentReturnType = NodeReturnType;
 
 export type VariableDeclarationPosReturnType = number;
@@ -1309,6 +1995,8 @@ export type VariableDeclarationPosReturnType = number;
 export type VariableDeclarationRawTextReturnType = string;
 
 export interface VariableDeclarationRawTextArgs extends NodeRawTextArgs {}
+
+export type VariableDeclarationTypeNameReturnType = null | DeclarationNameReturnType;
 
 export type VariableDeclarationRootType = ts.VariableDeclaration;
 
@@ -1318,180 +2006,269 @@ export type NodeRootType = ts.Node;
 
 export type NodeReturnType = ts.Node;
 
+export type HasJSDocRootType = ts.HasJSDoc;
+
+export type HasJSDocReturnType = ts.HasJSDoc;
+
+export type MaybeOptionalRootType = ConstructorDeclarationRootType | FunctionDeclarationRootType | GetAccessorDeclarationRootType | MethodDeclarationRootType | PropertyDeclarationRootType | PropertySignatureRootType | SetAccessorDeclarationRootType;
+
+export type MaybeOptionalReturnType = ConstructorDeclarationReturnType | FunctionDeclarationReturnType | GetAccessorDeclarationReturnType | MethodDeclarationReturnType | PropertyDeclarationReturnType | PropertySignatureReturnType | SetAccessorDeclarationReturnType;
+
+export type JSDocTagRootType = ts.JSDocTag;
+
+export type JSDocTagReturnType = ts.JSDocTag;
+
 export interface GraphQLiteralGenArgTypes {
   Query: {
     parseFile: QueryParseFileArgs;
   };
   SourceFile: {
+    modifiers: SourceFileModifiersArgs;
     rawText: SourceFileRawTextArgs;
+    statements: SourceFileStatementsArgs;
   };
   Node: {
+    modifiers: NodeModifiersArgs;
     rawText: NodeRawTextArgs;
   };
+  BindingPattern: {
+    modifiers: BindingPatternModifiersArgs;
+    rawText: BindingPatternRawTextArgs;
+  };
+  ComputedPropertyName: {
+    modifiers: ComputedPropertyNameModifiersArgs;
+    rawText: ComputedPropertyNameRawTextArgs;
+  };
+  Identifier: {
+    modifiers: IdentifierModifiersArgs;
+    rawText: IdentifierRawTextArgs;
+  };
+  NumericLiteral: {
+    modifiers: NumericLiteralModifiersArgs;
+    rawText: NumericLiteralRawTextArgs;
+  };
+  QualifiedName: {
+    modifiers: QualifiedNameModifiersArgs;
+    rawText: QualifiedNameRawTextArgs;
+  };
+  StringLiteralLike: {
+    modifiers: StringLiteralLikeModifiersArgs;
+    rawText: StringLiteralLikeRawTextArgs;
+  };
   ArrayTypeNode: {
+    modifiers: ArrayTypeNodeModifiersArgs;
     rawText: ArrayTypeNodeRawTextArgs;
   };
   CallSignatureDeclaration: {
+    modifiers: CallSignatureDeclarationModifiersArgs;
     rawText: CallSignatureDeclarationRawTextArgs;
   };
   ClassDeclaration: {
+    members: ClassDeclarationMembersArgs;
+    modifiers: ClassDeclarationModifiersArgs;
     rawText: ClassDeclarationRawTextArgs;
   };
-  ComputedPropertyName: {
-    rawText: ComputedPropertyNameRawTextArgs;
-  };
   ConditionalTypeNode: {
+    modifiers: ConditionalTypeNodeModifiersArgs;
     rawText: ConditionalTypeNodeRawTextArgs;
   };
   ConstructorDeclaration: {
+    modifiers: ConstructorDeclarationModifiersArgs;
     rawText: ConstructorDeclarationRawTextArgs;
   };
   ParameterDeclaration: {
+    modifiers: ParameterDeclarationModifiersArgs;
     rawText: ParameterDeclarationRawTextArgs;
   };
   TypeParameterDeclaration: {
+    modifiers: TypeParameterDeclarationModifiersArgs;
     rawText: TypeParameterDeclarationRawTextArgs;
   };
   ConstructorTypeNode: {
+    modifiers: ConstructorTypeNodeModifiersArgs;
     rawText: ConstructorTypeNodeRawTextArgs;
   };
   ConstructSignatureDeclaration: {
+    modifiers: ConstructSignatureDeclarationModifiersArgs;
     rawText: ConstructSignatureDeclarationRawTextArgs;
   };
   EnumDeclaration: {
+    modifiers: EnumDeclarationModifiersArgs;
     rawText: EnumDeclarationRawTextArgs;
   };
   ExportAssignment: {
+    modifiers: ExportAssignmentModifiersArgs;
     rawText: ExportAssignmentRawTextArgs;
   };
   ExportDeclaration: {
+    modifiers: ExportDeclarationModifiersArgs;
     rawText: ExportDeclarationRawTextArgs;
   };
   FunctionDeclaration: {
+    modifiers: FunctionDeclarationModifiersArgs;
     rawText: FunctionDeclarationRawTextArgs;
   };
   FunctionTypeNode: {
+    modifiers: FunctionTypeNodeModifiersArgs;
     rawText: FunctionTypeNodeRawTextArgs;
   };
   GetAccessorDeclaration: {
+    modifiers: GetAccessorDeclarationModifiersArgs;
     rawText: GetAccessorDeclarationRawTextArgs;
   };
-  Identifier: {
-    rawText: IdentifierRawTextArgs;
-  };
   ImportDeclaration: {
+    modifiers: ImportDeclarationModifiersArgs;
     rawText: ImportDeclarationRawTextArgs;
   };
   ImportEqualsDeclaration: {
+    modifiers: ImportEqualsDeclarationModifiersArgs;
     rawText: ImportEqualsDeclarationRawTextArgs;
   };
   ImportTypeNode: {
+    modifiers: ImportTypeNodeModifiersArgs;
     rawText: ImportTypeNodeRawTextArgs;
   };
   IndexedAccessTypeNode: {
+    modifiers: IndexedAccessTypeNodeModifiersArgs;
     rawText: IndexedAccessTypeNodeRawTextArgs;
   };
   IndexSignatureDeclaration: {
+    modifiers: IndexSignatureDeclarationModifiersArgs;
     rawText: IndexSignatureDeclarationRawTextArgs;
   };
   InferTypeNode: {
+    modifiers: InferTypeNodeModifiersArgs;
     rawText: InferTypeNodeRawTextArgs;
   };
   InterfaceDeclaration: {
+    modifiers: InterfaceDeclarationModifiersArgs;
     rawText: InterfaceDeclarationRawTextArgs;
   };
   IntersectionTypeNode: {
+    modifiers: IntersectionTypeNodeModifiersArgs;
     rawText: IntersectionTypeNodeRawTextArgs;
   };
-  JSDoc: {
-    rawText: JSDocRawTextArgs;
-  };
   JSDocNamespaceDeclaration: {
+    modifiers: JSDocNamespaceDeclarationModifiersArgs;
     rawText: JSDocNamespaceDeclarationRawTextArgs;
   };
   KeywordTypeNode: {
+    modifiers: KeywordTypeNodeModifiersArgs;
     rawText: KeywordTypeNodeRawTextArgs;
   };
-  LiteralTypeNode: {
-    rawText: LiteralTypeNodeRawTextArgs;
+  LiteralType: {
+    modifiers: LiteralTypeModifiersArgs;
+    rawText: LiteralTypeRawTextArgs;
   };
   MappedTypeNode: {
+    modifiers: MappedTypeNodeModifiersArgs;
     rawText: MappedTypeNodeRawTextArgs;
   };
   MethodDeclaration: {
+    modifiers: MethodDeclarationModifiersArgs;
     rawText: MethodDeclarationRawTextArgs;
   };
   MissingDeclaration: {
+    modifiers: MissingDeclarationModifiersArgs;
     rawText: MissingDeclarationRawTextArgs;
   };
   ModuleDeclaration: {
+    modifiers: ModuleDeclarationModifiersArgs;
     rawText: ModuleDeclarationRawTextArgs;
   };
-  NamedDeclaration: {
-    rawText: NamedDeclarationRawTextArgs;
-  };
   NamespaceDeclaration: {
+    modifiers: NamespaceDeclarationModifiersArgs;
     rawText: NamespaceDeclarationRawTextArgs;
   };
   NamespaceExportDeclaration: {
+    modifiers: NamespaceExportDeclarationModifiersArgs;
     rawText: NamespaceExportDeclarationRawTextArgs;
   };
-  NumericLiteral: {
-    rawText: NumericLiteralRawTextArgs;
-  };
   OptionalTypeNode: {
+    modifiers: OptionalTypeNodeModifiersArgs;
     rawText: OptionalTypeNodeRawTextArgs;
   };
-  ParenthesizedTypeNode: {
-    rawText: ParenthesizedTypeNodeRawTextArgs;
+  ParenthesizedType: {
+    modifiers: ParenthesizedTypeModifiersArgs;
+    rawText: ParenthesizedTypeRawTextArgs;
   };
   PropertyDeclaration: {
+    modifiers: PropertyDeclarationModifiersArgs;
     rawText: PropertyDeclarationRawTextArgs;
   };
   PropertyLikeDeclaration: {
+    modifiers: PropertyLikeDeclarationModifiersArgs;
     rawText: PropertyLikeDeclarationRawTextArgs;
   };
-  StringLiteral: {
-    rawText: StringLiteralRawTextArgs;
+  PropertySignature: {
+    modifiers: PropertySignatureModifiersArgs;
+    rawText: PropertySignatureRawTextArgs;
   };
   RestTypeNode: {
+    modifiers: RestTypeNodeModifiersArgs;
     rawText: RestTypeNodeRawTextArgs;
   };
   SetAccessorDeclaration: {
+    modifiers: SetAccessorDeclarationModifiersArgs;
     rawText: SetAccessorDeclarationRawTextArgs;
   };
+  StringLiteral: {
+    modifiers: StringLiteralModifiersArgs;
+    rawText: StringLiteralRawTextArgs;
+  };
   ThisTypeNode: {
+    modifiers: ThisTypeNodeModifiersArgs;
     rawText: ThisTypeNodeRawTextArgs;
   };
   TupleTypeNode: {
+    modifiers: TupleTypeNodeModifiersArgs;
     rawText: TupleTypeNodeRawTextArgs;
   };
   TypeAliasDeclaration: {
+    modifiers: TypeAliasDeclarationModifiersArgs;
     rawText: TypeAliasDeclarationRawTextArgs;
   };
+  TypeLiteral: {
+    modifiers: TypeLiteralModifiersArgs;
+    rawText: TypeLiteralRawTextArgs;
+  };
   TypeReference: {
+    modifiers: TypeReferenceModifiersArgs;
     rawText: TypeReferenceRawTextArgs;
   };
-  UnionTypeNode: {
-    rawText: UnionTypeNodeRawTextArgs;
+  UnionType: {
+    modifiers: UnionTypeModifiersArgs;
+    rawText: UnionTypeRawTextArgs;
   };
   UNKNOWN_NODE: {
+    modifiers: UNKNOWN_NODEModifiersArgs;
     rawText: UNKNOWN_NODERawTextArgs;
   };
   VariableDeclaration: {
+    modifiers: VariableDeclarationModifiersArgs;
     rawText: VariableDeclarationRawTextArgs;
   };
 }
 
 export interface GraphQLiteralGenRootTypes {
   Node: NodeRootType;
+  HasJSDoc: HasJSDocRootType;
+  JSDocTag: JSDocTagRootType;
+  MaybeOptional: MaybeOptionalRootType;
   Query: QueryRootType;
   SourceFile: SourceFileRootType;
   Token: TokenRootType;
+  BindingPattern: BindingPatternRootType;
+  ComputedPropertyName: ComputedPropertyNameRootType;
+  Identifier: IdentifierRootType;
+  NumericLiteral: NumericLiteralRootType;
+  QualifiedName: QualifiedNameRootType;
+  StringLiteralLike: StringLiteralLikeRootType;
+  UnnamedNode: UnnamedNodeRootType;
   ArrayTypeNode: ArrayTypeNodeRootType;
   CallSignatureDeclaration: CallSignatureDeclarationRootType;
   ClassDeclaration: ClassDeclarationRootType;
-  ComputedPropertyName: ComputedPropertyNameRootType;
+  JSDoc: JSDocRootType;
   ConditionalTypeNode: ConditionalTypeNodeRootType;
   ConstructorDeclaration: ConstructorDeclarationRootType;
   ParameterDeclaration: ParameterDeclarationRootType;
@@ -1504,7 +2281,6 @@ export interface GraphQLiteralGenRootTypes {
   FunctionDeclaration: FunctionDeclarationRootType;
   FunctionTypeNode: FunctionTypeNodeRootType;
   GetAccessorDeclaration: GetAccessorDeclarationRootType;
-  Identifier: IdentifierRootType;
   ImportDeclaration: ImportDeclarationRootType;
   ImportEqualsDeclaration: ImportEqualsDeclarationRootType;
   ImportTypeNode: ImportTypeNodeRootType;
@@ -1513,30 +2289,37 @@ export interface GraphQLiteralGenRootTypes {
   InferTypeNode: InferTypeNodeRootType;
   InterfaceDeclaration: InterfaceDeclarationRootType;
   IntersectionTypeNode: IntersectionTypeNodeRootType;
-  JSDoc: JSDocRootType;
+  JSDocAugmentsTag: JSDocAugmentsTagRootType;
+  JSDocClassTag: JSDocClassTagRootType;
+  JSDocEnumTag: JSDocEnumTagRootType;
   JSDocNamespaceDeclaration: JSDocNamespaceDeclarationRootType;
+  JSDocReturnTag: JSDocReturnTagRootType;
+  JSDocTemplateTag: JSDocTemplateTagRootType;
+  JSDocThisTag: JSDocThisTagRootType;
+  JSDocTypeTag: JSDocTypeTagRootType;
+  JSDocUnknownTag: JSDocUnknownTagRootType;
   KeywordTypeNode: KeywordTypeNodeRootType;
-  LiteralTypeNode: LiteralTypeNodeRootType;
+  LiteralType: LiteralTypeRootType;
   MappedTypeNode: MappedTypeNodeRootType;
   MethodDeclaration: MethodDeclarationRootType;
   MissingDeclaration: MissingDeclarationRootType;
   ModuleDeclaration: ModuleDeclarationRootType;
-  NamedDeclaration: NamedDeclarationRootType;
   NamespaceDeclaration: NamespaceDeclarationRootType;
   NamespaceExportDeclaration: NamespaceExportDeclarationRootType;
-  NumericLiteral: NumericLiteralRootType;
   OptionalTypeNode: OptionalTypeNodeRootType;
-  ParenthesizedTypeNode: ParenthesizedTypeNodeRootType;
+  ParenthesizedType: ParenthesizedTypeRootType;
   PropertyDeclaration: PropertyDeclarationRootType;
   PropertyLikeDeclaration: PropertyLikeDeclarationRootType;
-  StringLiteral: StringLiteralRootType;
+  PropertySignature: PropertySignatureRootType;
   RestTypeNode: RestTypeNodeRootType;
   SetAccessorDeclaration: SetAccessorDeclarationRootType;
+  StringLiteral: StringLiteralRootType;
   ThisTypeNode: ThisTypeNodeRootType;
   TupleTypeNode: TupleTypeNodeRootType;
   TypeAliasDeclaration: TypeAliasDeclarationRootType;
+  TypeLiteral: TypeLiteralRootType;
   TypeReference: TypeReferenceRootType;
-  UnionTypeNode: UnionTypeNodeRootType;
+  UnionType: UnionTypeRootType;
   UNKNOWN_NODE: UNKNOWN_NODERootType;
   VariableDeclaration: VariableDeclarationRootType;
 }
@@ -1551,10 +2334,13 @@ export interface GraphQLiteralGenReturnTypes {
     kind: SourceFileKindReturnType;
     kindCode: SourceFileKindCodeReturnType;
     modifiers: SourceFileModifiersReturnType;
+    name: SourceFileNameReturnType;
+    nameText: SourceFileNameTextReturnType;
     parent: SourceFileParentReturnType;
     pos: SourceFilePosReturnType;
     rawText: SourceFileRawTextReturnType;
     statements: SourceFileStatementsReturnType;
+    typeName: SourceFileTypeNameReturnType;
   };
   Node: {
     end: NodeEndReturnType;
@@ -1562,44 +2348,28 @@ export interface GraphQLiteralGenReturnTypes {
     kind: NodeKindReturnType;
     kindCode: NodeKindCodeReturnType;
     modifiers: NodeModifiersReturnType;
+    name: NodeNameReturnType;
+    nameText: NodeNameTextReturnType;
     parent: NodeParentReturnType;
     pos: NodePosReturnType;
     rawText: NodeRawTextReturnType;
+    typeName: NodeTypeNameReturnType;
   };
   Token: {
     kind: TokenKindReturnType;
   };
-  ArrayTypeNode: {
-    end: ArrayTypeNodeEndReturnType;
-    flags: ArrayTypeNodeFlagsReturnType;
-    kind: ArrayTypeNodeKindReturnType;
-    kindCode: ArrayTypeNodeKindCodeReturnType;
-    modifiers: ArrayTypeNodeModifiersReturnType;
-    parent: ArrayTypeNodeParentReturnType;
-    pos: ArrayTypeNodePosReturnType;
-    rawText: ArrayTypeNodeRawTextReturnType;
-  };
-  CallSignatureDeclaration: {
-    end: CallSignatureDeclarationEndReturnType;
-    flags: CallSignatureDeclarationFlagsReturnType;
-    kind: CallSignatureDeclarationKindReturnType;
-    kindCode: CallSignatureDeclarationKindCodeReturnType;
-    modifiers: CallSignatureDeclarationModifiersReturnType;
-    parent: CallSignatureDeclarationParentReturnType;
-    pos: CallSignatureDeclarationPosReturnType;
-    rawText: CallSignatureDeclarationRawTextReturnType;
-  };
-  ClassDeclaration: {
-    end: ClassDeclarationEndReturnType;
-    flags: ClassDeclarationFlagsReturnType;
-    kind: ClassDeclarationKindReturnType;
-    kindCode: ClassDeclarationKindCodeReturnType;
-    members: ClassDeclarationMembersReturnType;
-    modifiers: ClassDeclarationModifiersReturnType;
-    nameText: ClassDeclarationNameTextReturnType;
-    parent: ClassDeclarationParentReturnType;
-    pos: ClassDeclarationPosReturnType;
-    rawText: ClassDeclarationRawTextReturnType;
+  BindingPattern: {
+    end: BindingPatternEndReturnType;
+    flags: BindingPatternFlagsReturnType;
+    kind: BindingPatternKindReturnType;
+    kindCode: BindingPatternKindCodeReturnType;
+    modifiers: BindingPatternModifiersReturnType;
+    name: BindingPatternNameReturnType;
+    nameText: BindingPatternNameTextReturnType;
+    parent: BindingPatternParentReturnType;
+    pos: BindingPatternPosReturnType;
+    rawText: BindingPatternRawTextReturnType;
+    typeName: BindingPatternTypeNameReturnType;
   };
   ComputedPropertyName: {
     end: ComputedPropertyNameEndReturnType;
@@ -1607,28 +2377,149 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ComputedPropertyNameKindReturnType;
     kindCode: ComputedPropertyNameKindCodeReturnType;
     modifiers: ComputedPropertyNameModifiersReturnType;
+    name: ComputedPropertyNameNameReturnType;
+    nameText: ComputedPropertyNameNameTextReturnType;
     parent: ComputedPropertyNameParentReturnType;
     pos: ComputedPropertyNamePosReturnType;
     rawText: ComputedPropertyNameRawTextReturnType;
+    typeName: ComputedPropertyNameTypeNameReturnType;
+  };
+  Identifier: {
+    end: IdentifierEndReturnType;
+    flags: IdentifierFlagsReturnType;
+    kind: IdentifierKindReturnType;
+    kindCode: IdentifierKindCodeReturnType;
+    modifiers: IdentifierModifiersReturnType;
+    name: IdentifierNameReturnType;
+    nameText: IdentifierNameTextReturnType;
+    parent: IdentifierParentReturnType;
+    pos: IdentifierPosReturnType;
+    rawText: IdentifierRawTextReturnType;
+    text: IdentifierTextReturnType;
+    typeName: IdentifierTypeNameReturnType;
+  };
+  NumericLiteral: {
+    end: NumericLiteralEndReturnType;
+    flags: NumericLiteralFlagsReturnType;
+    kind: NumericLiteralKindReturnType;
+    kindCode: NumericLiteralKindCodeReturnType;
+    modifiers: NumericLiteralModifiersReturnType;
+    name: NumericLiteralNameReturnType;
+    nameText: NumericLiteralNameTextReturnType;
+    parent: NumericLiteralParentReturnType;
+    pos: NumericLiteralPosReturnType;
+    rawText: NumericLiteralRawTextReturnType;
+    typeName: NumericLiteralTypeNameReturnType;
+  };
+  QualifiedName: {
+    end: QualifiedNameEndReturnType;
+    flags: QualifiedNameFlagsReturnType;
+    kind: QualifiedNameKindReturnType;
+    kindCode: QualifiedNameKindCodeReturnType;
+    modifiers: QualifiedNameModifiersReturnType;
+    name: QualifiedNameNameReturnType;
+    nameText: QualifiedNameNameTextReturnType;
+    parent: QualifiedNameParentReturnType;
+    pos: QualifiedNamePosReturnType;
+    rawText: QualifiedNameRawTextReturnType;
+    typeName: QualifiedNameTypeNameReturnType;
+  };
+  StringLiteralLike: {
+    end: StringLiteralLikeEndReturnType;
+    flags: StringLiteralLikeFlagsReturnType;
+    kind: StringLiteralLikeKindReturnType;
+    kindCode: StringLiteralLikeKindCodeReturnType;
+    modifiers: StringLiteralLikeModifiersReturnType;
+    name: StringLiteralLikeNameReturnType;
+    nameText: StringLiteralLikeNameTextReturnType;
+    parent: StringLiteralLikeParentReturnType;
+    pos: StringLiteralLikePosReturnType;
+    rawText: StringLiteralLikeRawTextReturnType;
+    typeName: StringLiteralLikeTypeNameReturnType;
+  };
+  UnnamedNode: {
+    text: UnnamedNodeTextReturnType;
+  };
+  ArrayTypeNode: {
+    elementType: ArrayTypeNodeElementTypeReturnType;
+    end: ArrayTypeNodeEndReturnType;
+    flags: ArrayTypeNodeFlagsReturnType;
+    kind: ArrayTypeNodeKindReturnType;
+    kindCode: ArrayTypeNodeKindCodeReturnType;
+    modifiers: ArrayTypeNodeModifiersReturnType;
+    name: ArrayTypeNodeNameReturnType;
+    nameText: ArrayTypeNodeNameTextReturnType;
+    parent: ArrayTypeNodeParentReturnType;
+    pos: ArrayTypeNodePosReturnType;
+    rawText: ArrayTypeNodeRawTextReturnType;
+    typeName: ArrayTypeNodeTypeNameReturnType;
+  };
+  CallSignatureDeclaration: {
+    end: CallSignatureDeclarationEndReturnType;
+    flags: CallSignatureDeclarationFlagsReturnType;
+    kind: CallSignatureDeclarationKindReturnType;
+    kindCode: CallSignatureDeclarationKindCodeReturnType;
+    modifiers: CallSignatureDeclarationModifiersReturnType;
+    name: CallSignatureDeclarationNameReturnType;
+    nameText: CallSignatureDeclarationNameTextReturnType;
+    parent: CallSignatureDeclarationParentReturnType;
+    pos: CallSignatureDeclarationPosReturnType;
+    rawText: CallSignatureDeclarationRawTextReturnType;
+    typeName: CallSignatureDeclarationTypeNameReturnType;
+  };
+  ClassDeclaration: {
+    end: ClassDeclarationEndReturnType;
+    flags: ClassDeclarationFlagsReturnType;
+    jsDoc: ClassDeclarationJsDocReturnType;
+    kind: ClassDeclarationKindReturnType;
+    kindCode: ClassDeclarationKindCodeReturnType;
+    members: ClassDeclarationMembersReturnType;
+    modifiers: ClassDeclarationModifiersReturnType;
+    name: ClassDeclarationNameReturnType;
+    nameText: ClassDeclarationNameTextReturnType;
+    parent: ClassDeclarationParentReturnType;
+    pos: ClassDeclarationPosReturnType;
+    rawText: ClassDeclarationRawTextReturnType;
+    typeName: ClassDeclarationTypeNameReturnType;
+  };
+  HasJSDoc: {
+    jsDoc: HasJSDocJsDocReturnType;
+  };
+  JSDoc: {
+    comment: JSDocCommentReturnType;
+    tags: JSDocTagsReturnType;
+  };
+  JSDocTag: {
+    comment: JSDocTagCommentReturnType;
+    tagName: JSDocTagTagNameReturnType;
   };
   ConditionalTypeNode: {
+    checkType: ConditionalTypeNodeCheckTypeReturnType;
     end: ConditionalTypeNodeEndReturnType;
+    extendsType: ConditionalTypeNodeExtendsTypeReturnType;
+    falseType: ConditionalTypeNodeFalseTypeReturnType;
     flags: ConditionalTypeNodeFlagsReturnType;
     kind: ConditionalTypeNodeKindReturnType;
     kindCode: ConditionalTypeNodeKindCodeReturnType;
     modifiers: ConditionalTypeNodeModifiersReturnType;
+    name: ConditionalTypeNodeNameReturnType;
+    nameText: ConditionalTypeNodeNameTextReturnType;
     parent: ConditionalTypeNodeParentReturnType;
     pos: ConditionalTypeNodePosReturnType;
     rawText: ConditionalTypeNodeRawTextReturnType;
+    trueType: ConditionalTypeNodeTrueTypeReturnType;
+    typeName: ConditionalTypeNodeTypeNameReturnType;
   };
   ConstructorDeclaration: {
     asteriskToken: ConstructorDeclarationAsteriskTokenReturnType;
     end: ConstructorDeclarationEndReturnType;
     exclamationToken: ConstructorDeclarationExclamationTokenReturnType;
     flags: ConstructorDeclarationFlagsReturnType;
+    jsDoc: ConstructorDeclarationJsDocReturnType;
     kind: ConstructorDeclarationKindReturnType;
     kindCode: ConstructorDeclarationKindCodeReturnType;
     modifiers: ConstructorDeclarationModifiersReturnType;
+    name: ConstructorDeclarationNameReturnType;
     nameText: ConstructorDeclarationNameTextReturnType;
     parameters: ConstructorDeclarationParametersReturnType;
     parent: ConstructorDeclarationParentReturnType;
@@ -1636,29 +2527,42 @@ export interface GraphQLiteralGenReturnTypes {
     questionToken: ConstructorDeclarationQuestionTokenReturnType;
     rawText: ConstructorDeclarationRawTextReturnType;
     type: ConstructorDeclarationTypeReturnType;
+    typeName: ConstructorDeclarationTypeNameReturnType;
     typeParameters: ConstructorDeclarationTypeParametersReturnType;
+  };
+  MaybeOptional: {
+    questionToken: MaybeOptionalQuestionTokenReturnType;
   };
   ParameterDeclaration: {
     end: ParameterDeclarationEndReturnType;
     flags: ParameterDeclarationFlagsReturnType;
+    jsDoc: ParameterDeclarationJsDocReturnType;
     kind: ParameterDeclarationKindReturnType;
     kindCode: ParameterDeclarationKindCodeReturnType;
     modifiers: ParameterDeclarationModifiersReturnType;
+    name: ParameterDeclarationNameReturnType;
     nameText: ParameterDeclarationNameTextReturnType;
     parent: ParameterDeclarationParentReturnType;
     pos: ParameterDeclarationPosReturnType;
     rawText: ParameterDeclarationRawTextReturnType;
     type: ParameterDeclarationTypeReturnType;
+    typeName: ParameterDeclarationTypeNameReturnType;
   };
   TypeParameterDeclaration: {
+    constraint: TypeParameterDeclarationConstraintReturnType;
+    default: TypeParameterDeclarationDefaultReturnType;
     end: TypeParameterDeclarationEndReturnType;
+    expression: TypeParameterDeclarationExpressionReturnType;
     flags: TypeParameterDeclarationFlagsReturnType;
     kind: TypeParameterDeclarationKindReturnType;
     kindCode: TypeParameterDeclarationKindCodeReturnType;
     modifiers: TypeParameterDeclarationModifiersReturnType;
+    name: TypeParameterDeclarationNameReturnType;
+    nameText: TypeParameterDeclarationNameTextReturnType;
     parent: TypeParameterDeclarationParentReturnType;
     pos: TypeParameterDeclarationPosReturnType;
     rawText: TypeParameterDeclarationRawTextReturnType;
+    typeName: TypeParameterDeclarationTypeNameReturnType;
   };
   ConstructorTypeNode: {
     end: ConstructorTypeNodeEndReturnType;
@@ -1666,9 +2570,13 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ConstructorTypeNodeKindReturnType;
     kindCode: ConstructorTypeNodeKindCodeReturnType;
     modifiers: ConstructorTypeNodeModifiersReturnType;
+    name: ConstructorTypeNodeNameReturnType;
+    nameText: ConstructorTypeNodeNameTextReturnType;
     parent: ConstructorTypeNodeParentReturnType;
     pos: ConstructorTypeNodePosReturnType;
     rawText: ConstructorTypeNodeRawTextReturnType;
+    type: ConstructorTypeNodeTypeReturnType;
+    typeName: ConstructorTypeNodeTypeNameReturnType;
   };
   ConstructSignatureDeclaration: {
     end: ConstructSignatureDeclarationEndReturnType;
@@ -1676,19 +2584,27 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ConstructSignatureDeclarationKindReturnType;
     kindCode: ConstructSignatureDeclarationKindCodeReturnType;
     modifiers: ConstructSignatureDeclarationModifiersReturnType;
+    name: ConstructSignatureDeclarationNameReturnType;
+    nameText: ConstructSignatureDeclarationNameTextReturnType;
     parent: ConstructSignatureDeclarationParentReturnType;
     pos: ConstructSignatureDeclarationPosReturnType;
     rawText: ConstructSignatureDeclarationRawTextReturnType;
+    typeName: ConstructSignatureDeclarationTypeNameReturnType;
   };
   EnumDeclaration: {
     end: EnumDeclarationEndReturnType;
     flags: EnumDeclarationFlagsReturnType;
+    jsDoc: EnumDeclarationJsDocReturnType;
     kind: EnumDeclarationKindReturnType;
     kindCode: EnumDeclarationKindCodeReturnType;
+    members: EnumDeclarationMembersReturnType;
     modifiers: EnumDeclarationModifiersReturnType;
+    name: EnumDeclarationNameReturnType;
+    nameText: EnumDeclarationNameTextReturnType;
     parent: EnumDeclarationParentReturnType;
     pos: EnumDeclarationPosReturnType;
     rawText: EnumDeclarationRawTextReturnType;
+    typeName: EnumDeclarationTypeNameReturnType;
   };
   ExportAssignment: {
     end: ExportAssignmentEndReturnType;
@@ -1696,9 +2612,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ExportAssignmentKindReturnType;
     kindCode: ExportAssignmentKindCodeReturnType;
     modifiers: ExportAssignmentModifiersReturnType;
+    name: ExportAssignmentNameReturnType;
+    nameText: ExportAssignmentNameTextReturnType;
     parent: ExportAssignmentParentReturnType;
     pos: ExportAssignmentPosReturnType;
     rawText: ExportAssignmentRawTextReturnType;
+    typeName: ExportAssignmentTypeNameReturnType;
   };
   ExportDeclaration: {
     end: ExportDeclarationEndReturnType;
@@ -1706,18 +2625,23 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ExportDeclarationKindReturnType;
     kindCode: ExportDeclarationKindCodeReturnType;
     modifiers: ExportDeclarationModifiersReturnType;
+    name: ExportDeclarationNameReturnType;
+    nameText: ExportDeclarationNameTextReturnType;
     parent: ExportDeclarationParentReturnType;
     pos: ExportDeclarationPosReturnType;
     rawText: ExportDeclarationRawTextReturnType;
+    typeName: ExportDeclarationTypeNameReturnType;
   };
   FunctionDeclaration: {
     asteriskToken: FunctionDeclarationAsteriskTokenReturnType;
     end: FunctionDeclarationEndReturnType;
     exclamationToken: FunctionDeclarationExclamationTokenReturnType;
     flags: FunctionDeclarationFlagsReturnType;
+    jsDoc: FunctionDeclarationJsDocReturnType;
     kind: FunctionDeclarationKindReturnType;
     kindCode: FunctionDeclarationKindCodeReturnType;
     modifiers: FunctionDeclarationModifiersReturnType;
+    name: FunctionDeclarationNameReturnType;
     nameText: FunctionDeclarationNameTextReturnType;
     parameters: FunctionDeclarationParametersReturnType;
     parent: FunctionDeclarationParentReturnType;
@@ -1725,6 +2649,7 @@ export interface GraphQLiteralGenReturnTypes {
     questionToken: FunctionDeclarationQuestionTokenReturnType;
     rawText: FunctionDeclarationRawTextReturnType;
     type: FunctionDeclarationTypeReturnType;
+    typeName: FunctionDeclarationTypeNameReturnType;
     typeParameters: FunctionDeclarationTypeParametersReturnType;
   };
   FunctionTypeNode: {
@@ -1733,18 +2658,24 @@ export interface GraphQLiteralGenReturnTypes {
     kind: FunctionTypeNodeKindReturnType;
     kindCode: FunctionTypeNodeKindCodeReturnType;
     modifiers: FunctionTypeNodeModifiersReturnType;
+    name: FunctionTypeNodeNameReturnType;
+    nameText: FunctionTypeNodeNameTextReturnType;
     parent: FunctionTypeNodeParentReturnType;
     pos: FunctionTypeNodePosReturnType;
     rawText: FunctionTypeNodeRawTextReturnType;
+    type: FunctionTypeNodeTypeReturnType;
+    typeName: FunctionTypeNodeTypeNameReturnType;
   };
   GetAccessorDeclaration: {
     asteriskToken: GetAccessorDeclarationAsteriskTokenReturnType;
     end: GetAccessorDeclarationEndReturnType;
     exclamationToken: GetAccessorDeclarationExclamationTokenReturnType;
     flags: GetAccessorDeclarationFlagsReturnType;
+    jsDoc: GetAccessorDeclarationJsDocReturnType;
     kind: GetAccessorDeclarationKindReturnType;
     kindCode: GetAccessorDeclarationKindCodeReturnType;
     modifiers: GetAccessorDeclarationModifiersReturnType;
+    name: GetAccessorDeclarationNameReturnType;
     nameText: GetAccessorDeclarationNameTextReturnType;
     parameters: GetAccessorDeclarationParametersReturnType;
     parent: GetAccessorDeclarationParentReturnType;
@@ -1752,17 +2683,8 @@ export interface GraphQLiteralGenReturnTypes {
     questionToken: GetAccessorDeclarationQuestionTokenReturnType;
     rawText: GetAccessorDeclarationRawTextReturnType;
     type: GetAccessorDeclarationTypeReturnType;
+    typeName: GetAccessorDeclarationTypeNameReturnType;
     typeParameters: GetAccessorDeclarationTypeParametersReturnType;
-  };
-  Identifier: {
-    end: IdentifierEndReturnType;
-    flags: IdentifierFlagsReturnType;
-    kind: IdentifierKindReturnType;
-    kindCode: IdentifierKindCodeReturnType;
-    modifiers: IdentifierModifiersReturnType;
-    parent: IdentifierParentReturnType;
-    pos: IdentifierPosReturnType;
-    rawText: IdentifierRawTextReturnType;
   };
   ImportDeclaration: {
     end: ImportDeclarationEndReturnType;
@@ -1770,9 +2692,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ImportDeclarationKindReturnType;
     kindCode: ImportDeclarationKindCodeReturnType;
     modifiers: ImportDeclarationModifiersReturnType;
+    name: ImportDeclarationNameReturnType;
+    nameText: ImportDeclarationNameTextReturnType;
     parent: ImportDeclarationParentReturnType;
     pos: ImportDeclarationPosReturnType;
     rawText: ImportDeclarationRawTextReturnType;
+    typeName: ImportDeclarationTypeNameReturnType;
   };
   ImportEqualsDeclaration: {
     end: ImportEqualsDeclarationEndReturnType;
@@ -1780,9 +2705,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ImportEqualsDeclarationKindReturnType;
     kindCode: ImportEqualsDeclarationKindCodeReturnType;
     modifiers: ImportEqualsDeclarationModifiersReturnType;
+    name: ImportEqualsDeclarationNameReturnType;
+    nameText: ImportEqualsDeclarationNameTextReturnType;
     parent: ImportEqualsDeclarationParentReturnType;
     pos: ImportEqualsDeclarationPosReturnType;
     rawText: ImportEqualsDeclarationRawTextReturnType;
+    typeName: ImportEqualsDeclarationTypeNameReturnType;
   };
   ImportTypeNode: {
     end: ImportTypeNodeEndReturnType;
@@ -1790,9 +2718,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ImportTypeNodeKindReturnType;
     kindCode: ImportTypeNodeKindCodeReturnType;
     modifiers: ImportTypeNodeModifiersReturnType;
+    name: ImportTypeNodeNameReturnType;
+    nameText: ImportTypeNodeNameTextReturnType;
     parent: ImportTypeNodeParentReturnType;
     pos: ImportTypeNodePosReturnType;
     rawText: ImportTypeNodeRawTextReturnType;
+    typeName: ImportTypeNodeTypeNameReturnType;
   };
   IndexedAccessTypeNode: {
     end: IndexedAccessTypeNodeEndReturnType;
@@ -1800,19 +2731,26 @@ export interface GraphQLiteralGenReturnTypes {
     kind: IndexedAccessTypeNodeKindReturnType;
     kindCode: IndexedAccessTypeNodeKindCodeReturnType;
     modifiers: IndexedAccessTypeNodeModifiersReturnType;
+    name: IndexedAccessTypeNodeNameReturnType;
+    nameText: IndexedAccessTypeNodeNameTextReturnType;
     parent: IndexedAccessTypeNodeParentReturnType;
     pos: IndexedAccessTypeNodePosReturnType;
     rawText: IndexedAccessTypeNodeRawTextReturnType;
+    typeName: IndexedAccessTypeNodeTypeNameReturnType;
   };
   IndexSignatureDeclaration: {
     end: IndexSignatureDeclarationEndReturnType;
     flags: IndexSignatureDeclarationFlagsReturnType;
+    jsDoc: IndexSignatureDeclarationJsDocReturnType;
     kind: IndexSignatureDeclarationKindReturnType;
     kindCode: IndexSignatureDeclarationKindCodeReturnType;
     modifiers: IndexSignatureDeclarationModifiersReturnType;
+    name: IndexSignatureDeclarationNameReturnType;
+    nameText: IndexSignatureDeclarationNameTextReturnType;
     parent: IndexSignatureDeclarationParentReturnType;
     pos: IndexSignatureDeclarationPosReturnType;
     rawText: IndexSignatureDeclarationRawTextReturnType;
+    typeName: IndexSignatureDeclarationTypeNameReturnType;
   };
   InferTypeNode: {
     end: InferTypeNodeEndReturnType;
@@ -1820,19 +2758,27 @@ export interface GraphQLiteralGenReturnTypes {
     kind: InferTypeNodeKindReturnType;
     kindCode: InferTypeNodeKindCodeReturnType;
     modifiers: InferTypeNodeModifiersReturnType;
+    name: InferTypeNodeNameReturnType;
+    nameText: InferTypeNodeNameTextReturnType;
     parent: InferTypeNodeParentReturnType;
     pos: InferTypeNodePosReturnType;
     rawText: InferTypeNodeRawTextReturnType;
+    typeName: InferTypeNodeTypeNameReturnType;
+    typeParameter: InferTypeNodeTypeParameterReturnType;
   };
   InterfaceDeclaration: {
     end: InterfaceDeclarationEndReturnType;
     flags: InterfaceDeclarationFlagsReturnType;
+    jsDoc: InterfaceDeclarationJsDocReturnType;
     kind: InterfaceDeclarationKindReturnType;
     kindCode: InterfaceDeclarationKindCodeReturnType;
     modifiers: InterfaceDeclarationModifiersReturnType;
+    name: InterfaceDeclarationNameReturnType;
+    nameText: InterfaceDeclarationNameTextReturnType;
     parent: InterfaceDeclarationParentReturnType;
     pos: InterfaceDeclarationPosReturnType;
     rawText: InterfaceDeclarationRawTextReturnType;
+    typeName: InterfaceDeclarationTypeNameReturnType;
   };
   IntersectionTypeNode: {
     end: IntersectionTypeNodeEndReturnType;
@@ -1840,19 +2786,25 @@ export interface GraphQLiteralGenReturnTypes {
     kind: IntersectionTypeNodeKindReturnType;
     kindCode: IntersectionTypeNodeKindCodeReturnType;
     modifiers: IntersectionTypeNodeModifiersReturnType;
+    name: IntersectionTypeNodeNameReturnType;
+    nameText: IntersectionTypeNodeNameTextReturnType;
     parent: IntersectionTypeNodeParentReturnType;
     pos: IntersectionTypeNodePosReturnType;
     rawText: IntersectionTypeNodeRawTextReturnType;
+    typeName: IntersectionTypeNodeTypeNameReturnType;
+    types: IntersectionTypeNodeTypesReturnType;
   };
-  JSDoc: {
-    end: JSDocEndReturnType;
-    flags: JSDocFlagsReturnType;
-    kind: JSDocKindReturnType;
-    kindCode: JSDocKindCodeReturnType;
-    modifiers: JSDocModifiersReturnType;
-    parent: JSDocParentReturnType;
-    pos: JSDocPosReturnType;
-    rawText: JSDocRawTextReturnType;
+  JSDocAugmentsTag: {
+    comment: JSDocAugmentsTagCommentReturnType;
+    tagName: JSDocAugmentsTagTagNameReturnType;
+  };
+  JSDocClassTag: {
+    comment: JSDocClassTagCommentReturnType;
+    tagName: JSDocClassTagTagNameReturnType;
+  };
+  JSDocEnumTag: {
+    comment: JSDocEnumTagCommentReturnType;
+    tagName: JSDocEnumTagTagNameReturnType;
   };
   JSDocNamespaceDeclaration: {
     end: JSDocNamespaceDeclarationEndReturnType;
@@ -1860,9 +2812,32 @@ export interface GraphQLiteralGenReturnTypes {
     kind: JSDocNamespaceDeclarationKindReturnType;
     kindCode: JSDocNamespaceDeclarationKindCodeReturnType;
     modifiers: JSDocNamespaceDeclarationModifiersReturnType;
+    name: JSDocNamespaceDeclarationNameReturnType;
+    nameText: JSDocNamespaceDeclarationNameTextReturnType;
     parent: JSDocNamespaceDeclarationParentReturnType;
     pos: JSDocNamespaceDeclarationPosReturnType;
     rawText: JSDocNamespaceDeclarationRawTextReturnType;
+    typeName: JSDocNamespaceDeclarationTypeNameReturnType;
+  };
+  JSDocReturnTag: {
+    comment: JSDocReturnTagCommentReturnType;
+    tagName: JSDocReturnTagTagNameReturnType;
+  };
+  JSDocTemplateTag: {
+    comment: JSDocTemplateTagCommentReturnType;
+    tagName: JSDocTemplateTagTagNameReturnType;
+  };
+  JSDocThisTag: {
+    comment: JSDocThisTagCommentReturnType;
+    tagName: JSDocThisTagTagNameReturnType;
+  };
+  JSDocTypeTag: {
+    comment: JSDocTypeTagCommentReturnType;
+    tagName: JSDocTypeTagTagNameReturnType;
+  };
+  JSDocUnknownTag: {
+    comment: JSDocUnknownTagCommentReturnType;
+    tagName: JSDocUnknownTagTagNameReturnType;
   };
   KeywordTypeNode: {
     end: KeywordTypeNodeEndReturnType;
@@ -1870,19 +2845,25 @@ export interface GraphQLiteralGenReturnTypes {
     kind: KeywordTypeNodeKindReturnType;
     kindCode: KeywordTypeNodeKindCodeReturnType;
     modifiers: KeywordTypeNodeModifiersReturnType;
+    name: KeywordTypeNodeNameReturnType;
+    nameText: KeywordTypeNodeNameTextReturnType;
     parent: KeywordTypeNodeParentReturnType;
     pos: KeywordTypeNodePosReturnType;
     rawText: KeywordTypeNodeRawTextReturnType;
+    typeName: KeywordTypeNodeTypeNameReturnType;
   };
-  LiteralTypeNode: {
-    end: LiteralTypeNodeEndReturnType;
-    flags: LiteralTypeNodeFlagsReturnType;
-    kind: LiteralTypeNodeKindReturnType;
-    kindCode: LiteralTypeNodeKindCodeReturnType;
-    modifiers: LiteralTypeNodeModifiersReturnType;
-    parent: LiteralTypeNodeParentReturnType;
-    pos: LiteralTypeNodePosReturnType;
-    rawText: LiteralTypeNodeRawTextReturnType;
+  LiteralType: {
+    end: LiteralTypeEndReturnType;
+    flags: LiteralTypeFlagsReturnType;
+    kind: LiteralTypeKindReturnType;
+    kindCode: LiteralTypeKindCodeReturnType;
+    modifiers: LiteralTypeModifiersReturnType;
+    name: LiteralTypeNameReturnType;
+    nameText: LiteralTypeNameTextReturnType;
+    parent: LiteralTypeParentReturnType;
+    pos: LiteralTypePosReturnType;
+    rawText: LiteralTypeRawTextReturnType;
+    typeName: LiteralTypeTypeNameReturnType;
   };
   MappedTypeNode: {
     end: MappedTypeNodeEndReturnType;
@@ -1890,18 +2871,23 @@ export interface GraphQLiteralGenReturnTypes {
     kind: MappedTypeNodeKindReturnType;
     kindCode: MappedTypeNodeKindCodeReturnType;
     modifiers: MappedTypeNodeModifiersReturnType;
+    name: MappedTypeNodeNameReturnType;
+    nameText: MappedTypeNodeNameTextReturnType;
     parent: MappedTypeNodeParentReturnType;
     pos: MappedTypeNodePosReturnType;
     rawText: MappedTypeNodeRawTextReturnType;
+    typeName: MappedTypeNodeTypeNameReturnType;
   };
   MethodDeclaration: {
     asteriskToken: MethodDeclarationAsteriskTokenReturnType;
     end: MethodDeclarationEndReturnType;
     exclamationToken: MethodDeclarationExclamationTokenReturnType;
     flags: MethodDeclarationFlagsReturnType;
+    jsDoc: MethodDeclarationJsDocReturnType;
     kind: MethodDeclarationKindReturnType;
     kindCode: MethodDeclarationKindCodeReturnType;
     modifiers: MethodDeclarationModifiersReturnType;
+    name: MethodDeclarationNameReturnType;
     nameText: MethodDeclarationNameTextReturnType;
     parameters: MethodDeclarationParametersReturnType;
     parent: MethodDeclarationParentReturnType;
@@ -1909,6 +2895,7 @@ export interface GraphQLiteralGenReturnTypes {
     questionToken: MethodDeclarationQuestionTokenReturnType;
     rawText: MethodDeclarationRawTextReturnType;
     type: MethodDeclarationTypeReturnType;
+    typeName: MethodDeclarationTypeNameReturnType;
     typeParameters: MethodDeclarationTypeParametersReturnType;
   };
   MissingDeclaration: {
@@ -1917,39 +2904,40 @@ export interface GraphQLiteralGenReturnTypes {
     kind: MissingDeclarationKindReturnType;
     kindCode: MissingDeclarationKindCodeReturnType;
     modifiers: MissingDeclarationModifiersReturnType;
+    name: MissingDeclarationNameReturnType;
+    nameText: MissingDeclarationNameTextReturnType;
     parent: MissingDeclarationParentReturnType;
     pos: MissingDeclarationPosReturnType;
     rawText: MissingDeclarationRawTextReturnType;
+    typeName: MissingDeclarationTypeNameReturnType;
   };
   ModuleDeclaration: {
     end: ModuleDeclarationEndReturnType;
     flags: ModuleDeclarationFlagsReturnType;
+    jsDoc: ModuleDeclarationJsDocReturnType;
     kind: ModuleDeclarationKindReturnType;
     kindCode: ModuleDeclarationKindCodeReturnType;
     modifiers: ModuleDeclarationModifiersReturnType;
+    name: ModuleDeclarationNameReturnType;
+    nameText: ModuleDeclarationNameTextReturnType;
     parent: ModuleDeclarationParentReturnType;
     pos: ModuleDeclarationPosReturnType;
     rawText: ModuleDeclarationRawTextReturnType;
-  };
-  NamedDeclaration: {
-    end: NamedDeclarationEndReturnType;
-    flags: NamedDeclarationFlagsReturnType;
-    kind: NamedDeclarationKindReturnType;
-    kindCode: NamedDeclarationKindCodeReturnType;
-    modifiers: NamedDeclarationModifiersReturnType;
-    parent: NamedDeclarationParentReturnType;
-    pos: NamedDeclarationPosReturnType;
-    rawText: NamedDeclarationRawTextReturnType;
+    typeName: ModuleDeclarationTypeNameReturnType;
   };
   NamespaceDeclaration: {
     end: NamespaceDeclarationEndReturnType;
     flags: NamespaceDeclarationFlagsReturnType;
+    jsDoc: NamespaceDeclarationJsDocReturnType;
     kind: NamespaceDeclarationKindReturnType;
     kindCode: NamespaceDeclarationKindCodeReturnType;
     modifiers: NamespaceDeclarationModifiersReturnType;
+    name: NamespaceDeclarationNameReturnType;
+    nameText: NamespaceDeclarationNameTextReturnType;
     parent: NamespaceDeclarationParentReturnType;
     pos: NamespaceDeclarationPosReturnType;
     rawText: NamespaceDeclarationRawTextReturnType;
+    typeName: NamespaceDeclarationTypeNameReturnType;
   };
   NamespaceExportDeclaration: {
     end: NamespaceExportDeclarationEndReturnType;
@@ -1957,19 +2945,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: NamespaceExportDeclarationKindReturnType;
     kindCode: NamespaceExportDeclarationKindCodeReturnType;
     modifiers: NamespaceExportDeclarationModifiersReturnType;
+    name: NamespaceExportDeclarationNameReturnType;
+    nameText: NamespaceExportDeclarationNameTextReturnType;
     parent: NamespaceExportDeclarationParentReturnType;
     pos: NamespaceExportDeclarationPosReturnType;
     rawText: NamespaceExportDeclarationRawTextReturnType;
-  };
-  NumericLiteral: {
-    end: NumericLiteralEndReturnType;
-    flags: NumericLiteralFlagsReturnType;
-    kind: NumericLiteralKindReturnType;
-    kindCode: NumericLiteralKindCodeReturnType;
-    modifiers: NumericLiteralModifiersReturnType;
-    parent: NumericLiteralParentReturnType;
-    pos: NumericLiteralPosReturnType;
-    rawText: NumericLiteralRawTextReturnType;
+    typeName: NamespaceExportDeclarationTypeNameReturnType;
   };
   OptionalTypeNode: {
     end: OptionalTypeNodeEndReturnType;
@@ -1977,29 +2958,42 @@ export interface GraphQLiteralGenReturnTypes {
     kind: OptionalTypeNodeKindReturnType;
     kindCode: OptionalTypeNodeKindCodeReturnType;
     modifiers: OptionalTypeNodeModifiersReturnType;
+    name: OptionalTypeNodeNameReturnType;
+    nameText: OptionalTypeNodeNameTextReturnType;
     parent: OptionalTypeNodeParentReturnType;
     pos: OptionalTypeNodePosReturnType;
     rawText: OptionalTypeNodeRawTextReturnType;
+    type: OptionalTypeNodeTypeReturnType;
+    typeName: OptionalTypeNodeTypeNameReturnType;
   };
-  ParenthesizedTypeNode: {
-    end: ParenthesizedTypeNodeEndReturnType;
-    flags: ParenthesizedTypeNodeFlagsReturnType;
-    kind: ParenthesizedTypeNodeKindReturnType;
-    kindCode: ParenthesizedTypeNodeKindCodeReturnType;
-    modifiers: ParenthesizedTypeNodeModifiersReturnType;
-    parent: ParenthesizedTypeNodeParentReturnType;
-    pos: ParenthesizedTypeNodePosReturnType;
-    rawText: ParenthesizedTypeNodeRawTextReturnType;
+  ParenthesizedType: {
+    end: ParenthesizedTypeEndReturnType;
+    flags: ParenthesizedTypeFlagsReturnType;
+    kind: ParenthesizedTypeKindReturnType;
+    kindCode: ParenthesizedTypeKindCodeReturnType;
+    modifiers: ParenthesizedTypeModifiersReturnType;
+    name: ParenthesizedTypeNameReturnType;
+    nameText: ParenthesizedTypeNameTextReturnType;
+    parent: ParenthesizedTypeParentReturnType;
+    pos: ParenthesizedTypePosReturnType;
+    rawText: ParenthesizedTypeRawTextReturnType;
+    type: ParenthesizedTypeTypeReturnType;
+    typeName: ParenthesizedTypeTypeNameReturnType;
   };
   PropertyDeclaration: {
     end: PropertyDeclarationEndReturnType;
     flags: PropertyDeclarationFlagsReturnType;
+    jsDoc: PropertyDeclarationJsDocReturnType;
     kind: PropertyDeclarationKindReturnType;
     kindCode: PropertyDeclarationKindCodeReturnType;
     modifiers: PropertyDeclarationModifiersReturnType;
+    name: PropertyDeclarationNameReturnType;
+    nameText: PropertyDeclarationNameTextReturnType;
     parent: PropertyDeclarationParentReturnType;
     pos: PropertyDeclarationPosReturnType;
+    questionToken: PropertyDeclarationQuestionTokenReturnType;
     rawText: PropertyDeclarationRawTextReturnType;
+    typeName: PropertyDeclarationTypeNameReturnType;
   };
   PropertyLikeDeclaration: {
     end: PropertyLikeDeclarationEndReturnType;
@@ -2007,19 +3001,28 @@ export interface GraphQLiteralGenReturnTypes {
     kind: PropertyLikeDeclarationKindReturnType;
     kindCode: PropertyLikeDeclarationKindCodeReturnType;
     modifiers: PropertyLikeDeclarationModifiersReturnType;
+    name: PropertyLikeDeclarationNameReturnType;
+    nameText: PropertyLikeDeclarationNameTextReturnType;
     parent: PropertyLikeDeclarationParentReturnType;
     pos: PropertyLikeDeclarationPosReturnType;
     rawText: PropertyLikeDeclarationRawTextReturnType;
+    typeName: PropertyLikeDeclarationTypeNameReturnType;
   };
-  StringLiteral: {
-    end: StringLiteralEndReturnType;
-    flags: StringLiteralFlagsReturnType;
-    kind: StringLiteralKindReturnType;
-    kindCode: StringLiteralKindCodeReturnType;
-    modifiers: StringLiteralModifiersReturnType;
-    parent: StringLiteralParentReturnType;
-    pos: StringLiteralPosReturnType;
-    rawText: StringLiteralRawTextReturnType;
+  PropertySignature: {
+    end: PropertySignatureEndReturnType;
+    flags: PropertySignatureFlagsReturnType;
+    jsDoc: PropertySignatureJsDocReturnType;
+    kind: PropertySignatureKindReturnType;
+    kindCode: PropertySignatureKindCodeReturnType;
+    modifiers: PropertySignatureModifiersReturnType;
+    name: PropertySignatureNameReturnType;
+    nameText: PropertySignatureNameTextReturnType;
+    parent: PropertySignatureParentReturnType;
+    pos: PropertySignaturePosReturnType;
+    questionToken: PropertySignatureQuestionTokenReturnType;
+    rawText: PropertySignatureRawTextReturnType;
+    type: PropertySignatureTypeReturnType;
+    typeName: PropertySignatureTypeNameReturnType;
   };
   RestTypeNode: {
     end: RestTypeNodeEndReturnType;
@@ -2027,18 +3030,24 @@ export interface GraphQLiteralGenReturnTypes {
     kind: RestTypeNodeKindReturnType;
     kindCode: RestTypeNodeKindCodeReturnType;
     modifiers: RestTypeNodeModifiersReturnType;
+    name: RestTypeNodeNameReturnType;
+    nameText: RestTypeNodeNameTextReturnType;
     parent: RestTypeNodeParentReturnType;
     pos: RestTypeNodePosReturnType;
     rawText: RestTypeNodeRawTextReturnType;
+    type: RestTypeNodeTypeReturnType;
+    typeName: RestTypeNodeTypeNameReturnType;
   };
   SetAccessorDeclaration: {
     asteriskToken: SetAccessorDeclarationAsteriskTokenReturnType;
     end: SetAccessorDeclarationEndReturnType;
     exclamationToken: SetAccessorDeclarationExclamationTokenReturnType;
     flags: SetAccessorDeclarationFlagsReturnType;
+    jsDoc: SetAccessorDeclarationJsDocReturnType;
     kind: SetAccessorDeclarationKindReturnType;
     kindCode: SetAccessorDeclarationKindCodeReturnType;
     modifiers: SetAccessorDeclarationModifiersReturnType;
+    name: SetAccessorDeclarationNameReturnType;
     nameText: SetAccessorDeclarationNameTextReturnType;
     parameters: SetAccessorDeclarationParametersReturnType;
     parent: SetAccessorDeclarationParentReturnType;
@@ -2046,7 +3055,21 @@ export interface GraphQLiteralGenReturnTypes {
     questionToken: SetAccessorDeclarationQuestionTokenReturnType;
     rawText: SetAccessorDeclarationRawTextReturnType;
     type: SetAccessorDeclarationTypeReturnType;
+    typeName: SetAccessorDeclarationTypeNameReturnType;
     typeParameters: SetAccessorDeclarationTypeParametersReturnType;
+  };
+  StringLiteral: {
+    end: StringLiteralEndReturnType;
+    flags: StringLiteralFlagsReturnType;
+    kind: StringLiteralKindReturnType;
+    kindCode: StringLiteralKindCodeReturnType;
+    modifiers: StringLiteralModifiersReturnType;
+    name: StringLiteralNameReturnType;
+    nameText: StringLiteralNameTextReturnType;
+    parent: StringLiteralParentReturnType;
+    pos: StringLiteralPosReturnType;
+    rawText: StringLiteralRawTextReturnType;
+    typeName: StringLiteralTypeNameReturnType;
   };
   ThisTypeNode: {
     end: ThisTypeNodeEndReturnType;
@@ -2054,29 +3077,55 @@ export interface GraphQLiteralGenReturnTypes {
     kind: ThisTypeNodeKindReturnType;
     kindCode: ThisTypeNodeKindCodeReturnType;
     modifiers: ThisTypeNodeModifiersReturnType;
+    name: ThisTypeNodeNameReturnType;
+    nameText: ThisTypeNodeNameTextReturnType;
     parent: ThisTypeNodeParentReturnType;
     pos: ThisTypeNodePosReturnType;
     rawText: ThisTypeNodeRawTextReturnType;
+    typeName: ThisTypeNodeTypeNameReturnType;
   };
   TupleTypeNode: {
+    elementTypes: TupleTypeNodeElementTypesReturnType;
     end: TupleTypeNodeEndReturnType;
     flags: TupleTypeNodeFlagsReturnType;
     kind: TupleTypeNodeKindReturnType;
     kindCode: TupleTypeNodeKindCodeReturnType;
     modifiers: TupleTypeNodeModifiersReturnType;
+    name: TupleTypeNodeNameReturnType;
+    nameText: TupleTypeNodeNameTextReturnType;
     parent: TupleTypeNodeParentReturnType;
     pos: TupleTypeNodePosReturnType;
     rawText: TupleTypeNodeRawTextReturnType;
+    typeName: TupleTypeNodeTypeNameReturnType;
   };
   TypeAliasDeclaration: {
     end: TypeAliasDeclarationEndReturnType;
     flags: TypeAliasDeclarationFlagsReturnType;
+    jsDoc: TypeAliasDeclarationJsDocReturnType;
     kind: TypeAliasDeclarationKindReturnType;
     kindCode: TypeAliasDeclarationKindCodeReturnType;
     modifiers: TypeAliasDeclarationModifiersReturnType;
+    name: TypeAliasDeclarationNameReturnType;
+    nameText: TypeAliasDeclarationNameTextReturnType;
     parent: TypeAliasDeclarationParentReturnType;
     pos: TypeAliasDeclarationPosReturnType;
     rawText: TypeAliasDeclarationRawTextReturnType;
+    type: TypeAliasDeclarationTypeReturnType;
+    typeName: TypeAliasDeclarationTypeNameReturnType;
+    typeParameters: TypeAliasDeclarationTypeParametersReturnType;
+  };
+  TypeLiteral: {
+    end: TypeLiteralEndReturnType;
+    flags: TypeLiteralFlagsReturnType;
+    kind: TypeLiteralKindReturnType;
+    kindCode: TypeLiteralKindCodeReturnType;
+    modifiers: TypeLiteralModifiersReturnType;
+    name: TypeLiteralNameReturnType;
+    nameText: TypeLiteralNameTextReturnType;
+    parent: TypeLiteralParentReturnType;
+    pos: TypeLiteralPosReturnType;
+    rawText: TypeLiteralRawTextReturnType;
+    typeName: TypeLiteralTypeNameReturnType;
   };
   TypeReference: {
     end: TypeReferenceEndReturnType;
@@ -2084,21 +3133,28 @@ export interface GraphQLiteralGenReturnTypes {
     kind: TypeReferenceKindReturnType;
     kindCode: TypeReferenceKindCodeReturnType;
     modifiers: TypeReferenceModifiersReturnType;
+    name: TypeReferenceNameReturnType;
     nameText: TypeReferenceNameTextReturnType;
     parent: TypeReferenceParentReturnType;
     pos: TypeReferencePosReturnType;
     rawText: TypeReferenceRawTextReturnType;
     text: TypeReferenceTextReturnType;
+    typeArguments: TypeReferenceTypeArgumentsReturnType;
+    typeName: TypeReferenceTypeNameReturnType;
   };
-  UnionTypeNode: {
-    end: UnionTypeNodeEndReturnType;
-    flags: UnionTypeNodeFlagsReturnType;
-    kind: UnionTypeNodeKindReturnType;
-    kindCode: UnionTypeNodeKindCodeReturnType;
-    modifiers: UnionTypeNodeModifiersReturnType;
-    parent: UnionTypeNodeParentReturnType;
-    pos: UnionTypeNodePosReturnType;
-    rawText: UnionTypeNodeRawTextReturnType;
+  UnionType: {
+    end: UnionTypeEndReturnType;
+    flags: UnionTypeFlagsReturnType;
+    kind: UnionTypeKindReturnType;
+    kindCode: UnionTypeKindCodeReturnType;
+    modifiers: UnionTypeModifiersReturnType;
+    name: UnionTypeNameReturnType;
+    nameText: UnionTypeNameTextReturnType;
+    parent: UnionTypeParentReturnType;
+    pos: UnionTypePosReturnType;
+    rawText: UnionTypeRawTextReturnType;
+    typeName: UnionTypeTypeNameReturnType;
+    types: UnionTypeTypesReturnType;
   };
   UNKNOWN_NODE: {
     end: UNKNOWN_NODEEndReturnType;
@@ -2106,9 +3162,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: UNKNOWN_NODEKindReturnType;
     kindCode: UNKNOWN_NODEKindCodeReturnType;
     modifiers: UNKNOWN_NODEModifiersReturnType;
+    name: UNKNOWN_NODENameReturnType;
+    nameText: UNKNOWN_NODENameTextReturnType;
     parent: UNKNOWN_NODEParentReturnType;
     pos: UNKNOWN_NODEPosReturnType;
     rawText: UNKNOWN_NODERawTextReturnType;
+    typeName: UNKNOWN_NODETypeNameReturnType;
   };
   VariableDeclaration: {
     end: VariableDeclarationEndReturnType;
@@ -2116,9 +3175,12 @@ export interface GraphQLiteralGenReturnTypes {
     kind: VariableDeclarationKindReturnType;
     kindCode: VariableDeclarationKindCodeReturnType;
     modifiers: VariableDeclarationModifiersReturnType;
+    name: VariableDeclarationNameReturnType;
+    nameText: VariableDeclarationNameTextReturnType;
     parent: VariableDeclarationParentReturnType;
     pos: VariableDeclarationPosReturnType;
     rawText: VariableDeclarationRawTextReturnType;
+    typeName: VariableDeclarationTypeNameReturnType;
   };
 }
 
@@ -2135,10 +3197,17 @@ export interface GraphQLiteralGenTypes {
     Query: QueryRootType;
     SourceFile: SourceFileRootType;
     Token: TokenRootType;
+    BindingPattern: BindingPatternRootType;
+    ComputedPropertyName: ComputedPropertyNameRootType;
+    Identifier: IdentifierRootType;
+    NumericLiteral: NumericLiteralRootType;
+    QualifiedName: QualifiedNameRootType;
+    StringLiteralLike: StringLiteralLikeRootType;
+    UnnamedNode: UnnamedNodeRootType;
     ArrayTypeNode: ArrayTypeNodeRootType;
     CallSignatureDeclaration: CallSignatureDeclarationRootType;
     ClassDeclaration: ClassDeclarationRootType;
-    ComputedPropertyName: ComputedPropertyNameRootType;
+    JSDoc: JSDocRootType;
     ConditionalTypeNode: ConditionalTypeNodeRootType;
     ConstructorDeclaration: ConstructorDeclarationRootType;
     ParameterDeclaration: ParameterDeclarationRootType;
@@ -2151,7 +3220,6 @@ export interface GraphQLiteralGenTypes {
     FunctionDeclaration: FunctionDeclarationRootType;
     FunctionTypeNode: FunctionTypeNodeRootType;
     GetAccessorDeclaration: GetAccessorDeclarationRootType;
-    Identifier: IdentifierRootType;
     ImportDeclaration: ImportDeclarationRootType;
     ImportEqualsDeclaration: ImportEqualsDeclarationRootType;
     ImportTypeNode: ImportTypeNodeRootType;
@@ -2160,38 +3228,48 @@ export interface GraphQLiteralGenTypes {
     InferTypeNode: InferTypeNodeRootType;
     InterfaceDeclaration: InterfaceDeclarationRootType;
     IntersectionTypeNode: IntersectionTypeNodeRootType;
-    JSDoc: JSDocRootType;
+    JSDocAugmentsTag: JSDocAugmentsTagRootType;
+    JSDocClassTag: JSDocClassTagRootType;
+    JSDocEnumTag: JSDocEnumTagRootType;
     JSDocNamespaceDeclaration: JSDocNamespaceDeclarationRootType;
+    JSDocReturnTag: JSDocReturnTagRootType;
+    JSDocTemplateTag: JSDocTemplateTagRootType;
+    JSDocThisTag: JSDocThisTagRootType;
+    JSDocTypeTag: JSDocTypeTagRootType;
+    JSDocUnknownTag: JSDocUnknownTagRootType;
     KeywordTypeNode: KeywordTypeNodeRootType;
-    LiteralTypeNode: LiteralTypeNodeRootType;
+    LiteralType: LiteralTypeRootType;
     MappedTypeNode: MappedTypeNodeRootType;
     MethodDeclaration: MethodDeclarationRootType;
     MissingDeclaration: MissingDeclarationRootType;
     ModuleDeclaration: ModuleDeclarationRootType;
-    NamedDeclaration: NamedDeclarationRootType;
     NamespaceDeclaration: NamespaceDeclarationRootType;
     NamespaceExportDeclaration: NamespaceExportDeclarationRootType;
-    NumericLiteral: NumericLiteralRootType;
     OptionalTypeNode: OptionalTypeNodeRootType;
-    ParenthesizedTypeNode: ParenthesizedTypeNodeRootType;
+    ParenthesizedType: ParenthesizedTypeRootType;
     PropertyDeclaration: PropertyDeclarationRootType;
     PropertyLikeDeclaration: PropertyLikeDeclarationRootType;
-    StringLiteral: StringLiteralRootType;
+    PropertySignature: PropertySignatureRootType;
     RestTypeNode: RestTypeNodeRootType;
     SetAccessorDeclaration: SetAccessorDeclarationRootType;
+    StringLiteral: StringLiteralRootType;
     ThisTypeNode: ThisTypeNodeRootType;
     TupleTypeNode: TupleTypeNodeRootType;
     TypeAliasDeclaration: TypeAliasDeclarationRootType;
+    TypeLiteral: TypeLiteralRootType;
     TypeReference: TypeReferenceRootType;
-    UnionTypeNode: UnionTypeNodeRootType;
+    UnionType: UnionTypeRootType;
     UNKNOWN_NODE: UNKNOWN_NODERootType;
     VariableDeclaration: VariableDeclarationRootType;
   };
   interfaces: {
-    Node: "SourceFile" | "ArrayTypeNode" | "CallSignatureDeclaration" | "ClassDeclaration" | "ComputedPropertyName" | "ConditionalTypeNode" | "ConstructorDeclaration" | "ParameterDeclaration" | "TypeParameterDeclaration" | "ConstructorTypeNode" | "ConstructSignatureDeclaration" | "EnumDeclaration" | "ExportAssignment" | "ExportDeclaration" | "FunctionDeclaration" | "FunctionTypeNode" | "GetAccessorDeclaration" | "Identifier" | "ImportDeclaration" | "ImportEqualsDeclaration" | "ImportTypeNode" | "IndexedAccessTypeNode" | "IndexSignatureDeclaration" | "InferTypeNode" | "InterfaceDeclaration" | "IntersectionTypeNode" | "JSDoc" | "JSDocNamespaceDeclaration" | "KeywordTypeNode" | "LiteralTypeNode" | "MappedTypeNode" | "MethodDeclaration" | "MissingDeclaration" | "ModuleDeclaration" | "NamedDeclaration" | "NamespaceDeclaration" | "NamespaceExportDeclaration" | "NumericLiteral" | "OptionalTypeNode" | "ParenthesizedTypeNode" | "PropertyDeclaration" | "PropertyLikeDeclaration" | "StringLiteral" | "RestTypeNode" | "SetAccessorDeclaration" | "ThisTypeNode" | "TupleTypeNode" | "TypeAliasDeclaration" | "TypeReference" | "UnionTypeNode" | "UNKNOWN_NODE" | "VariableDeclaration";
+    Node: "SourceFile" | "BindingPattern" | "ComputedPropertyName" | "Identifier" | "NumericLiteral" | "QualifiedName" | "StringLiteralLike" | "ArrayTypeNode" | "CallSignatureDeclaration" | "ClassDeclaration" | "ConditionalTypeNode" | "ConstructorDeclaration" | "ParameterDeclaration" | "TypeParameterDeclaration" | "ConstructorTypeNode" | "ConstructSignatureDeclaration" | "EnumDeclaration" | "ExportAssignment" | "ExportDeclaration" | "FunctionDeclaration" | "FunctionTypeNode" | "GetAccessorDeclaration" | "ImportDeclaration" | "ImportEqualsDeclaration" | "ImportTypeNode" | "IndexedAccessTypeNode" | "IndexSignatureDeclaration" | "InferTypeNode" | "InterfaceDeclaration" | "IntersectionTypeNode" | "JSDocNamespaceDeclaration" | "KeywordTypeNode" | "LiteralType" | "MappedTypeNode" | "MethodDeclaration" | "MissingDeclaration" | "ModuleDeclaration" | "NamespaceDeclaration" | "NamespaceExportDeclaration" | "OptionalTypeNode" | "ParenthesizedType" | "PropertyDeclaration" | "PropertyLikeDeclaration" | "PropertySignature" | "RestTypeNode" | "SetAccessorDeclaration" | "StringLiteral" | "ThisTypeNode" | "TupleTypeNode" | "TypeAliasDeclaration" | "TypeLiteral" | "TypeReference" | "UnionType" | "UNKNOWN_NODE" | "VariableDeclaration";
+    HasJSDoc: "ClassDeclaration" | "ConstructorDeclaration" | "ParameterDeclaration" | "EnumDeclaration" | "FunctionDeclaration" | "GetAccessorDeclaration" | "IndexSignatureDeclaration" | "InterfaceDeclaration" | "MethodDeclaration" | "ModuleDeclaration" | "NamespaceDeclaration" | "PropertyDeclaration" | "PropertySignature" | "SetAccessorDeclaration" | "TypeAliasDeclaration";
+    JSDocTag: "JSDocAugmentsTag" | "JSDocClassTag" | "JSDocEnumTag" | "JSDocReturnTag" | "JSDocTemplateTag" | "JSDocThisTag" | "JSDocTypeTag" | "JSDocUnknownTag";
+    MaybeOptional: "ConstructorDeclaration" | "FunctionDeclaration" | "GetAccessorDeclaration" | "MethodDeclaration" | "PropertyDeclaration" | "PropertySignature" | "SetAccessorDeclaration";
   };
   unions: {
-    PropertyName: any;
+    DeclarationName: any;
   };
   scalars: {
     String: any;

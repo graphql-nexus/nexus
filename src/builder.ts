@@ -33,6 +33,7 @@ import {
   isOutputType,
   isUnionType,
   GraphQLSchema,
+  specifiedDirectives,
 } from "graphql";
 import { Metadata } from "./metadata";
 import {
@@ -762,7 +763,7 @@ export function makeSchemaWithMetadata(
     query: Query,
     mutation: Mutation,
     subscription: Subscription,
-    directives: objValues(directiveMap),
+    directives: specifiedDirectives.concat(objValues(directiveMap)),
     types: objValues(typeMap),
   });
 

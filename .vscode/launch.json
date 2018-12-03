@@ -22,6 +22,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug ts-ast-reader",
+      "protocol": "inspector",
+      "cwd": "${workspaceRoot}/examples/ts-ast-reader",
+      "runtimeExecutable": "${workspaceRoot}/examples/ts-ast-reader/node_modules/.bin/ts-node-dev",
+      "args": [
+        "--no-notify",
+        "--transpileOnly",
+        "${workspaceRoot}/examples/ts-ast-reader/src/index.ts"
+      ],
+      "restart": true,
+      "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Jest All",
       "program": "${workspaceFolder}/node_modules/.bin/jest",
       "args": ["--runInBand"],

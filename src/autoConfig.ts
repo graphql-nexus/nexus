@@ -1,4 +1,9 @@
-import { GraphQLSchema, isOutputType } from "graphql";
+import {
+  GraphQLSchema,
+  isOutputType,
+  GraphQLNamedType,
+  isEnumType,
+} from "graphql";
 import path from "path";
 import * as Types from "./types";
 import { TYPEGEN_HEADER } from "./lang";
@@ -133,10 +138,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
           importPath,
           fileContents,
           onlyTypes,
-          typeMatch:
-            typeMatch ||
-            ((typeName: string) =>
-              new RegExp(`(interface|type|class)\\s+${typeName}\\W`, "g")),
+          typeMatch: typeMatch || defaultTypeMatcher,
         };
       })
     );
@@ -162,9 +164,8 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
 
       const type = schema.getType(typeName);
 
-      // For now we'll say that if it's an output type it can be backed.
-      // Maybe we'll loosen this up with unions, interfaces, etc.
-      if (isOutputType(type)) {
+      // For now we'll say that if it's non-enum output type it can be backed
+      if (isOutputType(type) && !isEnumType(type)) {
         for (let i = 0; i < typeSources.length; i++) {
           const typeSource = typeSources[i];
           if (!typeSource) {
@@ -188,19 +189,25 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
             alias,
             typeMatch,
           } = typeSource;
-          const typeRegex = typeMatch(typeName);
-          if (fileContents.match(typeRegex)) {
+          const typeRegex = typeMatch(type, defaultTypeMatcher(type)[0]);
+          const matched = firstMatch(
+            fileContents,
+            Array.isArray(typeRegex) ? typeRegex : [typeRegex]
+          );
+          if (matched) {
             if (debug) {
               log(
-                `Matched type - ${typeName} in ${importPath} using ${typeRegex}`
+                `Matched type - ${typeName} in "${importPath}" - ${alias}.${
+                  matched[1]
+                }`
               );
             }
             importsMap[alias] = [importPath, glob];
-            backingTypeMap[typeName] = `${alias}.${typeName}`;
+            backingTypeMap[typeName] = `${alias}.${matched[1]}`;
           } else {
             if (debug) {
               log(
-                `No match for ${typeName} in ${importPath} using ${typeRegex}`
+                `No match for ${typeName} in "${importPath}" using ${typeRegex}`
               );
             }
           }
@@ -255,7 +262,9 @@ function findTypingForFile(absolutePath: string, pathOrModule: string) {
     );
     require.resolve(typeDefPath);
     return typeDefPath;
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 
   // TODO: need to figure out cases where it's a node module
   // and "typings" is set in the package.json
@@ -264,3 +273,21 @@ function findTypingForFile(absolutePath: string, pathOrModule: string) {
     `Unable to find typings associated with ${pathOrModule}, skipping`
   );
 }
+
+const firstMatch = (
+  fileContents: string,
+  typeRegex: RegExp[]
+): RegExpExecArray | null => {
+  for (let i = 0; i < typeRegex.length; i++) {
+    const regex = typeRegex[i];
+    const match = regex.exec(fileContents);
+    if (match) {
+      return match;
+    }
+  }
+  return null;
+};
+
+const defaultTypeMatcher = (type: GraphQLNamedType) => {
+  return [new RegExp(`(?:interface|type|class)\\s+(${type.name})\\W`, "g")];
+};
