@@ -3465,12 +3465,6 @@ got@^5.0.0:
     unzip-response "^1.0.2"
     url-parse-lax "^1.0.0"
 
-gqliteral@0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/gqliteral/-/gqliteral-0.4.0.tgz#450905842b6f3d40276a5f23ddee7cb66a39fc01"
-  dependencies:
-    tslib "^1.9.3"
-
 graceful-fs@^3.0.0:
   version "3.0.11"
   resolved "http://registry.npmjs.org/graceful-fs/-/graceful-fs-3.0.11.tgz#7613c778a1afea62f25c630a086d7f3acbbdd818"
@@ -3492,6 +3486,13 @@ graceful-fs@~1.2.0:
 "graceful-readlink@>= 1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
+
+graphql-nexus@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/graphql-nexus/-/graphql-nexus-0.1.0.tgz#26fc92c37b0b5cea50466f03dfd211c97a164cc5"
+  integrity sha512-+Nta2sPUVRYeXS9SuwvyVex9LLHRJLCPj3do48M5Bmb2yP+KfIhnBGSup9KKqutTDSbgxf9CwekKJRA1N+w7uw==
+  dependencies:
+    tslib "^1.9.3"
 
 graphql@^14.0.2:
   version "14.0.2"
