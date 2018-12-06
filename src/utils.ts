@@ -1,4 +1,10 @@
-import { GraphQLFieldResolver } from "graphql";
+import {
+  GraphQLFieldResolver,
+  GraphQLObjectType,
+  GraphQLInterfaceType,
+  GraphQLUnionType,
+  isUnionType,
+} from "graphql";
 import path from "path";
 import * as Types from "./types";
 
@@ -22,6 +28,20 @@ export const enumShorthandMembers = (
       value: arg[name],
     };
   });
+};
+
+export const isInterfaceField = (
+  type: GraphQLObjectType,
+  fieldName: string
+) => {
+  return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]));
+};
+
+export const hasField = (
+  type: GraphQLObjectType | GraphQLInterfaceType,
+  fieldName: string
+) => {
+  return Boolean(type.getFields()[fieldName]);
 };
 
 /**

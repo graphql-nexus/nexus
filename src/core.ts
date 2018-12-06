@@ -15,6 +15,8 @@ import { dedent } from "./utils";
 import { SchemaBuilder, isNamedTypeDef } from "./builder";
 import { Metadata } from "./metadata";
 
+export { SDLConverter } from "./sdlConverter";
+
 // Export the ts definitions so they can be used by library authors under `core.Types`
 export { Types };
 

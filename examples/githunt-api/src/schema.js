@@ -114,7 +114,7 @@ exports.Mutation = objectType("Mutation", (t) => {
 
 /**
  * Example of using functions to mixin fields across types
- * @type {(t: import('gqliteral').core.GraphQLiteralObjectType) => void}
+ * @type {(t: import('gqliteral').core.ObjectTypeDef) => void}
  */
 const commonFields = (t) => {
   t.int("id", { description: "The SQL ID of this entry" });

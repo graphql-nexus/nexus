@@ -15,9 +15,11 @@ import {
   isObjectType,
   isScalarType,
   isUnionType,
+  GraphQLNamedType,
+  GraphQLUnionType,
 } from "graphql";
 import { Metadata } from "./metadata";
-import { arrPush, eachObj, mapObj } from "./utils";
+import { arrPush, eachObj, mapObj, hasField } from "./utils";
 
 type AllTypes =
   | "enums"
@@ -103,8 +105,17 @@ export async function buildTypeDefinitions(
     suffixed(typeName, fieldName, "Args");
   const fieldReturnTypeName = (typeName: string, fieldName: string) =>
     suffixed(typeName, fieldName, "ReturnType");
-  const typeReturnTypeName = (typeName: string) =>
-    suffixed(typeName, "ReturnType");
+  const typeReturnTypeName = (
+    type: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType
+  ) => {
+    if (isUnionType(type)) {
+      return suffixed(type.name, "ReturnType");
+    }
+    if (!hasField(type, "ReturnType")) {
+      return suffixed(type.name, "_ReturnType");
+    }
+    return suffixed(type.name, "ReturnType");
+  };
   const typeRootTypeName = (typeName: string) => suffixed(typeName, "RootType");
   const fieldResolverName = (typeName: string, fieldName: string) =>
     suffixed(typeName, fieldName, "Resolver");
@@ -117,7 +128,7 @@ export async function buildTypeDefinitions(
       return `${typeStr}${maybePromiseList(getReturnType(type.ofType))}`;
     }
     if (isObjectType(type) || isInterfaceType(type) || isUnionType(type)) {
-      typeStr += typeReturnTypeName(type.name);
+      typeStr += typeReturnTypeName(type);
     } else if (isEnumType(type)) {
       typeStr += type.name;
     } else if (isScalarType(type)) {
@@ -267,9 +278,7 @@ export async function buildTypeDefinitions(
   const makeReturnType = (type: GraphQLObjectType) => {
     if (backingTypeMap[type.name]) {
       allTypeStrings.push(
-        `export type ${typeReturnTypeName(type.name)} = ${
-          backingTypeMap[type.name]
-        }`
+        `export type ${typeReturnTypeName(type)} = ${backingTypeMap[type.name]}`
       );
     } else {
       const returnMembers = mapObj(type.getFields(), (f) => {
@@ -288,13 +297,11 @@ export async function buildTypeDefinitions(
         };`;
       }).filter((f) => f);
       if (returnMembers.length === 0) {
-        allTypeStrings.push(
-          `export type ${typeReturnTypeName(type.name)} = {};`
-        );
+        allTypeStrings.push(`export type ${typeReturnTypeName(type)} = {};`);
       } else {
         allTypeStrings.push(
           [
-            `export type ${typeReturnTypeName(type.name)} = {`,
+            `export type ${typeReturnTypeName(type)} = {`,
             returnMembers.join("\n"),
             `}`,
           ].join("\n")
@@ -349,9 +356,9 @@ export async function buildTypeDefinitions(
         )};`
       );
       allTypeStrings.push(
-        `export type ${typeReturnTypeName(type.name)} = ${map(
+        `export type ${typeReturnTypeName(type)} = ${map(
           type.getTypes(),
-          ({ name }) => typeReturnTypeName(name),
+          (t) => typeReturnTypeName(t),
           " | "
         )};`
       );

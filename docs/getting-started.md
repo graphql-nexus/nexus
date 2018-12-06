@@ -119,7 +119,7 @@ When using the TypeScript, configuring the [backing object type](type-generation
 
 ## Type Mixing
 
-When hand constructing schemas in a GraphQL Interface Definition Language (IDL) file, one of the big pain points is making a change to multiple types at once, for instance when adding a field to an interface. Changing types, keeping consistent descriptions, field deprecation are all difficult when you're maintaining this by hand.
+When hand constructing schemas in a GraphQL Schema Definition Language (SDL) file, one of the big pain points is making a change to multiple types at once, for instance when adding a field to an interface. Changing types, keeping consistent descriptions, field deprecation are all difficult when you're maintaining this by hand.
 
 ## Auto-Generated Artifacts
 
