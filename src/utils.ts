@@ -9,7 +9,7 @@ import path from "path";
 import * as Types from "./types";
 
 export function log(msg: string) {
-  console.log(`GQLiteral: ${msg}`);
+  console.log(`GraphQL Nexus: ${msg}`);
 }
 
 export function withDeprecationComment(description?: string | null) {

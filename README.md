@@ -1,4 +1,4 @@
-## GraphQLiteral
+## GraphQL Nexus
 
 **(Still actively WIP, any feedback appreciated!)**
 

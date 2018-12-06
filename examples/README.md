@@ -1,4 +1,4 @@
-# GraphQLiteral Examples
+# GraphQL Nexus Examples
 
 ## Featured Example (TypeScript)
 

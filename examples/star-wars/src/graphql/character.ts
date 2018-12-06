@@ -1,4 +1,4 @@
-import { interfaceType, idArg } from "gqliteral";
+import { interfaceType, idArg } from "graphql-nexus";
 import { getFriends } from "../data";
 
 export const Character = interfaceType("Character", (t) => {

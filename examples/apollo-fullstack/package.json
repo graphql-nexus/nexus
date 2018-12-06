@@ -1,5 +1,5 @@
 {
-  "name": "@graphqliteral/example-fullstack-tutorial-server",
+  "name": "@graphql-nexus/example-fullstack-tutorial-server",
   "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "apollo-server": "2.2.0-alpha.2",
     "apollo-server-testing": "2.2.0-alpha.2",
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
-    "gqliteral": "0.4.0",
+    "graphql-nexus": "0.1.0",
     "graphql": "^14.0.2",
     "isemail": "^3.2.0",
     "sequelize": "^4.41.1",

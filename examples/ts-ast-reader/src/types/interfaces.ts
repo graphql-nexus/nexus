@@ -1,4 +1,4 @@
-import { interfaceType, arg } from "gqliteral";
+import { interfaceType, arg } from "graphql-nexus";
 import { SyntaxKind, JSDoc } from "typescript";
 import ts from "typescript";
 import { allKnownNodes, syntaxKindFilter } from "./utils";

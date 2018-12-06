@@ -91,7 +91,7 @@ export class SchemaBuilder {
   protected definedTypeMap: Record<string, GraphQLNamedType> = {};
   /**
    * The "pending type" map keeps track of all types that were defined w/
-   * GraphQLiteral and haven't been processed into concrete types yet.
+   * GraphQL Nexus and haven't been processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, Types.NamedTypeDef> = {};
 
@@ -282,7 +282,7 @@ export class SchemaBuilder {
     });
     if (!Object.keys(values).length) {
       throw new Error(
-        `GraphQLiteral: Enum ${config.name} must have at least one member`
+        `GraphQL Nexus: Enum ${config.name} must have at least one member`
       );
     }
     return values;
@@ -315,7 +315,7 @@ export class SchemaBuilder {
     });
     if (!Object.keys(unionMembers).length) {
       throw new Error(
-        `GraphQLiteral: Union ${config.name} must have at least one member type`
+        `GraphQL Nexus: Union ${config.name} must have at least one member type`
       );
     }
     return unionMembers;
@@ -608,7 +608,7 @@ export class SchemaBuilder {
     }
     if (this.buildingTypes.has(name)) {
       throw new Error(
-        `GraphQLiteral: Circular dependency detected, while building types ${Array.from(
+        `GraphQL Nexus: Circular dependency detected, while building types ${Array.from(
           this.buildingTypes
         )}`
       );
@@ -728,7 +728,7 @@ export function makeSchemaWithMetadata(
 
   if (!Query) {
     console.warn(
-      "GQLiteral: You should define a root `Query` type for your schema"
+      "GraphQL Nexus: You should define a root `Query` type for your schema"
     );
     Query = new GraphQLObjectType({
       name: "Query",
@@ -774,7 +774,7 @@ export function makeSchemaWithMetadata(
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the GraphQLiteral layer or any manually defined GraphQLType objects.
+ * by the GraphQL Nexus layer or any manually defined GraphQLType objects.
  *
  * Requires at least one type be named "Query", which will be used as the
  * root query type.

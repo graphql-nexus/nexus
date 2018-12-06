@@ -27,14 +27,14 @@ export { SchemaBuilder, isNamedTypeDef, Metadata };
 export { typegenAutoConfig } from "./autoConfig";
 
 declare global {
-  interface GraphQLiteralGen {}
+  interface GraphQLNexusGen {}
 }
 
 /**
  * Provided to the [objectType](#objectType) function, this
  */
 export class ObjectTypeDef<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 > {
   /**
@@ -197,7 +197,7 @@ export class ObjectTypeDef<
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
-   * more about GraphQLiteral's assumptions and configuration
+   * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    *
    * @param nullability
@@ -224,7 +224,7 @@ export class ObjectTypeDef<
 /**
  * Backing type for an enum member.
  */
-export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
+export class EnumTypeDef<GenTypes = GraphQLNexusGen> {
   protected typeConfig: Types.EnumTypeConfig;
 
   constructor(readonly name: string) {
@@ -307,7 +307,7 @@ export class EnumTypeDef<GenTypes = GraphQLiteralGen> {
  * Configure the `GraphQLUnionType` definition
  */
 export class UnionTypeDef<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 > {
   protected typeConfig: Types.UnionTypeConfig;
@@ -384,7 +384,7 @@ export class UnionTypeDef<
 }
 
 export class InterfaceTypeDef<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 > {
   /**
@@ -518,7 +518,7 @@ export class InterfaceTypeDef<
 }
 
 export class InputObjectTypeDef<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 > {
   protected typeConfig: Types.InputTypeConfig;
@@ -628,7 +628,7 @@ export class InputObjectTypeDef<
   }
 }
 
-export class DirectiveTypeDef<GenTypes = GraphQLiteralGen> {
+export class DirectiveTypeDef<GenTypes = GraphQLNexusGen> {
   protected typeConfig: Types.DirectiveTypeConfig;
 
   constructor(readonly name: string) {

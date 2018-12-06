@@ -1,4 +1,4 @@
-import { objectType } from "gqliteral";
+import { objectType } from "graphql-nexus";
 
 export const User = objectType("User", (t) => {
   t.id("id");

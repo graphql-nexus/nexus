@@ -1,5 +1,5 @@
 import { ApolloServer } from "apollo-server";
-import { makeSchema } from "gqliteral";
+import { makeSchema } from "graphql-nexus";
 import path from "path";
 import * as types from "./definitions";
 

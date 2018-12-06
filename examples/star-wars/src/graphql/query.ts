@@ -1,4 +1,4 @@
-import { objectType, arg, stringArg } from "gqliteral";
+import { objectType, arg, stringArg } from "graphql-nexus";
 import { getHero, getHuman, getDroid } from "../data";
 
 const characterArgs = {

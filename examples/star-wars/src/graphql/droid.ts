@@ -1,4 +1,4 @@
-import { objectType } from "gqliteral";
+import { objectType } from "graphql-nexus";
 
 export const Droid = objectType("Droid", (t) => {
   t.description("A mechanical creature in the Star Wars universe.");

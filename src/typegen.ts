@@ -32,7 +32,7 @@ type AllTypes =
 // This is intentionally concise and procedural. Didn't want to make this
 // unnecessarily abstracted and it should run only with only a single iteration
 // of the schema. The types created here are generally meant for internal use
-// by GraphQLiteral anyway. If there is a need, this could be factored out into
+// by GraphQLNexus anyway. If there is a need, this could be factored out into
 // something nicer, but for now let's just make it work well, however ugly it is.
 // At least it's type safe™
 export async function buildTypeDefinitions(
@@ -61,7 +61,7 @@ export async function buildTypeDefinitions(
   const allTypeStrings: string[] = [];
 
   const interfaceRootTypes: {
-    [interfaceName: string]: string[]; // objectRootType
+    [interfaceName: string]: GraphQLObjectType[]; // objectRootType
   } = {};
   const returnTypeFields: {
     [typeName: string]: [string, string][]; // fieldName, returnTypeName
@@ -329,7 +329,7 @@ export async function buildTypeDefinitions(
       eachObj(type.getFields(), (field) => processField(type, field));
       type
         .getInterfaces()
-        .forEach((i) => arrPush(interfaceRootTypes, i.name, type.name));
+        .forEach((i) => arrPush(interfaceRootTypes, i.name, type));
       makeRootType(type);
       makeReturnType(type);
       makeResolvers(type);
@@ -378,6 +378,10 @@ export async function buildTypeDefinitions(
   });
 
   eachObj(interfaceRootTypes, (members, interfaceName) => {
+    const i = schema.getType(interfaceName);
+    if (!isInterfaceType(i)) {
+      return;
+    }
     if (backingTypeMap[interfaceName]) {
       allTypeStrings.push(
         `export type ${typeRootTypeName(interfaceName)} = ${
@@ -385,18 +389,18 @@ export async function buildTypeDefinitions(
         };`
       );
       allTypeStrings.push(
-        `export type ${typeReturnTypeName(interfaceName)} = ${
+        `export type ${typeReturnTypeName(i)} = ${
           backingTypeMap[interfaceName]
         };`
       );
     } else {
       allTypeStrings.push(
         `export type ${typeRootTypeName(interfaceName)} = ${members
-          .map((name) => typeRootTypeName(name))
+          .map((name) => typeRootTypeName(i.name))
           .join(" | ")};`
       );
       allTypeStrings.push(
-        `export type ${typeReturnTypeName(interfaceName)} = ${members
+        `export type ${typeReturnTypeName(i)} = ${members
           .map((name) => typeReturnTypeName(name))
           .join(" | ")};`
       );
@@ -472,7 +476,7 @@ export async function buildTypeDefinitions(
 ${imports.join("\n")}
 
 declare global {
-  interface GraphQLiteralGen extends GraphQLiteralGenTypes {}
+  interface GraphQLNexusGen extends GraphQLNexusGenTypes {}
 }
 
 // Maybe Promise
@@ -489,21 +493,21 @@ type ${MTA}<T, A> = T | ((args?: A) => T);
 
 ${allTypeStrings.join("\n\n")}
 
-${stringifyTypeFieldMapping("GraphQLiteralGenArgTypes", argTypeFields)}
+${stringifyTypeFieldMapping("GraphQLNexusGenArgTypes", argTypeFields)}
 
-export interface GraphQLiteralGenRootTypes {
+export interface GraphQLNexusGenRootTypes {
 ${map(
     typeNames.interfaces.concat(typeNames.objects),
     (name) => `  ${name}: ${typeRootTypeName(name)};`
   )}
 }
 
-${stringifyTypeFieldMapping("GraphQLiteralGenReturnTypes", returnTypeFields)}
+${stringifyTypeFieldMapping("GraphQLNexusGenReturnTypes", returnTypeFields)}
 
-export interface GraphQLiteralGenTypes {
-  argTypes: GraphQLiteralGenArgTypes;
-  backingTypes: GraphQLiteralGenRootTypes;
-  returnTypes: GraphQLiteralGenReturnTypes;
+export interface GraphQLNexusGenTypes {
+  argTypes: GraphQLNexusGenArgTypes;
+  backingTypes: GraphQLNexusGenRootTypes;
+  returnTypes: GraphQLNexusGenReturnTypes;
   context: ${contextType};
   enums: ${enums()};
   objects: ${objectNames()};
@@ -512,18 +516,18 @@ export interface GraphQLiteralGenTypes {
   scalars: ${scalars()};
   inputObjects: ${inputObjects()};
   allInputTypes: 
-    | Extract<keyof GraphQLiteralGenTypes['inputObjects'], string>
-    | Extract<keyof GraphQLiteralGenTypes['enums'], string>
-    | Extract<keyof GraphQLiteralGenTypes['scalars'], string>;
+    | Extract<keyof GraphQLNexusGenTypes['inputObjects'], string>
+    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
+    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
   allOutputTypes: 
-    | Extract<keyof GraphQLiteralGenTypes['objects'], string>
-    | Extract<keyof GraphQLiteralGenTypes['enums'], string>
-    | Extract<keyof GraphQLiteralGenTypes['unions'], string>
-    | Extract<keyof GraphQLiteralGenTypes['interfaces'], string>
-    | Extract<keyof GraphQLiteralGenTypes['scalars'], string>;
+    | Extract<keyof GraphQLNexusGenTypes['objects'], string>
+    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
+    | Extract<keyof GraphQLNexusGenTypes['unions'], string>
+    | Extract<keyof GraphQLNexusGenTypes['interfaces'], string>
+    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
 }
 
-export type Gen = GraphQLiteralGenTypes;
+export type Gen = GraphQLNexusGenTypes;
 `;
 }
 

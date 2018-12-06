@@ -18,7 +18,7 @@ import { enumShorthandMembers } from "./utils";
  * @see https://graphql.github.io/learn/schema/#object-types-and-fields
  */
 export function objectType<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 >(
   name: TypeName,
@@ -34,7 +34,7 @@ export function objectType<
  * abstract type that includes a certain set of fields that a type must
  * include to implement the interface.
  *
- * In GraphQLiteral, you do not need to redefine the interface fields on the
+ * In GraphQL Nexus, you do not need to redefine the interface fields on the
  * implementing object types, instead you may use `.implements(interfaceName)`
  * and all of the interface fields will be added to the type.
  *
@@ -51,7 +51,7 @@ export function objectType<
  * @see https://graphql.github.io/learn/schema/#interfaces
  */
 export function interfaceType<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 >(
   name: TypeName,
@@ -81,7 +81,7 @@ export function interfaceType<
  * @see https://graphql.org/learn/schema/#union-types
  */
 export function unionType<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 >(
   name: TypeName,
@@ -128,7 +128,7 @@ export function unionType<
  * @see https://graphql.github.io/learn/schema/#enumeration-types
  */
 export function enumType<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 >(
   name: TypeName,
@@ -155,7 +155,7 @@ export function enumType<
  * @see https://graphql.org/learn/schema/#input-types
  */
 export function inputObjectType<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   TypeName extends string = any
 >(name: TypeName, fn: (t: InputObjectTypeDef<GenTypes>) => void): WrappedType {
   const factory = new InputObjectTypeDef<GenTypes>(assertValidName(name));
@@ -206,7 +206,7 @@ export function scalarType(
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg<GenTypes = GraphQLiteralGen>(
+export function arg<GenTypes = GraphQLNexusGen>(
   type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
   options?: Types.ArgOpts
 ): Types.ArgDefinition {
@@ -260,7 +260,7 @@ export function booleanArg(options?: Types.ArgOpts): Types.ArgDefinition {
  * > consumers of the schema.
  */
 export function directiveType<
-  GenTypes = GraphQLiteralGen,
+  GenTypes = GraphQLNexusGen,
   DirectiveName extends string = any
 >(
   name: DirectiveName,

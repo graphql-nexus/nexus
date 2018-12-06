@@ -1,5 +1,5 @@
 /**
- * Links examples & website to local version of graphqliteral
+ * Links examples & website to local version of GraphQL Nexus
  */
 import { exec } from "child_process";
 import util from "util";
@@ -12,7 +12,7 @@ async function linkDir(dir: string, root: string) {
   await execAsync("yarn", {
     cwd: dir,
   });
-  await execAsync("yarn link gqliteral", {
+  await execAsync("yarn link graphql-nexus", {
     cwd: dir,
   });
   await execAsync("rm -rf graphql", {

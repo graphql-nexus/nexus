@@ -1,4 +1,4 @@
-import { interfaceType, objectType, core } from "gqliteral";
+import { interfaceType, objectType, core } from "graphql-nexus";
 import ts from "typescript";
 
 export const JSDoc = objectType("JSDoc", (t) => {
@@ -20,7 +20,7 @@ export const JSDocTag = interfaceType("JSDocTag", (t) => {
   });
 });
 
-const jsDocTag = (t: core.ObjectTypeDef<GraphQLiteralGen, any>) =>
+const jsDocTag = (t: core.ObjectTypeDef<GraphQLNexusGen, any>) =>
   t.implements("JSDocTag");
 
 export const JSDocUnknownTag = objectType("JSDocUnknownTag", jsDocTag);

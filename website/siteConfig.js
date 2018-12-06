@@ -10,11 +10,11 @@ const users = [
 ];
 
 const siteConfig = {
-  title: "GraphQLiteral", // Title for your website.
+  title: "GraphQL Nexus", // Title for your website.
   tagline:
     "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
   // url: "https://tgriesser.com", // Your website URL
-  baseUrl: "/graphqliteral/", // Base URL for your project */
+  baseUrl: "/graphql-nexus/", // Base URL for your project */
   noIndex: true,
 
   // algolia: {
@@ -24,7 +24,7 @@ const siteConfig = {
   // }
 
   // Used for publishing and more
-  projectName: "graphqliteral",
+  projectName: "graphql-nexus",
   organizationName: "tgriesser",
 
   // For no header links in the top nav bar -> headerLinks: [],
@@ -40,8 +40,8 @@ const siteConfig = {
   // users,
 
   /* path to images for header/footer */
-  headerIcon: "img/graphqliteral.png",
-  footerIcon: "img/graphqliteral.png",
+  headerIcon: "img/graphql-nexus.png",
+  footerIcon: "img/graphql-nexus.png",
   favicon: "img/favicon.png",
 
   /* Colors for website */
@@ -76,13 +76,13 @@ const siteConfig = {
   scripts: [
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
-    "/graphqliteral/js/api-docs.js",
-    "/graphqliteral/js/code-block-buttons.js",
-    "/graphqliteral/js/code-block-toggle.js",
+    "/graphql-nexus/js/api-docs.js",
+    "/graphql-nexus/js/code-block-buttons.js",
+    "/graphql-nexus/js/code-block-toggle.js",
   ],
   stylesheets: [
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.css",
-    "/graphqliteral/css/code-block-buttons.css",
+    "/graphql-nexus/css/code-block-buttons.css",
   ],
 
   // On page navigation for the current documentation page.
@@ -91,8 +91,8 @@ const siteConfig = {
   cleanUrl: true,
 
   // Open Graph and Twitter card images.
-  ogImage: "img/graphqliteral.png",
-  twitterImage: "img/graphqliteral.png",
+  ogImage: "img/graphql-nexus.png",
+  twitterImage: "img/graphql-nexus.png",
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,

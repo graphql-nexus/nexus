@@ -1,12 +1,12 @@
 {
-  "name": "@graphqliteral/example-githunt-api",
+  "name": "@graphql-nexus/example-githunt-api",
   "scripts": {
     "start": "nodemon src/index.js"
   },
   "dependencies": {
     "apollo-server": "2.2.0-alpha.2",
     "githunt-api": "apollographql/GitHunt-API.git",
-    "gqliteral": "0.4.0",
+    "graphql-nexus": "0.1.0",
     "graphql": "^14.0.2"
   },
   "devDependencies": {

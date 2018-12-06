@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import { Playground } from "./Playground";
 
 const content = dedent`
-  // All GraphQLiteral objects are available globally here,
+  // All GraphQL Nexus objects are available globally here,
   // and will automatically be added to the schema
 
   objectType('Account', t => {

@@ -1,12 +1,12 @@
 {
-  "name": "@graphqliteral/example-kitchen-sink",
+  "name": "@graphql-nexus/example-kitchen-sink",
   "version": "0.0.0",
   "scripts": {
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
     "apollo-server": "^2.2.0",
-    "gqliteral": "0.4.0",
+    "graphql-nexus": "0.1.0",
     "graphql": "^14.0.2",
     "ts-node-dev": "^1.0.0-pre.30"
   },

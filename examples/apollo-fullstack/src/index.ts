@@ -1,7 +1,7 @@
 // @ts-check
 import { ApolloServer } from "apollo-server";
 import path from "path";
-import { makeSchema } from "gqliteral";
+import { makeSchema } from "graphql-nexus";
 import isEmail from "isemail";
 import * as types from "./schema";
 import { Request } from "express";

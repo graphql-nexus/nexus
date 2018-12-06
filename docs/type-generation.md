@@ -8,7 +8,7 @@ This is relevant to JavaScript as well as TypeScript users, as tools like VSCode
 
 ## Overview
 
-GraphQLiteral was designed with TypeScript in mind. In order to fully typecheck our GraphQL objects, we need to generate a number of types that combine the schema, any type or field configuration provided, and the GraphQL resolution algorithm to create as much type-safety as possible without any additional work importing and assigning types throughout the codebase.
+GraphQL Nexus was designed with TypeScript in mind. In order to fully typecheck our GraphQL objects, we need to generate a number of types that combine the schema, any type or field configuration provided, and the GraphQL resolution algorithm to create as much type-safety as possible without any additional work importing and assigning types throughout the codebase.
 
 ## Backing Types
 
@@ -19,7 +19,7 @@ the field definitions.
 
 Scalars can also have backing types, representing the value they are parsed into.
 
-Sometimes GraphQL types are passthrough, and don't have a dedicated type backing them. One such case would be in the `Edge` of a Relay style pagination. In this case, GraphQLiteral will generate a type-definition which makes assumptions of the necessary value to fulfill the contract. If this is incorrect, you can always provide a concrete type for the object.
+Sometimes GraphQL types are passthrough, and don't have a dedicated type backing them. One such case would be in the `Edge` of a Relay style pagination. In this case, GraphQL Nexus will generate a type-definition which makes assumptions of the necessary value to fulfill the contract. If this is incorrect, you can always provide a concrete type for the object.
 
 > In the case of custom [default resolve functions](../api-reference), we will lose type safety if the
 > backing type is not defined. For this reason, defining a backing type is required

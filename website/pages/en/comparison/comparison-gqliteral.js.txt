@@ -3,7 +3,7 @@ import {
   interfaceType,
   enumType,
   makeSchema,
-} from "gqliteral";
+} from "graphql-nexus";
 
 const Node = interfaceType("Node", t => {
   t.id("id", { description: "ID of the Resource" });

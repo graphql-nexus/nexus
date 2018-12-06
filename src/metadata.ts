@@ -224,7 +224,7 @@ export class Metadata {
   writeFile(name: string, output: string, filePath: string) {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
       throw new Error(
-        `Expected an absolute path to output the GraphQLiteral ${name}, saw ${filePath}`
+        `Expected an absolute path to output the GraphQL Nexus ${name}, saw ${filePath}`
       );
     }
     const fs = require("fs") as typeof import("fs");

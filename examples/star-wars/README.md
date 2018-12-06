@@ -1,6 +1,6 @@
-# GraphQLiteral Star Wars:
+# GraphQL Nexus Star Wars:
 
-This is meant to demonstrate some of the features of GraphQLiteral.
+This is meant to demonstrate some of the features of GraphQL Nexus.
 
 ### Changes from the graphql-js example:
 

@@ -1,4 +1,4 @@
-import { objectType } from "gqliteral";
+import { objectType } from "graphql-nexus";
 
 export const Rocket = objectType("Rocket", (t) => {
   t.id("id");

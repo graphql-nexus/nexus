@@ -1,4 +1,4 @@
-import { enumType } from "gqliteral";
+import { enumType } from "graphql-nexus";
 
 /**
  * Note: this could also be:

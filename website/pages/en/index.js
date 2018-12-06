@@ -73,8 +73,8 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
-            <Button href={pageUrl("blog/2018/11/04/introducing-graphqliteral")}>
-              Why GraphQLiteral?
+            <Button href={pageUrl("blog/2018/11/04/introducing-graphql-nexus")}>
+              Why GraphQL Nexus?
             </Button>
             <Button href={pageUrl("api-reference", language)}>API Docs</Button>
             <Button href="https://github.com/tgriesser/gqliteral/tree/master/examples">
@@ -103,19 +103,19 @@ const Features = () => (
       {
         content:
           "Utilize the full features of the language when building your schema",
-        image: imgUrl("graphqliteral.png"),
+        image: imgUrl("graphql-nexus.png"),
         imageAlign: "top",
         title: "Feature One",
       },
       {
         content: "The content of my second feature",
-        image: imgUrl("graphqliteral.png"),
+        image: imgUrl("graphql-nexus.png"),
         imageAlign: "top",
         title: "Type-Safe by Default",
       },
       {
         content: "The content of my second feature",
-        image: imgUrl("graphqliteral.png"),
+        image: imgUrl("graphql-nexus.png"),
         imageAlign: "top",
         title: "Type-Safe by Default",
       },
@@ -150,7 +150,7 @@ const TryOut = () => (
     {[
       {
         content: "Talk about trying this out",
-        image: imgUrl("graphqliteral.png"),
+        image: imgUrl("graphql-nexus.png"),
         imageAlign: "left",
         title: "Try it Out",
       },
@@ -163,7 +163,7 @@ const Description = () => (
     {[
       {
         content: "This is another description of how this project is useful",
-        image: imgUrl("graphqliteral.png"),
+        image: imgUrl("graphql-nexus.png"),
         imageAlign: "right",
         title: "Description",
       },

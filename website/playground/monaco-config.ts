@@ -60,24 +60,24 @@ files.forEach((file, i) => {
 
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
   `
-import * as graphqliteral from 'gqliteral'
+import * as nexus from 'graphql-nexus'
 
 // Re-export these so we can use globally in the sandbox
 // while still preserving the typegen
 declare global {
-  declare const arg: typeof graphqliteral.arg;
-  declare const intArg: typeof graphqliteral.intArg;
-  declare const stringArg: typeof graphqliteral.stringArg;
-  declare const floatArg: typeof graphqliteral.floatArg;
-  declare const idArg: typeof graphqliteral.idArg;
-  declare const booleanArg: typeof graphqliteral.booleanArg;
-  declare const enumType: typeof graphqliteral.enumType;
-  declare const unionType: typeof graphqliteral.unionType;
-  declare const scalarType: typeof graphqliteral.scalarType;
-  declare const directiveType: typeof graphqliteral.directiveType;
-  declare const objectType: typeof graphqliteral.objectType;
-  declare const interfaceType: typeof graphqliteral.interfaceType;
-  declare const inputObjectType: typeof graphqliteral.inputObjectType;
+  declare const arg: typeof nexus.arg;
+  declare const intArg: typeof nexus.intArg;
+  declare const stringArg: typeof nexus.stringArg;
+  declare const floatArg: typeof nexus.floatArg;
+  declare const idArg: typeof nexus.idArg;
+  declare const booleanArg: typeof nexus.booleanArg;
+  declare const enumType: typeof nexus.enumType;
+  declare const unionType: typeof nexus.unionType;
+  declare const scalarType: typeof nexus.scalarType;
+  declare const directiveType: typeof nexus.directiveType;
+  declare const objectType: typeof nexus.objectType;
+  declare const interfaceType: typeof nexus.interfaceType;
+  declare const inputObjectType: typeof nexus.inputObjectType;
 }
 `,
   "file:///sandbox-globals.ts"

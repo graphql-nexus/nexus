@@ -1,5 +1,5 @@
 {
-  "name": "@graphqliteral/website",
+  "name": "@graphql-nexus/website",
   "license": "MIT",
   "scripts": {
     "start": "gulp start",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "dedent": "^0.7.0",
-    "gqliteral": "0.4.0",
+    "graphql-nexus": "0.1.0",
     "graphql": "^14.0.2",
     "monaco-editor": "^0.15.5",
     "react": "^16.7.0-alpha.2",

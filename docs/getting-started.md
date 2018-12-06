@@ -1,35 +1,35 @@
 ---
 id: getting-started
-title: GraphQLiteral
+title: GraphQL Nexus
 sidebar_label: Getting Started
 ---
 
 Robust, composable type definition for GraphQL in TypeScript/JavaScript.
 
-GraphQLiteral aims to combine the simplicity and ease of development of schema-first development approaches (like [graphql-tools](https://www.apollographql.com/docs/graphql-tools/generate-schema.html)) with the long-term maintainability of tools like [graphene-python](https://docs.graphene-python.org/en/latest/), or [graphql-ruby](https://github.com/rmosolgo/graphql-ruby), or [graphql-js](https://github.com/graphql/graphql-js).
+GraphQL Nexus aims to combine the simplicity and ease of development of schema-first development approaches (like [graphql-tools](https://www.apollographql.com/docs/graphql-tools/generate-schema.html)) with the long-term maintainability of tools like [graphene-python](https://docs.graphene-python.org/en/latest/), or [graphql-ruby](https://github.com/rmosolgo/graphql-ruby), or [graphql-js](https://github.com/graphql/graphql-js).
 
 It builds upon the primitives of `graphql-js` and similar to the schema-first approach, utilizes the type names rather than concrete object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
 
-GraphQLiteral was designed with TypeScript/JavaScript intellisense in mind, and combines TypeScript generics, conditional types, and type merging to provide full auto-generated type coverage out of the box.
+GraphQL Nexus was designed with TypeScript/JavaScript intellisense in mind, and combines TypeScript generics, conditional types, and type merging to provide full auto-generated type coverage out of the box.
 
 Try it out in the [playground](../playground) to see what we mean!
 
 ## Installation
 
-GraphQLiteral requires that `graphql` it be installed as a peer dependency. It can be installed with either `npm` or `yarn`.
+GraphQL Nexus requires that `graphql` it be installed as a peer dependency. It can be installed with either `npm` or `yarn`.
 
-`yarn add gqliteral graphql`
+`yarn add graphql-nexus graphql`
 
 or
 
-`npm i --save gqliteral graphql`
+`npm i --save graphql-nexus graphql`
 
 ## Building a Schema
 
-As documented in the [API reference](../api-reference) GraphQLiteral provides a consistent, scalable approach to defining GraphQL types in code. Fields are referred to by their GraphQL defined name.
+As documented in the [API reference](../api-reference) GraphQL Nexus provides a consistent, scalable approach to defining GraphQL types in code. Fields are referred to by their GraphQL defined name.
 
 ```js
-const { objectType, stringArg, fieldArg, makeSchema } = require("gqliteral");
+import { objectType, stringArg, fieldArg, makeSchema } from "graphql-nexus";
 
 const Query = objectType("Query", (t) => {
   t.field("account", "Account", {
@@ -76,7 +76,7 @@ const schema = makeSchema({
 
 ## Nullability & Default Values
 
-_tl;dr - GraphQLiteral assumes output fields are non-null by default_
+_tl;dr - GraphQL Nexus assumes output fields are non-null by default_
 
 One benefit of GraphQL is the strict enforcement and guarentees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default.
 
@@ -84,7 +84,7 @@ The GraphQL documentation provides [this explanation](https://graphql.org/learn/
 
 > ... in a GraphQL type system, every field is nullable by default. This is because there are many things which can go awry in a networked service backed by databases and other services. A database could go down, an asynchronous action could fail, an exception could be thrown. Beyond simply system failures, authorization can often be granular, where individual fields within a request can have different authorization rules.
 
-GraphQLiteral breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all arguments are nullable unless `required` is set to true.
+GraphQL Nexus breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all arguments are nullable unless `required` is set to true.
 
 The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.
 
@@ -94,7 +94,7 @@ This can also be configured on a per-type basis, using the `nullability` method 
 
 #### default
 
-Enforcing non-null guarantees at the resolver layer can be tedious, so GraphQLiteral also provides a `default` option; a value used when the resolved type is otherwise `null` or `undefined`. Providing the `default` will set the schema definition for the field to non-null regardless of root schema configuration, unless `nullable: true` is set explicitly on the field.
+Enforcing non-null guarantees at the resolver layer can be tedious, so GraphQL Nexus also provides a `default` option; a value used when the resolved type is otherwise `null` or `undefined`. Providing the `default` will set the schema definition for the field to non-null regardless of root schema configuration, unless `nullable: true` is set explicitly on the field.
 
 ```ts
 const AccountInfo = objectType("AccountInfo", (t) => {
@@ -105,7 +105,7 @@ const AccountInfo = objectType("AccountInfo", (t) => {
 
 ## Resolving: Property
 
-One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQLiteral provides a `property` option on the field configuration object, for conveniently accessing an object property without needing to define a resolver function.
+One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus provides a `property` option on the field configuration object, for conveniently accessing an object property without needing to define a resolver function.
 
 ```ts
 const User = objectType("User", (t) => {
@@ -125,7 +125,7 @@ When hand constructing schemas in a GraphQL Schema Definition Language (SDL) fil
 
 When you make a change to your GraphQL schema it is useful to see how exactly this changes the contract of the API, or the associated typings.
 
-GraphQLiteral takes care of this for you, simply provide a path to where you want these files to be output and it will auto-generate them when the server starts. By default, this only occurs when `process.env.NODE_ENV !== "production"`.
+GraphQL Nexus takes care of this for you, simply provide a path to where you want these files to be output and it will auto-generate them when the server starts. By default, this only occurs when `process.env.NODE_ENV !== "production"`.
 
 ```js
 const schema = makeSchema({
@@ -154,4 +154,4 @@ Specifying a defaultResolver for a type can have unintended consequences, and ma
 
 </blockquote>
 
-GraphQLiteral allows you to define an override to the `defaultResolver` on a per-type basis.
+GraphQL Nexus allows you to define an override to the `defaultResolver` on a per-type basis.
