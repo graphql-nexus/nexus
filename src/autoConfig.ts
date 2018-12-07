@@ -33,6 +33,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
       backingTypeMap: _backingTypeMap,
       debug,
     } = options;
+
     const typeMap = schema.getTypeMap();
     const typesToIgnore = new Set<string>();
     const typesToIgnoreRegex: RegExp[] = [];
@@ -95,7 +96,9 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
         let resolvedPath: string;
         let fileContents: string;
         try {
-          resolvedPath = require.resolve(pathOrModule);
+          resolvedPath = require.resolve(pathOrModule, {
+            paths: [process.cwd()],
+          });
           if (path.extname(resolvedPath) !== ".ts") {
             resolvedPath = findTypingForFile(resolvedPath, pathOrModule);
           }
@@ -114,9 +117,10 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
           return null;
         }
 
-        const importPath = path.isAbsolute(pathOrModule)
+        const importPath = (path.isAbsolute(pathOrModule)
           ? relativePathTo(resolvedPath, outputPath)
-          : pathOrModule;
+          : pathOrModule
+        ).replace(/\.d?\.ts/, "");
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(

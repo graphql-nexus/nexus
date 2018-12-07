@@ -236,8 +236,8 @@ export async function buildTypeDefinitions(
     const colon = metadata.hasDefaultValue(type, field.name)
       ? "?:"
       : isNonNullType(field.type)
-        ? ":"
-        : "?:";
+      ? ":"
+      : "?:";
     if (metadata.hasPropertyResolver(type, field.name)) {
       return `${metadata.getPropertyResolver(type, field.name)}${colon}`;
     }
@@ -396,7 +396,7 @@ export async function buildTypeDefinitions(
     } else {
       allTypeStrings.push(
         `export type ${typeRootTypeName(interfaceName)} = ${members
-          .map((name) => typeRootTypeName(i.name))
+          .map(({ name }) => typeRootTypeName(name))
           .join(" | ")};`
       );
       allTypeStrings.push(
