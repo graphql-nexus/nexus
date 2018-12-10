@@ -1,4 +1,4 @@
-import { objectType, arg } from "graphql-nexus";
+import { objectType, arg } from "nexus";
 import { nodeType, functionLikeDeclaration, hasTypeParameters } from "./mixins";
 import { filteredNodesList } from "./utils";
 

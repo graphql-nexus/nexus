@@ -21,7 +21,7 @@ import {
   idArg,
   booleanArg,
   core,
-} from "graphql-nexus";
+} from "nexus";
 import { GraphQLSchema, graphql } from "graphql";
 import * as monaco from "monaco-editor";
 import { useDebounce } from "use-debounce";

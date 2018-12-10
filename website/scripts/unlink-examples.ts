@@ -9,7 +9,7 @@ async function unlinkDir(dir: string) {
   await execAsync("rm -rf graphql", {
     cwd: path.join(dir, "node_modules"),
   });
-  await execAsync("yarn unlink graphql-nexus", {
+  await execAsync("yarn unlink nexus", {
     cwd: dir,
   });
   await execAsync("yarn --force", {

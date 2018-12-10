@@ -1,4 +1,4 @@
-import { interfaceType, objectType, core } from "graphql-nexus";
+import { interfaceType, objectType, core } from "nexus";
 import ts from "typescript";
 
 export const JSDoc = objectType("JSDoc", (t) => {

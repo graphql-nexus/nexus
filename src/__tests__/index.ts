@@ -2,7 +2,7 @@
 import { GraphQLEnumType, GraphQLObjectType } from "graphql";
 import { buildTypes, objectType, enumType } from "../";
 
-describe("gqlit", () => {
+describe("nexus", () => {
   describe("enumType", () => {
     const PrimaryColors = enumType<any>("PrimaryColors", (t) => {
       t.members(["RED", "YELLOW", "BLUE"]);

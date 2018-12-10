@@ -1,4 +1,4 @@
-import { objectType, idArg, stringArg } from "graphql-nexus";
+import { objectType, idArg, stringArg } from "nexus";
 
 export const Mutation = objectType("Mutation", (t) => {
   t.field("bookTrips", "TripUpdateResponse", {

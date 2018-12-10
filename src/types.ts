@@ -186,10 +186,10 @@ export interface ArgOpts extends FieldOpts {
 
 export interface ArgDefinition
   extends Readonly<
-      ArgOpts & {
-        type: any;
-      }
-    > {} // TODO: Make type safe
+    ArgOpts & {
+      type: any;
+    }
+  > {} // TODO: Make type safe
 
 export interface DirectiveArgDefinition extends ArgDefinition {
   readonly name: string;
@@ -263,9 +263,9 @@ export interface InputFieldOpts<GenTypes = any, TypeName = any>
 
 export interface ScalarOpts
   extends Pick<
-      GraphQLScalarTypeConfig<any, any>,
-      "description" | "serialize" | "parseValue" | "parseLiteral"
-    > {
+    GraphQLScalarTypeConfig<any, any>,
+    "description" | "serialize" | "parseValue" | "parseLiteral"
+  > {
   /**
    * Backing type for the scalar
    */
@@ -400,13 +400,7 @@ export interface ImportedType {
   importPath: string;
 }
 
-export interface SchemaConfig extends Nullability {
-  /**
-   * All of the GraphQL types. This is an any for simplicity of developer experience,
-   * if it's an object we get the values, if it's an array we flatten out the
-   * valid types, ignoring invalid ones.
-   */
-  types: any;
+export interface BuilderConfig extends Nullability {
   /**
    * When the schema starts and `process.env.NODE_ENV !== "production"`,
    * artifact files are auto-generated containing the .graphql definitions of
@@ -444,6 +438,15 @@ export interface SchemaConfig extends Nullability {
     schema: GraphQLSchema,
     outputPath: string
   ) => TypegenInfo | PromiseLike<TypegenInfo>);
+}
+
+export interface SchemaConfig extends BuilderConfig {
+  /**
+   * All of the GraphQL types. This is an any for simplicity of developer experience,
+   * if it's an object we get the values, if it's an array we flatten out the
+   * valid types, ignoring invalid ones.
+   */
+  types: any;
 }
 
 export interface TypegenInfo<GenTypes = any> {

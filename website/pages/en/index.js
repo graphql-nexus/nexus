@@ -74,10 +74,10 @@ class HomeSplash extends React.Component {
           <ProjectTitle />
           <PromoSection>
             <Button href={pageUrl("blog/2018/11/04/introducing-graphql-nexus")}>
-              Why GraphQL Nexus?
+              Why Nexus?
             </Button>
             <Button href={pageUrl("api-reference", language)}>API Docs</Button>
-            <Button href="https://github.com/tgriesser/gqliteral/tree/master/examples">
+            <Button href="https://github.com/tgriesser/nexus/tree/master/examples">
               Examples
             </Button>
           </PromoSection>

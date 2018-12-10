@@ -1,6 +1,6 @@
 {
-  "name": "graphql-nexus",
-  "version": "0.1.1",
+  "name": "nexus",
+  "version": "0.5.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",

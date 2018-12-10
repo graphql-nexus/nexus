@@ -6,7 +6,7 @@
   "dependencies": {
     "apollo-server": "2.2.0-alpha.2",
     "githunt-api": "apollographql/GitHunt-API.git",
-    "graphql-nexus": "0.1.0",
+    "nexus": "0.5.0",
     "graphql": "^14.0.2"
   },
   "devDependencies": {

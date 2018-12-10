@@ -1,4 +1,4 @@
-import { makeSchema } from "graphql-nexus";
+import { makeSchema } from "nexus";
 import path from "path";
 import * as types from "./types";
 import { isObjectType, GraphQLNamedType } from "graphql";

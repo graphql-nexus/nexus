@@ -102,9 +102,13 @@ export class SchemaBuilder {
 
   constructor(
     protected metadata: Metadata,
-    protected config: Types.Omit<Types.SchemaConfig, "types">
+    protected config: Types.BuilderConfig
   ) {
     this.nullability = config.nullability || {};
+  }
+
+  getConfig(): Types.BuilderConfig {
+    return this.config;
   }
 
   addType(typeDef: Types.NamedTypeDef | GraphQLNamedType) {
@@ -493,12 +497,12 @@ export class SchemaBuilder {
       typeof nullable !== "undefined"
         ? nullable
         : list
-          ? isInput
-            ? nullConfig.inputList
-            : nullConfig.outputList
-          : isInput
-            ? nullConfig.input
-            : nullConfig.output;
+        ? isInput
+          ? nullConfig.inputList
+          : nullConfig.outputList
+        : isInput
+        ? nullConfig.input
+        : nullConfig.output;
 
     if (list) {
       const depth = listDepth || 1;
@@ -506,8 +510,8 @@ export class SchemaBuilder {
         typeof listItemNullable !== "undefined"
           ? listItemNullable
           : isInput
-            ? nullConfig.inputListItem
-            : nullConfig.outputListItem;
+          ? nullConfig.inputListItem
+          : nullConfig.outputListItem;
       if (Array.isArray(nullableItem) && nullableItem.length !== depth) {
         throw new Error(
           `Incorrect listItemNullable array length for ${typeConfig.name}${
@@ -682,7 +686,7 @@ export function buildTypes<
   DirectiveDefs extends Record<string, GraphQLDirective> = any
 >(
   types: any,
-  config: Types.Omit<Types.SchemaConfig, "types"> = { outputs: false },
+  config: Types.BuilderConfig = { outputs: false },
   SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
   MetadataClass: typeof Metadata = Metadata
 ): Types.BuildTypes<TypeMapDefs, DirectiveDefs> {
@@ -695,6 +699,9 @@ export function buildTypes<
 function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
+  }
+  if (typeof types === "function") {
+    addTypes(builder, types(builder));
   }
   if (isWrappedTypeDef(types)) {
     types = types.type;

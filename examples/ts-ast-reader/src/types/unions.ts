@@ -1,4 +1,4 @@
-import { unionType } from "graphql-nexus";
+import { unionType } from "nexus";
 import ts from "typescript";
 
 export const DeclarationName = unionType("DeclarationName", (t) => {

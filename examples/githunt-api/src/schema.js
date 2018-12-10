@@ -6,7 +6,7 @@ const {
   intArg,
   directiveType,
   stringArg,
-} = require("gqliteral");
+} = require("nexus");
 
 exports.CacheControl = directiveType("cacheControl", (t) => {
   t.int("maxAge");
@@ -114,7 +114,7 @@ exports.Mutation = objectType("Mutation", (t) => {
 
 /**
  * Example of using functions to mixin fields across types
- * @type {(t: import('gqliteral').core.ObjectTypeDef) => void}
+ * @type {(t: import('nexus').core.ObjectTypeDef) => void}
  */
 const commonFields = (t) => {
   t.int("id", { description: "The SQL ID of this entry" });

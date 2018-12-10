@@ -18,18 +18,18 @@ Try it out in the [playground](../playground) to see what we mean!
 
 GraphQL Nexus requires that `graphql` it be installed as a peer dependency. It can be installed with either `npm` or `yarn`.
 
-`yarn add graphql-nexus graphql`
+`yarn add nexus graphql`
 
 or
 
-`npm i --save graphql-nexus graphql`
+`npm i --save nexus graphql`
 
 ## Building a Schema
 
 As documented in the [API reference](../api-reference) GraphQL Nexus provides a consistent, scalable approach to defining GraphQL types in code. Fields are referred to by their GraphQL defined name.
 
 ```js
-import { objectType, stringArg, fieldArg, makeSchema } from "graphql-nexus";
+import { objectType, stringArg, fieldArg, makeSchema } from "nexus";
 
 const Query = objectType("Query", (t) => {
   t.field("account", "Account", {

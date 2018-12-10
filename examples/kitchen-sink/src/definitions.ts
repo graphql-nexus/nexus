@@ -4,7 +4,7 @@ import {
   enumType,
   scalarType,
   interfaceType,
-} from "graphql-nexus";
+} from "nexus";
 
 export const Bar = interfaceType("Bar", (t) => {
   t.boolean("ok");

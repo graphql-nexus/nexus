@@ -1,9 +1,9 @@
 // language-ts-graphql-tools
 window.addEventListener("load", function() {
   var codeToggles = document.getElementsByClassName("code-toggle");
-  const validLanguages = ["graphql-nexus", "graphqljs", "graphqltools"];
+  const validLanguages = ["nexus", "graphqljs", "graphqltools"];
   const languageLabels = {
-    graphql-nexus: "GraphQL Nexus",
+    nexus: "GraphQL Nexus",
     graphqljs: "GraphQL JS",
     graphqltools: "graphql-tools (Apollo)",
   };
@@ -11,7 +11,7 @@ window.addEventListener("load", function() {
     let preSibling = true;
     let currentNode = node;
     /**
-     * @type {Array<{language: 'graphql-nexus' | 'graphqljs' | 'graphqltools', node: Element}>}
+     * @type {Array<{language: 'nexus' | 'graphqljs' | 'graphqltools', node: Element}>}
      */
     const toggleNodes = [];
     while (preSibling) {
@@ -41,7 +41,7 @@ window.addEventListener("load", function() {
             );
             break;
           }
-          if (language !== "graphql-nexus") {
+          if (language !== "nexus") {
             currentNode.style.display = "none";
           }
           const button = document.createElement("button");

@@ -1,4 +1,4 @@
-import { objectType, stringArg } from "graphql-nexus";
+import { objectType, stringArg } from "nexus";
 import ts from "typescript";
 import fs from "fs-extra";
 

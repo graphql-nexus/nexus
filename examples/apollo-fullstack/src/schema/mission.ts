@@ -1,4 +1,4 @@
-import { objectType, enumType, arg } from "graphql-nexus";
+import { objectType, enumType, arg } from "nexus";
 
 export const Mission = objectType("Mission", (t) => {
   t.string("name", { nullable: true });

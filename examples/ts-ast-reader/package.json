@@ -7,7 +7,7 @@
   "dependencies": {
     "apollo-server": "^2.2.5",
     "fs-extra": "^7.0.1",
-    "graphql-nexus": "0.1.0",
+    "nexus": "0.5.0",
     "graphql": "^14.0.2",
     "ts-node-dev": "1.0.0-pre.31",
     "typescript": "3.2.0-rc"

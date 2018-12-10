@@ -14,7 +14,7 @@ const siteConfig = {
   tagline:
     "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
   // url: "https://tgriesser.com", // Your website URL
-  baseUrl: "/graphql-nexus/", // Base URL for your project */
+  baseUrl: "/nexus/", // Base URL for your project */
   noIndex: true,
 
   // algolia: {
@@ -24,7 +24,7 @@ const siteConfig = {
   // }
 
   // Used for publishing and more
-  projectName: "graphql-nexus",
+  projectName: "nexus",
   organizationName: "tgriesser",
 
   // For no header links in the top nav bar -> headerLinks: [],

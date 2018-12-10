@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { enumType } from "graphql-nexus";
+import { enumType } from "nexus";
 import { convertTsEnum } from "./utils";
 
 export const SyntaxKind = enumType("SyntaxKind", convertTsEnum(ts.SyntaxKind));

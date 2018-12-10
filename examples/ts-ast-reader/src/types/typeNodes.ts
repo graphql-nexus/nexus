@@ -1,4 +1,4 @@
-import { objectType } from "graphql-nexus";
+import { objectType } from "nexus";
 import { nodeType } from "./mixins";
 
 export const KeywordTypeNode = objectType("KeywordTypeNode", (t) => {

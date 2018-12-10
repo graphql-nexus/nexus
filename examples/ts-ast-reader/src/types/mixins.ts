@@ -1,4 +1,4 @@
-import { core } from "graphql-nexus";
+import { core } from "nexus";
 import typescript from "typescript";
 import { Gen } from "../ts-ast-reader-typegen";
 

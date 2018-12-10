@@ -50,7 +50,7 @@ export class Metadata {
   protected typeImports: string[] = [];
   protected typegenFile: string = "";
 
-  constructor(protected config: Types.Omit<Types.SchemaConfig, "types">) {
+  constructor(protected config: Types.BuilderConfig) {
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
       if (config.outputs.typegen) {
         this.typegenFile = assertAbsolutePath(
