@@ -3487,13 +3487,6 @@ graceful-fs@~1.2.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphql-nexus@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/graphql-nexus/-/graphql-nexus-0.1.0.tgz#26fc92c37b0b5cea50466f03dfd211c97a164cc5"
-  integrity sha512-+Nta2sPUVRYeXS9SuwvyVex9LLHRJLCPj3do48M5Bmb2yP+KfIhnBGSup9KKqutTDSbgxf9CwekKJRA1N+w7uw==
-  dependencies:
-    tslib "^1.9.3"
-
 graphql@^14.0.2:
   version "14.0.2"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.0.2.tgz#7dded337a4c3fd2d075692323384034b357f5650"
@@ -5022,6 +5015,13 @@ negotiator@0.6.1:
 neo-async@^2.5.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
+
+nexus@0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.5.0.tgz#9d72fac4a4a93351fbbcc70885a25952238f6456"
+  integrity sha512-weZcOr0M6dkMeB4n0LhPpaRmRz0GSaS0Y4IKWnrMdEobsZzaay+tnWpMfJA3lytcydVN0W8COfwqLjKs8sXDUg==
+  dependencies:
+    tslib "^1.9.3"
 
 nice-try@^1.0.4:
   version "1.0.5"

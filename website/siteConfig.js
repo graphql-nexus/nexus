@@ -40,8 +40,8 @@ const siteConfig = {
   // users,
 
   /* path to images for header/footer */
-  headerIcon: "img/graphql-nexus.png",
-  footerIcon: "img/graphql-nexus.png",
+  headerIcon: "img/nexus.png",
+  footerIcon: "img/nexus.png",
   favicon: "img/favicon.png",
 
   /* Colors for website */
@@ -76,13 +76,13 @@ const siteConfig = {
   scripts: [
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
-    "/graphql-nexus/js/api-docs.js",
-    "/graphql-nexus/js/code-block-buttons.js",
-    "/graphql-nexus/js/code-block-toggle.js",
+    "/nexus/js/api-docs.js",
+    "/nexus/js/code-block-buttons.js",
+    "/nexus/js/code-block-toggle.js",
   ],
   stylesheets: [
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.css",
-    "/graphql-nexus/css/code-block-buttons.css",
+    "/nexus/css/code-block-buttons.css",
   ],
 
   // On page navigation for the current documentation page.
@@ -91,8 +91,8 @@ const siteConfig = {
   cleanUrl: true,
 
   // Open Graph and Twitter card images.
-  ogImage: "img/graphql-nexus.png",
-  twitterImage: "img/graphql-nexus.png",
+  ogImage: "img/nexus.png",
+  twitterImage: "img/nexus.png",
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,

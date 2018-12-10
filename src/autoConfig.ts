@@ -120,7 +120,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
         const importPath = (path.isAbsolute(pathOrModule)
           ? relativePathTo(resolvedPath, outputPath)
           : pathOrModule
-        ).replace(/\.d?\.ts/, "");
+        ).replace(/(\.d)?\.ts/, "");
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(

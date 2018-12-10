@@ -60,7 +60,7 @@ files.forEach((file, i) => {
 
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
   `
-import * as nexus from 'graphql-nexus'
+import * as nexus from 'nexus'
 
 // Re-export these so we can use globally in the sandbox
 // while still preserving the typegen
