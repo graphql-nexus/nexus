@@ -34,8 +34,8 @@ export interface QueryEntryArgs {
 export type QueryFeedReturnType = MaybePromiseList<Entry_ReturnType>;
 
 export interface QueryFeedArgs {
-  limit?: number;
-  offset?: number;
+  limit?: null | number;
+  offset?: null | number;
   type: FeedType;
 }
 
@@ -72,8 +72,8 @@ export type EntryCommentCountReturnType = number;
 export type EntryCommentsReturnType = MaybePromiseList<Comment_ReturnType>;
 
 export interface EntryCommentsArgs {
-  limit?: number;
-  offset?: number;
+  limit?: null | number;
+  offset?: null | number;
 }
 
 export type EntryCreatedAtReturnType = number;

@@ -26,15 +26,15 @@ type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
 export type QueryLaunchReturnType = Launch_ReturnType;
 
 export interface QueryLaunchArgs {
-  count?: number;
+  count?: null | number;
   id: string;
 }
 
 export type QueryLaunchesReturnType = LaunchConnection_ReturnType;
 
 export interface QueryLaunchesArgs {
-  after?: string;
-  pageSize?: number;
+  after?: null | string;
+  pageSize?: null | number;
 }
 
 export type QueryMeReturnType = null | User_ReturnType;
@@ -60,7 +60,7 @@ export type Launch_ReturnType = t.Launch
 export type MissionMissionPatchReturnType = string;
 
 export interface MissionMissionPatchArgs {
-  size?: PatchSize;
+  size?: null | PatchSize;
 }
 
 export type MissionNameReturnType = null | string;
@@ -130,7 +130,7 @@ export interface MutationCancelTripArgs {
 export type MutationLoginReturnType = null | string;
 
 export interface MutationLoginArgs {
-  email?: string;
+  email?: null | string;
 }
 
 export type MutationRootType = {};

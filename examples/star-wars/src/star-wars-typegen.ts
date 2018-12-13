@@ -32,7 +32,7 @@ export interface QueryDroidArgs {
 export type QueryHeroReturnType = Character_ReturnType;
 
 export interface QueryHeroArgs {
-  episode?: Episode;
+  episode?: null | Episode;
 }
 
 export type QueryHumanReturnType = Human_ReturnType;

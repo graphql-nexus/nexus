@@ -46,7 +46,7 @@ export const Mutation = objectType("Mutation", (t) => {
     async resolve(_, { email }, { dataSources }) {
       const user = await dataSources.userAPI.findOrCreateUser({ email });
       if (user && email) {
-        return new Buffer(email).toString("base64");
+        return Buffer.from(email).toString("base64");
       }
       return null;
     },

@@ -2010,7 +2010,7 @@ export type HasJSDocRootType = ts.HasJSDoc;
 
 export type HasJSDoc_ReturnType = ts.HasJSDoc;
 
-export type MaybeOptionalRootType = MaybeOptionalRootType | MaybeOptionalRootType | MaybeOptionalRootType | MaybeOptionalRootType | MaybeOptionalRootType | MaybeOptionalRootType | MaybeOptionalRootType;
+export type MaybeOptionalRootType = ConstructorDeclarationRootType | FunctionDeclarationRootType | GetAccessorDeclarationRootType | MethodDeclarationRootType | PropertyDeclarationRootType | PropertySignatureRootType | SetAccessorDeclarationRootType;
 
 export type MaybeOptional_ReturnType = ConstructorDeclaration_ReturnType | FunctionDeclaration_ReturnType | GetAccessorDeclaration_ReturnType | MethodDeclaration_ReturnType | PropertyDeclaration_ReturnType | PropertySignature_ReturnType | SetAccessorDeclaration_ReturnType;
 

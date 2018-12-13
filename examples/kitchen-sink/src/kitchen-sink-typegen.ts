@@ -47,16 +47,16 @@ export type Foo_ReturnType = {
   ok: MaybeThunk<MaybePromise<boolean>>;
 }
 
-interface InputType {
-  answer?: number;
+export interface InputType {
+  answer?: null | number;
   key: string;
 }
 
-export type BarRootType = BarRootType;
+export type BarRootType = FooRootType;
 
 export type Bar_ReturnType = Foo_ReturnType;
 
-export type BazRootType = BazRootType;
+export type BazRootType = FooRootType;
 
 export type Baz_ReturnType = Foo_ReturnType;
 
@@ -106,7 +106,7 @@ export interface GraphQLNexusGenTypes {
     Int: any;
   };
   inputObjects: {
-    InputType: any;
+    InputType: InputType;
   };
   allInputTypes: 
     | Extract<keyof GraphQLNexusGenTypes['inputObjects'], string>

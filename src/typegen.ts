@@ -146,10 +146,10 @@ export async function buildTypeDefinitions(
         : `${typeStr}${inputTypeStr}[]`;
     }
     if (isInputObjectType(type) || isEnumType(type)) {
-      return type.name;
+      return `${typeStr}${type.name}`;
     }
     if (isScalarType(type)) {
-      return backingTypeMap[type.name] || "unknown";
+      return `${typeStr}${backingTypeMap[type.name] || "unknown"}`;
     }
     throw new Error(`Unexpected type ${type}`);
   };
@@ -337,7 +337,7 @@ export async function buildTypeDefinitions(
       typeNames.inputObjects.push(type.name);
       allTypeStrings.push(
         [
-          `interface ${type.name} {`,
+          `export interface ${type.name} {`,
           mapObj(type.getFields(), (inputField) =>
             printArgOrFieldMember(inputField)
           ).join("\n"),
@@ -467,7 +467,7 @@ export async function buildTypeDefinitions(
     }
     return [
       `{`,
-      map(typeNames.inputObjects, (n) => `    ${n}: any;`),
+      map(typeNames.inputObjects, (n) => `    ${n}: ${n};`),
       "  }",
     ].join("\n");
   };
