@@ -700,11 +700,12 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
-  if (typeof types === "function") {
-    addTypes(builder, types(builder));
-  }
   if (isWrappedTypeDef(types)) {
     types = types.type;
+    if (typeof types === "function") {
+      addTypes(builder, types(builder));
+      return;
+    }
   }
   if (isNamedTypeDef(types) || isNamedType(types)) {
     builder.addType(types);

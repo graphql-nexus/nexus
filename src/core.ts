@@ -706,12 +706,17 @@ export class DirectiveTypeDef<GenTypes = GraphQLNexusGen> {
 }
 
 /**
- * The `WrappedType` exists purely to signify that the value returned from
+ * The `WrappedType` exists to signify that the value returned from
  * the type construction APIs should not be used externally outside of the
- * builder function.
+ * builder function. It also is useful if you need the SchemaBuilder, in that
+ * it can take a function which is lazy-evaluated to build the type.
  */
 export class WrappedType {
   constructor(
-    readonly type: Types.NamedTypeDef | DirectiveTypeDef | GraphQLScalarType
+    readonly type:
+      | Types.NamedTypeDef
+      | DirectiveTypeDef
+      | GraphQLScalarType
+      | ((schema: SchemaBuilder) => WrappedType)
   ) {}
 }
