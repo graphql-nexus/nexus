@@ -438,7 +438,22 @@ export interface BuilderConfig extends Nullability {
     schema: GraphQLSchema,
     outputPath: string
   ) => TypegenInfo | PromiseLike<TypegenInfo>);
+  /**
+   * Either an absolute path to a .prettierrc file, or an object
+   * with relevant Prettier rules to be used on the generated output
+   */
+  prettierConfig?: string | object;
+  /**
+   * Manually apply a formatter to the generated content before saving,
+   * see the `prettierConfig` option if you want to use Prettier.
+   */
+  formatTypegen?: FormatTypegenFn;
 }
+
+export type FormatTypegenFn = (
+  content: string,
+  type: "types" | "schema"
+) => MaybePromise<string>;
 
 export interface SchemaConfig extends BuilderConfig {
   /**
@@ -606,7 +621,7 @@ export interface TypegenAutoConfigOptions {
    * If debug is set to true, this will log out info about all types
    * found, skipped, etc. for the type generation files.
    */
-  debug?: true;
+  debug?: boolean;
   /**
    * If provided this will be used for the backing types rather than the auto-resolve
    * mechanism above. Useful as an override for one-off cases, or for scalar

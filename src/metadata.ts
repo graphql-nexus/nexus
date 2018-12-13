@@ -18,6 +18,7 @@ import { assertAbsolutePath } from "./utils";
 import { buildTypeDefinitions } from "./typegen";
 import { typegenAutoConfig } from "./autoConfig";
 import { SCALAR_TYPES } from "./common";
+import { prettierFormat } from "./prettierFormat";
 
 export interface DirectiveUse {
   location: DirectiveLocationEnum;
@@ -206,9 +207,9 @@ export class Metadata {
       }
       const typegen = this.config.outputs.typegen;
       if (typegen) {
-        this.generateTypesFile(sortedSchema).then((value) => {
-          this.writeFile("types", value, typegen);
-        });
+        this.generateTypesFile(sortedSchema).then((value) =>
+          this.writeFile("types", value, typegen)
+        );
       }
     }
   }
@@ -221,16 +222,35 @@ export class Metadata {
     return sortedSchema;
   }
 
-  writeFile(name: string, output: string, filePath: string) {
+  writeFile(type: "schema" | "types", output: string, filePath: string) {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
-      throw new Error(
-        `Expected an absolute path to output the GraphQL Nexus ${name}, saw ${filePath}`
+      return Promise.reject(
+        new Error(
+          `Expected an absolute path to output the GraphQL Nexus ${type}, saw ${filePath}`
+        )
       );
     }
     const fs = require("fs") as typeof import("fs");
-    fs.writeFile(filePath, output, (err) => {
-      if (err) {
-        console.error(err);
+    const util = require("util") as typeof import("util");
+    const [readFile, writeFile] = [
+      util.promisify(fs.readFile),
+      util.promisify(fs.writeFile),
+    ];
+    let formatTypegen: Types.Maybe<Types.FormatTypegenFn> = null;
+    if (typeof this.config.formatTypegen === "function") {
+      formatTypegen = this.config.formatTypegen;
+    } else if (this.config.prettierConfig) {
+      formatTypegen = prettierFormat(this.config.prettierConfig);
+    }
+    const content = Promise.resolve(
+      typeof formatTypegen === "function" ? formatTypegen(output, type) : output
+    );
+    return Promise.all([
+      content,
+      readFile(filePath, "utf8").catch(() => ""),
+    ]).then(([toSave, existing]) => {
+      if (toSave !== existing) {
+        return writeFile(filePath, toSave);
       }
     });
   }
