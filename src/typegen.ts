@@ -480,16 +480,16 @@ declare global {
 }
 
 // Maybe Promise
-type ${MP}<T> = T | PromiseLike<T>;
+export type ${MP}<T> = T | PromiseLike<T>;
 
 // Maybe Promise List
-type ${MPL}<T> = Array<${MP}<T>>;
+export type ${MPL}<T> = Array<${MP}<T>>;
 
 // Maybe Thunk
-type ${MT}<T> = T | (() => T);
+export type ${MT}<T> = T | (() => T);
 
 // Maybe Thunk, with args
-type ${MTA}<T, A> = T | ((args?: A) => T);
+export type ${MTA}<T, A> = T | ((args?: A) => T);
 
 ${allTypeStrings.join("\n\n")}
 
