@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.6.2",
+  "version": "0.0.0-development",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -17,7 +17,8 @@
     "link-examples": "cd website && yarn && gulp link-examples",
     "unlink-examples": "cd website && yarn && gulp unlink-examples",
     "upgrade-deps": "cd website && yarn && gulp upgrade-deps",
-    "ts-ast-reader": "cd examples/ts-ast-reader && yarn start"
+    "ts-ast-reader": "cd examples/ts-ast-reader && yarn start",
+    "semantic-release": "semantic-release"
   },
   "files": [
     "src",
@@ -34,6 +35,7 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^3.0.2",
     "@types/graphql": "14.0.3",
     "@types/jest": "^23.3.7",
     "@types/node": "^10.12.2",
@@ -43,6 +45,7 @@
     "jest": "^23.6.0",
     "lint-staged": "^7.3.0",
     "prettier": "^1.14.3",
+    "semantic-release": "^15.13.2",
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
@@ -62,5 +65,9 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tanguyantoine/nexus.git"
   }
 }
