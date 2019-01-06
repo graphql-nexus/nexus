@@ -41,9 +41,7 @@
     "links": {
       "Docs": "Docs",
       "API": "API",
-      "Playground": "Playground",
-      "Compare": "Compare",
-      "Blog": "Blog"
+      "Playground": "Playground"
     },
     "categories": {
       "Documentation": "Documentation"

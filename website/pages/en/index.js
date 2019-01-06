@@ -73,7 +73,7 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
-            <Button href={pageUrl("blog/2018/11/04/introducing-graphql-nexus")}>
+            <Button href={pageUrl("blog/2018/11/04/introducing-nexus")}>
               Why Nexus?
             </Button>
             <Button href={pageUrl("api-reference", language)}>API Docs</Button>
@@ -103,19 +103,16 @@ const Features = () => (
       {
         content:
           "Utilize the full features of the language when building your schema",
-        image: imgUrl("graphql-nexus.png"),
         imageAlign: "top",
         title: "Feature One",
       },
       {
         content: "The content of my second feature",
-        image: imgUrl("graphql-nexus.png"),
         imageAlign: "top",
         title: "Type-Safe by Default",
       },
       {
         content: "The content of my second feature",
-        image: imgUrl("graphql-nexus.png"),
         imageAlign: "top",
         title: "Type-Safe by Default",
       },
@@ -150,7 +147,7 @@ const TryOut = () => (
     {[
       {
         content: "Talk about trying this out",
-        image: imgUrl("graphql-nexus.png"),
+        image: imgUrl("nexus.png"),
         imageAlign: "left",
         title: "Try it Out",
       },
@@ -163,7 +160,7 @@ const Description = () => (
     {[
       {
         content: "This is another description of how this project is useful",
-        image: imgUrl("graphql-nexus.png"),
+        image: imgUrl("nexus.png"),
         imageAlign: "right",
         title: "Description",
       },
@@ -204,14 +201,7 @@ class Index extends React.Component {
     return (
       <div>
         <HomeSplash language={language} />
-        <div className="mainContainer">
-          <Features />
-          <FeatureCallout />
-          <LearnHow />
-          <TryOut />
-          <Description />
-          <Showcase language={language} />
-        </div>
+        <Features />
       </div>
     );
   }

@@ -32,8 +32,6 @@ const siteConfig = {
     { doc: "getting-started", label: "Docs" },
     { page: "api-reference", label: "API" },
     { page: "playground", label: "Playground" },
-    { page: "comparison", label: "Compare" },
-    { blog: true, label: "Blog" },
   ],
 
   // If you have users set above, you add it here:

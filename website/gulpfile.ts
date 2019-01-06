@@ -65,7 +65,14 @@ gulp.task("core-tsc", () => {
 
 gulp.task(
   "start",
-  ["docusaurus", "webpack", "watch:api-types", "api-tsc", "core-tsc"],
+  [
+    "docusaurus",
+    "link-examples",
+    "webpack",
+    "watch:api-types",
+    "api-tsc",
+    "core-tsc",
+  ],
   () => {
     console.log("Server starting, please wait...");
     gulp.watch(path.join(__dirname, "siteConfig.js"), ["docusaurus"]);

@@ -14,7 +14,7 @@ module.exports = {
     playground: "./playground/index.tsx",
   },
   output: {
-    publicPath: "/graphql-nexus/playground-dist/",
+    publicPath: "/nexus/playground-dist/",
     filename: "[name].js",
     path: __dirname + "/static/playground-dist",
   },
@@ -43,6 +43,7 @@ module.exports = {
     }),
   ],
   externals: {
+    prettier: "empty",
     fs: "function() {}",
     clipboard: "ClipboardJS",
     react: "React",

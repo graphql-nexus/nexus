@@ -34,10 +34,7 @@ import { objectType, stringArg, fieldArg, makeSchema } from "nexus";
 const Query = objectType("Query", (t) => {
   t.field("account", "Account", {
     args: {
-      name: stringArg({
-        description:
-          "Providing the name of the account holder will search for accounts matching that name",
-      }),
+      name: stringArg(),
       status: fieldArg("StatusEnum"),
     },
   });

@@ -3,7 +3,8 @@
   "license": "MIT",
   "scripts": {
     "start": "gulp start",
-    "build": "docusaurus-build",
+    "build": "yarn && webpack && tsc -p api/tsconfig.json && docusaurus-build",
+    "build-webpack": "webpack",
     "publish-gh-pages": "docusaurus-publish",
     "write-translations": "docusaurus-write-translations",
     "version": "docusaurus-version",
