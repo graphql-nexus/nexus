@@ -282,23 +282,6 @@ export const ApiSidebar = () => {
             ))}
           </ul>
         </li>
-        <li>
-          <a href="#nullability-default-values">
-            Nullability &amp; Default Values
-          </a>
-        </li>
-        <li>
-          <a href="#resolving-property">Resolving: Property</a>
-        </li>
-        <li>
-          <a href="#type-mixing">Type Mixing</a>
-        </li>
-        <li>
-          <a href="#auto-generated-artifacts">Auto-Generated Artifacts</a>
-        </li>
-        <li>
-          <a href="#type-level-defaultresolver">Type-Level defaultResolver</a>
-        </li>
       </ul>
     </nav>
   );

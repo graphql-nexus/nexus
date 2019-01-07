@@ -6,13 +6,15 @@ sidebar_label: Getting Started
 
 Robust, composable type definition for GraphQL in TypeScript/JavaScript.
 
-GraphQL Nexus aims to combine the simplicity and ease of development of schema-first development approaches (like [graphql-tools](https://www.apollographql.com/docs/graphql-tools/generate-schema.html)) with the long-term maintainability of tools like [graphene-python](https://docs.graphene-python.org/en/latest/), or [graphql-ruby](https://github.com/rmosolgo/graphql-ruby), or [graphql-js](https://github.com/graphql/graphql-js).
+GraphQL Nexus aims to combine the simplicity and ease of development of SDL development approaches like [graphql-tools](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) with the long-term maintainability of programmatic construction, as seen in [graphene-python](https://docs.graphene-python.org/en/latest/), [graphql-ruby](https://github.com/rmosolgo/graphql-ruby), or [graphql-js](https://github.com/graphql/graphql-js).
 
-It builds upon the primitives of `graphql-js` and similar to the schema-first approach, utilizes the type names rather than concrete object references to build the schema. What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
+Nexus builds upon the primitives of `graphql-js`, and similar to the schema-first approach, utilizes the type names rather than concrete object references to build the schema.
+
+What this means is you won't end up with a ton of confusing imports just to build out your types, side-stepping the dreaded circular import problem.
 
 GraphQL Nexus was designed with TypeScript/JavaScript intellisense in mind, and combines TypeScript generics, conditional types, and type merging to provide full auto-generated type coverage out of the box.
 
-Try it out in the [playground](../playground) to see what we mean!
+Check out the [example projects](https://github.com/graphql-nexus/nexus/tree/develop/examples) to get some ideas of what this looks like in practice, or try it out in the [playground](../playground) to see what we mean!
 
 ## Installation
 
@@ -61,8 +63,10 @@ const Account = objectType("Account", (t) => {
   t.string("email");
 });
 
+const StatusEnum = enumType("StatusEnum", ["ACTIVE", "DISABLED"]);
+
 const schema = makeSchema({
-  types: [Account, Node, Query],
+  types: [Account, Node, Query, StatusEnum],
   // or types: { Account, Node, Query }
   // or types: [Account, [Node], { Query }]
   // This is intentionally a very permissive API :)

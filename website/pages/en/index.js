@@ -77,7 +77,7 @@ class HomeSplash extends React.Component {
               Why Nexus?
             </Button>
             <Button href={pageUrl("api-reference", language)}>API Docs</Button>
-            <Button href="https://github.com/tgriesser/nexus/tree/master/examples">
+            <Button href="https://github.com/graphql-nexus/nexus/tree/develop/examples">
               Examples
             </Button>
           </PromoSection>
@@ -101,20 +101,17 @@ const Features = () => (
   <Block layout="fourColumn">
     {[
       {
+        title: "",
         content:
           "Utilize the full features of the language when building your schema",
-        imageAlign: "top",
-        title: "Feature One",
       },
       {
-        content: "The content of my second feature",
-        imageAlign: "top",
         title: "Type-Safe by Default",
+        content: "The content of my second feature",
       },
       {
-        content: "The content of my second feature",
-        imageAlign: "top",
         title: "Type-Safe by Default",
+        content: "The content of my second feature",
       },
     ]}
   </Block>
@@ -201,7 +198,7 @@ class Index extends React.Component {
     return (
       <div>
         <HomeSplash language={language} />
-        <Features />
+        {/* <Features /> */}
       </div>
     );
   }

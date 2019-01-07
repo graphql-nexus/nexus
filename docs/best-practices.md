@@ -4,9 +4,11 @@ title: Best Practices
 sidebar_label: Best Practices
 ---
 
-A few tips when using GraphQL Nexus to build out a schema
+A few tips when using GraphQL Nexus to build out a schema:
 
 ## Configure your development server to auto-restart
+
+The development experience works best when you are using a tool like [Nodemon](https://github.com/remy/nodemon) to restart your application. as the schema changes. The GraphQL schema artifact will automatically regenerate when the server restarts in development mode.
 
 ## VSCode: Configuring a keyboard shortcut for "Go to Type Definition"
 

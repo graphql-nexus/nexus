@@ -1,7 +1,5 @@
 ---
-title: Introducing GraphQL Nexus
-author: Tim Griesser
-authorURL: http://twitter.com/tgriesser
+title: Why GraphQL Nexus
 ---
 
 ## Why GraphQL Nexus?
@@ -18,15 +16,6 @@ GraphQL Nexus aims to fill that void, making the process as simple as possible w
 
 The core idea of GraphQL Nexus draws from basing the schema off the SDL - it uses the type names as string literals rather than as imported to reference types! How can that be type safe, you might be wondering? By combining automatic type generation with some of the more powerful features of TypeScript - type merging, conditional types, and type inference, we can know exactly which type names we are able to use in which position. We can know both the parameters and the return type of resolvers without providing any type annotation.
 
-## Project Goals
-
-Developer experience.
-
 ## Non-Goals
 
 The project stays intentionally unopinionated on resolvers or the shape of a context object. It should be a tool you can layer on top of with higher level abstractions or opinions. When you have more information about a database
-
-## Further Reading
-
-- [Getting Started]()
-- [Simple Example API]()
