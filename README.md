@@ -1,5 +1,9 @@
 ## GraphQL Nexus
 
+```
+yarn add nexus # or npm install nexus
+```
+
 **(Still under construction, check [#1](https://github.com/graphql-nexus/nexus/issues/1) for the TODO List!)**
 
 Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript
