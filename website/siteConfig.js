@@ -38,6 +38,10 @@ const siteConfig = {
       href: "https://github.com/graphql-nexus/nexus/tree/develop/examples",
       label: "Examples",
     },
+    {
+      href: "https://github.com/graphql-nexus/nexus",
+      label: "GitHub",
+    },
   ],
 
   // If you have users set above, you add it here:
@@ -106,7 +110,7 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  //   repoUrl: 'https://github.com/facebook/test-site',
+  repoUrl: "https://github.com/graphql-nexus/nexus",
   separateCss: ["static/separate-css"],
 
   users,
