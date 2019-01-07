@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "dedent": "^0.7.0",
-    "nexus": "0.5.0",
     "graphql": "^14.0.2",
     "monaco-editor": "^0.15.5",
+    "nexus": "0.6.2",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2"
   },

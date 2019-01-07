@@ -14,7 +14,7 @@ const siteConfig = {
   tagline:
     "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
   // url: "https://tgriesser.com", // Your website URL
-  baseUrl: "/nexus/", // Base URL for your project */
+  baseUrl: "/", // Base URL for your project */
   noIndex: true,
 
   // algolia: {
@@ -32,6 +32,10 @@ const siteConfig = {
     { doc: "getting-started", label: "Docs" },
     { page: "api-reference", label: "API" },
     { page: "playground", label: "Playground" },
+    {
+      href: "https://github.com/graphql-nexus/nexus/tree/develop/examples",
+      label: "Examples",
+    },
   ],
 
   // If you have users set above, you add it here:
@@ -74,13 +78,13 @@ const siteConfig = {
   scripts: [
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
-    "/nexus/js/api-docs.js",
-    "/nexus/js/code-block-buttons.js",
-    "/nexus/js/code-block-toggle.js",
+    "/js/api-docs.js",
+    "/js/code-block-buttons.js",
+    "/js/code-block-toggle.js",
   ],
   stylesheets: [
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.css",
-    "/nexus/css/code-block-buttons.css",
+    "/css/code-block-buttons.css",
   ],
 
   // On page navigation for the current documentation page.

@@ -15,9 +15,9 @@
     "apollo-server": "2.2.0-alpha.2",
     "apollo-server-testing": "2.2.0-alpha.2",
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
-    "nexus": "0.5.0",
     "graphql": "^14.0.2",
     "isemail": "^3.2.0",
+    "nexus": "0.6.2",
     "sequelize": "^4.41.1",
     "sqlite3": "^4.0.4"
   },

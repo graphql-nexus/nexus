@@ -14,7 +14,7 @@ module.exports = {
     playground: "./playground/index.tsx",
   },
   output: {
-    publicPath: "/nexus/playground-dist/",
+    publicPath: "/playground-dist/",
     filename: "[name].js",
     path: __dirname + "/static/playground-dist",
   },

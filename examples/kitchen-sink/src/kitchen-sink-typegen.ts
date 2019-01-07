@@ -12,16 +12,16 @@ declare global {
 }
 
 // Maybe Promise
-type MaybePromise<T> = T | PromiseLike<T>;
+export type MaybePromise<T> = T | PromiseLike<T>;
 
 // Maybe Promise List
-type MaybePromiseList<T> = Array<MaybePromise<T>>;
+export type MaybePromiseList<T> = Array<MaybePromise<T>>;
 
 // Maybe Thunk
-type MaybeThunk<T> = T | (() => T);
+export type MaybeThunk<T> = T | (() => T);
 
 // Maybe Thunk, with args
-type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
+export type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
 
 export type QueryOkReturnType = boolean;
 
