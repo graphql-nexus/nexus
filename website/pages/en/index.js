@@ -76,7 +76,7 @@ class HomeSplash extends React.Component {
             {/* <Button href={pageUrl("blog/2018/11/04/introducing-nexus")}>
               Why Nexus?
             </Button> */}
-            <Button href={pageUrl("getting-started", language)}>
+            <Button href={pageUrl("docs/getting-started", language)}>
               Getting Started
             </Button>
             <Button href="https://github.com/graphql-nexus/nexus/tree/develop/examples">
