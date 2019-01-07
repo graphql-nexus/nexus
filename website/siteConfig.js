@@ -31,8 +31,7 @@ const siteConfig = {
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    { doc: "getting-started", label: "Docs" },
-    { page: "api-reference", label: "API" },
+    { doc: "getting-started", label: "Getting Started" },
     { page: "playground", label: "Playground" },
     {
       href: "https://github.com/graphql-nexus/nexus/tree/develop/examples",
