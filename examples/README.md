@@ -22,14 +22,14 @@ npm run examples
 
 ## Featured Example (TypeScript)
 
-- [ts-ast-reader](ts-ast-reader/README.md)
+- [ts-ast-reader](ts-ast-reader)
 
 ### JavaScript:
 
-- [githunt-api](githunt-api/README.md)
+- [githunt-api](githunt-api)
 
 ### TypeScript:
 
-- [apollo-fullstack](apollo-fullstack/README.md)
-- [star-wars](star-wars/README.md)
-- [kitchen-sink](kitchen-sink/README.md)
+- [apollo-fullstack](apollo-fullstack)
+- [star-wars](star-wars)
+- [kitchen-sink](kitchen-sink)

@@ -1,6 +1,6 @@
 ## GraphQL Nexus
 
-**(Still actively WIP, any feedback appreciated!)**
+**(Still under construction, check [#1](https://github.com/graphql-nexus/nexus/issues/1) for the TODO List!)**
 
 Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript
 
@@ -12,11 +12,7 @@ Check out the [`/examples`](/examples) for some sample uses.
 
 ### Docs
 
-Build them manually (for now)
-
-```
-yarn run website
-```
+[graphql-nexus.com](https://graphql-nexus.com)
 
 ### License
 
