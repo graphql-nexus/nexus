@@ -815,36 +815,35 @@ export type ConditionalOutputFieldOpts<
    * 1. If the field actually exists in the "root value"
    */
   FieldName extends keyof RootValue<GenTypes, TypeName>
-    ? /**
-       * 2. And the value of the root field is the expected type
-       */
-      RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
+  /**
+   * 2. And the value of the root field is the expected type
+   */
+    ? RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
         GenTypes,
         TypeName,
         FieldName
       >
-      /**
-       * Then the resolver is optional
-       */
-      ?
-          | []
+      ? /**
+         * Then the resolver is optional
+         */
+        | []
           | [OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
           | [OutputFieldResolver<GenTypes, TypeName, FieldName>]
-        /**
+      : /**
          * Otherwise, if it's the wrong type, then we need a resolver / default for this field
          */
-      :
-          | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
+        | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
           | [OutputFieldResolver<GenTypes, TypeName, FieldName>]
-      /**
+    : /**
        * The field doesn't even exist in the root type, we need a resolver
        */
-    :
-        | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
+      | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
         | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
 
 /**
- * The "Needs Resolver" output field opts means that the
+ * The "Needs Resolver" output field opts means that the resolver cannot
+ * be fulfilled by the "backing value" alone, and therefore needs either
+ * a valid resolver or a "root value".
  */
 export type NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName> =
   | (CommonOutputOpts & {
@@ -857,7 +856,8 @@ export type NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName> =
     });
 
 /**
- * If we already have the correct value for the field, then we
+ * If we already have the correct value for the field from the root type,
+ * then we can provide a resolver or a default value, but we don't have to.
  */
 export type OptionalResolverOutputFieldOpts<
   GenTypes,
