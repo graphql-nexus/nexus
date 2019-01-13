@@ -637,15 +637,15 @@ export interface TypegenAutoConfigOptions {
   backingTypeMap?: Record<string, string>;
 }
 
-/**
- * Generated type helpers:
- */
-
 export type TypeResolver<GenTypes, TypeName> = (
   root: RootValue<GenTypes, TypeName>,
   context: ContextValue<GenTypes>,
   info: GraphQLResolveInfo
 ) => MaybePromise<Maybe<InterfaceMembers<GenTypes, TypeName>>>;
+
+/**
+ * Generated type helpers:
+ */
 
 type GenTypesShapeKeys =
   | "context"
@@ -810,35 +810,24 @@ export type ConditionalOutputFieldOpts<
   GenTypes = any,
   TypeName = any,
   FieldName = any
-> =
-  /**
-   * 1. If the field actually exists in the "root value"
-   */
-  FieldName extends keyof RootValue<GenTypes, TypeName>
-  /**
-   * 2. And the value of the root field is the expected type
-   */
-    ? RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
-        GenTypes,
-        TypeName,
-        FieldName
-      >
-      ? /**
-         * Then the resolver is optional
-         */
-        | []
-          | [OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
-          | [OutputFieldResolver<GenTypes, TypeName, FieldName>]
-      : /**
-         * Otherwise, if it's the wrong type, then we need a resolver / default for this field
-         */
-        | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
-          | [OutputFieldResolver<GenTypes, TypeName, FieldName>]
-    : /**
-       * The field doesn't even exist in the root type, we need a resolver
-       */
-      | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
-        | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
+> = FieldName extends keyof RootValue<GenTypes, TypeName> // If the field actually exists in the "root value"
+  ? RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
+      GenTypes,
+      TypeName,
+      FieldName
+    > // And the value of the root field is the expected type
+    ? OptionalFieldResolver<GenTypes, TypeName, FieldName> // Then the resolver is optional
+    : NeedsFieldResolver<GenTypes, TypeName, FieldName> // Otherwise, if it's the wrong type, then we need a resolver / default for this field
+  : NeedsFieldResolver<GenTypes, TypeName, FieldName>; // The field doesn't even exist in the root type, we need a resolver
+
+export type OptionalFieldResolver<GenTypes, TypeName, FieldName> =
+  | []
+  | [OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
+  | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
+
+export type NeedsFieldResolver<GenTypes, TypeName, FieldName> =
+  | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
+  | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
 
 /**
  * The "Needs Resolver" output field opts means that the resolver cannot
