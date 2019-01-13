@@ -69,9 +69,9 @@ export class ObjectTypeDef<
    */
   id<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "ID", options);
+    this.field(name, "ID", ...opts);
   }
 
   /**
@@ -79,9 +79,9 @@ export class ObjectTypeDef<
    */
   int<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "Int", options);
+    this.field(name, "Int", ...opts);
   }
 
   /**
@@ -89,9 +89,9 @@ export class ObjectTypeDef<
    */
   float<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "Float", options);
+    this.field(name, "Float", ...opts);
   }
 
   /**
@@ -99,9 +99,9 @@ export class ObjectTypeDef<
    */
   string<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "String", options);
+    this.field(name, "String", ...opts);
   }
 
   /**
@@ -109,9 +109,9 @@ export class ObjectTypeDef<
    */
   boolean<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "Boolean", options);
+    this.field(name, "Boolean", ...opts);
   }
 
   /**
@@ -120,8 +120,14 @@ export class ObjectTypeDef<
   field<FieldName extends string>(
     name: FieldName,
     type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
+    if (typeof opts[0] === "function") {
+      options.resolve = opts[0];
+    } else {
+      options = { ...opts[0] };
+    }
     this.typeConfig.fields.push({
       item: Types.NodeType.FIELD,
       config: {
@@ -157,8 +163,8 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Used to modify a field already defined on an interface or
-   * abstract type.
+   * Used to modify a field already defined on an interface or mixed-in
+   * from another type.
    *
    * At this point the type will not change, but the resolver,
    * default, property, or description fields can.
@@ -417,9 +423,9 @@ export class InterfaceTypeDef<
    */
   id<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "ID", options);
+    this.field(name, "ID", ...opts);
   }
 
   /**
@@ -427,9 +433,9 @@ export class InterfaceTypeDef<
    */
   int<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "Int", options);
+    this.field(name, "Int", ...opts);
   }
 
   /**
@@ -437,9 +443,9 @@ export class InterfaceTypeDef<
    */
   float<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "Float", options);
+    this.field(name, "Float", ...opts);
   }
 
   /**
@@ -447,9 +453,9 @@ export class InterfaceTypeDef<
    */
   string<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "String", options);
+    this.field(name, "String", ...opts);
   }
 
   /**
@@ -457,9 +463,9 @@ export class InterfaceTypeDef<
    */
   boolean<FieldName extends string>(
     name: FieldName,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
-    this.field(name, "Boolean", options);
+    this.field(name, "Boolean", ...opts);
   }
 
   /**
@@ -468,8 +474,14 @@ export class InterfaceTypeDef<
   field<FieldName extends string>(
     name: FieldName,
     type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
-    options?: Types.OutputFieldOpts<GenTypes, TypeName, FieldName>
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
+    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
+    if (typeof opts[0] === "function") {
+      options.resolve = opts[0];
+    } else {
+      options = { ...opts[0] };
+    }
     this.typeConfig.fields.push({
       item: Types.NodeType.FIELD,
       config: {

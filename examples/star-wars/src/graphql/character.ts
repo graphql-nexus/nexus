@@ -14,7 +14,7 @@ export const Character = interfaceType("Character", (t) => {
   t.field("appearsIn", "Episode", {
     list: true,
     description: "Which movies they appear in.",
-    property: "appears_in",
+    resolve: (o) => o.appears_in,
     args: {
       id: idArg({ required: true }),
     },

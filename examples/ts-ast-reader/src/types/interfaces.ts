@@ -24,7 +24,7 @@ export const Node = interfaceType("Node", (t) => {
   t.field("name", "DeclarationName", { nullable: true });
   t.field("typeName", "DeclarationName", { nullable: true });
   t.field("kind", "SyntaxKind");
-  t.int("kindCode", { property: "kind" });
+  t.int("kindCode", (o) => o.kind);
   t.field("flags", "NodeFlags");
   // t.field('decorators', 'Decorator', {list: true, nullable: true})
   t.field("modifiers", "Token", {

@@ -39,11 +39,6 @@ export interface QueryFeedArgs {
   type: FeedType;
 }
 
-export interface QueryRootType {
-  currentUser: any;
-  entry?: null | any;
-}
-
 export type Query_ReturnType = {
   currentUser: MaybeThunk<MaybePromise<any>>;
   entry?: MaybeThunkArgs<MaybePromise<null | any>, QueryEntryArgs>;
@@ -94,7 +89,6 @@ export interface EntryRootType {
   commentCount: number;
   comments: any[];
   createdAt: number;
-  hot_score: number;
   id: number;
   postedBy?: null | any;
   repository: any;
@@ -106,7 +100,6 @@ export type Entry_ReturnType = {
   commentCount: MaybeThunk<MaybePromise<number>>;
   comments: MaybeThunkArgs<MaybePromise<any[]>, EntryCommentsArgs>;
   createdAt: MaybeThunk<MaybePromise<number>>;
-  hot_score: MaybeThunk<MaybePromise<number>>;
   id: MaybeThunk<MaybePromise<number>>;
   postedBy?: MaybeThunk<MaybePromise<null | any>>;
   repository: MaybeThunk<MaybePromise<any>>;
@@ -126,7 +119,6 @@ export type CommentRepoNameReturnType = string;
 
 export interface CommentRootType {
   content: string;
-  created_at: number;
   id: number;
   postedBy?: null | any;
   repoName: string;
@@ -134,7 +126,6 @@ export interface CommentRootType {
 
 export type Comment_ReturnType = {
   content: MaybeThunk<MaybePromise<string>>;
-  created_at: MaybeThunk<MaybePromise<number>>;
   id: MaybeThunk<MaybePromise<number>>;
   postedBy?: MaybeThunk<MaybePromise<null | any>>;
   repoName: MaybeThunk<MaybePromise<string>>;
@@ -206,12 +197,6 @@ export interface MutationVoteArgs {
   type: VoteType;
 }
 
-export interface MutationRootType {
-  submitComment: any;
-  submitRepository: any;
-  vote: any;
-}
-
 export type Mutation_ReturnType = {
   submitComment: MaybeThunkArgs<MaybePromise<any>, MutationSubmitCommentArgs>;
   submitRepository: MaybeThunkArgs<MaybePromise<any>, MutationSubmitRepositoryArgs>;
@@ -238,13 +223,13 @@ export interface GraphQLNexusGenArgTypes {
 }
 
 export interface GraphQLNexusGenRootTypes {
-  Query: QueryRootType;
+  Query: {};
   User: UserRootType;
   Entry: EntryRootType;
   Comment: CommentRootType;
   Repository: RepositoryRootType;
   Vote: VoteRootType;
-  Mutation: MutationRootType;
+  Mutation: {};
 }
 
 export interface GraphQLNexusGenReturnTypes {
@@ -306,13 +291,13 @@ export interface GraphQLNexusGenTypes {
     CacheControlScope: CacheControlScope;
   };
   objects: {
-    Query: QueryRootType;
+    Query: {};
     User: UserRootType;
     Entry: EntryRootType;
     Comment: CommentRootType;
     Repository: RepositoryRootType;
     Vote: VoteRootType;
-    Mutation: MutationRootType;
+    Mutation: {};
   };
   interfaces: {};
   unions: {};
