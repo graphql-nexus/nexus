@@ -806,28 +806,47 @@ export type DirectiveConfig<GenTypes, DirectiveName> = {
 // any of those can exist but they're not required.
 // -----
 
+// - If the field actually exists in the "root value"
+//  - If the value of the root field is the expected type, and the field isn't nullable
+//    - Then the resolver is optional
+//    - Else if it's the wrong type, then we need a resolver / default for this field
+// - Else field doesn't even exist in the root type, we need a resolver
 export type ConditionalOutputFieldOpts<
   GenTypes = any,
   TypeName = any,
   FieldName = any
-> = FieldName extends keyof RootValue<GenTypes, TypeName> // If the field actually exists in the "root value"
+> = FieldName extends keyof RootValue<GenTypes, TypeName>
   ? RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
       GenTypes,
       TypeName,
       FieldName
-    > // And the value of the root field is the expected type
-    ? OptionalFieldResolver<GenTypes, TypeName, FieldName> // Then the resolver is optional
-    : NeedsFieldResolver<GenTypes, TypeName, FieldName> // Otherwise, if it's the wrong type, then we need a resolver / default for this field
-  : NeedsFieldResolver<GenTypes, TypeName, FieldName>; // The field doesn't even exist in the root type, we need a resolver
+    >
+    ? OptionalOutputOpts<GenTypes, TypeName, FieldName>
+    : Extract<RootValueField<GenTypes, TypeName, FieldName>, null> extends null
+    ? OptionalOutputOpts<GenTypes, TypeName, FieldName>
+    : RequiredOutputOpts<GenTypes, TypeName, FieldName>
+  : RequiredOutputOpts<GenTypes, TypeName, FieldName>;
 
-export type OptionalFieldResolver<GenTypes, TypeName, FieldName> =
+export type OptionalOutputOpts<GenTypes, TypeName, FieldName> =
   | []
   | [OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
   | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
 
-export type NeedsFieldResolver<GenTypes, TypeName, FieldName> =
+export type RequiredOutputOpts<GenTypes, TypeName, FieldName> =
   | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
   | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
+
+export interface OutputWithDefaultOpts<GenTypes, TypeName, FieldName>
+  extends CommonOutputOpts {
+  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
+  default: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+}
+
+export interface OutputWithResolveOpts<GenTypes, TypeName, FieldName>
+  extends CommonOutputOpts {
+  resolve: OutputFieldResolver<GenTypes, TypeName, FieldName>;
+  default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+}
 
 /**
  * The "Needs Resolver" output field opts means that the resolver cannot
@@ -835,24 +854,15 @@ export type NeedsFieldResolver<GenTypes, TypeName, FieldName> =
  * a valid resolver or a "root value".
  */
 export type NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName> =
-  | (CommonOutputOpts & {
-      resolve: OutputFieldResolver<GenTypes, TypeName, FieldName>;
-      default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
-    })
-  | (CommonOutputOpts & {
-      resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
-      default: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
-    });
+  | OutputWithDefaultOpts<GenTypes, TypeName, FieldName>
+  | OutputWithResolveOpts<GenTypes, TypeName, FieldName>;
 
 /**
  * If we already have the correct value for the field from the root type,
  * then we can provide a resolver or a default value, but we don't have to.
  */
-export type OptionalResolverOutputFieldOpts<
-  GenTypes,
-  TypeName,
-  FieldName
-> = CommonOutputOpts & {
+export interface OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>
+  extends CommonOutputOpts {
   resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
   default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
-};
+}

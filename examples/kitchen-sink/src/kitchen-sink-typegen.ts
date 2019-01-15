@@ -25,9 +25,7 @@ export type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
 
 export type QueryBarReturnType = Bar_ReturnType;
 
-export type Query_ReturnType = {
-  bar: MaybeThunk<MaybePromise<any>>;
-}
+export type Query_ReturnType = {};
 
 export type BarOkReturnType = boolean;
 
