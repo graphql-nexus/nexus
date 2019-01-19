@@ -14,8 +14,7 @@ GraphQL Nexus was designed with TypeScript in mind. In order to fully typecheck 
 
 A **backing type** is a type representation of the value used to resolve the fields of an object type. In GraphQL terminology this is the `rootValue` for the object. Other tools like Prisma refer to this as a `model`.
 
-Whatever you want to call it, just think of it as the object that will be passed as the first argument of `resolve`. It can be a plain JS object, a database model, a mongoose document, a JS class, anything that fulfills the contract defined by the GraphQL object type, based on
-the field definitions.
+Whatever you want to call it, just think of it as the object that will be passed as the first argument of `resolve`. It can be a plain JS object, a database model, a mongoose document, a JS class, anything that fulfills the contract defined by the GraphQL object type, based on the field definitions.
 
 Scalars can also have backing types, representing the value they are parsed into.
 

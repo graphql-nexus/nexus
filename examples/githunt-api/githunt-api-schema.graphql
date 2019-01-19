@@ -10,8 +10,6 @@ enum CacheControlScope {
 type Comment {
   """The text of the comment"""
   content: String!
-
-  """A timestamp of when the comment was posted"""
   createdAt: Float!
 
   """The SQL ID of this entry"""

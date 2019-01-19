@@ -15,7 +15,6 @@ const siteConfig = {
     "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
   url: "https://graphql-nexus.com", // Your website URL
   baseUrl: "/", // Base URL for your project */
-  noIndex: true,
 
   gaTrackingId: "UA-39763513-4",
 

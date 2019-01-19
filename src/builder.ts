@@ -46,7 +46,7 @@ import {
   WrappedType,
 } from "./core";
 import * as Types from "./types";
-import { propertyFieldResolver, suggestionList, objValues } from "./utils";
+import { suggestionList, objValues } from "./utils";
 import { isObject } from "util";
 
 const isPromise = (val: any): val is Promise<any> =>
@@ -631,14 +631,7 @@ export class SchemaBuilder {
   ) {
     let resolver = typeConfig.defaultResolver || defaultFieldResolver;
     if (fieldOptions.resolve) {
-      if (typeof fieldOptions.property !== "undefined") {
-        console.warn(
-          `Both resolve and property should not be supplied, property will be ignored`
-        );
-      }
       resolver = fieldOptions.resolve;
-    } else if (fieldOptions.property) {
-      resolver = propertyFieldResolver(fieldOptions.property);
     }
     if (typeof fieldOptions.default !== "undefined") {
       resolver = withDefaultValue(resolver, fieldOptions.default);

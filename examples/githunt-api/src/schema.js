@@ -128,8 +128,7 @@ exports.Comment = objectType("Comment", (t) => {
   commonFields(t);
   t.description("A comment about an entry, submitted by a user");
   t.directive("cacheControl", { maxAge: 240 });
-  t.float("createdAt", {
-    property: "created_at",
+  t.float("createdAt", (o) => o.created_at, {
     description: "A timestamp of when the comment was posted",
   });
   t.string("content", {
@@ -159,7 +158,7 @@ exports.Entry = objectType("Entry", (t) => {
     description: "The score of this repository, upvotes - downvotes",
   });
   t.float("hotScore", {
-    property: "hot_score",
+    resolve: (o) => o.hot_score,
     description: "The hot score of this repository",
   });
   t.field("comments", "Comment", {

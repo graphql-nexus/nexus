@@ -1,10 +1,4 @@
-import {
-  objectType,
-  inputObjectType,
-  enumType,
-  scalarType,
-  interfaceType,
-} from "nexus";
+import { objectType, inputObjectType, interfaceType } from "nexus";
 
 export const Bar = interfaceType("Bar", (t) => {
   t.boolean("ok");
@@ -20,5 +14,11 @@ export const Foo = objectType("Foo", (t) => {
 
 export const InputType = inputObjectType("InputType", (t) => {
   t.string("key", { required: true });
-  t.int("answer", { default: "a" });
+  t.int("answer");
+});
+
+export const Query = objectType("Query", (t) => {
+  t.field("bar", "Bar", {
+    resolve: () => ({ ok: true }),
+  });
 });

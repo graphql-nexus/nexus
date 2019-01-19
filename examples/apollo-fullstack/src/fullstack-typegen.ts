@@ -39,8 +39,6 @@ export interface QueryLaunchesArgs {
 
 export type QueryMeReturnType = null | User_ReturnType;
 
-export type QueryRootType = {};
-
 export type Query_ReturnType = {};
 
 export type LaunchIdReturnType = string;
@@ -133,8 +131,6 @@ export interface MutationLoginArgs {
   email?: null | string;
 }
 
-export type MutationRootType = {};
-
 export type Mutation_ReturnType = {};
 
 export type TripUpdateResponseLaunchesReturnType = null | Launch_ReturnType;
@@ -171,13 +167,13 @@ export interface GraphQLNexusGenArgTypes {
 }
 
 export interface GraphQLNexusGenRootTypes {
-  Query: QueryRootType;
+  Query: {};
   Launch: LaunchRootType;
   Mission: MissionRootType;
   Rocket: RocketRootType;
   LaunchConnection: LaunchConnectionRootType;
   User: UserRootType;
-  Mutation: MutationRootType;
+  Mutation: {};
   TripUpdateResponse: TripUpdateResponseRootType;
 }
 
@@ -234,13 +230,13 @@ export interface GraphQLNexusGenTypes {
     PatchSize: PatchSize;
   };
   objects: {
-    Query: QueryRootType;
+    Query: {};
     Launch: LaunchRootType;
     Mission: MissionRootType;
     Rocket: RocketRootType;
     LaunchConnection: LaunchConnectionRootType;
     User: UserRootType;
-    Mutation: MutationRootType;
+    Mutation: {};
     TripUpdateResponse: TripUpdateResponseRootType;
   };
   interfaces: {};

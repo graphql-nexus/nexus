@@ -124,17 +124,6 @@ export class Metadata {
     );
   }
 
-  hasPropertyResolver(type: GraphQLObjectType, fieldName: string) {
-    if (this.isInterfaceField(type, fieldName)) {
-      //
-    }
-    return Boolean(
-      this.objectFieldMeta[type.name] &&
-        this.objectFieldMeta[type.name][fieldName] &&
-        this.objectFieldMeta[type.name][fieldName].property
-    );
-  }
-
   hasDefaultValue(type: GraphQLObjectType, fieldName: string) {
     return Boolean(
       this.objectFieldMeta[type.name] &&
@@ -153,15 +142,6 @@ export class Metadata {
   isInterfaceField(type: GraphQLObjectType, fieldName: string) {
     return Boolean(
       type.getInterfaces().forEach((i) => i.getFields()[fieldName])
-    );
-  }
-
-  // Type Genreation Helpers:
-
-  getPropertyResolver(type: GraphQLObjectType, fieldName: string) {
-    return (
-      this.objectFieldMeta[type.name] &&
-      this.objectFieldMeta[type.name][fieldName].property
     );
   }
 

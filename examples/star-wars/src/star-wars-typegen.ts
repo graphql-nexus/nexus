@@ -41,8 +41,6 @@ export interface QueryHumanArgs {
   id: string;
 }
 
-export type QueryRootType = {};
-
 export type Query_ReturnType = {};
 
 export type DroidAppearsInReturnType = MaybePromiseList<Episode>;
@@ -116,7 +114,7 @@ export interface GraphQLNexusGenArgTypes {
 
 export interface GraphQLNexusGenRootTypes {
   Character: CharacterRootType;
-  Query: QueryRootType;
+  Query: {};
   Droid: DroidRootType;
   Human: HumanRootType;
 }
@@ -159,7 +157,7 @@ export interface GraphQLNexusGenTypes {
     MoreEpisodes: MoreEpisodes;
   };
   objects: {
-    Query: QueryRootType;
+    Query: {};
     Droid: DroidRootType;
     Human: HumanRootType;
   };

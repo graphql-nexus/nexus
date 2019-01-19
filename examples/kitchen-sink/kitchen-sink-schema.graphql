@@ -19,5 +19,5 @@ input InputType {
 }
 
 type Query {
-  ok: Boolean!
+  bar: Bar!
 }

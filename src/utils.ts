@@ -1,10 +1,4 @@
-import {
-  GraphQLFieldResolver,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  isUnionType,
-} from "graphql";
+import { GraphQLObjectType, GraphQLInterfaceType } from "graphql";
 import path from "path";
 import * as Types from "./types";
 
@@ -42,28 +36,6 @@ export const hasField = (
   fieldName: string
 ) => {
   return Boolean(type.getFields()[fieldName]);
-};
-
-/**
- * If a resolve function is not given, then a default resolve behavior is used
- * which takes the property of the source object of the same name as the field
- * and returns it as the result, or if it's a function, returns the result
- * of calling that function while passing along args and context value.
- */
-export const propertyFieldResolver = (
-  key: string
-): GraphQLFieldResolver<any, any> => {
-  return function(source, args, contextValue, info) {
-    // ensure source is a value for which property access is acceptable.
-    if (typeof source === "object" || typeof source === "function") {
-      // TODO: Maybe warn here if key doesn't exist on source?
-      const property = source[key];
-      if (typeof property === "function") {
-        return source[key](args, contextValue, info);
-      }
-      return property;
-    }
-  };
 };
 
 // ----------------------------

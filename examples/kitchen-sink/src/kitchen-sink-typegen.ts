@@ -23,15 +23,9 @@ export type MaybeThunk<T> = T | (() => T);
 // Maybe Thunk, with args
 export type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
 
-export type QueryOkReturnType = boolean;
+export type QueryBarReturnType = Bar_ReturnType;
 
-export interface QueryRootType {
-  ok: boolean;
-}
-
-export type Query_ReturnType = {
-  ok: MaybeThunk<MaybePromise<boolean>>;
-}
+export type Query_ReturnType = {};
 
 export type BarOkReturnType = boolean;
 
@@ -66,13 +60,13 @@ export interface GraphQLNexusGenArgTypes {
 export interface GraphQLNexusGenRootTypes {
   Bar: BarRootType;
   Baz: BazRootType;
-  Query: QueryRootType;
+  Query: {};
   Foo: FooRootType;
 }
 
 export interface GraphQLNexusGenReturnTypes {
   Query: {
-    ok: QueryOkReturnType;
+    bar: QueryBarReturnType;
   };
   Bar: {
     ok: BarOkReturnType;
@@ -92,7 +86,7 @@ export interface GraphQLNexusGenTypes {
   context: unknown;
   enums: {};
   objects: {
-    Query: QueryRootType;
+    Query: {};
     Foo: FooRootType;
   };
   interfaces: {

@@ -6,6 +6,6 @@ export const Human = objectType("Human", (t) => {
   t.string("homePlanet", {
     nullable: true,
     description: "The home planet of the human, or null if unknown.",
-    property: "home_planet",
+    resolve: (o) => o.home_planet || null,
   });
 });

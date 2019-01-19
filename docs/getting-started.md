@@ -104,15 +104,15 @@ const AccountInfo = objectType("AccountInfo", (t) => {
 });
 ```
 
-## Resolving: Property
+## Resolving: Inline Function
 
-One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus provides a `property` option on the field configuration object, for conveniently accessing an object property without needing to define a resolver function.
+One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus makes this simple by allowing a function as the second parameter to the resolver function.
 
 ```ts
 const User = objectType("User", (t) => {
-  t.id("id", { property: "user_id" });
-  t.id("name", { property: "user_name" });
-  t.id("description", { property: "user_description" });
+  t.id("id", (o) => o.user_id);
+  t.id("name", (o) => o.user_name);
+  t.id("description", (o) => o.user_description);
 });
 ```
 

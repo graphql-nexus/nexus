@@ -30,8 +30,6 @@ export interface QueryParseFileArgs {
   file: string;
 }
 
-export type QueryRootType = {};
-
 export type Query_ReturnType = {};
 
 export type SourceFileEndReturnType = number;
@@ -2255,7 +2253,7 @@ export interface GraphQLNexusGenRootTypes {
   HasJSDoc: HasJSDocRootType;
   JSDocTag: JSDocTagRootType;
   MaybeOptional: MaybeOptionalRootType;
-  Query: QueryRootType;
+  Query: {};
   SourceFile: SourceFileRootType;
   Token: TokenRootType;
   BindingPattern: BindingPatternRootType;
@@ -3194,7 +3192,7 @@ export interface GraphQLNexusGenTypes {
     SyntaxKind: SyntaxKind;
   };
   objects: {
-    Query: QueryRootType;
+    Query: {};
     SourceFile: SourceFileRootType;
     Token: TokenRootType;
     BindingPattern: BindingPatternRootType;

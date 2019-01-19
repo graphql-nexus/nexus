@@ -1,3 +1,5 @@
+import { Episode } from "../star-wars-typegen";
+
 /**
  * These are Flow types which correspond to the schema.
  * They represent the shape of the data visited during field resolution.
@@ -6,7 +8,7 @@ export interface CharacterFields {
   id: string;
   name: string;
   friends: string[];
-  appears_in: number[];
+  appears_in: Episode[];
 }
 
 export interface Human extends CharacterFields {

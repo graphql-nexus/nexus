@@ -116,7 +116,12 @@ export async function buildTypeDefinitions(
     }
     return suffixed(type.name, "ReturnType");
   };
-  const typeRootTypeName = (typeName: string) => suffixed(typeName, "RootType");
+  const typeRootTypeName = (typeName: string) => {
+    if (isEntryType(typeName)) {
+      return "{}";
+    }
+    return suffixed(typeName, "RootType");
+  };
   const fieldResolverName = (typeName: string, fieldName: string) =>
     suffixed(typeName, fieldName, "Resolver");
 
@@ -238,13 +243,13 @@ export async function buildTypeDefinitions(
       : isNonNullType(field.type)
       ? ":"
       : "?:";
-    if (metadata.hasPropertyResolver(type, field.name)) {
-      return `${metadata.getPropertyResolver(type, field.name)}${colon}`;
-    }
     return `${field.name}${colon}`;
   };
 
   const makeRootType = (type: GraphQLObjectType) => {
+    if (isEntryType(type.name)) {
+      return;
+    }
     if (backingTypeMap[type.name]) {
       allTypeStrings.push(
         `export type ${typeRootTypeName(type.name)} = ${
@@ -529,6 +534,14 @@ export interface GraphQLNexusGenTypes {
 
 export type Gen = GraphQLNexusGenTypes;
 `;
+}
+
+function isEntryType(typeName: string) {
+  return (
+    typeName === "Query" ||
+    typeName === "Mutation" ||
+    typeName === "Subscription"
+  );
 }
 
 const stringify = (v: any) => JSON.stringify(v);
