@@ -34,6 +34,7 @@ import {
   isUnionType,
   GraphQLSchema,
   specifiedDirectives,
+  getNamedType,
 } from "graphql";
 import { Metadata } from "./metadata";
 import {
@@ -332,7 +333,31 @@ export class SchemaBuilder {
     typeConfig.fields.forEach((field) => {
       switch (field.item) {
         case Types.NodeType.MIX:
-          throw new Error("TODO");
+          const {
+            mixOptions: { pick, omit },
+            typeName,
+          } = field;
+          const objectToMix = this.getObjectType(typeName);
+          const objectToMixFieldMap = objectToMix.getFields();
+          for (let k in objectToMixFieldMap) {
+            const objectToMixFieldConfig = objectToMixFieldMap[k];
+            const objectToMixFieldName = objectToMixFieldConfig.name;
+            if (pick && pick.indexOf(objectToMixFieldName) === -1) {
+              continue;
+            }
+            if (omit && omit.indexOf(objectToMixFieldName) !== -1) {
+              continue;
+            }
+            fieldMap[objectToMixFieldName] = this.buildObjectField(
+              {
+                name: objectToMixFieldName,
+                type: getNamedType(objectToMixFieldConfig.type).name,
+              },
+              // TODO - remove reliance on protected property
+              // @ts-ignore
+              this.metadata.objectMeta[typeName]
+            );
+          }
           break;
         case Types.NodeType.FIELD:
           fieldMap[field.config.name] = this.buildObjectField(

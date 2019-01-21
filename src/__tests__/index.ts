@@ -139,18 +139,90 @@ describe("nexus", () => {
   });
 
   describe("objectType", () => {
-    const Account = objectType("Account", (t) => {
-      t.id("id", { description: "The ID of the account" });
-      t.string("name", { description: "Holder of the account" });
-      t.string("email", {
-        description: "The email of the person whos account this is",
+    it("builds an object", () => {
+      const Account = objectType("Account", (t) => {
+        t.id("id", { description: "The ID of the account" });
+        t.string("name", { description: "Holder of the account" });
+        t.string("email", {
+          description: "The email of the person whos account this is",
+        });
       });
+      const type = buildTypes<{ Account: GraphQLObjectType }>([Account]);
+      expect(Object.keys(type.typeMap.Account.getFields()).sort()).toEqual([
+        "email",
+        "id",
+        "name",
+      ]);
     });
-    const type = buildTypes<{ Account: GraphQLObjectType }>([Account]);
-    expect(Object.keys(type.typeMap.Account.getFields()).sort()).toEqual([
-      "email",
-      "id",
-      "name",
-    ]);
+
+    it("can mix objects", () => {
+      const Foo = objectType("Foo", (t) => {
+        t.string("foo");
+        t.string("bar");
+      });
+      const Account = objectType("Account", (t) => {
+        t.mix("Foo");
+        t.id("id");
+        t.string("name");
+        t.string("email");
+      });
+      const type = buildTypes<{
+        Account: GraphQLObjectType;
+        Foo: GraphQLObjectType;
+      }>([Account, Foo]);
+      expect(Object.keys(type.typeMap.Account.getFields()).sort()).toEqual([
+        "bar",
+        "email",
+        "foo",
+        "id",
+        "name",
+      ]);
+    });
+
+    it("can pick with mix", () => {
+      const Foo = objectType("Foo", (t) => {
+        t.string("foo");
+        t.string("bar");
+      });
+      const Account = objectType("Account", (t) => {
+        t.mix("Foo", { pick: ["foo"] });
+        t.id("id");
+        t.string("name");
+        t.string("email");
+      });
+      const type = buildTypes<{
+        Account: GraphQLObjectType;
+        Foo: GraphQLObjectType;
+      }>([Account, Foo]);
+      expect(Object.keys(type.typeMap.Account.getFields()).sort()).toEqual([
+        "email",
+        "foo",
+        "id",
+        "name",
+      ]);
+    });
+
+    it("can omit with mix", () => {
+      const Foo = objectType("Foo", (t) => {
+        t.string("foo");
+        t.string("bar");
+      });
+      const Account = objectType("Account", (t) => {
+        t.mix("Foo", { omit: ["foo"] });
+        t.id("id");
+        t.string("name");
+        t.string("email");
+      });
+      const type = buildTypes<{
+        Account: GraphQLObjectType;
+        Foo: GraphQLObjectType;
+      }>([Account, Foo]);
+      expect(Object.keys(type.typeMap.Account.getFields()).sort()).toEqual([
+        "bar",
+        "email",
+        "id",
+        "name",
+      ]);
+    });
   });
 });
