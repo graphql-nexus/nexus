@@ -269,13 +269,24 @@ export class SchemaBuilder {
           } = member;
           const enumToMix = this.getEnum(typeName);
           enumToMix.getValues().forEach((val) => {
-            if (pick && pick.indexOf(val.name) === -1) {
-              return;
+            let name = undefined;
+            if (pick) {
+              const match = pick.find((p) =>
+                typeof p === "object" ? p.name === val.name : p === val.name
+              );
+              if (!match) {
+                return;
+              }
+              if (typeof match === "object") {
+                name = match.alias;
+              } else {
+                name = match;
+              }
             }
             if (omit && omit.indexOf(val.name) !== -1) {
               return;
             }
-            values[val.name] = {
+            values[name || val.name] = {
               description: val.description,
               deprecationReason: val.deprecationReason,
               value: val.value,

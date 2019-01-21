@@ -107,7 +107,7 @@ export interface MixOmitOpts<TMembers> {
  * fields from the types you're mixing in.
  */
 export interface MixOpts<TMembers> {
-  pick?: Array<TMembers>;
+  pick?: Array<TMembers | { name: keyof TMembers; alias: string }>;
   omit?: Array<TMembers>;
 }
 

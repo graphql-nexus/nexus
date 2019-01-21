@@ -79,6 +79,26 @@ describe("nexus", () => {
       ).toEqual(["RED", "GREEN"]);
     });
 
+    it("can pick with mix and alias", () => {
+      const FavoriteColors = enumType<any>("FavoriteColors", (t) => {
+        t.mix("RainbowColors", {
+          pick: ["RED", { name: "GREEN", alias: "GREEN_ALIAS" }],
+        });
+      });
+      const types = buildTypes<{ FavoriteColors: GraphQLEnumType }>([
+        PrimaryColors,
+        RainbowColors,
+        FavoriteColors,
+      ]);
+      expect(types.typeMap.FavoriteColors).toBeInstanceOf(GraphQLEnumType);
+      expect(
+        types.typeMap.FavoriteColors.getValues().map((v) => v.name)
+      ).toEqual(["RED", "GREEN_ALIAS"]);
+      expect(
+        types.typeMap.FavoriteColors.getValues().map((v) => v.value)
+      ).toEqual(["RED", "GREEN"]);
+    });
+
     it("can map internal values", () => {
       const Internal = enumType("Internal", (t) => {
         t.members([
