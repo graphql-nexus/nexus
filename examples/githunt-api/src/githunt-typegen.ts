@@ -8,7 +8,7 @@
 
 
 declare global {
-  interface GraphQLNexusGen extends GraphQLNexusGenTypes {}
+  interface NexusGen extends NexusGenTypes {}
 }
 
 // Maybe Promise
@@ -207,7 +207,7 @@ export type VoteType = "CANCEL" | "DOWN" | "UP";
 
 export type CacheControlScope = "PRIVATE" | "PUBLIC";
 
-export interface GraphQLNexusGenArgTypes {
+export interface NexusGenArgTypes {
   Query: {
     entry: QueryEntryArgs;
     feed: QueryFeedArgs;
@@ -222,7 +222,7 @@ export interface GraphQLNexusGenArgTypes {
   };
 }
 
-export interface GraphQLNexusGenRootTypes {
+export interface NexusGenRootTypes {
   Query: {};
   User: UserRootType;
   Entry: EntryRootType;
@@ -232,7 +232,7 @@ export interface GraphQLNexusGenRootTypes {
   Mutation: {};
 }
 
-export interface GraphQLNexusGenReturnTypes {
+export interface NexusGenReturnTypes {
   Query: {
     currentUser: QueryCurrentUserReturnType;
     entry: QueryEntryReturnType;
@@ -280,10 +280,10 @@ export interface GraphQLNexusGenReturnTypes {
   };
 }
 
-export interface GraphQLNexusGenTypes {
-  argTypes: GraphQLNexusGenArgTypes;
-  backingTypes: GraphQLNexusGenRootTypes;
-  returnTypes: GraphQLNexusGenReturnTypes;
+export interface NexusGenTypes {
+  argTypes: NexusGenArgTypes;
+  backingTypes: NexusGenRootTypes;
+  returnTypes: NexusGenReturnTypes;
   context: unknown;
   enums: {
     FeedType: FeedType;
@@ -309,15 +309,15 @@ export interface GraphQLNexusGenTypes {
   };
   inputObjects: {};
   allInputTypes: 
-    | Extract<keyof GraphQLNexusGenTypes['inputObjects'], string>
-    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
-    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
+    | Extract<keyof NexusGenTypes['inputObjects'], string>
+    | Extract<keyof NexusGenTypes['enums'], string>
+    | Extract<keyof NexusGenTypes['scalars'], string>;
   allOutputTypes: 
-    | Extract<keyof GraphQLNexusGenTypes['objects'], string>
-    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
-    | Extract<keyof GraphQLNexusGenTypes['unions'], string>
-    | Extract<keyof GraphQLNexusGenTypes['interfaces'], string>
-    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
+    | Extract<keyof NexusGenTypes['objects'], string>
+    | Extract<keyof NexusGenTypes['enums'], string>
+    | Extract<keyof NexusGenTypes['unions'], string>
+    | Extract<keyof NexusGenTypes['interfaces'], string>
+    | Extract<keyof NexusGenTypes['scalars'], string>;
 }
 
-export type Gen = GraphQLNexusGenTypes;
+export type Gen = NexusGenTypes;

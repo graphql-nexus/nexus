@@ -1,5 +1,4 @@
 import { core } from "nexus";
-import typescript from "typescript";
 import { Gen } from "../ts-ast-reader-typegen";
 
 export function withTypeArguments(t: core.ObjectTypeDef<Gen, any>) {

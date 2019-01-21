@@ -165,7 +165,7 @@ export class Metadata {
     this.checkMutable();
   }
 
-  addField(typeName: string, field: Types.FieldConfig) {
+  addField(typeName: string, field: Types.OutputFieldConfig) {
     this.checkMutable();
     this.objectFieldMeta[typeName] = this.objectFieldMeta[typeName] || {};
     this.objectFieldMeta[typeName][field.name] = field;

@@ -9,6 +9,8 @@ import {
   DirectiveLocationEnum,
   GraphQLObjectType,
   GraphQLDirective,
+  GraphQLFieldConfigMap,
+  Thunk,
 } from "graphql";
 import { dedent } from "./utils";
 import { SchemaBuilder, isNamedTypeDef } from "./builder";
@@ -26,25 +28,162 @@ export { SchemaBuilder, isNamedTypeDef, Metadata };
 export { typegenAutoConfig } from "./autoConfig";
 
 declare global {
-  interface GraphQLNexusGen {}
+  interface NexusGen {}
 }
 
 /**
- * Provided to the [objectType](#objectType) function, this
+ * Contains methods shared between `objectType`, `extendType`, and `interfaceType`
  */
-export class ObjectTypeDef<
-  GenTypes = GraphQLNexusGen,
+export class AbstractOutputObject<
+  GenTypes = NexusGen,
   TypeName extends string = any
 > {
+  protected typeConfig: Types.OutputObjectConfig;
+
+  constructor(readonly name: string) {
+    this.typeConfig = {
+      name,
+      fields: [],
+    };
+  }
+
+  /**
+   * Add an ID field type to the object schema.
+   */
+  id<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<
+      GenTypes,
+      TypeName,
+      FieldName,
+      string
+    >
+  ) {
+    this.field(name, "ID", ...opts);
+  }
+
+  /**
+   * Add an Int field type to the object schema.
+   */
+  int<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<
+      GenTypes,
+      TypeName,
+      FieldName,
+      number
+    >
+  ) {
+    this.field(name, "Int", ...opts);
+  }
+
+  /**
+   * Add a Float field type to the object schema.
+   */
+  float<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<
+      GenTypes,
+      TypeName,
+      FieldName,
+      number
+    >
+  ) {
+    this.field(name, "Float", ...opts);
+  }
+
+  /**
+   * Add a String field type to the object schema.
+   */
+  string<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<
+      GenTypes,
+      TypeName,
+      FieldName,
+      string
+    >
+  ) {
+    this.field(name, "String", ...opts);
+  }
+
+  /**
+   * Add a Boolean field type to the object schema.
+   */
+  boolean<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<
+      GenTypes,
+      TypeName,
+      FieldName,
+      boolean
+    >
+  ) {
+    this.field(name, "Boolean", ...opts);
+  }
+
+  /**
+   * Adds a new field to the object type
+   */
+  field<FieldName extends string>(
+    name: FieldName,
+    type:
+      | Types.AllOutputTypes<GenTypes>
+      | Types.WrappedOutput
+      | Types.BaseScalars,
+    ...opts: Types.ConditionalOutputFieldOpts<
+      GenTypes,
+      TypeName,
+      FieldName,
+      any
+    >
+  ) {
+    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
+    if (typeof opts[0] === "function") {
+      options.resolve = opts[0];
+    } else {
+      options = { ...opts[0] };
+    }
+    this.typeConfig.fields.push({
+      name,
+      type,
+      ...options,
+    });
+  }
+
+  protected addField(name: string, type: any, ...opts: any[]) {
+    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
+    if (typeof opts[0] === "function") {
+      options.resolve = opts[0];
+    } else {
+      options = { ...opts[0] };
+    }
+    this.typeConfig.fields.push({
+      name,
+      type,
+      ...options,
+    });
+  }
+}
+
+/**
+ * Container object for defining the `GraphQLObjectType`
+ */
+export class ObjectTypeDef<
+  GenTypes = NexusGen,
+  TypeName extends string = any
+> extends AbstractOutputObject<GenTypes, TypeName> {
   /**
    * All metadata about the object type
    */
   protected typeConfig: Types.ObjectTypeConfig;
 
   constructor(readonly name: string) {
+    super(name);
     this.typeConfig = {
       name,
       fields: [],
+      mixed: [],
       interfaces: [],
       directives: [],
       fieldModifications: {},
@@ -55,85 +194,10 @@ export class ObjectTypeDef<
    * Mixes in an existing field definition or object type
    * with the current type.
    */
-  mix(typeName: string, options?: Types.MixOpts<any>) {
-    this.typeConfig.fields.push({
-      item: Types.NodeType.MIX,
+  mix(typeName: string, options: Types.MixOpts<any> = {}) {
+    this.typeConfig.mixed.push({
       typeName,
-      mixOptions: options || {},
-    });
-  }
-
-  /**
-   * Add an ID field type to the object schema.
-   */
-  id<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "ID", ...opts);
-  }
-
-  /**
-   * Add an Int field type to the object schema.
-   */
-  int<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "Int", ...opts);
-  }
-
-  /**
-   * Add a Float field type to the object schema.
-   */
-  float<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "Float", ...opts);
-  }
-
-  /**
-   * Add a String field type to the object schema.
-   */
-  string<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "String", ...opts);
-  }
-
-  /**
-   * Add a Boolean field type to the object schema.
-   */
-  boolean<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "Boolean", ...opts);
-  }
-
-  /**
-   * Adds a new field to the object type
-   */
-  field<FieldName extends string>(
-    name: FieldName,
-    type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
-    if (typeof opts[0] === "function") {
-      options.resolve = opts[0];
-    } else {
-      options = { ...opts[0] };
-    }
-    this.typeConfig.fields.push({
-      item: Types.NodeType.FIELD,
-      config: {
-        name,
-        type,
-        ...options,
-      },
+      options,
     });
   }
 
@@ -170,7 +234,7 @@ export class ObjectTypeDef<
    */
   modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
     field: FieldName,
-    options: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName>
+    options: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName, any>
   ): void {
     this.typeConfig.fieldModifications[field as string] = options;
   }
@@ -204,10 +268,8 @@ export class ObjectTypeDef<
    * documentation's "Getting Started" section to learn
    * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
-   *
-   * @param nullability
    */
-  nullability(nullability: Types.NullabilityConfig): void {
+  nullability(config: Types.NullabilityConfig): void {
     if (this.typeConfig.nullability) {
       console.warn(
         `nullability has already been set for type ${
@@ -215,10 +277,13 @@ export class ObjectTypeDef<
         }, the previous value will be replaced`
       );
     }
-    this.typeConfig.nullability = nullability;
+    this.typeConfig.nullability = config;
   }
 
   /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLObjectType {
@@ -229,36 +294,33 @@ export class ObjectTypeDef<
 /**
  * Backing type for an enum member.
  */
-export class EnumTypeDef<GenTypes = GraphQLNexusGen> {
+export class EnumTypeDef<GenTypes = NexusGen> {
   protected typeConfig: Types.EnumTypeConfig;
 
   constructor(readonly name: string) {
     this.typeConfig = {
       name,
       members: [],
+      mixed: [],
       directives: [],
     };
   }
 
   mix<EnumName extends Types.EnumNames<GenTypes>>(
     typeName: EnumName,
-    options?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
+    options: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>> = {}
   ) {
-    this.typeConfig.members.push({
-      item: Types.NodeType.MIX,
+    this.typeConfig.mixed.push({
       typeName,
-      mixOptions: options || {},
+      options,
     });
   }
 
-  member(name: string, config?: Types.EnumMemberConfig) {
+  member(name: string, config: Types.EnumMemberConfig = {}) {
     this.typeConfig.members.push({
-      item: Types.NodeType.ENUM_MEMBER,
-      info: {
-        name,
-        value: name,
-        ...config,
-      },
+      name,
+      value: name,
+      ...config,
     });
   }
 
@@ -269,14 +331,11 @@ export class EnumTypeDef<GenTypes = GraphQLNexusGen> {
     info.forEach((member) => {
       if (typeof member === "string") {
         return this.typeConfig.members.push({
-          item: Types.NodeType.ENUM_MEMBER,
-          info: { name: member, value: member },
+          name: member,
+          value: member,
         });
       }
-      this.typeConfig.members.push({
-        item: Types.NodeType.ENUM_MEMBER,
-        info: member,
-      });
+      this.typeConfig.members.push(member);
     });
   }
 
@@ -301,6 +360,9 @@ export class EnumTypeDef<GenTypes = GraphQLNexusGen> {
   }
 
   /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLEnumType {
@@ -311,15 +373,13 @@ export class EnumTypeDef<GenTypes = GraphQLNexusGen> {
 /**
  * Configure the `GraphQLUnionType` definition
  */
-export class UnionTypeDef<
-  GenTypes = GraphQLNexusGen,
-  TypeName extends string = any
-> {
+export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
   protected typeConfig: Types.UnionTypeConfig;
 
   constructor(readonly name: string) {
     this.typeConfig = {
       name,
+      mixed: [],
       members: [],
       directives: [],
     };
@@ -333,13 +393,12 @@ export class UnionTypeDef<
    * trigger an error at build-time.
    */
   mix<UnionTypeName extends string>(
-    type: UnionTypeName,
-    options?: Types.MixOmitOpts<any>
+    typeName: UnionTypeName,
+    options: Types.MixOmitOpts<any> = {}
   ) {
-    this.typeConfig.members.push({
-      item: Types.NodeType.MIX,
-      typeName: type,
-      mixOptions: options || {},
+    this.typeConfig.mixed.push({
+      typeName,
+      options,
     });
   }
 
@@ -349,10 +408,7 @@ export class UnionTypeDef<
    */
   members(...types: Array<Types.ObjectNames<GenTypes>>) {
     types.forEach((typeName) => {
-      this.typeConfig.members.push({
-        item: Types.NodeType.UNION_MEMBER,
-        typeName,
-      });
+      this.typeConfig.members.push(typeName);
     });
   }
 
@@ -381,6 +437,9 @@ export class UnionTypeDef<
   }
 
   /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLUnionType {
@@ -388,107 +447,26 @@ export class UnionTypeDef<
   }
 }
 
+/**
+ * Container for the `GraphQLInterfaceType` definition
+ */
 export class InterfaceTypeDef<
-  GenTypes = GraphQLNexusGen,
+  GenTypes = NexusGen,
   TypeName extends string = any
-> {
+> extends AbstractOutputObject<GenTypes, TypeName> {
   /**
    * Metadata about the object type
    */
   protected typeConfig: Types.InterfaceTypeConfig;
 
   constructor(readonly name: string) {
+    super(name);
     this.typeConfig = {
       name,
       fields: [],
+      mixed: [],
       directives: [],
     };
-  }
-
-  /**
-   * Mixes in an existing field definition or object type
-   * with the current type.
-   */
-  mix(typeName: string, options?: Types.MixOpts<any>) {
-    this.typeConfig.fields.push({
-      item: Types.NodeType.MIX,
-      typeName,
-      mixOptions: options || {},
-    });
-  }
-
-  /**
-   * Add an ID field type to the object schema.
-   */
-  id<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "ID", ...opts);
-  }
-
-  /**
-   * Add an Int field type to the object schema.
-   */
-  int<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "Int", ...opts);
-  }
-
-  /**
-   * Add a Float field type to the object schema.
-   */
-  float<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "Float", ...opts);
-  }
-
-  /**
-   * Add a String field type to the object schema.
-   */
-  string<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "String", ...opts);
-  }
-
-  /**
-   * Add a Boolean field type to the object schema.
-   */
-  boolean<FieldName extends string>(
-    name: FieldName,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    this.field(name, "Boolean", ...opts);
-  }
-
-  /**
-   * Adds a new field to the object type
-   */
-  field<FieldName extends string>(
-    name: FieldName,
-    type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
-    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
-  ) {
-    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
-    if (typeof opts[0] === "function") {
-      options.resolve = opts[0];
-    } else {
-      options = { ...opts[0] };
-    }
-    this.typeConfig.fields.push({
-      item: Types.NodeType.FIELD,
-      config: {
-        name,
-        type,
-        ...options,
-      },
-    });
   }
 
   /**
@@ -521,6 +499,9 @@ export class InterfaceTypeDef<
   }
 
   /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLInterfaceType {
@@ -529,7 +510,7 @@ export class InterfaceTypeDef<
 }
 
 export class InputObjectTypeDef<
-  GenTypes = GraphQLNexusGen,
+  GenTypes = NexusGen,
   TypeName extends string = any
 > {
   protected typeConfig: Types.InputTypeConfig;
@@ -538,6 +519,7 @@ export class InputObjectTypeDef<
     this.typeConfig = {
       name,
       fields: [],
+      mixed: [],
       directives: [],
     };
   }
@@ -580,18 +562,15 @@ export class InputObjectTypeDef<
   /**
    * Adds a new field to the input object type
    */
-  field<FieldName extends string>(
-    name: FieldName,
+  field(
+    name: string,
     type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
     options?: Types.InputFieldOpts<GenTypes, TypeName>
   ) {
     this.typeConfig.fields.push({
-      item: Types.NodeType.FIELD,
-      config: {
-        name,
-        type,
-        ...options,
-      },
+      name,
+      type,
+      ...options,
     });
   }
 
@@ -632,6 +611,9 @@ export class InputObjectTypeDef<
   }
 
   /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLInputObjectType {
@@ -639,7 +621,7 @@ export class InputObjectTypeDef<
   }
 }
 
-export class DirectiveTypeDef<GenTypes = GraphQLNexusGen> {
+export class DirectiveTypeDef<GenTypes = NexusGen> {
   protected typeConfig: Types.DirectiveTypeConfig;
 
   constructor(readonly name: string) {
@@ -709,10 +691,54 @@ export class DirectiveTypeDef<GenTypes = GraphQLNexusGen> {
   }
 
   /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLDirective {
     return builder.directiveType(this.typeConfig);
+  }
+}
+
+/**
+ * Provided to the `extendType` function, the ExtendTypeDef
+ * is a container for all metadata about the type we're extending.
+ */
+export class ExtendTypeDef<
+  GenTypes = NexusGen,
+  TypeName extends string = any
+> extends AbstractOutputObject<GenTypes, TypeName> {
+  /**
+   * All metadata about the object type
+   */
+  protected typeConfig: Types.ExtendTypeConfig;
+
+  constructor(readonly name: string) {
+    super(name);
+    this.typeConfig = {
+      name,
+      fields: [],
+      interfaces: [],
+    };
+  }
+
+  /**
+   * Declare that an object type implements a particular interface,
+   * by providing the name of the interface
+   */
+  implements(...interfaceName: Types.AllInterfaces<GenTypes>[]) {
+    this.typeConfig.interfaces.push(...interfaceName);
+  }
+
+  /**
+   * Used internally in the construction of the types,
+   * this method should not be called in normal schema building.
+   *
+   * @internal
+   */
+  buildType(builder: SchemaBuilder): Thunk<GraphQLFieldConfigMap<any, any>> {
+    return builder.extendType(this.typeConfig);
   }
 }
 

@@ -13,7 +13,6 @@ import {
   GraphQLUnionType,
   isUnionType,
   isEnumType,
-  GraphQLNamedType,
   GraphQLField,
 } from "graphql";
 import { isInterfaceField, eachObj } from "./utils";

@@ -34,6 +34,7 @@ import {
   isUnionType,
   GraphQLSchema,
   specifiedDirectives,
+  Thunk,
 } from "graphql";
 import { Metadata } from "./metadata";
 import {
@@ -174,6 +175,14 @@ export class SchemaBuilder {
     });
   }
 
+  extendType(
+    config: Types.ExtendTypeConfig
+  ): Thunk<GraphQLFieldConfigMap<any, any>> {
+    return () => {
+      return {};
+    };
+  }
+
   objectType(config: Types.ObjectTypeConfig) {
     this.metadata.addObjectType(config);
     return new GraphQLObjectType({
@@ -181,18 +190,18 @@ export class SchemaBuilder {
       interfaces: () => config.interfaces.map((i) => this.getInterface(i)),
       description: config.description,
       fields: () => {
-        const interfaceFields: GraphQLFieldConfigMap<any, any> = {};
+        const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {};
         const allInterfaces = config.interfaces.map((i) =>
           this.getInterface(i)
         );
         allInterfaces.forEach((i) => {
-          const iFields = i.getFields();
+          const interfaceFields = i.getFields();
           // We need to take the interface fields and reconstruct them
           // this actually simplifies things becuase if we've modified
           // the field at all it needs to happen here.
-          Object.keys(iFields).forEach((iFieldName) => {
-            const { isDeprecated, args, ...rest } = iFields[iFieldName];
-            interfaceFields[iFieldName] = {
+          Object.keys(interfaceFields).forEach((iFieldName) => {
+            const { isDeprecated, args, ...rest } = interfaceFields[iFieldName];
+            interfaceFieldsMap[iFieldName] = {
               ...rest,
               args: args.reduce(
                 (result: GraphQLFieldConfigArgumentMap, arg) => {
@@ -206,7 +215,7 @@ export class SchemaBuilder {
           });
         });
         return {
-          ...interfaceFields,
+          ...interfaceFieldsMap,
           ...this.buildObjectFields(config),
         };
       },
@@ -255,34 +264,31 @@ export class SchemaBuilder {
   protected buildEnumMembers(config: Types.EnumTypeConfig) {
     let values: GraphQLEnumValueConfigMap = {};
     config.members.forEach((member) => {
-      switch (member.item) {
-        case Types.NodeType.ENUM_MEMBER:
-          values[member.info.name] = {
-            value: member.info.value,
-            description: member.info.description,
-          };
-          break;
-        case Types.NodeType.MIX:
-          const {
-            mixOptions: { pick, omit },
-            typeName,
-          } = member;
-          const enumToMix = this.getEnum(typeName);
-          enumToMix.getValues().forEach((val) => {
-            if (pick && pick.indexOf(val.name) === -1) {
-              return;
-            }
-            if (omit && omit.indexOf(val.name) !== -1) {
-              return;
-            }
-            values[val.name] = {
-              description: val.description,
-              deprecationReason: val.deprecationReason,
-              value: val.value,
-              // astNode: val.astNode,
-            };
-          });
-      }
+      values[member.name] = {
+        value: member.value,
+        description: member.description,
+      };
+    });
+    config.mixed.forEach((mixed) => {
+      const {
+        options: { pick, omit },
+        typeName,
+      } = mixed;
+      const enumToMix = this.getEnum(typeName);
+      enumToMix.getValues().forEach((val) => {
+        if (pick && pick.indexOf(val.name) === -1) {
+          return;
+        }
+        if (omit && omit.indexOf(val.name) !== -1) {
+          return;
+        }
+        values[val.name] = {
+          description: val.description,
+          deprecationReason: val.deprecationReason,
+          value: val.value,
+          // astNode: val.astNode,
+        };
+      });
     });
     if (!Object.keys(values).length) {
       throw new Error(
@@ -295,27 +301,23 @@ export class SchemaBuilder {
   protected buildUnionMembers(config: Types.UnionTypeConfig) {
     const unionMembers: GraphQLObjectType[] = [];
     config.members.forEach((member) => {
-      switch (member.item) {
-        case Types.NodeType.UNION_MEMBER:
-          unionMembers.push(this.getObjectType(member.typeName));
-          break;
-        case Types.NodeType.MIX:
-          const {
-            mixOptions: { pick, omit },
-            typeName,
-          } = member;
-          const unionToMix = this.getUnion(typeName);
-          unionToMix.getTypes().forEach((type) => {
-            if (pick && pick.indexOf(type.name) === -1) {
-              return;
-            }
-            if (omit && omit.indexOf(type.name) !== -1) {
-              return;
-            }
-            unionMembers.push(type);
-          });
-          break;
-      }
+      unionMembers.push(this.getObjectType(member));
+    });
+    config.mixed.forEach((mixed) => {
+      const {
+        options: { pick, omit },
+        typeName,
+      } = mixed;
+      const unionToMix = this.getUnion(typeName);
+      unionToMix.getTypes().forEach((type) => {
+        if (pick && pick.indexOf(type.name) === -1) {
+          return;
+        }
+        if (omit && omit.indexOf(type.name) !== -1) {
+          return;
+        }
+        unionMembers.push(type);
+      });
     });
     if (!Object.keys(unionMembers).length) {
       throw new Error(
@@ -330,17 +332,10 @@ export class SchemaBuilder {
   ): GraphQLFieldConfigMap<any, any> {
     const fieldMap: GraphQLFieldConfigMap<any, any> = {};
     typeConfig.fields.forEach((field) => {
-      switch (field.item) {
-        case Types.NodeType.MIX:
-          throw new Error("TODO");
-          break;
-        case Types.NodeType.FIELD:
-          fieldMap[field.config.name] = this.buildObjectField(
-            field.config,
-            typeConfig
-          );
-          break;
-      }
+      fieldMap[field.name] = this.buildObjectField(field, typeConfig);
+    });
+    typeConfig.mixed.forEach((mixed) => {
+      throw new Error("TODO");
     });
     return fieldMap;
   }
@@ -350,17 +345,10 @@ export class SchemaBuilder {
   ): GraphQLInputFieldConfigMap {
     const fieldMap: GraphQLInputFieldConfigMap = {};
     typeConfig.fields.forEach((field) => {
-      switch (field.item) {
-        case Types.NodeType.MIX:
-          throw new Error("TODO");
-          break;
-        case Types.NodeType.FIELD:
-          fieldMap[field.config.name] = this.buildInputObjectField(
-            field.config,
-            typeConfig
-          );
-          break;
-      }
+      fieldMap[field.name] = this.buildInputObjectField(field, typeConfig);
+    });
+    typeConfig.mixed.forEach((mixed) => {
+      throw new Error("TODO");
     });
     return fieldMap;
   }
@@ -438,7 +426,7 @@ export class SchemaBuilder {
 
   protected decorateOutputType(
     type: GraphQLOutputType,
-    fieldConfig: Types.FieldConfig,
+    fieldConfig: Types.FieldDef,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig
   ) {
     return this.decorateType(type, fieldConfig, typeConfig, false);
@@ -467,19 +455,19 @@ export class SchemaBuilder {
    */
   protected decorateType(
     type: GraphQLOutputType,
-    fieldConfig: Types.Omit<Types.FieldConfig, "type" | "default">,
+    fieldConfig: Types.Omit<Types.FieldDef, "type" | "default">,
     typeConfig: Types.ObjectTypeConfig | Types.InterfaceTypeConfig,
     isInput: false
   ): GraphQLOutputType;
   protected decorateType(
     type: GraphQLInputType,
-    fieldConfig: Types.Omit<Types.FieldConfig, "type" | "default">,
+    fieldConfig: Types.Omit<Types.FieldDef, "type" | "default">,
     typeConfig: Types.InputTypeConfig,
     isInput: true
   ): GraphQLInputType;
   protected decorateType(
     type: any,
-    fieldConfig: Types.Omit<Types.FieldConfig, "type" | "default">,
+    fieldConfig: Types.Omit<Types.FieldDef, "type" | "default">,
     typeConfig:
       | Types.ObjectTypeConfig
       | Types.InterfaceTypeConfig

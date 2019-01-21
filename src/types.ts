@@ -16,17 +16,30 @@ import {
   EnumTypeDef,
   UnionTypeDef,
   DirectiveTypeDef,
+  ExtendTypeDef,
+  WrappedType,
 } from "./core";
 import { Metadata } from "./metadata";
 
-export type Wrappable = NamedTypeDef | DirectiveTypeDef | GraphQLScalarType;
+export type WrappedOutput =
+  | WrappedType<NamedOutputTypeDef>
+  | WrappedType<GraphQLScalarType>;
 
-export type NamedTypeDef<GenTypes = any> =
+export type Wrappable =
+  | NamedTypeDef
+  | ExtendTypeDef<any, any>
+  | DirectiveTypeDef
+  | GraphQLScalarType;
+
+export type NamedOutputTypeDef<GenTypes = any> =
   | ObjectTypeDef<GenTypes, any>
-  | InputObjectTypeDef<GenTypes, any>
   | InterfaceTypeDef<GenTypes, any>
   | EnumTypeDef<GenTypes>
   | UnionTypeDef<GenTypes>;
+
+export type NamedTypeDef<GenTypes = any> =
+  | InputObjectTypeDef<GenTypes, any>
+  | NamedOutputTypeDef<GenTypes>;
 
 export enum NodeType {
   MIX = "MIX",
@@ -46,17 +59,11 @@ export type MaybeThunk<T> = T | (() => T);
 export type Maybe<T> = T | null;
 
 export type MixDef = {
-  item: NodeType.MIX;
   typeName: string;
-  mixOptions: MixOpts<any>;
+  options: MixOpts<any>;
 };
 
-export type FieldDef = {
-  item: NodeType.FIELD;
-  config: FieldConfig;
-};
-
-export type FieldConfig = InputFieldConfig | OutputFieldConfig;
+export type FieldDef = InputFieldConfig | OutputFieldConfig;
 
 export interface OutputFieldConfig extends OutputFieldOpts {
   name: string;
@@ -67,16 +74,6 @@ export interface InputFieldConfig extends InputFieldOpts {
   name: string;
   type: any;
 }
-
-export type FieldDefType = MixDef | FieldDef;
-
-export type EnumDefType =
-  | MixDef
-  | { item: NodeType.ENUM_MEMBER; info: EnumMemberInfo };
-
-export type UnionDefType =
-  | MixDef
-  | { item: NodeType.UNION_MEMBER; typeName: string };
 
 export interface EnumMemberInfo {
   name: string;
@@ -213,17 +210,20 @@ export interface CommonOutputOpts extends FieldOpts {
 export interface OutputFieldOpts<
   GenTypes = any,
   TypeName = any,
-  FieldName = any
+  FieldName = any,
+  ResolveFallback = any
 > extends CommonOutputOpts {
   /**
    * Resolver for the output field
    */
-  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
+  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>;
 
   /**
    * Default value for the field, if none is returned.
    */
-  default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+  default?: MaybeThunk<
+    ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>
+  >;
 
   // /**
   //  * Subscription for the output field.
@@ -231,17 +231,22 @@ export interface OutputFieldOpts<
   // subscribe?: OutputFieldResolver<GenTypes, TypeName, FieldName>
 }
 
-export type OutputFieldResolver<GenTypes, TypeName, FieldName> = (
+export type OutputFieldResolver<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> = (
   root: RootValue<GenTypes, TypeName>,
   args: ArgsValue<GenTypes, TypeName, FieldName>,
   context: ContextValue<GenTypes>,
   info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName>>;
+) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>>;
 
 /**
  * All properties that can be changed about a field
  */
-export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = {
+export type ModifyFieldOpts<GenTypes, TypeName, FieldName, ResolveFallback> = {
   /**
    * The description of the field, as defined in the GraphQL object definition.
    */
@@ -249,11 +254,13 @@ export type ModifyFieldOpts<GenTypes, TypeName, FieldName> = {
   /**
    * Resolver for the output field
    */
-  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
+  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>;
   /**
    * Default value for the field, if none is returned.
    */
-  default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+  default?: MaybeThunk<
+    ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>
+  >;
 };
 
 export interface InputFieldOpts<GenTypes = any, TypeName = any>
@@ -287,8 +294,16 @@ export interface ScalarOpts
   deprecation?: string | DeprecationInfo;
 }
 
+interface HasMixins {
+  mixed: MixDef[];
+}
+
 interface HasFields {
-  fields: FieldDefType[];
+  fields: FieldDef[];
+}
+
+interface HasInterfaces {
+  interfaces: string[];
 }
 
 interface HasDirectives {
@@ -325,15 +340,20 @@ export interface Nullability {
   nullability?: NullabilityConfig;
 }
 
-export interface EnumTypeConfig extends Named, HasDirectives, SharedTypeConfig {
-  members: EnumDefType[];
+export interface EnumTypeConfig
+  extends Named,
+    HasMixins,
+    HasDirectives,
+    SharedTypeConfig {
+  members: EnumMemberInfo[];
 }
 
 export interface UnionTypeConfig
   extends Named,
+    HasMixins,
     HasDirectives,
     SharedTypeConfig {
-  members: UnionDefType[];
+  members: string[];
   /**
    * Optionally provide a custom type resolver function. If one is not provided,
    * the default implementation will call `isTypeOf` on each implementing
@@ -342,9 +362,12 @@ export interface UnionTypeConfig
   resolveType?: TypeResolver<any, any>;
 }
 
+export interface OutputObjectConfig extends Named, HasFields {}
+
 export interface InputTypeConfig
   extends Named,
     HasFields,
+    HasMixins,
     HasDirectives,
     SharedTypeConfig,
     Nullability {}
@@ -352,19 +375,16 @@ export interface InputTypeConfig
 export interface ObjectTypeConfig
   extends Named,
     HasFields,
+    HasMixins,
+    HasInterfaces,
     HasDirectives,
     SharedTypeConfig,
     Nullability,
     DefaultResolver {
   /**
-   * All interfaces the object implements.
-   */
-  interfaces: string[];
-
-  /**
    * Any modifications to the field config
    */
-  fieldModifications: Record<string, ModifyFieldOpts<any, any, any>>;
+  fieldModifications: Record<string, ModifyFieldOpts<any, any, any, any>>;
 
   /**
    * An (optional) isTypeOf check for the object type
@@ -372,9 +392,7 @@ export interface ObjectTypeConfig
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
 }
 
-export interface AbstractTypeConfig {
-  fields: FieldConfig[];
-}
+export interface ExtendTypeConfig extends Named, HasFields, HasInterfaces {}
 
 export interface DirectiveTypeConfig extends Named {
   description?: string;
@@ -385,6 +403,7 @@ export interface DirectiveTypeConfig extends Named {
 export interface InterfaceTypeConfig
   extends Named,
     HasFields,
+    HasMixins,
     HasDirectives,
     SharedTypeConfig,
     Nullability,
@@ -771,14 +790,15 @@ export type ArgsValue<
 export type ResultValue<
   GenTypes,
   TypeName,
-  FieldName
+  FieldName,
+  ResolveFallback
 > = GenTypes extends GenTypesShape
   ? TypeName extends keyof GenTypes["returnTypes"]
     ? FieldName extends keyof GenTypes["returnTypes"][TypeName]
       ? GenTypes["returnTypes"][TypeName][FieldName]
-      : any
-    : any
-  : never;
+      : ResolveFallback
+    : ResolveFallback
+  : ResolveFallback;
 
 export type InputValue<GenTypes, TypeName> = any;
 // GenTypes extends GenTypesShape
@@ -816,40 +836,83 @@ export type DirectiveConfig<GenTypes, DirectiveName> = {
 //    - Else if it's the wrong type, then we need a resolver / default for this field
 // - Else field doesn't even exist in the root type, we need a resolver
 export type ConditionalOutputFieldOpts<
-  GenTypes = any,
-  TypeName = any,
-  FieldName = any
-> = FieldName extends keyof RootValue<GenTypes, TypeName>
-  ? RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
-      GenTypes,
-      TypeName,
-      FieldName
-    >
-    ? OptionalOutputOpts<GenTypes, TypeName, FieldName>
-    : Extract<RootValueField<GenTypes, TypeName, FieldName>, null> extends null
-    ? OptionalOutputOpts<GenTypes, TypeName, FieldName>
-    : RequiredOutputOpts<GenTypes, TypeName, FieldName>
-  : RequiredOutputOpts<GenTypes, TypeName, FieldName>;
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> = GenTypes extends GenTypesShape // If we actually have generated definitions
+  ? FieldName extends keyof RootValue<GenTypes, TypeName> // And the field name is in the root value
+    ? RootValueField<GenTypes, TypeName, FieldName> extends ResultValue<
+        GenTypes,
+        TypeName,
+        FieldName,
+        ResolveFallback
+      > // And the root value matches up with a valid value for the result
+      ? OptionalOutputOpts<GenTypes, TypeName, FieldName, ResolveFallback> // Then the result is optional
+      : Extract<
+          RootValueField<GenTypes, TypeName, FieldName>,
+          null
+        > extends null // If the root value can be null
+      ? OptionalOutputOpts<GenTypes, TypeName, FieldName, ResolveFallback> // Then it's also optional
+      : RequiredOutputOpts<GenTypes, TypeName, FieldName, ResolveFallback> // Otherwise it's required
+    : RequiredOutputOpts<GenTypes, TypeName, FieldName, ResolveFallback> // If it's not in the root value, it's required
+  : OptionalOutputOpts<GenTypes, TypeName, FieldName, ResolveFallback>; // If we don't have generated defs, it's optional
 
-export type OptionalOutputOpts<GenTypes, TypeName, FieldName> =
+export type OptionalOutputOpts<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> =
   | []
-  | [OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
-  | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
+  | [
+      OptionalResolverOutputFieldOpts<
+        GenTypes,
+        TypeName,
+        FieldName,
+        ResolveFallback
+      >
+    ]
+  | [OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>];
 
-export type RequiredOutputOpts<GenTypes, TypeName, FieldName> =
-  | [NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName>]
-  | [OutputFieldResolver<GenTypes, TypeName, FieldName>];
+export type RequiredOutputOpts<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> =
+  | [
+      NeedsResolverOutputFieldOpts<
+        GenTypes,
+        TypeName,
+        FieldName,
+        ResolveFallback
+      >
+    ]
+  | [OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>];
 
-export interface OutputWithDefaultOpts<GenTypes, TypeName, FieldName>
-  extends CommonOutputOpts {
-  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
-  default: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+export interface OutputWithDefaultOpts<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> extends CommonOutputOpts {
+  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>;
+  default: MaybeThunk<
+    ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>
+  >;
 }
 
-export interface OutputWithResolveOpts<GenTypes, TypeName, FieldName>
-  extends CommonOutputOpts {
-  resolve: OutputFieldResolver<GenTypes, TypeName, FieldName>;
-  default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+export interface OutputWithResolveOpts<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> extends CommonOutputOpts {
+  resolve: OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>;
+  default?: MaybeThunk<
+    ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>
+  >;
 }
 
 /**
@@ -857,16 +920,27 @@ export interface OutputWithResolveOpts<GenTypes, TypeName, FieldName>
  * be fulfilled by the "backing value" alone, and therefore needs either
  * a valid resolver or a "root value".
  */
-export type NeedsResolverOutputFieldOpts<GenTypes, TypeName, FieldName> =
-  | OutputWithDefaultOpts<GenTypes, TypeName, FieldName>
-  | OutputWithResolveOpts<GenTypes, TypeName, FieldName>;
+export type NeedsResolverOutputFieldOpts<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> =
+  | OutputWithDefaultOpts<GenTypes, TypeName, FieldName, ResolveFallback>
+  | OutputWithResolveOpts<GenTypes, TypeName, FieldName, ResolveFallback>;
 
 /**
  * If we already have the correct value for the field from the root type,
  * then we can provide a resolver or a default value, but we don't have to.
  */
-export interface OptionalResolverOutputFieldOpts<GenTypes, TypeName, FieldName>
-  extends CommonOutputOpts {
-  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName>;
-  default?: MaybeThunk<ResultValue<GenTypes, TypeName, FieldName>>;
+export interface OptionalResolverOutputFieldOpts<
+  GenTypes,
+  TypeName,
+  FieldName,
+  ResolveFallback
+> extends CommonOutputOpts {
+  resolve?: OutputFieldResolver<GenTypes, TypeName, FieldName, ResolveFallback>;
+  default?: MaybeThunk<
+    ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>
+  >;
 }

@@ -4,7 +4,7 @@ title: Type Generation Details
 sidebar_label: Type Generation Details
 ---
 
-This is relevant to JavaScript as well as TypeScript users, as tools like VSCode can utilize these types to aid in autocomplete. The goal is to have the best possible type coverage with the least possible manual type annotation.
+This is relevant to JavaScript as well as TypeScript users, as tools like VSCode can utilize these types to aid in autocomplete. A core goal of Nexus is to have the best possible type coverage with the least possible manual type annotation.
 
 ## Overview
 

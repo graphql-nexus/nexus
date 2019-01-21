@@ -73,8 +73,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
         // e.g. in the Playground, it doesn't break things.
 
         // Yeah, this doesn't exist in Node 6, but since this is a new
-        // lib and that's super close to EOL so if you really need it.
-        // open a PR :)
+        // lib and Node 6 is close to EOL so if you really need it, open a PR :)
         const fs = require("fs") as typeof import("fs");
         const util = require("util") as typeof import("util");
         const readFile = util.promisify(fs.readFile);

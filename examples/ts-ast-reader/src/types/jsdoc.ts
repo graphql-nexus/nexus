@@ -20,7 +20,7 @@ export const JSDocTag = interfaceType("JSDocTag", (t) => {
   });
 });
 
-const jsDocTag = (t: core.ObjectTypeDef<GraphQLNexusGen, any>) =>
+const jsDocTag = (t: core.ObjectTypeDef<NexusGen, any>) =>
   t.implements("JSDocTag");
 
 export const JSDocUnknownTag = objectType("JSDocUnknownTag", jsDocTag);
