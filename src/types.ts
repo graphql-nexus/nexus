@@ -7,6 +7,7 @@ import {
   DirectiveLocationEnum,
   GraphQLDirective,
   GraphQLSchema,
+  GraphQLScalarType,
 } from "graphql";
 import {
   ObjectTypeDef,
@@ -14,8 +15,11 @@ import {
   InterfaceTypeDef,
   EnumTypeDef,
   UnionTypeDef,
+  DirectiveTypeDef,
 } from "./core";
 import { Metadata } from "./metadata";
+
+export type Wrappable = NamedTypeDef | DirectiveTypeDef | GraphQLScalarType;
 
 export type NamedTypeDef<GenTypes = any> =
   | ObjectTypeDef<GenTypes, any>
@@ -441,10 +445,10 @@ export interface BuilderConfig extends Nullability {
    * A configuration function for advanced cases where
    * more control over the `TypegenInfo` is needed.
    */
-  typegenConfig?: ((
+  typegenConfig?: (
     schema: GraphQLSchema,
     outputPath: string
-  ) => TypegenInfo | PromiseLike<TypegenInfo>);
+  ) => TypegenInfo | PromiseLike<TypegenInfo>;
   /**
    * Either an absolute path to a .prettierrc file, or an object
    * with relevant Prettier rules to be used on the generated output

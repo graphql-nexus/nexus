@@ -9,7 +9,6 @@ import {
   DirectiveLocationEnum,
   GraphQLObjectType,
   GraphQLDirective,
-  GraphQLScalarType,
 } from "graphql";
 import { dedent } from "./utils";
 import { SchemaBuilder, isNamedTypeDef } from "./builder";
@@ -723,12 +722,6 @@ export class DirectiveTypeDef<GenTypes = GraphQLNexusGen> {
  * builder function. It also is useful if you need the SchemaBuilder, in that
  * it can take a function which is lazy-evaluated to build the type.
  */
-export class WrappedType {
-  constructor(
-    readonly type:
-      | Types.NamedTypeDef
-      | DirectiveTypeDef
-      | GraphQLScalarType
-      | ((schema: SchemaBuilder) => WrappedType)
-  ) {}
+export class WrappedType<T extends Types.Wrappable = any> {
+  constructor(readonly type: T | ((schema: SchemaBuilder) => T)) {}
 }

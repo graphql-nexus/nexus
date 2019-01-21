@@ -502,9 +502,9 @@ ${stringifyTypeFieldMapping("GraphQLNexusGenArgTypes", argTypeFields)}
 
 export interface GraphQLNexusGenRootTypes {
 ${map(
-    typeNames.interfaces.concat(typeNames.objects),
-    (name) => `  ${name}: ${typeRootTypeName(name)};`
-  )}
+  typeNames.interfaces.concat(typeNames.objects),
+  (name) => `  ${name}: ${typeRootTypeName(name)};`
+)}
 }
 
 ${stringifyTypeFieldMapping("GraphQLNexusGenReturnTypes", returnTypeFields)}
