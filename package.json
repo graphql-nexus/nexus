@@ -2,7 +2,7 @@
   "name": "nexus",
   "version": "0.7.0-alpha.1",
   "main": "dist",
-  "types": "src",
+  "types": "dist",
   "license": "MIT",
   "description": "Scalable, strongly typed GraphQL schema development",
   "scripts": {
