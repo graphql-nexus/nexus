@@ -501,9 +501,9 @@ ${stringifyTypeFieldMapping("NexusGenArgTypes", argTypeFields)}
 
 export interface NexusGenRootTypes {
 ${map(
-    typeNames.interfaces.concat(typeNames.objects),
-    (name) => `  ${name}: ${typeRootTypeName(name)};`
-  )}
+  typeNames.interfaces.concat(typeNames.objects),
+  (name) => `  ${name}: ${typeRootTypeName(name)};`
+)}
 }
 
 ${stringifyTypeFieldMapping("NexusGenReturnTypes", returnTypeFields)}
