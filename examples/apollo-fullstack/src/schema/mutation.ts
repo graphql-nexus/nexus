@@ -56,5 +56,5 @@ export const Mutation = objectType("Mutation", (t) => {
 export const TripUpdateResponse = objectType("TripUpdateResponse", (t) => {
   t.boolean("success");
   t.string("message", { nullable: true });
-  t.field("launches", "Launch", { nullable: true });
+  t.field("launches", "Launch", { nullable: true, list: true });
 });

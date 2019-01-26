@@ -125,15 +125,10 @@ export abstract class AbstractOutputMethods<
   field<FieldName extends string>(
     name: FieldName,
     type:
-      | Types.AllOutputTypes<GenTypes>
+      | Types.GetGen<GenTypes, "allOutputTypes">
       | Types.WrappedOutput
       | Types.BaseScalars,
-    ...opts: Types.ConditionalOutputFieldOpts<
-      GenTypes,
-      TypeName,
-      FieldName,
-      any
-    >
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
     if (typeof opts[0] === "function") {
@@ -201,7 +196,7 @@ export class ObjectTypeDef<
    * Declare that an object type implements a particular interface,
    * by providing the name of the interface
    */
-  implements(...interfaceName: Types.AllInterfaces<GenTypes>[]) {
+  implements(...interfaceName: Types.GetGen<GenTypes, "interfaceNames">[]) {
     this.typeConfig.interfaces.push(...interfaceName);
   }
 
@@ -221,7 +216,12 @@ export class ObjectTypeDef<
    * At this point the type will not change, but the resolver,
    * default, property, or description fields can.
    */
-  modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
+  modify<
+    FieldName extends Extract<
+      keyof Types.GetGen2<GenTypes, "returnTypes", TypeName>,
+      string
+    >
+  >(
     field: FieldName,
     options: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName, any>
   ): void {
@@ -234,7 +234,7 @@ export class ObjectTypeDef<
   defaultResolver(
     resolverFn: GraphQLFieldResolver<
       Types.RootValue<GenTypes, TypeName>,
-      Types.ContextValue<GenTypes>
+      Types.GetGen<GenTypes, "context">
     >
   ): void {
     this.typeConfig.defaultResolver = resolverFn;
@@ -279,7 +279,7 @@ export class EnumTypeDef<GenTypes = NexusGen> {
     };
   }
 
-  mix<EnumName extends Types.EnumNames<GenTypes>>(
+  mix<EnumName extends Types.GetGen<GenTypes, "enumNames">>(
     typeName: EnumName,
     options: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>> = {}
   ) {
@@ -364,7 +364,7 @@ export class UnionTypeDef<TypeName extends string, GenTypes = NexusGen> {
    * Add one or more members to the GraphQLUnion. Any types provided should be valid
    * object types available to the schema.
    */
-  members(...types: Array<Types.ObjectNames<GenTypes>>) {
+  members(...types: Array<Types.GetGen<GenTypes, "objectNames">>) {
     types.forEach((typeName) => {
       this.typeConfig.members.push(typeName);
     });
@@ -407,6 +407,92 @@ export class InterfaceTypeDef<
       fields: [],
       mixed: [],
     };
+  }
+
+  /**
+   * Mixes in an existing field definition or object type
+   * with the current type.
+   */
+  mix(typeName: string, options?: Types.MixOpts<any>) {
+    this.typeConfig.fields.push({
+      item: Types.NodeType.MIX,
+      typeName,
+      mixOptions: options || {},
+    });
+  }
+
+  /**
+   * Add an ID field type to the object schema.
+   */
+  id<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
+  ) {
+    this.field(name, "ID", ...opts);
+  }
+
+  /**
+   * Add an Int field type to the object schema.
+   */
+  int<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
+  ) {
+    this.field(name, "Int", ...opts);
+  }
+
+  /**
+   * Add a Float field type to the object schema.
+   */
+  float<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
+  ) {
+    this.field(name, "Float", ...opts);
+  }
+
+  /**
+   * Add a String field type to the object schema.
+   */
+  string<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
+  ) {
+    this.field(name, "String", ...opts);
+  }
+
+  /**
+   * Add a Boolean field type to the object schema.
+   */
+  boolean<FieldName extends string>(
+    name: FieldName,
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
+  ) {
+    this.field(name, "Boolean", ...opts);
+  }
+
+  /**
+   * Adds a new field to the object type
+   */
+  field<FieldName extends string>(
+    name: FieldName,
+    type: Types.GetGen<GenTypes, "allOutputTypes"> | Types.BaseScalars,
+    ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
+  ) {
+    let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
+    if (typeof opts[0] === "function") {
+      options.resolve = opts[0];
+    } else {
+      options = { ...opts[0] };
+    }
+    this.typeConfig.fields.push({
+      item: Types.NodeType.FIELD,
+      config: {
+        name,
+        type,
+        ...options,
+      },
+    });
   }
 
   /**
@@ -477,7 +563,7 @@ export class InputObjectTypeDef<TypeName extends string, GenTypes = NexusGen> {
    */
   field(
     name: string,
-    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
+    type: Types.GetGen<GenTypes, "inputNames"> | Types.BaseScalars,
     options?: Types.InputFieldOpts<GenTypes, TypeName>
   ) {
     this.typeConfig.fields.push({
@@ -546,8 +632,18 @@ export class ExtendTypeDef<
    * Declare that an object type implements a particular interface,
    * by providing the name of the interface
    */
-  implements(...interfaceName: Types.AllInterfaces<GenTypes>[]) {
-    this.typeConfig.interfaces.push(...interfaceName);
+  field<
+    TypeName extends Types.GetGen<GenTypes, "inputNames"> | Types.BaseScalars
+  >(
+    name: string,
+    type: TypeName,
+    options?: Types.InputFieldOpts<GenTypes, TypeName>
+  ) {
+    this.typeConfig.directiveArgs.push({
+      name,
+      type,
+      ...options,
+    });
   }
 
   /**

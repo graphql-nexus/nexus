@@ -104,8 +104,17 @@ export function scalarType(name: string, options: Types.ScalarOpts) {
   );
 }
 
+/**
+ * Defines an argument that can be used in any object or interface type
+ *
+ * Takes the GraphQL type name and any options.
+ *
+ * The value returned from this argument can be used multiple times in any valid `args` object value
+ *
+ * @see https://graphql.github.io/learn/schema/#arguments
+ */
 export function arg<GenTypes = NexusGen>(
-  type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
+  type: Types.GetGen<GenTypes, "inputNames"> | Types.BaseScalars,
   options?: Types.ArgOpts
 ): Types.ArgDefinition {
   // This isn't wrapped for now because it's not a named type, it's really

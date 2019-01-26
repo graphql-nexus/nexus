@@ -57,7 +57,7 @@ type Rocket {
 }
 
 type TripUpdateResponse {
-  launches: Launch
+  launches: [Launch!]
   message: String
   success: Boolean!
 }
