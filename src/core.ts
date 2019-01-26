@@ -32,8 +32,8 @@ declare global {
  * Contains methods shared between `objectType`, `extendType`, and `interfaceType`
  */
 export abstract class AbstractOutputMethods<
-  GenTypes = NexusGen,
-  TypeName extends string = any
+  TypeName extends string,
+  GenTypes = NexusGen
 > {
   protected typeConfig: Types.OutputObjectConfig;
 
@@ -167,9 +167,9 @@ export abstract class AbstractOutputMethods<
  * Container object for defining the `GraphQLObjectType`
  */
 export class ObjectTypeDef<
-  GenTypes = NexusGen,
-  TypeName extends string = any
-> extends AbstractOutputMethods<GenTypes, TypeName> {
+  TypeName extends string,
+  GenTypes = NexusGen
+> extends AbstractOutputMethods<TypeName, GenTypes> {
   /**
    * All metadata about the object type
    */
@@ -332,10 +332,10 @@ export class EnumTypeDef<GenTypes = NexusGen> {
 /**
  * Configure the `GraphQLUnionType` definition
  */
-export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
+export class UnionTypeDef<TypeName extends string, GenTypes = NexusGen> {
   protected typeConfig: Types.UnionTypeConfig;
 
-  constructor(readonly name: string) {
+  constructor(readonly name: TypeName) {
     this.typeConfig = {
       name,
       mixed: [],
@@ -392,9 +392,9 @@ export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
  * Container for the `GraphQLInterfaceType` definition
  */
 export class InterfaceTypeDef<
-  GenTypes = NexusGen,
-  TypeName extends string = any
-> extends AbstractOutputMethods<GenTypes, TypeName> {
+  TypeName extends string,
+  GenTypes = NexusGen
+> extends AbstractOutputMethods<TypeName, GenTypes> {
   /**
    * Metadata about the object type
    */
@@ -426,10 +426,7 @@ export class InterfaceTypeDef<
   }
 }
 
-export class InputObjectTypeDef<
-  GenTypes = NexusGen,
-  TypeName extends string = any
-> {
+export class InputObjectTypeDef<TypeName extends string, GenTypes = NexusGen> {
   protected typeConfig: Types.InputTypeConfig;
 
   constructor(readonly name: string) {
@@ -528,9 +525,9 @@ export class InputObjectTypeDef<
  * is a container for all metadata about the type we're extending.
  */
 export class ExtendTypeDef<
-  GenTypes = NexusGen,
-  TypeName extends string = any
-> extends AbstractOutputMethods<GenTypes, TypeName> {
+  TypeName extends string,
+  GenTypes = NexusGen
+> extends AbstractOutputMethods<TypeName, GenTypes> {
   /**
    * All metadata about the object type
    */

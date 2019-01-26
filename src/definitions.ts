@@ -10,37 +10,68 @@ import {
 } from "./core";
 import * as Types from "./types";
 import { enumShorthandMembers } from "./utils";
+import { DeprecationInfo } from "./types";
 
-export function objectType<GenTypes = NexusGen, TypeName extends string = any>(
-  name: TypeName,
-  fn: (t: ObjectTypeDef<GenTypes, TypeName>) => void
+export interface DefinitionBlock<
+  TypeName extends string,
+  GenTypes = NexusGen
+> {}
+
+export interface ObjectTypeConfig<
+  TypeName extends string,
+  GenTypes = NexusGen
+> {
+  name: TypeName;
+  definition(t: ObjectTypeDef<TypeName, GenTypes>): void;
+  description?: string;
+  nullability?: string;
+}
+
+export function objectType<TypeName extends string, GenTypes = NexusGen>(
+  config: ObjectTypeConfig<TypeName, GenTypes>
 ) {
-  const factory = new ObjectTypeDef<GenTypes, TypeName>(assertValidName(name));
-  fn(factory);
+  const factory = new ObjectTypeDef<TypeName, GenTypes>(assertValidName(name));
+  config.definition(factory);
   return new WrappedType(factory);
 }
 
-export function interfaceType<
-  GenTypes = NexusGen,
-  TypeName extends string = any
->(name: TypeName, fn: (t: InterfaceTypeDef<GenTypes, TypeName>) => void) {
-  const factory = new InterfaceTypeDef<GenTypes, TypeName>(
-    assertValidName(name)
+export interface InterfaceTypeConfig<
+  TypeName extends string,
+  GenTypes = NexusGen
+> {
+  name: TypeName;
+  definition(t: InterfaceTypeDef<TypeName, GenTypes>): void;
+  description?: string;
+  nullability?: string;
+}
+
+export function interfaceType<TypeName extends string, GenTypes = NexusGen>(
+  config: InterfaceTypeConfig<TypeName, GenTypes>
+) {
+  const factory = new InterfaceTypeDef<TypeName, GenTypes>(
+    assertValidName(config.name)
   );
-  fn(factory);
+  config.definition(factory);
   return new WrappedType(factory);
 }
 
-export function unionType<GenTypes = NexusGen, TypeName extends string = any>(
-  name: TypeName,
-  fn: (t: UnionTypeDef<GenTypes, TypeName>) => void
+export interface UnionTypeConfig<TypeName extends string, GenTypes = NexusGen> {
+  name: TypeName;
+  definition(t: UnionTypeDef<TypeName, GenTypes>): void;
+  description?: string;
+  deprecation?: string | DeprecationInfo;
+}
+
+export function unionType<TypeName extends string, GenTypes = NexusGen>(
+  config: UnionTypeConfig<TypeName, GenTypes>
 ) {
-  const factory = new UnionTypeDef<GenTypes>(assertValidName(name));
-  fn(factory);
+  assertValidName(config.name);
+  const factory = new UnionTypeDef<TypeName, GenTypes>(config.name);
+  config.definition(factory);
   return new WrappedType(factory);
 }
 
-export function enumType<GenTypes = NexusGen, TypeName extends string = any>(
+export function enumType<TypeName extends string, GenTypes = NexusGen>(
   name: TypeName,
   fn:
     | ((arg: EnumTypeDef<GenTypes>) => void)
@@ -56,11 +87,13 @@ export function enumType<GenTypes = NexusGen, TypeName extends string = any>(
   return new WrappedType(factory);
 }
 
-export function inputObjectType<
-  GenTypes = NexusGen,
-  TypeName extends string = any
->(name: TypeName, fn: (t: InputObjectTypeDef<GenTypes>) => void) {
-  const factory = new InputObjectTypeDef<GenTypes>(assertValidName(name));
+export function inputObjectType<TypeName extends string, GenTypes = NexusGen>(
+  name: TypeName,
+  fn: (t: InputObjectTypeDef<TypeName, GenTypes>) => void
+) {
+  const factory = new InputObjectTypeDef<TypeName, GenTypes>(
+    assertValidName(name)
+  );
   fn(factory);
   return new WrappedType(factory);
 }
@@ -103,17 +136,25 @@ export function booleanArg(options?: Types.ArgOpts): Types.ArgDefinition {
   return arg("Boolean", options);
 }
 
+export interface ExtendTypeConfig<
+  TypeName extends string,
+  GenTypes = NexusGen
+> {
+  type: TypeName;
+  definition(t: ExtendTypeDef<TypeName, GenTypes>): void;
+}
+
 /**
  * Adds new fields to an existing type in the schema. Useful when splitting your
  * schema across several domains.
  *
  * @see http://graphql-nexus.com/api/extendType
  */
-export function extendType<GenTypes = NexusGen, TypeName extends string = any>(
+export function extendType<TypeName extends string, GenTypes = NexusGen>(
   name: TypeName,
-  fn: (t: ExtendTypeDef<GenTypes, TypeName>) => void
+  fn: (t: ExtendTypeDef<TypeName, GenTypes>) => void
 ) {
-  const factory = new ExtendTypeDef<GenTypes, TypeName>(assertValidName(name));
+  const factory = new ExtendTypeDef<TypeName, GenTypes>(assertValidName(name));
   fn(factory);
   return new WrappedType(factory);
 }
