@@ -227,10 +227,14 @@ export interface OutputFieldOpts<
   // subscribe?: OutputFieldResolver<GenTypes, TypeName, FieldName>
 }
 
-export type OutputFieldResolver<GenTypes, TypeName, FieldName> = (
-  root: RootValue<GenTypes, TypeName>,
-  args: ArgsValue<GenTypes, TypeName, FieldName>,
-  context: ContextValue<GenTypes>,
+export type OutputFieldResolver<
+  GenTypes,
+  TypeName extends string,
+  FieldName extends string
+> = (
+  root: GetGen2<GenTypes, "rootTypes", TypeName>,
+  args: GetGen3<GenTypes, "argTypes", TypeName, FieldName>,
+  context: GetGen<GenTypes, "context">,
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName>>;
 
@@ -407,7 +411,7 @@ export interface ImportedType {
   importPath: string;
 }
 
-export interface BuilderConfig extends Nullability {
+export interface BuilderConfig<GenTypes = GraphQLNexusGen> extends Nullability {
   /**
    * When the schema starts and `process.env.NODE_ENV !== "production"`,
    * artifact files are auto-generated containing the .graphql definitions of
@@ -441,10 +445,10 @@ export interface BuilderConfig extends Nullability {
    * A configuration function for advanced cases where
    * more control over the `TypegenInfo` is needed.
    */
-  typegenConfig?: ((
+  typegenConfig?: (
     schema: GraphQLSchema,
     outputPath: string
-  ) => TypegenInfo | PromiseLike<TypegenInfo>);
+  ) => TypegenInfo<GenTypes> | PromiseLike<TypegenInfo<GenTypes>>;
   /**
    * Either an absolute path to a .prettierrc file, or an object
    * with relevant Prettier rules to be used on the generated output
@@ -471,7 +475,7 @@ export interface SchemaConfig extends BuilderConfig {
   types: any;
 }
 
-export interface TypegenInfo<GenTypes = any> {
+export interface TypegenInfo<GenTypes> {
   /**
    * Headers attached to the generate type output
    */
@@ -484,7 +488,7 @@ export interface TypegenInfo<GenTypes = any> {
    * A map of all GraphQL types and what TypeScript types they should
    * be represented by.
    */
-  backingTypeMap: { [K in ObjectNames<GenTypes>]?: string };
+  backingTypeMap: { [K in GetGen<GenTypes, "objectNames">]?: string };
   /**
    * The type of the context for the resolvers
    */
@@ -638,145 +642,122 @@ export interface TypegenAutoConfigOptions {
 }
 
 export type TypeResolver<GenTypes, TypeName> = (
-  root: RootValue<GenTypes, TypeName>,
-  context: ContextValue<GenTypes>,
+  source: AbstractResolveRoot<GenTypes, TypeName>,
+  context: GetGen<GenTypes, "context">,
   info: GraphQLResolveInfo
-) => MaybePromise<Maybe<InterfaceMembers<GenTypes, TypeName>>>;
+) => MaybePromise<AbstractResolveReturn<GenTypes, TypeName>>;
+
+export type AbstractResolveRoot<
+  GenTypes,
+  TypeName
+> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["abstractResolveRoot"]
+    ? GenTypes["abstractResolveRoot"][TypeName]
+    : any
+  : any;
+
+export type AbstractResolveReturn<
+  GenTypes,
+  TypeName
+> = GenTypes extends GenTypesShape
+  ? TypeName extends keyof GenTypes["abstractResolveReturn"]
+    ? GenTypes["abstractResolveReturn"][TypeName]
+    : any
+  : any;
 
 /**
  * Generated type helpers:
  */
 
-type GenTypesShapeKeys =
+export type GenTypesShapeKeys =
   | "context"
+  | "rootTypes"
   | "argTypes"
-  | "backingTypes"
   | "returnTypes"
-  | "enums"
-  | "objects"
-  | "interfaces"
-  | "unions"
-  | "scalars"
-  | "inputObjects"
+  | "objectNames"
+  | "inputNames"
+  | "enumNames"
+  | "interfaceNames"
+  | "scalarNames"
+  | "unionNames"
   | "allInputTypes"
-  | "allOutputTypes";
+  | "allOutputTypes"
+  | "allNamedTypes"
+  | "abstractTypes"
+  | "abstractResolveRoot"
+  | "abstractResolveReturn";
 
 /**
  * Helpers for handling the generated schema
  */
 export type GenTypesShape = Record<GenTypesShapeKeys, any>;
 
-export type ObjectNames<GenTypes> = GenTypes extends GenTypesShape
-  ? Extract<keyof GenTypes["objects"], string>
-  : never;
-
-export type InterfaceMembers<
+export type GetGen<
   GenTypes,
+  K extends GenTypesShapeKeys,
+  Fallback = any
+> = GenTypes extends GenTypesShape ? GenTypes[K] : Fallback;
+
+export type Or<T, Fallback> = T extends never ? Fallback : T;
+export type Bool<T> = T extends never ? false : true;
+
+export type GetGen2<
+  GenTypes,
+  K extends GenTypesShapeKeys,
+  K2 extends Extract<keyof GenTypesShape[K], string>,
+  Fallback = any
+> = GenTypes extends GenTypesShape ? Or<GenTypes[K][K2], Fallback> : Fallback;
+
+export type GetGen3<
+  GenTypes,
+  K extends GenTypesShapeKeys,
+  K2 extends Extract<keyof GenTypesShape[K], string>,
+  K3 extends Extract<keyof GenTypesShape[K][K2], string>,
+  Fallback = any
+> = GenTypes extends GenTypesShape
+  ? Or<GenTypes[K][K2][K3], Fallback>
+  : Fallback;
+
+export type GenHas2<
+  GenTypes,
+  K extends GenTypesShapeKeys,
+  K2 extends Extract<keyof GenTypesShape[K], string>
+> = GenTypes extends GenTypesShape ? Bool<GenTypesShape[K][K2]> : false;
+
+export type GenHas3<
+  GenTypes,
+  K extends GenTypesShapeKeys,
+  K2 extends Extract<keyof GenTypesShape[K], string>,
+  K3 extends Extract<keyof GenTypesShape[K][K2], string>
+> = GenTypes extends GenTypesShape ? Bool<GenTypesShape[K][K2][K3]> : false;
+
+export type EnumMembers<GenTypes, EnumName extends string> = any; // TODO!
+
+export type RootValue<GenTypes, TypeName extends string> = GetGen2<
+  GenTypes,
+  "rootTypes",
   TypeName
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["interfaces"]
-    ? GenTypes["interfaces"][TypeName]
-    : any
-  : never;
-
-export type UnionMembers<GenTypes, TypeName> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["unions"]
-    ? GenTypes["unions"][TypeName]
-    : any
-  : never;
-
-export type EnumNames<GenTypes> = GenTypes extends GenTypesShape
-  ? Extract<keyof GenTypes["enums"], string>
-  : never;
-
-export type UnionNames<GenTypes> = GenTypes extends GenTypesShape
-  ? Extract<keyof GenTypes["unions"], string>
-  : never;
-
-export type ObjectTypeFields<
-  GenTypes,
-  TypeName
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["returnTypes"]
-    ? Extract<keyof GenTypes["returnTypes"][TypeName], string>
-    : never
-  : unknown;
-
-export type EnumMembers<
-  GenTypes,
-  EnumName extends string
-> = GenTypes extends GenTypesShape
-  ? EnumName extends keyof GenTypes["enums"]
-    ? GenTypes["enums"][EnumName]
-    : never
-  : string;
-
-export type ObjectTypeDef<GenTypes, TypeName> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["objects"]
-    ? GenTypes["objects"][TypeName]["rootType"]
-    : never
-  : string;
-
-export type InputObjectTypeDef<
-  GenTypes,
-  TypeName
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["inputObjects"]
-    ? GenTypes["inputObjects"][TypeName]
-    : never
-  : unknown;
-
-export type AllInterfaces<GenTypes> = GenTypes extends GenTypesShape
-  ? Extract<keyof GenTypes["interfaces"], string>
-  : never;
-
-export type AllInputTypes<GenTypes> = GenTypes extends GenTypesShape
-  ? GenTypes["allInputTypes"]
-  : never;
-
-export type AllOutputTypes<GenTypes> = GenTypes extends GenTypesShape
-  ? GenTypes["allOutputTypes"]
-  : never;
-
-export type RootValue<GenTypes, TypeName> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["backingTypes"]
-    ? GenTypes["backingTypes"][TypeName]
-    : any
-  : never;
+>;
 
 export type RootValueField<
   GenTypes,
-  TypeName,
-  FieldName
-> = FieldName extends keyof RootValue<GenTypes, TypeName>
-  ? RootValue<GenTypes, TypeName>[FieldName]
-  : never;
+  TypeName extends string,
+  FieldName extends string
+> = GetGen3<GenTypes, "rootTypes", TypeName, FieldName>;
 
 export type ArgsValue<
   GenTypes,
-  TypeName,
-  FieldName
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["argTypes"]
-    ? FieldName extends keyof GenTypes["argTypes"][TypeName]
-      ? GenTypes["argTypes"][TypeName][FieldName]
-      : any
-    : {}
-  : never;
+  TypeName extends string,
+  FieldName extends string
+> = GetGen3<GenTypes, "argTypes", TypeName, FieldName, {}>;
 
 export type ResultValue<
   GenTypes,
-  TypeName,
-  FieldName
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["returnTypes"]
-    ? FieldName extends keyof GenTypes["returnTypes"][TypeName]
-      ? GenTypes["returnTypes"][TypeName][FieldName]
-      : any
-    : any
-  : never;
+  TypeName extends string,
+  FieldName extends string
+> = GetGen3<GenTypes, "returnTypes", TypeName, FieldName>;
 
-export type InputValue<GenTypes, TypeName> = any;
+export type InputValue<GenTypes, TypeName> = GetGen<GenTypes, "", any>;
 // GenTypes extends GenTypesShape
 // ? TypeName extends keyof GenTypes["inputTypes"]
 //   ? FieldName extends keyof GenTypes["inputTypes"][TypeName]
@@ -784,10 +765,6 @@ export type InputValue<GenTypes, TypeName> = any;
 //     : any
 //   : any
 // : never;
-
-export type ContextValue<GenTypes> = GenTypes extends GenTypesShape
-  ? GenTypes["context"]
-  : any;
 
 export type DirectiveConfig<GenTypes, DirectiveName> = {
   locations: DirectiveLocationEnum[];

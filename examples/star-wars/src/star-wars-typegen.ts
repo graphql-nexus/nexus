@@ -5,182 +5,139 @@
  * For better typings, you should provide configuration for how to lookup 
  * the types. See the documentation for "typegenAutoConfig"
  */
+import { GraphQLResolveInfo } from "graphql";
 import * as swapi from "./types/backingTypes"
-
 declare global {
-  interface GraphQLNexusGen extends GraphQLNexusGenTypes {}
+  interface GraphQLNexusGen extends NexusGenTypes {}
 }
 
-// Maybe Promise
-export type MaybePromise<T> = T | PromiseLike<T>;
-
-// Maybe Promise List
-export type MaybePromiseList<T> = Array<MaybePromise<T>>;
-
-// Maybe Thunk
-export type MaybeThunk<T> = T | (() => T);
-
-// Maybe Thunk, with args
-export type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
-
-export type QueryDroidReturnType = Droid_ReturnType;
-
-export interface QueryDroidArgs {
-  id: string;
+export interface NexusGenInputs {
 }
 
-export type QueryHeroReturnType = Character_ReturnType;
-
-export interface QueryHeroArgs {
-  episode?: null | Episode;
+interface NexusGenEnums {
+  Episode: 5 | 6 | 4
+  MoreEpisodes: 5 | 6 | 4 | "OTHER"
 }
 
-export type QueryHumanReturnType = Human_ReturnType;
-
-export interface QueryHumanArgs {
-  id: string;
-}
-
-export type Query_ReturnType = {};
-
-export type DroidAppearsInReturnType = MaybePromiseList<Episode>;
-
-export interface DroidAppearsInArgs extends CharacterAppearsInArgs {}
-
-export type DroidFriendsReturnType = MaybePromiseList<Character_ReturnType>;
-
-export type DroidIdReturnType = string;
-
-export type DroidNameReturnType = string;
-
-export type DroidPrimaryFunctionReturnType = string;
-
-export type DroidRootType = swapi.Droid;
-
-export type Droid_ReturnType = swapi.Droid
-
-export type CharacterAppearsInReturnType = MaybePromiseList<Episode>;
-
-export interface CharacterAppearsInArgs {
-  id: string;
-}
-
-export type CharacterFriendsReturnType = MaybePromiseList<Character_ReturnType>;
-
-export type CharacterIdReturnType = string;
-
-export type CharacterNameReturnType = string;
-
-export type Episode = 5 | 6 | 4;
-
-export type HumanAppearsInReturnType = MaybePromiseList<Episode>;
-
-export interface HumanAppearsInArgs extends CharacterAppearsInArgs {}
-
-export type HumanFriendsReturnType = MaybePromiseList<Character_ReturnType>;
-
-export type HumanHomePlanetReturnType = null | string;
-
-export type HumanIdReturnType = string;
-
-export type HumanNameReturnType = string;
-
-export type HumanRootType = swapi.Human;
-
-export type Human_ReturnType = swapi.Human
-
-export type MoreEpisodes = 5 | 6 | 4 | "OTHER";
-
-export type CharacterRootType = swapi.Character;
-
-export type Character_ReturnType = swapi.Character;
-
-export interface GraphQLNexusGenArgTypes {
-  Query: {
-    droid: QueryDroidArgs;
-    hero: QueryHeroArgs;
-    human: QueryHumanArgs;
-  };
-  Droid: {
-    appearsIn: DroidAppearsInArgs;
-  };
-  Character: {
-    appearsIn: CharacterAppearsInArgs;
-  };
-  Human: {
-    appearsIn: HumanAppearsInArgs;
-  };
-}
-
-export interface GraphQLNexusGenRootTypes {
-  Character: CharacterRootType;
+export interface NexusGenRootTypes {
+  Character: swapi.Character;
+  Droid: swapi.Droid;
+  Human: swapi.Human;
   Query: {};
-  Droid: DroidRootType;
-  Human: HumanRootType;
 }
 
-export interface GraphQLNexusGenReturnTypes {
-  Query: {
-    droid: QueryDroidReturnType;
-    hero: QueryHeroReturnType;
-    human: QueryHumanReturnType;
-  };
-  Droid: {
-    appearsIn: DroidAppearsInReturnType;
-    friends: DroidFriendsReturnType;
-    id: DroidIdReturnType;
-    name: DroidNameReturnType;
-    primaryFunction: DroidPrimaryFunctionReturnType;
-  };
+export interface NexusGenReturnTypes {
+  Character: { // return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: Array<undefined | null>; // [Character!]!
+    id: string; // String!
+    name: string; // String!
+  }
+  Droid: { // return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: Array<undefined | null>; // [Character!]!
+    id: string; // String!
+    name: string; // String!
+    primaryFunction: string; // String!
+  }
+  Human: { // return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: Array<undefined | null>; // [Character!]!
+    homePlanet: string | null; // String
+    id: string; // String!
+    name: string; // String!
+  }
+  Query: { // return type
+    droid: NexusGenRootTypes['Droid']; // Droid!
+    hero: undefined | null; // Character!
+    human: NexusGenRootTypes['Human']; // Human!
+  }
+}
+
+export interface NexusGenArgTypes {
   Character: {
-    appearsIn: CharacterAppearsInReturnType;
-    friends: CharacterFriendsReturnType;
-    id: CharacterIdReturnType;
-    name: CharacterNameReturnType;
-  };
+    appearsIn: { // args
+      id: string; // ID!
+    }
+  }
+  Droid: {
+    appearsIn: { // args
+      id: string; // ID!
+    }
+  }
   Human: {
-    appearsIn: HumanAppearsInReturnType;
-    friends: HumanFriendsReturnType;
-    homePlanet: HumanHomePlanetReturnType;
-    id: HumanIdReturnType;
-    name: HumanNameReturnType;
-  };
+    appearsIn: { // args
+      id: string; // ID!
+    }
+  }
+  Query: {
+    droid: { // args
+      id: string; // String!
+    }
+    hero: { // args
+      episode?: NexusGenEnums['Episode'] | null; // Episode
+    }
+    human: { // args
+      id: string; // String!
+    }
+  }
 }
 
-export interface GraphQLNexusGenTypes {
-  argTypes: GraphQLNexusGenArgTypes;
-  backingTypes: GraphQLNexusGenRootTypes;
-  returnTypes: GraphQLNexusGenReturnTypes;
+interface NexusGenAbstractResolveSourceTypes {
+  Character: NexusGenRootTypes['Droid'] | NexusGenRootTypes['Human']
+}
+
+interface NexusGenAbstractResolveReturnTypes {
+  Character: "Droid" | "Human"
+}
+
+export type NexusGenObjectNames = "Droid" | "Human" | "Query";
+
+export type NexusGenInputNames = never;
+
+export type NexusGenEnumNames = "Episode" | "MoreEpisodes";
+
+export type NexusGenInterfaceNames = "Character";
+
+export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String";
+
+export type NexusGenUnionNames = never;
+
+export interface NexusGenTypes {
   context: swapi.ContextType;
-  enums: {
-    Episode: Episode;
-    MoreEpisodes: MoreEpisodes;
-  };
-  objects: {
-    Query: {};
-    Droid: DroidRootType;
-    Human: HumanRootType;
-  };
-  interfaces: {
-    Character: "Droid" | "Human";
-  };
-  unions: {};
-  scalars: {
-    String: any;
-    ID: any;
-    Boolean: any;
-  };
-  inputObjects: {};
-  allInputTypes: 
-    | Extract<keyof GraphQLNexusGenTypes['inputObjects'], string>
-    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
-    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
-  allOutputTypes: 
-    | Extract<keyof GraphQLNexusGenTypes['objects'], string>
-    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
-    | Extract<keyof GraphQLNexusGenTypes['unions'], string>
-    | Extract<keyof GraphQLNexusGenTypes['interfaces'], string>
-    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
+  rootTypes: NexusGenRootTypes;
+  argTypes: NexusGenArgTypes;
+  returnTypes: NexusGenReturnTypes;
+  objectNames: NexusGenObjectNames;
+  inputNames: NexusGenInputNames;
+  enumNames: NexusGenEnumNames;
+  interfaceNames: NexusGenInterfaceNames;
+  scalarNames: NexusGenScalarNames;
+  unionNames: NexusGenUnionNames;
+  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
+  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  abstractResolveRoot: NexusGenAbstractResolveSourceTypes;
+  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
 
-export type Gen = GraphQLNexusGenTypes;
+export type Gen = NexusGenTypes;
+
+type MaybePromise<T> = PromiseLike<T> | T;
+type SourceType<TypeName> = TypeName extends keyof NexusGenAbstractResolveSourceTypes ? NexusGenAbstractResolveSourceTypes[TypeName] : never;
+type RootType<TypeName> = TypeName extends keyof NexusGenRootTypes ? NexusGenRootTypes[TypeName] : never;
+type ArgType<TypeName, FieldName> = TypeName extends keyof NexusGenArgTypes ? FieldName extends keyof NexusGenArgTypes[TypeName] ? NexusGenArgTypes[TypeName][FieldName] : {} : {};
+
+export type NexusResolver<TypeName extends keyof NexusGenReturnTypes, FieldName extends keyof NexusGenReturnTypes[TypeName]> = (
+  root: RootType<TypeName>, 
+  args: ArgType<TypeName, FieldName>, 
+  context: NexusGenTypes['context'], 
+  info: GraphQLResolveInfo
+) => MaybePromise<NexusGenReturnTypes[TypeName][FieldName]>
+
+export type NexusAbstractTypeResolver<TypeName extends keyof NexusGenAbstractResolveReturnTypes> = (
+  root: SourceType<TypeName>, 
+  context: NexusGenTypes['context'], 
+  info: GraphQLResolveInfo
+) => MaybePromise<NexusGenAbstractResolveReturnTypes[TypeName]>

@@ -119,7 +119,7 @@ export class ObjectTypeDef<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
+    type: Types.GetGen<GenTypes, "allOutputTypes"> | Types.BaseScalars,
     ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
@@ -142,7 +142,7 @@ export class ObjectTypeDef<
    * Declare that an object type implements a particular interface,
    * by providing the name of the interface
    */
-  implements(...interfaceName: Types.AllInterfaces<GenTypes>[]) {
+  implements(...interfaceName: Types.GetGen<GenTypes, "interfaceNames">[]) {
     this.typeConfig.interfaces.push(...interfaceName);
   }
 
@@ -169,7 +169,12 @@ export class ObjectTypeDef<
    * At this point the type will not change, but the resolver,
    * default, property, or description fields can.
    */
-  modify<FieldName extends Types.ObjectTypeFields<GenTypes, TypeName>>(
+  modify<
+    FieldName extends Extract<
+      keyof Types.GetGen2<GenTypes, "returnTypes", TypeName>,
+      string
+    >
+  >(
     field: FieldName,
     options: Types.ModifyFieldOpts<GenTypes, TypeName, FieldName>
   ): void {
@@ -182,7 +187,7 @@ export class ObjectTypeDef<
   defaultResolver(
     resolverFn: GraphQLFieldResolver<
       Types.RootValue<GenTypes, TypeName>,
-      Types.ContextValue<GenTypes>
+      Types.GetGen<GenTypes, "context">
     >
   ): void {
     this.typeConfig.defaultResolver = resolverFn;
@@ -241,7 +246,7 @@ export class EnumTypeDef<GenTypes = GraphQLNexusGen> {
     };
   }
 
-  mix<EnumName extends Types.EnumNames<GenTypes>>(
+  mix<EnumName extends Types.GetGen<GenTypes, "enumNames">>(
     typeName: EnumName,
     options?: Types.MixOpts<Types.EnumMembers<GenTypes, EnumName>>
   ) {
@@ -348,7 +353,7 @@ export class UnionTypeDef<
    * Add one or more members to the GraphQLUnion. Any types provided should be valid
    * object types available to the schema.
    */
-  members(...types: Array<Types.ObjectNames<GenTypes>>) {
+  members(...types: Array<Types.GetGen<GenTypes, "objectNames">>) {
     types.forEach((typeName) => {
       this.typeConfig.members.push({
         item: Types.NodeType.UNION_MEMBER,
@@ -473,7 +478,7 @@ export class InterfaceTypeDef<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllOutputTypes<GenTypes> | Types.BaseScalars,
+    type: Types.GetGen<GenTypes, "allOutputTypes"> | Types.BaseScalars,
     ...opts: Types.ConditionalOutputFieldOpts<GenTypes, TypeName, FieldName>
   ) {
     let options: Types.OutputFieldOpts<GenTypes, TypeName, any> = {};
@@ -583,7 +588,7 @@ export class InputObjectTypeDef<
    */
   field<FieldName extends string>(
     name: FieldName,
-    type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
+    type: Types.GetGen<GenTypes, "inputNames"> | Types.BaseScalars,
     options?: Types.InputFieldOpts<GenTypes, TypeName>
   ) {
     this.typeConfig.fields.push({
@@ -697,7 +702,9 @@ export class DirectiveTypeDef<GenTypes = GraphQLNexusGen> {
   /**
    * Adds a new field to the input object type
    */
-  field<TypeName extends Types.AllInputTypes<GenTypes> | Types.BaseScalars>(
+  field<
+    TypeName extends Types.GetGen<GenTypes, "inputNames"> | Types.BaseScalars
+  >(
     name: string,
     type: TypeName,
     options?: Types.InputFieldOpts<GenTypes, TypeName>

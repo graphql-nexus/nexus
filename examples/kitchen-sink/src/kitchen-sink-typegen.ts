@@ -5,113 +5,110 @@
  * For better typings, you should provide configuration for how to lookup 
  * the types. See the documentation for "typegenAutoConfig"
  */
-
+import { GraphQLResolveInfo } from "graphql";
 
 declare global {
-  interface GraphQLNexusGen extends GraphQLNexusGenTypes {}
+  interface GraphQLNexusGen extends NexusGenTypes {}
 }
 
-// Maybe Promise
-export type MaybePromise<T> = T | PromiseLike<T>;
-
-// Maybe Promise List
-export type MaybePromiseList<T> = Array<MaybePromise<T>>;
-
-// Maybe Thunk
-export type MaybeThunk<T> = T | (() => T);
-
-// Maybe Thunk, with args
-export type MaybeThunkArgs<T, A> = T | ((args?: A) => T);
-
-export type QueryBarReturnType = Bar_ReturnType;
-
-export type Query_ReturnType = {};
-
-export type BarOkReturnType = boolean;
-
-export type BazOkReturnType = boolean;
-
-export type FooOkReturnType = boolean;
-
-export interface FooRootType {
-  ok: boolean;
+export interface NexusGenInputs {
+  InputType: { // input type
+    answer?: number | null; // Int
+    key: string; // String!
+  }
 }
 
-export type Foo_ReturnType = {
-  ok: MaybeThunk<MaybePromise<boolean>>;
+interface NexusGenEnums {
 }
 
-export interface InputType {
-  answer?: null | number;
-  key: string;
-}
-
-export type BarRootType = FooRootType;
-
-export type Bar_ReturnType = Foo_ReturnType;
-
-export type BazRootType = FooRootType;
-
-export type Baz_ReturnType = Foo_ReturnType;
-
-export interface GraphQLNexusGenArgTypes {
-}
-
-export interface GraphQLNexusGenRootTypes {
-  Bar: BarRootType;
-  Baz: BazRootType;
+export interface NexusGenRootTypes {
+  Bar: { // root types
+    ok: boolean; // Boolean!
+  }
+  Baz: { // root types
+    ok: boolean; // Boolean!
+  }
+  Foo: { // root types
+    ok: boolean; // Boolean!
+  }
   Query: {};
-  Foo: FooRootType;
 }
 
-export interface GraphQLNexusGenReturnTypes {
-  Query: {
-    bar: QueryBarReturnType;
-  };
-  Bar: {
-    ok: BarOkReturnType;
-  };
-  Baz: {
-    ok: BazOkReturnType;
-  };
-  Foo: {
-    ok: FooOkReturnType;
-  };
+export interface NexusGenReturnTypes {
+  Bar: { // return type
+    ok: boolean; // Boolean!
+  }
+  Baz: { // return type
+    ok: boolean; // Boolean!
+  }
+  Foo: { // return type
+    ok: boolean; // Boolean!
+  }
+  Query: { // return type
+    bar: undefined | null; // Bar!
+  }
 }
 
-export interface GraphQLNexusGenTypes {
-  argTypes: GraphQLNexusGenArgTypes;
-  backingTypes: GraphQLNexusGenRootTypes;
-  returnTypes: GraphQLNexusGenReturnTypes;
+export interface NexusGenArgTypes {
+}
+
+interface NexusGenAbstractResolveSourceTypes {
+  Bar: NexusGenRootTypes['Foo']
+  Baz: NexusGenRootTypes['Foo']
+}
+
+interface NexusGenAbstractResolveReturnTypes {
+  Bar: "Foo"
+  Baz: "Foo"
+}
+
+export type NexusGenObjectNames = "Foo" | "Query";
+
+export type NexusGenInputNames = "InputType";
+
+export type NexusGenEnumNames = never;
+
+export type NexusGenInterfaceNames = "Bar" | "Baz";
+
+export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String";
+
+export type NexusGenUnionNames = never;
+
+export interface NexusGenTypes {
   context: unknown;
-  enums: {};
-  objects: {
-    Query: {};
-    Foo: FooRootType;
-  };
-  interfaces: {
-    Bar: "Foo";
-    Baz: "Foo";
-  };
-  unions: {};
-  scalars: {
-    Boolean: any;
-    String: any;
-    Int: any;
-  };
-  inputObjects: {
-    InputType: InputType;
-  };
-  allInputTypes: 
-    | Extract<keyof GraphQLNexusGenTypes['inputObjects'], string>
-    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
-    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
-  allOutputTypes: 
-    | Extract<keyof GraphQLNexusGenTypes['objects'], string>
-    | Extract<keyof GraphQLNexusGenTypes['enums'], string>
-    | Extract<keyof GraphQLNexusGenTypes['unions'], string>
-    | Extract<keyof GraphQLNexusGenTypes['interfaces'], string>
-    | Extract<keyof GraphQLNexusGenTypes['scalars'], string>;
+  rootTypes: NexusGenRootTypes;
+  argTypes: NexusGenArgTypes;
+  returnTypes: NexusGenReturnTypes;
+  objectNames: NexusGenObjectNames;
+  inputNames: NexusGenInputNames;
+  enumNames: NexusGenEnumNames;
+  interfaceNames: NexusGenInterfaceNames;
+  scalarNames: NexusGenScalarNames;
+  unionNames: NexusGenUnionNames;
+  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
+  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  abstractResolveRoot: NexusGenAbstractResolveSourceTypes;
+  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
 
-export type Gen = GraphQLNexusGenTypes;
+export type Gen = NexusGenTypes;
+
+type MaybePromise<T> = PromiseLike<T> | T;
+type SourceType<TypeName> = TypeName extends keyof NexusGenAbstractResolveSourceTypes ? NexusGenAbstractResolveSourceTypes[TypeName] : never;
+type RootType<TypeName> = TypeName extends keyof NexusGenRootTypes ? NexusGenRootTypes[TypeName] : never;
+type ArgType<TypeName, FieldName> = TypeName extends keyof NexusGenArgTypes ? FieldName extends keyof NexusGenArgTypes[TypeName] ? NexusGenArgTypes[TypeName][FieldName] : {} : {};
+
+export type NexusResolver<TypeName extends keyof NexusGenReturnTypes, FieldName extends keyof NexusGenReturnTypes[TypeName]> = (
+  root: RootType<TypeName>, 
+  args: ArgType<TypeName, FieldName>, 
+  context: NexusGenTypes['context'], 
+  info: GraphQLResolveInfo
+) => MaybePromise<NexusGenReturnTypes[TypeName][FieldName]>
+
+export type NexusAbstractTypeResolver<TypeName extends keyof NexusGenAbstractResolveReturnTypes> = (
+  root: SourceType<TypeName>, 
+  context: NexusGenTypes['context'], 
+  info: GraphQLResolveInfo
+) => MaybePromise<NexusGenAbstractResolveReturnTypes[TypeName]>

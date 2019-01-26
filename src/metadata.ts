@@ -15,7 +15,7 @@ import path from "path";
 import * as Types from "./types";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { assertAbsolutePath } from "./utils";
-import { buildTypeDefinitions } from "./typegen";
+import { buildTypeDefinitions, Typegen } from "./typegen";
 import { typegenAutoConfig } from "./autoConfig";
 import { SCALAR_TYPES } from "./common";
 import { prettierFormat } from "./prettierFormat";
@@ -260,7 +260,7 @@ export class Metadata {
    * Generates the type definitions
    */
   async generateTypesFile(schema: GraphQLSchema): Promise<string> {
-    return buildTypeDefinitions(schema, this);
+    return new Typegen(schema, this, await this.getTypegenInfo(schema)).print();
   }
 
   async getTypegenInfo(schema: GraphQLSchema): Promise<Types.TypegenInfo> {

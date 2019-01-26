@@ -231,7 +231,7 @@ export function scalarType(
  * @see https://graphql.github.io/learn/schema/#arguments
  */
 export function arg<GenTypes = GraphQLNexusGen>(
-  type: Types.AllInputTypes<GenTypes> | Types.BaseScalars,
+  type: Types.GetGen<GenTypes, "inputNames"> | Types.BaseScalars,
   options?: Types.ArgOpts
 ): Types.ArgDefinition {
   // This isn't wrapped for now because it's not a named type, it's really
