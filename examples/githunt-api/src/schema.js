@@ -1,23 +1,5 @@
 // @ts-check
-const {
-  enumType,
-  objectType,
-  arg,
-  intArg,
-  directiveType,
-  stringArg,
-} = require("nexus");
-
-exports.CacheControl = directiveType("cacheControl", (t) => {
-  t.int("maxAge");
-  t.field("scope", "CacheControlScope");
-  t.locations("OBJECT", "FIELD_DEFINITION");
-});
-
-exports.CacheControlScope = enumType("CacheControlScope", [
-  "PUBLIC",
-  "PRIVATE",
-]);
+const { enumType, objectType, arg, intArg, stringArg } = require("nexus");
 
 exports.FeedType = enumType("FeedType", (t) => {
   t.description("A list of options for the sort order of the feed");
@@ -61,14 +43,6 @@ exports.Query = objectType("Query", (t) => {
   t.field("currentUser", "User", {
     description:
       "Return the currently logged in user, or null if nobody is logged in",
-    directives: [
-      {
-        name: "cacheControl",
-        args: {
-          scope: "PRIVATE",
-        },
-      },
-    ],
   });
 });
 
@@ -127,7 +101,6 @@ const commonFields = (t) => {
 exports.Comment = objectType("Comment", (t) => {
   commonFields(t);
   t.description("A comment about an entry, submitted by a user");
-  t.directive("cacheControl", { maxAge: 240 });
   t.float("createdAt", (o) => o.created_at, {
     description: "A timestamp of when the comment was posted",
   });
@@ -147,7 +120,6 @@ exports.Vote = objectType("Vote", (t) => {
 // # Information about a GitHub repository submitted to GitHunt
 exports.Entry = objectType("Entry", (t) => {
   commonFields(t);
-  t.directive("cacheControl", { maxAge: 240 });
   t.field("repository", "Repository", {
     description: "Information about the repository from GitHub",
   });
@@ -180,9 +152,6 @@ exports.Repository = objectType("Repository", (t) => {
     A repository object from the GitHub API. This uses the exact field names returned by the
     GitHub API for simplicity, even though the convention for GraphQL is usually to camel case.
   `);
-  t.directive("cacheControl", {
-    maxAge: 240,
-  });
   t.string("name", {
     description: "Just the name of the repository, e.g. GitHunt-API",
   });
@@ -213,9 +182,6 @@ exports.User = objectType("User", (t) => {
   t.description(
     "A user object from the GitHub API. This uses the exact field names returned from the GitHub API."
   );
-  t.directive("cacheControl", {
-    maxAge: 240,
-  });
   t.string("login", { description: "The name of the user, e.g. apollostack" });
   t.string("avatar_url", {
     description:

@@ -2,10 +2,7 @@ import {
   GraphQLFieldResolver,
   GraphQLScalarTypeConfig,
   GraphQLNamedType,
-  GraphQLIsTypeOfFn,
   GraphQLResolveInfo,
-  DirectiveLocationEnum,
-  GraphQLDirective,
   GraphQLSchema,
   GraphQLScalarType,
 } from "graphql";
@@ -15,7 +12,6 @@ import {
   InterfaceTypeDef,
   EnumTypeDef,
   UnionTypeDef,
-  DirectiveTypeDef,
   ExtendTypeDef,
   WrappedType,
 } from "./core";
@@ -28,7 +24,6 @@ export type WrappedOutput =
 export type Wrappable =
   | NamedTypeDef
   | ExtendTypeDef<any, any>
-  | DirectiveTypeDef
   | GraphQLScalarType;
 
 export type NamedOutputTypeDef<GenTypes = any> =
@@ -87,12 +82,10 @@ export interface EnumMemberConfig {
 }
 
 export interface BuildTypes<
-  TypeMapDefs extends Record<string, GraphQLNamedType>,
-  DirectiveDefs extends Record<string, GraphQLDirective>
+  TypeMapDefs extends Record<string, GraphQLNamedType>
 > {
   typeMap: TypeMapDefs;
   metadata: Metadata;
-  directiveMap: DirectiveDefs;
 }
 
 /**
@@ -138,10 +131,6 @@ export interface CommonOpts {
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string | DeprecationInfo;
-  /**
-   * Any directives for the field or argument
-   */
-  directives?: DirectiveOption[];
 }
 
 export interface DirectiveOption {
@@ -200,7 +189,7 @@ export type OutputFieldArgs = Record<string, ArgDefinition>;
 /**
  * All non-resolver output field options
  */
-export interface CommonOutputOpts extends FieldOpts {
+export interface CommonOutputOpts {
   /**
    * Any arguments defined
    */
@@ -263,8 +252,7 @@ export type ModifyFieldOpts<GenTypes, TypeName, FieldName, ResolveFallback> = {
   >;
 };
 
-export interface InputFieldOpts<GenTypes = any, TypeName = any>
-  extends FieldOpts {
+export interface InputFieldOpts<GenTypes = any, TypeName = any> {
   /**
    * Setting this to true is the same as setting `nullable: false`
    */
@@ -306,10 +294,6 @@ interface HasInterfaces {
   interfaces: string[];
 }
 
-interface HasDirectives {
-  directives: DirectiveOption[];
-}
-
 interface Named {
   name: string;
 }
@@ -340,19 +324,11 @@ export interface Nullability {
   nullability?: NullabilityConfig;
 }
 
-export interface EnumTypeConfig
-  extends Named,
-    HasMixins,
-    HasDirectives,
-    SharedTypeConfig {
+export interface EnumTypeConfig extends Named, HasMixins, SharedTypeConfig {
   members: EnumMemberInfo[];
 }
 
-export interface UnionTypeConfig
-  extends Named,
-    HasMixins,
-    HasDirectives,
-    SharedTypeConfig {
+export interface UnionTypeConfig extends Named, HasMixins, SharedTypeConfig {
   members: string[];
   /**
    * Optionally provide a custom type resolver function. If one is not provided,
@@ -368,7 +344,6 @@ export interface InputTypeConfig
   extends Named,
     HasFields,
     HasMixins,
-    HasDirectives,
     SharedTypeConfig,
     Nullability {}
 
@@ -377,7 +352,6 @@ export interface ObjectTypeConfig
     HasFields,
     HasMixins,
     HasInterfaces,
-    HasDirectives,
     SharedTypeConfig,
     Nullability,
     DefaultResolver {
@@ -385,26 +359,14 @@ export interface ObjectTypeConfig
    * Any modifications to the field config
    */
   fieldModifications: Record<string, ModifyFieldOpts<any, any, any, any>>;
-
-  /**
-   * An (optional) isTypeOf check for the object type
-   */
-  isTypeOf?: GraphQLIsTypeOfFn<any, any>;
 }
 
 export interface ExtendTypeConfig extends Named, HasFields, HasInterfaces {}
-
-export interface DirectiveTypeConfig extends Named {
-  description?: string;
-  locations: DirectiveLocationEnum[];
-  directiveArgs: DirectiveArgDefinition[];
-}
 
 export interface InterfaceTypeConfig
   extends Named,
     HasFields,
     HasMixins,
-    HasDirectives,
     SharedTypeConfig,
     Nullability,
     DefaultResolver {
@@ -511,70 +473,33 @@ export interface TypegenInfo<GenTypes = any> {
   /**
    * The type of the context for the resolvers
    */
-  contextType: string;
+  contextType?: string;
 }
 
 export interface NullabilityConfig {
   /**
-   * Whether non-list output fields can return null by default
+   * Whether output fields can return null by default.
    *
    * type Example {
    *   field: String!
+   *   otherField: [String!]!
    * }
    *
    * @default false
    */
   output?: boolean;
   /**
-   * Whether outputs that return lists can be null by default
-   *
-   * type Example {
-   *   field: [String]!
-   * }
-   *
-   * @default false
-   */
-  outputList?: boolean;
-  /**
-   * Whether non-list output fields can return null by default
-   *
-   * type Example {
-   *   field: [String!]
-   * }
-   *
-   * @default false
-   */
-  outputListItem?: boolean;
-  /**
-   * Whether non-list input fields (field arguments, input type members) are nullable by default
+   * Whether input fields (field arguments, input type members)
+   * are nullable by default.
    *
    * input Example {
    *   field: String
+   *   something: [String]
    * }
    *
    * @default true
    */
   input?: boolean;
-  /**
-   * Whether input fields that are lists are nullable by default
-   *
-   * input Example {
-   *   field: [String]
-   * }
-   *
-   * @default true
-   */
-  inputList?: boolean;
-  /**
-   * Whether any members of input list item values can be null by default
-   *
-   * input Example {
-   *   field: [String!]
-   * }
-   *
-   * @default false
-   */
-  inputListItem?: boolean;
 }
 
 export interface TypegenConfigSourceModule {
@@ -812,11 +737,6 @@ export type InputValue<GenTypes, TypeName> = any;
 export type ContextValue<GenTypes> = GenTypes extends GenTypesShape
   ? GenTypes["context"]
   : any;
-
-export type DirectiveConfig<GenTypes, DirectiveName> = {
-  locations: DirectiveLocationEnum[];
-  args?: [];
-};
 
 // -----
 // Conditional Output Field Options

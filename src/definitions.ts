@@ -1,6 +1,5 @@
 import { assertValidName, GraphQLScalarType } from "graphql";
 import {
-  DirectiveTypeDef,
   EnumTypeDef,
   InputObjectTypeDef,
   InterfaceTypeDef,
@@ -117,28 +116,4 @@ export function extendType<GenTypes = NexusGen, TypeName extends string = any>(
   const factory = new ExtendTypeDef<GenTypes, TypeName>(assertValidName(name));
   fn(factory);
   return new WrappedType(factory);
-}
-
-/**
- * Defines a directive that can be used by the schema.
- *
- * > Note: Directives should be rarely used, as they only function for external
- * > consumers of the schema.
- */
-export function directiveType<
-  GenTypes = NexusGen,
-  DirectiveName extends string = any
->(
-  name: DirectiveName,
-  config:
-    | Types.DirectiveConfig<GenTypes, DirectiveName>
-    | ((arg: DirectiveTypeDef<GenTypes>) => void)
-) {
-  const directive = new DirectiveTypeDef<GenTypes>(assertValidName(name));
-  if (typeof config === "function") {
-    config(directive);
-  } else {
-    directive.locations(...config.locations);
-  }
-  return new WrappedType(directive);
 }

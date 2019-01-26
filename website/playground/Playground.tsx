@@ -12,7 +12,6 @@ import {
   unionType,
   enumType,
   scalarType,
-  directiveType,
   makeSchemaWithMetadata,
   arg,
   intArg,
@@ -98,18 +97,15 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
         : "",
     [debouncedSchema]
   );
-  useEffect(
-    () => {
-      if (debouncedSchema) {
-        debouncedSchema.metadata
-          .generateTypesFile(debouncedSchema.schema)
-          .then((generated) => {
-            setGeneratedTypes(generated);
-          });
-      }
-    },
-    [printedSchema]
-  );
+  useEffect(() => {
+    if (debouncedSchema) {
+      debouncedSchema.metadata
+        .generateTypesFile(debouncedSchema.schema)
+        .then((generated) => {
+          setGeneratedTypes(generated);
+        });
+    }
+  }, [printedSchema]);
 
   useEffect(() => {
     if (codeDiv.current && typesDiv.current && schemaDiv.current) {
@@ -151,64 +147,49 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
     }
   }, []);
 
-  useEffect(
-    () => {
-      if (schemaEditorRef.current) {
-        schemaEditorRef.current.setValue(printedSchema);
-      }
-    },
-    [printedSchema]
-  );
+  useEffect(() => {
+    if (schemaEditorRef.current) {
+      schemaEditorRef.current.setValue(printedSchema);
+    }
+  }, [printedSchema]);
 
-  useEffect(
-    () => {
-      const { schema, metadata, error } = getCurrentSchema(content);
-      if (error) {
-        setSchemaError(error);
-      } else if (schema && metadata) {
-        setActiveSchema({ schema, metadata });
-        setSchemaError(null);
-      }
-    },
-    [content]
-  );
+  useEffect(() => {
+    const { schema, metadata, error } = getCurrentSchema(content);
+    if (error) {
+      setSchemaError(error);
+    } else if (schema && metadata) {
+      setActiveSchema({ schema, metadata });
+      setSchemaError(null);
+    }
+  }, [content]);
 
-  useEffect(
-    () => {
-      if (codeEditorRef.current) {
-        codeEditorRef.current.layout();
-      }
+  useEffect(() => {
+    if (codeEditorRef.current) {
+      codeEditorRef.current.layout();
+    }
+    if (typesEditorRef.current) {
+      typesEditorRef.current.layout();
+    }
+  }, [schemaError, activeEditor]);
+
+  useEffect(() => {
+    if (activeSchema && graphiqlRef.current) {
+      graphiqlRef.current.handleRunQuery();
+    }
+  }, [activeSchema, graphiqlRef.current]);
+
+  useEffect(() => {
+    if (generatedTypes) {
+      const disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+        generatedTypes,
+        "file:///generated-types.d.ts"
+      );
       if (typesEditorRef.current) {
-        typesEditorRef.current.layout();
+        typesEditorRef.current.setValue(generatedTypes);
       }
-    },
-    [schemaError, activeEditor]
-  );
-
-  useEffect(
-    () => {
-      if (activeSchema && graphiqlRef.current) {
-        graphiqlRef.current.handleRunQuery();
-      }
-    },
-    [activeSchema, graphiqlRef.current]
-  );
-
-  useEffect(
-    () => {
-      if (generatedTypes) {
-        const disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-          generatedTypes,
-          "file:///generated-types.d.ts"
-        );
-        if (typesEditorRef.current) {
-          typesEditorRef.current.setValue(generatedTypes);
-        }
-        return () => disposable.dispose();
-      }
-    },
-    [generatedTypes]
-  );
+      return () => disposable.dispose();
+    }
+  }, [generatedTypes]);
 
   const toggleSDL = useCallback(() => setActiveEditor("SDL"), []);
   const toggleTypings = useCallback(() => setActiveEditor("TYPES"), []);
@@ -308,9 +289,6 @@ function getCurrentSchema(code: string): SchemaOrError {
     scalarType(name: any, fn: any) {
       return add(scalarType(name, fn));
     },
-    directiveType(name: any, fn: any) {
-      return add(directiveType(name, fn));
-    },
   };
   try {
     const fn = new Function(
@@ -320,7 +298,6 @@ function getCurrentSchema(code: string): SchemaOrError {
       "enumType",
       "unionType",
       "scalarType",
-      "directiveType",
       "arg",
       "intArg",
       "stringArg",
@@ -339,7 +316,6 @@ function getCurrentSchema(code: string): SchemaOrError {
       singleton.enumType,
       singleton.unionType,
       singleton.scalarType,
-      singleton.directiveType,
       arg,
       intArg,
       stringArg,

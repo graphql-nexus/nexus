@@ -5,10 +5,7 @@ import {
   GraphQLInterfaceType,
   GraphQLUnionType,
   GraphQLEnumType,
-  GraphQLIsTypeOfFn,
-  DirectiveLocationEnum,
   GraphQLObjectType,
-  GraphQLDirective,
   GraphQLFieldConfigMap,
   Thunk,
 } from "graphql";
@@ -185,7 +182,6 @@ export class ObjectTypeDef<
       fields: [],
       mixed: [],
       interfaces: [],
-      directives: [],
       fieldModifications: {},
     };
   }
@@ -219,13 +215,6 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Adds an "isTypeOf" check to the object type.
-   */
-  isTypeOf(fn: (value: GraphQLIsTypeOfFn<any, any>) => boolean): void {
-    this.typeConfig.isTypeOf = fn;
-  }
-
-  /**
    * Used to modify a field already defined on an interface or mixed-in
    * from another type.
    *
@@ -252,18 +241,6 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Adds a directive directly to the object definition
-   *
-   * > Should be used rarely, typically only for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>): void {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
    * more about GraphQL Nexus's assumptions and configuration
@@ -281,9 +258,6 @@ export class ObjectTypeDef<
   }
 
   /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLObjectType {
@@ -302,7 +276,6 @@ export class EnumTypeDef<GenTypes = NexusGen> {
       name,
       members: [],
       mixed: [],
-      directives: [],
     };
   }
 
@@ -349,20 +322,6 @@ export class EnumTypeDef<GenTypes = NexusGen> {
   }
 
   /**
-   * Should be used very rarely, adds a directive directly to the
-   * enum definition - for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>) {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLEnumType {
@@ -381,7 +340,6 @@ export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
       name,
       mixed: [],
       members: [],
-      directives: [],
     };
   }
 
@@ -416,9 +374,6 @@ export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
    * Define a type resolver function for the union type. The Resolver should
    * return the type name of the union member that should be fulfilled.
    *
-   * > Providing this is highly recommended. If one is not provided, the
-   * default implementation will call `isTypeOf` on each implementing Object type.
-   *
    * @see https://github.com/graphql/graphql-js/issues/876#issuecomment-304398882
    */
   resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
@@ -426,20 +381,6 @@ export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
   }
 
   /**
-   * Should be used very rarely, adds a directive directly to the
-   * union definition - for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>) {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLUnionType {
@@ -465,7 +406,6 @@ export class InterfaceTypeDef<
       name,
       fields: [],
       mixed: [],
-      directives: [],
     };
   }
 
@@ -488,20 +428,6 @@ export class InterfaceTypeDef<
   }
 
   /**
-   * Should be used very rarely, adds a directive directly to the
-   * interface definition - for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>) {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLInterfaceType {
@@ -520,7 +446,6 @@ export class InputObjectTypeDef<
       name,
       fields: [],
       mixed: [],
-      directives: [],
     };
   }
 
@@ -584,17 +509,6 @@ export class InputObjectTypeDef<
   }
 
   /**
-   * Should be used very rarely, adds a directive directly to the
-   * input object definition - for interpretation by other schema consumers.
-   */
-  directive(name: string, args?: Record<string, any>) {
-    this.typeConfig.directives.push({
-      name,
-      args: args || {},
-    });
-  }
-
-  /**
    * Configures the nullability for the type
    *
    * @see nullability
@@ -611,93 +525,10 @@ export class InputObjectTypeDef<
   }
 
   /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
    * @internal
    */
   buildType(builder: SchemaBuilder): GraphQLInputObjectType {
     return builder.inputObjectType(this.typeConfig);
-  }
-}
-
-export class DirectiveTypeDef<GenTypes = NexusGen> {
-  protected typeConfig: Types.DirectiveTypeConfig;
-
-  constructor(readonly name: string) {
-    this.typeConfig = {
-      name,
-      locations: [],
-      directiveArgs: [],
-    };
-  }
-
-  description(description: string) {
-    this.typeConfig.description = dedent(description);
-  }
-
-  locations(...location: DirectiveLocationEnum[]) {
-    this.typeConfig.locations.push(...location);
-  }
-
-  /**
-   * Add an ID field type to the object schema.
-   */
-  id(name: string, options?: Types.InputFieldOpts<GenTypes, "ID">) {
-    this.field(name, "ID", options);
-  }
-
-  /**
-   * Add an Int field type to the object schema.
-   */
-  int(name: string, options?: Types.InputFieldOpts<GenTypes, "Int">) {
-    this.field(name, "Int", options);
-  }
-
-  /**
-   * Add a Float field type to the object schema.
-   */
-  float(name: string, options?: Types.InputFieldOpts<GenTypes, "Float">) {
-    this.field(name, "Float", options);
-  }
-
-  /**
-   * Add a String field type to the object schema.
-   */
-  string(name: string, options?: Types.InputFieldOpts<GenTypes, "String">) {
-    this.field(name, "String", options);
-  }
-
-  /**
-   * Add a Boolean field type to the object schema.
-   */
-  boolean(name: string, options?: Types.InputFieldOpts<GenTypes, "Boolean">) {
-    this.field(name, "Boolean", options);
-  }
-
-  /**
-   * Adds a new field to the input object type
-   */
-  field<TypeName extends Types.AllInputTypes<GenTypes> | Types.BaseScalars>(
-    name: string,
-    type: TypeName,
-    options?: Types.InputFieldOpts<GenTypes, TypeName>
-  ) {
-    this.typeConfig.directiveArgs.push({
-      name,
-      type,
-      ...options,
-    });
-  }
-
-  /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
-   * @internal
-   */
-  buildType(builder: SchemaBuilder): GraphQLDirective {
-    return builder.directiveType(this.typeConfig);
   }
 }
 
@@ -732,9 +563,6 @@ export class ExtendTypeDef<
   }
 
   /**
-   * Used internally in the construction of the types,
-   * this method should not be called in normal schema building.
-   *
    * @internal
    */
   buildType(builder: SchemaBuilder): Thunk<GraphQLFieldConfigMap<any, any>> {

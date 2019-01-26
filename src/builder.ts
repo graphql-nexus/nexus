@@ -1,7 +1,6 @@
 import {
   defaultFieldResolver,
   GraphQLBoolean,
-  GraphQLDirective,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
@@ -24,7 +23,6 @@ import {
   GraphQLScalarType,
   GraphQLString,
   GraphQLUnionType,
-  isDirective,
   isEnumType,
   isInputType,
   isInterfaceType,
@@ -33,12 +31,10 @@ import {
   isOutputType,
   isUnionType,
   GraphQLSchema,
-  specifiedDirectives,
   Thunk,
 } from "graphql";
 import { Metadata } from "./metadata";
 import {
-  DirectiveTypeDef,
   ObjectTypeDef,
   InputObjectTypeDef,
   EnumTypeDef,
@@ -55,11 +51,7 @@ const isPromise = (val: any): val is Promise<any> =>
 
 const NULL_DEFAULTS = {
   output: false,
-  outputList: false,
-  outputListItem: false,
   input: true,
-  inputList: true,
-  inputListItem: false,
 };
 
 const SCALARS: Record<string, GraphQLScalarType> = {
@@ -96,9 +88,6 @@ export class SchemaBuilder {
    */
   protected pendingTypeMap: Record<string, Types.NamedTypeDef> = {};
 
-  protected pendingDirectiveMap: Record<string, DirectiveTypeDef<any>> = {};
-  protected directiveMap: Record<string, GraphQLDirective> = {};
-
   protected nullability: Types.NullabilityConfig = {};
 
   constructor(
@@ -131,14 +120,6 @@ export class SchemaBuilder {
     }
   }
 
-  addDirective(directiveDef: DirectiveTypeDef<any> | GraphQLDirective) {
-    if (isDirective(directiveDef)) {
-      this.directiveMap[directiveDef.name] = directiveDef;
-    } else {
-      this.pendingDirectiveMap[directiveDef.name] = directiveDef;
-    }
-  }
-
   getFinalTypeMap(): Types.BuildTypes<any, any> {
     Object.keys(this.pendingTypeMap).forEach((key) => {
       // If we've already constructed the type by this point,
@@ -152,19 +133,10 @@ export class SchemaBuilder {
       this.finalTypeMap[key] = this.getOrBuildType(key);
       this.buildingTypes.clear();
     });
-    Object.keys(this.pendingDirectiveMap).forEach((key) => {});
     return {
       typeMap: this.finalTypeMap,
       metadata: this.metadata,
-      directiveMap: this.directiveMap,
     };
-  }
-
-  directiveType(config: Types.DirectiveTypeConfig) {
-    return new GraphQLDirective({
-      name: config.name,
-      locations: [],
-    });
   }
 
   inputObjectType(config: Types.InputTypeConfig): GraphQLInputObjectType {
@@ -480,7 +452,7 @@ export class SchemaBuilder {
       ...this.nullability,
       ...typeConfig.nullability,
     };
-    const { list, nullable, listDepth, listItemNullable } = fieldConfig;
+    const { list, nullable } = fieldConfig;
     const isNullable =
       typeof nullable !== "undefined"
         ? nullable
@@ -663,14 +635,13 @@ function extendError(name: string) {
  * type generation
  */
 export function buildTypes<
-  TypeMapDefs extends Record<string, GraphQLNamedType> = any,
-  DirectiveDefs extends Record<string, GraphQLDirective> = any
+  TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(
   types: any,
   config: Types.BuilderConfig = { outputs: false },
   SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
   MetadataClass: typeof Metadata = Metadata
-): Types.BuildTypes<TypeMapDefs, DirectiveDefs> {
+): Types.BuildTypes<TypeMapDefs> {
   const metadata = new MetadataClass(config);
   const builder = new SchemaBuilderClass(metadata, config);
   addTypes(builder, types);
@@ -690,8 +661,6 @@ function addTypes(builder: SchemaBuilder, types: any) {
   }
   if (isNamedTypeDef(types) || isNamedType(types)) {
     builder.addType(types);
-  } else if (types instanceof DirectiveTypeDef || isDirective(types)) {
-    builder.addDirective(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));
   } else if (isObject(types)) {
@@ -707,7 +676,7 @@ export function makeSchemaWithMetadata(
   SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
   MetadataClass: typeof Metadata = Metadata
 ): { metadata: Metadata; schema: GraphQLSchema } {
-  const { typeMap: typeMap, directiveMap: directiveMap, metadata } = buildTypes(
+  const { typeMap: typeMap, metadata } = buildTypes(
     options.types,
     options,
     SchemaBuilderClass,
@@ -752,7 +721,6 @@ export function makeSchemaWithMetadata(
     query: Query,
     mutation: Mutation,
     subscription: Subscription,
-    directives: specifiedDirectives.concat(objValues(directiveMap)),
     types: objValues(typeMap),
   });
 

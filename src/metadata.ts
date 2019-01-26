@@ -1,10 +1,7 @@
 import {
-  DirectiveLocationEnum,
   GraphQLNamedType,
   GraphQLSchema,
   lexicographicSortSchema,
-  visit,
-  parse,
   printSchema,
   GraphQLObjectType,
   isInputObjectType,
@@ -20,20 +17,11 @@ import { typegenAutoConfig } from "./autoConfig";
 import { SCALAR_TYPES } from "./common";
 import { prettierFormat } from "./prettierFormat";
 
-export interface DirectiveUse {
-  location: DirectiveLocationEnum;
-  typeName: string;
-  args: [];
-  argName?: string;
-  fieldName?: string;
-}
-
 /**
  * Passed into the SchemaBuilder, this keeps track of any necessary
  * field / type metadata we need to be aware of when building the
  * generated types and/or SDL artifact, including but not limited to:
  *
- * - Directive usage
  * - The TS type backing the GraphQL type
  * - Type default resolver
  * - Whether the field has a resolver
@@ -240,19 +228,6 @@ export class Metadata {
    */
   generateSchemaFile(schema: GraphQLSchema): string {
     let printedSchema = printSchema(schema);
-    /**
-     * If there are directives defined to be used on the types,
-     * we need to add these manually to the AST. Directives shouldn't
-     * be too common, since we're defining the schema programatically
-     * rather than by hand.
-     */
-    if (Object.keys({}).length > 0) {
-      printedSchema = printSchema(
-        visit(parse(printedSchema), {
-          // TODO: Add directives
-        })
-      );
-    }
     return [SDL_HEADER, printedSchema].join("\n\n");
   }
 
