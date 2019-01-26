@@ -5,7 +5,11 @@ sidebar_label: enumType
 hide_title: true
 ---
 
-## enumType()
+## enumType(typeName: string, EnumMembers[])
+
+## enumType(typeName: string, EnumMapping)
+
+## enumType(EnumDefinitionBlock)
 
 An Enum is a special GraphQL type that represents a set of symbolic names (members)
 bound to unique, constant values. There are three ways to create a GraphQLEnumType
@@ -27,15 +31,18 @@ const Episode = enumType("Episode", {
 });
 ```
 
-As a function, where other enums can be mixed in:
+As a "definition" block, where other enums can be mixed in:
 
 ```ts
-const Episode = enumType("Episode", (t) => {
-  t.mix("OneThroughThree");
-  t.mix("FourThroughSix");
-  t.mix("SevenThroughNine");
-  t.members(["OTHER"]);
-  t.description("All Movies in the Skywalker saga, or OTHER");
+const Episode = enumType({
+  name: "Episode",
+  description: "All Movies in the Skywalker saga, or OTHER",
+  definition: (t) => {
+    t.mix("OneThroughThree");
+    t.mix("FourThroughSix");
+    t.mix("SevenThroughNine");
+    t.members(["OTHER"]);
+  },
 });
 ```
 

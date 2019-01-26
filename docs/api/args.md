@@ -5,6 +5,8 @@ sidebar_label: "args: arg / *Arg"
 hide_title: true
 ---
 
+Nexus provides a way to create these
+
 ## Args: `arg()` / `*Arg()`
 
 Defines an argument that can be used in any object or interface type

@@ -11,16 +11,19 @@ The most basic components of a GraphQL schema are object types, which just repre
 a kind of object you can fetch from your service, and what fields it has.
 
 ```ts
-const User = objectType("User", (t) => {
-  t.int("id", { description: "Id of the user" });
-  t.string("fullName", { description: "Full name of the user" });
-  t.field("status", "StatusEnum");
-  t.field("posts", "Post", {
-    list: true,
-    resolve(root, args, ctx) {
-      return ctx.getUser(root.id).posts();
-    },
-  });
+const User = objectType({
+  name: "User",
+  definition: (t) => {
+    t.int("id", { description: "Id of the user" });
+    t.string("fullName", { description: "Full name of the user" });
+    t.field("status", "StatusEnum");
+    t.field("posts", "Post", {
+      list: true,
+      resolve(root, args, ctx) {
+        return ctx.getUser(root.id).posts();
+      },
+    });
+  },
 });
 
 const Post = objectType("Post", (t) => {

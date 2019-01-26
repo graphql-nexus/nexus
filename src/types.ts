@@ -36,13 +36,6 @@ export type NamedTypeDef<GenTypes = any> =
   | InputObjectTypeDef<GenTypes, any>
   | NamedOutputTypeDef<GenTypes>;
 
-export enum NodeType {
-  MIX = "MIX",
-  FIELD = "FIELD",
-  ENUM_MEMBER = "ENUM_MEMBER",
-  UNION_MEMBER = "UNION_MEMBER",
-}
-
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";
@@ -138,7 +131,7 @@ export interface DirectiveOption {
   args: Record<string, any>;
 }
 
-export interface FieldOpts extends CommonOpts {
+export interface OutputOpts extends CommonOpts {
   /**
    * Whether the field can be returned or input as null
    * @default false
@@ -146,31 +139,24 @@ export interface FieldOpts extends CommonOpts {
   nullable?: boolean;
   /**
    * Whether the field returns a list of values, or just a single value.
-   */
-  list?: boolean;
-  /**
-   * Sets the list depth, for the rare cases where the depth is greater than 1
-   */
-  listDepth?: number;
-  /**
-   * Whether a member of the list can be a null value. If `list` is not true,
-   * this option is ignored.
+   * If list is true, we assume the field is a list. If list is an array,
+   * we'll assume that it's a list with the depth. The boolean indicates whether
+   * the field is required (non-null).
    *
-   * If the listDepth is > 1, you can specify an Array of whether the
-   * list should be nullable, otherwise it's assumed to be false
+   * @see TODO: Examples
    */
-  listItemNullable?: boolean | boolean[];
+  list?: true | boolean[];
 }
 
-export interface ArgOpts extends FieldOpts {
+export interface ArgOpts extends CommonOpts {
   /**
    * Whether the field is required
    */
   required?: boolean;
   /**
-   * Whether the item in the list is required
+   * Whether the arguments are a list or not
    */
-  requiredListItem?: boolean;
+  list: true | boolean[];
 }
 
 export interface ArgDefinition

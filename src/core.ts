@@ -31,7 +31,7 @@ declare global {
 /**
  * Contains methods shared between `objectType`, `extendType`, and `interfaceType`
  */
-export class AbstractOutputObject<
+export abstract class AbstractOutputMethods<
   GenTypes = NexusGen,
   TypeName extends string = any
 > {
@@ -169,7 +169,7 @@ export class AbstractOutputObject<
 export class ObjectTypeDef<
   GenTypes = NexusGen,
   TypeName extends string = any
-> extends AbstractOutputObject<GenTypes, TypeName> {
+> extends AbstractOutputMethods<GenTypes, TypeName> {
   /**
    * All metadata about the object type
    */
@@ -394,7 +394,7 @@ export class UnionTypeDef<GenTypes = NexusGen, TypeName extends string = any> {
 export class InterfaceTypeDef<
   GenTypes = NexusGen,
   TypeName extends string = any
-> extends AbstractOutputObject<GenTypes, TypeName> {
+> extends AbstractOutputMethods<GenTypes, TypeName> {
   /**
    * Metadata about the object type
    */
@@ -416,15 +416,6 @@ export class InterfaceTypeDef<
    */
   description(description: string) {
     this.typeConfig.description = dedent(description);
-  }
-
-  /**
-   * Optionally provide a custom type resolver function. If one is not provided,
-   * the default implementation will call `isTypeOf` on each implementing
-   * Object type.
-   */
-  resolveType(typeResolver: Types.TypeResolver<GenTypes, TypeName>) {
-    this.typeConfig.resolveType = typeResolver;
   }
 
   /**
@@ -539,7 +530,7 @@ export class InputObjectTypeDef<
 export class ExtendTypeDef<
   GenTypes = NexusGen,
   TypeName extends string = any
-> extends AbstractOutputObject<GenTypes, TypeName> {
+> extends AbstractOutputMethods<GenTypes, TypeName> {
   /**
    * All metadata about the object type
    */

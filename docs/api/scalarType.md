@@ -9,8 +9,9 @@ A GraphQL object type has a name and fields, but at some point those fields have
 to resolve to some concrete data. That's where the scalar types come in:
 they represent the leaves of the query.
 
-```js
-const DateScalar = scalarType("Date", {
+```ts
+const DateScalar = scalarType({
+  name: "Date",
   description: "Date custom scalar type",
   parseValue(value) {
     return new Date(value);

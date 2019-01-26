@@ -34,19 +34,21 @@ As documented in the [API reference](../api-reference) GraphQL Nexus provides a 
 import { objectType, stringArg, fieldArg, makeSchema } from "nexus";
 
 const Query = objectType("Query", (t) => {
-  t.field("account", "Account", {
+  t.field("account", {
+    type: "Account",
     args: {
       name: stringArg(),
       status: fieldArg("StatusEnum"),
     },
   });
-  t.field("accountsById", "Account", {
-    list: true,
+  t.list.field("accountsById", {
+    type: "Account",
     args: {
       ids: intArg({ list: true }),
     },
   });
-  t.field("accounts", "AccountConnection", {
+  t.field("accounts", {
+    type: "AccountConnection",
     args: {
       limit: intArg({ required: true }),
     },

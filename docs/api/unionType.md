@@ -1,7 +1,7 @@
 ---
-id: scalarType
-title: scalarType
-sidebar_label: scalarType
+id: unionType
+title: unionType
+sidebar_label: unionType
 hide_title: true
 ---
 
@@ -11,10 +11,13 @@ any common fields between the types.
 As a function, where other unions can be mixed in:
 
 ```ts
-const CombinedResult = unionType("CombinedResult", (t) => {
-  t.mix("SearchResult");
-  t.members("AnotherType", "YetAnotherType");
-  t.resolveType((item) => item.name);
+const CombinedResult = unionType({
+  name: "CombinedResult",
+  resolveType: (item) => item.name,
+  definition: (t) => {
+    t.mix("SearchResult");
+    t.members("AnotherType", "YetAnotherType");
+  },
 });
 ```
 
