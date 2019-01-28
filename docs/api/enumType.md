@@ -5,10 +5,6 @@ sidebar_label: enumType
 hide_title: true
 ---
 
-## enumType(typeName: string, EnumMembers[])
-
-## enumType(typeName: string, EnumMapping)
-
 ## enumType(EnumDefinitionBlock)
 
 An Enum is a special GraphQL type that represents a set of symbolic names (members)
@@ -18,20 +14,26 @@ with enumType:
 As an array of enum values:
 
 ```ts
-const Episode = enumType("Episode", ["NEWHOPE", "EMPIRE", "JEDI"]);
-```
-
-As an object, with a mapping of enum values to internal values:
-
-```ts
-const Episode = enumType("Episode", {
-  NEWHOPE: 4,
-  EMPIRE: 5,
-  JEDI: 6,
+const Episode = enumType({
+  name: "Episode",
+  members: ["NEWHOPE", "EMPIRE", "JEDI"],
 });
 ```
 
-As a "definition" block, where other enums can be mixed in:
+As an object, with a simple mapping of enum values to internal values:
+
+```ts
+const Episode = enumType({
+  name: "Episode",
+  members: {
+    NEWHOPE: 4,
+    EMPIRE: 5,
+    JEDI: 6,
+  },
+});
+```
+
+As an array of full definitions, with comments, etc.
 
 ```ts
 const Episode = enumType({

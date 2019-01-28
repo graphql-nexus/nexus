@@ -1,8 +1,6 @@
 import {
   GraphQLArgument,
-  GraphQLEnumType,
   GraphQLInputField,
-  GraphQLInputObjectType,
   GraphQLInputType as GraphQLType,
   GraphQLInterfaceType,
   GraphQLObjectType,
@@ -18,13 +16,11 @@ import {
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
-  isUnionType,
   GraphQLNamedType,
-  specifiedScalarTypes,
 } from "graphql";
-import { eachObj, mapObj } from "./utils";
+import { eachObj, mapObj, groupTypes, GroupedTypes } from "./utils";
 import { Metadata } from "./metadata";
-import * as Types from "./types";
+import { TypegenInfo } from "./builder";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -33,16 +29,7 @@ const SpecifiedScalars = {
   Int: "number",
   Boolean: "boolean",
 };
-
-interface GroupedTypes {
-  input: GraphQLInputObjectType[];
-  interface: GraphQLInterfaceType[];
-  interfaceMembers: Record<string, string[]>;
-  object: GraphQLObjectType[];
-  union: GraphQLUnionType[];
-  enum: GraphQLEnumType[];
-  scalar: GraphQLScalarType[];
-}
+type SpecifiedScalarNames = keyof typeof SpecifiedScalars;
 
 type TypeFieldMapping = Record<string, Record<string, [string, string]>>;
 type TypeMapping = Record<string, string>;
@@ -67,46 +54,14 @@ type RootTypeMapping = Record<
  * - Non-scalar types will get a dedicated "Root" type associated with it
  */
 export class Typegen {
-  groupedTypes: GroupedTypes = {
-    input: [],
-    interface: [],
-    interfaceMembers: {},
-    object: [],
-    union: [],
-    enum: [],
-    scalar: ([] as GraphQLScalarType[]).concat(specifiedScalarTypes),
-  };
+  groupedTypes: GroupedTypes;
 
   constructor(
     protected schema: GraphQLSchema,
     protected metadata: Metadata,
-    protected typegenInfo: Types.TypegenInfo
+    protected typegenInfo: TypegenInfo
   ) {
-    const schemaTypeMap = schema.getTypeMap();
-    Object.keys(schemaTypeMap).forEach((typeName) => {
-      if (typeName.indexOf("__") === 0) {
-        return;
-      }
-      const type = schema.getType(typeName);
-      if (isObjectType(type)) {
-        this.groupedTypes.object.push(type);
-        type.getInterfaces().forEach((i) => {
-          this.groupedTypes.interfaceMembers[i.name] =
-            this.groupedTypes.interfaceMembers[i.name] || [];
-          this.groupedTypes.interfaceMembers[i.name].push(type.name);
-        });
-      } else if (isInputObjectType(type)) {
-        this.groupedTypes.input.push(type);
-      } else if (isScalarType(type) && !isSpecifiedScalarType(type)) {
-        this.groupedTypes.scalar.push(type);
-      } else if (isUnionType(type)) {
-        this.groupedTypes.union.push(type);
-      } else if (isInterfaceType(type)) {
-        this.groupedTypes.interface.push(type);
-      } else if (isEnumType(type)) {
-        this.groupedTypes.enum.push(type);
-      }
-    });
+    this.groupedTypes = groupTypes(schema);
   }
 
   print() {
@@ -147,6 +102,7 @@ export class Typegen {
     return [`export interface NexusGenTypes {`]
       .concat([
         `  context: ${this.printContext()};`,
+        `  inputTypes: NexusGenInputs;`,
         `  rootTypes: NexusGenRootTypes;`,
         `  argTypes: NexusGenArgTypes;`,
         `  returnTypes: NexusGenReturnTypes;`,
@@ -275,15 +231,26 @@ export class Typegen {
 
   buildRootTypeMap() {
     const rootTypeMap: RootTypeMapping = {};
-    const hasFields: (GraphQLInterfaceType | GraphQLObjectType)[] = [];
+    const hasFields: (
+      | GraphQLInterfaceType
+      | GraphQLObjectType
+      | GraphQLScalarType)[] = [];
     hasFields
       .concat(this.groupedTypes.object)
       .concat(this.groupedTypes.interface)
+      .concat(this.groupedTypes.scalar)
       .sort()
       .forEach((type) => {
         const backingType = this.typegenInfo.backingTypeMap[type.name];
         if (typeof backingType === "string") {
           rootTypeMap[type.name] = backingType;
+        } else if (isScalarType(type)) {
+          if (isSpecifiedScalarType(type)) {
+            rootTypeMap[type.name] =
+              SpecifiedScalars[type.name as SpecifiedScalarNames];
+          } else {
+            rootTypeMap[type.name] = "any";
+          }
         } else {
           eachObj(type.getFields(), (field) => {
             const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {});
@@ -459,7 +426,7 @@ export class Typegen {
   }
 
   printTypeInterface(interfaceName: string, typeMapping: TypeMapping) {
-    return [`interface ${interfaceName} {`]
+    return [`export interface ${interfaceName} {`]
       .concat(mapObj(typeMapping, (val, key) => `  ${key}: ${val}`))
       .concat("}")
       .join("\n");
@@ -478,7 +445,7 @@ export class Typegen {
           if (Object.keys(val).length === 0) {
             return `  ${key}: {};`;
           }
-          return this.printObj("  ", "root types")(val, key);
+          return this.printObj("  ", "root type")(val, key);
         })
       )
       .concat("}")
@@ -526,7 +493,7 @@ export class Typegen {
 
   printScalar(type: GraphQLScalarType) {
     if (isSpecifiedScalarType(type)) {
-      return SpecifiedScalars[type.name as keyof typeof SpecifiedScalars];
+      return SpecifiedScalars[type.name as SpecifiedScalarNames];
     }
     const backingType = this.typegenInfo.backingTypeMap[type.name];
     if (typeof backingType === "string") {

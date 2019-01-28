@@ -10,12 +10,11 @@ const users = [
 ];
 
 const siteConfig = {
-  title: "GraphQL Nexus", // Title for your website.
+  title: "Nexus", // Title for your website.
   tagline:
-    "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
-  url: "https://graphql-nexus.com", // Your website URL
+    "Simple, code-first, strongly typed GraphQL schemas for JavaScript/TypeScript",
+  url: "https://nexus.js.org", // Your website URL
   baseUrl: "/", // Base URL for your project */
-
   gaTrackingId: "UA-39763513-4",
 
   // algolia: {

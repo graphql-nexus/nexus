@@ -3,19 +3,18 @@ import {
   GraphQLSchema,
   lexicographicSortSchema,
   printSchema,
-  GraphQLObjectType,
-  isInputObjectType,
-  isObjectType,
-  isInterfaceType,
 } from "graphql";
 import path from "path";
-import * as Types from "./types";
-import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
+import { Typegen } from "./typegen";
 import { assertAbsolutePath } from "./utils";
-import { buildTypeDefinitions, Typegen } from "./typegen";
-import { typegenAutoConfig } from "./autoConfig";
-import { SCALAR_TYPES } from "./common";
-import { prettierFormat } from "./prettierFormat";
+import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
+import { typegenAutoConfig } from "./typegenAutoConfig";
+import { prettierFormat, FormatTypegenFn } from "./prettierFormat";
+import { BuilderConfig, TypegenInfo } from "./builder";
+import { InterfaceTypeDef } from "./definitions/interfaceType";
+import { ScalarTypeDef } from "./definitions/scalarType";
+import { ObjectTypeDef } from "./definitions/objectType";
+import { OutputFieldConfig } from "./definitions/blocks";
 
 /**
  * Passed into the SchemaBuilder, this keeps track of any necessary
@@ -30,16 +29,16 @@ import { prettierFormat } from "./prettierFormat";
  */
 export class Metadata {
   protected completed = false;
-  protected objectMeta: Record<string, Types.ObjectTypeConfig> = {};
-  protected interfaceMeta: Record<string, Types.InterfaceTypeConfig> = {};
+  protected objectMeta: Record<string, ObjectTypeDef> = {};
+  protected interfaceMeta: Record<string, InterfaceTypeDef> = {};
   protected objectFieldMeta: Record<
     string,
-    Record<string, Types.OutputFieldConfig>
+    Record<string, OutputFieldConfig>
   > = {};
   protected typeImports: string[] = [];
   protected typegenFile: string = "";
 
-  constructor(protected config: Types.BuilderConfig) {
+  constructor(protected config: BuilderConfig) {
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
       if (config.outputs.typegen) {
         this.typegenFile = assertAbsolutePath(
@@ -54,51 +53,9 @@ export class Metadata {
     this.completed = true;
   }
 
-  /**
-   * Ensure the type doesn't conflict with an existing type, prefixing
-   * with a _ if it does
-   */
-  safeTypeName(schema: GraphQLSchema, typeName: string) {
-    if (!schema.getType(typeName)) {
-      return typeName;
-    }
-    return `_${typeName}`;
-  }
-
-  /**
-   * Check for the field's existence in an object type.
-   */
-  hasField(
-    schema: GraphQLSchema,
-    typeName: string,
-    fieldName: string
-  ): boolean {
-    const type = schema.getType(typeName);
-    if (!type) {
-      throw new Error(".hasField should only be called on known type names");
-    }
-    if (
-      isInputObjectType(type) ||
-      isObjectType(type) ||
-      isInterfaceType(type)
-    ) {
-      const fields = type.getFields();
-      return Boolean(fields[fieldName]);
-    }
-    throw new Error(
-      `.hasField should only be used with GraphQL types with fields, ${type}`
-    );
-  }
-
   // Predicates:
 
-  isExternalType(typeName: string) {
-    return Boolean(this.objectMeta[typeName]);
-  }
-
   hasResolver(typeName: string, fieldName: string) {
-    if (this.isFieldModified(typeName, fieldName)) {
-    }
     return Boolean(
       this.objectFieldMeta[typeName] &&
         this.objectFieldMeta[typeName][fieldName] &&
@@ -106,54 +63,17 @@ export class Metadata {
     );
   }
 
-  hasDefaultResolver(typeName: string) {
-    return Boolean(
-      this.objectMeta[typeName] && this.objectMeta[typeName].defaultResolver
-    );
-  }
-
-  hasDefaultValue(type: GraphQLObjectType, fieldName: string) {
-    return Boolean(
-      this.objectFieldMeta[type.name] &&
-        this.objectFieldMeta[type.name][fieldName] &&
-        this.objectFieldMeta[type.name][fieldName].default
-    );
-  }
-
-  isFieldModified(typeName: string, fieldName: string) {
-    return Boolean(
-      this.objectMeta[typeName] &&
-        this.objectMeta[typeName].fieldModifications[fieldName]
-    );
-  }
-
-  isInterfaceField(type: GraphQLObjectType, fieldName: string) {
-    return Boolean(
-      type.getInterfaces().forEach((i) => i.getFields()[fieldName])
-    );
-  }
-
   // Schema construction helpers:
 
-  addScalar(config: Types.ScalarOpts) {
+  addScalar(config: ScalarTypeDef) {
     this.checkMutable();
-  }
-
-  addInterfaceType(config: Types.InterfaceTypeConfig) {
-    this.checkMutable();
-    this.interfaceMeta[config.name] = config;
-  }
-
-  addObjectType(config: Types.ObjectTypeConfig) {
-    this.checkMutable();
-    this.objectMeta[config.name] = config;
   }
 
   addExternalType(type: GraphQLNamedType) {
     this.checkMutable();
   }
 
-  addField(typeName: string, field: Types.OutputFieldConfig) {
+  addField(typeName: string, field: OutputFieldConfig) {
     this.checkMutable();
     this.objectFieldMeta[typeName] = this.objectFieldMeta[typeName] || {};
     this.objectFieldMeta[typeName][field.name] = field;
@@ -204,7 +124,7 @@ export class Metadata {
       util.promisify(fs.readFile),
       util.promisify(fs.writeFile),
     ];
-    let formatTypegen: Types.Maybe<Types.FormatTypegenFn> = null;
+    let formatTypegen: FormatTypegenFn | null = null;
     if (typeof this.config.formatTypegen === "function") {
       formatTypegen = this.config.formatTypegen;
     } else if (this.config.prettierConfig) {
@@ -238,7 +158,7 @@ export class Metadata {
     return new Typegen(schema, this, await this.getTypegenInfo(schema)).print();
   }
 
-  async getTypegenInfo(schema: GraphQLSchema): Promise<Types.TypegenInfo> {
+  async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {
     if (this.config.typegenConfig) {
       if (this.config.typegenAutoConfig) {
         console.warn(
@@ -256,9 +176,7 @@ export class Metadata {
       headers: [TYPEGEN_HEADER],
       imports: [],
       contextType: "unknown",
-      backingTypeMap: {
-        ...SCALAR_TYPES,
-      },
+      backingTypeMap: {},
     };
   }
 

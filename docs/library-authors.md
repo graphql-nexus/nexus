@@ -6,10 +6,7 @@ sidebar_label: Library Authors
 
 ## Wrapping the API
 
-If you are a library author building tools for GraphQL, we expose the core types
-It is recommended that you have `nexus` specified as a peer dependency rather
-than a direct dependency of your wrapping plugin, so duplicate copies of the library are
-not installed.
+If you are a library author building tools for GraphQL, we expose the core types It is recommended that you have `nexus` specified as a peer dependency rather than a direct dependency of your wrapping plugin, so duplicate copies of the library are not installed.
 
 One example of this pattern is in `nexus-contrib` where functions for creating relay-style connections are constructed:
 

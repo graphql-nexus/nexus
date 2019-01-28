@@ -55,17 +55,26 @@ const Query = objectType("Query", (t) => {
   });
 });
 
-const Node = objectType("Node", (t) => {
-  t.id("id", { description: "Unique identifier for the resource" });
+const Node = objectType({
+  name: "Node",
+  definition(t) {
+    t.id("id", { description: "Unique identifier for the resource" });
+  },
 });
 
-const Account = objectType("Account", (t) => {
-  t.implements("Node");
-  t.string("username");
-  t.string("email");
+const Account = objectType({
+  name: "Account",
+  implements: ["Node"],
+  definition(t) {
+    t.string("username");
+    t.string("email");
+  },
 });
 
-const StatusEnum = enumType("StatusEnum", ["ACTIVE", "DISABLED"]);
+const StatusEnum = enumType({
+  name: "StatusEnum",
+  members: ["ACTIVE", "DISABLED"],
+});
 
 const schema = makeSchema({
   types: [Account, Node, Query, StatusEnum],

@@ -43,7 +43,7 @@ const StatusEnum = enumType("StatusEnum", {
 
 Configures the nullability for the type, check the
 documentation's "Getting Started" section to learn
-more about GraphQL Nexus's assumptions and configuration
+more about Nexus's assumptions and configuration
 on nullability.
 
 @param nullability

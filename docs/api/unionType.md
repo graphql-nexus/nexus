@@ -8,16 +8,12 @@ hide_title: true
 Union types are very similar to interfaces, but they don't get to specify
 any common fields between the types.
 
-As a function, where other unions can be mixed in:
-
 ```ts
-const CombinedResult = unionType({
-  name: "CombinedResult",
+const MediaType = unionType({
+  name: "MediaType",
+  description: "Any container type that can be rendered into the feed",
+  members: ["Post", "Image", "Card"],
   resolveType: (item) => item.name,
-  definition: (t) => {
-    t.mix("SearchResult");
-    t.members("AnotherType", "YetAnotherType");
-  },
 });
 ```
 

@@ -8,7 +8,7 @@
 import { GraphQLResolveInfo } from "graphql";
 
 declare global {
-  interface GraphQLNexusGen extends NexusGenTypes {}
+  interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {
@@ -58,12 +58,12 @@ export interface NexusGenReturnTypes {
 
 export interface NexusGenArgTypes {}
 
-interface NexusGenAbstractResolveSourceTypes {
+export interface NexusGenAbstractResolveSourceTypes {
   Bar: NexusGenRootTypes["Foo"];
   Baz: NexusGenRootTypes["Foo"];
 }
 
-interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractResolveReturnTypes {
   Bar: "Foo";
   Baz: "Foo";
 }

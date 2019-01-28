@@ -8,7 +8,7 @@
 import { GraphQLResolveInfo } from "graphql";
 import * as swapi from "./types/backingTypes";
 declare global {
-  interface GraphQLNexusGen extends NexusGenTypes {}
+  interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {}
@@ -144,14 +144,6 @@ export interface NexusGenTypes {
 export type Gen = NexusGenTypes;
 
 type MaybePromise<T> = PromiseLike<T> | T;
-type SourceType<
-  TypeName
-> = TypeName extends keyof NexusGenAbstractResolveSourceTypes
-  ? NexusGenAbstractResolveSourceTypes[TypeName]
-  : never;
-type RootType<TypeName> = TypeName extends keyof NexusGenRootTypes
-  ? NexusGenRootTypes[TypeName]
-  : never;
 type ArgType<TypeName, FieldName> = TypeName extends keyof NexusGenArgTypes
   ? FieldName extends keyof NexusGenArgTypes[TypeName]
     ? NexusGenArgTypes[TypeName][FieldName]
@@ -159,19 +151,20 @@ type ArgType<TypeName, FieldName> = TypeName extends keyof NexusGenArgTypes
   : {};
 
 export type NexusResolver<
-  TypeName extends keyof NexusGenReturnTypes,
+  TypeName extends keyof NexusGenReturnTypes & keyof NexusGenRootTypes,
   FieldName extends keyof NexusGenReturnTypes[TypeName]
 > = (
-  root: RootType<TypeName>,
+  root: NexusGenRootTypes[TypeName],
   args: ArgType<TypeName, FieldName>,
   context: NexusGenTypes["context"],
   info: GraphQLResolveInfo
 ) => MaybePromise<NexusGenReturnTypes[TypeName][FieldName]>;
 
 export type NexusAbstractTypeResolver<
-  TypeName extends keyof NexusGenAbstractResolveReturnTypes
+  TypeName extends keyof NexusGenAbstractResolveReturnTypes &
+    keyof NexusGenAbstractResolveSourceTypes
 > = (
-  root: SourceType<TypeName>,
+  root: NexusGenAbstractResolveSourceTypes[TypeName],
   context: NexusGenTypes["context"],
   info: GraphQLResolveInfo
 ) => MaybePromise<NexusGenAbstractResolveReturnTypes[TypeName]>;

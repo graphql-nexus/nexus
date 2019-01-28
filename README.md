@@ -16,7 +16,7 @@ Check out the [`/examples`](/examples) for some sample uses.
 
 ### Docs
 
-[graphql-nexus.com](https://graphql-nexus.com)
+[nexus.js.org](https://nexus.js.org)
 
 ### License
 

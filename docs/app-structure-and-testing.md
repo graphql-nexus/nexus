@@ -4,7 +4,7 @@ title: App Structure & Testing
 sidebar_label: App Structure & Testing
 ---
 
-GraphQL Nexus encourages separating your domain logic from the actual resolvers, so you can easily test and reuse your application logic independent of their use in GraphQL.
+Nexus encourages separating your domain logic from the actual resolvers, so you can easily test and reuse your application logic independent of their use in GraphQL.
 
 ### Structuring Context
 

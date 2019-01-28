@@ -4,7 +4,7 @@ title: Best Practices
 sidebar_label: Best Practices
 ---
 
-A few tips when using GraphQL Nexus to build out a schema:
+A few tips when using Nexus to build out a schema:
 
 ## Configure your development server to auto-restart
 
