@@ -143,6 +143,9 @@ export class Typegen {
       .sort()
       .forEach((type) => {
         if (isInterfaceType(type)) {
+          // this.schema.getPossibleTypes(type).map(t => {
+          //  ...
+          // })
           sourceMap[type.name] = this.groupedTypes.interfaceMembers[type.name]
             .map((val) => `NexusGenRootTypes['${val}']`)
             .join(" | ");
@@ -254,7 +257,7 @@ export class Typegen {
         } else {
           eachObj(type.getFields(), (field) => {
             const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {});
-            if (!this.metadata.hasResolver(type.name, field.name)) {
+            if (!Boolean(field.resolve)) {
               if (typeof obj !== "string") {
                 obj[field.name] = [
                   this.argSeparator(field.type as GraphQLType),

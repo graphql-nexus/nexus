@@ -1,4 +1,4 @@
-import { Episode } from "../star-wars-typegen";
+import { NexusGenEnums } from "../star-wars-typegen";
 
 /**
  * These are Flow types which correspond to the schema.
@@ -8,7 +8,7 @@ export interface CharacterFields {
   id: string;
   name: string;
   friends: string[];
-  appears_in: Episode[];
+  appears_in: NexusGenEnums["Episode"][];
 }
 
 export interface Human extends CharacterFields {

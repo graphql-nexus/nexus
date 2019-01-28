@@ -1,8 +1,8 @@
-import { core } from "nexus";
+import { core, Types } from "nexus";
 import { Gen } from "../ts-ast-reader-typegen";
 
 export function withTypeArguments(t: core.ObjectTypeDef<Gen, any>) {
-  t.field("typeArguments", "Node", { list: true, nullable: true });
+  t.list.field("typeArguments", { type: "Node", nullable: true });
 }
 
 export function hasTypeParameters(t: core.ObjectTypeDef<Gen, any>) {

@@ -8,7 +8,7 @@
 import { GraphQLResolveInfo } from "graphql";
 import * as t from "./typeDefs";
 declare global {
-  interface GraphQLNexusGen extends NexusGenTypes {}
+  interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {}

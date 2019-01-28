@@ -15,8 +15,6 @@ import {
   isEnumType,
 } from "graphql";
 import path from "path";
-import * as Types from "./typegenTypeHelpers";
-import { EnumMemberInfo } from "./definitions/enumType";
 
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);

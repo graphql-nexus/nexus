@@ -1,5 +1,13 @@
-import { DeprecationInfo, NexusTypes } from "./_types";
+import { DeprecationInfo, NexusTypes, BaseScalars } from "./_types";
 import { ArgDef } from "./args";
+import {
+  AbstractTypeResolver,
+  NeedsResolver,
+  NexusFieldResolver,
+  GetGen,
+} from "../typegenTypeHelpers";
+import { WrappedOutput } from "./wrappedType";
+import { GraphQLCompositeType, GraphQLLeafType } from "graphql";
 
 export interface CommonFieldConfig {
   /**
@@ -23,7 +31,7 @@ export interface CommonFieldConfig {
   list?: true | boolean[];
 }
 
-export interface OutputFieldConfig extends CommonFieldConfig {
+export interface OutputScalarConfig extends CommonFieldConfig {
   /**
    * Whether the field can be null
    * @default (false - depends on whether nullability is configured)
@@ -33,6 +41,15 @@ export interface OutputFieldConfig extends CommonFieldConfig {
    * Arguments for the field
    */
   args?: Record<string, ArgDef>;
+}
+
+export interface OutputFieldConfig<GenTypes = NexusGen>
+  extends OutputScalarConfig {
+  type:
+    | GetGen<GenTypes, "allOutputTypes">
+    | WrappedOutput
+    | GraphQLCompositeType
+    | GraphQLLeafType;
 }
 
 export interface InputFieldConfig extends CommonFieldConfig {
@@ -55,21 +72,48 @@ export interface InputFieldDef extends InputFieldConfig {
   type: any;
 }
 
-export type ScalarOutArgs<
+export type ScalarOutSpread<
   TypeName extends string,
   FieldName extends string,
-  Fallback,
+  Fallback = any,
   GenTypes = NexusGen
-> = [] | [];
+> = NeedsResolver<TypeName, FieldName, GenTypes> extends true
+  ?
+      | [NexusFieldResolver<TypeName, FieldName, Fallback, GenTypes>]
+      | [ScalarOutConfig<TypeName, FieldName, Fallback, GenTypes>]
+  :
+      | []
+      | [NexusFieldResolver<TypeName, FieldName, Fallback, GenTypes>]
+      | [ScalarOutConfig<TypeName, FieldName, Fallback, GenTypes>];
 
-export type FieldOutArgs<
+export type ScalarOutConfig<
   TypeName extends string,
   FieldName extends string,
-  Fallback,
+  Fallback = any,
   GenTypes = NexusGen
-> = [] | [];
+> = NeedsResolver<TypeName, FieldName, GenTypes> extends true
+  ? OutputScalarConfig & {
+      resolve: NexusFieldResolver<TypeName, FieldName, Fallback, GenTypes>;
+    }
+  : OutputScalarConfig & {
+      resolve?: NexusFieldResolver<TypeName, FieldName, Fallback, GenTypes>;
+    };
 
-export type ScalarInArgs<
+export type FieldOutConfig<
+  TypeName extends string,
+  FieldName extends string,
+  Fallback = any,
+  GenTypes = NexusGen
+> = OutputFieldConfig &
+  (NeedsResolver<TypeName, FieldName, GenTypes> extends true
+    ? {
+        resolve: NexusFieldResolver<TypeName, FieldName, Fallback, GenTypes>;
+      }
+    : {
+        resolve?: NexusFieldResolver<TypeName, FieldName, Fallback, GenTypes>;
+      });
+
+export type ScalarInSpread<
   TypeName extends string,
   FieldName extends string,
   Fallback,
@@ -77,6 +121,14 @@ export type ScalarInArgs<
 > = [] | [];
 
 export type FieldInArgs = [] | [];
+
+export interface OutputDefinitionBuilder {
+  addField(config: OutputFieldDef): void;
+}
+
+export interface InputDefinitionBuilder {
+  addField(config: InputFieldDef): void;
+}
 
 /**
  * The output definition block is passed to the "definition"
@@ -88,59 +140,75 @@ export class OutputDefinitionBlock<
 > {
   protected hasAdded: boolean;
 
-  constructor(protected fields: any[], isList = false) {
+  constructor(
+    protected typeBuilder: OutputDefinitionBuilder,
+    protected isList = false
+  ) {
     this.hasAdded = false;
   }
 
   get list() {
-    return new OutputDefinitionBlock(this.fields, true);
+    if (this.isList) {
+      throw new Error(
+        "Cannot chain list.list, in the definition block. Use `list: []` config value"
+      );
+    }
+    return new OutputDefinitionBlock(this.typeBuilder, true);
   }
 
   string<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutArgs<TypeName, FieldName, string, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName, string, GenTypes>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, "String", opts);
   }
 
   int<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutArgs<TypeName, FieldName, number, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName, number, GenTypes>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, "Int", opts);
   }
 
   boolean<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutArgs<TypeName, FieldName, boolean, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName, boolean, GenTypes>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, "Boolean", opts);
   }
 
   id<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutArgs<TypeName, FieldName, string, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName, string, GenTypes>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, "ID", opts);
   }
 
   float<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutArgs<TypeName, FieldName, number, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName, number, GenTypes>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, "Float", opts);
   }
 
   field<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: FieldOutArgs<TypeName, FieldName, GenTypes>
-  ) {}
+    fieldDef: FieldOutConfig<TypeName, FieldName, any, GenTypes>
+  ) {
+    this.typeBuilder.addField();
+  }
 
   protected addScalarField(
     fieldName: string,
-    ...opts: ScalarOutArgs<TypeName, any, any, GenTypes>
+    typeName: BaseScalars,
+    opts: ScalarOutSpread<TypeName, any, any, GenTypes>
   ) {
-    this.fields.push();
+    if (typeof opts[0] === "function") {
+    }
+    this.typeBuilder.addField({
+      name: fieldName,
+      type: typeName,
+    });
   }
 }
 
@@ -150,54 +218,80 @@ export class InputDefinitionBlock<
 > {
   protected hasAdded: boolean;
 
-  constructor(protected fields: any[], isList = false) {
+  constructor(protected typeBuilder: InputDefinitionBuilder, isList = false) {
     this.hasAdded = false;
   }
 
   get list() {
-    return new InputDefinitionBlock(this.fields, true);
+    return new InputDefinitionBlock(this.typeBuilder, true);
   }
 
   string<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarInArgs<TypeName, FieldName, string>
+    ...opts: ScalarInSpread<TypeName, FieldName, string>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, opts);
   }
 
   int<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarInArgs<TypeName, FieldName, number>
+    ...opts: ScalarInSpread<TypeName, FieldName, number>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, opts);
   }
 
   boolean<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarInArgs<TypeName, FieldName, boolean>
+    ...opts: ScalarInSpread<TypeName, FieldName, boolean>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, opts);
   }
 
   id<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarInArgs<TypeName, FieldName, string>
+    ...opts: ScalarInSpread<TypeName, FieldName, string>
   ) {
-    this.addScalarField(fieldName, ...opts);
+    this.addScalarField(fieldName, opts);
   }
 
   float<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarInArgs<TypeName, FieldName, string>
-  ) {}
+    ...opts: ScalarInSpread<TypeName, FieldName, string>
+  ) {
+    this.addScalarField(fieldName, opts);
+  }
 
   field<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarInArgs<TypeName, FieldName, string>
-  ) {}
-
+    fieldConfig: ScalarInSpread<TypeName, FieldName, string>
+  ) {
+    this.typeBuilder.addField({
+      name: fieldName,
+      ...fieldConfig,
+    });
+  }
   protected addScalarField(
     fieldName: string,
-    ...opts: ScalarInArgs<TypeName, any, any>
+    opts: ScalarInSpread<TypeName, any, any>
   ) {}
+}
+
+export interface AbstractOutputDefinitionBuilder
+  extends OutputDefinitionBuilder {
+  setResolveType(fn: AbstractTypeResolver<any>): void;
+}
+
+export class AbstractOutputDefinitionBlock<
+  TypeName extends string,
+  GenTypes = NexusGen
+> extends OutputDefinitionBlock<TypeName, NexusGen> {
+  constructor(protected typeBuilder: AbstractOutputDefinitionBuilder) {
+    super(typeBuilder);
+  }
+  /**
+   *
+   */
+  resolveType(fn: AbstractTypeResolver<TypeName, GenTypes>) {
+    this.typeBuilder.setResolveType(fn);
+  }
 }

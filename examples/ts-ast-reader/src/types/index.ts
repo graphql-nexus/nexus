@@ -15,21 +15,25 @@ export interface ContextType {
   source: ts.SourceFile;
 }
 
-export const Query = objectType("Query", (t) => {
-  t.field("parseFile", "SourceFile", {
-    args: {
-      file: stringArg({ required: true }),
-    },
-    async resolve(root, args, ctx) {
-      const fileContents = await fs.readFile(args.file, "utf-8");
-      const sourceFile = ts.createSourceFile(
-        args.file,
-        fileContents,
-        ts.ScriptTarget.ES2017
-      );
-      ctx.source = sourceFile;
+export const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.field("parseFile", {
+      type: "SourceFile",
+      args: {
+        file: stringArg({ required: true }),
+      },
+      async resolve(root, args, ctx) {
+        const fileContents = await fs.readFile(args.file, "utf-8");
+        const sourceFile = ts.createSourceFile(
+          args.file,
+          fileContents,
+          ts.ScriptTarget.ES2017
+        );
+        ctx.source = sourceFile;
 
-      return sourceFile;
-    },
-  });
+        return sourceFile;
+      },
+    });
+  },
 });

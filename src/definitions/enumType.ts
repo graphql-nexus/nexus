@@ -24,7 +24,7 @@ export interface EnumTypeConfig<TypeName extends string, GenTypes = NexusGen> {
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
-  members: MaybeThunk<string[]>;
+  members: Array<string | EnumMemberInfo>;
 }
 
 export type EnumTypeDef = ReturnType<typeof enumType>;

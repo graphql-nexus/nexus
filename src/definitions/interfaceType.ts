@@ -1,10 +1,6 @@
-import { OutputDefinitionBlock } from "./blocks";
+import { AbstractOutputDefinitionBlock } from "./blocks";
 import { wrappedType } from "./wrappedType";
-import {
-  AbstractResolveRoot,
-  AbstractResolveReturn,
-} from "../typegenTypeHelpers";
-import { NexusTypes, MaybePromise } from "./_types";
+import { NexusTypes, NullabilityConfig } from "./_types";
 
 export interface InterfaceTypeBase<
   TypeName extends string,
@@ -15,16 +11,30 @@ export interface InterfaceTypeBase<
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
-  resolveType(
-    source: AbstractResolveRoot<GenTypes, TypeName>
-  ): MaybePromise<AbstractResolveReturn<TypeName, GenTypes>>;
+
+  // Really wanted to keep this here, but alas:
+  //
+  // resolveType(
+  //   source: AbstractResolveRoot<GenTypes, TypeName>
+  // ): MaybePromise<AbstractResolveReturn<TypeName, GenTypes> | null>;
 }
 
 export interface InterfaceTypeConfig<
   TypeName extends string,
   GenTypes = NexusGen
 > extends InterfaceTypeBase<TypeName, GenTypes> {
-  definition(t: OutputDefinitionBlock<TypeName, GenTypes>): void;
+  definition(t: AbstractOutputDefinitionBlock<TypeName, GenTypes>): void;
+  /**
+   * Configures the nullability for the type, check the
+   * documentation's "Getting Started" section to learn
+   * more about GraphQL Nexus's assumptions and configuration
+   * on nullability.
+   */
+  nullability?: NullabilityConfig;
+  /**
+   * The description to annotate the GraphQL SDL
+   */
+  description?: string | null;
 }
 
 export type InterfaceTypeDef = ReturnType<typeof interfaceType>;
@@ -32,19 +42,13 @@ export type InterfaceTypeDef = ReturnType<typeof interfaceType>;
 /**
  * Defines a GraphQLInterfaceType
  *
- * @see {}
- *
  * @param config
  */
 export function interfaceType<TypeName extends string, GenTypes = NexusGen>(
   config: InterfaceTypeConfig<TypeName, GenTypes>
 ) {
-  const { definition, ...rest } = config;
-  const fields: any[] = [];
-  definition(new OutputDefinitionBlock(fields));
   return wrappedType({
     nexus: NexusTypes.Interface as NexusTypes.Interface,
-    fields,
-    ...rest,
+    ...config,
   });
 }

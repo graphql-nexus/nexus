@@ -1,19 +1,14 @@
-import {
-  GraphQLNamedType,
-  GraphQLSchema,
-  lexicographicSortSchema,
-  printSchema,
-} from "graphql";
+import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import path from "path";
 import { Typegen } from "./typegen";
 import { assertAbsolutePath } from "./utils";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { typegenAutoConfig } from "./typegenAutoConfig";
-import { prettierFormat, FormatTypegenFn } from "./prettierFormat";
+import {
+  typegenFormatPrettier,
+  TypegenFormatFn,
+} from "./typegenFormatPrettier";
 import { BuilderConfig, TypegenInfo } from "./builder";
-import { InterfaceTypeDef } from "./definitions/interfaceType";
-import { ScalarTypeDef } from "./definitions/scalarType";
-import { ObjectTypeDef } from "./definitions/objectType";
 import { OutputFieldConfig } from "./definitions/blocks";
 
 /**
@@ -28,14 +23,10 @@ import { OutputFieldConfig } from "./definitions/blocks";
  * - If the field has a "default" value
  */
 export class Metadata {
-  protected completed = false;
-  protected objectMeta: Record<string, ObjectTypeDef> = {};
-  protected interfaceMeta: Record<string, InterfaceTypeDef> = {};
   protected objectFieldMeta: Record<
     string,
     Record<string, OutputFieldConfig>
   > = {};
-  protected typeImports: string[] = [];
   protected typegenFile: string = "";
 
   constructor(protected config: BuilderConfig) {
@@ -47,36 +38,6 @@ export class Metadata {
         );
       }
     }
-  }
-
-  finishConstruction() {
-    this.completed = true;
-  }
-
-  // Predicates:
-
-  hasResolver(typeName: string, fieldName: string) {
-    return Boolean(
-      this.objectFieldMeta[typeName] &&
-        this.objectFieldMeta[typeName][fieldName] &&
-        this.objectFieldMeta[typeName][fieldName].resolve
-    );
-  }
-
-  // Schema construction helpers:
-
-  addScalar(config: ScalarTypeDef) {
-    this.checkMutable();
-  }
-
-  addExternalType(type: GraphQLNamedType) {
-    this.checkMutable();
-  }
-
-  addField(typeName: string, field: OutputFieldConfig) {
-    this.checkMutable();
-    this.objectFieldMeta[typeName] = this.objectFieldMeta[typeName] || {};
-    this.objectFieldMeta[typeName][field.name] = field;
   }
 
   /**
@@ -124,11 +85,11 @@ export class Metadata {
       util.promisify(fs.readFile),
       util.promisify(fs.writeFile),
     ];
-    let formatTypegen: FormatTypegenFn | null = null;
+    let formatTypegen: TypegenFormatFn | null = null;
     if (typeof this.config.formatTypegen === "function") {
       formatTypegen = this.config.formatTypegen;
     } else if (this.config.prettierConfig) {
-      formatTypegen = prettierFormat(this.config.prettierConfig);
+      formatTypegen = typegenFormatPrettier(this.config.prettierConfig);
     }
     const content = Promise.resolve(
       typeof formatTypegen === "function" ? formatTypegen(output, type) : output
@@ -178,11 +139,5 @@ export class Metadata {
       contextType: "unknown",
       backingTypeMap: {},
     };
-  }
-
-  protected checkMutable() {
-    if (this.completed) {
-      throw new Error("Metadata cannot be modified after the schema is built");
-    }
   }
 }

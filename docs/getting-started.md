@@ -33,26 +33,29 @@ As documented in the [API reference](../api-reference) GraphQL Nexus provides a 
 ```js
 import { objectType, stringArg, fieldArg, makeSchema } from "nexus";
 
-const Query = objectType("Query", (t) => {
-  t.field("account", {
-    type: "Account",
-    args: {
-      name: stringArg(),
-      status: fieldArg("StatusEnum"),
-    },
-  });
-  t.list.field("accountsById", {
-    type: "Account",
-    args: {
-      ids: intArg({ list: true }),
-    },
-  });
-  t.field("accounts", {
-    type: "AccountConnection",
-    args: {
-      limit: intArg({ required: true }),
-    },
-  });
+const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.field("account", {
+      type: "Account",
+      args: {
+        name: stringArg(),
+        status: fieldArg("StatusEnum"),
+      },
+    });
+    t.list.field("accountsById", {
+      type: "Account",
+      args: {
+        ids: intArg({ list: true }),
+      },
+    });
+    t.field("accounts", {
+      type: "AccountConnection",
+      args: {
+        limit: intArg({ required: true }),
+      },
+    });
+  },
 });
 
 const Node = objectType({
@@ -64,8 +67,8 @@ const Node = objectType({
 
 const Account = objectType({
   name: "Account",
-  implements: ["Node"],
   definition(t) {
+    t.implements("Node"); // or t.implements(Node)
     t.string("username");
     t.string("email");
   },
@@ -109,9 +112,12 @@ This can also be configured on a per-type basis, using the `nullability` method 
 Enforcing non-null guarantees at the resolver layer can be tedious, so GraphQL Nexus also provides a `default` option; a value used when the resolved type is otherwise `null` or `undefined`. Providing the `default` will set the schema definition for the field to non-null regardless of root schema configuration, unless `nullable: true` is set explicitly on the field.
 
 ```ts
-const AccountInfo = objectType("AccountInfo", (t) => {
-  t.string("description", { default: "N/A" });
-  t.int("linkedAccountId", { nullable: true });
+const AccountInfo = objectType({
+  name: "AccountInfo",
+  definition(t) {
+    t.string("description", () => "N/A");
+    t.int("linkedAccountId", { nullable: true });
+  },
 });
 ```
 
@@ -120,18 +126,18 @@ const AccountInfo = objectType("AccountInfo", (t) => {
 One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus makes this simple by allowing a function as the second parameter to the resolver function.
 
 ```ts
-const User = objectType("User", (t) => {
-  t.id("id", (o) => o.user_id);
-  t.id("name", (o) => o.user_name);
-  t.id("description", (o) => o.user_description);
+const User = objectType({
+  name: "User",
+  definition(t) {
+    t.id("id", (o) => o.user_id);
+    t.id("name", (o) => o.user_name);
+    t.id("description", (o) => o.user_description);
+  },
 });
 ```
 
 When using the TypeScript, configuring the [backing object type](type-generation.md#backing-types) definitions will check for the existence of the property on the object, and error if a non-existent property is referenced.
-
-## Type Mixing
-
-When hand constructing schemas in a GraphQL Schema Definition Language (SDL) file, one of the big pain points is making a change to multiple types at once, for instance when adding a field to an interface. Changing types, keeping consistent descriptions, field deprecation are all difficult when you're maintaining this by hand.
+d.
 
 ## Auto-Generated Artifacts
 

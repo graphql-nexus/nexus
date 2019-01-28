@@ -13,7 +13,7 @@ declare global {
 
 export interface NexusGenInputs {}
 
-interface NexusGenEnums {
+export interface NexusGenEnums {
   Episode: 5 | 6 | 4;
   MoreEpisodes: 5 | 6 | 4 | "OTHER";
 }

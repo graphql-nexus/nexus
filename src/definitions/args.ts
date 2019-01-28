@@ -1,6 +1,7 @@
 import { GetGen } from "../typegenTypeHelpers";
 import { NexusTypes, BaseScalars } from "./_types";
 import { GraphQLScalarType } from "graphql";
+import { wrappedArg, Wrapped } from "./wrappedType";
 
 export interface ScalarArgConfig {
   /**
@@ -16,6 +17,10 @@ export interface ScalarArgConfig {
    * whether the list member can be nullable
    */
   list?: null | true | boolean[];
+  /**
+   * The description to annotate the GraphQL SDL
+   */
+  description?: string | null;
 }
 
 export interface ArgConfig<GenTypes = NexusGen> extends ScalarArgConfig {
@@ -23,7 +28,11 @@ export interface ArgConfig<GenTypes = NexusGen> extends ScalarArgConfig {
    * The type of the argument, either the string name of the type,
    * or the concrete
    */
-  type: GetGen<GenTypes, "allInputTypes"> | BaseScalars | GraphQLScalarType;
+  type:
+    | GetGen<GenTypes, "allInputTypes">
+    | Wrapped<{ nexus: NexusTypes.Scalar }>
+    | BaseScalars
+    | GraphQLScalarType;
 }
 
 export type ArgDef = ReturnType<typeof arg>;
@@ -38,24 +47,23 @@ export type ArgDef = ReturnType<typeof arg>;
  * @see https://graphql.github.io/learn/schema/#arguments
  */
 export function arg<GenTypes = NexusGen>(options: ArgConfig<GenTypes>) {
-  const data = {
+  return wrappedArg({
     ...options,
     nexus: NexusTypes.Arg as NexusTypes.Arg,
-  };
-  return data as Readonly<typeof data>;
+  });
 }
-export function stringArg(options?: ArgConfig) {
+export function stringArg(options?: ScalarArgConfig) {
   return arg({ type: "String", ...options });
 }
-export function intArg(options?: ArgConfig) {
+export function intArg(options?: ScalarArgConfig) {
   return arg({ type: "Int", ...options });
 }
-export function floatArg(options?: ArgConfig) {
+export function floatArg(options?: ScalarArgConfig) {
   return arg({ type: "Float", ...options });
 }
-export function idArg(options?: ArgConfig) {
+export function idArg(options?: ScalarArgConfig) {
   return arg({ type: "ID", ...options });
 }
-export function booleanArg(options?: ArgConfig) {
+export function booleanArg(options?: ScalarArgConfig) {
   return arg({ type: "Boolean", ...options });
 }

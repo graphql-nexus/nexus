@@ -21,13 +21,10 @@ export type ExtendTypeDef = ReturnType<typeof extendType>;
 export function extendType<TypeName extends string>(
   config: ExtendTypeConfig<TypeName>
 ) {
-  const { type, definition, ...rest } = config;
-  const fields: any[] = [];
-  definition(new OutputDefinitionBlock(fields));
+  const { type, ...rest } = config;
   return wrappedType({
     name: type,
     nexus: NexusTypes.ExtendObject as NexusTypes.ExtendObject,
-    fields,
     ...rest,
   });
 }

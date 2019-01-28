@@ -9,7 +9,7 @@ import { GraphQLResolveInfo } from "graphql";
 import * as t from "./types/index";
 import ts from "typescript";
 declare global {
-  interface GraphQLNexusGen extends NexusGenTypes {}
+  interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {}

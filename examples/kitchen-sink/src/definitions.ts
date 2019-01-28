@@ -4,16 +4,19 @@ export const Bar = interfaceType({
   name: "Bar",
   definition(t) {
     t.boolean("ok");
+    t.resolveType((root) => "Foo");
   },
-  resolveType: (root) => "Foo",
 });
 
 export const Baz = interfaceType({
   name: "Baz",
   definition(t) {
     t.boolean("ok");
+    t.field("a", {
+      type: Bar,
+    });
+    t.resolveType(() => "Foo");
   },
-  resolveType: () => "Foo",
 });
 
 export const Foo = objectType({

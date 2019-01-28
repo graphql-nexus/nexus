@@ -1,22 +1,33 @@
-import { OutputDefinitionBlock } from "./blocks";
-import { GetGen2, GetGen } from "../typegenTypeHelpers";
-import { NullabilityConfig, NexusTypes, MaybeThunk } from "./_types";
-import { wrappedType } from "./wrappedType";
+import { OutputDefinitionBlock, OutputDefinitionBuilder } from "./blocks";
+import { GetGen2, GetGen, NexusFieldResolver } from "../typegenTypeHelpers";
+import { NullabilityConfig, NexusTypes } from "./_types";
+import { wrappedType, Wrapped } from "./wrappedType";
 import { GraphQLInterfaceType } from "graphql";
+
+export type Implemented<GenTypes = NexusGen> =
+  | GetGen<GenTypes, "interfaceNames">
+  | GraphQLInterfaceType
+  | Wrapped<{ nexus: NexusTypes.Interface }>;
+
+export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {
+  addInterface(toAdd: Implemented): void;
+}
 
 export class ObjectDefinitionBlock<
   TypeName extends string,
   GenTypes = NexusGen
 > extends OutputDefinitionBlock<TypeName, GenTypes> {
+  constructor(protected typeBuilder: ObjectDefinitionBuilder) {
+    super(typeBuilder);
+  }
+
   /**
-   *
    * @param interfaceName
    */
-  implements(
-    ...interfaceName: Array<
-      GetGen<GenTypes, "interfaceNames"> | GraphQLInterfaceType
-    >
-  ) {}
+  implements(...interfaceName: Array<Implemented>) {
+    interfaceName.forEach((i) => this.typeBuilder.addInterface(i));
+  }
+
   /**
    * Modifies a field added via an interface
    */
@@ -42,14 +53,14 @@ export interface ObjectTypeConfig<
    */
   nullability?: NullabilityConfig;
   /**
-   * Specifies a default field resolver for all members of this type.
-   * Warning: this may break type-safety.
-   */
-  defaultResolver?: any;
-  /**
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
+  /**
+   * Specifies a default field resolver for all members of this type.
+   * Warning: this may break type-safety.
+   */
+  defaultResolver?: NexusFieldResolver<TypeName, any, GenTypes>;
 }
 
 export type ObjectTypeDef = ReturnType<typeof objectType>;
@@ -57,13 +68,8 @@ export type ObjectTypeDef = ReturnType<typeof objectType>;
 export function objectType<TypeName extends string, GenTypes = NexusGen>(
   config: ObjectTypeConfig<TypeName, GenTypes>
 ) {
-  const { definition, ...rest } = config;
-  const fields: any[] = [];
-  const factory = new OutputDefinitionBlock<TypeName, GenTypes>(fields);
-  definition(factory);
   return wrappedType({
     nexus: NexusTypes.Object as NexusTypes.Object,
-    fields,
-    ...rest,
+    ...config,
   });
 }

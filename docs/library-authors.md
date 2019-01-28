@@ -17,38 +17,45 @@ export const UserConnectionTypes = connectionType("User");
 Where `connectionType` is really just a wrapper creating two `objectType`:
 
 ```ts
-import { core } from './nexus';
+import { Types } from './nexus';
 
 interface ConnectionConfigFn {
   (
-    connection: core.Types.GraphQLNexusObjectType,
-    edge: core.Types.GraphQLNexusObjectType
+    connection(t: Types.GraphQLNexusObjectType): void,
+    edge(t: Types.GraphQLNexusObjectType): void
   ) => void;
 }
 
-const PageInfo = objectType('PageInfo', t => {
-  t.boolean('hasNextPage')
-  t.boolean('hasPreviousPage')
+const PageInfo = objectType({
+  type: 'PageInfo',
+  definition(t) {
+    t.boolean('hasNextPage')
+    t.boolean('hasPreviousPage')
+  }
 })
 
 export function connectionType(name: string, fn?: ConnectionConfigFn) {
   let connectionObj, edgeObj;
-  const Connection = objectType(`${name}Connection`, t => {
-    t.field(
-      'edges',
-      // @ts-ignore ...we know the type name exists cause we define it below :)
-      `${name}Edge`
-    );
-    connectionObj = t;
-  });
-  const Edge = objectType(`${name}Edge`, t => {
-    t.id('cursor', {
-      resolve(root) {
-        return `${name}:${root.id}`
-      }
-    })
-    t.field('node', name);
-    edgeObj = t;
+  const Connection = objectType({
+    name: `${name}Connection`,
+    definition(t) {
+      t.field(
+        'edges',
+        // @ts-ignore ...we know the type name exists cause we define it below :)
+        `${name}Edge`
+      );
+    });
+  })
+  const Edge = objectType(
+    name: `${name}Edge`,
+    definition(t) {
+      t.id('cursor', {
+        resolve(root) {
+          return `${name}:${root.id}`
+        }
+      })
+      t.field('node', { type: name });
+    }
   });
   if (typeof fn === 'function') {
     fn(connectionObj, edgeObj)

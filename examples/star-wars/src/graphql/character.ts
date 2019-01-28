@@ -6,13 +6,14 @@ export const Character = interfaceType({
   definition: (t) => {
     t.string("id", { description: "The id of the character" });
     t.string("name", { description: "The name of the character" });
-    t.field("friends", "Character", {
-      list: true,
+    t.list.field("friends", {
+      type: "Character",
       description:
         "The friends of the character, or an empty list if they have none.",
       resolve: (character) => getFriends(character),
     });
-    t.field("appearsIn", "Episode", {
+    t.field("appearsIn", {
+      type: "Episode",
       list: true,
       description: "Which movies they appear in.",
       resolve: (o) => o.appears_in,
@@ -20,6 +21,6 @@ export const Character = interfaceType({
         id: idArg({ required: true }),
       },
     });
+    t.resolveType((character) => character.type);
   },
-  resolveType: (character) => character.type,
 });

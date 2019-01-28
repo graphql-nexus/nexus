@@ -21,7 +21,7 @@ export type OutputFieldArgs = Record<string, ArgDef>;
  *
  * @example
  * ```
- * const mediaType: NexusAbstractTypeResolver<'MediaType'> = (root, ctx, info) => {
+ * const mediaType: AbstractTypeResolver<'MediaType'> = (root, ctx, info) => {
  *   if (ctx.user.isLoggedIn()) {
  *     return ctx.user.getItems()
  *   }
@@ -29,19 +29,22 @@ export type OutputFieldArgs = Record<string, ArgDef>;
  * }
  * ```
  */
-export type AbstractTypeResolver<TypeName extends string, GenTypes> = (
+export type AbstractTypeResolver<
+  TypeName extends string,
+  GenTypes = NexusGen
+> = (
   source: AbstractResolveRoot<GenTypes, TypeName>,
   context: GetGen<GenTypes, "context">,
   info: GraphQLResolveInfo
 ) => MaybePromise<AbstractResolveReturn<TypeName, GenTypes>>;
 
 /**
- * The NexusResolver type can be used when you want to preserve type-safety
+ * The FieldResolver type can be used when you want to preserve type-safety
  * and autocomplete on a resolver outside of the Nexus definition block
  *
  * @example
  * ```
- * const userItems: NexusResolver<'User', 'items'> = (root, args, ctx, info) => {
+ * const userItems: FieldResolver<'User', 'items'> = (root, args, ctx, info) => {
  *   if (ctx.user.isLoggedIn()) {
  *     return ctx.user.getItems()
  *   }
@@ -49,7 +52,7 @@ export type AbstractTypeResolver<TypeName extends string, GenTypes> = (
  * }
  * ```
  */
-export type NexusResolver<
+export type FieldResolver<
   TypeName extends string,
   FieldName extends string,
   GenTypes = NexusGen
@@ -110,15 +113,18 @@ export type GetGen<
   Fallback = any
 > = GenTypes extends GenTypesShape ? GenTypes[K] : Fallback;
 
-export type Or<T, Fallback> = T extends never ? Fallback : T;
-export type Bool<T> = T extends never ? false : true;
-
 export type GetGen2<
   GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
   Fallback = any
-> = GenTypes extends GenTypesShape ? Or<GenTypes[K][K2], Fallback> : Fallback;
+> = GenTypes extends GenTypesShape
+  ? K extends keyof GenTypes
+    ? K2 extends keyof GenTypes[K]
+      ? GenTypes[K][K2]
+      : Fallback
+    : Fallback
+  : Fallback;
 
 export type GetGen3<
   GenTypes,
@@ -127,21 +133,41 @@ export type GetGen3<
   K3 extends Extract<keyof GenTypesShape[K][K2], string>,
   Fallback = any
 > = GenTypes extends GenTypesShape
-  ? Or<GenTypes[K][K2][K3], Fallback>
+  ? K extends keyof GenTypes
+    ? K2 extends keyof GenTypes[K]
+      ? K3 extends keyof GenTypes[K][K2]
+        ? GenTypes[K][K2][K3]
+        : Fallback
+      : Fallback
+    : Fallback
   : Fallback;
 
 export type GenHas2<
   GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>
-> = GenTypes extends GenTypesShape ? Bool<GenTypesShape[K][K2]> : false;
+> = GenTypes extends GenTypesShape
+  ? K extends keyof GenTypes
+    ? K2 extends keyof GenTypes[K]
+      ? true
+      : false
+    : false
+  : false;
 
 export type GenHas3<
   GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
   K3 extends Extract<keyof GenTypesShape[K][K2], string>
-> = GenTypes extends GenTypesShape ? Bool<GenTypesShape[K][K2][K3]> : false;
+> = GenTypes extends GenTypesShape
+  ? K extends keyof GenTypes
+    ? K2 extends keyof GenTypes[K]
+      ? K3 extends keyof GenTypes[K][K2]
+        ? true
+        : false
+      : false
+    : false
+  : false;
 
 export type RootValue<TypeName extends string, GenTypes = NexusGen> = GetGen2<
   GenTypes,
@@ -153,29 +179,43 @@ export type RootValueField<
   GenTypes,
   TypeName extends string,
   FieldName extends string
-> = GetGen3<GenTypes, "rootTypes", TypeName, FieldName>;
+> = GetGen3<GenTypes, "rootTypes", TypeName, FieldName, unknown>;
 
 export type ArgsValue<
   TypeName extends string,
   FieldName extends string,
   GenTypes = NexusGen
-> = GetGen3<GenTypes, "argTypes", TypeName, FieldName, {}>;
+> = GetGen3<GenTypes, "argTypes", TypeName, FieldName, Record<string, any>>;
 
 export type ResultValue<
   GenTypes,
   TypeName extends string,
   FieldName extends string,
   ResolveFallback
-> = Or<GetGen3<GenTypes, "returnTypes", TypeName, FieldName>, ResolveFallback>;
+> = GetGen3<GenTypes, "returnTypes", TypeName, FieldName, ResolveFallback>;
 
 export type NexusFieldResolver<
-  GenTypes,
   TypeName extends string,
   FieldName extends string,
-  ResolveFallback
+  Fallback = any,
+  GenTypes = NexusGen
 > = (
   root: RootValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<GenTypes, "context">,
   info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName, ResolveFallback>>;
+) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName, Fallback>>;
+
+export type NeedsResolver<
+  TypeName extends string,
+  FieldName extends string,
+  GenTypes = NexusGen
+> = GenHas3<GenTypes, "returnTypes", TypeName, FieldName> extends true
+  ? GetGen3<GenTypes, "returnTypes", TypeName, FieldName> extends null
+    ? false
+    : GenHas3<GenTypes, "rootTypes", TypeName, FieldName> extends true
+    ? GetGen3<GenTypes, "rootTypes", TypeName, FieldName> extends null
+      ? true
+      : false
+    : true
+  : false;
