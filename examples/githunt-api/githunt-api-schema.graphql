@@ -5,48 +5,48 @@
 """A comment about an entry, submitted by a user"""
 type Comment {
   """The text of the comment"""
-  content: String
+  content: String!
 
   """A timestamp of when the comment was posted"""
-  createdAt: Float
+  createdAt: Float!
 
   """The SQL ID of this entry"""
-  id: Int
+  id: Int!
 
   """The GitHub user who posted the comment"""
   postedBy: User
 
   """The repository which this comment is about"""
-  repoName: String
+  repoName: String!
 }
 
 type Entry {
   """The number of comments posted about this repository"""
-  commentCount: Int
+  commentCount: Int!
 
   """Comments posted about this repository"""
-  comments(limit: Int, offset: Int): [Comment!]
+  comments(limit: Int, offset: Int): [Comment!]!
 
   """A timestamp of when the entry was submitted"""
-  createdAt: Float
+  createdAt: Float!
 
   """The hot score of this repository"""
-  hotScore: Float
+  hotScore: Float!
 
   """The SQL ID of this entry"""
-  id: Int
+  id: Int!
 
   """The GitHub user who posted the comment"""
   postedBy: User
 
   """Information about the repository from GitHub"""
-  repository: Repository
+  repository: Repository!
 
   """The score of this repository, upvotes - downvotes"""
-  score: Int
+  score: Int!
 
   """XXX to be changed"""
-  vote: Vote
+  vote: Vote!
 }
 
 """A list of options for the sort order of the feed"""
@@ -72,7 +72,7 @@ type Mutation {
     The full repository name from GitHub, e.g. "apollostack/GitHunt-API"
     """
     repoFullName: String!
-  ): Comment
+  ): Comment!
 
   """Submit a new repository, returns the new submission"""
   submitRepository(
@@ -80,7 +80,7 @@ type Mutation {
     The full repository name from GitHub, e.g. "apollostack/GitHunt-API"
     """
     repoFullName: String!
-  ): Entry
+  ): Entry!
 
   """
   Vote on a repository submission, returns the submission that was voted on
@@ -93,12 +93,12 @@ type Mutation {
 
     """The type of vote - UP, DOWN, or CANCEL"""
     type: VoteType!
-  ): Entry
+  ): Entry!
 }
 
 type Query {
   """Return the currently logged in user, or null if nobody is logged in"""
-  currentUser: User
+  currentUser: User!
 
   """A single entry"""
   entry(
@@ -116,7 +116,7 @@ type Query {
 
     """The sort order for the feed"""
     type: FeedType!
-  ): [Entry!]
+  ): [Entry!]!
 }
 
 """
@@ -132,13 +132,13 @@ type Repository {
   """
   The full name of the repository with the username, e.g. apollostack/GitHunt-API
   """
-  full_name: String
+  full_name: String!
 
   """The link to the repository on GitHub"""
-  html_url: String
+  html_url: String!
 
   """Just the name of the repository, e.g. GitHunt-API"""
-  name: String
+  name: String!
 
   """The number of open issues on this repository on GitHub"""
   open_issues_count: Int
@@ -147,7 +147,7 @@ type Repository {
   owner: User
 
   """The number of people who have starred this repository on GitHub"""
-  stargazers_count: Int
+  stargazers_count: Int!
 }
 
 """
@@ -155,17 +155,17 @@ A user object from the GitHub API. This uses the exact field names returned from
 """
 type User {
   """The URL to a directly embeddable image for this user's avatar"""
-  avatar_url: String
+  avatar_url: String!
 
   """The URL of this user's GitHub page"""
-  html_url: String
+  html_url: String!
 
   """The name of the user, e.g. apollostack"""
-  login: String
+  login: String!
 }
 
 type Vote {
-  vote_value: Int
+  vote_value: Int!
 }
 
 """The type of vote to record, when submitting a vote"""

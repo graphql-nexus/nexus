@@ -2,26 +2,27 @@
 ### Do not make changes to this file directly
 
 
+"""Bar description"""
 interface Bar {
-  ok: Boolean @deprecated(reason: "Not ok?")
+  ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
 interface Baz {
   """'A' description"""
-  a: Bar
-  ok: Boolean
+  a: Bar!
+  ok: Boolean!
 }
 
 type Foo implements Bar {
-  name: String
-  ok: Boolean @deprecated(reason: "Not ok?")
+  name: String!
+  ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
 type Query {
-  bar: Bar
+  bar: Bar!
 }
 
 type TestObj implements Bar {
-  item: String
-  ok: Boolean @deprecated(reason: "Not ok?")
+  item: String!
+  ok: Boolean! @deprecated(reason: "Not ok?")
 }

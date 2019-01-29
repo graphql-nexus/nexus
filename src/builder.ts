@@ -518,7 +518,7 @@ export class SchemaBuilder<GenTypes = NexusGen> {
       return !nullable;
     }
     // Non-Null by default
-    return firstDefined(nullability.output, this.nullability.output, false);
+    return firstDefined(nullability.output, this.nullability.output, true);
   }
 
   protected decorateType<T extends GraphQLNamedType>(

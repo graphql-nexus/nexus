@@ -20,45 +20,41 @@ export interface NexusGenRootTypes {
   Boolean: boolean;
   Float: number;
   Foo: { // root type
-    name?: string | null; // String
-    ok?: boolean | null; // Boolean
+    name: string; // String!
+    ok: boolean; // Boolean!
   }
   ID: string;
   Int: number;
   Query: {};
   String: string;
   TestObj: { // root type
-    item?: string | null; // String
-    ok?: boolean | null; // Boolean
+    item: string; // String!
+    ok: boolean; // Boolean!
   }
 }
 
 export interface NexusGenFieldTypes {
   Bar: { // field return type
-    ok: boolean | null; // Boolean
+    ok: boolean; // Boolean!
   }
   Baz: { // field return type
-    a: NexusGenRootTypes['Bar'] | null; // Bar
-    ok: boolean | null; // Boolean
+    a: NexusGenRootTypes['Bar']; // Bar!
+    ok: boolean; // Boolean!
   }
   Foo: { // field return type
-    name: string | null; // String
-    ok: boolean | null; // Boolean
+    name: string; // String!
+    ok: boolean; // Boolean!
   }
   Query: { // field return type
-    bar: NexusGenRootTypes['Bar'] | null; // Bar
+    bar: NexusGenRootTypes['Bar']; // Bar!
   }
   TestObj: { // field return type
-    item: string | null; // String
-    ok: boolean | null; // Boolean
+    item: string; // String!
+    ok: boolean; // Boolean!
   }
 }
 
 export interface NexusGenArgTypes {
-}
-
-export interface NexusGenAbstractResolveSourceTypes {
-  Bar: NexusGenRootTypes['Foo'] | NexusGenRootTypes['TestObj']
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
@@ -96,7 +92,6 @@ export interface NexusGenTypes {
   allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
-  abstractResolveRoot: NexusGenAbstractResolveSourceTypes;
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
 

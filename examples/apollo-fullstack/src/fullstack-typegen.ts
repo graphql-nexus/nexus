@@ -23,8 +23,8 @@ export interface NexusGenRootTypes {
   Launch: t.Launch;
   LaunchConnection: { // root type
     cursor?: string | null; // String
-    hasMore?: boolean | null; // Boolean
-    launches?: Array<NexusGenRootTypes['Launch'] | null> | null; // [Launch]
+    hasMore: boolean; // Boolean!
+    launches: Array<NexusGenRootTypes['Launch'] | null>; // [Launch]!
   }
   Mission: t.Mission;
   Mutation: {};
@@ -34,55 +34,55 @@ export interface NexusGenRootTypes {
   TripUpdateResponse: { // root type
     launches?: NexusGenRootTypes['Launch'][] | null; // [Launch!]
     message?: string | null; // String
-    success?: boolean | null; // Boolean
+    success: boolean; // Boolean!
   }
   User: { // root type
-    email?: string | null; // String
-    id?: string | null; // ID
+    email: string; // String!
+    id: string; // ID!
   }
 }
 
 export interface NexusGenFieldTypes {
   Launch: { // field return type
-    id: string | null; // ID
-    isBooked: boolean | null; // Boolean
-    mission: NexusGenRootTypes['Mission'] | null; // Mission
-    rocket: NexusGenRootTypes['Rocket'] | null; // Rocket
+    id: string; // ID!
+    isBooked: boolean; // Boolean!
+    mission: NexusGenRootTypes['Mission']; // Mission!
+    rocket: NexusGenRootTypes['Rocket']; // Rocket!
     site: string | null; // String
   }
   LaunchConnection: { // field return type
     cursor: string | null; // String
-    hasMore: boolean | null; // Boolean
-    launches: Array<NexusGenRootTypes['Launch'] | null> | null; // [Launch]
+    hasMore: boolean; // Boolean!
+    launches: Array<NexusGenRootTypes['Launch'] | null>; // [Launch]!
   }
   Mission: { // field return type
-    missionPatch: string | null; // String
+    missionPatch: string; // String!
     name: string | null; // String
   }
   Mutation: { // field return type
-    bookTrips: NexusGenRootTypes['TripUpdateResponse'] | null; // TripUpdateResponse
-    cancelTrip: NexusGenRootTypes['TripUpdateResponse'] | null; // TripUpdateResponse
+    bookTrips: NexusGenRootTypes['TripUpdateResponse']; // TripUpdateResponse!
+    cancelTrip: NexusGenRootTypes['TripUpdateResponse']; // TripUpdateResponse!
     login: string | null; // String
   }
   Query: { // field return type
-    launch: NexusGenRootTypes['Launch'] | null; // Launch
-    launches: NexusGenRootTypes['LaunchConnection'] | null; // LaunchConnection
+    launch: NexusGenRootTypes['Launch']; // Launch!
+    launches: NexusGenRootTypes['LaunchConnection']; // LaunchConnection!
     me: NexusGenRootTypes['User'] | null; // User
   }
   Rocket: { // field return type
-    id: string | null; // ID
+    id: string; // ID!
     name: string | null; // String
     type: string | null; // String
   }
   TripUpdateResponse: { // field return type
     launches: NexusGenRootTypes['Launch'][] | null; // [Launch!]
     message: string | null; // String
-    success: boolean | null; // Boolean
+    success: boolean; // Boolean!
   }
   User: { // field return type
-    email: string | null; // String
-    id: string | null; // ID
-    trips: NexusGenRootTypes['Launch'][] | null; // [Launch!]
+    email: string; // String!
+    id: string; // ID!
+    trips: NexusGenRootTypes['Launch'][]; // [Launch!]!
   }
 }
 

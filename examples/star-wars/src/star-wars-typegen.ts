@@ -30,29 +30,29 @@ export interface NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   Character: { // field return type
-    appearsIn: NexusGenEnums['Episode'][] | null; // [Episode!]
-    friends: NexusGenRootTypes['Character'][] | null; // [Character!]
-    id: string | null; // String
-    name: string | null; // String
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    id: string; // String!
+    name: string; // String!
   }
   Droid: { // field return type
-    appearsIn: NexusGenEnums['Episode'][] | null; // [Episode!]
-    friends: NexusGenRootTypes['Character'][] | null; // [Character!]
-    id: string | null; // String
-    name: string | null; // String
-    primaryFunction: string | null; // String
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    id: string; // String!
+    name: string; // String!
+    primaryFunction: string; // String!
   }
   Human: { // field return type
-    appearsIn: NexusGenEnums['Episode'][] | null; // [Episode!]
-    friends: NexusGenRootTypes['Character'][] | null; // [Character!]
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
     homePlanet: string | null; // String
-    id: string | null; // String
-    name: string | null; // String
+    id: string; // String!
+    name: string; // String!
   }
   Query: { // field return type
-    droid: NexusGenRootTypes['Droid'] | null; // Droid
-    hero: NexusGenRootTypes['Character'] | null; // Character
-    human: NexusGenRootTypes['Human'] | null; // Human
+    droid: NexusGenRootTypes['Droid']; // Droid!
+    hero: NexusGenRootTypes['Character']; // Character!
+    human: NexusGenRootTypes['Human']; // Human!
   }
 }
 
@@ -83,10 +83,6 @@ export interface NexusGenArgTypes {
       id: string; // String!
     }
   }
-}
-
-export interface NexusGenAbstractResolveSourceTypes {
-  Character: NexusGenRootTypes['Droid'] | NexusGenRootTypes['Human']
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
@@ -124,7 +120,6 @@ export interface NexusGenTypes {
   allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
-  abstractResolveRoot: NexusGenAbstractResolveSourceTypes;
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
 
