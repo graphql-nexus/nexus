@@ -67,15 +67,3 @@ export function enumType<TypeName extends string>(
     ...rest,
   });
 }
-
-const enumShorthandMembers = (arg: string[]): EnumMemberInfo[] => {
-  if (Array.isArray(arg)) {
-    return arg.map((name) => ({ name, value: name }));
-  }
-  return Object.keys(arg).map((name) => {
-    return {
-      name,
-      value: arg[name],
-    };
-  });
-};

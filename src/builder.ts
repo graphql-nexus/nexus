@@ -34,7 +34,6 @@ import {
 import { isObject } from "util";
 import { ArgDef } from "./definitions/args";
 import {
-  AbstractOutputDefinitionBlock,
   InputFieldDef,
   OutputFieldDef,
   InputDefinitionBlock,
@@ -42,7 +41,10 @@ import {
 import { EnumTypeDef } from "./definitions/enumType";
 import { ExtendTypeDef } from "./definitions/extendType";
 import { InputObjectTypeDef } from "./definitions/inputObjectType";
-import { InterfaceTypeDef } from "./definitions/interfaceType";
+import {
+  InterfaceTypeDef,
+  InterfaceDefinitionBlock,
+} from "./definitions/interfaceType";
 import {
   FieldModificationDef,
   Implemented,
@@ -320,7 +322,7 @@ export class SchemaBuilder<GenTypes = NexusGen> {
     let resolveType: AbstractTypeResolver<string, NexusGen> | undefined;
     const fields: OutputFieldDef[] = [];
     config.definition(
-      new AbstractOutputDefinitionBlock({
+      new InterfaceDefinitionBlock({
         addField: (field) => fields.push(field),
         setResolveType: (fn) => (resolveType = fn),
       })

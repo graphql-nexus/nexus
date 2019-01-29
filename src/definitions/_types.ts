@@ -4,10 +4,6 @@ import {
   GraphQLInputObjectType,
 } from "graphql";
 
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-export type MaybePromise<T> = Promise<T> | T;
-
 export type MaybeThunk<T> = T | (() => T);
 
 export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";

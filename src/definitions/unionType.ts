@@ -1,9 +1,6 @@
 import { assertValidName } from "graphql";
-import { GetGen } from "../typegenTypeHelpers";
-import {
-  AbstractOutputDefinitionBlock,
-  AbstractOutputDefinitionBuilder,
-} from "./blocks";
+import { GetGen, AbstractTypeResolver } from "../typegenTypeHelpers";
+import { AbstractOutputDefinitionBuilder } from "./blocks";
 import { ObjectTypeDef } from "./objectType";
 import { wrappedType } from "./wrappedType";
 import { NexusTypes } from "./_types";
@@ -22,14 +19,22 @@ export type UnionMembers<GenTypes = NexusGen> = Array<
 export class UnionDefinitionBlock<
   TypeName extends string,
   GenTypes = NexusGen
-> extends AbstractOutputDefinitionBlock<TypeName, GenTypes> {
+> {
   constructor(
     protected typeBuilder: UnionDefinitionBuilder<TypeName, GenTypes>
-  ) {
-    super(typeBuilder);
-  }
+  ) {}
+  /**
+   * All ObjectType names that should be part of the union, either
+   * as string names or as references to the `objectType()` return value
+   */
   members(...unionMembers: UnionMembers<GenTypes>) {
     this.typeBuilder.addUnionMembers(unionMembers);
+  }
+  /**
+   * Sets the "resolveType" method for the current union
+   */
+  resolveType(fn: AbstractTypeResolver<TypeName, GenTypes>) {
+    this.typeBuilder.setResolveType(fn);
   }
 }
 

@@ -15,13 +15,9 @@ export { interfaceType } from "./definitions/interfaceType";
 export { objectType } from "./definitions/objectType";
 export { scalarType } from "./definitions/scalarType";
 export { unionType } from "./definitions/unionType";
-export { nexusWrappedFn as wrappedFn } from "./definitions/wrappedType";
+export { nexusWrappedFn } from "./definitions/wrappedType";
 export { convertSDL } from "./sdlConverter";
-export { FieldResolver } from "./types";
-export { GroupedTypes, groupTypes } from "./utils";
+export { groupTypes } from "./utils";
+export { FieldResolver } from "./typegenTypeHelpers";
 export { core };
-// Export the ts definitions so they can be used by library authors under `core.Types`
-export { Types };
-
 import * as core from "./core";
-import * as Types from "./types";

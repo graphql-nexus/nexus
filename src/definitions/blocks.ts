@@ -297,20 +297,3 @@ export interface AbstractOutputDefinitionBuilder<
 > extends OutputDefinitionBuilder {
   setResolveType(fn: AbstractTypeResolver<TypeName, GenTypes>): void;
 }
-
-export class AbstractOutputDefinitionBlock<
-  TypeName extends string,
-  GenTypes = NexusGen
-> extends OutputDefinitionBlock<TypeName, GenTypes> {
-  constructor(
-    protected typeBuilder: AbstractOutputDefinitionBuilder<TypeName, GenTypes>
-  ) {
-    super(typeBuilder);
-  }
-  /**
-   * Sets the "resolveType" method for the current type.
-   */
-  resolveType(fn: AbstractTypeResolver<TypeName, GenTypes>) {
-    this.typeBuilder.setResolveType(fn);
-  }
-}

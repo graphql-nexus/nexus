@@ -1,6 +1,10 @@
-import { AbstractOutputDefinitionBlock } from "./blocks";
+import {
+  OutputDefinitionBlock,
+  AbstractOutputDefinitionBuilder,
+} from "./blocks";
 import { wrappedType } from "./wrappedType";
 import { NexusTypes, NonNullConfig } from "./_types";
+import { AbstractTypeResolver } from "../core";
 
 // export interface SetResolveType<TypeName extends string, GenTypes = NexusGen> {
 //   setResolveType(fn: AbstractTypeResolver<TypeName, GenTypes>): void;
@@ -19,7 +23,7 @@ export type InterfaceTypeConfig<
   //
   // resolveType: AbstractTypeResolver<TypeName, GenTypes>;
 
-  definition(t: AbstractOutputDefinitionBlock<TypeName, GenTypes>): void;
+  definition(t: InterfaceDefinitionBlock<TypeName, GenTypes>): void;
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
@@ -34,6 +38,23 @@ export type InterfaceTypeConfig<
 };
 
 export type InterfaceTypeDef = ReturnType<typeof interfaceType>;
+
+export class InterfaceDefinitionBlock<
+  TypeName extends string,
+  GenTypes = NexusGen
+> extends OutputDefinitionBlock<TypeName, GenTypes> {
+  constructor(
+    protected typeBuilder: AbstractOutputDefinitionBuilder<TypeName, GenTypes>
+  ) {
+    super(typeBuilder);
+  }
+  /**
+   * Sets the "resolveType" method for the current type.
+   */
+  resolveType(fn: AbstractTypeResolver<TypeName, GenTypes>) {
+    this.typeBuilder.setResolveType(fn);
+  }
+}
 
 /**
  * Defines a GraphQLInterfaceType
