@@ -33,21 +33,6 @@ const Episode = enumType({
 });
 ```
 
-As an array of full definitions, with comments, etc.
-
-```ts
-const Episode = enumType({
-  name: "Episode",
-  description: "All Movies in the Skywalker saga, or OTHER",
-  definition: (t) => {
-    t.mix("OneThroughThree");
-    t.mix("FourThroughSix");
-    t.mix("SevenThroughNine");
-    t.members(["OTHER"]);
-  },
-});
-```
-
 ```graphql
 """
 All Movies in the Skywalker saga, or OTHER

@@ -1,4 +1,4 @@
-import { objectType, enumType, arg, Types } from "nexus";
+import { objectType, enumType, arg } from "nexus";
 
 export const Mission = objectType({
   name: "Mission",

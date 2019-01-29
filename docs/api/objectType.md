@@ -44,12 +44,3 @@ const StatusEnum = enumType({
 ```
 
 @see https://graphql.github.io/learn/schema/#object-types-and-fields
-
-### ObjectDefinition
-
-Configures the nullability for the type, check the
-documentation's "Getting Started" section to learn
-more about Nexus's assumptions and configuration
-on nullability.
-
-@param nullability

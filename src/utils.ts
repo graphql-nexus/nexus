@@ -13,6 +13,7 @@ import {
   isUnionType,
   isInterfaceType,
   isEnumType,
+  specifiedScalarTypes,
 } from "graphql";
 import path from "path";
 
@@ -156,7 +157,6 @@ export const assertAbsolutePath = (pathName: string, property: string) => {
 export interface GroupedTypes {
   input: GraphQLInputObjectType[];
   interface: GraphQLInterfaceType[];
-  interfaceMembers: Record<string, string[]>;
   object: GraphQLObjectType[];
   union: GraphQLUnionType[];
   enum: GraphQLEnumType[];
@@ -167,11 +167,10 @@ export function groupTypes(schema: GraphQLSchema) {
   const groupedTypes: GroupedTypes = {
     input: [],
     interface: [],
-    interfaceMembers: {},
     object: [],
     union: [],
     enum: [],
-    scalar: [],
+    scalar: Array.from(specifiedScalarTypes),
   };
   const schemaTypeMap = schema.getTypeMap();
   Object.keys(schemaTypeMap).forEach((typeName) => {
@@ -181,11 +180,6 @@ export function groupTypes(schema: GraphQLSchema) {
     const type = schema.getType(typeName);
     if (isObjectType(type)) {
       groupedTypes.object.push(type);
-      type.getInterfaces().forEach((i) => {
-        groupedTypes.interfaceMembers[i.name] =
-          groupedTypes.interfaceMembers[i.name] || [];
-        groupedTypes.interfaceMembers[i.name].push(type.name);
-      });
     } else if (isInputObjectType(type)) {
       groupedTypes.input.push(type);
     } else if (isScalarType(type) && !isSpecifiedScalarType(type)) {
@@ -199,4 +193,14 @@ export function groupTypes(schema: GraphQLSchema) {
     }
   });
   return groupedTypes;
+}
+
+export function firstDefined<T>(...args: Array<T | undefined>): T {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (typeof arg !== "undefined") {
+      return arg;
+    }
+  }
+  throw new Error("At least one of the values should be defined");
 }

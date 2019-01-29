@@ -1,6 +1,6 @@
 import { GraphQLScalarTypeConfig } from "graphql";
 import { wrappedType } from "./wrappedType";
-import { DeprecationInfo, NexusTypes } from "./_types";
+import { NexusTypes } from "./_types";
 
 export interface ScalarBase
   extends Pick<
@@ -16,10 +16,10 @@ export interface ScalarConfig extends ScalarBase {
   /**
    * Any deprecation info for this scalar type
    */
-  deprecation?: string | DeprecationInfo;
+  deprecation?: string; // | DeprecationInfo;
 }
 
-export type ScalarTypeDef = ReturnType<typeof scalarType>;
+export type ScalarTypeDef<T> = ReturnType<typeof scalarType>;
 
 export function scalarType(options: ScalarConfig) {
   return wrappedType({

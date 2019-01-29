@@ -23,7 +23,9 @@ const Node = interfaceType({
 
 const User = objectType({
   name: "User",
-  implements: ["Node"],
+  definition(t) {
+    t.implements("Node");
+  },
 });
 ```
 

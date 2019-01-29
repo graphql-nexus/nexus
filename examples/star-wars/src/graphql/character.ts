@@ -12,9 +12,8 @@ export const Character = interfaceType({
         "The friends of the character, or an empty list if they have none.",
       resolve: (character) => getFriends(character),
     });
-    t.field("appearsIn", {
+    t.list.field("appearsIn", {
       type: "Episode",
-      list: true,
       description: "Which movies they appear in.",
       resolve: (o) => o.appears_in,
       args: {

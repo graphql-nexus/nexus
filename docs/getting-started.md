@@ -123,21 +123,18 @@ const AccountInfo = objectType({
 
 ## Resolving: Inline Function
 
-One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus makes this simple by allowing a function as the second parameter to the resolver function.
+One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus makes this simple by allowing a function as the second parameter to any built-in scalar resolver function.
 
 ```ts
 const User = objectType({
   name: "User",
   definition(t) {
     t.id("id", (o) => o.user_id);
-    t.id("name", (o) => o.user_name);
-    t.id("description", (o) => o.user_description);
+    t.string("name", (o) => o.user_name);
+    t.string("description", (o) => o.user_description);
   },
 });
 ```
-
-When using the TypeScript, configuring the [backing object type](type-generation.md#backing-types) definitions will check for the existence of the property on the object, and error if a non-existent property is referenced.
-d.
 
 ## Auto-Generated Artifacts
 

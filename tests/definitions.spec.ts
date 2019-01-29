@@ -1,15 +1,11 @@
 /// <reference types="jest" />
 import { GraphQLEnumType, GraphQLObjectType } from "graphql";
-import { buildTypes, enumType, extendType, objectType } from "..";
+import { idArg, buildTypes, enumType, extendType, objectType } from "..";
 
 describe("enumType", () => {
   const PrimaryColors = enumType({
     name: "PrimaryColors",
     members: ["RED", "YELLOW", "BLUE"],
-  });
-  const RainbowColors = enumType({
-    name: "RainbowColors",
-    members: ["ORANGE", "GREEN", "VIOLET"],
   });
 
   it("builds an enum", () => {
@@ -21,6 +17,7 @@ describe("enumType", () => {
       ["RED", "YELLOW", "BLUE"]
     );
   });
+
   it("can map internal values", () => {
     const Internal = enumType({
       name: "Internal",
@@ -59,11 +56,11 @@ describe("enumType", () => {
   });
 
   it("throws if the enum has no members", () => {
-    const NoMembers = enumType({
-      name: "NoMembers",
-      members: [],
-    });
     expect(() => {
+      const NoMembers = enumType({
+        name: "NoMembers",
+        members: [],
+      });
       const types = buildTypes<{ NoMembers: GraphQLEnumType }>([NoMembers]);
       expect(types.typeMap.NoMembers.getValues()).toHaveLength(0);
     }).toThrow("must have at least one member");

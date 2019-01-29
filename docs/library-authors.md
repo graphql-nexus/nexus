@@ -14,17 +14,10 @@ One example of this pattern is in `nexus-contrib` where functions for creating r
 export const UserConnectionTypes = connectionType("User");
 ```
 
-Where `connectionType` is really just a wrapper creating two `objectType`:
+Where `connectionType` is really just a wrapper creating two `objectTypes`:
 
 ```ts
 import { Types } from './nexus';
-
-interface ConnectionConfigFn {
-  (
-    connection(t: Types.GraphQLNexusObjectType): void,
-    edge(t: Types.GraphQLNexusObjectType): void
-  ) => void;
-}
 
 const PageInfo = objectType({
   type: 'PageInfo',
@@ -32,34 +25,29 @@ const PageInfo = objectType({
     t.boolean('hasNextPage')
     t.boolean('hasPreviousPage')
   }
-})
+});
 
-export function connectionType(name: string, fn?: ConnectionConfigFn) {
-  let connectionObj, edgeObj;
+interface ConnectionTypeConfig {
+  name: NexusGen['objectNames']
+}
+
+export function connectionType(config: ConnectionTypeConfig) {
   const Connection = objectType({
     name: `${name}Connection`,
     definition(t) {
       t.field(
         'edges',
-        // @ts-ignore ...we know the type name exists cause we define it below :)
-        `${name}Edge`
+        { type: `${name}Edge` as any }
       );
     });
   })
   const Edge = objectType(
     name: `${name}Edge`,
     definition(t) {
-      t.id('cursor', {
-        resolve(root) {
-          return `${name}:${root.id}`
-        }
-      })
+      t.id('cursor', root => `${name}:${root.id}`)
       t.field('node', { type: name });
     }
   });
-  if (typeof fn === 'function') {
-    fn(connectionObj, edgeObj)
-  }
   return { Connection, Edge, PageInfo }
 }
 ```

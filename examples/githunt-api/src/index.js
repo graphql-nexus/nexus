@@ -13,6 +13,7 @@ const schema = makeSchema({
 });
 
 const server = new ApolloServer({
+  // @ts-ignore
   schema,
 });
 

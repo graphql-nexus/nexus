@@ -21,7 +21,8 @@ exports.Query = objectType({
     t.list.field("feed", {
       type: "Entry",
       args: {
-        type: arg("FeedType", {
+        type: arg({
+          type: "FeedType",
           required: true,
           description: "The sort order for the feed",
         }),
@@ -35,7 +36,8 @@ exports.Query = objectType({
       },
       resolve(root, args, ctx) {},
     });
-    t.field("entry", "Entry", {
+    t.field("entry", {
+      type: "Entry",
       nullable: true,
       description: "A single entry",
       args: {
@@ -46,7 +48,8 @@ exports.Query = objectType({
         }),
       },
     });
-    t.field("currentUser", "User", {
+    t.field("currentUser", {
+      type: "User",
       description:
         "Return the currently logged in user, or null if nobody is logged in",
     });
@@ -55,10 +58,8 @@ exports.Query = objectType({
 
 exports.VoteType = enumType({
   name: "VoteType",
-  definition(t) {
-    t.description("The type of vote to record, when submitting a vote");
-    t.members(["UP", "DOWN", "CANCEL"]);
-  },
+  description: "The type of vote to record, when submitting a vote",
+  members: ["UP", "DOWN", "CANCEL"],
 });
 
 const RepoNameArg = stringArg({
@@ -105,11 +106,12 @@ exports.Mutation = objectType({
 
 /**
  * Example of using functions to mixin fields across types
- * @type {(t: import('nexus').core.ObjectTypeDef) => void}
+ * @type {(t: import('nexus').Types.ObjectDefinitionBlock<any>) => void}
  */
 const commonFields = (t) => {
   t.int("id", { description: "The SQL ID of this entry" });
-  t.field("postedBy", "User", {
+  t.field("postedBy", {
+    type: "User",
     nullable: true,
     description: "The GitHub user who posted the comment",
   });

@@ -12,6 +12,7 @@ export const MaybeOptional = interfaceType({
   name: "MaybeOptional",
   definition(t) {
     t.field("questionToken", { type: "Token", nullable: true });
+    t.resolveType((o) => o.kind as any);
   },
 });
 

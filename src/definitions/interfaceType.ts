@@ -1,28 +1,24 @@
 import { AbstractOutputDefinitionBlock } from "./blocks";
 import { wrappedType } from "./wrappedType";
-import { NexusTypes, NullabilityConfig } from "./_types";
+import { NexusTypes, NonNullConfig } from "./_types";
 
-export interface InterfaceTypeBase<
+// export interface SetResolveType<TypeName extends string, GenTypes = NexusGen> {
+//   setResolveType(fn: AbstractTypeResolver<TypeName, GenTypes>): void;
+// }
+
+export type InterfaceTypeConfig<
   TypeName extends string,
   GenTypes = NexusGen
-> {
+> = {
   name: TypeName;
-  /**
-   * The description to annotate the GraphQL SDL
-   */
-  description?: string | null;
 
-  // Really wanted to keep this here, but alas:
+  // Really wanted to keep this here, but alas, it looks like there's some
+  // issues around inferring the generic.
+  // https://github.com/Microsoft/TypeScript/pull/29478
+  // https://github.com/Microsoft/TypeScript/issues/10195
   //
-  // resolveType(
-  //   source: AbstractResolveRoot<GenTypes, TypeName>
-  // ): MaybePromise<AbstractResolveReturn<TypeName, GenTypes> | null>;
-}
+  // resolveType: AbstractTypeResolver<TypeName, GenTypes>;
 
-export interface InterfaceTypeConfig<
-  TypeName extends string,
-  GenTypes = NexusGen
-> extends InterfaceTypeBase<TypeName, GenTypes> {
   definition(t: AbstractOutputDefinitionBlock<TypeName, GenTypes>): void;
   /**
    * Configures the nullability for the type, check the
@@ -30,12 +26,12 @@ export interface InterfaceTypeConfig<
    * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    */
-  nullability?: NullabilityConfig;
+  nullability?: NonNullConfig;
   /**
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
-}
+};
 
 export type InterfaceTypeDef = ReturnType<typeof interfaceType>;
 

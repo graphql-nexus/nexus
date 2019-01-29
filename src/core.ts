@@ -1,10 +1,7 @@
-import { SchemaBuilder } from "./builder";
-import { Metadata } from "./metadata";
-
+// The "core" is used as a namespace to re-export everything,
+// For anyone who wants to use the internals
+export { SchemaBuilder } from "./builder";
+export { TypegenMetadata } from "./typegenMetadata";
 export { SDLConverter } from "./sdlConverter";
-
-// Same as above, export all core things under the "core" namespace
-export { SchemaBuilder, Metadata };
-
-// Keeping this in core since it shouldn't be needed directly
 export { typegenAutoConfig } from "./typegenAutoConfig";
+export { Typegen } from "./typegen";

@@ -6,8 +6,13 @@ import { ScalarTypeDef } from "./scalarType";
 import { InputObjectTypeDef } from "./inputObjectType";
 import { ObjectTypeDef } from "./objectType";
 import { InterfaceTypeDef } from "./interfaceType";
+import { ExtendTypeDef } from "./extendType";
 
 export type Wrapped<T> = Readonly<T & { $wrapped: typeof NexusWrappedSymbol }>;
+
+export type WrappedInput = Wrapped<{
+  nexus: NexusTypes.Enum | NexusTypes.Scalar | NexusTypes.InputObject;
+}>;
 
 export type WrappedOutput = Wrapped<{
   nexus:
@@ -40,7 +45,7 @@ export function wrappedType<T extends WrappedTypeInfo>(config: T): Wrapped<T> {
  * Useful if you want to encapsulate
  * @param fn
  */
-export function wrappedFn(fn: Function) {
+export function nexusWrappedFn(fn: Function) {
   const w = {
     fn,
     nexus: NexusTypes.WrappedFn as NexusTypes.WrappedFn,
@@ -49,11 +54,9 @@ export function wrappedFn(fn: Function) {
   return w as Readonly<typeof w>;
 }
 
-export function isNexusWrappedFn(arg: any): boolean {
-  return false;
-}
+export type WrappedFn = ReturnType<typeof nexusWrappedFn>;
 
-export function wrappedArg<T>(arg: T): Wrapped<T> {
+export function nexusWrappedArg<T>(arg: T): Wrapped<T> {
   return {
     ...arg,
     $wrapped: NexusWrappedSymbol,
@@ -63,18 +66,24 @@ export function wrappedArg<T>(arg: T): Wrapped<T> {
 export const NexusWrappedSymbol = Symbol.for("@nexus/wrapped");
 
 export type AllWrappedNamedTypes =
-  | EnumTypeDef
   | UnionTypeDef
-  | ScalarTypeDef
-  | InputObjectTypeDef
   | ObjectTypeDef
-  | InterfaceTypeDef;
+  | InterfaceTypeDef
+  | EnumTypeDef<any>
+  | ScalarTypeDef<any>
+  | InputObjectTypeDef<any>;
 
-// export function isNexusWrappedFn() obj is  {}
+export type InputTypeDefs =
+  | InputObjectTypeDef<any>
+  | EnumTypeDef<any>
+  | ScalarTypeDef<any>;
 
-export function isNexusTypeDef(obj: any): obj is WrappedTypeInfo {
-  return obj && obj.$wrapped === NexusWrappedSymbol;
-}
+export type OuputTypeDefs =
+  | ObjectTypeDef
+  | InterfaceTypeDef
+  | UnionTypeDef
+  | ScalarTypeDef<any>
+  | EnumTypeDef<any>;
 
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
@@ -84,6 +93,18 @@ const NamedTypeDefs = new Set([
   NexusTypes.Interface,
 ]);
 
-export function isNamedTypeDef(obj: any): obj is AllWrappedNamedTypes {
+export function isNexusTypeDef(obj: any): obj is WrappedTypeInfo {
+  return obj && obj.$wrapped === NexusWrappedSymbol;
+}
+
+export function isNexusNamedTypeDef(obj: any): obj is AllWrappedNamedTypes {
   return isNexusTypeDef(obj) && NamedTypeDefs.has(obj.nexus);
+}
+
+export function isNexusExtendTypeDef(obj: any): obj is ExtendTypeDef {
+  return isNexusTypeDef(obj) && obj.nexus === NexusTypes.ExtendObject;
+}
+
+export function isNexusWrappedFn(obj: any): obj is WrappedFn {
+  return isNexusTypeDef(obj) && obj.name === NexusTypes.WrappedFn;
 }

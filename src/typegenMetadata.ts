@@ -9,24 +9,13 @@ import {
   TypegenFormatFn,
 } from "./typegenFormatPrettier";
 import { BuilderConfig, TypegenInfo } from "./builder";
-import { OutputFieldConfig } from "./definitions/blocks";
 
 /**
  * Passed into the SchemaBuilder, this keeps track of any necessary
  * field / type metadata we need to be aware of when building the
  * generated types and/or SDL artifact, including but not limited to:
- *
- * - The TS type backing the GraphQL type
- * - Type default resolver
- * - Whether the field has a resolver
- * - The property name of the field
- * - If the field has a "default" value
  */
-export class Metadata {
-  protected objectFieldMeta: Record<
-    string,
-    Record<string, OutputFieldConfig>
-  > = {};
+export class TypegenMetadata {
   protected typegenFile: string = "";
 
   constructor(protected config: BuilderConfig) {
@@ -116,7 +105,7 @@ export class Metadata {
    * Generates the type definitions
    */
   async generateTypesFile(schema: GraphQLSchema): Promise<string> {
-    return new Typegen(schema, this, await this.getTypegenInfo(schema)).print();
+    return new Typegen(schema, await this.getTypegenInfo(schema)).print();
   }
 
   async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {
@@ -136,7 +125,7 @@ export class Metadata {
     return {
       headers: [TYPEGEN_HEADER],
       imports: [],
-      contextType: "unknown",
+      contextType: "any",
       backingTypeMap: {},
     };
   }

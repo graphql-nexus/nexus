@@ -1,8 +1,10 @@
 import {
   GraphQLArgument,
+  GraphQLField,
   GraphQLInputField,
   GraphQLInputType as GraphQLType,
   GraphQLInterfaceType,
+  GraphQLNamedType,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
@@ -16,11 +18,10 @@ import {
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
-  GraphQLNamedType,
+  isUnionType,
 } from "graphql";
-import { eachObj, mapObj, groupTypes, GroupedTypes } from "./utils";
-import { Metadata } from "./metadata";
 import { TypegenInfo } from "./builder";
+import { eachObj, GroupedTypes, groupTypes, mapObj } from "./utils";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -58,7 +59,6 @@ export class Typegen {
 
   constructor(
     protected schema: GraphQLSchema,
-    protected metadata: Metadata,
     protected typegenInfo: TypegenInfo
   ) {
     this.groupedTypes = groupTypes(schema);
@@ -72,8 +72,8 @@ export class Typegen {
       this.printRootTypeMap(),
       this.printReturnTypeMap(),
       this.printArgTypeMap(),
-      this.printAbstractResolveSourceTypeMap(),
       this.printAbstractResolveReturnTypeMap(),
+      this.printInheritedFieldMap(),
       this.printTypeNames("object", "NexusGenObjectNames"),
       this.printTypeNames("input", "NexusGenInputNames"),
       this.printTypeNames("enum", "NexusGenEnumNames"),
@@ -88,14 +88,13 @@ export class Typegen {
   printHeaders() {
     return [
       this.typegenInfo.headers.join("\n"),
-      GRAPHQL_IMPORTS,
       this.typegenInfo.imports.join("\n"),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
 
   printFooters() {
-    return TYPEGEN_FOOTER;
+    return `export type Gen = NexusGenTypes;`;
   }
 
   printGenTypeMap() {
@@ -105,7 +104,8 @@ export class Typegen {
         `  inputTypes: NexusGenInputs;`,
         `  rootTypes: NexusGenRootTypes;`,
         `  argTypes: NexusGenArgTypes;`,
-        `  returnTypes: NexusGenReturnTypes;`,
+        `  fieldTypes: NexusGenFieldTypes;`,
+        `  inheritedFields: NexusGenInheritedFields;`,
         `  objectNames: NexusGenObjectNames;`,
         `  inputNames: NexusGenInputNames;`,
         `  enumNames: NexusGenEnumNames;`,
@@ -116,22 +116,18 @@ export class Typegen {
         `  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];`,
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
-        `  abstractResolveRoot: NexusGenAbstractResolveSourceTypes;`,
         `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
       ])
       .concat("}")
       .join("\n");
   }
 
-  printContext() {
-    return this.typegenInfo.contextType || "{}";
+  printInheritedFieldMap() {
+    return "export interface NexusGenInheritedFields {}";
   }
 
-  printAbstractResolveSourceTypeMap() {
-    return this.printTypeInterface(
-      "NexusGenAbstractResolveSourceTypes",
-      this.buildResolveSourceTypeMap()
-    );
+  printContext() {
+    return this.typegenInfo.contextType || "{}";
   }
 
   buildResolveSourceTypeMap() {
@@ -143,12 +139,14 @@ export class Typegen {
       .sort()
       .forEach((type) => {
         if (isInterfaceType(type)) {
-          // this.schema.getPossibleTypes(type).map(t => {
-          //  ...
-          // })
-          sourceMap[type.name] = this.groupedTypes.interfaceMembers[type.name]
-            .map((val) => `NexusGenRootTypes['${val}']`)
-            .join(" | ");
+          const possibleNames = this.schema
+            .getPossibleTypes(type)
+            .map((t) => t.name);
+          if (possibleNames.length > 0) {
+            sourceMap[type.name] = possibleNames
+              .map((val) => `NexusGenRootTypes['${val}']`)
+              .join(" | ");
+          }
         } else {
           sourceMap[type.name] = type
             .getTypes()
@@ -175,9 +173,20 @@ export class Typegen {
       .sort()
       .forEach((type) => {
         if (isInterfaceType(type)) {
-          sourceMap[type.name] = this.groupedTypes.interfaceMembers[type.name]
-            .map((val) => JSON.stringify(val))
-            .join(" | ");
+          const possibleNames = this.schema
+            .getPossibleTypes(type)
+            .map((t) => t.name);
+          if (possibleNames.length > 0) {
+            sourceMap[type.name] = possibleNames
+              .map((val) => JSON.stringify(val))
+              .join(" | ");
+          } else {
+            console.warn(
+              `Nexus Warning: Interface ${
+                type.name
+              } is not implemented by any object types`
+            );
+          }
         } else {
           sourceMap[type.name] = type
             .getTypes()
@@ -254,10 +263,24 @@ export class Typegen {
           } else {
             rootTypeMap[type.name] = "any";
           }
+        } else if (isUnionType(type)) {
+          rootTypeMap[type.name] = type
+            .getTypes()
+            .map((t) => `NexusGenRootTypes['${t.name}']`)
+            .join(" | ");
+        } else if (isInterfaceType(type)) {
+          const possibleRoots = this.schema
+            .getPossibleTypes(type)
+            .map((t) => `NexusGenRootTypes['${t.name}']`);
+          if (possibleRoots.length > 0) {
+            rootTypeMap[type.name] = possibleRoots.join(" | ");
+          } else {
+            rootTypeMap[type.name] = "any";
+          }
         } else {
           eachObj(type.getFields(), (field) => {
             const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {});
-            if (!Boolean(field.resolve)) {
+            if (!this.hasResolver(field, type)) {
               if (typeof obj !== "string") {
                 obj[field.name] = [
                   this.argSeparator(field.type as GraphQLType),
@@ -269,6 +292,13 @@ export class Typegen {
         }
       });
     return rootTypeMap;
+  }
+
+  hasResolver(
+    field: GraphQLField<any, any>,
+    _type: GraphQLObjectType | GraphQLInterfaceType // Used in tests
+  ) {
+    return Boolean(field.resolve);
   }
 
   printRootTypeMap() {
@@ -361,7 +391,7 @@ export class Typegen {
       typing.push(this.printScalar(type));
     } else if (isEnumType(type)) {
       typing.push(`NexusGenEnums['${type.name}']`);
-    } else if (isObjectType(type)) {
+    } else if (isObjectType(type) || isInterfaceType(type)) {
       typing.push(`NexusGenRootTypes['${type.name}']`);
     }
     return typing;
@@ -369,9 +399,9 @@ export class Typegen {
 
   printReturnTypeMap() {
     return this.printTypeFieldInterface(
-      "NexusGenReturnTypes",
+      "NexusGenFieldTypes",
       this.buildReturnTypeMap(),
-      "return type"
+      "field return type"
     );
   }
 
@@ -507,58 +537,6 @@ export class Typegen {
   }
 }
 
-const GRAPHQL_IMPORTS = `import { GraphQLResolveInfo } from "graphql";`;
-
 const GLOBAL_DECLARATION = `declare global {
   interface NexusGen extends NexusGenTypes {}
 }`;
-
-const TYPEGEN_FOOTER = `export type Gen = NexusGenTypes;
-
-type MaybePromise<T> = PromiseLike<T> | T;
-type SourceType<TypeName> = TypeName extends keyof NexusGenAbstractResolveSourceTypes ? NexusGenAbstractResolveSourceTypes[TypeName] : never;
-type RootType<TypeName> = TypeName extends keyof NexusGenRootTypes ? NexusGenRootTypes[TypeName] : never;
-type ArgType<TypeName, FieldName> = TypeName extends keyof NexusGenArgTypes ? FieldName extends keyof NexusGenArgTypes[TypeName] ? NexusGenArgTypes[TypeName][FieldName] : {} : {};
-
-/**
- * The NexusResolver type can be used when you want to preserve type-safety 
- * and autocomplete on a resolver outside of the Nexus definition block
- * 
- * @example
- * \`\`\`
- * const userItems: NexusResolver<'User', 'items'> = (root, args, ctx, info) => {
- *   if (ctx.user.isLoggedIn()) {
- *     return ctx.user.getItems()
- *   }
- *   return null
- * }
- * \`\`\`
- */
-export type NexusResolver<TypeName extends keyof NexusGenReturnTypes, FieldName extends keyof NexusGenReturnTypes[TypeName]> = (
-  root: RootType<TypeName>, 
-  args: ArgType<TypeName, FieldName>, 
-  context: NexusGenTypes['context'], 
-  info: GraphQLResolveInfo
-) => MaybePromise<NexusGenReturnTypes[TypeName][FieldName]>
-
-/**
- * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety
- * and autocomplete on an abstract type resolver (interface or union) outside of the Nexus 
- * configuration
- * 
- * @example
- * \`\`\`
- * const userItems: NexusResolver<'User', 'items'> = (root, args, ctx, info) => {
- *   if (ctx.user.isLoggedIn()) {
- *     return ctx.user.getItems()
- *   }
- *   return null
- * }
- * \`\`\`
- */
-export type NexusAbstractTypeResolver<TypeName extends keyof NexusGenAbstractResolveReturnTypes> = (
-  root: SourceType<TypeName>, 
-  context: NexusGenTypes['context'], 
-  info: GraphQLResolveInfo
-) => MaybePromise<NexusGenAbstractResolveReturnTypes[TypeName]>
-`;

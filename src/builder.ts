@@ -1,11 +1,10 @@
 import {
-  defaultFieldResolver,
   GraphQLBoolean,
   GraphQLEnumType,
-  GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
+  GraphQLFieldResolver,
   GraphQLFloat,
   GraphQLID,
   GraphQLInputFieldConfig,
@@ -24,43 +23,57 @@ import {
   GraphQLString,
   GraphQLUnionType,
   isEnumType,
-  isInputType,
+  isInputObjectType,
   isInterfaceType,
+  isLeafType,
   isNamedType,
   isObjectType,
   isOutputType,
   isUnionType,
-  Thunk,
 } from "graphql";
 import { isObject } from "util";
 import { ArgDef } from "./definitions/args";
-import { InputFieldDef, OutputFieldDef } from "./definitions/blocks";
+import {
+  AbstractOutputDefinitionBlock,
+  InputFieldDef,
+  OutputFieldDef,
+  InputDefinitionBlock,
+} from "./definitions/blocks";
 import { EnumTypeDef } from "./definitions/enumType";
-import { ExtendTypeDef, ExtendTypeConfig } from "./definitions/extendType";
+import { ExtendTypeDef } from "./definitions/extendType";
 import { InputObjectTypeDef } from "./definitions/inputObjectType";
 import { InterfaceTypeDef } from "./definitions/interfaceType";
-import { ObjectTypeDef } from "./definitions/objectType";
-import { UnionTypeDef } from "./definitions/unionType";
 import {
-  isNamedTypeDef,
-  isNexusWrappedFn,
+  FieldModificationDef,
+  Implemented,
+  ObjectDefinitionBlock,
+  ObjectTypeDef,
+} from "./definitions/objectType";
+import {
+  UnionDefinitionBlock,
+  UnionMembers,
+  UnionTypeDef,
+} from "./definitions/unionType";
+import {
   AllWrappedNamedTypes,
+  isNexusExtendTypeDef,
+  isNexusNamedTypeDef,
+  isNexusWrappedFn,
+  InputTypeDefs,
 } from "./definitions/wrappedType";
-import { NullabilityConfig, Omit } from "./definitions/_types";
-import { Metadata } from "./metadata";
+import {
+  GraphQLPossibleInputs,
+  GraphQLPossibleOutputs,
+  NexusTypes,
+  NonNullConfig,
+} from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
-import * as Types from "./typegenTypeHelpers";
-import { GetGen } from "./typegenTypeHelpers";
-import { objValues, suggestionList } from "./utils";
+import { TypegenMetadata } from "./typegenMetadata";
+import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
+import { objValues, suggestionList, firstDefined } from "./utils";
 
-const isPromise = (val: any): val is Promise<any> =>
-  Boolean(val && typeof val.then === "function");
-
-const NULL_DEFAULTS = {
-  output: false,
-  input: true,
-};
+export type Maybe<T> = T | null;
 
 const SCALARS: Record<string, GraphQLScalarType> = {
   String: GraphQLString,
@@ -124,7 +137,7 @@ export interface BuilderConfig<GenTypes = NexusGen> {
    *
    * @link {}
    */
-  nullability?: NullabilityConfig;
+  nullability?: NonNullConfig;
 }
 
 export interface TypegenInfo<GenTypes = NexusGen> {
@@ -161,7 +174,7 @@ export interface SchemaConfig extends BuilderConfig {
  * Since the enum types are resolved synchronously, these need to guard for
  * circular references at this step, while fields will guard for it during lazy evaluation.
  */
-export class SchemaBuilder {
+export class SchemaBuilder<GenTypes = NexusGen> {
   /**
    * Used to check for circular references.
    */
@@ -184,19 +197,13 @@ export class SchemaBuilder {
   /**
    * All "extensions" to types (adding fields on types from many locations)
    */
-  protected typeExtensionMap: Record<
-    string,
-    Record<string, ExtendTypeConfig<any>>
-  > = {};
-
+  protected typeExtensionMap: Record<string, ExtendTypeDef[]> = {};
   /**
-   * Configure the root-level nullability defaults
+   * Configures the root-level nullability defaults
    */
-  protected nullability: NullabilityConfig = {};
+  protected nullability: NonNullConfig = {};
 
-  constructor(protected metadata: Metadata, protected config: BuilderConfig) {
-    this.nullability = config.nullability || {};
-  }
+  constructor(protected config: BuilderConfig) {}
 
   getConfig(): BuilderConfig {
     return this.config;
@@ -205,6 +212,14 @@ export class SchemaBuilder {
   addType(typeDef: AllWrappedNamedTypes | GraphQLNamedType) {
     const existingType =
       this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
+
+    if (isNexusExtendTypeDef(typeDef)) {
+      this.typeExtensionMap[typeDef.name] =
+        this.typeExtensionMap[typeDef.name] || [];
+      this.typeExtensionMap[typeDef.name].push(typeDef);
+      return;
+    }
+
     if (existingType) {
       // Allow importing the same exact type more than once.
       if (existingType === typeDef) {
@@ -212,6 +227,7 @@ export class SchemaBuilder {
       }
       throw extendError(typeDef.name);
     }
+
     if (isNamedType(typeDef)) {
       this.finalTypeMap[typeDef.name] = typeDef;
       this.definedTypeMap[typeDef.name] = typeDef;
@@ -235,34 +251,44 @@ export class SchemaBuilder {
     });
     return {
       typeMap: this.finalTypeMap,
-      metadata: this.metadata,
     };
   }
 
-  inputObjectType(config: InputObjectTypeDef): GraphQLInputObjectType {
+  inputObjectType(config: InputObjectTypeDef<any>): GraphQLInputObjectType {
+    const fields: InputFieldDef[] = [];
+    config.definition(
+      new InputDefinitionBlock({
+        addField: (field) => fields.push(field),
+      })
+    );
     return new GraphQLInputObjectType({
       name: config.name,
-      fields: () => this.buildInputObjectFields(config),
+      fields: () => this.buildInputObjectFields(fields, config),
       description: config.description,
     });
   }
 
-  extendType(config: ExtendTypeDef): Thunk<GraphQLFieldConfigMap<any, any>> {
-    return () => {
-      return {};
-    };
-  }
-
   objectType(config: ObjectTypeDef) {
+    const fields: OutputFieldDef[] = [];
+    const interfaces: Implemented<GenTypes>[] = [];
+    const modifications: Record<string, FieldModificationDef<any, any>[]> = {};
+    config.definition(
+      new ObjectDefinitionBlock({
+        addField: (fieldDef) => fields.push(fieldDef),
+        addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
+        addFieldModifications(mods) {
+          modifications[mods.field] = modifications[mods.field] || [];
+          modifications[mods.field].push(mods);
+        },
+      })
+    );
     return new GraphQLObjectType({
       name: config.name,
-      interfaces: () => config.interfaces.map((i) => this.getInterface(i)),
+      interfaces: () => interfaces.map((i) => this.getInterface(i)),
       description: config.description,
       fields: () => {
-        const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {};
-        const allInterfaces = config.interfaces.map((i) =>
-          this.getInterface(i)
-        );
+        const allFieldsMap: GraphQLFieldConfigMap<any, any> = {};
+        const allInterfaces = interfaces.map((i) => this.getInterface(i));
         allInterfaces.forEach((i) => {
           const interfaceFields = i.getFields();
           // We need to take the interface fields and reconstruct them
@@ -270,7 +296,7 @@ export class SchemaBuilder {
           // the field at all it needs to happen here.
           Object.keys(interfaceFields).forEach((iFieldName) => {
             const { isDeprecated, args, ...rest } = interfaceFields[iFieldName];
-            interfaceFieldsMap[iFieldName] = {
+            allFieldsMap[iFieldName] = {
               ...rest,
               args: args.reduce(
                 (result: GraphQLFieldConfigArgumentMap, arg) => {
@@ -281,42 +307,67 @@ export class SchemaBuilder {
                 {}
               ),
             };
+            if (modifications[iFieldName]) {
+            }
           });
         });
-        return {
-          ...interfaceFieldsMap,
-          ...this.buildObjectFields(config),
-        };
+        return this.buildObjectFields(fields, config, allFieldsMap);
       },
     });
   }
-
-  addObjectInterfaces(config: ObjectTypeDef) {
-    config.definition();
-  }
-
   interfaceType(config: InterfaceTypeDef) {
-    const { name, resolveType, description } = config;
+    const { name, description } = config;
+    let resolveType: AbstractTypeResolver<string, NexusGen> | undefined;
+    const fields: OutputFieldDef[] = [];
+    config.definition(
+      new AbstractOutputDefinitionBlock({
+        addField: (field) => fields.push(field),
+        setResolveType: (fn) => (resolveType = fn),
+      })
+    );
+    if (!resolveType) {
+      throw new Error(
+        `Missing resolveType for the ${name} union.` +
+          `Be sure to add one in the definition block for the type`
+      );
+    }
     return new GraphQLInterfaceType({
       name,
-      fields: () => this.buildObjectFields(config),
+      fields: () => this.buildObjectFields(fields, config, {}),
       resolveType,
       description,
     });
   }
 
-  enumType(config: EnumTypeDef) {
+  enumType(config: EnumTypeDef<any>) {
     return new GraphQLEnumType({
       name: config.name,
-      values: this.buildEnumMembers(config),
+      values: config.values,
+      description: config.description,
     });
   }
 
   unionType(config: UnionTypeDef) {
+    let members: UnionMembers<GenTypes> | undefined;
+    let resolveType: AbstractTypeResolver<string, NexusGen> | undefined;
+    config.definition(
+      new UnionDefinitionBlock({
+        addField() {},
+        setResolveType: (fn) => (resolveType = fn),
+        addUnionMembers: (unionMembers) => (members = unionMembers),
+      })
+    );
+    if (!resolveType) {
+      throw new Error(
+        `Missing resolveType for the ${config.name} union.` +
+          `Be sure to add one in the definition block for the type`
+      );
+    }
     return new GraphQLUnionType({
       name: config.name,
-      resolveType: config.resolveType,
-      types: () => this.buildUnionMembers(config),
+      resolveType,
+      description: config.description,
+      types: () => this.buildUnionMembers(config.name, members),
     });
   }
 
@@ -334,50 +385,45 @@ export class SchemaBuilder {
     );
   }
 
-  protected buildEnumMembers(config: EnumTypeDef) {
-    let values: GraphQLEnumValueConfigMap = {};
-    config.members.forEach((member) => {
-      values[member.name] = {
-        value: member.value,
-        description: member.description,
-      };
-    });
-    if (!Object.keys(values).length) {
+  protected buildUnionMembers(
+    unionName: string,
+    members: UnionMembers<GenTypes> | undefined
+  ) {
+    const unionMembers: GraphQLObjectType[] = [];
+    if (!members) {
       throw new Error(
-        `GraphQL Nexus: Enum ${config.name} must have at least one member`
+        `Missing Union members for ${unionName}.` +
+          `Make sure to call the t.members(...) method in the union blocks`
       );
     }
-    return values;
-  }
-
-  protected buildUnionMembers(config: UnionTypeDef) {
-    const unionMembers: GraphQLObjectType[] = [];
-    config.members.forEach((member) => {
+    members.forEach((member) => {
       unionMembers.push(this.getObjectType(member));
     });
     if (!unionMembers.length) {
       throw new Error(
-        `GraphQL Nexus: Union ${config.name} must have at least one member type`
+        `GraphQL Nexus: Union ${unionName} must have at least one member type`
       );
     }
     return unionMembers;
   }
 
   protected buildObjectFields(
-    typeConfig: ObjectTypeDef | InterfaceTypeDef
+    fields: OutputFieldDef[],
+    typeConfig: ObjectTypeDef | InterfaceTypeDef,
+    intoObject: GraphQLFieldConfigMap<any, any>
   ): GraphQLFieldConfigMap<any, any> {
-    const fieldMap: GraphQLFieldConfigMap<any, any> = {};
-    typeConfig.fields.forEach((field) => {
-      fieldMap[field.name] = this.buildObjectField(field, typeConfig);
+    fields.forEach((field) => {
+      intoObject[field.name] = this.buildObjectField(field, typeConfig);
     });
-    return fieldMap;
+    return intoObject;
   }
 
   protected buildInputObjectFields(
-    typeConfig: InputObjectTypeDef
+    fields: InputFieldDef[],
+    typeConfig: InputObjectTypeDef<any>
   ): GraphQLInputFieldConfigMap {
     const fieldMap: GraphQLInputFieldConfigMap = {};
-    typeConfig.fields.forEach((field) => {
+    fields.forEach((field) => {
       fieldMap[field.name] = this.buildInputObjectField(field, typeConfig);
     });
     return fieldMap;
@@ -387,32 +433,38 @@ export class SchemaBuilder {
     fieldConfig: OutputFieldDef,
     typeConfig: ObjectTypeDef | InterfaceTypeDef
   ): GraphQLFieldConfig<any, any> {
-    this.metadata.addField(typeConfig.name, fieldConfig);
+    if (!fieldConfig.type) {
+      throw new Error(
+        `Missing required "type" field for ${typeConfig.name}.${
+          fieldConfig.name
+        }`
+      );
+    }
     return {
-      type: this.decorateOutputType(
+      type: this.decorateType(
         this.getOutputType(fieldConfig.type),
-        fieldConfig,
-        typeConfig
+        fieldConfig.list,
+        this.outputNonNull(typeConfig, fieldConfig)
       ),
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
       resolve: this.getResolver(fieldConfig, typeConfig),
       description: fieldConfig.description,
+      deprecationReason: fieldConfig.deprecation,
       // TODO: Need to look into subscription semantics and how
       // resolution works for them.
       // subscribe: fieldConfig.subscribe,
-      // deprecationReason?: Maybe<string>;
     };
   }
 
   protected buildInputObjectField(
     field: InputFieldDef,
-    typeConfig: InputObjectTypeDef
+    typeConfig: InputObjectTypeDef<any>
   ): GraphQLInputFieldConfig {
     return {
-      type: this.decorateInputType(
-        this.getInputType(field.type),
-        field,
-        typeConfig
+      type: this.decorateType(
+        this.getInputObjectType(field.type),
+        field.list,
+        this.inputNonNull(typeConfig, field)
       ),
     };
   }
@@ -425,114 +477,84 @@ export class SchemaBuilder {
     Object.keys(args).forEach((argName) => {
       const argDef = args[argName];
       allArgs[argName] = {
-        type: this.decorateArgType(
+        type: this.decorateType(
           this.getInputType(argDef.type),
-          { ...argDef, name: argName },
-          typeConfig
+          argDef.list,
+          this.inputNonNull(typeConfig, argDef)
         ),
         description: argDef.description,
+        defaultValue: argDef.default,
       };
     });
     return allArgs;
   }
 
-  protected decorateInputType(
-    type: GraphQLInputType,
-    fieldConfig: InputFieldDef,
-    typeConfig: InputObjectTypeDef
-  ) {
-    const { required: _required, ...rest } = fieldConfig;
-    const newOpts = rest;
-    if (typeof _required !== "undefined") {
-      newOpts.nullable = !_required;
+  protected inputNonNull(
+    typeDef: ObjectTypeDef | InterfaceTypeDef | InputObjectTypeDef<any>,
+    field: InputFieldDef | ArgDef
+  ): boolean {
+    const { nullable, required } = field;
+    const { name, nullability = {} } = typeDef;
+    if (typeof nullable !== "undefined" && typeof required !== "undefined") {
+      throw new Error(`Cannot set both nullable & required on ${name}`);
     }
-    return this.decorateType(type, newOpts, typeConfig, true);
-  }
-
-  protected decorateOutputType(
-    type: GraphQLOutputType,
-    fieldConfig: OutputFieldDef,
-    typeConfig: ObjectTypeDef | InterfaceTypeDef
-  ) {
-    return this.decorateType(type, fieldConfig, typeConfig, false);
-  }
-
-  protected decorateArgType(
-    type: GraphQLInputType,
-    argOpts: ArgDef & { name: string },
-    typeConfig: InputObjectTypeDef
-  ) {
-    const { required: _required, ...rest } = argOpts;
-    const newOpts = rest;
-    if (typeof _required !== "undefined") {
-      newOpts.nullable = !_required;
+    if (typeof nullable !== "undefined") {
+      return !nullable;
     }
-    return this.decorateType(type, newOpts, typeConfig, true);
+    if (typeof required !== "undefined") {
+      return required;
+    }
+    // Null by default
+    return firstDefined(nullability.input, this.nullability.input, false);
   }
 
-  /**
-   * Adds the null / list configuration to the type.
-   */
-  protected decorateType(
-    type: GraphQLOutputType,
-    fieldConfig: Omit<Types.FieldDef, "type" | "default">,
-    typeConfig: ObjectTypeDef | InterfaceTypeDef,
-    isInput: false
-  ): GraphQLOutputType;
-  protected decorateType(
-    type: GraphQLInputType,
-    fieldConfig: Omit<Types.FieldDef, "type" | "default">,
-    typeConfig: InputObjectTypeDef,
-    isInput: true
-  ): GraphQLInputType;
-  protected decorateType(
-    type: any,
-    fieldConfig: Omit<Types.FieldDef, "type" | "default">,
-    typeConfig: ObjectTypeDef | InterfaceTypeDef | InputObjectTypeDef,
-    isInput: boolean
-  ): any {
+  protected outputNonNull(
+    typeDef: ObjectTypeDef | InterfaceTypeDef,
+    field: OutputFieldDef
+  ): boolean {
+    const { nullable } = field;
+    const { nullability = {} } = typeDef;
+    if (typeof nullable !== "undefined") {
+      return !nullable;
+    }
+    // Non-Null by default
+    return firstDefined(nullability.output, this.nullability.output, false);
+  }
+
+  protected decorateType<T extends GraphQLNamedType>(
+    type: T,
+    list: null | undefined | true | boolean[],
+    isNonNull: boolean
+  ): T {
+    if (list) {
+      type = this.decorateList(type, list);
+    }
+    return (isNonNull ? GraphQLNonNull(type) : type) as T;
+  }
+
+  protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(
+    type: T,
+    list: true | boolean[]
+  ): T {
     let finalType = type;
-    const nullConfig: typeof NULL_DEFAULTS = {
-      ...NULL_DEFAULTS,
-      ...this.nullability,
-      ...typeConfig.nullability,
-    };
-    const { list, nullable } = fieldConfig;
-    const isNullable =
-      typeof nullable !== "undefined"
-        ? nullable
-        : list
-        ? isInput
-          ? nullConfig.inputList
-          : nullConfig.outputList
-        : isInput
-        ? nullConfig.input
-        : nullConfig.output;
-    if (Array.isArray(list)) {
-      const depth = listDepth || 1;
-      const nullableItem =
-        typeof listItemNullable !== "undefined"
-          ? listItemNullable
-          : isInput
-          ? nullConfig.inputListItem
-          : nullConfig.outputListItem;
-      for (let i = 0; i < depth; i++) {
-        const isNull = Array.isArray(nullableItem)
-          ? nullableItem[i]
-          : nullableItem;
-        if (!isNull) {
-          finalType = GraphQLNonNull(finalType);
-        }
-        finalType = GraphQLList(finalType);
-      }
+    if (!Array.isArray(list)) {
+      return GraphQLList(GraphQLNonNull(type)) as T;
     }
-    if (!isNullable) {
-      return GraphQLNonNull(finalType);
+    if (Array.isArray(list)) {
+      for (let i = 0; i < list.length; i++) {
+        const isNull = !list[0];
+        if (!isNull) {
+          finalType = GraphQLNonNull(finalType) as T;
+        }
+        finalType = GraphQLList(finalType) as T;
+      }
     }
     return finalType;
   }
 
-  protected getInterface(name: string): GraphQLInterfaceType {
+  protected getInterface(
+    name: string | InterfaceTypeDef
+  ): GraphQLInterfaceType {
     const type = this.getOrBuildType(name);
     if (!isInterfaceType(type)) {
       throw new Error(
@@ -562,9 +584,9 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected getInputType(name: string) {
+  protected getInputObjectType(name: string): GraphQLInputObjectType {
     const type = this.getOrBuildType(name);
-    if (!isInputType(type)) {
+    if (!isInputObjectType(type)) {
       throw new Error(
         `Expected ${name} to be a valid input type, saw ${
           type.constructor.name
@@ -574,7 +596,19 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected getOutputType(name: string) {
+  protected getInputType(name: string | InputTypeDefs): GraphQLPossibleInputs {
+    const type = this.getOrBuildType(name);
+    if (!isInputObjectType(type) && !isLeafType(type)) {
+      throw new Error(
+        `Expected ${name} to be a possible input type, saw ${
+          type.constructor.name
+        }`
+      );
+    }
+    return type;
+  }
+
+  protected getOutputType(name: string): GraphQLPossibleOutputs {
     const type = this.getOrBuildType(name);
     if (!isOutputType(type)) {
       throw new Error(
@@ -586,7 +620,7 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected getObjectType(name: string) {
+  protected getObjectType(name: string | ObjectTypeDef) {
     const type = this.getOrBuildType(name);
     if (!isObjectType(type)) {
       throw new Error(
@@ -596,7 +630,12 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected getOrBuildType(name: string): GraphQLNamedType {
+  protected getOrBuildType(
+    name: string | AllWrappedNamedTypes
+  ): GraphQLNamedType {
+    if (isNexusNamedTypeDef(name)) {
+      return this.getOrBuildType(name.name);
+    }
     if (SCALARS[name]) {
       return SCALARS[name];
     }
@@ -610,10 +649,34 @@ export class SchemaBuilder {
         )}`
       );
     }
+
+    if (!name) {
+      throw new Error("Unknown name??");
+    }
+
     const pendingType = this.pendingTypeMap[name];
     if (pendingType) {
       this.buildingTypes.add(name);
-      return pendingType.buildType(this);
+      switch (pendingType.nexus) {
+        case NexusTypes.Enum: {
+          return this.enumType(pendingType);
+        }
+        case NexusTypes.Object: {
+          return this.objectType(pendingType);
+        }
+        case NexusTypes.Union: {
+          return this.unionType(pendingType);
+        }
+        case NexusTypes.Scalar: {
+          return new GraphQLScalarType(pendingType);
+        }
+        case NexusTypes.Interface: {
+          return this.interfaceType(pendingType);
+        }
+        case NexusTypes.InputObject: {
+          return this.inputObjectType(pendingType);
+        }
+      }
     }
     return this.missingType(name);
   }
@@ -622,9 +685,12 @@ export class SchemaBuilder {
     fieldOptions: OutputFieldDef,
     typeConfig: ObjectTypeDef | InterfaceTypeDef
   ) {
-    let resolver = typeConfig.defaultResolver || defaultFieldResolver;
+    let resolver: undefined | GraphQLFieldResolver<any, any>;
     if (fieldOptions.resolve) {
       resolver = fieldOptions.resolve;
+    }
+    if (typeConfig.nexus === NexusTypes.Object && typeConfig.defaultResolver) {
+      resolver = typeConfig.defaultResolver;
     }
     return resolver;
   }
@@ -640,7 +706,6 @@ export interface BuildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType>
 > {
   typeMap: TypeMapDefs;
-  metadata: Metadata;
 }
 
 /**
@@ -653,11 +718,9 @@ export function buildTypes<
 >(
   types: any,
   config: BuilderConfig = { outputs: false },
-  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
-  MetadataClass: typeof Metadata = Metadata
+  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
-  const metadata = new MetadataClass(config);
-  const builder = new SchemaBuilderClass(metadata, config);
+  const builder = new SchemaBuilderClass(config);
   addTypes(builder, types);
   return builder.getFinalTypeMap();
 }
@@ -667,13 +730,10 @@ function addTypes(builder: SchemaBuilder, types: any) {
     return;
   }
   if (isNexusWrappedFn(types)) {
-    types = types.type;
-    if (typeof types === "function") {
-      addTypes(builder, types(builder));
-      return;
-    }
+    addTypes(builder, types.fn(builder));
+    return;
   }
-  if (isNamedTypeDef(types) || isNamedType(types)) {
+  if (isNexusNamedTypeDef(types) || isNamedType(types)) {
     builder.addType(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));
@@ -687,14 +747,12 @@ function addTypes(builder: SchemaBuilder, types: any) {
  */
 export function makeSchemaWithMetadata(
   options: SchemaConfig,
-  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder,
-  MetadataClass: typeof Metadata = Metadata
-): { metadata: Metadata; schema: GraphQLSchema } {
-  const { typeMap: typeMap, metadata } = buildTypes(
+  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder
+): { schema: GraphQLSchema } {
+  const { typeMap: typeMap } = buildTypes(
     options.types,
     options,
-    SchemaBuilderClass,
-    MetadataClass
+    SchemaBuilderClass
   );
 
   let { Query, Mutation, Subscription } = typeMap;
@@ -739,7 +797,7 @@ export function makeSchemaWithMetadata(
     types: objValues(typeMap),
   });
 
-  return { schema, metadata };
+  return { schema };
 }
 
 /**
@@ -750,7 +808,7 @@ export function makeSchemaWithMetadata(
  * root query type.
  */
 export function makeSchema(options: SchemaConfig): GraphQLSchema {
-  const { schema, metadata } = makeSchemaWithMetadata(options);
+  const { schema } = makeSchemaWithMetadata(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
@@ -761,7 +819,7 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   if (shouldGenerateArtifacts) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    metadata.generateArtifacts(schema);
+    new TypegenMetadata(options).generateArtifacts(schema);
   }
 
   return schema;

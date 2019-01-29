@@ -1,3 +1,9 @@
+import {
+  GraphQLLeafType,
+  GraphQLCompositeType,
+  GraphQLInputObjectType,
+} from "graphql";
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export type MaybePromise<T> = Promise<T> | T;
@@ -36,28 +42,32 @@ export interface DeprecationInfo {
   supersededBy?: string;
 }
 
-export interface NullabilityConfig {
+export interface NonNullConfig {
   /**
-   * Whether output fields can return null by default.
+   * Whether output fields are non-null by default.
    *
    * type Example {
    *   field: String!
    *   otherField: [String!]!
    * }
    *
-   * @default false
+   * @default true
    */
   output?: boolean;
   /**
    * Whether input fields (field arguments, input type members)
-   * are nullable by default.
+   * are non-null by default.
    *
    * input Example {
    *   field: String
    *   something: [String]
    * }
    *
-   * @default true
+   * @default false
    */
   input?: boolean;
 }
+
+export type GraphQLPossibleOutputs = GraphQLCompositeType | GraphQLLeafType;
+
+export type GraphQLPossibleInputs = GraphQLInputObjectType | GraphQLLeafType;

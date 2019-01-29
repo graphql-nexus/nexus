@@ -9,7 +9,8 @@ const characterArgs = {
 };
 
 const heroArgs = {
-  episode: arg("Episode", {
+  episode: arg({
+    type: "Episode",
     description:
       "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.",
   }),

@@ -2,8 +2,9 @@ import { objectType, inputObjectType, interfaceType } from "nexus";
 
 export const Bar = interfaceType({
   name: "Bar",
+  description: "Bar description",
   definition(t) {
-    t.boolean("ok");
+    t.boolean("ok", { deprecation: "Not ok?" });
     t.resolveType((root) => "Foo");
   },
 });
@@ -14,15 +15,24 @@ export const Baz = interfaceType({
     t.boolean("ok");
     t.field("a", {
       type: Bar,
+      description: "'A' description",
     });
     t.resolveType(() => "Foo");
+  },
+});
+
+export const TestObj = objectType({
+  name: "TestObj",
+  definition(t) {
+    t.implements("Bar");
+    t.string("item");
   },
 });
 
 export const Foo = objectType({
   name: "Foo",
   definition(t) {
-    t.implements(Bar);
+    t.implements("Bar");
     t.string("name");
   },
 });

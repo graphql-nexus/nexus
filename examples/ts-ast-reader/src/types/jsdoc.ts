@@ -26,7 +26,7 @@ export const JSDocTag = interfaceType({
   },
 });
 
-const jsDocTag = (t: core.ObjectTypeDef<NexusGen, any>) =>
+const jsDocTag = (t: Types.ObjectDefinitionBlock<any>) =>
   t.implements("JSDocTag");
 
 export const JSDocUnknownTag = objectType({

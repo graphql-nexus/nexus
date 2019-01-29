@@ -7,12 +7,24 @@ declare global {
 
 export type MaybePromise<T> = PromiseLike<T> | T;
 
-export interface InputFieldConfig {
-  name: string;
-  type: any;
-}
+/**
+ *
+ */
+export type MaybePromiseDeep<T> = {
+  [P in keyof T]?: T[P] extends Array<infer U>
+    ? Array<MaybePromiseDeep<U>>
+    : T[P] extends ReadonlyArray<infer Y>
+    ? ReadonlyArray<MaybePromiseDeep<Y>>
+    : MaybePromiseDeep<T[P]>
+};
 
 export type OutputFieldArgs = Record<string, ArgDef>;
+
+// export type FieldType<
+//   TypeName extends string,
+//   FieldName extends string,
+//   GenTypes = NexusGen
+// > = GetGen3<GenTypes, "">;
 
 /**
  * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety
@@ -29,14 +41,16 @@ export type OutputFieldArgs = Record<string, ArgDef>;
  * }
  * ```
  */
-export type AbstractTypeResolver<
+export interface AbstractTypeResolver<
   TypeName extends string,
   GenTypes = NexusGen
-> = (
-  source: AbstractResolveRoot<GenTypes, TypeName>,
-  context: GetGen<GenTypes, "context">,
-  info: GraphQLResolveInfo
-) => MaybePromise<AbstractResolveReturn<TypeName, GenTypes>>;
+> {
+  (
+    source: RootValue<TypeName, GenTypes>,
+    context: GetGen<GenTypes, "context">,
+    info: GraphQLResolveInfo
+  ): MaybePromise<AbstractResolveReturn<TypeName, GenTypes>>;
+}
 
 /**
  * The FieldResolver type can be used when you want to preserve type-safety
@@ -57,20 +71,11 @@ export type FieldResolver<
   FieldName extends string,
   GenTypes = NexusGen
 > = (
-  root: GetGen2<GenTypes, "rootTypes", TypeName>,
-  args: GetGen3<GenTypes, "argTypes", TypeName, FieldName>,
+  root: RootValue<TypeName>,
+  args: ArgsValue<TypeName, FieldName>,
   context: GetGen<GenTypes, "context">,
   info: GraphQLResolveInfo
-) => MaybePromise<GetGen3<GenTypes, "returnTypes", TypeName, FieldName>>;
-
-export type AbstractResolveRoot<
-  GenTypes,
-  TypeName
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["abstractResolveRoot"]
-    ? GenTypes["abstractResolveRoot"][TypeName]
-    : any
-  : any;
+) => MaybePromiseDeep<ResultValue<GenTypes, TypeName, FieldName>>;
 
 export type AbstractResolveReturn<
   TypeName extends string,
@@ -86,9 +91,11 @@ export type AbstractResolveReturn<
  */
 export type GenTypesShapeKeys =
   | "context"
+  | "inputTypes"
   | "rootTypes"
   | "argTypes"
-  | "returnTypes"
+  | "fieldTypes"
+  | "inheritedFields"
   | "objectNames"
   | "inputNames"
   | "enumNames"
@@ -99,7 +106,6 @@ export type GenTypesShapeKeys =
   | "allOutputTypes"
   | "allNamedTypes"
   | "abstractTypes"
-  | "abstractResolveRoot"
   | "abstractResolveReturn";
 
 /**
@@ -109,40 +115,46 @@ export type GenTypesShape = Record<GenTypesShapeKeys, any>;
 
 export type GetGen<
   GenTypes,
-  K extends GenTypesShapeKeys,
-  Fallback = any
-> = GenTypes extends GenTypesShape ? GenTypes[K] : Fallback;
+  K extends GenTypesShapeKeys
+> = GenTypes extends GenTypesShape ? GenTypes[K] : any;
 
 export type GetGen2<
   GenTypes,
   K extends GenTypesShapeKeys,
-  K2 extends Extract<keyof GenTypesShape[K], string>,
-  Fallback = any
+  K2 extends Extract<keyof GenTypesShape[K], string>
 > = GenTypes extends GenTypesShape
   ? K extends keyof GenTypes
     ? K2 extends keyof GenTypes[K]
       ? GenTypes[K][K2]
-      : Fallback
-    : Fallback
-  : Fallback;
+      : any
+    : any
+  : any;
 
 export type GetGen3<
   GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
-  K3 extends Extract<keyof GenTypesShape[K][K2], string>,
-  Fallback = any
+  K3 extends Extract<keyof GenTypesShape[K][K2], string>
 > = GenTypes extends GenTypesShape
   ? K extends keyof GenTypes
     ? K2 extends keyof GenTypes[K]
       ? K3 extends keyof GenTypes[K][K2]
         ? GenTypes[K][K2][K3]
-        : Fallback
-      : Fallback
-    : Fallback
-  : Fallback;
+        : any
+      : any
+    : any
+  : any;
 
-export type GenHas2<
+export type HasGen<
+  GenTypes,
+  K extends GenTypesShapeKeys
+> = GenTypes extends GenTypesShape
+  ? K extends keyof GenTypes
+    ? true
+    : false
+  : false;
+
+export type HasGen2<
   GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>
@@ -154,7 +166,7 @@ export type GenHas2<
     : false
   : false;
 
-export type GenHas3<
+export type HasGen3<
   GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
@@ -179,41 +191,28 @@ export type RootValueField<
   GenTypes,
   TypeName extends string,
   FieldName extends string
-> = GetGen3<GenTypes, "rootTypes", TypeName, FieldName, unknown>;
+> = GetGen3<GenTypes, "rootTypes", TypeName, FieldName>;
 
 export type ArgsValue<
   TypeName extends string,
   FieldName extends string,
   GenTypes = NexusGen
-> = GetGen3<GenTypes, "argTypes", TypeName, FieldName, Record<string, any>>;
+> = GetGen3<GenTypes, "argTypes", TypeName, FieldName>;
 
 export type ResultValue<
   GenTypes,
   TypeName extends string,
-  FieldName extends string,
-  ResolveFallback
-> = GetGen3<GenTypes, "returnTypes", TypeName, FieldName, ResolveFallback>;
-
-export type NexusFieldResolver<
-  TypeName extends string,
-  FieldName extends string,
-  Fallback = any,
-  GenTypes = NexusGen
-> = (
-  root: RootValue<TypeName>,
-  args: ArgsValue<TypeName, FieldName>,
-  context: GetGen<GenTypes, "context">,
-  info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<GenTypes, TypeName, FieldName, Fallback>>;
+  FieldName extends string
+> = GetGen3<GenTypes, "fieldTypes", TypeName, FieldName>;
 
 export type NeedsResolver<
   TypeName extends string,
   FieldName extends string,
   GenTypes = NexusGen
-> = GenHas3<GenTypes, "returnTypes", TypeName, FieldName> extends true
-  ? GetGen3<GenTypes, "returnTypes", TypeName, FieldName> extends null
+> = HasGen3<GenTypes, "fieldTypes", TypeName, FieldName> extends true
+  ? GetGen3<GenTypes, "fieldTypes", TypeName, FieldName> extends null
     ? false
-    : GenHas3<GenTypes, "rootTypes", TypeName, FieldName> extends true
+    : HasGen3<GenTypes, "rootTypes", TypeName, FieldName> extends true
     ? GetGen3<GenTypes, "rootTypes", TypeName, FieldName> extends null
       ? true
       : false

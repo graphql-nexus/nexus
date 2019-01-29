@@ -13,33 +13,46 @@ export {
   OutputFieldDef,
   OutputScalarConfig,
 } from "./definitions/blocks";
+export { EnumMemberInfo, EnumTypeConfig } from "./definitions/enumType";
+export { ExtendTypeConfig, ExtendTypeDef } from "./definitions/extendType";
 export {
-  EnumMemberConfig,
-  EnumMemberInfo,
-  EnumTypeConfig,
-} from "./definitions/enumType";
-export { ExtendTypeConfig } from "./definitions/extendType";
-export { InputObjectTypeConfig } from "./definitions/inputObjectType";
+  InputObjectTypeConfig,
+  InputObjectTypeDef,
+} from "./definitions/inputObjectType";
 export {
-  InterfaceTypeBase,
   InterfaceTypeConfig,
+  InterfaceTypeDef,
 } from "./definitions/interfaceType";
 export {
+  ObjectDefinitionBlock,
   ObjectDefinitionBuilder,
   ObjectTypeConfig,
 } from "./definitions/objectType";
-export { ScalarBase, ScalarConfig } from "./definitions/scalarType";
-export { UnionTypeConfig } from "./definitions/unionType";
-export { WrappedTypeInfo } from "./definitions/wrappedType";
-export { DeprecationInfo, NullabilityConfig } from "./definitions/_types";
+export {
+  ScalarBase,
+  ScalarConfig,
+  ScalarTypeDef,
+} from "./definitions/scalarType";
+export {
+  UnionDefinitionBlock,
+  UnionTypeConfig,
+  UnionTypeDef,
+} from "./definitions/unionType";
+export {
+  WrappedTypeInfo,
+  Wrapped,
+  WrappedOutput,
+  WrappedFn,
+  AllWrappedNamedTypes,
+} from "./definitions/wrappedType";
+export {
+  DeprecationInfo,
+  NonNullConfig as NullabilityConfig,
+} from "./definitions/_types";
 export * from "./typegenTypeHelpers";
 
-// Omit
-// MaybePromise
-// MaybeThunk
 // BaseScalars
 // ArgDef
-// ScalarOutArgs
 // ScalarOutConfig
 // FieldOutConfig
 // ScalarInArgs
