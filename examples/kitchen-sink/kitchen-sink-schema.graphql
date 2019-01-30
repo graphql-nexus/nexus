@@ -4,7 +4,7 @@
 
 """Bar description"""
 interface Bar {
-  argsTest(a: InputType = null): Boolean!
+  argsTest(a: InputType = {answer: 2, key: "one"}): Boolean!
   ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
@@ -15,7 +15,7 @@ interface Baz {
 }
 
 type Foo implements Bar {
-  argsTest(a: InputType = null): Boolean!
+  argsTest(a: InputType = {answer: 2, key: "one"}): Boolean!
   name: String!
   ok: Boolean! @deprecated(reason: "Not ok?")
 }
@@ -32,7 +32,7 @@ type Query {
 type TestObj implements Bar & Baz {
   """'A' description"""
   a: Bar!
-  argsTest(a: InputType = null): Boolean!
+  argsTest(a: InputType = {answer: 2, key: "one"}): Boolean!
   item: String!
   ok: Boolean!
 }

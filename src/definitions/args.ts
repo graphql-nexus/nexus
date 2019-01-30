@@ -33,21 +33,13 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
   default?: T;
 }
 
-export type PossibleArgNames = NexusGen extends infer GenTypes
-  ? HasGen<"allInputTypes"> extends true
-    ? GetGen<"allInputTypes">
-    : string
-  : string;
-
-export interface NexusArgConfig<
-  T extends PossibleArgNames,
-  U extends AllNexusInputTypeDefs<T> = AllNexusInputTypeDefs<T>
-> extends CommonArgConfig {
+export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
+  extends CommonArgConfig {
   /**
    * The type of the argument, either the string name of the type,
    * or the concrete Nexus type definition
    */
-  type: T | U;
+  type: T | AllNexusInputTypeDefs<T>;
   /**
    * Configure the default for the object
    */
@@ -55,10 +47,7 @@ export interface NexusArgConfig<
 }
 
 export class NexusArgDef<TypeName extends string> {
-  constructor(
-    readonly name: TypeName,
-    protected config: NexusArgConfig<any, any>
-  ) {}
+  constructor(readonly name: TypeName, protected config: NexusArgConfig<any>) {}
   get value() {
     return this.config;
   }
@@ -75,9 +64,16 @@ withNexusSymbol(NexusArgDef, NexusTypes.Interface);
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg(options: NexusArgConfig<any, any>) {
+export function arg<T extends GetGen<"allInputTypes", string>>(
+  options: { type: T | AllNexusInputTypeDefs<T> } & NexusArgConfig<T>
+) {
+  if (!options.type) {
+    throw new Error('You must provide a "type" for the arg()');
+  }
   return new NexusArgDef(
-    typeof options.type === "string" ? options.type : options.type.name,
+    typeof options.type === "string"
+      ? options.type
+      : (options.type as any).name,
     options
   );
 }

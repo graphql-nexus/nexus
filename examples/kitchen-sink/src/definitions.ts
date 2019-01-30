@@ -4,10 +4,7 @@ import {
   interfaceType,
   unionType,
   arg,
-  core,
 } from "nexus";
-
-type T = core.PossibleArgNames;
 
 export const Bar = interfaceType({
   name: "Bar",
@@ -17,8 +14,11 @@ export const Bar = interfaceType({
     t.boolean("argsTest", {
       args: {
         a: arg({
-          type: InputType,
-          default: 1,
+          type: "InputType",
+          default: {
+            key: "one",
+            answer: 2,
+          },
         }),
       },
     });

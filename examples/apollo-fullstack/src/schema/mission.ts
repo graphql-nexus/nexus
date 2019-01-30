@@ -6,7 +6,7 @@ export const Mission = objectType({
     t.string("name", { nullable: true });
     t.string("missionPatch", {
       args: {
-        size: arg("PatchSize", {}),
+        size: arg({ type: "PatchSize" }),
       },
       resolve(mission, { size }) {
         return size === "SMALL"

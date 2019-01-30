@@ -521,7 +521,7 @@ export class SchemaBuilder {
 
   protected buildInputObjectField(
     field: NexusInputFieldDef,
-    typeConfig: NexusInputObjectTypeConfig<string>
+    typeConfig: NexusInputObjectTypeConfig<any>
   ): GraphQLInputFieldConfig {
     return {
       type: this.decorateType(
@@ -559,7 +559,7 @@ export class SchemaBuilder {
       | NexusObjectTypeConfig<any>
       | NexusInterfaceTypeConfig<any>
       | NexusInputObjectTypeConfig<any>,
-    field: NexusInputFieldDef | NexusArgConfig<any, any>
+    field: NexusInputFieldDef | NexusArgConfig<any>
   ): boolean {
     const { nullable, required } = field;
     const { name, nonNullDefaults = {} } = typeDef;
