@@ -18,4 +18,4 @@ export * from "./definitions/interfaceType";
 export * from "./definitions/objectType";
 export * from "./definitions/scalarType";
 export * from "./definitions/unionType";
-export * from "./definitions/wrappedType";
+export * from "./definitions/wrapping";

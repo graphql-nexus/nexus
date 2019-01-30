@@ -1,12 +1,12 @@
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from "./blocks";
 import { GetGen2, GetGen, FieldResolver } from "../typegenTypeHelpers";
-import { NonNullConfig, NexusTypes } from "./_types";
-import { wrappedType } from "./wrappedType";
-import { InterfaceTypeDef } from "./interfaceType";
+import { NonNullConfig, NexusTypes, withNexusSymbol } from "./_types";
+import { assertValidName } from "graphql";
+import { NexusInterfaceTypeDef } from "./interfaceType";
 
 export type Implemented<GenTypes = NexusGen> =
   | GetGen<GenTypes, "interfaceNames">
-  | InterfaceTypeDef;
+  | NexusInterfaceTypeDef<string>;
 
 export interface FieldModification<
   TypeName extends string,
@@ -72,7 +72,7 @@ export class ObjectDefinitionBlock<
   }
 }
 
-export interface ObjectTypeConfig<
+export interface NexusObjectTypeConfig<
   TypeName extends string,
   GenTypes = NexusGen
 > {
@@ -84,7 +84,7 @@ export interface ObjectTypeConfig<
    * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    */
-  nullability?: NonNullConfig;
+  nonNullDefaults?: NonNullConfig;
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -96,13 +96,22 @@ export interface ObjectTypeConfig<
   defaultResolver?: FieldResolver<TypeName, any, GenTypes>;
 }
 
-export type ObjectTypeDef = ReturnType<typeof objectType>;
+export class NexusObjectTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusObjectTypeConfig<any, any>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
+
+withNexusSymbol(NexusObjectTypeDef, NexusTypes.Object);
 
 export function objectType<TypeName extends string, GenTypes = NexusGen>(
-  config: ObjectTypeConfig<TypeName, GenTypes>
+  config: NexusObjectTypeConfig<TypeName, GenTypes>
 ) {
-  return wrappedType({
-    nexus: NexusTypes.Object as NexusTypes.Object,
-    ...config,
-  });
+  return new NexusObjectTypeDef(config.name, config);
 }

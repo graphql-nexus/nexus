@@ -2,15 +2,11 @@ import {
   OutputDefinitionBlock,
   AbstractOutputDefinitionBuilder,
 } from "./blocks";
-import { wrappedType } from "./wrappedType";
-import { NexusTypes, NonNullConfig } from "./_types";
-import { AbstractTypeResolver } from "../core";
+import { NexusTypes, NonNullConfig, withNexusSymbol } from "./_types";
+import { assertValidName } from "graphql";
+import { AbstractTypeResolver } from "../typegenTypeHelpers";
 
-// export interface SetResolveType<TypeName extends string, GenTypes = NexusGen> {
-//   setResolveType(fn: AbstractTypeResolver<TypeName, GenTypes>): void;
-// }
-
-export type InterfaceTypeConfig<
+export type NexusInterfaceTypeConfig<
   TypeName extends string,
   GenTypes = NexusGen
 > = {
@@ -30,14 +26,12 @@ export type InterfaceTypeConfig<
    * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    */
-  nullability?: NonNullConfig;
+  nonNullDefaults?: NonNullConfig;
   /**
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
 };
-
-export type InterfaceTypeDef = ReturnType<typeof interfaceType>;
 
 export class InterfaceDefinitionBlock<
   TypeName extends string,
@@ -56,16 +50,26 @@ export class InterfaceDefinitionBlock<
   }
 }
 
+export class NexusInterfaceTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusInterfaceTypeConfig<any, any>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
+
+withNexusSymbol(NexusInterfaceTypeDef, NexusTypes.Interface);
+
 /**
  * Defines a GraphQLInterfaceType
- *
  * @param config
  */
 export function interfaceType<TypeName extends string, GenTypes = NexusGen>(
-  config: InterfaceTypeConfig<TypeName, GenTypes>
+  config: NexusInterfaceTypeConfig<TypeName, GenTypes>
 ) {
-  return wrappedType({
-    nexus: NexusTypes.Interface as NexusTypes.Interface,
-    ...config,
-  });
+  return new NexusInterfaceTypeDef(config.name, config);
 }

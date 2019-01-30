@@ -1,9 +1,8 @@
-import { assertValidName } from "graphql";
 import { GetGen, AbstractTypeResolver } from "../typegenTypeHelpers";
 import { AbstractOutputDefinitionBuilder } from "./blocks";
-import { ObjectTypeDef } from "./objectType";
-import { wrappedType } from "./wrappedType";
-import { NexusTypes } from "./_types";
+import { NexusTypes, withNexusSymbol } from "./_types";
+import { assertValidName } from "graphql";
+import { NexusObjectTypeDef } from "./objectType";
 
 export interface UnionDefinitionBuilder<
   TypeName extends string,
@@ -13,7 +12,7 @@ export interface UnionDefinitionBuilder<
 }
 
 export type UnionMembers<GenTypes = NexusGen> = Array<
-  GetGen<GenTypes, "objectNames"> | ObjectTypeDef
+  GetGen<GenTypes, "objectNames"> | NexusObjectTypeDef<string>
 >;
 
 export class UnionDefinitionBlock<
@@ -38,7 +37,10 @@ export class UnionDefinitionBlock<
   }
 }
 
-export interface UnionTypeConfig<TypeName extends string, GenTypes = NexusGen> {
+export interface NexusUnionTypeConfig<
+  TypeName extends string,
+  GenTypes = NexusGen
+> {
   /**
    * The name of the union type
    */
@@ -58,19 +60,26 @@ export interface UnionTypeConfig<TypeName extends string, GenTypes = NexusGen> {
   deprecation?: string; // | DeprecationInfo;
 }
 
-export type UnionTypeDef = ReturnType<typeof unionType>;
+export class NexusUnionTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusUnionTypeConfig<any, any>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
+
+withNexusSymbol(NexusUnionTypeDef, NexusTypes.Union);
 
 /**
  * Defines a new `GraphQLUnionType`
  * @param config
  */
 export function unionType<TypeName extends string, GenTypes = NexusGen>(
-  config: UnionTypeConfig<TypeName, GenTypes>
+  config: NexusUnionTypeConfig<TypeName, GenTypes>
 ) {
-  const { name, ...rest } = config;
-  return wrappedType({
-    nexus: NexusTypes.Union as NexusTypes.Union,
-    name: assertValidName(config.name),
-    ...rest,
-  });
+  return new NexusUnionTypeDef(config.name, config);
 }

@@ -99,13 +99,13 @@ The GraphQL documentation provides [this explanation](https://graphql.org/learn/
 
 > ... in a GraphQL type system, every field is nullable by default. This is because there are many things which can go awry in a networked service backed by databases and other services. A database could go down, an asynchronous action could fail, an exception could be thrown. Beyond simply system failures, authorization can often be granular, where individual fields within a request can have different authorization rules.
 
-GraphQL Nexus breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all arguments are nullable unless `required` is set to true.
+GraphQL Nexus breaks slightly from this convention, and instead assumes by all fields are "non-null" unless otherwise specified with a `nullable` option set to `true`. It also assumes all input types (fields/args) are nullable unless `required` is set to true.
 
 The rationale being that for most applications, the case of returning `null` to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.
 
-If you find yourself wanting this the other way around, there is a `nullability` option for the `makeSchema` which will make all fields nullable unless `required: true` (an alias for `nullable: false`) is specified during field definition.
+If you find yourself wanting this the other way around, there is a `nonNullDefaults` option for the `makeSchema` which will make all fields nullable unless `required: true` (an alias for `nullable: false`) is specified during field definition.
 
-This can also be configured on a per-type basis, using the `nullability` method on the type definition object. This comes in handy where you know you want
+This can also be configured on a per-type basis, using the `nonNullDefaults` option on the type definition object. This can be handy if you find yourself adding `{ nullable: true }` to many fields of an output object type.
 
 #### default
 

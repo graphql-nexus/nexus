@@ -1,8 +1,8 @@
-import { wrappedType } from "./wrappedType";
-import { NexusTypes } from "./_types";
+import { NexusTypes, withNexusSymbol } from "./_types";
 import { OutputDefinitionBlock } from "./blocks";
+import { assertValidName } from "graphql";
 
-export interface ExtendTypeConfig<
+export interface NexusExtendTypeConfig<
   TypeName extends string,
   GenTypes = NexusGen
 > {
@@ -10,7 +10,19 @@ export interface ExtendTypeConfig<
   definition(t: OutputDefinitionBlock<TypeName, GenTypes>): void;
 }
 
-export type ExtendTypeDef = ReturnType<typeof extendType>;
+export class NexusExtendTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusExtendTypeConfig<any, any>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
+
+withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject);
 
 /**
  * Adds new fields to an existing type in the schema. Useful when splitting your
@@ -19,12 +31,7 @@ export type ExtendTypeDef = ReturnType<typeof extendType>;
  * @see http://graphql-nexus.com/api/extendType
  */
 export function extendType<TypeName extends string>(
-  config: ExtendTypeConfig<TypeName>
+  config: NexusExtendTypeConfig<TypeName>
 ) {
-  const { type, ...rest } = config;
-  return wrappedType({
-    name: type,
-    nexus: NexusTypes.ExtendObject as NexusTypes.ExtendObject,
-    ...rest,
-  });
+  return new NexusExtendTypeDef(config.type, config);
 }

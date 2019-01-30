@@ -1,4 +1,4 @@
-import { objectType, inputObjectType, interfaceType } from "nexus";
+import { objectType, inputObjectType, interfaceType, unionType } from "nexus";
 
 export const Bar = interfaceType({
   name: "Bar",
@@ -17,6 +17,14 @@ export const Baz = interfaceType({
       type: Bar,
       description: "'A' description",
     });
+    t.resolveType(() => "TestObj");
+  },
+});
+
+export const TestUnion = unionType({
+  name: "TestUnion",
+  definition(t) {
+    t.members("Foo");
     t.resolveType(() => "Foo");
   },
 });
@@ -24,7 +32,7 @@ export const Baz = interfaceType({
 export const TestObj = objectType({
   name: "TestObj",
   definition(t) {
-    t.implements("Bar");
+    t.implements("Bar", Baz);
     t.string("item");
   },
 });

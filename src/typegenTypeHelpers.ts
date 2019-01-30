@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from "graphql";
-import { ArgDef } from "./definitions/args";
+import { NexusArgDef } from "./definitions/args";
 
 declare global {
   interface NexusGen {}
@@ -8,7 +8,9 @@ declare global {
 export type MaybePromise<T> = PromiseLike<T> | T;
 
 /**
- *
+ * Because the GraphQL field execution algorithm automatically
+ * resolves promises at any level of the tree, we use this
+ * to help signify that.
  */
 export type MaybePromiseDeep<T> = {
   [P in keyof T]?: T[P] extends Array<infer U>
@@ -17,8 +19,6 @@ export type MaybePromiseDeep<T> = {
     ? ReadonlyArray<MaybePromiseDeep<Y>>
     : MaybePromiseDeep<T[P]>
 };
-
-export type OutputFieldArgs = Record<string, ArgDef>;
 
 // export type FieldType<
 //   TypeName extends string,

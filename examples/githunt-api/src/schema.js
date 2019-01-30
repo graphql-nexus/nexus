@@ -34,7 +34,9 @@ exports.Query = objectType({
             "The number of items to fetch starting from the offset, for pagination",
         }),
       },
-      resolve(root, args, ctx) {},
+      resolve(root, args, ctx) {
+        return [];
+      },
     });
     t.field("entry", {
       type: "Entry",

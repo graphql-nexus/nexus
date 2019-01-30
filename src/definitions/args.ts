@@ -1,6 +1,6 @@
 import { GetGen, HasGen } from "../typegenTypeHelpers";
-import { InputTypeDefs, nexusWrappedArg } from "./wrappedType";
-import { NexusTypes } from "./_types";
+import { NexusInputTypeName } from "./wrapping";
+import { NexusTypes, withNexusSymbol } from "./_types";
 
 export interface CommonArgConfig {
   /**
@@ -40,7 +40,7 @@ export type PossibleArgNames<GenTypes = NexusGen> = HasGen<
   ? GetGen<GenTypes, "allInputTypes">
   : string;
 
-export interface ArgConfig<
+export interface NexusArgConfig<
   GenTypes = NexusGen,
   T extends PossibleArgNames<GenTypes> = PossibleArgNames<GenTypes>
 > extends CommonArgConfig {
@@ -48,14 +48,21 @@ export interface ArgConfig<
    * The type of the argument, either the string name of the type,
    * or the concrete
    */
-  type: T | InputTypeDefs;
+  type: T | NexusInputTypeName<T>;
   /**
    * Configure the default for the object
    */
   default?: any; // TODO: Make this type-safe somehow
 }
 
-export type ArgDef = ReturnType<typeof arg>;
+export class NexusArgDef<TypeName extends string> {
+  constructor(readonly name: TypeName, protected config: NexusArgConfig) {}
+  get value() {
+    return this.config;
+  }
+}
+
+withNexusSymbol(NexusArgDef, NexusTypes.Interface);
 
 /**
  * Defines an argument that can be used in any object or interface type
@@ -66,11 +73,8 @@ export type ArgDef = ReturnType<typeof arg>;
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg(options: ArgConfig) {
-  return nexusWrappedArg({
-    ...options,
-    nexus: NexusTypes.Arg as NexusTypes.Arg,
-  });
+export function arg(options: NexusArgConfig) {
+  return new NexusArgDef(options.type, options);
 }
 export function stringArg(options?: ScalarArgConfig<string>) {
   return arg({ type: "String", ...options });

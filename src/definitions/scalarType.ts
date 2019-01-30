@@ -1,6 +1,5 @@
-import { GraphQLScalarTypeConfig } from "graphql";
-import { wrappedType } from "./wrappedType";
-import { NexusTypes } from "./_types";
+import { GraphQLScalarTypeConfig, assertValidName } from "graphql";
+import { NexusTypes, withNexusSymbol } from "./_types";
 
 export interface ScalarBase
   extends Pick<
@@ -8,22 +7,33 @@ export interface ScalarBase
     "description" | "serialize" | "parseValue" | "parseLiteral"
   > {}
 
-export interface ScalarConfig extends ScalarBase {
+export interface NexusScalarTypeConfig<T extends string> extends ScalarBase {
   /**
    * The name of the scalar type
    */
-  name: string;
+  name: T;
   /**
    * Any deprecation info for this scalar type
    */
   deprecation?: string; // | DeprecationInfo;
 }
 
-export type ScalarTypeDef<T> = ReturnType<typeof scalarType>;
+export class NexusScalarTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusScalarTypeConfig<string>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
 
-export function scalarType(options: ScalarConfig) {
-  return wrappedType({
-    nexus: NexusTypes.Scalar as NexusTypes.Scalar,
-    ...options,
-  });
+withNexusSymbol(NexusScalarTypeDef, NexusTypes.Scalar);
+
+export function scalarType<TypeName extends string>(
+  options: NexusScalarTypeConfig<TypeName>
+) {
+  return new NexusScalarTypeDef(options.name, options);
 }

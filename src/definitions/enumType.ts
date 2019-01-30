@@ -1,9 +1,14 @@
-import { NexusTypes } from "./_types";
-import { wrappedType } from "./wrappedType";
-import { GraphQLEnumValueConfig, GraphQLEnumValueConfigMap } from "graphql";
+import { NexusTypes, withNexusSymbol } from "./_types";
+import { assertValidName } from "graphql";
 
 export interface EnumMemberInfo {
+  /**
+   * The external "value" of the enum as displayed in the SDL
+   */
   name: string;
+  /**
+   * The internal representation of the enum
+   */
   value?: string | number | object | boolean;
   /**
    * The description to annotate the GraphQL SDL
@@ -16,7 +21,7 @@ export interface EnumMemberInfo {
   deprecation?: string; // | DeprecationInfo;
 }
 
-export interface EnumTypeConfig<TypeName extends string, GenTypes = NexusGen> {
+export interface EnumTypeConfig<TypeName extends string> {
   name: TypeName;
   /**
    * The description to annotate the GraphQL SDL
@@ -30,40 +35,21 @@ export interface EnumTypeConfig<TypeName extends string, GenTypes = NexusGen> {
     | Record<string, string | number | object | boolean>;
 }
 
-export type EnumTypeDef<T> = ReturnType<typeof enumType>;
+export class NexusEnumTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: EnumTypeConfig<string>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
+withNexusSymbol(NexusEnumTypeDef, NexusTypes.Enum);
 
 export function enumType<TypeName extends string>(
   config: EnumTypeConfig<TypeName>
 ) {
-  const { members, ...rest } = config;
-  const values: GraphQLEnumValueConfigMap = {};
-  if (Array.isArray(members)) {
-    members.forEach((m) => {
-      if (typeof m === "string") {
-        values[m] = { value: m };
-      } else {
-        values[m.name] = {
-          value: typeof m.value === "undefined" ? m : m.value,
-          deprecationReason: m.deprecation,
-          description: m.description,
-        };
-      }
-    });
-  } else {
-    Object.keys(members).forEach((key) => {
-      values[key] = {
-        value: members[key],
-      };
-    });
-  }
-  if (!Object.keys(values).length) {
-    throw new Error(
-      `GraphQL Nexus: Enum ${config.name} must have at least one member`
-    );
-  }
-  return wrappedType({
-    nexus: NexusTypes.Enum as NexusTypes.Enum,
-    values,
-    ...rest,
-  });
+  return new NexusEnumTypeDef(config.name, config);
 }

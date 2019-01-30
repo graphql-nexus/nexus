@@ -1,8 +1,8 @@
-import { wrappedType } from "./wrappedType";
-import { NexusTypes, NonNullConfig } from "./_types";
+import { NexusTypes, NonNullConfig, withNexusSymbol } from "./_types";
 import { InputDefinitionBlock } from "./blocks";
+import { assertValidName } from "graphql";
 
-export interface InputObjectTypeConfig<
+export interface NexusInputObjectTypeConfig<
   TypeName extends string,
   GenTypes = NexusGen
 > {
@@ -24,16 +24,24 @@ export interface InputObjectTypeConfig<
    * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    */
-  nullability?: NonNullConfig;
+  nonNullDefaults?: NonNullConfig;
 }
 
-export type InputObjectTypeDef<T> = ReturnType<typeof inputObjectType>;
+export class NexusInputObjectTypeDef<TypeName extends string> {
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusInputObjectTypeConfig<any, any>
+  ) {
+    assertValidName(name);
+  }
+  get value() {
+    return this.config;
+  }
+}
+withNexusSymbol(NexusInputObjectTypeDef, NexusTypes.InputObject);
 
 export function inputObjectType<TypeName extends string, GenTypes = NexusGen>(
-  config: InputObjectTypeConfig<TypeName, GenTypes>
+  config: NexusInputObjectTypeConfig<TypeName, GenTypes>
 ) {
-  return wrappedType({
-    nexus: NexusTypes.InputObject as NexusTypes.InputObject,
-    ...config,
-  });
+  return new NexusInputObjectTypeDef(config.name, config);
 }

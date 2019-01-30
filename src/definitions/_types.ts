@@ -67,3 +67,9 @@ export interface NonNullConfig {
 export type GraphQLPossibleOutputs = GraphQLCompositeType | GraphQLLeafType;
 
 export type GraphQLPossibleInputs = GraphQLInputObjectType | GraphQLLeafType;
+
+export const NexusWrappedSymbol = Symbol.for("@nexus/wrapped");
+
+export function withNexusSymbol(obj: Function, nexusType: NexusTypes) {
+  obj.prototype[NexusWrappedSymbol] = nexusType;
+}
