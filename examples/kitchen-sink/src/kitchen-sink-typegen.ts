@@ -30,7 +30,9 @@ export interface NexusGenRootTypes {
   }
   ID: string;
   Int: number;
-  Query: {};
+  Query: { // root type
+    extended: NexusGenRootTypes['Bar']; // Bar!
+  }
   String: string;
   TestObj: { // root type
     a: NexusGenRootTypes['Bar']; // Bar!
@@ -61,6 +63,7 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     bar: NexusGenRootTypes['Bar']; // Bar!
+    extended: NexusGenRootTypes['Bar']; // Bar!
   }
   TestObj: { // field return type
     a: NexusGenRootTypes['Bar']; // Bar!

@@ -27,6 +27,7 @@ input InputType {
 
 type Query {
   bar: Bar!
+  extended: Bar!
 }
 
 type TestObj implements Bar & Baz {

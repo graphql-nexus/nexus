@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo } from "graphql";
-import { NexusArgDef } from "./definitions/args";
 
 declare global {
   interface NexusGen {}
@@ -19,11 +18,6 @@ export type MaybePromiseDeep<T> = {
     ? ReadonlyArray<MaybePromiseDeep<Y>>
     : MaybePromiseDeep<T[P]>
 };
-
-// export type FieldType<
-//   TypeName extends string,
-//   FieldName extends string,
-// > = GetGen3< "">;
 
 /**
  * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety

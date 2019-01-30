@@ -33,11 +33,11 @@ export class TypegenMetadata {
    * Generates the artifacts of the build based on what we
    * know about the schema and how it was defined.
    */
-  generateArtifacts(schema: GraphQLSchema) {
+  async generateArtifacts(schema: GraphQLSchema) {
     const sortedSchema = this.sortSchema(schema);
     if (this.config.outputs) {
       if (this.config.outputs.schema) {
-        this.writeFile(
+        await this.writeFile(
           "schema",
           this.generateSchemaFile(sortedSchema),
           this.config.outputs.schema
@@ -45,9 +45,8 @@ export class TypegenMetadata {
       }
       const typegen = this.config.outputs.typegen;
       if (typegen) {
-        this.generateTypesFile(sortedSchema).then((value) =>
-          this.writeFile("types", value, typegen)
-        );
+        const value = await this.generateTypesFile(sortedSchema);
+        await this.writeFile("types", value, typegen);
       }
     }
   }
@@ -60,7 +59,7 @@ export class TypegenMetadata {
     return sortedSchema;
   }
 
-  writeFile(type: "schema" | "types", output: string, filePath: string) {
+  async writeFile(type: "schema" | "types", output: string, filePath: string) {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
       return Promise.reject(
         new Error(
@@ -80,17 +79,17 @@ export class TypegenMetadata {
     } else if (this.config.prettierConfig) {
       formatTypegen = typegenFormatPrettier(this.config.prettierConfig);
     }
-    const content = Promise.resolve(
-      typeof formatTypegen === "function" ? formatTypegen(output, type) : output
-    );
-    return Promise.all([
+    const content =
+      typeof formatTypegen === "function"
+        ? await formatTypegen(output, type)
+        : output;
+    const [toSave, existing] = await Promise.all([
       content,
       readFile(filePath, "utf8").catch(() => ""),
-    ]).then(([toSave, existing]) => {
-      if (toSave !== existing) {
-        return writeFile(filePath, toSave);
-      }
-    });
+    ]);
+    if (toSave !== existing) {
+      return writeFile(filePath, toSave);
+    }
   }
 
   /**

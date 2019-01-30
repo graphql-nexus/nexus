@@ -4,6 +4,7 @@ import {
   interfaceType,
   unionType,
   arg,
+  extendType,
 } from "nexus";
 
 export const Bar = interfaceType({
@@ -76,6 +77,15 @@ export const Query = objectType({
     t.field("bar", {
       type: "Bar",
       resolve: () => ({ ok: true }),
+    });
+  },
+});
+
+export const MoreQueryFields = extendType({
+  type: "Query",
+  definition(t) {
+    t.field("extended", {
+      type: "Bar",
     });
   },
 });

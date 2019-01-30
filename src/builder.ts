@@ -86,7 +86,7 @@ import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
 import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
-import { firstDefined, objValues, suggestionList } from "./utils";
+import { firstDefined, objValues, suggestionList, eachObj } from "./utils";
 
 export type Maybe<T> = T | null;
 
@@ -296,17 +296,25 @@ export class SchemaBuilder {
   objectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
     const interfaces: Implemented[] = [];
-    const modifications: Record<string, FieldModificationDef<any, any>[]> = {};
-    config.definition(
-      new ObjectDefinitionBlock({
-        addField: (fieldDef) => fields.push(fieldDef),
-        addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-        addFieldModifications(mods) {
-          modifications[mods.field] = modifications[mods.field] || [];
-          modifications[mods.field].push(mods);
-        },
-      })
-    );
+    const modifications: Record<
+      string,
+      FieldModificationDef<string, string>[]
+    > = {};
+    const definitionBlock = new ObjectDefinitionBlock({
+      addField: (fieldDef) => fields.push(fieldDef),
+      addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
+      addFieldModifications(mods) {
+        modifications[mods.field] = modifications[mods.field] || [];
+        modifications[mods.field].push(mods);
+      },
+    });
+    config.definition(definitionBlock);
+    const extensions = this.typeExtensionMap[config.name];
+    if (extensions) {
+      extensions.forEach((extension) => {
+        extension.definition(definitionBlock);
+      });
+    }
     return new GraphQLObjectType({
       name: config.name,
       interfaces: () => interfaces.map((i) => this.getInterface(i)),
@@ -332,7 +340,16 @@ export class SchemaBuilder {
                 {}
               ),
             };
-            if (modifications[iFieldName]) {
+            const mods = modifications[iFieldName];
+            if (mods) {
+              mods.map((mod) => {
+                if (typeof mod.description !== "undefined") {
+                  allFieldsMap[iFieldName].description = mod.description;
+                }
+                if (typeof mod.resolve !== "undefined") {
+                  allFieldsMap[iFieldName].resolve = mod.resolve;
+                }
+              });
             }
           });
         });
@@ -344,12 +361,17 @@ export class SchemaBuilder {
     const { name, description } = config;
     let resolveType: AbstractTypeResolver<string> | undefined;
     const fields: NexusOutputFieldDef[] = [];
-    config.definition(
-      new InterfaceDefinitionBlock({
-        addField: (field) => fields.push(field),
-        setResolveType: (fn) => (resolveType = fn),
-      })
-    );
+    const definitionBlock = new InterfaceDefinitionBlock({
+      addField: (field) => fields.push(field),
+      setResolveType: (fn) => (resolveType = fn),
+    });
+    config.definition(definitionBlock);
+    const extensions = this.typeExtensionMap[config.name];
+    if (extensions) {
+      extensions.forEach((extension) => {
+        extension.definition(definitionBlock);
+      });
+    }
     if (!resolveType) {
       throw new Error(
         `Missing resolveType for the ${name} union.` +
@@ -806,7 +828,11 @@ function addTypes(builder: SchemaBuilder, types: any) {
     addTypes(builder, types.fn(builder));
     return;
   }
-  if (isNexusNamedTypeDef(types) || isNamedType(types)) {
+  if (
+    isNexusNamedTypeDef(types) ||
+    isNexusExtendTypeDef(types) ||
+    isNamedType(types)
+  ) {
     builder.addType(types);
   } else if (Array.isArray(types)) {
     types.forEach((typeDef) => addTypes(builder, typeDef));
@@ -816,9 +842,10 @@ function addTypes(builder: SchemaBuilder, types: any) {
 }
 
 /**
- * Builds the schema, returning both the schema and metadata.
+ * Builds the schema, we may return more than just the schema
+ * from this one day.
  */
-export function makeSchemaWithMetadata(
+export function makeSchemaInternal(
   options: SchemaConfig,
   SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder
 ): { schema: GraphQLSchema } {
@@ -881,7 +908,7 @@ export function makeSchemaWithMetadata(
  * root query type.
  */
 export function makeSchema(options: SchemaConfig): GraphQLSchema {
-  const { schema } = makeSchemaWithMetadata(options);
+  const { schema } = makeSchemaInternal(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
@@ -894,7 +921,9 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   if (shouldGenerateArtifacts) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(options).generateArtifacts(schema);
+    new TypegenMetadata(options).generateArtifacts(schema).catch((e) => {
+      console.error(e);
+    });
   }
 
   return schema;

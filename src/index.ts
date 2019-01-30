@@ -1,5 +1,5 @@
 // All of the Public API definitions
-export { buildTypes, makeSchema, makeSchemaWithMetadata } from "./builder";
+export { buildTypes, makeSchema } from "./builder";
 export {
   arg,
   booleanArg,
@@ -19,5 +19,6 @@ export { nexusWrappedFn } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";
 export { groupTypes } from "./utils";
 export { FieldResolver } from "./typegenTypeHelpers";
-export { core };
+export { core, blocks };
 import * as core from "./core";
+import * as blocks from "./definitionBlocks";

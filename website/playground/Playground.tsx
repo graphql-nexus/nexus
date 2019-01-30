@@ -12,7 +12,6 @@ import {
   unionType,
   enumType,
   scalarType,
-  makeSchemaWithMetadata,
   arg,
   intArg,
   stringArg,
@@ -21,7 +20,7 @@ import {
   booleanArg,
   core,
 } from "nexus";
-import { GraphQLSchema, graphql } from "graphql";
+import { GraphQLSchema, graphql, lexicographicSortSchema } from "graphql";
 import * as monaco from "monaco-editor";
 import { useDebounce } from "use-debounce";
 import "./monaco-config";
@@ -83,11 +82,11 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   const [generatedTypes, setGeneratedTypes] = useState("");
   const [activeSchema, setActiveSchema] = useState<{
     schema: GraphQLSchema;
-    metadata: core.Metadata;
+    metadata: core.TypegenMetadata;
   } | null>(null);
   const debouncedSchema = useDebounce<{
     schema: GraphQLSchema;
-    metadata: core.Metadata;
+    metadata: core.TypegenMetadata;
   } | null>(activeSchema, 100);
 
   const printedSchema = useMemo(
@@ -261,7 +260,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 };
 
 type SchemaOrError =
-  | { schema: GraphQLSchema; metadata: core.Metadata; error: null }
+  | { schema: GraphQLSchema; metadata: core.TypegenMetadata; error: null }
   | { schema: null; metadata: null; error: Error };
 
 function getCurrentSchema(code: string): SchemaOrError {
@@ -271,23 +270,23 @@ function getCurrentSchema(code: string): SchemaOrError {
     return val;
   }
   const singleton = {
-    objectType(name: any, fn: any) {
-      return add(objectType(name, fn));
+    objectType(obj: any) {
+      return add(objectType(obj));
     },
-    interfaceType(name: any, fn: any) {
-      return add(interfaceType(name, fn));
+    interfaceType(obj: any) {
+      return add(interfaceType(obj));
     },
-    inputObjectType(name: any, fn: any) {
-      return add(inputObjectType(name, fn));
+    inputObjectType(obj: any) {
+      return add(inputObjectType(obj));
     },
-    enumType(name: any, fn: any) {
-      return add(enumType(name, fn));
+    enumType(obj: any) {
+      return add(enumType(obj));
     },
-    unionType(name: any, fn: any) {
-      return add(unionType(name, fn));
+    unionType(obj: any) {
+      return add(unionType(obj));
     },
-    scalarType(name: any, fn: any) {
-      return add(scalarType(name, fn));
+    scalarType(obj: any) {
+      return add(scalarType(obj));
     },
   };
   try {
@@ -323,9 +322,9 @@ function getCurrentSchema(code: string): SchemaOrError {
       idArg,
       booleanArg
     );
-    const { schema, metadata } = makeSchemaWithMetadata({
+    const config = {
       types: cache,
-      outputs: false,
+      outputs: false as false,
       typegenAutoConfig: {
         contextType: "{}",
         sources: [],
@@ -333,11 +332,14 @@ function getCurrentSchema(code: string): SchemaOrError {
           Date: "Date",
         },
       },
-    });
-
-    const sortedSchema = metadata.sortSchema(schema);
-
-    return { schema: sortedSchema, metadata, error: null };
+    };
+    const { schema } = core.makeSchemaInternal(config);
+    const sortedSchema = lexicographicSortSchema(schema);
+    return {
+      schema: sortedSchema,
+      metadata: new core.TypegenMetadata(config),
+      error: null,
+    };
   } catch (error) {
     return { schema: null, metadata: null, error };
   }
