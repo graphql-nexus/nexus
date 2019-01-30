@@ -28,6 +28,11 @@ export interface NexusGenRootTypes {
   String: string;
 }
 
+export interface NexusGenAllTypes extends NexusGenRootTypes {
+  Episode: NexusGenEnumTypes['Episode'];
+  MoreEpisodes: NexusGenEnumTypes['MoreEpisodes'];
+}
+
 export interface NexusGenFieldTypes {
   Character: { // field return type
     appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
@@ -109,6 +114,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;
   fieldTypes: NexusGenFieldTypes;
+  allTypes: NexusGenAllTypes;
   inheritedFields: NexusGenInheritedFields;
   objectNames: NexusGenObjectNames;
   inputNames: NexusGenInputNames;

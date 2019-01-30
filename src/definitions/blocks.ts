@@ -38,8 +38,7 @@ export interface CommonFieldConfig {
 
 export interface OutputScalarConfig<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes
+  FieldName extends string
 > extends CommonFieldConfig {
   /**
    * Arguments for the field
@@ -48,22 +47,17 @@ export interface OutputScalarConfig<
   /**
    * Resolve method for the field
    */
-  resolve?: FieldResolver<TypeName, FieldName, GenTypes>;
+  resolve?: FieldResolver<TypeName, FieldName>;
 }
 
 export interface NexusOutputFieldConfig<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> extends OutputScalarConfig<TypeName, FieldName, GenTypes> {
-  type: GetGen<GenTypes, "allOutputTypes"> | AllNexusOutputTypeDefs;
+  FieldName extends string
+> extends OutputScalarConfig<TypeName, FieldName> {
+  type: GetGen<"allOutputTypes"> | AllNexusOutputTypeDefs;
 }
 
-export type NexusOutputFieldDef = NexusOutputFieldConfig<
-  string,
-  string,
-  any
-> & {
+export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string;
 };
 
@@ -72,40 +66,37 @@ export type NexusOutputFieldDef = NexusOutputFieldConfig<
  */
 export type ScalarOutSpread<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> = NeedsResolver<TypeName, FieldName, GenTypes> extends true
-  ? HasGen3<GenTypes, "argTypes", TypeName, FieldName> extends true
-    ? [ScalarOutConfig<TypeName, FieldName, GenTypes>]
+  FieldName extends string
+> = NeedsResolver<TypeName, FieldName> extends true
+  ? HasGen3<"argTypes", TypeName, FieldName> extends true
+    ? [ScalarOutConfig<TypeName, FieldName>]
     :
-        | [ScalarOutConfig<TypeName, FieldName, GenTypes>]
-        | [FieldResolver<TypeName, FieldName, GenTypes>]
-  : HasGen3<GenTypes, "argTypes", TypeName, FieldName> extends true
-  ? [ScalarOutConfig<TypeName, FieldName, GenTypes>]
+        | [ScalarOutConfig<TypeName, FieldName>]
+        | [FieldResolver<TypeName, FieldName>]
+  : HasGen3<"argTypes", TypeName, FieldName> extends true
+  ? [ScalarOutConfig<TypeName, FieldName>]
   :
       | []
-      | [FieldResolver<TypeName, FieldName, GenTypes>]
-      | [ScalarOutConfig<TypeName, FieldName, GenTypes>];
+      | [FieldResolver<TypeName, FieldName>]
+      | [ScalarOutConfig<TypeName, FieldName>];
 
 export type ScalarOutConfig<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> = NeedsResolver<TypeName, FieldName, GenTypes> extends true
-  ? OutputScalarConfig<TypeName, FieldName, GenTypes> & {
-      resolve: FieldResolver<TypeName, FieldName, GenTypes>;
+  FieldName extends string
+> = NeedsResolver<TypeName, FieldName> extends true
+  ? OutputScalarConfig<TypeName, FieldName> & {
+      resolve: FieldResolver<TypeName, FieldName>;
     }
-  : OutputScalarConfig<TypeName, FieldName, GenTypes>;
+  : OutputScalarConfig<TypeName, FieldName>;
 
 export type FieldOutConfig<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> = NeedsResolver<TypeName, FieldName, GenTypes> extends true
-  ? NexusOutputFieldConfig<TypeName, FieldName, GenTypes> & {
-      resolve: FieldResolver<TypeName, FieldName, GenTypes>;
+  FieldName extends string
+> = NeedsResolver<TypeName, FieldName> extends true
+  ? NexusOutputFieldConfig<TypeName, FieldName> & {
+      resolve: FieldResolver<TypeName, FieldName>;
     }
-  : NexusOutputFieldConfig<TypeName, FieldName, GenTypes>;
+  : NexusOutputFieldConfig<TypeName, FieldName>;
 
 export interface OutputDefinitionBuilder {
   addField(config: NexusOutputFieldDef): void;
@@ -119,10 +110,7 @@ export interface InputDefinitionBuilder {
  * The output definition block is passed to the "definition"
  * argument of the
  */
-export class OutputDefinitionBlock<
-  TypeName extends string,
-  GenTypes = NexusGen
-> {
+export class OutputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean;
 
   constructor(
@@ -138,50 +126,47 @@ export class OutputDefinitionBlock<
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return new OutputDefinitionBlock<TypeName, GenTypes>(
-      this.typeBuilder,
-      true
-    );
+    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 
   string<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutSpread<TypeName, FieldName, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName>
   ) {
     this.addScalarField(fieldName, "String", opts);
   }
 
   int<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutSpread<TypeName, FieldName, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName>
   ) {
     this.addScalarField(fieldName, "Int", opts);
   }
 
   boolean<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutSpread<TypeName, FieldName, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName>
   ) {
     this.addScalarField(fieldName, "Boolean", opts);
   }
 
   id<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutSpread<TypeName, FieldName, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName>
   ) {
     this.addScalarField(fieldName, "ID", opts);
   }
 
   float<FieldName extends string>(
     fieldName: FieldName,
-    ...opts: ScalarOutSpread<TypeName, FieldName, GenTypes>
+    ...opts: ScalarOutSpread<TypeName, FieldName>
   ) {
     this.addScalarField(fieldName, "Float", opts);
   }
 
   field<FieldName extends string>(
     name: FieldName,
-    fieldConfig: FieldOutConfig<TypeName, FieldName, GenTypes>
+    fieldConfig: FieldOutConfig<TypeName, FieldName>
   ) {
     const field: NexusOutputFieldDef = {
       name,
@@ -203,7 +188,7 @@ export class OutputDefinitionBlock<
   protected addScalarField(
     fieldName: string,
     typeName: BaseScalars,
-    opts: [] | ScalarOutSpread<TypeName, any, GenTypes>
+    opts: [] | ScalarOutSpread<TypeName, any>
   ) {
     let config: NexusOutputFieldDef = {
       name: fieldName,
@@ -230,19 +215,15 @@ export interface ScalarInputFieldConfig<T> extends CommonFieldConfig {
   default?: T;
 }
 
-export interface NexusInputFieldConfig<GenTypes = NexusGen>
-  extends ScalarInputFieldConfig<string> {
-  type: GetGen<GenTypes, "allInputTypes"> | NexusInputTypeName<string>;
+export interface NexusInputFieldConfig extends ScalarInputFieldConfig<string> {
+  type: GetGen<"allInputTypes"> | NexusInputTypeName<string>;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig & {
   name: string;
 };
 
-export class InputDefinitionBlock<
-  TypeName extends string,
-  GenTypes = NexusGen
-> {
+export class InputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean;
 
   constructor(protected typeBuilder: InputDefinitionBuilder, isList = false) {
@@ -250,7 +231,7 @@ export class InputDefinitionBlock<
   }
 
   get list() {
-    return new InputDefinitionBlock<TypeName, GenTypes>(this.typeBuilder, true);
+    return new InputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 
   string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
@@ -275,7 +256,7 @@ export class InputDefinitionBlock<
 
   field<FieldName extends string>(
     fieldName: FieldName,
-    fieldConfig: NexusInputFieldConfig<GenTypes>
+    fieldConfig: NexusInputFieldConfig
   ) {
     this.typeBuilder.addField({
       name: fieldName,
@@ -296,9 +277,7 @@ export class InputDefinitionBlock<
   }
 }
 
-export interface AbstractOutputDefinitionBuilder<
-  TypeName extends string,
-  GenTypes = NexusGen
-> extends OutputDefinitionBuilder {
-  setResolveType(fn: AbstractTypeResolver<TypeName, GenTypes>): void;
+export interface AbstractOutputDefinitionBuilder<TypeName extends string>
+  extends OutputDefinitionBuilder {
+  setResolveType(fn: AbstractTypeResolver<TypeName>): void;
 }

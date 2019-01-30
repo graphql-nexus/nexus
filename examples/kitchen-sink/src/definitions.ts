@@ -1,10 +1,27 @@
-import { objectType, inputObjectType, interfaceType, unionType } from "nexus";
+import {
+  objectType,
+  inputObjectType,
+  interfaceType,
+  unionType,
+  arg,
+  core,
+} from "nexus";
+
+type T = core.PossibleArgNames;
 
 export const Bar = interfaceType({
   name: "Bar",
   description: "Bar description",
   definition(t) {
     t.boolean("ok", { deprecation: "Not ok?" });
+    t.boolean("argsTest", {
+      args: {
+        a: arg({
+          type: InputType,
+          default: 1,
+        }),
+      },
+    });
     t.resolveType((root) => "Foo");
   },
 });

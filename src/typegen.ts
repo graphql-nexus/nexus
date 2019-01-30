@@ -19,6 +19,8 @@ import {
   isScalarType,
   isSpecifiedScalarType,
   isUnionType,
+  GraphQLInputObjectType,
+  GraphQLEnumType,
 } from "graphql";
 import { TypegenInfo } from "./builder";
 import { eachObj, GroupedTypes, groupTypes, mapObj } from "./utils";
@@ -70,6 +72,7 @@ export class Typegen {
       this.printInputTypeMap(),
       this.printEnumTypeMap(),
       this.printRootTypeMap(),
+      this.printAllTypesMap(),
       this.printReturnTypeMap(),
       this.printArgTypeMap(),
       this.printAbstractResolveReturnTypeMap(),
@@ -105,6 +108,7 @@ export class Typegen {
         `  rootTypes: NexusGenRootTypes;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
+        `  allTypes: NexusGenAllTypes;`,
         `  inheritedFields: NexusGenInheritedFields;`,
         `  objectNames: NexusGenObjectNames;`,
         `  inputNames: NexusGenInputNames;`,
@@ -246,11 +250,13 @@ export class Typegen {
     const hasFields: (
       | GraphQLInterfaceType
       | GraphQLObjectType
-      | GraphQLScalarType)[] = [];
+      | GraphQLScalarType
+      | GraphQLUnionType)[] = [];
     hasFields
       .concat(this.groupedTypes.object)
       .concat(this.groupedTypes.interface)
       .concat(this.groupedTypes.scalar)
+      .concat(this.groupedTypes.union)
       .sort()
       .forEach((type) => {
         const backingType = this.typegenInfo.backingTypeMap[type.name];
@@ -294,6 +300,23 @@ export class Typegen {
     return rootTypeMap;
   }
 
+  buildAllTypesMap() {
+    const typeMap: TypeMapping = {};
+    const toCheck: (GraphQLInputObjectType | GraphQLEnumType)[] = [];
+    toCheck
+      .concat(this.groupedTypes.input)
+      .concat(this.groupedTypes.enum)
+      .sort()
+      .forEach((type) => {
+        if (isInputObjectType(type)) {
+          typeMap[type.name] = `NexusGenInputs['${type.name}']`;
+        } else if (isEnumType(type)) {
+          typeMap[type.name] = `NexusGenEnumTypes['${type.name}']`;
+        }
+      });
+    return typeMap;
+  }
+
   hasResolver(
     field: GraphQLField<any, any>,
     _type: GraphQLObjectType | GraphQLInterfaceType // Used in tests
@@ -306,6 +329,18 @@ export class Typegen {
       "NexusGenRootTypes",
       this.buildRootTypeMap()
     );
+  }
+
+  printAllTypesMap() {
+    const typeMapping = this.buildAllTypesMap();
+    return [`export interface NexusGenAllTypes extends NexusGenRootTypes {`]
+      .concat(
+        mapObj(typeMapping, (val, key) => {
+          return `  ${key}: ${val};`;
+        })
+      )
+      .concat("}")
+      .join("\n");
   }
 
   buildArgTypeMap() {

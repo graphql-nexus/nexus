@@ -98,7 +98,7 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   Boolean: GraphQLBoolean,
 };
 
-export interface BuilderConfig<GenTypes = NexusGen> {
+export interface BuilderConfig {
   /**
    * When the schema starts and `process.env.NODE_ENV !== "production"`,
    * artifact files are auto-generated containing the .graphql definitions of
@@ -135,7 +135,7 @@ export interface BuilderConfig<GenTypes = NexusGen> {
   typegenConfig?: (
     schema: GraphQLSchema,
     outputPath: string
-  ) => TypegenInfo<GenTypes> | PromiseLike<TypegenInfo<GenTypes>>;
+  ) => TypegenInfo | PromiseLike<TypegenInfo>;
   /**
    * Either an absolute path to a .prettierrc file, or an object
    * with relevant Prettier rules to be used on the generated output
@@ -155,7 +155,7 @@ export interface BuilderConfig<GenTypes = NexusGen> {
   nonNullDefaults?: NonNullConfig;
 }
 
-export interface TypegenInfo<GenTypes = NexusGen> {
+export interface TypegenInfo {
   /**
    * Headers attached to the generate type output
    */
@@ -168,7 +168,7 @@ export interface TypegenInfo<GenTypes = NexusGen> {
    * A map of all GraphQL types and what TypeScript types they should
    * be represented by.
    */
-  backingTypeMap: { [K in GetGen<GenTypes, "objectNames">]?: string };
+  backingTypeMap: { [K in GetGen<"objectNames">]?: string };
   /**
    * The type of the context for the resolvers
    */
@@ -189,7 +189,7 @@ export interface SchemaConfig extends BuilderConfig {
  * Since the enum types are resolved synchronously, these need to guard for
  * circular references at this step, while fields will guard for it during lazy evaluation.
  */
-export class SchemaBuilder<GenTypes = NexusGen> {
+export class SchemaBuilder {
   /**
    * Used to check for circular references.
    */
@@ -295,7 +295,7 @@ export class SchemaBuilder<GenTypes = NexusGen> {
 
   objectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
-    const interfaces: Implemented<GenTypes>[] = [];
+    const interfaces: Implemented[] = [];
     const modifications: Record<string, FieldModificationDef<any, any>[]> = {};
     config.definition(
       new ObjectDefinitionBlock({
@@ -342,7 +342,7 @@ export class SchemaBuilder<GenTypes = NexusGen> {
   }
   interfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config;
-    let resolveType: AbstractTypeResolver<string, NexusGen> | undefined;
+    let resolveType: AbstractTypeResolver<string> | undefined;
     const fields: NexusOutputFieldDef[] = [];
     config.definition(
       new InterfaceDefinitionBlock({
@@ -399,8 +399,8 @@ export class SchemaBuilder<GenTypes = NexusGen> {
   }
 
   unionType(config: NexusUnionTypeConfig<any>) {
-    let members: UnionMembers<GenTypes> | undefined;
-    let resolveType: AbstractTypeResolver<string, NexusGen> | undefined;
+    let members: UnionMembers | undefined;
+    let resolveType: AbstractTypeResolver<string> | undefined;
     config.definition(
       new UnionDefinitionBlock({
         addField() {},
@@ -442,7 +442,7 @@ export class SchemaBuilder<GenTypes = NexusGen> {
 
   protected buildUnionMembers(
     unionName: string,
-    members: UnionMembers<GenTypes> | undefined
+    members: UnionMembers | undefined
   ) {
     const unionMembers: GraphQLObjectType[] = [];
     if (!members) {
@@ -559,7 +559,7 @@ export class SchemaBuilder<GenTypes = NexusGen> {
       | NexusObjectTypeConfig<any>
       | NexusInterfaceTypeConfig<any>
       | NexusInputObjectTypeConfig<any>,
-    field: NexusInputFieldDef | NexusArgConfig
+    field: NexusInputFieldDef | NexusArgConfig<any, any>
   ): boolean {
     const { nullable, required } = field;
     const { name, nonNullDefaults = {} } = typeDef;

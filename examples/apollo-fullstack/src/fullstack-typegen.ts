@@ -42,6 +42,10 @@ export interface NexusGenRootTypes {
   }
 }
 
+export interface NexusGenAllTypes extends NexusGenRootTypes {
+  PatchSize: NexusGenEnumTypes['PatchSize'];
+}
+
 export interface NexusGenFieldTypes {
   Launch: { // field return type
     id: string; // ID!
@@ -138,6 +142,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;
   fieldTypes: NexusGenFieldTypes;
+  allTypes: NexusGenAllTypes;
   inheritedFields: NexusGenInheritedFields;
   objectNames: NexusGenObjectNames;
   inputNames: NexusGenInputNames;

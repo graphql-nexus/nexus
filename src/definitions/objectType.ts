@@ -4,14 +4,13 @@ import { NonNullConfig, NexusTypes, withNexusSymbol } from "./_types";
 import { assertValidName } from "graphql";
 import { NexusInterfaceTypeDef } from "./interfaceType";
 
-export type Implemented<GenTypes = NexusGen> =
-  | GetGen<GenTypes, "interfaceNames">
+export type Implemented =
+  | GetGen<"interfaceNames">
   | NexusInterfaceTypeDef<string>;
 
 export interface FieldModification<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
+  FieldName extends string
 > {
   /**
    * The description to annotate the GraphQL SDL
@@ -20,64 +19,49 @@ export interface FieldModification<
   /**
    * The resolve method we should be resolving the field with
    */
-  resolve?: FieldResolver<TypeName, FieldName, GenTypes>;
+  resolve?: FieldResolver<TypeName, FieldName>;
 }
 
 export interface FieldModificationDef<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> extends FieldModification<TypeName, FieldName, GenTypes> {
+  FieldName extends string
+> extends FieldModification<TypeName, FieldName> {
   field: FieldName;
 }
 
-export interface ObjectDefinitionBuilder<
-  TypeName extends string,
-  GenTypes = NexusGen
-> extends OutputDefinitionBuilder {
-  addInterfaces(toAdd: Implemented<GenTypes>[]): void;
+export interface ObjectDefinitionBuilder<TypeName extends string>
+  extends OutputDefinitionBuilder {
+  addInterfaces(toAdd: Implemented[]): void;
   addFieldModifications<FieldName extends string>(
-    changes: FieldModificationDef<TypeName, FieldName, GenTypes>
+    changes: FieldModificationDef<TypeName, FieldName>
   ): void;
 }
 
 export class ObjectDefinitionBlock<
-  TypeName extends string,
-  GenTypes = NexusGen
-> extends OutputDefinitionBlock<TypeName, GenTypes> {
-  constructor(
-    protected typeBuilder: ObjectDefinitionBuilder<TypeName, GenTypes>
-  ) {
+  TypeName extends string
+> extends OutputDefinitionBlock<TypeName> {
+  constructor(protected typeBuilder: ObjectDefinitionBuilder<TypeName>) {
     super(typeBuilder);
   }
   /**
    * @param interfaceName
    */
-  implements(...interfaceName: Array<Implemented<GenTypes>>) {
+  implements(...interfaceName: Array<Implemented>) {
     this.typeBuilder.addInterfaces(interfaceName);
   }
   /**
    * Modifies a field added via an interface
    */
   modify<
-    FieldName extends Extract<
-      keyof GetGen2<GenTypes, "fieldTypes", TypeName>,
-      string
-    >
-  >(
-    field: FieldName,
-    modifications: FieldModification<TypeName, FieldName, GenTypes>
-  ) {
+    FieldName extends Extract<keyof GetGen2<"fieldTypes", TypeName>, string>
+  >(field: FieldName, modifications: FieldModification<TypeName, FieldName>) {
     this.typeBuilder.addFieldModifications({ ...modifications, field });
   }
 }
 
-export interface NexusObjectTypeConfig<
-  TypeName extends string,
-  GenTypes = NexusGen
-> {
+export interface NexusObjectTypeConfig<TypeName extends string> {
   name: TypeName;
-  definition(t: ObjectDefinitionBlock<TypeName, GenTypes>): void;
+  definition(t: ObjectDefinitionBlock<TypeName>): void;
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
@@ -93,13 +77,13 @@ export interface NexusObjectTypeConfig<
    * Specifies a default field resolver for all members of this type.
    * Warning: this may break type-safety.
    */
-  defaultResolver?: FieldResolver<TypeName, any, GenTypes>;
+  defaultResolver?: FieldResolver<TypeName, any>;
 }
 
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusObjectTypeConfig<any, any>
+    protected config: NexusObjectTypeConfig<string>
   ) {
     assertValidName(name);
   }
@@ -110,8 +94,8 @@ export class NexusObjectTypeDef<TypeName extends string> {
 
 withNexusSymbol(NexusObjectTypeDef, NexusTypes.Object);
 
-export function objectType<TypeName extends string, GenTypes = NexusGen>(
-  config: NexusObjectTypeConfig<TypeName, GenTypes>
+export function objectType<TypeName extends string>(
+  config: NexusObjectTypeConfig<TypeName>
 ) {
   return new NexusObjectTypeDef(config.name, config);
 }

@@ -23,8 +23,7 @@ export type MaybePromiseDeep<T> = {
 // export type FieldType<
 //   TypeName extends string,
 //   FieldName extends string,
-//   GenTypes = NexusGen
-// > = GetGen3<GenTypes, "">;
+// > = GetGen3< "">;
 
 /**
  * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety
@@ -41,15 +40,12 @@ export type MaybePromiseDeep<T> = {
  * }
  * ```
  */
-export interface AbstractTypeResolver<
-  TypeName extends string,
-  GenTypes = NexusGen
-> {
+export interface AbstractTypeResolver<TypeName extends string> {
   (
-    source: RootValue<TypeName, GenTypes>,
-    context: GetGen<GenTypes, "context">,
+    source: RootValue<TypeName>,
+    context: GetGen<"context">,
     info: GraphQLResolveInfo
-  ): MaybePromise<AbstractResolveReturn<TypeName, GenTypes>>;
+  ): MaybePromise<AbstractResolveReturn<TypeName>>;
 }
 
 /**
@@ -66,23 +62,20 @@ export interface AbstractTypeResolver<
  * }
  * ```
  */
-export type FieldResolver<
-  TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> = (
+export type FieldResolver<TypeName extends string, FieldName extends string> = (
   root: RootValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
-  context: GetGen<GenTypes, "context">,
+  context: GetGen<"context">,
   info: GraphQLResolveInfo
-) => MaybePromiseDeep<ResultValue<GenTypes, TypeName, FieldName>>;
+) => MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
 
 export type AbstractResolveReturn<
-  TypeName extends string,
-  GenTypes = NexusGen
-> = GenTypes extends GenTypesShape
-  ? TypeName extends keyof GenTypes["abstractResolveReturn"]
-    ? GenTypes["abstractResolveReturn"][TypeName]
+  TypeName extends string
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? TypeName extends keyof GenTypes["abstractResolveReturn"]
+      ? GenTypes["abstractResolveReturn"][TypeName]
+      : any
     : any
   : any;
 
@@ -95,6 +88,7 @@ export type GenTypesShapeKeys =
   | "rootTypes"
   | "argTypes"
   | "fieldTypes"
+  | "allTypes"
   | "inheritedFields"
   | "objectNames"
   | "inputNames"
@@ -114,106 +108,106 @@ export type GenTypesShapeKeys =
 export type GenTypesShape = Record<GenTypesShapeKeys, any>;
 
 export type GetGen<
-  GenTypes,
   K extends GenTypesShapeKeys
-> = GenTypes extends GenTypesShape ? GenTypes[K] : any;
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? GenTypes[K]
+    : any
+  : any;
 
 export type GetGen2<
-  GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>
-> = GenTypes extends GenTypesShape
-  ? K extends keyof GenTypes
-    ? K2 extends keyof GenTypes[K]
-      ? GenTypes[K][K2]
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? K extends keyof GenTypes
+      ? K2 extends keyof GenTypes[K]
+        ? GenTypes[K][K2]
+        : any
       : any
     : any
   : any;
 
 export type GetGen3<
-  GenTypes,
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
   K3 extends Extract<keyof GenTypesShape[K][K2], string>
-> = GenTypes extends GenTypesShape
-  ? K extends keyof GenTypes
-    ? K2 extends keyof GenTypes[K]
-      ? K3 extends keyof GenTypes[K][K2]
-        ? GenTypes[K][K2][K3]
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? K extends keyof GenTypes
+      ? K2 extends keyof GenTypes[K]
+        ? K3 extends keyof GenTypes[K][K2]
+          ? GenTypes[K][K2][K3]
+          : any
         : any
       : any
     : any
   : any;
 
 export type HasGen<
-  GenTypes,
   K extends GenTypesShapeKeys
-> = GenTypes extends GenTypesShape
-  ? K extends keyof GenTypes
-    ? true
-    : false
-  : false;
-
-export type HasGen2<
-  GenTypes,
-  K extends GenTypesShapeKeys,
-  K2 extends Extract<keyof GenTypesShape[K], string>
-> = GenTypes extends GenTypesShape
-  ? K extends keyof GenTypes
-    ? K2 extends keyof GenTypes[K]
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? K extends keyof GenTypes
       ? true
       : false
     : false
   : false;
 
-export type HasGen3<
-  GenTypes,
+export type HasGen2<
   K extends GenTypesShapeKeys,
-  K2 extends Extract<keyof GenTypesShape[K], string>,
-  K3 extends Extract<keyof GenTypesShape[K][K2], string>
-> = GenTypes extends GenTypesShape
-  ? K extends keyof GenTypes
-    ? K2 extends keyof GenTypes[K]
-      ? K3 extends keyof GenTypes[K][K2]
+  K2 extends Extract<keyof GenTypesShape[K], string>
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? K extends keyof GenTypes
+      ? K2 extends keyof GenTypes[K]
         ? true
         : false
       : false
     : false
   : false;
 
-export type RootValue<TypeName extends string, GenTypes = NexusGen> = GetGen2<
-  GenTypes,
-  "rootTypes",
-  TypeName
->;
+export type HasGen3<
+  K extends GenTypesShapeKeys,
+  K2 extends Extract<keyof GenTypesShape[K], string>,
+  K3 extends Extract<keyof GenTypesShape[K][K2], string>
+> = NexusGen extends infer GenTypes
+  ? GenTypes extends GenTypesShape
+    ? K extends keyof GenTypes
+      ? K2 extends keyof GenTypes[K]
+        ? K3 extends keyof GenTypes[K][K2]
+          ? true
+          : false
+        : false
+      : false
+    : false
+  : false;
+
+export type RootValue<TypeName extends string> = GetGen2<"rootTypes", TypeName>;
 
 export type RootValueField<
-  GenTypes,
   TypeName extends string,
   FieldName extends string
-> = GetGen3<GenTypes, "rootTypes", TypeName, FieldName>;
+> = GetGen3<"rootTypes", TypeName, FieldName>;
 
 export type ArgsValue<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> = GetGen3<GenTypes, "argTypes", TypeName, FieldName>;
+  FieldName extends string
+> = GetGen3<"argTypes", TypeName, FieldName>;
 
 export type ResultValue<
-  GenTypes,
   TypeName extends string,
   FieldName extends string
-> = GetGen3<GenTypes, "fieldTypes", TypeName, FieldName>;
+> = GetGen3<"fieldTypes", TypeName, FieldName>;
 
 export type NeedsResolver<
   TypeName extends string,
-  FieldName extends string,
-  GenTypes = NexusGen
-> = HasGen3<GenTypes, "fieldTypes", TypeName, FieldName> extends true
-  ? GetGen3<GenTypes, "fieldTypes", TypeName, FieldName> extends null
+  FieldName extends string
+> = HasGen3<"fieldTypes", TypeName, FieldName> extends true
+  ? GetGen3<"fieldTypes", TypeName, FieldName> extends null
     ? false
-    : HasGen3<GenTypes, "rootTypes", TypeName, FieldName> extends true
-    ? GetGen3<GenTypes, "rootTypes", TypeName, FieldName> extends null
+    : HasGen3<"rootTypes", TypeName, FieldName> extends true
+    ? GetGen3<"rootTypes", TypeName, FieldName> extends null
       ? true
       : false
     : true

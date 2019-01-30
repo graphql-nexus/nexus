@@ -2,18 +2,15 @@ import { NexusTypes, withNexusSymbol } from "./_types";
 import { OutputDefinitionBlock } from "./blocks";
 import { assertValidName } from "graphql";
 
-export interface NexusExtendTypeConfig<
-  TypeName extends string,
-  GenTypes = NexusGen
-> {
+export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName;
-  definition(t: OutputDefinitionBlock<TypeName, GenTypes>): void;
+  definition(t: OutputDefinitionBlock<TypeName>): void;
 }
 
 export class NexusExtendTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusExtendTypeConfig<any, any>
+    protected config: NexusExtendTypeConfig<string>
   ) {
     assertValidName(name);
   }

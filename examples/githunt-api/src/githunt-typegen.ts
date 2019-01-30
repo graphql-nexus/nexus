@@ -66,6 +66,11 @@ export interface NexusGenRootTypes {
   }
 }
 
+export interface NexusGenAllTypes extends NexusGenRootTypes {
+  FeedType: NexusGenEnumTypes['FeedType'];
+  VoteType: NexusGenEnumTypes['VoteType'];
+}
+
 export interface NexusGenFieldTypes {
   Comment: { // field return type
     content: string; // String!
@@ -169,6 +174,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;
   fieldTypes: NexusGenFieldTypes;
+  allTypes: NexusGenAllTypes;
   inheritedFields: NexusGenInheritedFields;
   objectNames: NexusGenObjectNames;
   inputNames: NexusGenInputNames;

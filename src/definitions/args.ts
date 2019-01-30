@@ -1,5 +1,5 @@
-import { GetGen, HasGen } from "../typegenTypeHelpers";
-import { NexusInputTypeName } from "./wrapping";
+import { GetGen, HasGen, GetGen2 } from "../typegenTypeHelpers";
+import { AllNexusInputTypeDefs } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
 export interface CommonArgConfig {
@@ -33,30 +33,32 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
   default?: T;
 }
 
-export type PossibleArgNames<GenTypes = NexusGen> = HasGen<
-  GenTypes,
-  "allInputTypes"
-> extends true
-  ? GetGen<GenTypes, "allInputTypes">
+export type PossibleArgNames = NexusGen extends infer GenTypes
+  ? HasGen<"allInputTypes"> extends true
+    ? GetGen<"allInputTypes">
+    : string
   : string;
 
 export interface NexusArgConfig<
-  GenTypes = NexusGen,
-  T extends PossibleArgNames<GenTypes> = PossibleArgNames<GenTypes>
+  T extends PossibleArgNames,
+  U extends AllNexusInputTypeDefs<T> = AllNexusInputTypeDefs<T>
 > extends CommonArgConfig {
   /**
    * The type of the argument, either the string name of the type,
-   * or the concrete
+   * or the concrete Nexus type definition
    */
-  type: T | NexusInputTypeName<T>;
+  type: T | U;
   /**
    * Configure the default for the object
    */
-  default?: any; // TODO: Make this type-safe somehow
+  default?: GetGen2<"allTypes", T>; // TODO: Make this type-safe somehow
 }
 
 export class NexusArgDef<TypeName extends string> {
-  constructor(readonly name: TypeName, protected config: NexusArgConfig) {}
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusArgConfig<any, any>
+  ) {}
   get value() {
     return this.config;
   }
@@ -73,8 +75,11 @@ withNexusSymbol(NexusArgDef, NexusTypes.Interface);
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg(options: NexusArgConfig) {
-  return new NexusArgDef(options.type, options);
+export function arg(options: NexusArgConfig<any, any>) {
+  return new NexusArgDef(
+    typeof options.type === "string" ? options.type : options.type.name,
+    options
+  );
 }
 export function stringArg(options?: ScalarArgConfig<string>) {
   return arg({ type: "String", ...options });

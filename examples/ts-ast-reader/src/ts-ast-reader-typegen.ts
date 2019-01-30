@@ -28,6 +28,7 @@ export interface NexusGenRootTypes {
   ConstructSignatureDeclaration: ts.ConstructSignatureDeclaration;
   ConstructorDeclaration: ts.ConstructorDeclaration;
   ConstructorTypeNode: ts.ConstructorTypeNode;
+  DeclarationName: ts.DeclarationName;
   EnumDeclaration: ts.EnumDeclaration;
   ExportAssignment: ts.ExportAssignment;
   ExportDeclaration: ts.ExportDeclaration;
@@ -104,6 +105,11 @@ export interface NexusGenRootTypes {
     text?: string | null; // String
   }
   VariableDeclaration: ts.VariableDeclaration;
+}
+
+export interface NexusGenAllTypes extends NexusGenRootTypes {
+  NodeFlags: NexusGenEnumTypes['NodeFlags'];
+  SyntaxKind: NexusGenEnumTypes['SyntaxKind'];
 }
 
 export interface NexusGenFieldTypes {
@@ -1570,6 +1576,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;
   fieldTypes: NexusGenFieldTypes;
+  allTypes: NexusGenAllTypes;
   inheritedFields: NexusGenInheritedFields;
   objectNames: NexusGenObjectNames;
   inputNames: NexusGenInputNames;

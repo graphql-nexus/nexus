@@ -2,10 +2,7 @@ import { NexusTypes, NonNullConfig, withNexusSymbol } from "./_types";
 import { InputDefinitionBlock } from "./blocks";
 import { assertValidName } from "graphql";
 
-export interface NexusInputObjectTypeConfig<
-  TypeName extends string,
-  GenTypes = NexusGen
-> {
+export interface NexusInputObjectTypeConfig<TypeName extends string> {
   /**
    * Name of the input object type
    */
@@ -13,7 +10,7 @@ export interface NexusInputObjectTypeConfig<
   /**
    * Definition block for the input type
    */
-  definition(t: InputDefinitionBlock<TypeName, GenTypes>): void;
+  definition(t: InputDefinitionBlock<TypeName>): void;
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -30,7 +27,7 @@ export interface NexusInputObjectTypeConfig<
 export class NexusInputObjectTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusInputObjectTypeConfig<any, any>
+    protected config: NexusInputObjectTypeConfig<string>
   ) {
     assertValidName(name);
   }
@@ -40,8 +37,8 @@ export class NexusInputObjectTypeDef<TypeName extends string> {
 }
 withNexusSymbol(NexusInputObjectTypeDef, NexusTypes.InputObject);
 
-export function inputObjectType<TypeName extends string, GenTypes = NexusGen>(
-  config: NexusInputObjectTypeConfig<TypeName, GenTypes>
+export function inputObjectType<TypeName extends string>(
+  config: NexusInputObjectTypeConfig<TypeName>
 ) {
   return new NexusInputObjectTypeDef(config.name, config);
 }

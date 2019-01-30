@@ -17,10 +17,10 @@ export type NexusInputTypeName<T> = T extends NexusInputObjectTypeDef<infer A>
   ? C
   : never;
 
-export type AllNexusInputTypeDefs =
-  | NexusInputObjectTypeDef<string>
-  | NexusEnumTypeDef<string>
-  | NexusScalarTypeDef<string>;
+export type AllNexusInputTypeDefs<T extends string = string> =
+  | NexusInputObjectTypeDef<T>
+  | NexusEnumTypeDef<T>
+  | NexusScalarTypeDef<T>;
 
 export type AllNexusOutputTypeDefs =
   | NexusObjectTypeDef<string>
