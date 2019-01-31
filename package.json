@@ -5,6 +5,7 @@
   "types": "dist",
   "license": "MIT",
   "description": "Scalable, strongly typed GraphQL schema development",
+  "homepage": "https://nexus.js.org",
   "scripts": {
     "dev": "yarn link-examples && tsc -w",
     "test": "jest",
@@ -66,5 +67,15 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "keywords": [
+    "graphql",
+    "schema",
+    "types",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/graphql-nexus/nexus.git"
   }
 }
