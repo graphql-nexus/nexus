@@ -1,129 +1,190 @@
 import {
   buildSchema,
-  lexicographicSortSchema,
-  isObjectType,
-  isInterfaceType,
-  isScalarType,
-  isInputObjectType,
   GraphQLObjectType,
   GraphQLEnumType,
   GraphQLInterfaceType,
   GraphQLInputObjectType,
   GraphQLScalarType,
   GraphQLUnionType,
-  isUnionType,
-  isEnumType,
-  GraphQLNamedType,
   GraphQLField,
+  GraphQLSchema,
+  GraphQLNamedType,
 } from "graphql";
-import { isInterfaceField, eachObj } from "./utils";
+import { groupTypes, GroupedTypes } from "./utils";
 
 export function convertSDL(sdl: string, commonjs: boolean = false) {
-  return new SDLConverter(commonjs).convert(sdl);
+  return new SDLConverter(commonjs, sdl).print();
 }
 
 /**
- * Convert an existing SDL schema into a GraphQL Nexus format
+ * Convert an existing SDL schema into a Nexus GraphQL format
  */
 export class SDLConverter {
   protected export: string;
+  protected schema: GraphQLSchema;
+  protected groupedTypes: GroupedTypes;
 
-  constructor(commonjs: boolean = false) {
+  constructor(commonjs: boolean = false, sdl: string) {
     this.export = commonjs ? "exports." : "export const ";
+    this.schema = buildSchema(sdl);
+    this.groupedTypes = groupTypes(this.schema);
   }
 
-  convert(sdl: string) {
-    let schema = buildSchema(sdl);
-    if (typeof lexicographicSortSchema === "function") {
-      schema = lexicographicSortSchema(schema);
+  print() {
+    return [
+      this.printObjectTypes(),
+      this.printInterfaceTypes(),
+      this.printInputObjectTypes(),
+      this.printUnionTypes(),
+      this.printEnumTypes(),
+      this.printScalarTypes(),
+    ].join("\n\n");
+  }
+
+  printObjectTypes() {
+    if (this.groupedTypes.object.length > 0) {
+      return this.groupedTypes.object
+        .map((t) => this.printObjectType(t))
+        .join("\n");
     }
-    const typeMap = schema.getTypeMap();
-    const typeFragments: string[] = [];
-    Object.keys(typeMap).forEach((typeName) => {
-      if (typeName.indexOf("__") === 0) {
-        return;
-      }
-      const type = typeMap[typeName];
-      if (isObjectType(type)) {
-        typeFragments.push(this.makeObjectType(type));
-      } else if (isInterfaceType(type)) {
-        typeFragments.push(this.makeInterfaceType(type));
-      } else if (isUnionType(type)) {
-        typeFragments.push(this.makeUnionType(type));
-      } else if (isEnumType(type)) {
-        typeFragments.push(this.makeEnumType(type));
-      } else if (isScalarType(type)) {
-        typeFragments.push(this.makeScalarType(type));
-      } else if (isInputObjectType(type)) {
-        typeFragments.push(this.makeInputObjectType(type));
-      }
-    });
-    return typeFragments.join("\n\n");
+    return "";
   }
 
-  makeObjectType(type: GraphQLObjectType): string {
-    const str = [
-      `${this.export}${type.name} = objectType("${type.name}", t => {`,
-    ];
-    if (type.getInterfaces().length > 0) {
-      str.push(
-        `  t.implements("${type
-          .getInterfaces()
-          .map((i) => i.name)
-          .join('", "')}")`
-      );
+  printObjectType(type: GraphQLObjectType): string {
+    return this.printBlock([
+      `${this.export}${type.name} = objectType({`,
+      `  name: "${type.name}"`,
+      `})`,
+    ]);
+    // if (type.getInterfaces().length > 0) {
+    //   const interfaceNames = type
+    //     .getInterfaces()
+    //     .map((i) => JSON.stringify(i.name))
+    //     .join(", ");
+    //   str.push(`  t.implements(${interfaceNames})`);
+    // }
+    // Object.keys(type.getFields()).forEach((fieldName) => {
+    //   if (isInterfaceField(type, fieldName)) {
+    //     return;
+    //   }
+    //   eachObj(type.getFields(), (field, key) => {
+    //     getFieldType(field);
+    //   });
+    // });
+    // return str.join("\n");
+  }
+
+  printInterfaceTypes() {
+    if (this.groupedTypes.interface.length) {
+      return this.groupedTypes.interface
+        .map((t) => this.printInterfaceType(t))
+        .join("\n");
     }
-    Object.keys(type.getFields()).forEach((fieldName) => {
-      if (isInterfaceField(type, fieldName)) {
-        return;
-      }
-      eachObj(type.getFields(), (field, key) => {
-        getFieldType(field);
-      });
-    });
-    return str.concat("});").join("\n");
+    return "";
   }
 
-  makeEnumType(type: GraphQLEnumType): string {
-    const str = [
-      `${this.export}${type.name} = enumType("${type.name}", t => {`,
-    ];
-
-    return str.concat("});").join("\n");
+  printInterfaceType(type: GraphQLInterfaceType): string {
+    return this.printBlock([
+      `${this.export}${type.name} = interfaceType({`,
+      `  name: "${type.name}",`,
+      this.maybeDescription(type),
+      `  definition(t) {`,
+      `  }`,
+      `});`,
+    ]);
+    // eachObj(type.getFields(), (field, key) => {
+    //   getFieldType(field);
+    // });
+    // return str.join("\n");
   }
 
-  makeInterfaceType(type: GraphQLInterfaceType): string {
-    const str = [
-      `${this.export}${type.name} = interfaceType("${type.name}", t => {`,
-    ];
-    eachObj(type.getFields(), (field, key) => {
-      getFieldType(field);
-    });
-    return str.concat("});").join("\n");
+  printEnumTypes() {
+    if (this.groupedTypes.enum.length) {
+      return this.groupedTypes.enum
+        .map((t) => this.printEnumType(t))
+        .join("\n");
+    }
+    return "";
   }
 
-  makeInputObjectType(type: GraphQLInputObjectType): string {
-    const str = [
-      `${this.export}${type.name} = inputObjectType("${type.name}", t => {`,
-    ];
-
-    return str.concat("});").join("\n");
+  printEnumType(type: GraphQLEnumType): string {
+    return this.printBlock([
+      `${this.export}${type.name} = enumType({`,
+      `  name: "${type.name}",`,
+      this.maybeDescription(type),
+      `  definition(t) {`,
+      `  }`,
+      `});`,
+    ]);
   }
 
-  makeUnionType(type: GraphQLUnionType): string {
-    const str = [
-      `${this.export}${type.name} = unionType("${type.name}", t => {`,
-    ];
-
-    return str.concat("});").join("\n");
+  printInputObjectTypes() {
+    if (this.groupedTypes.input.length) {
+      return this.groupedTypes.input.map((t) => this.printInputObjectType(t));
+    }
+    return "";
   }
 
-  makeScalarType(type: GraphQLScalarType): string {
-    const str = [
-      `${this.export}${type.name} = scalarType("${type.name}", t => {`,
-    ];
+  printInputObjectType(type: GraphQLInputObjectType): string {
+    return this.printBlock([
+      `${this.export}${type.name} = inputObjectType({`,
+      `  name: "${type.name}",`,
+      this.maybeDescription(type),
+      `  definition(t) {`,
+      `  }`,
+      `});`,
+    ]);
+  }
 
-    return str.concat("});").join("\n");
+  printUnionTypes() {
+    if (this.groupedTypes.union.length) {
+      return this.groupedTypes.union
+        .map((t) => this.printUnionType(t))
+        .join("\n");
+    }
+    return "";
+  }
+
+  printUnionType(type: GraphQLUnionType): string {
+    return this.printBlock([
+      `${this.export}${type.name} = unionType({`,
+      `  name: "${type.name}",`,
+      this.maybeDescription(type),
+      `  definition(t) {`,
+      `  }`,
+      `});`,
+    ]);
+  }
+
+  printScalarTypes() {
+    if (this.groupedTypes.scalar.length) {
+      return this.groupedTypes.scalar
+        .map((t) => this.printScalarType(t))
+        .join("\n");
+    }
+    return "";
+  }
+
+  printScalarType(type: GraphQLScalarType): string {
+    return this.printBlock([
+      `${this.export}${type.name} = scalarType({`,
+      `  name: ${type.name}",`,
+      this.maybeDescription(type),
+      `  definition(t) {`,
+      `  }`,
+      `});`,
+    ]);
+  }
+
+  maybeDescription(type: GraphQLNamedType) {
+    if (type.description) {
+      return `  description: ${JSON.stringify(type.description)},`;
+    }
+    return null;
+  }
+
+  printBlock(block: (string | null)[]) {
+    return block.filter((t) => t !== null).join("\n");
   }
 }
 

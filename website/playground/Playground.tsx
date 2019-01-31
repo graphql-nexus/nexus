@@ -12,8 +12,6 @@ import {
   unionType,
   enumType,
   scalarType,
-  directiveType,
-  makeSchemaWithMetadata,
   arg,
   intArg,
   stringArg,
@@ -22,7 +20,7 @@ import {
   booleanArg,
   core,
 } from "nexus";
-import { GraphQLSchema, graphql } from "graphql";
+import { GraphQLSchema, graphql, lexicographicSortSchema } from "graphql";
 import * as monaco from "monaco-editor";
 import { useDebounce } from "use-debounce";
 import "./monaco-config";
@@ -84,11 +82,11 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   const [generatedTypes, setGeneratedTypes] = useState("");
   const [activeSchema, setActiveSchema] = useState<{
     schema: GraphQLSchema;
-    metadata: core.Metadata;
+    metadata: core.TypegenMetadata;
   } | null>(null);
   const debouncedSchema = useDebounce<{
     schema: GraphQLSchema;
-    metadata: core.Metadata;
+    metadata: core.TypegenMetadata;
   } | null>(activeSchema, 100);
 
   const printedSchema = useMemo(
@@ -98,18 +96,15 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
         : "",
     [debouncedSchema]
   );
-  useEffect(
-    () => {
-      if (debouncedSchema) {
-        debouncedSchema.metadata
-          .generateTypesFile(debouncedSchema.schema)
-          .then((generated) => {
-            setGeneratedTypes(generated);
-          });
-      }
-    },
-    [printedSchema]
-  );
+  useEffect(() => {
+    if (debouncedSchema) {
+      debouncedSchema.metadata
+        .generateTypesFile(debouncedSchema.schema)
+        .then((generated) => {
+          setGeneratedTypes(generated);
+        });
+    }
+  }, [printedSchema]);
 
   useEffect(() => {
     if (codeDiv.current && typesDiv.current && schemaDiv.current) {
@@ -151,64 +146,49 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
     }
   }, []);
 
-  useEffect(
-    () => {
-      if (schemaEditorRef.current) {
-        schemaEditorRef.current.setValue(printedSchema);
-      }
-    },
-    [printedSchema]
-  );
+  useEffect(() => {
+    if (schemaEditorRef.current) {
+      schemaEditorRef.current.setValue(printedSchema);
+    }
+  }, [printedSchema]);
 
-  useEffect(
-    () => {
-      const { schema, metadata, error } = getCurrentSchema(content);
-      if (error) {
-        setSchemaError(error);
-      } else if (schema && metadata) {
-        setActiveSchema({ schema, metadata });
-        setSchemaError(null);
-      }
-    },
-    [content]
-  );
+  useEffect(() => {
+    const { schema, metadata, error } = getCurrentSchema(content);
+    if (error) {
+      setSchemaError(error);
+    } else if (schema && metadata) {
+      setActiveSchema({ schema, metadata });
+      setSchemaError(null);
+    }
+  }, [content]);
 
-  useEffect(
-    () => {
-      if (codeEditorRef.current) {
-        codeEditorRef.current.layout();
-      }
+  useEffect(() => {
+    if (codeEditorRef.current) {
+      codeEditorRef.current.layout();
+    }
+    if (typesEditorRef.current) {
+      typesEditorRef.current.layout();
+    }
+  }, [schemaError, activeEditor]);
+
+  useEffect(() => {
+    if (activeSchema && graphiqlRef.current) {
+      graphiqlRef.current.handleRunQuery();
+    }
+  }, [activeSchema, graphiqlRef.current]);
+
+  useEffect(() => {
+    if (generatedTypes) {
+      const disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
+        generatedTypes,
+        "file:///generated-types.d.ts"
+      );
       if (typesEditorRef.current) {
-        typesEditorRef.current.layout();
+        typesEditorRef.current.setValue(generatedTypes);
       }
-    },
-    [schemaError, activeEditor]
-  );
-
-  useEffect(
-    () => {
-      if (activeSchema && graphiqlRef.current) {
-        graphiqlRef.current.handleRunQuery();
-      }
-    },
-    [activeSchema, graphiqlRef.current]
-  );
-
-  useEffect(
-    () => {
-      if (generatedTypes) {
-        const disposable = monaco.languages.typescript.typescriptDefaults.addExtraLib(
-          generatedTypes,
-          "file:///generated-types.d.ts"
-        );
-        if (typesEditorRef.current) {
-          typesEditorRef.current.setValue(generatedTypes);
-        }
-        return () => disposable.dispose();
-      }
-    },
-    [generatedTypes]
-  );
+      return () => disposable.dispose();
+    }
+  }, [generatedTypes]);
 
   const toggleSDL = useCallback(() => setActiveEditor("SDL"), []);
   const toggleTypings = useCallback(() => setActiveEditor("TYPES"), []);
@@ -280,7 +260,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
 };
 
 type SchemaOrError =
-  | { schema: GraphQLSchema; metadata: core.Metadata; error: null }
+  | { schema: GraphQLSchema; metadata: core.TypegenMetadata; error: null }
   | { schema: null; metadata: null; error: Error };
 
 function getCurrentSchema(code: string): SchemaOrError {
@@ -290,26 +270,23 @@ function getCurrentSchema(code: string): SchemaOrError {
     return val;
   }
   const singleton = {
-    objectType(name: any, fn: any) {
-      return add(objectType(name, fn));
+    objectType(obj: any) {
+      return add(objectType(obj));
     },
-    interfaceType(name: any, fn: any) {
-      return add(interfaceType(name, fn));
+    interfaceType(obj: any) {
+      return add(interfaceType(obj));
     },
-    inputObjectType(name: any, fn: any) {
-      return add(inputObjectType(name, fn));
+    inputObjectType(obj: any) {
+      return add(inputObjectType(obj));
     },
-    enumType(name: any, fn: any) {
-      return add(enumType(name, fn));
+    enumType(obj: any) {
+      return add(enumType(obj));
     },
-    unionType(name: any, fn: any) {
-      return add(unionType(name, fn));
+    unionType(obj: any) {
+      return add(unionType(obj));
     },
-    scalarType(name: any, fn: any) {
-      return add(scalarType(name, fn));
-    },
-    directiveType(name: any, fn: any) {
-      return add(directiveType(name, fn));
+    scalarType(obj: any) {
+      return add(scalarType(obj));
     },
   };
   try {
@@ -320,7 +297,6 @@ function getCurrentSchema(code: string): SchemaOrError {
       "enumType",
       "unionType",
       "scalarType",
-      "directiveType",
       "arg",
       "intArg",
       "stringArg",
@@ -339,7 +315,6 @@ function getCurrentSchema(code: string): SchemaOrError {
       singleton.enumType,
       singleton.unionType,
       singleton.scalarType,
-      singleton.directiveType,
       arg,
       intArg,
       stringArg,
@@ -347,9 +322,9 @@ function getCurrentSchema(code: string): SchemaOrError {
       idArg,
       booleanArg
     );
-    const { schema, metadata } = makeSchemaWithMetadata({
+    const config = {
       types: cache,
-      outputs: false,
+      outputs: false as false,
       typegenAutoConfig: {
         contextType: "{}",
         sources: [],
@@ -357,11 +332,14 @@ function getCurrentSchema(code: string): SchemaOrError {
           Date: "Date",
         },
       },
-    });
-
-    const sortedSchema = metadata.sortSchema(schema);
-
-    return { schema: sortedSchema, metadata, error: null };
+    };
+    const { schema } = core.makeSchemaInternal(config);
+    const sortedSchema = lexicographicSortSchema(schema);
+    return {
+      schema: sortedSchema,
+      metadata: new core.TypegenMetadata(config),
+      error: null,
+    };
   } catch (error) {
     return { schema: null, metadata: null, error };
   }

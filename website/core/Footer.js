@@ -35,12 +35,12 @@ class Footer extends React.Component {
           <div>
             <h5>Docs</h5>
             <a href={this.docUrl("getting-started")}>Getting Started</a>
-            <a href="api-reference">API Reference</a>
+            <a href={this.docUrl("api")}>API Reference</a>
             <a href="playground">Playground</a>
           </div>
           <div>
             <h5>More</h5>
-            <a href="https://github.com/">GitHub</a>
+            <a href="https://github.com/graphql-nexus/nexus">GitHub</a>
             <a
               className="github-button"
               href={this.props.config.repoUrl}

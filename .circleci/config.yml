@@ -1,0 +1,17 @@
+version: 2.1
+
+jobs:
+  build_lint_test:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn install
+      - run: yarn build
+      - run: yarn lint
+      - run: yarn jest --ci
+
+workflows:
+  nexus:
+    jobs:
+      - build_lint_test

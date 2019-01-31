@@ -4,10 +4,8 @@ title: Frequently Asked Questions
 sidebar_label: FAQ
 ---
 
-## Why not object
+## Why isn't this a decorator / class-based API like [TypeGraphQL](https://github.com/19majkel94/type-graphql)
 
-TODO
+Nexus aims to be both strongly type-safe, but also approachable from vanilla JavaScript. There are some issues with Nexus' approach to type generation and type resolution when utilizing decorators. Metadata reflection is
 
-## Why isn't this a class-based API
-
-TODO
+We have ideas on how a decorator API could be added to the API, however we are waiting to see how the ecossytems

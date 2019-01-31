@@ -9,23 +9,30 @@ const characterArgs = {
 };
 
 const heroArgs = {
-  episode: arg("Episode", {
+  episode: arg({
+    type: "Episode",
     description:
       "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.",
   }),
 };
 
-export const Query = objectType("Query", (t) => {
-  t.field("hero", "Character", {
-    args: heroArgs,
-    resolve: (_, { episode }) => getHero(episode),
-  });
-  t.field("human", "Human", {
-    args: characterArgs,
-    resolve: (_, { id }) => getHuman(id),
-  });
-  t.field("droid", "Droid", {
-    args: characterArgs,
-    resolve: (_, { id }) => getDroid(id),
-  });
+export const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.field("hero", {
+      type: "Character",
+      args: heroArgs,
+      resolve: (_, { episode }) => getHero(episode),
+    });
+    t.field("human", {
+      type: "Human",
+      args: characterArgs,
+      resolve: (_, { id }) => getHuman(id),
+    });
+    t.field("droid", {
+      type: "Droid",
+      args: characterArgs,
+      resolve: (_, { id }) => getDroid(id),
+    });
+  },
 });

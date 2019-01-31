@@ -4,11 +4,11 @@ title: Type Generation Details
 sidebar_label: Type Generation Details
 ---
 
-This is relevant to JavaScript as well as TypeScript users, as tools like VSCode can utilize these types to aid in autocomplete. The goal is to have the best possible type coverage with the least possible manual type annotation.
+This is relevant to JavaScript as well as TypeScript users, as tools like VSCode can utilize these types to aid in autocomplete. A core goal of Nexus is to have the best possible type coverage with the least possible manual type annotation.
 
 ## Overview
 
-GraphQL Nexus was designed with TypeScript in mind. In order to fully typecheck our GraphQL objects, we need to generate a number of types that combine the schema, any type or field configuration provided, and the GraphQL resolution algorithm to create as much type-safety as possible without any additional work importing and assigning types throughout the codebase.
+Nexus was designed with TypeScript in mind. In order to fully typecheck our GraphQL objects, we need to generate a number of types that combine the schema, any type or field configuration provided, and the GraphQL resolution algorithm to create as much type-safety as possible without any additional work importing and assigning types throughout the codebase.
 
 ## Backing Types
 
@@ -18,9 +18,9 @@ Whatever you want to call it, just think of it as the object that will be passed
 
 Scalars can also have backing types, representing the value they are parsed into.
 
-Sometimes GraphQL types are passthrough, and don't have a dedicated type backing them. One such case would be in the `Edge` of a Relay style pagination. In this case, GraphQL Nexus will generate a type-definition which makes assumptions of the necessary value to fulfill the contract. If this is incorrect, you can always provide a concrete type for the object.
+Sometimes GraphQL types are passthrough, and don't have a dedicated type backing them. One such case would be in the `Edge` of a Relay style pagination. In this case, Nexus will generate a type-definition which makes assumptions of the necessary value to fulfill the contract. If this is incorrect, you can always provide a concrete type for the object.
 
-> In the case of custom [default resolve functions](../api-reference), we will lose type safety if the
+> In the case of custom [default resolve functions](docs/api-core-concepts.md), we will lose type safety if the
 > backing type is not defined. For this reason, defining a backing type is required
 > for any object with a type-level resolver. If you wish to disable this behavior,
 > add `strict: false` to the options for the schema.

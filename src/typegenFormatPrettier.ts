@@ -1,9 +1,13 @@
 import path from "path";
-import * as Types from "./types";
 
-export function prettierFormat(
+export type TypegenFormatFn = (
+  content: string,
+  type: "types" | "schema"
+) => string | Promise<string>;
+
+export function typegenFormatPrettier(
   prettierConfig: string | object
-): Types.FormatTypegenFn {
+): TypegenFormatFn {
   return async function formatTypegen(
     content: string,
     type: "types" | "schema"

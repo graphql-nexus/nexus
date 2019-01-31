@@ -5,10 +5,103 @@ import {
   isEnumType,
 } from "graphql";
 import path from "path";
-import * as Types from "./types";
 import { TYPEGEN_HEADER } from "./lang";
 import { log, objValues } from "./utils";
-import { SCALAR_TYPES } from "./common";
+import { TypegenInfo } from "./builder";
+
+/**
+ * Any common types / constants that would otherwise be circular-imported
+ */
+export const SCALAR_TYPES = {
+  Int: "number",
+  String: "string",
+  ID: "string",
+  Float: "number",
+  Boolean: "boolean",
+};
+
+export interface TypegenConfigSourceModule {
+  /**
+   * The module for where to look for the types.
+   * This uses the node resolution algorthm via require.resolve,
+   * so if this lives in node_modules, you can just provide the module name
+   * otherwise you should provide the absolute path to the file.
+   */
+  module: string;
+  /**
+   * When we import the module, we use `import * as ____` to prevent
+   * conflicts. This alias should be a name that doesn't conflict with any other
+   * types, usually a short lowercase name.
+   */
+  alias: string;
+  /**
+   * Provides a custom approach to matching for the type
+   *
+   * If not provided, the default implementation is:
+   * ```
+   * (type) => new RegExp('(?:interface|type|class)\s+(${type.name})\W')
+   * ```
+   */
+  typeMatch?: (
+    type: GraphQLNamedType,
+    defaultRegex: RegExp
+  ) => RegExp | RegExp[];
+  /**
+   * A list of typesNames or regular expressions matching type names
+   * that should be resolved by this import. Provide an empty array if you
+   * wish to use the file for context and ensure no other types are matched.
+   */
+  onlyTypes?: (string | RegExp)[];
+  /**
+   * By default the import is configured `import * as alias from`, setting glob to false
+   * will change this to `import alias from`
+   */
+  glob?: false;
+}
+
+export interface TypegenAutoConfigOptions {
+  /**
+   * Any headers to prefix on the generated type file
+   */
+  headers?: string[];
+  /**
+   * Array of files to match for a type
+   *
+   * ```
+   * sources: [
+   *   { module: 'typescript', alias: 'ts' },
+   *   { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   * ]
+   * ```
+   */
+  sources: TypegenConfigSourceModule[];
+  /**
+   * Typing for the context, referencing a type defined in the aliased module
+   * provided in sources e.g. `alias.Context`
+   */
+  contextType?: string;
+  /**
+   * Types that should not be matched for a backing type,
+   *
+   * By default this is set to ['Query', 'Mutation', 'Subscription']
+   *
+   * ```
+   * skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
+   * ```
+   */
+  skipTypes?: (string | RegExp)[];
+  /**
+   * If debug is set to true, this will log out info about all types
+   * found, skipped, etc. for the type generation files.
+   */
+  debug?: boolean;
+  /**
+   * If provided this will be used for the backing types rather than the auto-resolve
+   * mechanism above. Useful as an override for one-off cases, or for scalar
+   * backing types.
+   */
+  backingTypeMap?: Record<string, string>;
+}
 
 /**
  * This is an approach for handling type definition auto-resolution.
@@ -21,11 +114,11 @@ import { SCALAR_TYPES } from "./common";
  *
  * @param options
  */
-export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
+export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
   return async (
     schema: GraphQLSchema,
     outputPath: string
-  ): Promise<Types.TypegenInfo> => {
+  ): Promise<TypegenInfo> => {
     const {
       headers,
       contextType,
@@ -73,8 +166,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
         // e.g. in the Playground, it doesn't break things.
 
         // Yeah, this doesn't exist in Node 6, but since this is a new
-        // lib and that's super close to EOL so if you really need it.
-        // open a PR :)
+        // lib and Node 6 is close to EOL so if you really need it, open a PR :)
         const fs = require("fs") as typeof import("fs");
         const util = require("util") as typeof import("util");
         const readFile = util.promisify(fs.readFile);
@@ -90,7 +182,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
           path.extname(pathOrModule) !== ".ts"
         ) {
           return console.warn(
-            `GraphQL Nexus Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
+            `Nexus GraphQL Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
           );
         }
         let resolvedPath: string;
@@ -109,7 +201,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
             e.message.indexOf("Cannot find module") !== -1
           ) {
             console.error(
-              `GraphQL Nexus: Unable to find file or module ${pathOrModule}, skipping`
+              `Nexus GraphQL: Unable to find file or module ${pathOrModule}, skipping`
             );
           } else {
             console.error(e.message);
@@ -124,7 +216,7 @@ export function typegenAutoConfig(options: Types.TypegenAutoConfigOptions) {
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
-            `GraphQL Nexus Typegen: Cannot have multiple type sources ${
+            `Nexus GraphQL Typegen: Cannot have multiple type sources ${
               importsMap[alias]
             } and ${pathOrModule} with the same alias ${alias}, skipping`
           );

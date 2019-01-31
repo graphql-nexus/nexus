@@ -3,15 +3,10 @@ import path from "path";
 import { ChildProcess, spawn, SpawnOptions } from "child_process";
 import getPort from "get-port";
 import http from "http";
-import { linkExamples } from "./scripts/link-examples";
+import { linkExamples, linkWebsite } from "./scripts/link-examples";
 import { unlinkExamples } from "./scripts/unlink-examples";
 import { allExamples } from "./scripts/constants";
 import { upgradeDeps } from "./scripts/upgrade-deps";
-
-function requireFresh(pkg: string) {
-  delete require.cache[require.resolve(pkg)];
-  return require(pkg);
-}
 
 const serviceRegistry = new Map<string, ChildProcess>();
 
@@ -32,21 +27,6 @@ const runService = (
   }
 };
 
-gulp.task("api-types", [], async () => {
-  const { run } = requireFresh("./api/types/types-to-json.ts");
-  await run();
-});
-
-gulp.task("watch:api-types", ["core-tsc", "api-types"], () => {
-  gulp.watch(
-    [
-      path.join(__dirname, "../dist/*.d.ts"),
-      path.join(__dirname, "./api/types/*.ts"),
-    ],
-    ["api-types"]
-  );
-});
-
 gulp.task("docusaurus", () => {
   runService("yarn", "docusaurus-start", { stdio: "ignore" }, true);
 });
@@ -65,14 +45,7 @@ gulp.task("core-tsc", () => {
 
 gulp.task(
   "start",
-  [
-    "docusaurus",
-    "link-examples",
-    "webpack",
-    "watch:api-types",
-    "api-tsc",
-    "core-tsc",
-  ],
+  ["docusaurus", "link-examples", "webpack", "core-tsc"],
   () => {
     console.log("Server starting, please wait...");
     gulp.watch(path.join(__dirname, "siteConfig.js"), ["docusaurus"]);
@@ -112,6 +85,11 @@ gulp.task("check-examples", ["link-examples"], async () => {});
 gulp.task("link-examples", async () => {
   await linkExamples();
   console.log("All examples linked");
+});
+
+gulp.task("link-website", async () => {
+  await linkWebsite();
+  console.log("Website linked");
 });
 
 gulp.task("unlink-examples", async () => {

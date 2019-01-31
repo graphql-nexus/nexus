@@ -1,0 +1,76 @@
+import {
+  GraphQLLeafType,
+  GraphQLCompositeType,
+  GraphQLInputObjectType,
+} from "graphql";
+import { GenTypesShape } from "../core";
+
+export type MaybeThunk<T> = T | (() => T);
+
+export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";
+
+export enum NexusTypes {
+  Arg = "Arg",
+  Enum = "Enum",
+  Object = "Object",
+  Interface = "Interface",
+  InputObject = "InputObject",
+  Scalar = "Scalar",
+  Union = "Union",
+  ExtendObject = "ExtendObject",
+  WrappedFn = "WrappedFn",
+  OutputField = "OutputField",
+  InputField = "InputField",
+}
+
+export interface DeprecationInfo {
+  /**
+   * Reason for the deprecation.
+   */
+  reason: string;
+  /**
+   * Date | YYYY-MM-DD formatted date of when this field
+   * became deprecated.
+   */
+  startDate?: string | Date;
+  /**
+   * Field or usage that replaces the deprecated field.
+   */
+  supersededBy?: string;
+}
+
+export interface NonNullConfig {
+  /**
+   * Whether output fields are non-null by default.
+   *
+   * type Example {
+   *   field: String!
+   *   otherField: [String!]!
+   * }
+   *
+   * @default true
+   */
+  output?: boolean;
+  /**
+   * Whether input fields (field arguments, input type members)
+   * are non-null by default.
+   *
+   * input Example {
+   *   field: String
+   *   something: [String]
+   * }
+   *
+   * @default false
+   */
+  input?: boolean;
+}
+
+export type GraphQLPossibleOutputs = GraphQLCompositeType | GraphQLLeafType;
+
+export type GraphQLPossibleInputs = GraphQLInputObjectType | GraphQLLeafType;
+
+export const NexusWrappedSymbol = Symbol.for("@nexus/wrapped");
+
+export function withNexusSymbol(obj: Function, nexusType: NexusTypes) {
+  obj.prototype[NexusWrappedSymbol] = nexusType;
+}

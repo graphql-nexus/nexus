@@ -18,8 +18,9 @@
     "./examples",
     "./scripts",
     "./dist",
-    "./src/__tests__",
+    "./tests",
     "./website",
-    "./gulpfile.ts"
+    "./gulpfile.ts",
+    "./package.json"
   ]
 }

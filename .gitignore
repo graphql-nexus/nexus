@@ -3,6 +3,4 @@ dist/*
 website/build
 examples/*/dist
 website/static/playground-dist
-website/api/dist
-website/api/src/*.json
 yarn-error.log

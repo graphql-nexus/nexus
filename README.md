@@ -1,4 +1,6 @@
-## GraphQL Nexus
+## Nexus GraphQL
+
+#### [nexus.js.org](https://nexus.js.org)
 
 ```
 yarn add nexus # or npm install nexus
@@ -16,7 +18,7 @@ Check out the [`/examples`](/examples) for some sample uses.
 
 ### Docs
 
-[graphql-nexus.com](https://graphql-nexus.com)
+[nexus.js.org](https://nexus.js.org)
 
 ### License
 

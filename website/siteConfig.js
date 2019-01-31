@@ -10,19 +10,18 @@ const users = [
 ];
 
 const siteConfig = {
-  title: "GraphQL Nexus", // Title for your website.
+  title: "Nexus GraphQL", // Title for your website.
   tagline:
-    "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
-  url: "https://graphql-nexus.com", // Your website URL
+    "Simple, code-first, strongly typed GraphQL schemas for JavaScript/TypeScript",
+  url: "https://nexus.js.org", // Your website URL
   baseUrl: "/", // Base URL for your project */
-
   gaTrackingId: "UA-39763513-4",
 
-  // algolia: {
-  //   apiKey: 'my-api-key',
-  //   indexName: 'my-index-name',
-  //   algoliaOptions: {} // Optional, if provided by Algolia
-  // }
+  algolia: {
+    apiKey: "80f72460aa3d84abf56948140313b079",
+    indexName: "graphql-nexus",
+    algoliaOptions: {}, // Optional, if provided by Algolia
+  },
 
   // Used for publishing and more
   projectName: "nexus",
@@ -40,6 +39,7 @@ const siteConfig = {
       href: "https://github.com/graphql-nexus/nexus",
       label: "GitHub",
     },
+    { search: true },
   ],
 
   // If you have users set above, you add it here:
@@ -82,9 +82,7 @@ const siteConfig = {
   scripts: [
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
-    "/js/api-docs.js",
     "/js/code-block-buttons.js",
-    "/js/code-block-toggle.js",
   ],
   stylesheets: [
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.css",

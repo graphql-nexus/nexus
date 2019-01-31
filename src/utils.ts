@@ -1,41 +1,35 @@
-import { GraphQLObjectType, GraphQLInterfaceType } from "graphql";
+import {
+  GraphQLObjectType,
+  GraphQLInterfaceType,
+  GraphQLSchema,
+  GraphQLInputObjectType,
+  GraphQLUnionType,
+  GraphQLEnumType,
+  GraphQLScalarType,
+  isObjectType,
+  isInputObjectType,
+  isScalarType,
+  isSpecifiedScalarType,
+  isUnionType,
+  isInterfaceType,
+  isEnumType,
+  specifiedScalarTypes,
+} from "graphql";
 import path from "path";
-import * as Types from "./types";
 
 export function log(msg: string) {
-  console.log(`GraphQL Nexus: ${msg}`);
+  console.log(`Nexus GraphQL: ${msg}`);
 }
 
 export function withDeprecationComment(description?: string | null) {
   return description;
 }
 
-export const enumShorthandMembers = (
-  arg: string[] | Record<string, string | number | object | boolean>
-): Types.EnumMemberInfo[] => {
-  if (Array.isArray(arg)) {
-    return arg.map((name) => ({ name, value: name }));
-  }
-  return Object.keys(arg).map((name) => {
-    return {
-      name,
-      value: arg[name],
-    };
-  });
-};
-
 export const isInterfaceField = (
   type: GraphQLObjectType,
   fieldName: string
 ) => {
   return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]));
-};
-
-export const hasField = (
-  type: GraphQLObjectType | GraphQLInterfaceType,
-  fieldName: string
-) => {
-  return Boolean(type.getFields()[fieldName]);
 };
 
 // ----------------------------
@@ -127,71 +121,6 @@ function lexicalDistance(aStr: string, bStr: string): number {
 
 // ----------------------------
 
-// Borrowed from https://github.com/dmnd/dedent
-
-export function dedent(
-  strings: string | TemplateStringsArray,
-  ...values: Array<string>
-) {
-  const raw = typeof strings === "string" ? [strings] : strings.raw;
-
-  // first, perform interpolation
-  let result = "";
-  for (let i = 0; i < raw.length; i++) {
-    result += raw[i]
-      // join lines when there is a suppressed newline
-      .replace(/\\\n[ \t]*/g, "")
-      // handle escaped backticks
-      .replace(/\\`/g, "`");
-
-    if (i < values.length) {
-      result += values[i];
-    }
-  }
-
-  // now strip indentation
-  const lines = result.split("\n");
-  let mindent: number | null = null;
-  lines.forEach((l) => {
-    let m = l.match(/^(\s+)\S+/);
-    if (m) {
-      let indent = m[1].length;
-      if (!mindent) {
-        // this is the first indented line
-        mindent = indent;
-      } else {
-        mindent = Math.min(mindent, indent);
-      }
-    }
-  });
-
-  if (mindent !== null) {
-    const m = mindent; // appease Flow
-    result = lines.map((l) => (l[0] === " " ? l.slice(m) : l)).join("\n");
-  }
-
-  return (
-    result
-      // dedent eats leading and trailing whitespace too
-      .trim()
-      // handle escaped newlines at the end to ensure they don't get stripped too
-      .replace(/\\n/g, "\n")
-  );
-}
-
-// ----------------------------
-
-// Helper Fns
-
-export function arrPush<T, O extends Record<string, T[]>>(
-  obj: O,
-  property: string,
-  value: T
-) {
-  obj[property] = obj[property] || [];
-  obj[property].push(value);
-}
-
 export function objValues<T>(obj: Record<string, T>): T[] {
   return Object.keys(obj).reduce((result: T[], key) => {
     result.push(obj[key]);
@@ -224,3 +153,56 @@ export const assertAbsolutePath = (pathName: string, property: string) => {
   }
   return pathName;
 };
+
+export interface GroupedTypes {
+  input: GraphQLInputObjectType[];
+  interface: GraphQLInterfaceType[];
+  object: GraphQLObjectType[];
+  union: GraphQLUnionType[];
+  enum: GraphQLEnumType[];
+  scalar: Array<GraphQLScalarType & { asNexusMethod?: string }>;
+}
+
+export function groupTypes(schema: GraphQLSchema) {
+  const groupedTypes: GroupedTypes = {
+    input: [],
+    interface: [],
+    object: [],
+    union: [],
+    enum: [],
+    scalar: Array.from(specifiedScalarTypes),
+  };
+  const schemaTypeMap = schema.getTypeMap();
+  Object.keys(schemaTypeMap)
+    .sort()
+    .forEach((typeName) => {
+      if (typeName.indexOf("__") === 0) {
+        return;
+      }
+      const type = schema.getType(typeName);
+      if (isObjectType(type)) {
+        groupedTypes.object.push(type);
+      } else if (isInputObjectType(type)) {
+        groupedTypes.input.push(type);
+      } else if (isScalarType(type) && !isSpecifiedScalarType(type)) {
+        groupedTypes.scalar.push(type);
+      } else if (isUnionType(type)) {
+        groupedTypes.union.push(type);
+      } else if (isInterfaceType(type)) {
+        groupedTypes.interface.push(type);
+      } else if (isEnumType(type)) {
+        groupedTypes.enum.push(type);
+      }
+    });
+  return groupedTypes;
+}
+
+export function firstDefined<T>(...args: Array<T | undefined>): T {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (typeof arg !== "undefined") {
+      return arg;
+    }
+  }
+  throw new Error("At least one of the values should be defined");
+}
