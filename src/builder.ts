@@ -80,14 +80,13 @@ import {
 import {
   GraphQLPossibleInputs,
   GraphQLPossibleOutputs,
-  NexusTypes,
   NonNullConfig,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
 import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
-import { firstDefined, objValues, suggestionList, eachObj } from "./utils";
+import { firstDefined, objValues, suggestionList } from "./utils";
 
 export type Maybe<T> = T | null;
 

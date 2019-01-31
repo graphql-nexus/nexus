@@ -14,10 +14,11 @@
     "format": "prettier --write 'src/**/*.ts'",
     "prepublish": "yarn clean && yarn lint && yarn build",
     "website": "cd website && yarn && yarn start",
-    "examples": "yarn link-examples && cd website && gulp run-examples",
-    "link-examples": "cd website && yarn && gulp link-examples",
-    "unlink-examples": "cd website && yarn && gulp unlink-examples",
-    "upgrade-deps": "cd website && yarn && gulp upgrade-deps",
+    "examples": "yarn link-examples && cd website && yarn gulp run-examples",
+    "deploy-site": "yarn link-examples && cd website && yarn build",
+    "link-examples": "cd website && yarn && yarn gulp link-examples",
+    "unlink-examples": "cd website && yarn && yarn gulp unlink-examples",
+    "upgrade-deps": "cd website && yarn && yarn gulp upgrade-deps",
     "ts-ast-reader": "cd examples/ts-ast-reader && yarn start"
   },
   "files": [
