@@ -39,7 +39,7 @@ const siteConfig = {
       href: "https://github.com/graphql-nexus/nexus",
       label: "GitHub",
     },
-    // { search: true },
+    { search: true },
   ],
 
   // If you have users set above, you add it here:
