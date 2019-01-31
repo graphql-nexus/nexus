@@ -26,12 +26,21 @@ async function linkDir(dir: string, root: string) {
   );
 }
 
-export async function linkExamples() {
-  const root = path.join(__dirname, "../..");
+const root = path.join(__dirname, "../..");
+export async function linkNexus() {
   const { stdout } = await execAsync("yarn link", {
     cwd: root,
   });
   console.log(stdout);
+}
+
+export async function linkWebsite() {
+  console.log("Linking website");
+  await linkDir(path.join(root, "website"), root);
+  console.log("Finished linking website");
+}
+
+export async function linkExamples() {
   await Promise.all(
     allExamples
       .map(async (exampleDir) => {
@@ -40,12 +49,6 @@ export async function linkExamples() {
         await linkDir(dir, root);
         console.log(`Finished linking ${exampleDir}`);
       })
-      .concat(
-        (async () => {
-          console.log("Linking website");
-          await linkDir(path.join(root, "website"), root);
-          console.log("Finished linking website");
-        })()
-      )
+      .concat(linkWebsite())
   );
 }
