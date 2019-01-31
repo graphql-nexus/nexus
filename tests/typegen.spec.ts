@@ -226,6 +226,8 @@ describe("typegen", () => {
  */
 
 import * as t from \\"./_helpers\\"
+
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
@@ -277,8 +279,8 @@ export interface NexusGenRootTypes {
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreatePostInput: NexusGenInputs['CreatePostInput'];
   PostFilters: NexusGenInputs['PostFilters'];
-  OrderEnum: NexusGenEnumTypes['OrderEnum'];
-  SomeEnum: NexusGenEnumTypes['SomeEnum'];
+  OrderEnum: NexusGenEnums['OrderEnum'];
+  SomeEnum: NexusGenEnums['SomeEnum'];
 }
 
 export interface NexusGenFieldTypes {
@@ -340,8 +342,6 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export interface NexusGenCustomScalarMethods {}
-
 export type NexusGenObjectNames = \\"Mutation\\" | \\"Post\\" | \\"Query\\" | \\"User\\";
 
 export type NexusGenInputNames = \\"CreatePostInput\\" | \\"PostFilters\\";
@@ -368,7 +368,6 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  scalarMethods: NexusGenCustomScalarMethods;
   allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
   allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
