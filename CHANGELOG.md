@@ -1,11 +1,8 @@
 # Changelog
 
-### Current:
+### 0.9.0:
 
-- backingTypeMap -> rootTypeMap
-- Adds [extendType]() for incrementally building types across a project.
-- Object types defined by Nexus may be passed as the second argument for a field
-- Major documentation overhaul
+##### See #16 for more info
 
 ### 0.7.0-alpha.1
 
