@@ -3,7 +3,7 @@ import path from "path";
 import { ChildProcess, spawn, SpawnOptions } from "child_process";
 import getPort from "get-port";
 import http from "http";
-import { linkExamples, linkWebsite } from "./scripts/link-examples";
+import { linkExamples, linkWebsite, linkNexus } from "./scripts/link-examples";
 import { unlinkExamples } from "./scripts/unlink-examples";
 import { allExamples } from "./scripts/constants";
 import { upgradeDeps } from "./scripts/upgrade-deps";
@@ -83,11 +83,13 @@ gulp.task("run-examples", async () => {
 gulp.task("check-examples", ["link-examples"], async () => {});
 
 gulp.task("link-examples", async () => {
+  await linkNexus();
   await linkExamples();
   console.log("All examples linked");
 });
 
 gulp.task("link-website", async () => {
+  await linkNexus();
   await linkWebsite();
   console.log("Website linked");
 });
