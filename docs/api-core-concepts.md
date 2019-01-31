@@ -1,8 +1,7 @@
 ---
-id: core-concepts
+id: api-core-concepts
 title: API Core Concepts
 sidebar_label: API Core Concepts
-hide_title: true
 ---
 
 The API has been carefully designed with the following goals in mind:

@@ -14,6 +14,8 @@ interface Baz {
   ok: Boolean!
 }
 
+scalar Date
+
 type Foo implements Bar {
   argsTest(a: InputType = {answer: 2, key: "one"}): Boolean!
   name: String!

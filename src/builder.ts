@@ -31,6 +31,7 @@ import {
   isObjectType,
   isOutputType,
   isUnionType,
+  isScalarType,
 } from "graphql";
 import { isObject } from "util";
 import { NexusArgConfig, NexusArgDef } from "./definitions/args";
@@ -38,7 +39,7 @@ import {
   InputDefinitionBlock,
   NexusInputFieldDef,
   NexusOutputFieldDef,
-} from "./definitions/blocks";
+} from "./definitions/definitionBlocks";
 import { EnumTypeConfig } from "./definitions/enumType";
 import {
   NexusExtendTypeConfig,
@@ -148,9 +149,7 @@ export interface BuilderConfig {
   formatTypegen?: TypegenFormatFn;
   /**
    * Configures the default "nonNullDefaults" for the entire schema the type.
-   * Read more about how nexus handles nullability:
-   *
-   * @link {}
+   * Read more about how nexus handles nullability
    */
   nonNullDefaults?: NonNullConfig;
 }
@@ -206,7 +205,7 @@ export class SchemaBuilder {
   protected definedTypeMap: Record<string, GraphQLNamedType> = {};
   /**
    * The "pending type" map keeps track of all types that were defined w/
-   * GraphQL Nexus and haven't been processed into concrete types yet.
+   * Nexus GraphQL and haven't been processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {};
   /**
@@ -220,6 +219,12 @@ export class SchemaBuilder {
    * Configures the root-level nonNullDefaults defaults
    */
   protected nonNullDefaults: NonNullConfig = {};
+
+  /**
+   * Adds custom dynamic scalar methods to the definition blocks
+   * tuple: [FieldName, TypeName]
+   */
+  protected customScalarMethods: [string, string][] = [];
 
   constructor(protected config: BuilderConfig) {}
 
@@ -249,6 +254,23 @@ export class SchemaBuilder {
         return;
       }
       throw extendError(typeDef.name);
+    }
+
+    if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
+      this.customScalarMethods.push([
+        typeDef.value.asNexusMethod,
+        typeDef.name,
+      ]);
+    } else if (isScalarType(typeDef)) {
+      const scalarDef = typeDef as GraphQLScalarType & {
+        asNexusMethod?: string;
+      };
+      if (scalarDef.asNexusMethod) {
+        this.customScalarMethods.push([
+          scalarDef.asNexusMethod,
+          scalarDef.name,
+        ]);
+      }
     }
 
     if (isNamedType(typeDef)) {
@@ -281,11 +303,10 @@ export class SchemaBuilder {
     config: NexusInputObjectTypeConfig<any>
   ): GraphQLInputObjectType {
     const fields: NexusInputFieldDef[] = [];
-    config.definition(
-      new InputDefinitionBlock({
-        addField: (field) => fields.push(field),
-      })
-    );
+    const definitionBlock = new InputDefinitionBlock({
+      addField: (field) => fields.push(field),
+    });
+    config.definition(this.withScalarMethods(definitionBlock));
     return new GraphQLInputObjectType({
       name: config.name,
       fields: () => this.buildInputObjectFields(fields, config),
@@ -308,7 +329,7 @@ export class SchemaBuilder {
         modifications[mods.field].push(mods);
       },
     });
-    config.definition(definitionBlock);
+    config.definition(this.withScalarMethods(definitionBlock));
     const extensions = this.typeExtensionMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
@@ -357,6 +378,7 @@ export class SchemaBuilder {
       },
     });
   }
+
   interfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config;
     let resolveType: AbstractTypeResolver<string> | undefined;
@@ -365,7 +387,7 @@ export class SchemaBuilder {
       addField: (field) => fields.push(field),
       setResolveType: (fn) => (resolveType = fn),
     });
-    config.definition(definitionBlock);
+    config.definition(this.withScalarMethods(definitionBlock));
     const extensions = this.typeExtensionMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
@@ -374,7 +396,7 @@ export class SchemaBuilder {
     }
     if (!resolveType) {
       throw new Error(
-        `Missing resolveType for the ${name} union.` +
+        `Missing resolveType for the ${name} interface.` +
           `Be sure to add one in the definition block for the type`
       );
     }
@@ -384,6 +406,19 @@ export class SchemaBuilder {
       resolveType,
       description,
     });
+  }
+
+  withScalarMethods<T extends NexusGenCustomScalarMethods<string>>(
+    definitionBlock: T
+  ): T {
+    this.customScalarMethods.forEach(([methodName, typeName]) => {
+      // @ts-ignore - Yeah, yeah... we know
+      definitionBlock[methodName] = function(fieldName, ...opts) {
+        // @ts-ignore
+        this.addScalarField(fieldName, typeName, opts);
+      };
+    });
+    return definitionBlock;
   }
 
   enumType(config: EnumTypeConfig<any>) {
@@ -410,7 +445,7 @@ export class SchemaBuilder {
     }
     if (!Object.keys(values).length) {
       throw new Error(
-        `GraphQL Nexus: Enum ${config.name} must have at least one member`
+        `Nexus GraphQL: Enum ${config.name} must have at least one member`
       );
     }
     return new GraphQLEnumType({
@@ -445,7 +480,13 @@ export class SchemaBuilder {
   }
 
   scalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
-    return new GraphQLScalarType(config);
+    const scalar: GraphQLScalarType & {
+      asNexusMethod?: string;
+    } = new GraphQLScalarType(config);
+    if (config.asNexusMethod) {
+      scalar.asNexusMethod = config.asNexusMethod;
+    }
+    return scalar;
   }
 
   protected missingType(typeName: string): GraphQLNamedType {
@@ -478,7 +519,7 @@ export class SchemaBuilder {
     });
     if (!unionMembers.length) {
       throw new Error(
-        `GraphQL Nexus: Union ${unionName} must have at least one member type`
+        `Nexus GraphQL: Union ${unionName} must have at least one member type`
       );
     }
     return unionMembers;
@@ -750,7 +791,7 @@ export class SchemaBuilder {
     }
     if (this.buildingTypes.has(name)) {
       throw new Error(
-        `GraphQL Nexus: Circular dependency detected, while building types ${Array.from(
+        `Nexus GraphQL: Circular dependency detected, while building types ${Array.from(
           this.buildingTypes
         )}`
       );
@@ -902,7 +943,7 @@ export function makeSchemaInternal(
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the GraphQL Nexus layer or any manually defined GraphQLType objects.
+ * by the Nexus GraphQL layer or any manually defined GraphQLType objects.
  *
  * Requires at least one type be named "Query", which will be used as the
  * root query type.

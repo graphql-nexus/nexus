@@ -2,7 +2,6 @@
 id: args
 title: args
 sidebar_label: "args: arg / *Arg"
-hide_title: true
 ---
 
 Nexus provides a way to create these

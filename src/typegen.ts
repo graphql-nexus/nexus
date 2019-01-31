@@ -92,6 +92,7 @@ export class Typegen {
     return [
       this.typegenInfo.headers.join("\n"),
       this.typegenInfo.imports.join("\n"),
+      this.printCustomScalarMethods(),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -117,13 +118,44 @@ export class Typegen {
         `  scalarNames: NexusGenScalarNames;`,
         `  unionNames: NexusGenUnionNames;`,
         `  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];`,
-        `  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];`,
+        `  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];`,
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
         `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
       ])
       .concat("}")
       .join("\n");
+  }
+
+  printCustomScalarMethods() {
+    const customScalars = this.buildCustomScalarMap();
+    if (!Object.keys(customScalars).length) {
+      return [];
+    }
+    return [
+      `import { core } from "nexus"`,
+      `declare global {`,
+      `  interface NexusGenCustomScalarMethods<TypeName extends string> {`,
+    ]
+      .concat(
+        mapObj(customScalars, (val, key) => {
+          return `    ${val}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+            key
+          )};`;
+        })
+      )
+      .concat([`  }`, `}`])
+      .join("\n");
+  }
+
+  buildCustomScalarMap() {
+    const customScalars: Record<string, string> = {};
+    this.groupedTypes.scalar.forEach((type) => {
+      if (type.asNexusMethod) {
+        customScalars[type.name] = type.asNexusMethod;
+      }
+    });
+    return customScalars;
   }
 
   printInheritedFieldMap() {
@@ -140,7 +172,6 @@ export class Typegen {
     abstractTypes
       .concat(this.groupedTypes.union)
       .concat(this.groupedTypes.interface)
-      .sort()
       .forEach((type) => {
         if (isInterfaceType(type)) {
           const possibleNames = this.schema
@@ -174,7 +205,6 @@ export class Typegen {
     abstractTypes
       .concat(this.groupedTypes.union)
       .concat(this.groupedTypes.interface)
-      .sort()
       .forEach((type) => {
         if (isInterfaceType(type)) {
           const possibleNames = this.schema
@@ -257,7 +287,6 @@ export class Typegen {
       .concat(this.groupedTypes.interface)
       .concat(this.groupedTypes.scalar)
       .concat(this.groupedTypes.union)
-      .sort()
       .forEach((type) => {
         const backingType = this.typegenInfo.backingTypeMap[type.name];
         if (typeof backingType === "string") {
@@ -306,12 +335,11 @@ export class Typegen {
     toCheck
       .concat(this.groupedTypes.input)
       .concat(this.groupedTypes.enum)
-      .sort()
       .forEach((type) => {
         if (isInputObjectType(type)) {
           typeMap[type.name] = `NexusGenInputs['${type.name}']`;
         } else if (isEnumType(type)) {
-          typeMap[type.name] = `NexusGenEnumTypes['${type.name}']`;
+          typeMap[type.name] = `NexusGenEnums['${type.name}']`;
         }
       });
     return typeMap;
@@ -349,7 +377,6 @@ export class Typegen {
     hasFields
       .concat(this.groupedTypes.object)
       .concat(this.groupedTypes.interface)
-      .sort()
       .forEach((type) => {
         eachObj(type.getFields(), (field) => {
           if (field.args.length > 0) {
@@ -377,7 +404,6 @@ export class Typegen {
     hasFields
       .concat(this.groupedTypes.object)
       .concat(this.groupedTypes.interface)
-      .sort()
       .forEach((type) => {
         eachObj(type.getFields(), (field) => {
           returnTypeMap[type.name] = returnTypeMap[type.name] || {};
@@ -572,6 +598,7 @@ export class Typegen {
   }
 }
 
-const GLOBAL_DECLARATION = `declare global {
+const GLOBAL_DECLARATION = `
+declare global {
   interface NexusGen extends NexusGenTypes {}
 }`;

@@ -1,8 +1,7 @@
 ---
-id: interfaceType
+id: api-interfaceType
 title: interfaceType
 sidebar_label: interfaceType
-hide_title: true
 ---
 
 Like many type systems, GraphQL supports interfaces. An Interface is an

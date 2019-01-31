@@ -63,14 +63,14 @@ describe("typegen", () => {
   it("builds the input object type defs", () => {
     expect(typegen.printInputTypeMap()).toMatchInlineSnapshot(`
 "export interface NexusGenInputs {
-  PostFilters: { // input type
-    order: NexusGenEnums['OrderEnum']; // OrderEnum!
-    search?: string | null; // String
-  }
   CreatePostInput: { // input type
     author: string; // ID!
     geo: Array<Array<number | null>>; // [[Float]!]!
     name: string; // String!
+  }
+  PostFilters: { // input type
+    order: NexusGenEnums['OrderEnum']; // OrderEnum!
+    search?: string | null; // String
   }
 }"
 `);
@@ -107,12 +107,7 @@ describe("typegen", () => {
   it("should print a root type map", () => {
     expect(typegen.printRootTypeMap()).toMatchInlineSnapshot(`
 "export interface NexusGenRootTypes {
-  Boolean: boolean;
-  Float: number;
-  ID: string;
-  Int: number;
   Mutation: {};
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
   Post: { // root type
     author: NexusGenRootTypes['User']; // User!
     geo: number[][]; // [[Float!]!]!
@@ -121,8 +116,6 @@ describe("typegen", () => {
     uuid: string; // UUID!
   }
   Query: {};
-  String: string;
-  UUID: string;
   User: { // root type
     email: string; // String!
     id: string; // ID!
@@ -131,6 +124,13 @@ describe("typegen", () => {
     phone?: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
+  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
+  UUID: string;
 }"
 `);
   });
@@ -158,12 +158,7 @@ describe("typegen", () => {
       );
     expect(typegen.printRootTypeMap()).toMatchInlineSnapshot(`
 "export interface NexusGenRootTypes {
-  Boolean: boolean;
-  Float: number;
-  ID: string;
-  Int: number;
   Mutation: {};
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
   Post: { // root type
     author: NexusGenRootTypes['User']; // User!
     geo: number[][]; // [[Float!]!]!
@@ -172,8 +167,6 @@ describe("typegen", () => {
     uuid: string; // UUID!
   }
   Query: {};
-  String: string;
-  UUID: string;
   User: { // root type
     email: string; // String!
     id: string; // ID!
@@ -181,6 +174,13 @@ describe("typegen", () => {
     outEnum?: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone?: string | null; // String
   }
+  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
+  UUID: string;
 }"
 `);
   });
@@ -191,9 +191,6 @@ describe("typegen", () => {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
     registerClick: NexusGenRootTypes['Query']; // Query!
-  }
-  Node: { // field return type
-    id: string; // ID!
   }
   Post: { // field return type
     author: NexusGenRootTypes['User']; // User!
@@ -213,6 +210,9 @@ describe("typegen", () => {
     outEnum: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
+  }
+  Node: { // field return type
+    id: string; // ID!
   }
 }"
 `);
@@ -231,14 +231,14 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  PostFilters: { // input type
-    order: NexusGenEnums['OrderEnum']; // OrderEnum!
-    search?: string | null; // String
-  }
   CreatePostInput: { // input type
     author: string; // ID!
     geo: Array<Array<number | null>>; // [[Float]!]!
     name: string; // String!
+  }
+  PostFilters: { // input type
+    order: NexusGenEnums['OrderEnum']; // OrderEnum!
+    search?: string | null; // String
   }
 }
 
@@ -248,12 +248,7 @@ export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
-  Boolean: boolean;
-  Float: number;
-  ID: string;
-  Int: number;
   Mutation: {};
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
   Post: { // root type
     author: NexusGenRootTypes['User']; // User!
     geo: number[][]; // [[Float!]!]!
@@ -262,8 +257,6 @@ export interface NexusGenRootTypes {
     uuid: string; // UUID!
   }
   Query: {};
-  String: string;
-  UUID: string;
   User: { // root type
     email: string; // String!
     id: string; // ID!
@@ -272,15 +265,26 @@ export interface NexusGenRootTypes {
     phone?: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
+  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
+  UUID: string;
+}
+
+export interface NexusGenAllTypes extends NexusGenRootTypes {
+  CreatePostInput: NexusGenInputs['CreatePostInput'];
+  PostFilters: NexusGenInputs['PostFilters'];
+  OrderEnum: NexusGenEnumTypes['OrderEnum'];
+  SomeEnum: NexusGenEnumTypes['SomeEnum'];
 }
 
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
     registerClick: NexusGenRootTypes['Query']; // Query!
-  }
-  Node: { // field return type
-    id: string; // ID!
   }
   Post: { // field return type
     author: NexusGenRootTypes['User']; // User!
@@ -300,6 +304,9 @@ export interface NexusGenFieldTypes {
     outEnum: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
+  }
+  Node: { // field return type
+    id: string; // ID!
   }
 }
 
@@ -333,6 +340,8 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
+export interface NexusGenCustomScalarMethods {}
+
 export type NexusGenObjectNames = \\"Mutation\\" | \\"Post\\" | \\"Query\\" | \\"User\\";
 
 export type NexusGenInputNames = \\"CreatePostInput\\" | \\"PostFilters\\";
@@ -351,6 +360,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;
   fieldTypes: NexusGenFieldTypes;
+  allTypes: NexusGenAllTypes;
   inheritedFields: NexusGenInheritedFields;
   objectNames: NexusGenObjectNames;
   inputNames: NexusGenInputNames;
@@ -358,8 +368,9 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
+  scalarMethods: NexusGenCustomScalarMethods;
   allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;

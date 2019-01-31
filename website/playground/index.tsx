@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import { Playground } from "./Playground";
 
 const content = dedent`
-  // All GraphQL Nexus objects are available globally here,
+  // All nexus.js objects are available globally here,
   // and will automatically be added to the schema
 
   objectType({
@@ -17,14 +17,14 @@ const content = dedent`
         type: 'Post', 
         resolve: () => [{id: 1}] 
       });
-    })
+    }
   });
 
   objectType({
     name: 'Post', 
     definition(t) {
       t.implements('Node');
-      t.string('title', { default: '' });
+      t.string('title', (o) => o.title || '');
       t.field('owner', {
         type: 'Account',
         resolve() {
@@ -43,7 +43,7 @@ const content = dedent`
           return { id: 1, email: 'test@example.com' }
         }
       });
-    })
+    }
   });
 
   interfaceType({
@@ -56,14 +56,16 @@ const content = dedent`
           return ${"`${info.parentType.name}:${root.id}`"}
         }
       });
+      t.resolveType(() => null)
     }
   })
 
   interfaceType({
     name: 'Timestamps', 
     definition(t) {
-      t.field('createdAt', { type: 'Date', resolve: () => new Date() });
-      t.field('updatedAt', { type: 'Date', resolve: () => new Date() });
+      t.date('createdAt', () => new Date());
+      t.date('updatedAt', () => new Date());
+      t.resolveType(() => null)
     }
   });
 
@@ -71,7 +73,8 @@ const content = dedent`
     name: 'Date',
     serialize: value => value.getTime(),
     parseValue: value => new Date(value),
-    parseLiteral: ast => ast.kind === "IntValue" ? new Date(ast.value) : null
+    parseLiteral: ast => ast.kind === "IntValue" ? new Date(ast.value) : null,
+    asNexusMethod: 'date'
   });
 `;
 

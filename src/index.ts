@@ -21,4 +21,4 @@ export { groupTypes } from "./utils";
 export { FieldResolver } from "./typegenTypeHelpers";
 export { core, blocks };
 import * as core from "./core";
-import * as blocks from "./definitionBlocks";
+import * as blocks from "./blocks";

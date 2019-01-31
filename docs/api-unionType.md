@@ -1,8 +1,7 @@
 ---
-id: unionType
+id: api-unionType
 title: unionType
 sidebar_label: unionType
-hide_title: true
 ---
 
 Union types are very similar to interfaces, but they don't get to specify any common fields between the types.

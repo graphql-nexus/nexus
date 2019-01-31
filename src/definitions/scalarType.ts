@@ -16,6 +16,10 @@ export interface NexusScalarTypeConfig<T extends string> extends ScalarBase {
    * Any deprecation info for this scalar type
    */
   deprecation?: string; // | DeprecationInfo;
+  /**
+   * Adds this scalar type as a method on the Object/Interface definition blocks
+   */
+  asNexusMethod?: string;
 }
 
 export class NexusScalarTypeDef<TypeName extends string> {

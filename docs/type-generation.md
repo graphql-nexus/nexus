@@ -20,7 +20,7 @@ Scalars can also have backing types, representing the value they are parsed into
 
 Sometimes GraphQL types are passthrough, and don't have a dedicated type backing them. One such case would be in the `Edge` of a Relay style pagination. In this case, Nexus will generate a type-definition which makes assumptions of the necessary value to fulfill the contract. If this is incorrect, you can always provide a concrete type for the object.
 
-> In the case of custom [default resolve functions](../api-reference), we will lose type safety if the
+> In the case of custom [default resolve functions](docs/api-core-concepts.md), we will lose type safety if the
 > backing type is not defined. For this reason, defining a backing type is required
 > for any object with a type-level resolver. If you wish to disable this behavior,
 > add `strict: false` to the options for the schema.

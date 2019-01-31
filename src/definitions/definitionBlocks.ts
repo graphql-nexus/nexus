@@ -1,13 +1,13 @@
-import { NexusTypes, BaseScalars } from "./_types";
 import {
   AbstractTypeResolver,
-  NeedsResolver,
   FieldResolver,
   GetGen,
   HasGen3,
+  NeedsResolver,
 } from "../typegenTypeHelpers";
-import { NexusInputTypeName, AllNexusOutputTypeDefs } from "./wrapping";
 import { NexusArgDef } from "./args";
+import { AllNexusOutputTypeDefs, NexusInputTypeName } from "./wrapping";
+import { BaseScalars } from "./_types";
 
 export interface CommonFieldConfig {
   /**
@@ -105,6 +105,9 @@ export interface OutputDefinitionBuilder {
 export interface InputDefinitionBuilder {
   addField(config: NexusInputFieldDef): void;
 }
+
+export interface OutputDefinitionBlock<TypeName extends string>
+  extends NexusGenCustomScalarMethods<TypeName> {}
 
 /**
  * The output definition block is passed to the "definition"
@@ -222,6 +225,9 @@ export interface NexusInputFieldConfig extends ScalarInputFieldConfig<string> {
 export type NexusInputFieldDef = NexusInputFieldConfig & {
   name: string;
 };
+
+export interface InputDefinitionBlock<TypeName extends string>
+  extends NexusGenCustomScalarMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean;

@@ -17,7 +17,7 @@ export function convertSDL(sdl: string, commonjs: boolean = false) {
 }
 
 /**
- * Convert an existing SDL schema into a GraphQL Nexus format
+ * Convert an existing SDL schema into a Nexus GraphQL format
  */
 export class SDLConverter {
   protected export: string;

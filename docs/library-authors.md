@@ -37,11 +37,11 @@ export function connectionType(config: ConnectionTypeConfig) {
     definition(t) {
       t.field(
         'edges',
-        { type: `${name}Edge` as any }
+        { type: `${name}Edge` }
       );
     });
   })
-  const Edge = objectType(
+  const Edge = objectType({
     name: `${name}Edge`,
     definition(t) {
       t.id('cursor', root => `${name}:${root.id}`)

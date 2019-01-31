@@ -16,10 +16,6 @@ export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
-  Boolean: boolean;
-  Float: number;
-  ID: string;
-  Int: number;
   Launch: t.Launch;
   LaunchConnection: { // root type
     cursor?: string | null; // String
@@ -30,7 +26,6 @@ export interface NexusGenRootTypes {
   Mutation: {};
   Query: {};
   Rocket: t.Rocket;
-  String: string;
   TripUpdateResponse: { // root type
     launches?: NexusGenRootTypes['Launch'][] | null; // [Launch!]
     message?: string | null; // String
@@ -40,10 +35,15 @@ export interface NexusGenRootTypes {
     email: string; // String!
     id: string; // ID!
   }
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  PatchSize: NexusGenEnumTypes['PatchSize'];
+  PatchSize: NexusGenEnums['PatchSize'];
 }
 
 export interface NexusGenFieldTypes {
@@ -124,6 +124,8 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
+
+
 export type NexusGenObjectNames = "Launch" | "LaunchConnection" | "Mission" | "Mutation" | "Query" | "Rocket" | "TripUpdateResponse" | "User";
 
 export type NexusGenInputNames = never;
@@ -151,7 +153,7 @@ export interface NexusGenTypes {
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
   allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;

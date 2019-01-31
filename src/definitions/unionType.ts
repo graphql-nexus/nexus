@@ -1,5 +1,5 @@
 import { GetGen, AbstractTypeResolver } from "../typegenTypeHelpers";
-import { AbstractOutputDefinitionBuilder } from "./blocks";
+import { AbstractOutputDefinitionBuilder } from "./definitionBlocks";
 import { NexusTypes, withNexusSymbol } from "./_types";
 import { assertValidName } from "graphql";
 import { NexusObjectTypeDef } from "./objectType";

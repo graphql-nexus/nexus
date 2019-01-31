@@ -1,8 +1,7 @@
 ---
-id: inputObjectType
+id: api-inputObjectType
 title: inputObjectType
 sidebar_label: inputObjectType
-hide_title: true
 ---
 
 Defines a complex object which can be passed as an input value.

@@ -5,6 +5,7 @@ import {
   unionType,
   arg,
   extendType,
+  scalarType,
 } from "nexus";
 
 export const Bar = interfaceType({
@@ -88,4 +89,12 @@ export const MoreQueryFields = extendType({
       type: "Bar",
     });
   },
+});
+
+export const DateScalar = scalarType({
+  name: "Date",
+  serialize: (value) => value.getTime(),
+  parseValue: (value) => new Date(value),
+  parseLiteral: (ast) => (ast.kind === "IntValue" ? new Date(ast.value) : null),
+  asNexusMethod: "date",
 });

@@ -1,5 +1,5 @@
 import { NexusTypes, NonNullConfig, withNexusSymbol } from "./_types";
-import { InputDefinitionBlock } from "./blocks";
+import { InputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
 
 export interface NexusInputObjectTypeConfig<TypeName extends string> {
@@ -18,7 +18,7 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
-   * more about GraphQL Nexus's assumptions and configuration
+   * more about Nexus GraphQL's assumptions and configuration
    * on nullability.
    */
   nonNullDefaults?: NonNullConfig;

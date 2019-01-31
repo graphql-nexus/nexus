@@ -3,6 +3,7 @@ import {
   GraphQLCompositeType,
   GraphQLInputObjectType,
 } from "graphql";
+import { GenTypesShape } from "../core";
 
 export type MaybeThunk<T> = T | (() => T);
 

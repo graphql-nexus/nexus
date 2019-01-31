@@ -1,5 +1,5 @@
 import { NexusTypes, withNexusSymbol } from "./_types";
-import { OutputDefinitionBlock } from "./blocks";
+import { OutputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
 
 export interface NexusExtendTypeConfig<TypeName extends string> {

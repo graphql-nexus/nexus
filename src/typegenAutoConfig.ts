@@ -182,7 +182,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
           path.extname(pathOrModule) !== ".ts"
         ) {
           return console.warn(
-            `GraphQL Nexus Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
+            `Nexus GraphQL Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
           );
         }
         let resolvedPath: string;
@@ -201,7 +201,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
             e.message.indexOf("Cannot find module") !== -1
           ) {
             console.error(
-              `GraphQL Nexus: Unable to find file or module ${pathOrModule}, skipping`
+              `Nexus GraphQL: Unable to find file or module ${pathOrModule}, skipping`
             );
           } else {
             console.error(e.message);
@@ -216,7 +216,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
-            `GraphQL Nexus Typegen: Cannot have multiple type sources ${
+            `Nexus GraphQL Typegen: Cannot have multiple type sources ${
               importsMap[alias]
             } and ${pathOrModule} with the same alias ${alias}, skipping`
           );

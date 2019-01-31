@@ -37,7 +37,7 @@
     "@types/webpack": "^4.4.19",
     "babel-loader": "^8.0.4",
     "css-loader": "^1.0.1",
-    "docusaurus": "^1.5.1",
+    "docusaurus": "^1.7.2",
     "fs-extra": "^7.0.1",
     "get-port": "^4.0.0",
     "gulp": "^3.9.1",

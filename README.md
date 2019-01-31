@@ -1,4 +1,4 @@
-## GraphQL Nexus
+## Nexus GraphQL
 
 ```
 yarn add nexus # or npm install nexus

@@ -2,7 +2,6 @@
 id: enumType
 title: enumType
 sidebar_label: enumType
-hide_title: true
 ---
 
 ## enumType(EnumDefinitionBlock)

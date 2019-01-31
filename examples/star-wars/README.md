@@ -1,6 +1,6 @@
-# GraphQL Nexus Star Wars:
+# Nexus GraphQL Star Wars:
 
-This is meant to demonstrate some of the features of GraphQL Nexus.
+This is meant to demonstrate some of the features of Nexus GraphQL.
 
 ### Changes from the graphql-js example:
 

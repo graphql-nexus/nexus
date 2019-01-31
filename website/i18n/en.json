@@ -3,11 +3,47 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Simple, scalable, strongly typed GraphQL schema construction for TypeScript/JavaScript",
+    "tagline": "Simple, code-first, strongly typed GraphQL schemas for JavaScript/TypeScript",
     "docs": {
-      "api-reference": {
-        "title": "API Reference",
-        "sidebar_label": "API Reference"
+      "args": {
+        "title": "args",
+        "sidebar_label": "args: arg / *Arg"
+      },
+      "api-core-concepts": {
+        "title": "API Core Concepts",
+        "sidebar_label": "API Core Concepts"
+      },
+      "enumType": {
+        "title": "enumType",
+        "sidebar_label": "enumType"
+      },
+      "api-extendType": {
+        "title": "extendType",
+        "sidebar_label": "extendType"
+      },
+      "api-inputObjectType": {
+        "title": "inputObjectType",
+        "sidebar_label": "inputObjectType"
+      },
+      "api-interfaceType": {
+        "title": "interfaceType",
+        "sidebar_label": "interfaceType"
+      },
+      "api-objectType": {
+        "title": "objectType",
+        "sidebar_label": "objectType"
+      },
+      "api-scalarType": {
+        "title": "scalarType",
+        "sidebar_label": "scalarType"
+      },
+      "api-unionType": {
+        "title": "unionType",
+        "sidebar_label": "unionType"
+      },
+      "testing": {
+        "title": "App Structure & Testing",
+        "sidebar_label": "App Structure & Testing"
       },
       "best-practices": {
         "title": "Best Practices",
@@ -17,35 +53,36 @@
         "title": "Frequently Asked Questions",
         "sidebar_label": "FAQ"
       },
+      "future-features": {
+        "title": "Potential Features",
+        "sidebar_label": "Potential Future Features"
+      },
       "getting-started": {
-        "title": "GraphQL Nexus",
+        "title": "Nexus GraphQL",
         "sidebar_label": "Getting Started"
       },
       "library-authors": {
         "title": "Library Authors",
         "sidebar_label": "Library Authors"
       },
-      "testing": {
-        "title": "Testing",
-        "sidebar_label": "Testing"
-      },
       "type-generation": {
         "title": "Type Generation Details",
         "sidebar_label": "Type Generation Details"
       },
-      "typescript-setup": {
-        "title": "TypeScript Configuration",
-        "sidebar_label": "Use with TypeScript"
+      "why-graphql-nexus": {
+        "title": "How is Nexus Different",
+        "sidebar_label": "How is Nexus Different"
       }
     },
     "links": {
-      "Docs": "Docs",
-      "API": "API",
+      "Getting Started": "Getting Started",
       "Playground": "Playground",
-      "Examples": "Examples"
+      "Examples": "Examples",
+      "GitHub": "GitHub"
     },
     "categories": {
-      "Documentation": "Documentation"
+      "Documentation": "Documentation",
+      "API": "API"
     }
   },
   "pages-strings": {

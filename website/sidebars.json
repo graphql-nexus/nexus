@@ -1,11 +1,25 @@
 {
   "docs": {
     "Documentation": [
-      "getting-started",
+      "why-graphql-nexus",
       "type-generation",
+      "getting-started",
+      "library-authors",
+      "faq",
+      "app-structure-and-testing",
       "best-practices",
-      "api-reference",
-      "faq"
+      "future-features"
+    ],
+    "API": [
+      "api-core-concepts",
+      "api-objectType",
+      "api-unionType",
+      "api-scalarType",
+      "api-interfaceType",
+      "api-inputObjectType",
+      "api-enumType",
+      "api-extendType",
+      "api-args"
     ]
   }
 }

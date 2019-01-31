@@ -17,29 +17,23 @@ export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
-  Boolean: boolean;
-  Character: swapi.Character;
   Droid: swapi.Droid;
-  Float: number;
   Human: swapi.Human;
-  ID: string;
-  Int: number;
   Query: {};
+  Character: swapi.Character;
   String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  Episode: NexusGenEnumTypes['Episode'];
-  MoreEpisodes: NexusGenEnumTypes['MoreEpisodes'];
+  Episode: NexusGenEnums['Episode'];
+  MoreEpisodes: NexusGenEnums['MoreEpisodes'];
 }
 
 export interface NexusGenFieldTypes {
-  Character: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
-    id: string; // String!
-    name: string; // String!
-  }
   Droid: { // field return type
     appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
     friends: NexusGenRootTypes['Character'][]; // [Character!]!
@@ -59,14 +53,15 @@ export interface NexusGenFieldTypes {
     hero: NexusGenRootTypes['Character']; // Character!
     human: NexusGenRootTypes['Human']; // Human!
   }
+  Character: { // field return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    id: string; // String!
+    name: string; // String!
+  }
 }
 
 export interface NexusGenArgTypes {
-  Character: {
-    appearsIn: { // args
-      id: string; // ID!
-    }
-  }
   Droid: {
     appearsIn: { // args
       id: string; // ID!
@@ -88,6 +83,11 @@ export interface NexusGenArgTypes {
       id: string; // String!
     }
   }
+  Character: {
+    appearsIn: { // args
+      id: string; // ID!
+    }
+  }
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
@@ -95,6 +95,8 @@ export interface NexusGenAbstractResolveReturnTypes {
 }
 
 export interface NexusGenInheritedFields {}
+
+
 
 export type NexusGenObjectNames = "Droid" | "Human" | "Query";
 
@@ -123,7 +125,7 @@ export interface NexusGenTypes {
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
   allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;

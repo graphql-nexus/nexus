@@ -17,7 +17,6 @@ export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
-  Boolean: boolean;
   Comment: { // root type
     content: string; // String!
     id: number; // Int!
@@ -34,9 +33,6 @@ export interface NexusGenRootTypes {
     score: number; // Int!
     vote: NexusGenRootTypes['Vote']; // Vote!
   }
-  Float: number;
-  ID: string;
-  Int: number;
   Mutation: { // root type
     submitComment: NexusGenRootTypes['Comment']; // Comment!
     submitRepository: NexusGenRootTypes['Entry']; // Entry!
@@ -55,7 +51,6 @@ export interface NexusGenRootTypes {
     owner?: NexusGenRootTypes['User'] | null; // User
     stargazers_count: number; // Int!
   }
-  String: string;
   User: { // root type
     avatar_url: string; // String!
     html_url: string; // String!
@@ -64,11 +59,16 @@ export interface NexusGenRootTypes {
   Vote: { // root type
     vote_value: number; // Int!
   }
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  FeedType: NexusGenEnumTypes['FeedType'];
-  VoteType: NexusGenEnumTypes['VoteType'];
+  FeedType: NexusGenEnums['FeedType'];
+  VoteType: NexusGenEnums['VoteType'];
 }
 
 export interface NexusGenFieldTypes {
@@ -156,6 +156,8 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
+
+
 export type NexusGenObjectNames = "Comment" | "Entry" | "Mutation" | "Query" | "Repository" | "User" | "Vote";
 
 export type NexusGenInputNames = never;
@@ -183,7 +185,7 @@ export interface NexusGenTypes {
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
   allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;

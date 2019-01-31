@@ -1,4 +1,7 @@
-import { OutputDefinitionBlock, OutputDefinitionBuilder } from "./blocks";
+import {
+  OutputDefinitionBlock,
+  OutputDefinitionBuilder,
+} from "./definitionBlocks";
 import { GetGen2, GetGen, FieldResolver } from "../typegenTypeHelpers";
 import { NonNullConfig, NexusTypes, withNexusSymbol } from "./_types";
 import { assertValidName } from "graphql";
@@ -65,7 +68,7 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
-   * more about GraphQL Nexus's assumptions and configuration
+   * more about Nexus GraphQL's assumptions and configuration
    * on nullability.
    */
   nonNullDefaults?: NonNullConfig;

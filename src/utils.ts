@@ -18,7 +18,7 @@ import {
 import path from "path";
 
 export function log(msg: string) {
-  console.log(`GraphQL Nexus: ${msg}`);
+  console.log(`Nexus GraphQL: ${msg}`);
 }
 
 export function withDeprecationComment(description?: string | null) {
@@ -160,7 +160,7 @@ export interface GroupedTypes {
   object: GraphQLObjectType[];
   union: GraphQLUnionType[];
   enum: GraphQLEnumType[];
-  scalar: GraphQLScalarType[];
+  scalar: Array<GraphQLScalarType & { asNexusMethod?: string }>;
 }
 
 export function groupTypes(schema: GraphQLSchema) {
@@ -173,25 +173,27 @@ export function groupTypes(schema: GraphQLSchema) {
     scalar: Array.from(specifiedScalarTypes),
   };
   const schemaTypeMap = schema.getTypeMap();
-  Object.keys(schemaTypeMap).forEach((typeName) => {
-    if (typeName.indexOf("__") === 0) {
-      return;
-    }
-    const type = schema.getType(typeName);
-    if (isObjectType(type)) {
-      groupedTypes.object.push(type);
-    } else if (isInputObjectType(type)) {
-      groupedTypes.input.push(type);
-    } else if (isScalarType(type) && !isSpecifiedScalarType(type)) {
-      groupedTypes.scalar.push(type);
-    } else if (isUnionType(type)) {
-      groupedTypes.union.push(type);
-    } else if (isInterfaceType(type)) {
-      groupedTypes.interface.push(type);
-    } else if (isEnumType(type)) {
-      groupedTypes.enum.push(type);
-    }
-  });
+  Object.keys(schemaTypeMap)
+    .sort()
+    .forEach((typeName) => {
+      if (typeName.indexOf("__") === 0) {
+        return;
+      }
+      const type = schema.getType(typeName);
+      if (isObjectType(type)) {
+        groupedTypes.object.push(type);
+      } else if (isInputObjectType(type)) {
+        groupedTypes.input.push(type);
+      } else if (isScalarType(type) && !isSpecifiedScalarType(type)) {
+        groupedTypes.scalar.push(type);
+      } else if (isUnionType(type)) {
+        groupedTypes.union.push(type);
+      } else if (isInterfaceType(type)) {
+        groupedTypes.interface.push(type);
+      } else if (isEnumType(type)) {
+        groupedTypes.enum.push(type);
+      }
+    });
   return groupedTypes;
 }
 

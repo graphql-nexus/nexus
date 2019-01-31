@@ -1,11 +1,12 @@
 ---
-id: objectType
+id: api-objectType
 title: objectType
 sidebar_label: objectType
-hide_title: true
 ---
 
-# `objectType(typeName: string, fn: (t: ObjectTypeDef) => void)`
+```ts
+objectType(typeName: string, fn: ObjectDefinitionBlock): NexusObjectType
+```
 
 The most basic components of a GraphQL schema are object types, which just represent
 a kind of object you can fetch from your service, and what fields it has.
@@ -13,12 +14,12 @@ a kind of object you can fetch from your service, and what fields it has.
 ```ts
 const User = objectType({
   name: "User",
-  definition: (t) => {
+  definition(t) {
     t.int("id", { description: "Id of the user" });
     t.string("fullName", { description: "Full name of the user" });
     t.field("status", "StatusEnum");
     t.list.field("posts", {
-      type: "Post",
+      type: Post, // or "Post"
       resolve(root, args, ctx) {
         return ctx.getUser(root.id).posts();
       },
@@ -44,3 +45,5 @@ const StatusEnum = enumType({
 ```
 
 @see https://graphql.github.io/learn/schema/#object-types-and-fields
+
+#### ObjectDefinitionBlock

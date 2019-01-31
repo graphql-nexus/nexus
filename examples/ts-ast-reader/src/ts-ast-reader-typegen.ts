@@ -20,7 +20,6 @@ export interface NexusGenEnums {
 export interface NexusGenRootTypes {
   ArrayTypeNode: ts.ArrayTypeNode;
   BindingPattern: ts.BindingPattern;
-  Boolean: boolean;
   CallSignatureDeclaration: ts.CallSignatureDeclaration;
   ClassDeclaration: ts.ClassDeclaration;
   ComputedPropertyName: ts.ComputedPropertyName;
@@ -28,16 +27,12 @@ export interface NexusGenRootTypes {
   ConstructSignatureDeclaration: ts.ConstructSignatureDeclaration;
   ConstructorDeclaration: ts.ConstructorDeclaration;
   ConstructorTypeNode: ts.ConstructorTypeNode;
-  DeclarationName: ts.DeclarationName;
   EnumDeclaration: ts.EnumDeclaration;
   ExportAssignment: ts.ExportAssignment;
   ExportDeclaration: ts.ExportDeclaration;
-  Float: number;
   FunctionDeclaration: ts.FunctionDeclaration;
   FunctionTypeNode: ts.FunctionTypeNode;
   GetAccessorDeclaration: ts.GetAccessorDeclaration;
-  HasJSDoc: ts.HasJSDoc;
-  ID: string;
   Identifier: ts.Identifier;
   ImportDeclaration: ts.ImportDeclaration;
   ImportEqualsDeclaration: ts.ImportEqualsDeclaration;
@@ -45,7 +40,6 @@ export interface NexusGenRootTypes {
   IndexSignatureDeclaration: ts.IndexSignatureDeclaration;
   IndexedAccessTypeNode: ts.IndexedAccessTypeNode;
   InferTypeNode: ts.InferTypeNode;
-  Int: number;
   InterfaceDeclaration: ts.InterfaceDeclaration;
   IntersectionTypeNode: ts.IntersectionTypeNode;
   JSDoc: ts.JSDoc;
@@ -54,7 +48,6 @@ export interface NexusGenRootTypes {
   JSDocEnumTag: ts.JSDocEnumTag;
   JSDocNamespaceDeclaration: ts.JSDocNamespaceDeclaration;
   JSDocReturnTag: ts.JSDocReturnTag;
-  JSDocTag: ts.JSDocTag;
   JSDocTemplateTag: ts.JSDocTemplateTag;
   JSDocThisTag: ts.JSDocThisTag;
   JSDocTypeTag: ts.JSDocTypeTag;
@@ -62,13 +55,11 @@ export interface NexusGenRootTypes {
   KeywordTypeNode: ts.KeywordTypeNode;
   LiteralType: ts.LiteralTypeNode;
   MappedTypeNode: ts.MappedTypeNode;
-  MaybeOptional: NexusGenRootTypes['ConstructorDeclaration'] | NexusGenRootTypes['FunctionDeclaration'] | NexusGenRootTypes['GetAccessorDeclaration'] | NexusGenRootTypes['MethodDeclaration'] | NexusGenRootTypes['PropertyDeclaration'] | NexusGenRootTypes['PropertySignature'] | NexusGenRootTypes['SetAccessorDeclaration'];
   MethodDeclaration: ts.MethodDeclaration;
   MissingDeclaration: ts.MissingDeclaration;
   ModuleDeclaration: ts.ModuleDeclaration;
   NamespaceDeclaration: ts.NamespaceDeclaration;
   NamespaceExportDeclaration: ts.NamespaceExportDeclaration;
-  Node: ts.Node;
   NumericLiteral: ts.NumericLiteral;
   OptionalTypeNode: ts.OptionalTypeNode;
   ParameterDeclaration: ts.ParameterDeclaration;
@@ -81,7 +72,6 @@ export interface NexusGenRootTypes {
   RestTypeNode: ts.RestTypeNode;
   SetAccessorDeclaration: ts.SetAccessorDeclaration;
   SourceFile: ts.SourceFile;
-  String: string;
   StringLiteral: ts.StringLiteral;
   StringLiteralLike: ts.StringLiteralLike;
   ThisTypeNode: ts.ThisTypeNode;
@@ -105,11 +95,21 @@ export interface NexusGenRootTypes {
     text?: string | null; // String
   }
   VariableDeclaration: ts.VariableDeclaration;
+  HasJSDoc: ts.HasJSDoc;
+  JSDocTag: ts.JSDocTag;
+  MaybeOptional: NexusGenRootTypes['ConstructorDeclaration'] | NexusGenRootTypes['FunctionDeclaration'] | NexusGenRootTypes['GetAccessorDeclaration'] | NexusGenRootTypes['MethodDeclaration'] | NexusGenRootTypes['PropertyDeclaration'] | NexusGenRootTypes['PropertySignature'] | NexusGenRootTypes['SetAccessorDeclaration'];
+  Node: ts.Node;
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
+  DeclarationName: ts.DeclarationName;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  NodeFlags: NexusGenEnumTypes['NodeFlags'];
-  SyntaxKind: NexusGenEnumTypes['SyntaxKind'];
+  NodeFlags: NexusGenEnums['NodeFlags'];
+  SyntaxKind: NexusGenEnums['SyntaxKind'];
 }
 
 export interface NexusGenFieldTypes {
@@ -340,9 +340,6 @@ export interface NexusGenFieldTypes {
     typeName: null; // DeclarationName
     typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
   }
-  HasJSDoc: { // field return type
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-  }
   Identifier: { // field return type
     end: number; // Int!
     flags: NexusGenEnums['NodeFlags']; // NodeFlags!
@@ -498,10 +495,6 @@ export interface NexusGenFieldTypes {
     comment: string | null; // String
     tagName: string | null; // String
   }
-  JSDocTag: { // field return type
-    comment: string | null; // String
-    tagName: string | null; // String
-  }
   JSDocTemplateTag: { // field return type
     comment: string | null; // String
     tagName: string | null; // String
@@ -556,9 +549,6 @@ export interface NexusGenFieldTypes {
     pos: number; // Int!
     rawText: string; // String!
     typeName: null; // DeclarationName
-  }
-  MaybeOptional: { // field return type
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
   }
   MethodDeclaration: { // field return type
     asteriskToken: NexusGenRootTypes['Token'] | null; // Token
@@ -622,19 +612,6 @@ export interface NexusGenFieldTypes {
     typeName: null; // DeclarationName
   }
   NamespaceExportDeclaration: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    rawText: string; // String!
-    typeName: null; // DeclarationName
-  }
-  Node: { // field return type
     end: number; // Int!
     flags: NexusGenEnums['NodeFlags']; // NodeFlags!
     kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
@@ -958,6 +935,29 @@ export interface NexusGenFieldTypes {
     text: string | null; // String
   }
   VariableDeclaration: { // field return type
+    end: number; // Int!
+    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
+    name: null; // DeclarationName
+    nameText: string | null; // String
+    parent: NexusGenRootTypes['Node']; // Node!
+    pos: number; // Int!
+    rawText: string; // String!
+    typeName: null; // DeclarationName
+  }
+  HasJSDoc: { // field return type
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
+  }
+  JSDocTag: { // field return type
+    comment: string | null; // String
+    tagName: string | null; // String
+  }
+  MaybeOptional: { // field return type
+    questionToken: NexusGenRootTypes['Token'] | null; // Token
+  }
+  Node: { // field return type
     end: number; // Int!
     flags: NexusGenEnums['NodeFlags']; // NodeFlags!
     kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
@@ -1307,16 +1307,6 @@ export interface NexusGenArgTypes {
       skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
     }
   }
-  Node: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
   NumericLiteral: {
     modifiers: { // args
       only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
@@ -1546,6 +1536,16 @@ export interface NexusGenArgTypes {
       skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
     }
   }
+  Node: {
+    modifiers: { // args
+      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
+    }
+    rawText: { // args
+      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
+    }
+  }
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
@@ -1557,6 +1557,8 @@ export interface NexusGenAbstractResolveReturnTypes {
 }
 
 export interface NexusGenInheritedFields {}
+
+
 
 export type NexusGenObjectNames = "ArrayTypeNode" | "BindingPattern" | "CallSignatureDeclaration" | "ClassDeclaration" | "ComputedPropertyName" | "ConditionalTypeNode" | "ConstructSignatureDeclaration" | "ConstructorDeclaration" | "ConstructorTypeNode" | "EnumDeclaration" | "ExportAssignment" | "ExportDeclaration" | "FunctionDeclaration" | "FunctionTypeNode" | "GetAccessorDeclaration" | "Identifier" | "ImportDeclaration" | "ImportEqualsDeclaration" | "ImportTypeNode" | "IndexSignatureDeclaration" | "IndexedAccessTypeNode" | "InferTypeNode" | "InterfaceDeclaration" | "IntersectionTypeNode" | "JSDoc" | "JSDocAugmentsTag" | "JSDocClassTag" | "JSDocEnumTag" | "JSDocNamespaceDeclaration" | "JSDocReturnTag" | "JSDocTemplateTag" | "JSDocThisTag" | "JSDocTypeTag" | "JSDocUnknownTag" | "KeywordTypeNode" | "LiteralType" | "MappedTypeNode" | "MethodDeclaration" | "MissingDeclaration" | "ModuleDeclaration" | "NamespaceDeclaration" | "NamespaceExportDeclaration" | "NumericLiteral" | "OptionalTypeNode" | "ParameterDeclaration" | "ParenthesizedType" | "PropertyDeclaration" | "PropertyLikeDeclaration" | "PropertySignature" | "QualifiedName" | "Query" | "RestTypeNode" | "SetAccessorDeclaration" | "SourceFile" | "StringLiteral" | "StringLiteralLike" | "ThisTypeNode" | "Token" | "TupleTypeNode" | "TypeAliasDeclaration" | "TypeLiteral" | "TypeParameterDeclaration" | "TypeReference" | "UNKNOWN_NODE" | "UnionType" | "UnnamedNode" | "VariableDeclaration";
 
@@ -1585,7 +1587,7 @@ export interface NexusGenTypes {
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
   allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['enumNames'];
+  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;

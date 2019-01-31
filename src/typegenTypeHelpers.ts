@@ -2,6 +2,7 @@ import { GraphQLResolveInfo } from "graphql";
 
 declare global {
   interface NexusGen {}
+  interface NexusGenCustomScalarMethods<TypeName extends string> {}
 }
 
 export type MaybePromise<T> = PromiseLike<T> | T;
