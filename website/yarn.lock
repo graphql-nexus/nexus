@@ -5057,10 +5057,10 @@ neo-async@^2.5.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
 
-nexus@0.9.1:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.9.1.tgz#8ff9bed0e47fe0992abe345755f820d8c6aa42e1"
-  integrity sha512-+W0md6axULHbB4RYDhHUOAsS77/K8pDmLWTQj1W4ZRIIkgcnM3L6iD7/fo79qGmHhby46MqybGu54qp0dR40Lg==
+nexus@0.9.2:
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.9.2.tgz#664fa54602c8b84a266bfe38c70862d3a46e99d4"
+  integrity sha512-lqQLOT7goSMRdlD8+KaM6kvJO02NBKAKfCY6J90pua96bQ/KQgGio9qFkq2hTc5YZO/bNifRWwiXelynRIn0Vw==
   dependencies:
     tslib "^1.9.3"
 
