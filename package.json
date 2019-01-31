@@ -14,6 +14,7 @@
     "clean": "rm -rf dist",
     "format": "prettier --write 'src/**/*.ts'",
     "prepublish": "yarn clean && yarn lint && yarn build",
+    "version": "yarn upgrade-deps",
     "website": "cd website && yarn && yarn start",
     "examples": "yarn link-examples && cd website && yarn gulp run-examples",
     "deploy-site": "cd website && yarn && yarn gulp link-website && yarn build",

@@ -30,6 +30,8 @@ import debounce from "lodash.debounce";
 interface GraphiQLProps {
   fetcher: Function;
   defaultQuery?: string;
+  onToggleDocs?: (toggle: boolean) => any;
+  storage?: Storage;
 }
 
 interface GraphiQLComponent extends React.Component<GraphiQLProps> {
@@ -250,6 +252,16 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
               defaultQuery={props.initialQuery}
               fetcher={(params: any) => {
                 return graphql(activeSchema.schema, params.query);
+              }}
+              storage={window.sessionStorage}
+              onToggleDocs={(open) => {
+                if (open) {
+                  setTimeout(() => {
+                    if (graphiqlRef.current) {
+                      graphiqlRef.current.setState({ docExplorerOpen: false });
+                    }
+                  }, 0);
+                }
               }}
             />
           )}

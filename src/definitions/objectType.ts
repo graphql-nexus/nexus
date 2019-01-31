@@ -102,3 +102,17 @@ export function objectType<TypeName extends string>(
 ) {
   return new NexusObjectTypeDef(config.name, config);
 }
+
+export function queryType(config: NexusObjectTypeConfig<"Query">) {
+  return objectType({ ...config, name: "Query" });
+}
+
+export function mutationType(config: NexusObjectTypeConfig<"Mutation">) {
+  return objectType({ ...config, name: "Mutation" });
+}
+
+// export function subscriptionType(
+//   config: NexusObjectTypeConfig<"Subscription">
+// ) {
+//   return objectType({ ...config, name: "Subscription" });
+// }

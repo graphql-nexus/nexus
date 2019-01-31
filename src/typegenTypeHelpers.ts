@@ -5,6 +5,15 @@ declare global {
   interface NexusGenCustomScalarMethods<TypeName extends string> {}
 }
 
+export type AllInputTypes = GetGen<"allInputTypes">;
+
+export type AllOutputTypes = GetGen<"allOutputTypes">;
+
+export type FieldType<
+  TypeName extends string,
+  FieldName extends string
+> = GetGen3<"fieldTypes", TypeName, FieldName>;
+
 export type MaybePromise<T> = PromiseLike<T> | T;
 
 /**
@@ -12,13 +21,15 @@ export type MaybePromise<T> = PromiseLike<T> | T;
  * resolves promises at any level of the tree, we use this
  * to help signify that.
  */
-export type MaybePromiseDeep<T> = {
-  [P in keyof T]?: T[P] extends Array<infer U>
-    ? Array<MaybePromiseDeep<U>>
-    : T[P] extends ReadonlyArray<infer Y>
-    ? ReadonlyArray<MaybePromiseDeep<Y>>
-    : MaybePromiseDeep<T[P]>
-};
+export type MaybePromiseDeep<T> = MaybePromise<
+  {
+    [P in keyof T]?: T[P] extends Array<infer U>
+      ? Array<MaybePromiseDeep<U>>
+      : T[P] extends ReadonlyArray<infer Y>
+      ? ReadonlyArray<MaybePromiseDeep<Y>>
+      : MaybePromiseDeep<T[P]>
+  }
+>;
 
 /**
  * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety
@@ -40,7 +51,7 @@ export interface AbstractTypeResolver<TypeName extends string> {
     source: RootValue<TypeName>,
     context: GetGen<"context">,
     info: GraphQLResolveInfo
-  ): MaybePromise<AbstractResolveReturn<TypeName>>;
+  ): MaybePromise<AbstractResolveReturn<TypeName> | null>;
 }
 
 /**
@@ -200,10 +211,10 @@ export type NeedsResolver<
   TypeName extends string,
   FieldName extends string
 > = HasGen3<"fieldTypes", TypeName, FieldName> extends true
-  ? GetGen3<"fieldTypes", TypeName, FieldName> extends null
+  ? null extends GetGen3<"fieldTypes", TypeName, FieldName>
     ? false
     : HasGen3<"rootTypes", TypeName, FieldName> extends true
-    ? GetGen3<"rootTypes", TypeName, FieldName> extends null
+    ? null extends GetGen3<"rootTypes", TypeName, FieldName>
       ? true
       : false
     : true

@@ -18,7 +18,12 @@ export { unionType } from "./definitions/unionType";
 export { nexusWrappedFn } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";
 export { groupTypes } from "./utils";
-export { FieldResolver } from "./typegenTypeHelpers";
+export {
+  FieldResolver,
+  AllInputTypes,
+  AllOutputTypes,
+  FieldType,
+} from "./typegenTypeHelpers";
 export { core, blocks };
 import * as core from "./core";
 import * as blocks from "./blocks";

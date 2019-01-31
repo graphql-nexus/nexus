@@ -1,14 +1,14 @@
 {
   "docs": {
     "Documentation": [
-      "why-graphql-nexus",
-      "type-generation",
       "getting-started",
-      "library-authors",
-      "faq",
-      "app-structure-and-testing",
+      "why-graphql-nexus",
       "best-practices",
-      "future-features"
+      "app-structure-and-testing",
+      "library-authors",
+      "future-features",
+      "type-generation",
+      "faq"
     ],
     "API": [
       "api-core-concepts",

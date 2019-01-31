@@ -394,10 +394,7 @@ export class SchemaBuilder {
       });
     }
     if (!resolveType) {
-      throw new Error(
-        `Missing resolveType for the ${name} interface.` +
-          `Be sure to add one in the definition block for the type`
-      );
+      resolveType = this.missingResolveType(config.name, "union");
     }
     return new GraphQLInterfaceType({
       name,
@@ -465,10 +462,7 @@ export class SchemaBuilder {
       })
     );
     if (!resolveType) {
-      throw new Error(
-        `Missing resolveType for the ${config.name} union.` +
-          `Be sure to add one in the definition block for the type`
-      );
+      resolveType = this.missingResolveType(config.name, "union");
     }
     return new GraphQLUnionType({
       name: config.name,
@@ -828,6 +822,17 @@ export class SchemaBuilder {
       resolver = (typeConfig as NexusObjectTypeConfig<any>).defaultResolver;
     }
     return resolver;
+  }
+
+  missingResolveType(name: string, location: "union" | "interface") {
+    console.error(
+      new Error(
+        `Missing resolveType for the ${name} ${location}.` +
+          `Be sure to add one in the definition block for the type, ` +
+          `or t.resolveType(() => null) if you don't want to implement yet`
+      )
+    );
+    return () => null;
   }
 }
 
