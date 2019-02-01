@@ -27,6 +27,8 @@ export type MaybePromiseDeep<T> = MaybePromise<
       ? Array<MaybePromiseDeep<U>>
       : T[P] extends ReadonlyArray<infer Y>
       ? ReadonlyArray<MaybePromiseDeep<Y>>
+      : Date extends T[P]
+      ? MaybePromise<T[P]>
       : MaybePromiseDeep<T[P]>
   }
 >;

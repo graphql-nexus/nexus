@@ -31,6 +31,7 @@ const siteConfig = {
   headerLinks: [
     { doc: "getting-started", label: "Getting Started" },
     { page: "playground", label: "Playground" },
+    { page: "converter", label: "SDL Converter" },
     {
       href: "https://github.com/graphql-nexus/nexus/tree/develop/examples",
       label: "Examples",

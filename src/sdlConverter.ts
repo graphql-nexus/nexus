@@ -6,14 +6,30 @@ import {
   GraphQLInputObjectType,
   GraphQLScalarType,
   GraphQLUnionType,
-  GraphQLField,
   GraphQLSchema,
   GraphQLNamedType,
+  isSpecifiedScalarType,
+  GraphQLField,
+  isWrappingType,
+  isNonNullType,
+  isListType,
+  GraphQLOutputType,
+  GraphQLWrappingType,
+  isScalarType,
+  isObjectType,
 } from "graphql";
-import { groupTypes, GroupedTypes } from "./utils";
+import { groupTypes, GroupedTypes, isInterfaceField, objValues } from "./utils";
 
-export function convertSDL(sdl: string, commonjs: boolean = false) {
-  return new SDLConverter(commonjs, sdl).print();
+export function convertSDL(
+  sdl: string,
+  commonjs: null | boolean = false,
+  json = JSON
+) {
+  try {
+    return new SDLConverter(sdl, commonjs, json).print();
+  } catch (e) {
+    return `Error Parsing SDL into Schema: ${e.stack}`;
+  }
 }
 
 /**
@@ -21,11 +37,16 @@ export function convertSDL(sdl: string, commonjs: boolean = false) {
  */
 export class SDLConverter {
   protected export: string;
-  protected schema: GraphQLSchema;
+  protected schema: GraphQLSchema | null;
   protected groupedTypes: GroupedTypes;
 
-  constructor(commonjs: boolean = false, sdl: string) {
-    this.export = commonjs ? "exports." : "export const ";
+  constructor(
+    sdl: string,
+    commonjs: null | boolean = false,
+    protected json: JSON
+  ) {
+    this.export =
+      commonjs === null ? "const " : commonjs ? "exports." : "export const ";
     this.schema = buildSchema(sdl);
     this.groupedTypes = groupTypes(this.schema);
   }
@@ -38,7 +59,9 @@ export class SDLConverter {
       this.printUnionTypes(),
       this.printEnumTypes(),
       this.printScalarTypes(),
-    ].join("\n\n");
+    ]
+      .filter((f) => f)
+      .join("\n\n");
   }
 
   printObjectTypes() {
@@ -51,27 +74,98 @@ export class SDLConverter {
   }
 
   printObjectType(type: GraphQLObjectType): string {
+    const implementing = type.getInterfaces().map((i) => i.name);
+    const implementsInterfaces =
+      implementing.length > 0
+        ? `    t.implements(${implementing
+            .map((i) => this.json.stringify(i))
+            .join(", ")})`
+        : "";
     return this.printBlock([
       `${this.export}${type.name} = objectType({`,
-      `  name: "${type.name}"`,
+      `  name: "${type.name}",`,
+      `  definition(t) {`,
+      implementsInterfaces,
+      this.printObjectFields(type),
+      `  }`,
       `})`,
     ]);
-    // if (type.getInterfaces().length > 0) {
-    //   const interfaceNames = type
-    //     .getInterfaces()
-    //     .map((i) => JSON.stringify(i.name))
-    //     .join(", ");
-    //   str.push(`  t.implements(${interfaceNames})`);
-    // }
-    // Object.keys(type.getFields()).forEach((fieldName) => {
-    //   if (isInterfaceField(type, fieldName)) {
-    //     return;
-    //   }
-    //   eachObj(type.getFields(), (field, key) => {
-    //     getFieldType(field);
-    //   });
-    // });
-    // return str.join("\n");
+  }
+
+  printObjectFields(type: GraphQLObjectType | GraphQLInterfaceType) {
+    return objValues(type.getFields())
+      .map((field) => {
+        if (isObjectType(type) && isInterfaceField(type, field.name)) {
+          return;
+        }
+        return this.printField("output", field);
+      })
+      .filter((f) => f)
+      .join("\n");
+  }
+
+  printField(source: "input" | "output", field: GraphQLField<any, any>) {
+    let fieldType = field.type;
+    let isNonNull = false;
+    const list = [];
+    while (isWrappingType(fieldType)) {
+      while (isListType(fieldType)) {
+        fieldType = fieldType.ofType;
+        if (isNonNullType(fieldType)) {
+          fieldType = fieldType.ofType;
+          list.unshift(true);
+        } else {
+          list.unshift(false);
+        }
+      }
+      if (isNonNullType(fieldType)) {
+        isNonNull = true;
+        fieldType = fieldType.ofType;
+      }
+    }
+    const prefix = list.length === 1 ? `t.list.` : `t.`;
+    return `    ${prefix}${this.printFieldMethod(
+      source,
+      field,
+      fieldType,
+      list,
+      isNonNull
+    )}`;
+  }
+
+  printFieldMethod(
+    source: "input" | "output",
+    field: GraphQLField<any, any>,
+    type: Exclude<GraphQLOutputType, GraphQLWrappingType>,
+    list: boolean[],
+    isNonNull: boolean
+  ) {
+    const objectMeta: Record<string, any> = {};
+    if (field.description) {
+      objectMeta.description = field.description;
+    }
+    if (field.deprecationReason) {
+      objectMeta.deprecation = field.deprecationReason;
+    }
+    if (list.length > 1) {
+      objectMeta.list = list;
+    }
+    if (!isNonNull && source === "output") {
+      objectMeta.nullable = true;
+    } else if (isNonNull && source === "input") {
+      objectMeta.required = true;
+    }
+    let str = "";
+    if (isCommonScalar(type)) {
+      str += `${type.name.toLowerCase()}("${field.name}"`;
+    } else {
+      objectMeta.type = type;
+      str += `field("${field.name}"`;
+    }
+    if (Object.keys(objectMeta).length > 0) {
+      str += `, ${this.json.stringify(objectMeta)}`;
+    }
+    return `${str})`;
   }
 
   printInterfaceTypes() {
@@ -89,13 +183,10 @@ export class SDLConverter {
       `  name: "${type.name}",`,
       this.maybeDescription(type),
       `  definition(t) {`,
+      this.printObjectFields(type),
       `  }`,
       `});`,
     ]);
-    // eachObj(type.getFields(), (field, key) => {
-    //   getFieldType(field);
-    // });
-    // return str.join("\n");
   }
 
   printEnumTypes() {
@@ -108,19 +199,27 @@ export class SDLConverter {
   }
 
   printEnumType(type: GraphQLEnumType): string {
+    const members = type.getValues().map((val) => {
+      const { description, name, deprecationReason, value } = val;
+      if (!description && !deprecationReason && name === value) {
+        return val.name;
+      }
+      return { description, name, deprecated: deprecationReason, value };
+    });
     return this.printBlock([
       `${this.export}${type.name} = enumType({`,
       `  name: "${type.name}",`,
       this.maybeDescription(type),
-      `  definition(t) {`,
-      `  }`,
+      `  members: ${this.json.stringify(members)},`,
       `});`,
     ]);
   }
 
   printInputObjectTypes() {
     if (this.groupedTypes.input.length) {
-      return this.groupedTypes.input.map((t) => this.printInputObjectType(t));
+      return this.groupedTypes.input
+        .map((t) => this.printInputObjectType(t))
+        .join("\n");
     }
     return "";
   }
@@ -159,6 +258,7 @@ export class SDLConverter {
   printScalarTypes() {
     if (this.groupedTypes.scalar.length) {
       return this.groupedTypes.scalar
+        .filter((s) => !isSpecifiedScalarType(s))
         .map((t) => this.printScalarType(t))
         .join("\n");
     }
@@ -168,12 +268,21 @@ export class SDLConverter {
   printScalarType(type: GraphQLScalarType): string {
     return this.printBlock([
       `${this.export}${type.name} = scalarType({`,
-      `  name: ${type.name}",`,
+      `  name: "${type.name}",`,
       this.maybeDescription(type),
-      `  definition(t) {`,
-      `  }`,
+      this.maybeAsNexusType(type),
+      `  serialize() { /* Todo */ },`,
+      `  parseValue() { /* Todo */ },`,
+      `  parseLiteral() { /* Todo */ }`,
       `});`,
     ]);
+  }
+
+  maybeAsNexusType(type: GraphQLScalarType) {
+    if (isCommonScalar(type)) {
+      return `  asNexusMethod: "${type.name.toLowerCase()}",`;
+    }
+    return null;
   }
 
   maybeDescription(type: GraphQLNamedType) {
@@ -184,14 +293,17 @@ export class SDLConverter {
   }
 
   printBlock(block: (string | null)[]) {
-    return block.filter((t) => t !== null).join("\n");
+    return block.filter((t) => t !== null && t !== "").join("\n");
   }
 }
 
-const getFieldType = (type: GraphQLField<any, any>) => {
-  //
-};
-
-const getInputFieldType = (type: GraphQLField<any, any>) => {
-  //
-};
+function isCommonScalar(field: GraphQLOutputType): boolean {
+  if (isScalarType(field)) {
+    return (
+      isSpecifiedScalarType(field) ||
+      field.name === "UUID" ||
+      field.name === "Date"
+    );
+  }
+  return false;
+}

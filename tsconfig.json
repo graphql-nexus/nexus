@@ -8,6 +8,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
     "declaration": true,
     "importHelpers": true,

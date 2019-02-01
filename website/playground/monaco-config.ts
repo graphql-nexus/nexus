@@ -1,4 +1,5 @@
 import * as monaco from "monaco-editor";
+import "./monaco-graphql";
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   target: monaco.languages.typescript.ScriptTarget.ES2016,
@@ -93,6 +94,7 @@ import * as nexus from 'nexus'
 // Re-export these so we can use globally in the sandbox
 // while still preserving the typegen
 declare global {
+  declare const core: typeof nexus.core;
   declare const arg: typeof nexus.arg;
   declare const intArg: typeof nexus.intArg;
   declare const stringArg: typeof nexus.stringArg;
@@ -110,47 +112,3 @@ declare global {
 `,
   "file:///sandbox-globals.ts"
 );
-
-monaco.languages.register({ id: "graphql" });
-
-// https://code.visualstudio.com/blogs/2017/02/08/syntax-highlighting-optimizations
-monaco.languages.setMonarchTokensProvider("graphql", {
-  ignoreCase: true,
-  // @ts-ignore
-  keywords: [
-    "type",
-    "input",
-    "scalar",
-    "enum",
-    "union",
-    "implements",
-    "interface",
-    "directive",
-  ],
-  tokenizer: {
-    root: [
-      { include: "@whitespace" },
-      [
-        /[a-z_$][\w$]*/,
-        {
-          cases: {
-            "@keywords": "keyword",
-            "@default": "identifier",
-          },
-        },
-      ],
-    ],
-    whitespace: [
-      [/\s+/, "white"],
-      [/(^#.*$)/, "comment"],
-      [/(""".*""")/, "string"],
-      [/""".*$/, "string", "@endDblDocString"],
-    ],
-    endDocString: [[/.*$/, "string"]],
-    endDblDocString: [
-      [/\\"/, "string"],
-      [/.*"""/, "string", "@popall"],
-      [/.*$/, "string"],
-    ],
-  },
-});

@@ -282,6 +282,7 @@ function getCurrentSchema(code: string): SchemaOrError {
     return val;
   }
   const singleton = {
+    core,
     objectType(obj: any) {
       return add(objectType(obj));
     },
@@ -303,6 +304,7 @@ function getCurrentSchema(code: string): SchemaOrError {
   };
   try {
     const fn = new Function(
+      "core",
       "objectType",
       "interfaceType",
       "inputObjectType",
@@ -321,6 +323,7 @@ function getCurrentSchema(code: string): SchemaOrError {
       `
     );
     fn(
+      singleton.core,
       singleton.objectType,
       singleton.interfaceType,
       singleton.inputObjectType,

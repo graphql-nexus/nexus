@@ -1,4 +1,4 @@
-import { GetGen, HasGen, GetGen2 } from "../typegenTypeHelpers";
+import { GetGen, GetGen2 } from "../typegenTypeHelpers";
 import { AllNexusInputTypeDefs } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 

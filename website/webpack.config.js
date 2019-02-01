@@ -12,6 +12,7 @@ module.exports = {
   devtool: "source-map",
   entry: {
     playground: "./playground/index.tsx",
+    converter: "./playground/Converter.tsx",
   },
   output: {
     publicPath: "/playground-dist/",
