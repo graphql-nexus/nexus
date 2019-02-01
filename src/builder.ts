@@ -33,7 +33,6 @@ import {
   isUnionType,
   isScalarType,
 } from "graphql";
-import { isObject } from "util";
 import { NexusArgConfig, NexusArgDef } from "./definitions/args";
 import {
   InputDefinitionBlock,
@@ -86,7 +85,7 @@ import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
 import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
-import { firstDefined, objValues, suggestionList } from "./utils";
+import { firstDefined, objValues, suggestionList, isObject } from "./utils";
 
 export type Maybe<T> = T | null;
 
