@@ -6,7 +6,11 @@ import {
   NeedsResolver,
 } from "../typegenTypeHelpers";
 import { NexusArgDef } from "./args";
-import { AllNexusOutputTypeDefs, NexusInputTypeName } from "./wrapping";
+import {
+  AllNexusOutputTypeDefs,
+  NexusInputTypeName,
+  NexusWrappedType,
+} from "./wrapping";
 import { BaseScalars } from "./_types";
 
 export interface CommonFieldConfig {
@@ -54,7 +58,10 @@ export interface NexusOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends OutputScalarConfig<TypeName, FieldName> {
-  type: GetGen<"allOutputTypes"> | AllNexusOutputTypeDefs;
+  type:
+    | GetGen<"allOutputTypes">
+    | AllNexusOutputTypeDefs
+    | NexusWrappedType<AllNexusOutputTypeDefs>;
 }
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {

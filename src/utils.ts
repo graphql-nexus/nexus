@@ -44,7 +44,10 @@ export const isInterfaceField = (
  * Given an invalid input string and a list of valid options, returns a filtered
  * list of valid options sorted based on their similarity with the input.
  */
-export function suggestionList(input: string, options: string[]): string[] {
+export function suggestionList(
+  input: string = "",
+  options: string[] = []
+): string[] {
   var optionsByDistance = Object.create(null);
   var oLength = options.length;
   var inputThreshold = input.length / 2;

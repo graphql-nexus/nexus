@@ -74,7 +74,8 @@ import {
   isNexusObjectTypeDef,
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
-  isNexusWrappedFn,
+  isNexusWrappedType,
+  NexusWrappedType,
 } from "./definitions/wrapping";
 import {
   GraphQLPossibleInputs,
@@ -482,6 +483,7 @@ export class SchemaBuilder {
   }
 
   protected missingType(typeName: string): GraphQLNamedType {
+    invariantGuard(typeName);
     const suggestions = suggestionList(
       typeName,
       Object.keys(this.buildingTypes).concat(Object.keys(this.finalTypeMap))
@@ -728,7 +730,10 @@ export class SchemaBuilder {
   }
 
   protected getInputType(
-    name: string | AllNexusInputTypeDefs
+    name:
+      | string
+      | AllNexusInputTypeDefs
+      | NexusWrappedType<AllNexusInputTypeDefs>
   ): GraphQLPossibleInputs {
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type) && !isLeafType(type)) {
@@ -769,10 +774,13 @@ export class SchemaBuilder {
   }
 
   protected getOrBuildType(
-    name: string | AllNexusNamedTypeDefs
+    name:
+      | string
+      | AllNexusNamedTypeDefs
+      | NexusWrappedType<AllNexusNamedTypeDefs>
   ): GraphQLNamedType {
     invariantGuard(name);
-    if (isNexusNamedTypeDef(name)) {
+    if (isNexusNamedTypeDef(name) || isNexusWrappedType(name)) {
       return this.getOrBuildType(name.name);
     }
     if (SCALARS[name]) {
@@ -868,7 +876,7 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
-  if (isNexusWrappedFn(types)) {
+  if (isNexusWrappedType(types)) {
     addTypes(builder, types.fn(builder));
     return;
   }

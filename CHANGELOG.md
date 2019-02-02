@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.4
+
+- Internal: nexusWrappedFn -> nexusWrappedType
+
 ### 0.9.3
 
 - Minor internal changes

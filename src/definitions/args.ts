@@ -1,5 +1,5 @@
 import { GetGen, GetGen2 } from "../typegenTypeHelpers";
-import { AllNexusInputTypeDefs } from "./wrapping";
+import { AllNexusInputTypeDefs, NexusWrappedType } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
 export interface CommonArgConfig {
@@ -39,7 +39,10 @@ export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
    * The type of the argument, either the string name of the type,
    * or the concrete Nexus type definition
    */
-  type: T | AllNexusInputTypeDefs<T>;
+  type:
+    | T
+    | AllNexusInputTypeDefs<T>
+    | NexusWrappedType<AllNexusInputTypeDefs<T>>;
   /**
    * Configure the default for the object
    */

@@ -38,19 +38,21 @@ export type AllTypeDefs =
   | AllNexusOutputTypeDefs
   | GraphQLNamedType;
 
-export type WrappedFnType = (builder: SchemaBuilder) => any;
+export type WrappedTypeFn<T extends AllNexusNamedTypeDefs> = (
+  builder: SchemaBuilder
+) => T;
 
 /**
  * Container object for a "wrapped function"
  */
-export class NexusWrappedFn {
-  constructor(protected wrappedFn: WrappedFnType) {}
-  get fn(): WrappedFnType {
+export class NexusWrappedType<T extends AllNexusNamedTypeDefs> {
+  constructor(readonly name: string, protected wrappedFn: WrappedTypeFn<T>) {}
+  get fn(): WrappedTypeFn<T> {
     return this.wrappedFn;
   }
 }
 
-withNexusSymbol(NexusWrappedFn, NexusTypes.WrappedFn);
+withNexusSymbol(NexusWrappedType, NexusTypes.WrappedType);
 
 /**
  * Useful primarily for plugins, where you want to delay the execution
@@ -58,8 +60,11 @@ withNexusSymbol(NexusWrappedFn, NexusTypes.WrappedFn);
  *
  * @param fn
  */
-export function nexusWrappedFn(fn: WrappedFnType) {
-  return new NexusWrappedFn(fn);
+export function nexusWrappedType<T extends AllNexusNamedTypeDefs>(
+  name: string,
+  fn: WrappedTypeFn<T>
+) {
+  return new NexusWrappedType(name, fn);
 }
 
 const NamedTypeDefs = new Set([
@@ -86,9 +91,11 @@ export function isNexusExtendTypeDef(
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.ExtendObject
   );
 }
-export function isNexusWrappedFn(obj: any): obj is NexusWrappedFn {
+export function isNexusWrappedType(
+  obj: any
+): obj is NexusWrappedType<AllNexusNamedTypeDefs> {
   return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.WrappedFn
+    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.WrappedType
   );
 }
 

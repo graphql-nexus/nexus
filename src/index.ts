@@ -15,7 +15,7 @@ export { interfaceType } from "./definitions/interfaceType";
 export { objectType } from "./definitions/objectType";
 export { scalarType } from "./definitions/scalarType";
 export { unionType } from "./definitions/unionType";
-export { nexusWrappedFn } from "./definitions/wrapping";
+export { nexusWrappedType } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";
 export { groupTypes } from "./utils";
 export {
