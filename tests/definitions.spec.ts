@@ -1,6 +1,7 @@
 /// <reference types="jest" />
 import { GraphQLEnumType, GraphQLObjectType } from "graphql";
-import { idArg, buildTypes, enumType, extendType, objectType } from "..";
+import { idArg, buildTypes, enumType, extendType, objectType } from "../src";
+import { UserObject, PostObject } from "./_helpers";
 
 describe("enumType", () => {
   const PrimaryColors = enumType({
@@ -93,28 +94,31 @@ describe("extendType", () => {
     const GetUser = extendType({
       type: "Query",
       definition(t) {
-        t.field("user", { type: "UserObject", args: { id: idArg() } });
+        t.field("user", { type: "User", args: { id: idArg() } });
       },
     });
-    const GetAccount = extendType({
+    const GetPost = extendType({
       type: "Query",
       definition(t) {
-        t.field("account", {
-          type: "Account",
+        t.field("post", {
+          type: PostObject,
         });
       },
     });
-    buildTypes([GetUser]);
-  });
-
-  it("should allow adding types to the Mutation type", () => {
-    const AddUser = extendType({
-      type: "Mutation",
-      definition(t) {},
-    });
-  });
-
-  it("should error if the type is extended but not defined", () => {
-    //
+    expect(
+      Object.keys(
+        buildTypes<{ Query: GraphQLObjectType }>([
+          GetUser,
+          GetPost,
+          PostObject,
+          UserObject,
+        ]).typeMap.Query.getFields()
+      )
+    ).toMatchInlineSnapshot(`
+Array [
+  "user",
+  "post",
+]
+`);
   });
 });

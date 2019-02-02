@@ -3,7 +3,7 @@ import {
   OutputDefinitionBuilder,
 } from "./definitionBlocks";
 import { GetGen2, GetGen, FieldResolver } from "../typegenTypeHelpers";
-import { NonNullConfig, NexusTypes, withNexusSymbol } from "./_types";
+import { NonNullConfig, NexusTypes, withNexusSymbol, Omit } from "./_types";
 import { assertValidName } from "graphql";
 import { NexusInterfaceTypeDef } from "./interfaceType";
 
@@ -103,11 +103,15 @@ export function objectType<TypeName extends string>(
   return new NexusObjectTypeDef(config.name, config);
 }
 
-export function queryType(config: NexusObjectTypeConfig<"Query">) {
+export function queryType(
+  config: Omit<NexusObjectTypeConfig<"Query">, "name">
+) {
   return objectType({ ...config, name: "Query" });
 }
 
-export function mutationType(config: NexusObjectTypeConfig<"Mutation">) {
+export function mutationType(
+  config: Omit<NexusObjectTypeConfig<"Mutation">, "name">
+) {
   return objectType({ ...config, name: "Mutation" });
 }
 

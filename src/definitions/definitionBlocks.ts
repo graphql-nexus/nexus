@@ -242,11 +242,19 @@ export interface InputDefinitionBlock<TypeName extends string>
 export class InputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean;
 
-  constructor(protected typeBuilder: InputDefinitionBuilder, isList = false) {
+  constructor(
+    protected typeBuilder: InputDefinitionBuilder,
+    protected isList = false
+  ) {
     this.hasAdded = false;
   }
 
   get list() {
+    if (this.isList) {
+      throw new Error(
+        "Cannot chain list.list, in the definition block. Use `list: []` config value"
+      );
+    }
     return new InputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 

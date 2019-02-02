@@ -212,7 +212,7 @@ export class SchemaBuilder {
    */
   protected typeExtensionMap: Record<
     string,
-    NexusExtendTypeConfig<string>[]
+    NexusExtendTypeConfig<string>[] | null
   > = {};
   /**
    * Configures the root-level nonNullDefaults defaults
@@ -225,7 +225,13 @@ export class SchemaBuilder {
    */
   protected customScalarMethods: [string, string][] = [];
 
-  constructor(protected config: BuilderConfig) {}
+  constructor(protected config: BuilderConfig) {
+    this.nonNullDefaults = {
+      input: false,
+      output: true,
+      ...config.nonNullDefaults,
+    };
+  }
 
   getConfig(): BuilderConfig {
     return this.config;
@@ -241,9 +247,9 @@ export class SchemaBuilder {
       this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
 
     if (isNexusExtendTypeDef(typeDef)) {
-      this.typeExtensionMap[typeDef.name] =
-        this.typeExtensionMap[typeDef.name] || [];
-      this.typeExtensionMap[typeDef.name].push(typeDef.value);
+      const typeExtensions = (this.typeExtensionMap[typeDef.name] =
+        this.typeExtensionMap[typeDef.name] || []);
+      typeExtensions.push(typeDef.value);
       return;
     }
 
@@ -293,12 +299,21 @@ export class SchemaBuilder {
       this.finalTypeMap[key] = this.getOrBuildType(key);
       this.buildingTypes.clear();
     });
+    Object.keys(this.typeExtensionMap).forEach((key) => {
+      // If we haven't defined the type, assume it's an object type
+      if (this.typeExtensionMap[key] !== null) {
+        this.buildObjectType({
+          name: key,
+          definition() {},
+        });
+      }
+    });
     return {
       typeMap: this.finalTypeMap,
     };
   }
 
-  inputObjectType(
+  buildInputObjectType(
     config: NexusInputObjectTypeConfig<any>
   ): GraphQLInputObjectType {
     const fields: NexusInputFieldDef[] = [];
@@ -306,14 +321,16 @@ export class SchemaBuilder {
       addField: (field) => fields.push(field),
     });
     config.definition(this.withScalarMethods(definitionBlock));
-    return new GraphQLInputObjectType({
-      name: config.name,
-      fields: () => this.buildInputObjectFields(fields, config),
-      description: config.description,
-    });
+    return this.finalize(
+      new GraphQLInputObjectType({
+        name: config.name,
+        fields: () => this.buildInputObjectFields(fields, config),
+        description: config.description,
+      })
+    );
   }
 
-  objectType(config: NexusObjectTypeConfig<any>) {
+  buildObjectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
     const interfaces: Implemented[] = [];
     const modifications: Record<
@@ -335,50 +352,55 @@ export class SchemaBuilder {
         extension.definition(definitionBlock);
       });
     }
-    return new GraphQLObjectType({
-      name: config.name,
-      interfaces: () => interfaces.map((i) => this.getInterface(i)),
-      description: config.description,
-      fields: () => {
-        const allFieldsMap: GraphQLFieldConfigMap<any, any> = {};
-        const allInterfaces = interfaces.map((i) => this.getInterface(i));
-        allInterfaces.forEach((i) => {
-          const interfaceFields = i.getFields();
-          // We need to take the interface fields and reconstruct them
-          // this actually simplifies things becuase if we've modified
-          // the field at all it needs to happen here.
-          Object.keys(interfaceFields).forEach((iFieldName) => {
-            const { isDeprecated, args, ...rest } = interfaceFields[iFieldName];
-            allFieldsMap[iFieldName] = {
-              ...rest,
-              args: args.reduce(
-                (result: GraphQLFieldConfigArgumentMap, arg) => {
-                  const { name, ...argRest } = arg;
-                  result[name] = argRest;
-                  return result;
-                },
-                {}
-              ),
-            };
-            const mods = modifications[iFieldName];
-            if (mods) {
-              mods.map((mod) => {
-                if (typeof mod.description !== "undefined") {
-                  allFieldsMap[iFieldName].description = mod.description;
-                }
-                if (typeof mod.resolve !== "undefined") {
-                  allFieldsMap[iFieldName].resolve = mod.resolve;
-                }
-              });
-            }
+    this.typeExtensionMap[config.name] = null;
+    return this.finalize(
+      new GraphQLObjectType({
+        name: config.name,
+        interfaces: () => interfaces.map((i) => this.getInterface(i)),
+        description: config.description,
+        fields: () => {
+          const allFieldsMap: GraphQLFieldConfigMap<any, any> = {};
+          const allInterfaces = interfaces.map((i) => this.getInterface(i));
+          allInterfaces.forEach((i) => {
+            const interfaceFields = i.getFields();
+            // We need to take the interface fields and reconstruct them
+            // this actually simplifies things becuase if we've modified
+            // the field at all it needs to happen here.
+            Object.keys(interfaceFields).forEach((iFieldName) => {
+              const { isDeprecated, args, ...rest } = interfaceFields[
+                iFieldName
+              ];
+              allFieldsMap[iFieldName] = {
+                ...rest,
+                args: args.reduce(
+                  (result: GraphQLFieldConfigArgumentMap, arg) => {
+                    const { name, ...argRest } = arg;
+                    result[name] = argRest;
+                    return result;
+                  },
+                  {}
+                ),
+              };
+              const mods = modifications[iFieldName];
+              if (mods) {
+                mods.map((mod) => {
+                  if (typeof mod.description !== "undefined") {
+                    allFieldsMap[iFieldName].description = mod.description;
+                  }
+                  if (typeof mod.resolve !== "undefined") {
+                    allFieldsMap[iFieldName].resolve = mod.resolve;
+                  }
+                });
+              }
+            });
           });
-        });
-        return this.buildObjectFields(fields, config, allFieldsMap);
-      },
-    });
+          return this.buildObjectFields(fields, config, allFieldsMap);
+        },
+      })
+    );
   }
 
-  interfaceType(config: NexusInterfaceTypeConfig<any>) {
+  buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config;
     let resolveType: AbstractTypeResolver<string> | undefined;
     const fields: NexusOutputFieldDef[] = [];
@@ -396,28 +418,17 @@ export class SchemaBuilder {
     if (!resolveType) {
       resolveType = this.missingResolveType(config.name, "union");
     }
-    return new GraphQLInterfaceType({
-      name,
-      fields: () => this.buildObjectFields(fields, config, {}, true),
-      resolveType,
-      description,
-    });
+    return this.finalize(
+      new GraphQLInterfaceType({
+        name,
+        fields: () => this.buildObjectFields(fields, config, {}, true),
+        resolveType,
+        description,
+      })
+    );
   }
 
-  withScalarMethods<T extends NexusGenCustomScalarMethods<string>>(
-    definitionBlock: T
-  ): T {
-    this.customScalarMethods.forEach(([methodName, typeName]) => {
-      // @ts-ignore - Yeah, yeah... we know
-      definitionBlock[methodName] = function(fieldName, ...opts) {
-        // @ts-ignore
-        this.addScalarField(fieldName, typeName, opts);
-      };
-    });
-    return definitionBlock;
-  }
-
-  enumType(config: EnumTypeConfig<any>) {
+  buildEnumType(config: EnumTypeConfig<any>) {
     const { members } = config;
     const values: GraphQLEnumValueConfigMap = {};
     if (Array.isArray(members)) {
@@ -444,14 +455,16 @@ export class SchemaBuilder {
         `Nexus GraphQL: Enum ${config.name} must have at least one member`
       );
     }
-    return new GraphQLEnumType({
-      name: config.name,
-      values: values,
-      description: config.description,
-    });
+    return this.finalize(
+      new GraphQLEnumType({
+        name: config.name,
+        values: values,
+        description: config.description,
+      })
+    );
   }
 
-  unionType(config: NexusUnionTypeConfig<any>) {
+  buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined;
     let resolveType: AbstractTypeResolver<string> | undefined;
     config.definition(
@@ -464,36 +477,64 @@ export class SchemaBuilder {
     if (!resolveType) {
       resolveType = this.missingResolveType(config.name, "union");
     }
-    return new GraphQLUnionType({
-      name: config.name,
-      resolveType,
-      description: config.description,
-      types: () => this.buildUnionMembers(config.name, members),
-    });
+    return this.finalize(
+      new GraphQLUnionType({
+        name: config.name,
+        resolveType,
+        description: config.description,
+        types: () => this.buildUnionMembers(config.name, members),
+      })
+    );
   }
 
-  scalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
+  buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
     const scalar: GraphQLScalarType & {
       asNexusMethod?: string;
     } = new GraphQLScalarType(config);
     if (config.asNexusMethod) {
       scalar.asNexusMethod = config.asNexusMethod;
     }
-    return scalar;
+    return this.finalize(scalar);
   }
 
-  protected missingType(typeName: string): GraphQLNamedType {
+  protected finalize<T extends GraphQLNamedType>(type: T): T {
+    this.finalTypeMap[type.name] = type;
+    return type;
+  }
+
+  protected withScalarMethods<T extends NexusGenCustomScalarMethods<string>>(
+    definitionBlock: T
+  ): T {
+    this.customScalarMethods.forEach(([methodName, typeName]) => {
+      // @ts-ignore - Yeah, yeah... we know
+      definitionBlock[methodName] = function(fieldName, ...opts) {
+        // @ts-ignore
+        this.addScalarField(fieldName, typeName, opts);
+      };
+    });
+    return definitionBlock;
+  }
+
+  protected missingType(
+    typeName: string,
+    fromObject: boolean = false
+  ): GraphQLNamedType {
     invariantGuard(typeName);
     const suggestions = suggestionList(
       typeName,
       Object.keys(this.buildingTypes).concat(Object.keys(this.finalTypeMap))
     );
+    if (fromObject) {
+      throw new Error(
+        `Looks like you forgot to import ${typeName} in the root "types" passed to Nexus makeSchema`
+      );
+    }
     let suggestionsString = "";
     if (suggestions.length > 0) {
       suggestionsString = ` or mean ${suggestions.join(", ")}`;
     }
     throw new Error(
-      `Missing type ${typeName}, did you forget to import a type${suggestionsString}?`
+      `Missing type ${typeName}, did you forget to import a type to the root query${suggestionsString}?`
     );
   }
 
@@ -777,11 +818,12 @@ export class SchemaBuilder {
     name:
       | string
       | AllNexusNamedTypeDefs
-      | NexusWrappedType<AllNexusNamedTypeDefs>
+      | NexusWrappedType<AllNexusNamedTypeDefs>,
+    fromObject: boolean = false
   ): GraphQLNamedType {
     invariantGuard(name);
     if (isNexusNamedTypeDef(name) || isNexusWrappedType(name)) {
-      return this.getOrBuildType(name.name);
+      return this.getOrBuildType(name.name, true);
     }
     if (SCALARS[name]) {
       return SCALARS[name];
@@ -800,20 +842,20 @@ export class SchemaBuilder {
     if (isNexusNamedTypeDef(pendingType)) {
       this.buildingTypes.add(pendingType.name);
       if (isNexusObjectTypeDef(pendingType)) {
-        return this.objectType(pendingType.value);
+        return this.buildObjectType(pendingType.value);
       } else if (isNexusInterfaceTypeDef(pendingType)) {
-        return this.interfaceType(pendingType.value);
+        return this.buildInterfaceType(pendingType.value);
       } else if (isNexusEnumTypeDef(pendingType)) {
-        return this.enumType(pendingType.value);
+        return this.buildEnumType(pendingType.value);
       } else if (isNexusScalarTypeDef(pendingType)) {
-        return this.scalarType(pendingType.value);
+        return this.buildScalarType(pendingType.value);
       } else if (isNexusInputObjectTypeDef(pendingType)) {
-        return this.inputObjectType(pendingType.value);
+        return this.buildInputObjectType(pendingType.value);
       } else if (isNexusUnionTypeDef(pendingType)) {
-        return this.unionType(pendingType.value);
+        return this.buildUnionType(pendingType.value);
       }
     }
-    return this.missingType(name);
+    return this.missingType(name, fromObject);
   }
 
   protected getResolver(

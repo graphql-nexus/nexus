@@ -4,6 +4,8 @@ import {
   GraphQLInputObjectType,
 } from "graphql";
 
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";
 
 export enum NexusTypes {

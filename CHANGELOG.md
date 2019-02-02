@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.9.5
+
+- Fix `nonNullDefaults` on schema
+- Finalize objects as they are constructed
+- Changes to a few internal methods
+
 ### 0.9.4
 
 - Internal: nexusWrappedFn -> nexusWrappedType

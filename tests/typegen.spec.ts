@@ -6,7 +6,7 @@ import {
   GraphQLInterfaceType,
 } from "graphql";
 import path from "path";
-import { core } from "..";
+import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
 
 const { Typegen, TypegenMetadata } = core;

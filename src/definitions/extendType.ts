@@ -22,8 +22,8 @@ export class NexusExtendTypeDef<TypeName extends string> {
 withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject);
 
 /**
- * Adds new fields to an existing type in the schema. Useful when splitting your
- * schema across several domains.
+ * Adds new fields to an existing objectType in the schema. Useful when
+ * splitting your schema across several domains.
  *
  * @see http://graphql-nexus.com/api/extendType
  */

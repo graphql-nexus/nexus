@@ -1,7 +1,4 @@
-import faker from "faker";
 import { objectType, inputObjectType } from "../src";
-
-faker.seed(0);
 
 /**
  * Used in testing, creates a generic "User" object
@@ -10,11 +7,8 @@ export const UserObject = objectType({
   name: "User",
   definition(t) {
     t.id("id", () => `User:1`);
-    t.string("email", () => faker.internet.email());
-    t.string(
-      "name",
-      () => `${faker.name.firstName()} ${faker.name.lastName()}`
-    );
+    t.string("email", () => "test@example.com");
+    t.string("name", () => `Test User`);
   },
 });
 
