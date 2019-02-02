@@ -15,7 +15,7 @@
     "dedent": "^0.7.0",
     "graphql": "^14.0.2",
     "monaco-editor": "^0.15.5",
-    "nexus": "0.9.2",
+    "nexus": "0.9.3",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2"
   },
@@ -26,12 +26,12 @@
     "@babel/preset-env": "^7.1.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.1.0",
-    "@types/json5": "^0.0.30",
     "@types/dedent": "^0.7.0",
     "@types/fs-extra": "^5.0.4",
     "@types/get-port": "^4.0.0",
     "@types/graphql": "^14.0.3",
     "@types/gulp": "3.8.36",
+    "@types/json5": "^0.0.30",
     "@types/lodash.debounce": "^4.0.4",
     "@types/react": "^16.7.6",
     "@types/react-dom": "^16.0.9",
@@ -42,6 +42,7 @@
     "fs-extra": "^7.0.1",
     "get-port": "^4.0.0",
     "gulp": "^3.9.1",
+    "json5": "^2.1.0",
     "lodash.debounce": "^4.0.8",
     "lodash.groupby": "^4.6.0",
     "lz-string": "^1.4.4",
@@ -54,7 +55,6 @@
     "typescript": "3.1.6",
     "use-debounce": "^0.0.7",
     "webpack": "^4.25.1",
-    "webpack-cli": "^3.1.2",
-    "json5": "^2.1.0"
+    "webpack-cli": "^3.1.2"
   }
 }
