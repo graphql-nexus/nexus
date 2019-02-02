@@ -33,31 +33,6 @@ As documented in the [API reference](docs/api-core-concepts.md) Nexus GraphQL pr
 ```js
 import { objectType, stringArg, fieldArg, makeSchema } from "nexus";
 
-const Query = objectType({
-  name: "Query",
-  definition(t) {
-    t.field("account", {
-      type: "Account",
-      args: {
-        name: stringArg(),
-        status: fieldArg("StatusEnum"),
-      },
-    });
-    t.list.field("accountsById", {
-      type: "Account",
-      args: {
-        ids: intArg({ list: true }),
-      },
-    });
-    t.field("accounts", {
-      type: "AccountConnection",
-      args: {
-        limit: intArg({ required: true }),
-      },
-    });
-  },
-});
-
 const Node = objectType({
   name: "Node",
   definition(t) {
@@ -79,11 +54,32 @@ const StatusEnum = enumType({
   members: ["ACTIVE", "DISABLED"],
 });
 
+const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.field("account", {
+      type: Account, // or "Account"
+      args: {
+        name: stringArg(),
+        status: fieldArg({ type: "StatusEnum" }),
+      },
+    });
+    t.list.field("accountsById", {
+      type: Account, // or "Account"
+      args: {
+        ids: intArg({ list: true }),
+      },
+    });
+  },
+});
+
+// Recursively traverses the value passed to types looking for
+// any valid Nexus or graphql-js objects to add to the schema,
+// so you can be pretty flexible with how you import types here.
 const schema = makeSchema({
   types: [Account, Node, Query, StatusEnum],
   // or types: { Account, Node, Query }
   // or types: [Account, [Node], { Query }]
-  // This is intentionally a very permissive API :)
 });
 ```
 

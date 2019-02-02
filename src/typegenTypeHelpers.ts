@@ -220,4 +220,8 @@ export type NeedsResolver<
       ? true
       : false
     : true
+  : HasGen3<"rootTypes", TypeName, FieldName> extends true
+  ? null extends GetGen3<"rootTypes", TypeName, FieldName>
+    ? true
+    : false
   : false;

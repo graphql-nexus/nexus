@@ -93,9 +93,12 @@ export type FieldOutConfig<
   TypeName extends string,
   FieldName extends string
 > = NeedsResolver<TypeName, FieldName> extends true
-  ? NexusOutputFieldConfig<TypeName, FieldName> & {
-      resolve: FieldResolver<TypeName, FieldName>;
-    }
+  ? NexusOutputFieldConfig<TypeName, FieldName> &
+      (
+        | {
+            resolve: FieldResolver<TypeName, FieldName>;
+          }
+        | { nullable: true })
   : NexusOutputFieldConfig<TypeName, FieldName>;
 
 export interface OutputDefinitionBuilder {
