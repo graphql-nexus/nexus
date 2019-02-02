@@ -43,7 +43,7 @@ export class SDLConverter {
   constructor(
     sdl: string,
     commonjs: null | boolean = false,
-    protected json: JSON
+    protected json: JSON = JSON
   ) {
     this.export =
       commonjs === null ? "const " : commonjs ? "exports." : "export const ";

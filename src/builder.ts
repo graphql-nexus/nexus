@@ -857,9 +857,9 @@ export function buildTypes<
 >(
   types: any,
   config: BuilderConfig = { outputs: false },
-  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder
+  schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
-  const builder = new SchemaBuilderClass(config);
+  const builder = schemaBuilder || new SchemaBuilder(config);
   addTypes(builder, types);
   return builder.getFinalTypeMap();
 }
@@ -891,12 +891,12 @@ function addTypes(builder: SchemaBuilder, types: any) {
  */
 export function makeSchemaInternal(
   options: SchemaConfig,
-  SchemaBuilderClass: typeof SchemaBuilder = SchemaBuilder
+  schemaBuilder?: SchemaBuilder
 ): { schema: GraphQLSchema } {
   const { typeMap: typeMap } = buildTypes(
     options.types,
     options,
-    SchemaBuilderClass
+    schemaBuilder
   );
 
   let { Query, Mutation, Subscription } = typeMap;

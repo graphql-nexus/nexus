@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.3
+
+- Minor internal changes
+
 ### 0.9.2
 
 - Fixes for conditional nullability check

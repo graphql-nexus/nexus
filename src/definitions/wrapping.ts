@@ -38,9 +38,7 @@ export type AllTypeDefs =
   | AllNexusOutputTypeDefs
   | GraphQLNamedType;
 
-export type WrappedFnType = (
-  builder: SchemaBuilder
-) => AllTypeDefs | AllTypeDefs[] | Record<string, AllTypeDefs>;
+export type WrappedFnType = (builder: SchemaBuilder) => any;
 
 /**
  * Container object for a "wrapped function"

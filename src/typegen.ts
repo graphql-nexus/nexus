@@ -84,7 +84,6 @@ export class Typegen {
       this.printTypeNames("scalar", "NexusGenScalarNames"),
       this.printTypeNames("union", "NexusGenUnionNames"),
       this.printGenTypeMap(),
-      this.printFooters(),
     ].join("\n\n");
   }
 
@@ -95,10 +94,6 @@ export class Typegen {
       this.printCustomScalarMethods(),
       GLOBAL_DECLARATION,
     ].join("\n");
-  }
-
-  printFooters() {
-    return `export type Gen = NexusGenTypes;`;
   }
 
   printGenTypeMap() {
