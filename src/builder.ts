@@ -287,6 +287,10 @@ export class SchemaBuilder {
   }
 
   getFinalTypeMap(): BuildTypes<any> {
+    // If Query isn't defined, set it to null so it falls through to "missingType"
+    if (!this.pendingTypeMap.Query) {
+      this.pendingTypeMap.Query = null as any;
+    }
     Object.keys(this.pendingTypeMap).forEach((key) => {
       // If we've already constructed the type by this point,
       // via circular dependency resolution don't worry about building it.
@@ -520,6 +524,20 @@ export class SchemaBuilder {
     fromObject: boolean = false
   ): GraphQLNamedType {
     invariantGuard(typeName);
+    if (typeName === "Query") {
+      console.warn(
+        "Nexus: You should define a root `Query` type for your schema"
+      );
+      return new GraphQLObjectType({
+        name: "Query",
+        fields: {
+          ok: {
+            type: GraphQLNonNull(GraphQLBoolean),
+            resolve: () => true,
+          },
+        },
+      });
+    }
     const suggestions = suggestionList(
       typeName,
       Object.keys(this.buildingTypes).concat(Object.keys(this.finalTypeMap))
@@ -948,23 +966,7 @@ export function makeSchemaInternal(
     options,
     schemaBuilder
   );
-
   let { Query, Mutation, Subscription } = typeMap;
-
-  if (!Query) {
-    console.warn(
-      "Nexus: You should define a root `Query` type for your schema"
-    );
-    Query = new GraphQLObjectType({
-      name: "Query",
-      fields: {
-        ok: {
-          type: GraphQLNonNull(GraphQLBoolean),
-          resolve: () => true,
-        },
-      },
-    });
-  }
 
   if (!isObjectType(Query)) {
     throw new Error(
