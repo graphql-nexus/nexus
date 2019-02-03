@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "main": "dist",
   "types": "dist",
   "license": "MIT",
