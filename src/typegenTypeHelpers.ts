@@ -23,7 +23,7 @@ export type MaybePromise<T> = PromiseLike<T> | T;
  */
 export type MaybePromiseDeep<T> = MaybePromise<
   {
-    [P in keyof T]?: T[P] extends Array<infer U>
+    [P in keyof T]: T[P] extends Array<infer U>
       ? Array<MaybePromiseDeep<U>>
       : T[P] extends ReadonlyArray<infer Y>
       ? ReadonlyArray<MaybePromiseDeep<Y>>

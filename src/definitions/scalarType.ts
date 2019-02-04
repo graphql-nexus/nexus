@@ -1,4 +1,8 @@
-import { GraphQLScalarTypeConfig, assertValidName } from "graphql";
+import {
+  GraphQLScalarTypeConfig,
+  assertValidName,
+  GraphQLScalarType,
+} from "graphql";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
 export interface ScalarBase
@@ -40,4 +44,13 @@ export function scalarType<TypeName extends string>(
   options: NexusScalarTypeConfig<TypeName>
 ) {
   return new NexusScalarTypeDef(options.name, options);
+}
+
+export function asNexusMethod<T extends GraphQLScalarType>(
+  scalar: T,
+  methodName: string
+): T {
+  // @ts-ignore
+  scalar.asNexusMethod = methodName;
+  return scalar;
 }
