@@ -5,27 +5,27 @@
     "dump-tables": "node -r ts-node/register/transpile-only scripts/dumpTables.ts"
   },
   "dependencies": {
+    "apollo-server-express": "^2.3.3",
+    "dataloader": "tgriesser/dataloader.git#ts-types",
+    "express": "^4.16.4",
     "ghost": "^2.13.1",
     "graphql": "^14.0.2",
-    "nexus": "0.9.6",
-    "knex": "^0.16.3",
-    "mysql": "^2.16.0",
-    "express": "^4.16.4",
-    "apollo-server-express": "^2.3.3",
-    "lodash": "^4.17.11",
     "graphql-iso-date": "^3.6.1",
-    "dataloader": "tgriesser/dataloader.git#ts-types"
+    "knex": "^0.16.3",
+    "lodash": "^4.17.11",
+    "mysql": "^2.16.0",
+    "nexus": "0.9.7"
   },
   "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/fs-extra": "^5.0.4",
     "@types/graphql-iso-date": "^3.3.1",
     "@types/lodash": "^4.14.120",
-    "@types/fs-extra": "^5.0.4",
-    "@types/express": "^4.16.1",
+    "fs-extra": "^7.0.1",
+    "prettier": "^1.15.2",
+    "schemats": "^3.0.3",
     "ts-node": "^8.0.2",
     "ts-node-dev": "^1.0.0-pre.30",
-    "prettier": "^1.15.2",
-    "typescript": "^3.1.6",
-    "schemats": "^3.0.3",
-    "fs-extra": "^7.0.1"
+    "typescript": "^3.1.6"
   }
 }
