@@ -55,9 +55,14 @@ gulp.task(
 gulp.task("run-examples", async () => {
   for (let i = 0; i < allExamples.length; i++) {
     const example = allExamples[i];
-    const port = await getPort({
-      port: [4000, 4001, 4002, 4003, 4004, 4005, 4006],
-    });
+    let port: number;
+    if (example === "ghost") {
+      port = 3000;
+    } else {
+      port = await getPort({
+        port: [4000, 4001, 4002, 4003, 4004, 4005, 4006],
+      });
+    }
     console.log(`Starting ${example} on port ${port}`);
     spawn("yarn", ["run", "start"], {
       env: {

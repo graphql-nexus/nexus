@@ -1,0 +1,26 @@
+import { makeSchema } from "nexus";
+import path from "path";
+import * as allTypes from "./schema";
+
+export const schema = makeSchema({
+  types: allTypes,
+  outputs: {
+    schema: path.join(__dirname, "ghost-schema.graphql"),
+    typegen: path.join(__dirname, "generated", "ghost-nexus.ts"),
+  },
+  typegenAutoConfig: {
+    contextType: "ctx.Context",
+    sources: [
+      {
+        alias: "ctx",
+        module: path.join(__dirname, "data-sources", "Context.ts"),
+      },
+      {
+        alias: "db",
+        module: path.join(__dirname, "generated", "ghost-db-types.ts"),
+        typeMatch: (type) => new RegExp(`(?:interface)\\s+(${type.name}s)\\W`),
+      },
+    ],
+  },
+  prettierConfig: {},
+});

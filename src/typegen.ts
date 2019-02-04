@@ -154,6 +154,7 @@ export class Typegen {
   }
 
   printInheritedFieldMap() {
+    // TODO:
     return "export interface NexusGenInheritedFields {}";
   }
 
@@ -307,6 +308,8 @@ export class Typegen {
           } else {
             rootTypeMap[type.name] = "any";
           }
+        } else if (type.name === "Query" || type.name === "Mutation") {
+          rootTypeMap[type.name] = "{}";
         } else {
           eachObj(type.getFields(), (field) => {
             const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {});

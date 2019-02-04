@@ -13,7 +13,7 @@ export { extendType } from "./definitions/extendType";
 export { inputObjectType } from "./definitions/inputObjectType";
 export { interfaceType } from "./definitions/interfaceType";
 export { objectType, queryType, mutationType } from "./definitions/objectType";
-export { scalarType } from "./definitions/scalarType";
+export { scalarType, asNexusMethod } from "./definitions/scalarType";
 export { unionType } from "./definitions/unionType";
 export { nexusWrappedType } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";

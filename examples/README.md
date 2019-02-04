@@ -22,7 +22,7 @@ npm run examples
 
 ## Featured Example (TypeScript)
 
-- [ts-ast-reader](ts-ast-reader)
+- [ghost-graphql](ghost) (makes use of [schemats](https://github.com/SweetIQ/schemats) and the full power of inferred types)
 
 ### JavaScript:
 
@@ -30,6 +30,7 @@ npm run examples
 
 ### TypeScript:
 
+- [ts-ast-reader](ts-ast-reader)
 - [apollo-fullstack](apollo-fullstack)
 - [star-wars](star-wars)
 - [kitchen-sink](kitchen-sink)
