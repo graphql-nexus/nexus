@@ -1,5 +1,14 @@
 # Changelog
 
+### 0.9.7
+
+- Fix `maybePromiseDeep` typing
+- Add `asNexusMethod` to annotate GraphQLScalarType
+
+### 0.9.6
+
+- Fallback Query construction to `missingType` internally
+
 ### 0.9.5
 
 - Fix `nonNullDefaults` on schema
