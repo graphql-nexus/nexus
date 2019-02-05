@@ -41,7 +41,11 @@
 }
 
 .homeContainer .homeWrapper {
-  margin-top: 40px;
+  padding-top: 0px;
+}
+
+.homeContainer .projectTitle {
+  margin-top: 0px !important;
 }
 
 blockquote {

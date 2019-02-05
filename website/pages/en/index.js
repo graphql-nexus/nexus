@@ -64,7 +64,8 @@ class HomeSplash extends React.Component {
     const language = this.props.language || "";
     return (
       <SplashContainer>
-        <div className="inner" style={{ marginTop: 20, marginBottom: 20 }}>
+        <div className="inner">
+          <img src="https://i.imgur.com/Y5BgDGl.png" width="150" />
           <ProjectTitle />
           <PromoSection>
             <Button href={pageUrl("docs/getting-started", language)}>

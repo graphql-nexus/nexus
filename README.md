@@ -1,4 +1,4 @@
-<p align="center"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /></p>
+<p align="center"><a href="https://nexus.js.org"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /><a></p>
 
 # [GraphQL Nexus](https://nexus.js.org)
 

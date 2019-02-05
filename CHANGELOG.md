@@ -1,8 +1,13 @@
 # Changelog
 
+### 0.9.8
+
+- Fix `MaybePromiseDeep` typing for non-object values
+- `NexusGenCustomScalarMethods` -> `NexusGenCustomDefinitionMethods` for when we allow non-scalars to be `asNexusMethod`
+
 ### 0.9.7
 
-- Fix `maybePromiseDeep` typing
+- Fix `MaybePromiseDeep` typing
 - Add `asNexusMethod` to annotate GraphQLScalarType
 
 ### 0.9.6

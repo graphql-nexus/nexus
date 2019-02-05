@@ -114,7 +114,7 @@ export interface InputDefinitionBuilder {
 }
 
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomScalarMethods<TypeName> {}
+  extends NexusGenCustomDefinitionMethods<TypeName> {}
 
 /**
  * The output definition block is passed to the "definition"
@@ -234,7 +234,7 @@ export type NexusInputFieldDef = NexusInputFieldConfig & {
 };
 
 export interface InputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomScalarMethods<TypeName> {}
+  extends NexusGenCustomDefinitionMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean;

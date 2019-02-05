@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from "graphql";
 
 declare global {
   interface NexusGen {}
-  interface NexusGenCustomScalarMethods<TypeName extends string> {}
+  interface NexusGenCustomDefinitionMethods<TypeName extends string> {}
 }
 
 export type AllInputTypes = GetGen<"allInputTypes">;
@@ -21,17 +21,19 @@ export type MaybePromise<T> = PromiseLike<T> | T;
  * resolves promises at any level of the tree, we use this
  * to help signify that.
  */
-export type MaybePromiseDeep<T> = MaybePromise<
-  {
-    [P in keyof T]: T[P] extends Array<infer U>
-      ? Array<MaybePromiseDeep<U>>
-      : T[P] extends ReadonlyArray<infer Y>
-      ? ReadonlyArray<MaybePromiseDeep<Y>>
-      : Date extends T[P]
-      ? MaybePromise<T[P]>
-      : MaybePromiseDeep<T[P]>
-  }
->;
+export type MaybePromiseDeep<T> = T extends object
+  ? MaybePromise<
+      {
+        [P in keyof T]: T[P] extends Array<infer U>
+          ? Array<MaybePromiseDeep<U>>
+          : T[P] extends ReadonlyArray<infer Y>
+          ? ReadonlyArray<MaybePromiseDeep<Y>>
+          : Date extends T[P]
+          ? MaybePromise<T[P]>
+          : MaybePromiseDeep<T[P]>
+      }
+    >
+  : MaybePromise<T>;
 
 /**
  * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety

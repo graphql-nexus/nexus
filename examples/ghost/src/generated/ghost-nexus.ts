@@ -7,7 +7,7 @@ import * as ctx from "../data-sources/Context";
 import * as db from "./ghost-db-types";
 import { core } from "nexus";
 declare global {
-  interface NexusGenCustomScalarMethods<TypeName extends string> {
+  interface NexusGenCustomDefinitionMethods<TypeName extends string> {
     date<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>

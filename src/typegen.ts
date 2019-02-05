@@ -130,7 +130,7 @@ export class Typegen {
     return [
       `import { core } from "nexus"`,
       `declare global {`,
-      `  interface NexusGenCustomScalarMethods<TypeName extends string> {`,
+      `  interface NexusGenCustomDefinitionMethods<TypeName extends string> {`,
     ]
       .concat(
         mapObj(customScalars, (val, key) => {

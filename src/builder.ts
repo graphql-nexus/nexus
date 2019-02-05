@@ -506,7 +506,7 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected withScalarMethods<T extends NexusGenCustomScalarMethods<string>>(
+  protected withScalarMethods<T extends NexusGenCustomDefinitionMethods<string>>(
     definitionBlock: T
   ): T {
     this.customScalarMethods.forEach(([methodName, typeName]) => {
