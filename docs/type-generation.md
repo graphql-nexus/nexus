@@ -37,17 +37,15 @@ export interface TypegenAutoConfigOptions {
   /**
    * Array of files to match for a type
    *
-   * \`\`\`
-   * sources: [
-   *   { module: 'typescript', alias: 'ts' },
-   *   { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
-   * ]
-   * \`\`\`
+   *   sources: [
+   *     { module: 'typescript', alias: 'ts' },
+   *     { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   *   ]
    */
   sources: TypegenConfigSourceModule[];
   /**
    * Typing for the context, referencing a type defined in the aliased module
-   * provided in sources e.g. `alias.Context`
+   * provided in sources e.g. 'alias.Context'
    */
   contextType?: string;
   /**
@@ -55,9 +53,7 @@ export interface TypegenAutoConfigOptions {
    *
    * By default this is set to ['Query', 'Mutation', 'Subscription']
    *
-   * \`\`\`
-   * skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
-   * \`\`\`
+   *   skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
    */
   skipTypes?: (string | RegExp)[];
   /**
@@ -82,7 +78,7 @@ export interface TypegenConfigSourceModule {
    */
   module: string;
   /**
-   * When we import the module, we use `import * as ____` to prevent
+   * When we import the module, we use 'import * as ____' to prevent
    * conflicts. This alias should be a name that doesn't conflict with any other
    * types, usually a short lowercase name.
    */
@@ -91,9 +87,9 @@ export interface TypegenConfigSourceModule {
    * Provides a custom approach to matching for the type
    *
    * If not provided, the default implementation is:
-   * \`\`\`
-   * (type) => new RegExp(`(?:interface|type|class)\s+(${type.name})\W`)
-   * \`\`\`
+   *
+   *   (type) => new RegExp('(?:interface|type|class)\s+(${type.name})\W')
+   *
    */
   typeMatch?: (
     type: GraphQLNamedType,
@@ -106,8 +102,8 @@ export interface TypegenConfigSourceModule {
    */
   onlyTypes?: (string | RegExp)[];
   /**
-   * By default the import is configured `import * as alias from`, setting glob to false
-   * will change this to `import alias from`
+   * By default the import is configured 'import * as alias from', setting glob to false
+   * will change this to 'import alias from'
    */
   glob?: false;
 }
