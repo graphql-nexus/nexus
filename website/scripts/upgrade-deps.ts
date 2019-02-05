@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import path from "path";
 import util from "util";
 import { allExamples } from "./constants";
-import { name, version } from "../../package.json";
+const { name, version } = require("../../package.json");
 
 const execAsync = util.promisify(exec);
 

@@ -17,6 +17,7 @@ import {
   GraphQLWrappingType,
   isScalarType,
   isObjectType,
+  GraphQLInputField,
 } from "graphql";
 import { groupTypes, GroupedTypes, isInterfaceField, objValues } from "./utils";
 
@@ -33,7 +34,7 @@ export function convertSDL(
 }
 
 /**
- * Convert an existing SDL schema into a Nexus GraphQL format
+ * Convert an existing SDL schema into a GraphQL Nexus format
  */
 export class SDLConverter {
   protected export: string;
@@ -104,7 +105,17 @@ export class SDLConverter {
       .join("\n");
   }
 
-  printField(source: "input" | "output", field: GraphQLField<any, any>) {
+  printInputObjectFields(type: GraphQLInputObjectType) {
+    return objValues(type.getFields())
+      .map((field) => this.printField("input", field))
+      .filter((f) => f)
+      .join("\n");
+  }
+
+  printField(
+    source: "input" | "output",
+    field: GraphQLField<any, any> | GraphQLInputField
+  ) {
     let fieldType = field.type;
     let isNonNull = false;
     const list = [];
@@ -135,8 +146,10 @@ export class SDLConverter {
 
   printFieldMethod(
     source: "input" | "output",
-    field: GraphQLField<any, any>,
-    type: Exclude<GraphQLOutputType, GraphQLWrappingType>,
+    field: GraphQLField<any, any> | GraphQLInputField,
+    type:
+      | Exclude<GraphQLOutputType, GraphQLWrappingType>
+      | Exclude<GraphQLInputObjectType, GraphQLWrappingType>,
     list: boolean[],
     isNonNull: boolean
   ) {
@@ -144,7 +157,7 @@ export class SDLConverter {
     if (field.description) {
       objectMeta.description = field.description;
     }
-    if (field.deprecationReason) {
+    if ("deprecationReason" in field && field.deprecationReason) {
       objectMeta.deprecation = field.deprecationReason;
     }
     if (list.length > 1) {
@@ -184,6 +197,7 @@ export class SDLConverter {
       this.maybeDescription(type),
       `  definition(t) {`,
       this.printObjectFields(type),
+      `    t.resolveType(() => null)`,
       `  }`,
       `});`,
     ]);
@@ -230,6 +244,7 @@ export class SDLConverter {
       `  name: "${type.name}",`,
       this.maybeDescription(type),
       `  definition(t) {`,
+      this.printInputObjectFields(type),
       `  }`,
       `});`,
     ]);
@@ -250,6 +265,10 @@ export class SDLConverter {
       `  name: "${type.name}",`,
       this.maybeDescription(type),
       `  definition(t) {`,
+      `    t.members(${type
+        .getTypes()
+        .map((t) => JSON.stringify(t.name))
+        .join(", ")})`,
       `  }`,
       `});`,
     ]);
@@ -297,7 +316,7 @@ export class SDLConverter {
   }
 }
 
-function isCommonScalar(field: GraphQLOutputType): boolean {
+function isCommonScalar(field: GraphQLNamedType): boolean {
   if (isScalarType(field)) {
     return (
       isSpecifiedScalarType(field) ||

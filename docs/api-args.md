@@ -4,22 +4,18 @@ title: args
 sidebar_label: "args: arg / *Arg"
 ---
 
-Nexus provides a way to create these
+[GraphQL Docs on Arguments](https://graphql.org/learn/schema/#arguments)
 
-## Args: `arg()` / `*Arg()`
+`arg`, `intArg`, `stringArg`, `floatArg`, `idArg`, `booleanArg`
 
-Defines an argument that can be used in any object or interface type
+Defines an argument that can be used in any object or interface type. Args can be reused in multiple locations, and it can be convenient to create your own wrappers around arguments.
 
-Takes the GraphQL type name and any options.
+```ts
+import { intArg, core } from "nexus";
 
-The value returned from this argument can be used multiple times in any valid `args` object value
+function requiredInt(opts: core.ScalarArgConfig<number>) {
+  return intArg({ ...opts, required: true });
+}
+```
 
-@see https://graphql.github.io/learn/schema/#arguments
-
-Alias for `arg("Float", options)`
-
-Alias for `arg("ID", options)`
-
-Alias for `arg("Int", options)`
-
-Alias for `arg("String", options)`
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options for `arg`, or feel free to open a PR on the docs to help document!

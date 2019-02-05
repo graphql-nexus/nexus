@@ -4,9 +4,7 @@ title: interfaceType
 sidebar_label: interfaceType
 ---
 
-Like many type systems, GraphQL supports interfaces. An Interface is an
-abstract type that includes a certain set of fields that a type must
-include to implement the interface.
+[GraphQL Docs for Interface Types](https://graphql.org/learn/schema/#input-types)
 
 In Nexus, you do not need to redefine the interface fields on the
 implementing object types, instead you may use `.implements(interfaceName)`
@@ -28,4 +26,4 @@ const User = objectType({
 });
 ```
 
-@see https://graphql.github.io/learn/schema/#interfaces
+If you need to modify the description or resolver defined by an interface, you can call the `modify` method on `objectType` to change these after the fact.

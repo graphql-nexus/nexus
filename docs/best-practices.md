@@ -8,13 +8,15 @@ A few tips when using Nexus to build out a schema:
 
 ## Configure your development server to auto-restart
 
-The development experience works best when you are using a tool like [Nodemon](https://github.com/remy/nodemon) to restart your application. as the schema changes. The GraphQL schema artifact will automatically regenerate when the server restarts in development mode.
+The development experience works best when you are using a tool like [Nodemon](https://github.com/remy/nodemon) to restart your application as the schema changes. The GraphQL schema artifact will automatically regenerate when the server restarts in development mode. Check the [/examples](https://github.com/prisma/nexus/tree/develop/examples) to see how they are setup to auto-restart.
 
 ## VSCode: Configuring a keyboard shortcut for "Go to Type Definition"
 
+Because the types are derived via conditional type expressions, command-click for the arguments in the resolve function don't quite work as you'd expect. There's another option, "Go To Type Expression" which you can find in the secondary click menu, but it's not bound to a keyboard shortcut by default. I've found it convenient to bind to `cmd+'`
+
 ```json
 {
-  "key": "cmd+.",
+  "key": "cmd+'",
   "command": "editor.action.goToTypeDefinition"
 }
 ```

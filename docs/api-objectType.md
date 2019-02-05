@@ -8,8 +8,7 @@ sidebar_label: objectType
 objectType(typeName: string, fn: ObjectDefinitionBlock): NexusObjectType
 ```
 
-The most basic components of a GraphQL schema are object types, which just represent
-a kind of object you can fetch from your service, and what fields it has.
+The most basic components of a GraphQL schema are object types, a type you can fetch from your schema, with fields:
 
 ```ts
 const User = objectType({
@@ -44,6 +43,6 @@ const StatusEnum = enumType({
 });
 ```
 
-@see https://graphql.github.io/learn/schema/#object-types-and-fields
+`queryType` / `mutationType` are shorthand for the root types.
 
-#### ObjectDefinitionBlock
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options of `objectType`, or feel free to open a PR on the docs to help document!

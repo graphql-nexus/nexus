@@ -1,5 +1,5 @@
 /// <reference path="../fullstack-typegen.ts" />
-import { objectType, idArg, intArg, stringArg } from "nexus";
+import { objectType, idArg, intArg, stringArg, core } from "nexus";
 import { Utils } from "../typeDefs";
 const utils: Utils = require("fullstack-tutorial/final/server/src/utils.js");
 

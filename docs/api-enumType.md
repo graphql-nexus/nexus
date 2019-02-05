@@ -4,18 +4,15 @@ title: enumType
 sidebar_label: enumType
 ---
 
-## enumType(EnumDefinitionBlock)
+[GraphQL Docs for Enum Types](https://graphql.org/learn/schema/#enumeration-types)
 
-An Enum is a special GraphQL type that represents a set of symbolic names (members)
-bound to unique, constant values. There are three ways to create a GraphQLEnumType
-with enumType:
-
-As an array of enum values:
+Definining as an array of enum values:
 
 ```ts
 const Episode = enumType({
   name: "Episode",
   members: ["NEWHOPE", "EMPIRE", "JEDI"],
+  description: "The first Star Wars episodes released",
 });
 ```
 
@@ -32,15 +29,4 @@ const Episode = enumType({
 });
 ```
 
-```graphql
-"""
-All Movies in the Skywalker saga, or OTHER
-"""
-enum Episode {
-  OTHER
-}
-```
-
-@see https://graphql.github.io/learn/schema/#enumeration-types
-
-###
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options of `enumType`, or feel free to open a PR on the docs to help document!

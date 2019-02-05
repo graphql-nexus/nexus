@@ -30,6 +30,11 @@ window.addEventListener("load", function() {
     button("Copy", "Copy code to clipboard", copyIcon, "btnClipboard")
   );
 
+  addButtons(
+    ".language-ts",
+    button("Copy", "Copy code to clipboard", copyIcon, "btnClipboard")
+  );
+
   const clipboard = new ClipboardJS(".btnClipboard", {
     target: function(trigger) {
       return trigger.parentNode.querySelector("code");

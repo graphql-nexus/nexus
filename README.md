@@ -1,28 +1,124 @@
-## Nexus GraphQL
+# [GraphQL Nexus](https://nexus.js.org)
 
-#### [nexus.js.org](https://nexus.js.org)
+Declarative, code-first, strongly typed GraphQL schema construction for JavaScript/TypeScript.
+
+_Note: This library is independent of the Prisma database client. For the prisma-plugin, visit https://github.com/prisma/nexus-prisma_
+
+## [Read the Documentation](https://nexus.js.org)
+
+## [Check out the Examples](https://github.com/prisma/nexus/tree/develop/examples)
 
 ```
-yarn add nexus # or npm install nexus
+yarn add nexus // or npm install nexus
 ```
 
-**(Still under construction, check [#1](https://github.com/graphql-nexus/nexus/issues/1) for the TODO List!)**
+---
 
-Simple, strongly typed GraphQL schema construction for TypeScript/JavaScript
+### Example Star Wars Schema:
 
-Combines the best practices from building real-world GraphQL servers without the boilerplate or excessive imports.
+```ts
+export const Character = interfaceType({
+  name: "Character",
+  definition: (t) => {
+    t.string("id", { description: "The id of the character" });
+    t.string("name", { description: "The name of the character" });
+    t.list.field("friends", {
+      type: Character,
+      description:
+        "The friends of the character, or an empty list if they have none.",
+      resolve: (character) => getFriends(character),
+    });
+    t.list.field("appearsIn", {
+      type: "Episode",
+      description: "Which movies they appear in.",
+      resolve: (o) => o.appears_in,
+      args: {
+        id: idArg({ required: true }),
+      },
+    });
+    t.resolveType((character) => character.type);
+  },
+});
 
-Inspired by use of [graphql-tools](https://github.com/apollographql/graphql-tools), [graphene](https://docs.graphene-python.org/en/latest/), and [graphql-ruby](https://github.com/rmosolgo/graphql-ruby).
+export const Droid = objectType({
+  name: "Droid",
+  description: "A mechanical creature in the Star Wars universe.",
+  definition(t) {
+    t.implements(Character);
+    t.string("primaryFunction", {
+      description: "The primary function of the droid.",
+      resolve: (o) => o.primary_function || "N/A",
+    });
+  },
+});
 
-Check out the [`/examples`](/examples) for some sample uses.
+const OriginalEpisodes = [
+  { name: "NEWHOPE", value: 4, description: "Released in 1977." },
+  { name: "EMPIRE", value: 5, description: "Released in 1980." },
+  { name: "JEDI", value: 6, description: "Released in 1983" },
+];
 
-### Docs
+export const Episode = enumType({
+  name: "Episode",
+  description: "One of the films in the Star Wars Trilogy",
+  members: OriginalEpisodes,
+});
 
-[nexus.js.org](https://nexus.js.org)
+export const Human = objectType({
+  name: "Human",
+  description: "A humanoid creature in the Star Wars universe.",
+  definition(t) {
+    t.implements(Character);
+    t.string("homePlanet", {
+      nullable: true,
+      description: "The home planet of the human, or null if unknown.",
+      resolve: (o) => o.home_planet || null,
+    });
+  },
+});
 
-### License
+const characterArgs = {
+  id: stringArg({
+    required: true,
+    description: "id of the character",
+  }),
+};
 
-Copyright 2019 Tim Griesser
+const heroArgs = {
+  episode: arg({
+    type: "Episode",
+    description:
+      "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.",
+  }),
+};
+
+export const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.field("hero", {
+      type: Character,
+      args: heroArgs,
+      resolve: (_, { episode }) => getHero(episode),
+    });
+    t.field("human", {
+      type: Human,
+      args: characterArgs,
+      resolve: (_, { id }) => getHuman(id),
+    });
+    t.field("droid", {
+      type: Droid,
+      args: characterArgs,
+      resolve: (_, { id }) => getDroid(id),
+    });
+  },
+});
+```
+
+---
+
+## License (MIT)
+
+(c) 2018-2019 Tim Griesser
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

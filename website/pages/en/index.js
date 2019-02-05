@@ -1,8 +1,6 @@
 const React = require("react");
-
 const CompLibrary = require("../../core/CompLibrary.js");
 
-const MarkdownBlock = CompLibrary.MarkdownBlock; /* Used to read markdown */
 const Container = CompLibrary.Container;
 const GridBlock = CompLibrary.GridBlock;
 
@@ -10,10 +8,6 @@ const siteConfig = require(`${process.cwd()}/siteConfig.js`);
 
 function imgUrl(img) {
   return `${siteConfig.baseUrl}img/${img}`;
-}
-
-function docUrl(doc, language) {
-  return `${siteConfig.baseUrl}docs/${language ? `${language}/` : ""}${doc}`;
 }
 
 function pageUrl(page, language) {
@@ -70,12 +64,9 @@ class HomeSplash extends React.Component {
     const language = this.props.language || "";
     return (
       <SplashContainer>
-        <div className="inner">
+        <div className="inner" style={{ marginTop: 20, marginBottom: 20 }}>
           <ProjectTitle />
           <PromoSection>
-            {/* <Button href={pageUrl("blog/2018/11/04/introducing-nexus")}>
-              Why Nexus?
-            </Button> */}
             <Button href={pageUrl("docs/getting-started", language)}>
               Getting Started
             </Button>
@@ -95,104 +86,13 @@ const Block = (props) => (
     id={props.id}
     background={props.background}
   >
-    <GridBlock align="center" contents={props.children} layout={props.layout} />
+    <GridBlock
+      align={props.align}
+      contents={props.children}
+      layout={props.layout}
+    />
   </Container>
 );
-
-const Features = () => (
-  <Block layout="fourColumn">
-    {[
-      {
-        title: "",
-        content:
-          "Utilize the full features of the language when building your schema",
-      },
-      {
-        title: "Type-Safe by Default",
-        content: "The content of my second feature",
-      },
-      {
-        title: "Type-Safe by Default",
-        content: "The content of my second feature",
-      },
-    ]}
-  </Block>
-);
-
-const FeatureCallout = () => (
-  <div
-    className="productShowcaseSection paddingBottom"
-    style={{ textAlign: "center" }}
-  >
-    <h2>Feature Callout</h2>
-    <MarkdownBlock>These are features of this project</MarkdownBlock>
-  </div>
-);
-
-const LearnHow = () => (
-  <Block background="light">
-    {[
-      {
-        title: "Learn How",
-        content:
-          "Schema first development is great for prototyping, but starts to break down when building larger scale applications.",
-      },
-    ]}
-  </Block>
-);
-
-const TryOut = () => (
-  <Block id="try">
-    {[
-      {
-        content: "Talk about trying this out",
-        image: imgUrl("nexus.png"),
-        imageAlign: "left",
-        title: "Try it Out",
-      },
-    ]}
-  </Block>
-);
-
-const Description = () => (
-  <Block background="dark">
-    {[
-      {
-        content: "This is another description of how this project is useful",
-        image: imgUrl("nexus.png"),
-        imageAlign: "right",
-        title: "Description",
-      },
-    ]}
-  </Block>
-);
-
-const Showcase = (props) => {
-  if ((siteConfig.users || []).length === 0) {
-    return null;
-  }
-
-  const showcase = siteConfig.users
-    .filter((user) => user.pinned)
-    .map((user) => (
-      <a href={user.infoLink} key={user.infoLink}>
-        <img src={user.image} alt={user.caption} title={user.caption} />
-      </a>
-    ));
-
-  return (
-    <div className="productShowcaseSection paddingBottom">
-      <h2>Who is Using This?</h2>
-      <p>This project is used by all these people</p>
-      <div className="logos">{showcase}</div>
-      <div className="more-users">
-        <a className="button" href={pageUrl("users.html", props.language)}>
-          More {siteConfig.title} Users
-        </a>
-      </div>
-    </div>
-  );
-};
 
 class Index extends React.Component {
   render() {
@@ -200,7 +100,72 @@ class Index extends React.Component {
     return (
       <div>
         <HomeSplash language={language} />
-        {/* <Features /> */}
+        <Block layout="threeColumn" background="light" align="center">
+          {[
+            {
+              title: "Type-Safe by Default",
+              image: imgUrl("tsjs.png"),
+              imageAlign: "top",
+              content:
+                `GraphQL Nexus' APIs were designed with type-safety in mind. We auto-generate type-definitions as you develop, ` +
+                `and infer them in your code, giving you IDE completion and type error catching out of the box!`,
+            },
+            {
+              title: "Works With The Ecosystem",
+              image: imgUrl("graphql-logo.png"),
+              imageAlign: "top",
+              content:
+                `Nexus can work with existing graphql-js types when constructing its schema. ` +
+                `The generated schema works with your favorite tools like Apollo Server or GraphQL middleware!`,
+            },
+            {
+              title: "Data-Agnostic",
+              image: imgUrl("database.png"),
+              imageAlign: "top",
+              content:
+                `GraphQL Nexus is just a declarative syntax layered on the graphql-js library. Whatever ` +
+                `you can do with graphql-js or apollo-tools, you can do with Nexus.`,
+            },
+          ]}
+        </Block>
+        <Block background="dark">
+          {[
+            {
+              title: "Automatic Type Inference (even in JS!)",
+              image: imgUrl("type-inference.png"),
+              imageAlign: "right",
+              content:
+                `Automatically generates and infers types based on the schema. No need to manually add ` +
+                `annotations, Nexus can automatically infer them in TypeScript using [global declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) ` +
+                `and [conditional type inference](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-inference-in-conditional-types).`,
+              textAlign: "left",
+            },
+          ]}
+        </Block>
+        <Block id="try">
+          {[
+            {
+              title: "Autocompletion on Type Names",
+              content:
+                `For association type fields, you can either import types you've created, or just supply their ` +
+                `names as strings... with free autocomplete! Nexus keeps track of the type names in your schema and provides them ` +
+                `to the type-system, so you know what you can use at various positions in your schema.`,
+              image: imgUrl("autocomplete.png"),
+              imageAlign: "left",
+            },
+          ]}
+        </Block>
+        <Block background="light">
+          {[
+            {
+              title: "SDL -> Nexus Converter",
+              image: imgUrl("converter.png"),
+              content:
+                "Try the automatic [SDL converter](/converter) to convert an existing schema into Nexus code",
+              imageAlign: "right",
+            },
+          ]}
+        </Block>
       </div>
     );
   }

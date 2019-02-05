@@ -4,6 +4,8 @@ title: unionType
 sidebar_label: unionType
 ---
 
+[GraphQL Docs for Union Types](https://graphql.org/learn/schema/#union-types)
+
 Union types are very similar to interfaces, but they don't get to specify any common fields between the types.
 
 ```ts
@@ -17,4 +19,4 @@ const MediaType = unionType({
 });
 ```
 
-@see https://graphql.org/learn/schema/#union-types
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options for `unionType`, or feel free to open a PR on the docs to help document!

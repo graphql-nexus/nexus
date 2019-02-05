@@ -79,6 +79,7 @@ export const SomeEnum = enumType({
   name: \\"Node\\",
   definition(t) {
     t.id(\\"id\\")
+    t.resolveType(() => null)
   }
 });"
 `);
@@ -127,17 +128,23 @@ export const Node = interfaceType({
   name: \\"Node\\",
   definition(t) {
     t.id(\\"id\\")
+    t.resolveType(() => null)
   }
 });
 
 export const CreatePostInput = inputObjectType({
   name: \\"CreatePostInput\\",
   definition(t) {
+    t.string(\\"name\\", {\\"required\\":true})
+    t.id(\\"author\\", {\\"required\\":true})
+    t.float(\\"geo\\", {\\"list\\":[false,true],\\"required\\":true})
   }
 });
 export const PostFilters = inputObjectType({
   name: \\"PostFilters\\",
   definition(t) {
+    t.field(\\"order\\", {\\"required\\":true,\\"type\\":\\"OrderEnum\\"})
+    t.string(\\"search\\")
   }
 });
 

@@ -3,7 +3,7 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Simple, code-first, strongly typed GraphQL schemas for JavaScript/TypeScript",
+    "tagline": "Declarative, Code-First GraphQL Schemas for JavaScript/TypeScript",
     "docs": {
       "args": {
         "title": "args",
@@ -29,6 +29,10 @@
         "title": "interfaceType",
         "sidebar_label": "interfaceType"
       },
+      "api-makeSchema": {
+        "title": "makeSchema",
+        "sidebar_label": "makeSchema"
+      },
       "api-objectType": {
         "title": "objectType",
         "sidebar_label": "objectType"
@@ -41,24 +45,16 @@
         "title": "unionType",
         "sidebar_label": "unionType"
       },
-      "testing": {
-        "title": "App Structure & Testing",
-        "sidebar_label": "App Structure & Testing"
-      },
       "best-practices": {
         "title": "Best Practices",
         "sidebar_label": "Best Practices"
-      },
-      "faq": {
-        "title": "Frequently Asked Questions",
-        "sidebar_label": "FAQ"
       },
       "future-features": {
         "title": "Potential Features",
         "sidebar_label": "Potential Future Features"
       },
       "getting-started": {
-        "title": "Nexus GraphQL",
+        "title": "GraphQL Nexus",
         "sidebar_label": "Getting Started"
       },
       "library-authors": {
@@ -70,8 +66,8 @@
         "sidebar_label": "Type Generation Details"
       },
       "why-graphql-nexus": {
-        "title": "How is Nexus Different",
-        "sidebar_label": "How is Nexus Different"
+        "title": "Why Nexus?",
+        "sidebar_label": "Why Nexus?"
       }
     },
     "links": {

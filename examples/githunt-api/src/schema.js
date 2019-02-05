@@ -54,6 +54,10 @@ exports.Query = objectType({
       type: "User",
       description:
         "Return the currently logged in user, or null if nobody is logged in",
+      nullable: true,
+      resolve() {
+        return null;
+      },
     });
   },
 });

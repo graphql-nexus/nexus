@@ -63,7 +63,7 @@ export class TypegenMetadata {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
       return Promise.reject(
         new Error(
-          `Expected an absolute path to output the Nexus GraphQL ${type}, saw ${filePath}`
+          `Expected an absolute path to output the GraphQL Nexus ${type}, saw ${filePath}`
         )
       );
     }

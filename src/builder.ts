@@ -204,7 +204,7 @@ export class SchemaBuilder {
   protected definedTypeMap: Record<string, GraphQLNamedType> = {};
   /**
    * The "pending type" map keeps track of all types that were defined w/
-   * Nexus GraphQL and haven't been processed into concrete types yet.
+   * GraphQL Nexus and haven't been processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {};
   /**
@@ -456,7 +456,7 @@ export class SchemaBuilder {
     }
     if (!Object.keys(values).length) {
       throw new Error(
-        `Nexus GraphQL: Enum ${config.name} must have at least one member`
+        `GraphQL Nexus: Enum ${config.name} must have at least one member`
       );
     }
     return this.finalize(
@@ -572,7 +572,7 @@ export class SchemaBuilder {
     });
     if (!unionMembers.length) {
       throw new Error(
-        `Nexus GraphQL: Union ${unionName} must have at least one member type`
+        `GraphQL Nexus: Union ${unionName} must have at least one member type`
       );
     }
     return unionMembers;
@@ -851,7 +851,7 @@ export class SchemaBuilder {
     }
     if (this.buildingTypes.has(name)) {
       throw new Error(
-        `Nexus GraphQL: Circular dependency detected, while building types ${Array.from(
+        `GraphQL Nexus: Circular dependency detected, while building types ${Array.from(
           this.buildingTypes
         )}`
       );
@@ -998,7 +998,7 @@ export function makeSchemaInternal(
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the Nexus GraphQL layer or any manually defined GraphQLType objects.
+ * by the GraphQL Nexus layer or any manually defined GraphQLType objects.
  *
  * Requires at least one type be named "Query", which will be used as the
  * root query type.

@@ -18,7 +18,7 @@ import {
 import path from "path";
 
 export function log(msg: string) {
-  console.log(`Nexus GraphQL: ${msg}`);
+  console.log(`GraphQL Nexus: ${msg}`);
 }
 
 export function withDeprecationComment(description?: string | null) {

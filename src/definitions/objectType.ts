@@ -68,7 +68,7 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
-   * more about Nexus GraphQL's assumptions and configuration
+   * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    */
   nonNullDefaults?: NonNullConfig;

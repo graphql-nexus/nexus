@@ -8,10 +8,10 @@ const content = dedent`
   // All nexus.js objects are available globally here,
   // and will automatically be added to the schema
 
-  objectType({
+  const Account = objectType({
     name: 'Account', 
     definition(t) {
-      t.implements('Node', 'Timestamps');
+      t.implements(NodeType, Timestamps);
       t.string('email', { nullable: true });
       t.list.field('posts', { 
         type: 'Post', 
@@ -20,10 +20,10 @@ const content = dedent`
     }
   });
 
-  objectType({
+  const Post = objectType({
     name: 'Post', 
     definition(t) {
-      t.implements('Node');
+      t.implements(NodeType);
       t.string('title', (o) => o.title || '');
       t.field('owner', {
         type: 'Account',
@@ -34,11 +34,11 @@ const content = dedent`
     }
   })
 
-  objectType({
+  const Query = objectType({
     name: 'Query', 
     definition(t) {
       t.field('account', {
-        type: 'Account',
+        type: Account,
         resolve() {
           return { id: 1, email: 'test@example.com' }
         }
@@ -46,7 +46,16 @@ const content = dedent`
     }
   });
 
-  interfaceType({
+  const Timestamps = interfaceType({
+    name: 'Timestamps', 
+    definition(t) {
+      t.date('createdAt', () => new Date());
+      t.date('updatedAt', () => new Date());
+      t.resolveType(() => null)
+    }
+  });
+
+  const NodeType = interfaceType({
     name: 'Node', 
     description: "A Node is a resource with a globally unique identifier",
     definition(t) {
@@ -59,15 +68,6 @@ const content = dedent`
       t.resolveType(() => null)
     }
   })
-
-  interfaceType({
-    name: 'Timestamps', 
-    definition(t) {
-      t.date('createdAt', () => new Date());
-      t.date('updatedAt', () => new Date());
-      t.resolveType(() => null)
-    }
-  });
 
   scalarType({
     name: 'Date',

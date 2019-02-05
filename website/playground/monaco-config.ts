@@ -3,7 +3,6 @@ import "./monaco-graphql";
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   target: monaco.languages.typescript.ScriptTarget.ES2016,
-  // lib: ["lib", "ScriptHost", "es5", "es6"],
   allowNonTsExtensions: true,
   moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
   module: monaco.languages.typescript.ModuleKind.CommonJS,

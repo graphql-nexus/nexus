@@ -6,9 +6,9 @@ import { objectType, inputObjectType } from "../src";
 export const UserObject = objectType({
   name: "User",
   definition(t) {
-    t.id("id", () => `User:1`);
-    t.string("email", () => "test@example.com");
-    t.string("name", () => `Test User`);
+    t.id("id", () => `User:1` as any);
+    t.string("email", () => "test@example.com" as any);
+    t.string("name", () => `Test User` as any);
   },
 });
 

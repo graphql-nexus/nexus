@@ -1,4 +1,4 @@
-# Nexus GraphQL Examples
+# GraphQL Nexus Examples
 
 All of these example can be run at once:
 

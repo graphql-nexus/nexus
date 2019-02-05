@@ -1,11 +1,12 @@
 /* your custom css */
 
+/* 
 .hljs {
   padding: 1em;
   display: block;
   overflow-x: auto;
   background: #f0f0f0 !important;
-}
+} */
 
 .codeLink {
   color: blue;
@@ -37,6 +38,10 @@
 .hashLink {
   color: #aaa;
   visibility: hidden;
+}
+
+.homeContainer .homeWrapper {
+  margin-top: 40px;
 }
 
 blockquote {

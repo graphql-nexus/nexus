@@ -4,8 +4,18 @@ title: inputObjectType
 sidebar_label: inputObjectType
 ---
 
+[GraphQL Docs for Input Object Types](https://graphql.org/learn/schema/#input-types)
+
 Defines a complex object which can be passed as an input value.
 
-Unlike object types, input types do not have arguments, so they do not have resolvers or "backing types"
+```ts
+export const InputType = inputObjectType({
+  name: "InputType",
+  definition(t) {
+    t.string("key", { required: true });
+    t.int("answer");
+  },
+});
+```
 
-@see https://graphql.org/learn/schema/#input-types
+Unlike object types, input types do not have arguments, so they do not have resolvers or "backing types"

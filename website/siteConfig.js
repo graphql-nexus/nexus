@@ -1,18 +1,6 @@
-// List of projects/orgs using your project for the users page.
-const users = [
-  {
-    caption: "Prisma",
-    // You will need to prepend the image path with your baseUrl
-    image: "img/prisma.png",
-    infoLink: "https://www.prisma.io/",
-    pinned: true,
-  },
-];
-
 const siteConfig = {
-  title: "Nexus GraphQL", // Title for your website.
-  tagline:
-    "Simple, code-first, strongly typed GraphQL schemas for JavaScript/TypeScript",
+  title: "GraphQL Nexus", // Title for your website.
+  tagline: "Declarative, Code-First GraphQL Schemas for JavaScript/TypeScript",
   url: "https://nexus.js.org", // Your website URL
   baseUrl: "/", // Base URL for your project */
   gaTrackingId: "UA-39763513-4",
@@ -76,19 +64,17 @@ const siteConfig = {
 
   highlight: {
     // Highlight.js theme to use for syntax highlighting in code blocks.
-    theme: "default",
+    theme: "atom-one-dark",
   },
 
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
+    "https://use.fontawesome.com/releases/v5.7.1/js/all.js",
     "https://buttons.github.io/buttons.js",
     "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",
     "/js/code-block-buttons.js",
   ],
-  stylesheets: [
-    "https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.css",
-    "/css/code-block-buttons.css",
-  ],
+  stylesheets: ["/css/code-block-buttons.css"],
 
   // On page navigation for the current documentation page.
   onPageNav: "separate",
@@ -110,7 +96,7 @@ const siteConfig = {
   repoUrl: "https://github.com/graphql-nexus/nexus",
   separateCss: ["static/separate-css"],
 
-  users,
+  // users,
 };
 
 module.exports = siteConfig;

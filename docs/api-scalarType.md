@@ -4,7 +4,7 @@ title: scalarType
 sidebar_label: scalarType
 ---
 
-[GraphQL Docs for Scalar Types](https://graphql.github.io/learn/schema/#scalar-types)
+[GraphQL Docs for Scalar Types](https://graphql.org/learn/schema/#scalar-types)
 
 Nexus allows you to provide an `asNexusMethod` property which will make the scalar available as a builtin on the definition block object. We automatically generate and merge the types so you get type-safety just like the scalar types specified in the spec:
 
@@ -27,3 +27,22 @@ const DateScalar = scalarType({
   },
 });
 ```
+
+If you have an existing GraphQL scalar and you'd like to expose it as a method on the builder, call `asNexusMethod`:
+
+```ts
+import { GraphQLDate } from "graphql-iso-date";
+
+export const GQLDate = asNexusMethod(GraphQLDate, "date");
+```
+
+```ts
+const SomeObject = objectType({
+  name: "SomeObject",
+  definition(t) {
+    t.date("createdAt"); // t.date() is now available (with types!) because of `asNexusMethod`
+  },
+});
+```
+
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options for `scalarType`, or feel free to open a PR on the docs to help document!

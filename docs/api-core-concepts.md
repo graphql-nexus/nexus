@@ -13,13 +13,14 @@ The API has been carefully designed with the following goals in mind:
 
 The API has evolved over the last few months of early development and internal use, and outside of implementing [additional features](future-features.md). That is, before you open a GitHub issue or pull-request with a suggested change to the API, ensure that it meets all four of those criteria listed above and prepare to explain why a change is necessary.
 
-Each public API is documented in detail:
+Each public API is documented below, feel free to open a PR with more examples/clarification:
 
-- [objectType](api-objectType.md)
+- [objectType / queryType / mutationType](api-objectType.md)
 - [unionType](api-unionType.md)
 - [interfaceType](api-interfaceType.md)
 - [inputObjectType](api-inputObjectType.md)
 - [enumType](api-enumType.md)
 - [scalarType](api-scalarType.md)
 - [args](api-args.md)
+- [makeSchema](api-makeSchema.md)
 - [extendType](api-extendType.md)

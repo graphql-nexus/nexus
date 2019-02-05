@@ -1,5 +1,5 @@
 /**
- * Links examples & website to local version of Nexus GraphQL
+ * Links examples & website to local version of GraphQL Nexus
  */
 import { exec } from "child_process";
 import util from "util";

@@ -28,7 +28,7 @@ const runService = (
 };
 
 gulp.task("docusaurus", () => {
-  runService("yarn", "docusaurus-start", { stdio: "ignore" }, true);
+  runService("yarn", "docusaurus-start", { stdio: "inherit" }, true);
 });
 gulp.task("webpack", () => {
   runService("yarn", "webpack", { stdio: "ignore" });
