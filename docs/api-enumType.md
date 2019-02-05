@@ -1,5 +1,5 @@
 ---
-id: enumType
+id: api-enumType
 title: enumType
 sidebar_label: enumType
 ---
