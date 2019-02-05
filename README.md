@@ -1,3 +1,5 @@
+<p align="center"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /></p>
+
 # [GraphQL Nexus](https://nexus.js.org)
 
 Declarative, code-first, strongly typed GraphQL schema construction for JavaScript/TypeScript.
