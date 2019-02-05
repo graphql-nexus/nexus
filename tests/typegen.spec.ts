@@ -28,7 +28,7 @@ describe("typegen", () => {
         sources: [
           {
             alias: "t",
-            module: path.join(__dirname, "_helpers.ts"),
+            source: path.join(__dirname, "_helpers.ts"),
           },
         ],
         contextType: "t.TestContext",

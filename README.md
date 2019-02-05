@@ -19,6 +19,8 @@ yarn add nexus // or npm install nexus
 ### Example Star Wars Schema:
 
 ```ts
+import { interfaceType, objectType, enumType, arg, stringArg } from "nexus";
+
 export const Character = interfaceType({
   name: "Character",
   definition: (t) => {
@@ -94,6 +96,7 @@ const heroArgs = {
   }),
 };
 
+// or queryType({...
 export const Query = objectType({
   name: "Query",
   definition(t) {

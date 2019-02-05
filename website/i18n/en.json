@@ -5,8 +5,8 @@
     "previous": "Previous",
     "tagline": "Declarative, Code-First GraphQL Schemas for JavaScript/TypeScript",
     "docs": {
-      "args": {
-        "title": "args",
+      "api-args": {
+        "title": "Args",
         "sidebar_label": "args: arg / *Arg"
       },
       "api-core-concepts": {

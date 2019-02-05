@@ -13,13 +13,13 @@ export const schema = makeSchema({
     sources: [
       {
         alias: "ts",
-        module: "typescript",
+        source: "typescript",
         glob: false,
         typeMatch: tsTypeMatch,
       },
       {
         alias: "t",
-        module: path.join(__dirname, "./types/index.ts"),
+        source: path.join(__dirname, "./types/index.ts"),
         onlyTypes: [],
       },
     ],

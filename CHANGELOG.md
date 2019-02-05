@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.9
+
+- `TypegenConfigSourceModule`: `sources.module` -> `sources.source`
+
 ### 0.9.8
 
 - Fix `MaybePromiseDeep` typing for non-object values

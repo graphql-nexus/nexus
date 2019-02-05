@@ -38,8 +38,8 @@ export interface TypegenAutoConfigOptions {
    * Array of files to match for a type
    *
    *   sources: [
-   *     { module: 'typescript', alias: 'ts' },
-   *     { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   *     { source: 'typescript', alias: 'ts' },
+   *     { source: path.join(__dirname, '../backingTypes'), alias: 'b' },
    *   ]
    */
   sources: TypegenConfigSourceModule[];
@@ -76,7 +76,7 @@ export interface TypegenConfigSourceModule {
    * so if this lives in node_modules, you can just provide the module name
    * otherwise you should provide the absolute path to the file.
    */
-  module: string;
+  source: string;
   /**
    * When we import the module, we use 'import * as ____' to prevent
    * conflicts. This alias should be a name that doesn't conflict with any other

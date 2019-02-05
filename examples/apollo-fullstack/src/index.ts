@@ -20,7 +20,7 @@ const schema = makeSchema({
   typegenAutoConfig: {
     sources: [
       {
-        module: path.join(__dirname, "./typeDefs.ts"),
+        source: path.join(__dirname, "./typeDefs.ts"),
         alias: "t",
       },
     ],

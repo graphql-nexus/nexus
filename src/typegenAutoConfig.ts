@@ -22,12 +22,16 @@ export const SCALAR_TYPES = {
 
 export interface TypegenConfigSourceModule {
   /**
+   * Deprecated, use 'source'
+   */
+  module?: string;
+  /**
    * The module for where to look for the types.
    * This uses the node resolution algorthm via require.resolve,
    * so if this lives in node_modules, you can just provide the module name
    * otherwise you should provide the absolute path to the file.
    */
-  module: string;
+  source: string;
   /**
    * When we import the module, we use `import * as ____` to prevent
    * conflicts. This alias should be a name that doesn't conflict with any other
@@ -69,8 +73,8 @@ export interface TypegenAutoConfigOptions {
    *
    * ```
    * sources: [
-   *   { module: 'typescript', alias: 'ts' },
-   *   { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   *   { source: 'typescript', alias: 'ts' },
+   *   { source: path.join(__dirname, '../backingTypes'), alias: 'b' },
    * ]
    * ```
    */
@@ -171,7 +175,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
         const util = require("util") as typeof import("util");
         const readFile = util.promisify(fs.readFile);
         const {
-          module: pathOrModule,
+          source: pathOrModule,
           glob = true,
           onlyTypes,
           alias,

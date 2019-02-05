@@ -13,11 +13,11 @@ export const schema = makeSchema({
     sources: [
       {
         alias: "ctx",
-        module: path.join(__dirname, "data-sources", "Context.ts"),
+        source: path.join(__dirname, "data-sources", "Context.ts"),
       },
       {
         alias: "db",
-        module: path.join(__dirname, "generated", "ghost-db-types.ts"),
+        source: path.join(__dirname, "generated", "ghost-db-types.ts"),
         typeMatch: (type) => new RegExp(`(?:interface)\\s+(${type.name}s)\\W`),
       },
     ],
