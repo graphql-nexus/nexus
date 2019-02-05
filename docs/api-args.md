@@ -1,6 +1,6 @@
 ---
-id: args
-title: args
+id: api-args
+title: Args
 sidebar_label: "args: arg / *Arg"
 ---
 

@@ -117,7 +117,7 @@ class Index extends React.Component {
               imageAlign: "top",
               content:
                 `Nexus can work with existing graphql-js types when constructing its schema. ` +
-                `The generated schema works with your favorite tools like Apollo Server or GraphQL middleware!`,
+                `The generated schema works with your favorite tools like Apollo Server or GraphQL middleware.`,
             },
             {
               title: "Data-Agnostic",
