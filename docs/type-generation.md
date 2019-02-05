@@ -28,7 +28,7 @@ The [Ghost Example](https://github.com/prisma/nexus/blob/develop/examples/ghost/
 
 The [makeSchema](api-makeSchema.md) takes an option `typegenAutoConfig` which helps us find the types we need to import into our generated schema.
 
-````ts
+```ts
 export interface TypegenAutoConfigOptions {
   /**
    * Any headers to prefix on the generated type file
@@ -37,12 +37,12 @@ export interface TypegenAutoConfigOptions {
   /**
    * Array of files to match for a type
    *
-   * ```
+   * \`\`\`
    * sources: [
    *   { module: 'typescript', alias: 'ts' },
    *   { module: path.join(__dirname, '../backingTypes'), alias: 'b' },
    * ]
-   * ```
+   * \`\`\`
    */
   sources: TypegenConfigSourceModule[];
   /**
@@ -55,9 +55,9 @@ export interface TypegenAutoConfigOptions {
    *
    * By default this is set to ['Query', 'Mutation', 'Subscription']
    *
-   * ```
+   * \`\`\`
    * skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
-   * ```
+   * \`\`\`
    */
   skipTypes?: (string | RegExp)[];
   /**
@@ -91,9 +91,9 @@ export interface TypegenConfigSourceModule {
    * Provides a custom approach to matching for the type
    *
    * If not provided, the default implementation is:
-   * ```
+   * \`\`\`
    * (type) => new RegExp(`(?:interface|type|class)\s+(${type.name})\W`)
-   * ```
+   * \`\`\`
    */
   typeMatch?: (
     type: GraphQLNamedType,
@@ -111,4 +111,4 @@ export interface TypegenConfigSourceModule {
    */
   glob?: false;
 }
-````
+```
