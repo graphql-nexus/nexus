@@ -1,22 +1,97 @@
 <p align="center"><a href="https://nexus.js.org"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /><a></p>
 
-# [GraphQL Nexus](https://nexus.js.org)
+# GraphQL Nexus
 
-Declarative, code-first, strongly typed GraphQL schema construction for JavaScript/TypeScript.
+Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript
 
-_Note: This library is independent of the Prisma database client. For the prisma-plugin, visit https://github.com/prisma/nexus-prisma_
+> GraphQL Nexus is independent from Prisma. To learn how it can best be combined with Prisma, check out the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin.
 
-## [Read the Documentation](https://nexus.js.org)
+## Overview
 
-## [Check out the Examples](https://github.com/prisma/nexus/tree/develop/examples)
+- **Code-first**: Programmatically define your GraphQL types in JavaScript/TypeScript
+- **Compatible with the GraphQL ecosystem**: Nexus is based on `graphql-js`
+- **Type-safe**: Nexus enables auto-completion and error checks in your IDE (even for JS)
+- **Generates SDL & TS definitions**: SDL schema and typings are updated as you code 
+
+## Features
+
+- Expressive, declarative API for building schemas
+- No need to re-declare interface fields per-object
+- Optionally possible to reference types by name (with autocomplete) rather than needing to import every single piece of the schema
+- Assumes non-null by default, but makes this configurable on per-schema/per-type basis
+- Interoperable with vanilla `graphql-js` types, and it's _just_ a [`GraphQLShema`](https://graphql.org/graphql-js/type/#graphqlschema) so it fits in just fine with existing community solutions of `apollo-server`, `graphql-middleware`, etc.
+- Inline function resolvers for when you need to do simple field aliasing
+- Auto-generated graphql SDL schema, great for when seeing how any code changes affected the schema
+- Lots of good [examples](https://github.com/prisma/nexus/tree/develop/examples) to get you started and thorough [API documentation](https://nexus.js.org/docs/api-core-concepts)
+- Full type-safety for free
+- Internal structure allows library authors to build more advanced abstractions
+- Independent from Prisma, but integrates nicely using the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin
+- Allows code re-use by creating higher level "functions" which wrap common fields
+
+## Documentation
+
+You can find the docs for GraphQL Nexus [here](https://nexus.js.org).
+
+## Install
+
+GraphQL Nexus can be installed via the `nexus` package. It also requires `graphql` as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/):
 
 ```
-yarn add nexus // or npm install nexus
+npm install --save nexus graphql
 ```
 
----
+or
 
-### Example Star Wars Schema:
+```
+yarn add nexus graphql
+```
+
+## Migrate from SDL
+
+If you've been following an [SDL-first](https://www.prisma.io/blog/the-problems-of-schema-first-graphql-development-x1mn4cb0tyl3/) approach to build your GraphQL server and want to see what your code looks like when written with GraphQL Nexus, you can use the [**SDL converter**](https://nexus.js.org/converter):
+
+![](https://imgur.com/AbkFWNO.png)
+
+## Examples
+
+All examples of GraphQL Nexus can be found in the [/examples](https://github.com/prisma/nexus/tree/develop/examples) directory.
+
+<Details>
+<Summary>Example: Hello World (with `graphql-yoga`)</Summary>
+
+```ts
+import { queryType, stringArg, makeSchema } from 'nexus'
+import { GraphQLServer } from 'graphql-yoga'
+
+const Query = queryType({
+  definition(t) {
+    t.string('hello', {
+      args: { name: stringArg({ nullable: true }) },
+      resolve: (parent, { name }) => `Hello ${name || 'World'}!`,
+    })
+  },
+})
+
+const schema = makeSchema({
+  types: [Query],
+  outputs: {
+    schema: __dirname + '/generated/schema.graphql',
+    typegen: __dirname + '/generated/typings.ts',
+  },
+})
+
+const server = new GraphQLServer({
+  schema,
+})
+
+server.start(() => `Server is running on http://localhost:4000`)
+```
+
+</Details>
+
+
+<Details>
+<Summary>Example: Star Wars</Summary>
 
 ```ts
 import { interfaceType, objectType, enumType, arg, stringArg } from "nexus";
@@ -118,6 +193,8 @@ export const Query = objectType({
   },
 });
 ```
+
+</Details>
 
 ---
 
