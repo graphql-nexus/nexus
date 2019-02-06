@@ -13,7 +13,7 @@
         "title": "API Core Concepts",
         "sidebar_label": "API Core Concepts"
       },
-      "enumType": {
+      "api-enumType": {
         "title": "enumType",
         "sidebar_label": "enumType"
       },

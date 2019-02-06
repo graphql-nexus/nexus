@@ -23,13 +23,24 @@ Check out the [example projects](https://github.com/graphql-nexus/nexus/tree/dev
 
 ## Installation
 
-GraphQL Nexus requires that `graphql` it be installed as a peer dependency. It can be installed with either `npm` or `yarn`.
+GraphQL Nexus can be installed with either `npm` or `yarn`.
 
-`yarn add nexus graphql`
+<!--DOCUSAURUS_CODE_TABS-->
+<!--npm-->
 
-or
+```sh
+npm install nexus
+npm install graphql # required as a peer dependency
+```
 
-`npm i --save nexus graphql`
+<!--yarn-->
+
+```sh
+yarn add nexus
+yarn add graphql # required as a peer dependency
+```
+
+<!--END_DOCUSAURUS_CODE_TABS-->
 
 ## Building an Example Schema
 
@@ -48,7 +59,7 @@ const Node = objectType({
 const Account = objectType({
   name: "Account",
   definition(t) {
-    t.implements("Node"); // or t.implements(Node)
+    t.implements(Node); // or t.implements("Node")
     t.string("username");
     t.string("email");
   },

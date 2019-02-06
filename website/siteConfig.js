@@ -82,8 +82,8 @@ const siteConfig = {
   cleanUrl: true,
 
   // Open Graph and Twitter card images.
-  ogImage: "img/nexus.png",
-  twitterImage: "img/nexus.png",
+  ogImage: "img/nexus-dark.png",
+  twitterImage: "img/nexus-dark.png",
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,
