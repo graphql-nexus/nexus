@@ -19,7 +19,7 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 - No need to re-declare interface fields per-object
 - Optionally possible to reference types by name (with autocomplete) rather than needing to import every single piece of the schema
 - Assumes non-null by default, but makes this configurable on per-schema/per-type basis
-- Interoperable with vanilla `graphql-js` types, and it's _just_ a [`GraphQLShema`](https://graphql.org/graphql-js/type/#graphqlschema) so it fits in just fine with existing community solutions of `apollo-server`, `graphql-middleware`, etc.
+- Interoperable with vanilla `graphql-js` types, and it's _just_ a [`GraphQLSchema`](https://graphql.org/graphql-js/type/#graphqlschema) so it fits in just fine with existing community solutions of `apollo-server`, `graphql-middleware`, etc.
 - Inline function resolvers for when you need to do simple field aliasing
 - Auto-generated graphql SDL schema, great for when seeing how any code changes affected the schema
 - Lots of good [examples](https://github.com/prisma/nexus/tree/develop/examples) to get you started and thorough [API documentation](https://nexus.js.org/docs/api-core-concepts)
