@@ -78,7 +78,6 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
   description?: string | null;
   /**
    * Specifies a default field resolver for all members of this type.
-   * Warning: this may break type-safety.
    */
   defaultResolver?: FieldResolver<TypeName, any>;
 }

@@ -14,6 +14,7 @@ export const Query = queryType({
     t.field("postById", {
       type: Post,
       args: { id: idArg() },
+      authorize: (root, args, ctx) => ctx.auth.canViewPost(args.id),
       resolve(root, args, ctx) {
         return ctx.post.byId(args.id);
       },
@@ -21,6 +22,7 @@ export const Query = queryType({
     t.field("userById", {
       type: User,
       args: { id: idArg() },
+      authorize: (root, args, ctx) => ctx.auth.canViewUser(args.id),
       resolve(root, args, ctx) {
         return ctx.user.byId(args.id);
       },

@@ -79,6 +79,16 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   info: GraphQLResolveInfo
 ) => MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
 
+export type AuthorizeResolver<
+  TypeName extends string,
+  FieldName extends string
+> = (
+  root: RootValue<TypeName>,
+  args: ArgsValue<TypeName, FieldName>,
+  context: GetGen<"context">,
+  info: GraphQLResolveInfo
+) => MaybePromise<boolean | Error>;
+
 export type AbstractResolveReturn<
   TypeName extends string
 > = NexusGen extends infer GenTypes
