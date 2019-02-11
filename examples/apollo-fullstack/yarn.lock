@@ -4547,10 +4547,10 @@ netrc-parser@^3.1.4:
     debug "^3.1.0"
     execa "^0.10.0"
 
-nexus@0.9.9:
-  version "0.9.9"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.9.9.tgz#321e848dac99de066fcaff79e2ab865c5e8519aa"
-  integrity sha512-IxMEHVctPHSg5KbetSDT9pP+2uzLY4M/OL9Rr/aUXIWWplWZk0TM5Oz64n/w7YE+y6lcpxhy72kyugOpwIIc9w==
+nexus@0.9.10:
+  version "0.9.10"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.9.10.tgz#9ff1a7b6ec66c9542a7131519208cb8ee3824e7d"
+  integrity sha512-TO9Z8pWkcVh+TAUacAX7SkQK4HrExBw581+5PCSucl/NlX4N8DkP1uIDCDIIcoBhJisUDa7/iPwKw8/qHqVOSw==
   dependencies:
     tslib "^1.9.3"
 
