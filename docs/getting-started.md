@@ -47,12 +47,21 @@ yarn add graphql # required as a peer dependency
 As documented in the [API reference](api-core-concepts.md) GraphQL Nexus provides a consistent, scalable approach to defining GraphQL types in code.
 
 ```js
-import { objectType, queryType, stringArg, fieldArg, makeSchema } from "nexus";
+import {
+  objectType,
+  interfaceType,
+  queryType,
+  stringArg,
+  intArg,
+  fieldArg,
+  makeSchema,
+} from "nexus";
 
-const Node = objectType({
+const Node = interfaceType({
   name: "Node",
   definition(t) {
     t.id("id", { description: "Unique identifier for the resource" });
+    t.resolveType(() => null);
   },
 });
 
