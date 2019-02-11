@@ -21,6 +21,9 @@ export const schema = makeSchema({
         typeMatch: (type) => new RegExp(`(?:interface)\\s+(${type.name}s)\\W`),
       },
     ],
+    backingTypeMap: {
+      Date: "Date",
+    },
   },
   prettierConfig: {},
 });
