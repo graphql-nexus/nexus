@@ -22,7 +22,7 @@ export type MaybePromise<T> = PromiseLike<T> | T;
  * to help signify that.
  */
 export type MaybePromiseDeep<T> = Date extends T
-  ? MaybePromise<Date>
+  ? MaybePromise<T>
   : boolean extends T
   ? MaybePromise<T>
   : T extends object
