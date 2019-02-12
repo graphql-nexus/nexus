@@ -21,15 +21,17 @@ export type MaybePromise<T> = PromiseLike<T> | T;
  * resolves promises at any level of the tree, we use this
  * to help signify that.
  */
-export type MaybePromiseDeep<T> = T extends object
+export type MaybePromiseDeep<T> = Date extends T
+  ? MaybePromise<T>
+  : boolean extends T
+  ? MaybePromise<T>
+  : T extends object
   ? MaybePromise<
       {
         [P in keyof T]: T[P] extends Array<infer U>
           ? Array<MaybePromiseDeep<U>>
           : T[P] extends ReadonlyArray<infer Y>
           ? ReadonlyArray<MaybePromiseDeep<Y>>
-          : Date extends T[P]
-          ? MaybePromise<T[P]>
           : MaybePromiseDeep<T[P]>
       }
     >

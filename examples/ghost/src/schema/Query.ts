@@ -1,4 +1,4 @@
-import { queryType, idArg, core } from "nexus";
+import { queryType, idArg } from "nexus";
 import { Post } from "./Post";
 import { User } from "./User";
 

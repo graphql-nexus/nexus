@@ -21,7 +21,7 @@ import { core } from './nexus';
 
 export function connectionType(type: core.AllOutputTypes) {
   const Connection = objectType({
-    name: `${name}Connection`,
+    name: `${type}Connection`,
     definition(t) {
       t.field(
         'edges',
@@ -30,14 +30,14 @@ export function connectionType(type: core.AllOutputTypes) {
     });
   })
   const Edge = objectType({
-    name: `${name}Edge`,
+    name: `${type}Edge`,
     definition(t) {
       t.id('cursor', root => `${name}:${root.id}`)
       t.field('node', { type: name });
     }
   });
   const PageInfo = objectType({
-    type: `${type}PageInfo`,
+    name: `${type}PageInfo`,
     definition(t) {
       t.boolean('hasNextPage')
       t.boolean('hasPreviousPage')

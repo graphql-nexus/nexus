@@ -22,10 +22,6 @@ export const SCALAR_TYPES = {
 
 export interface TypegenConfigSourceModule {
   /**
-   * Deprecated, use 'source'
-   */
-  module?: string;
-  /**
    * The module for where to look for the types.
    * This uses the node resolution algorthm via require.resolve,
    * so if this lives in node_modules, you can just provide the module name
@@ -69,7 +65,7 @@ export interface TypegenAutoConfigOptions {
    */
   headers?: string[];
   /**
-   * Array of files to match for a type
+   * Array of TypegenConfigSourceModule's to look in and match the type names against.
    *
    * ```
    * sources: [

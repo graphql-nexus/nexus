@@ -4383,10 +4383,10 @@ netjet@1.3.0:
     lru-cache "^4.0.0"
     posthtml "^0.9.0"
 
-nexus@0.9.9:
-  version "0.9.9"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.9.9.tgz#321e848dac99de066fcaff79e2ab865c5e8519aa"
-  integrity sha512-IxMEHVctPHSg5KbetSDT9pP+2uzLY4M/OL9Rr/aUXIWWplWZk0TM5Oz64n/w7YE+y6lcpxhy72kyugOpwIIc9w==
+nexus@0.9.11:
+  version "0.9.11"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.9.11.tgz#a8be516885566adcf177a35cbf363c5d05b0ae6c"
+  integrity sha512-MgIQihnNv7pdPyHgtDu1HETMNQZCe3olNb4TjPwf1RNatcHbcJgD4z96Xc1oROW88Cgvzn06M30DDI5tTGP2IQ==
   dependencies:
     tslib "^1.9.3"
 
