@@ -30,6 +30,32 @@ The `nexus-prisma` plugin is the glue between the Prisma client and GraphQL Nexu
 
 When constructing your GraphQL schema with GraphQL Nexus, you build upon these building blocks and expose/customize them to your own API needs.
 
+### Generated CRUD building blocks
+
+Assume you have a `User` type in your Prisma datamodel. `nexus-prisma-generate` will generate the following building blocks for it:
+
+- **Queries**
+  - **`user(...): User!`**: Fetches a single record
+  - **`users(...): [User!]!`**: Fetches a list of records
+  - **`usersConnection(...): UserConnection!`**: [Relay connections](https://graphql.org/learn/pagination/#complete-connection-model) & aggregations
+
+- **Mutations**
+  - **`createUser(...): User!`**: Creates a new record
+  - **`updateUser(...): User`**: Updates a record
+  - **`deleteUser(...): User`**: Deletes a record
+  - **`updatesManyUsers(...): BatchPayload!`**: Updates many records in bulk
+  - **`deleteManyUsers(...): BatchPayload!`**: Deletes many records in bulk
+  
+- [**GraphQL input types**](https://graphql.org/graphql-js/mutations-and-input-types/)
+  - **`UserCreateInput`**: Wraps all fields of the record
+  - **`UserUpdateInput`**: Wraps all fields of the record
+  - **`UserWhereInput`**: Provides filters for all fields of the record
+  - **`UserWhereUniqueInput`**: Provides filters for unique fields of the record
+  - **`UserUpdateManyMutationInput`**: Wraps fields that can be updated in bulk
+  - **`UserOrderByInput`**: Specifies ascending or descending orders by field
+
+> `UserCreateInput` and `UserUpdateInput` differ in the way relation fields are treated.
+
 ## Examples
 
 Here's a minimal example for using `nexus-prisma`:
