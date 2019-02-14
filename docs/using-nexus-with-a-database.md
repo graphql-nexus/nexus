@@ -45,7 +45,7 @@ Assume you have a `User` type in your Prisma datamodel. `nexus-prisma-generate` 
   - **`deleteUser(...): User`**: Deletes a record
   - **`updatesManyUsers(...): BatchPayload!`**: Updates many records in bulk
   - **`deleteManyUsers(...): BatchPayload!`**: Deletes many records in bulk
-  
+
 - [**GraphQL input types**](https://graphql.org/graphql-js/mutations-and-input-types/)
   - **`UserCreateInput`**: Wraps all fields of the record
   - **`UserUpdateInput`**: Wraps all fields of the record
@@ -304,7 +304,7 @@ import * as path from 'path'
 import { GraphQLServer } from 'graphql-yoga'
 import { makePrismaSchema, prismaObjectType } from 'nexus-prisma'
 import { prisma } from './generated/prisma-client'
-import metaSchema from './generated/nexus-prisma'
+import datamodelInfo from './generated/nexus-prisma'
 
 const Query = prismaObjectType({ 
   name: 'Query',
@@ -319,7 +319,7 @@ const schema = makePrismaSchema({
   types: [Query, Mutation],
 
   prisma: {
-    metaSchema,
+    datamodelInfo,
     client: prisma
   },
 
