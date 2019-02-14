@@ -6,7 +6,8 @@
       "type-generation",
       "library-authors",
       "why-graphql-nexus",
-      "future-features"
+      "future-features",
+      "using-nexus-with-a-database"
     ],
     "API": [
       "api-core-concepts",
