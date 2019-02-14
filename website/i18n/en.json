@@ -65,6 +65,10 @@
         "title": "Type Generation Details",
         "sidebar_label": "Type Generation Details"
       },
+      "using-nexus-with-a-database": {
+        "title": "Using GraphQL Nexus with a Database",
+        "sidebar_label": "Using with a Database"
+      },
       "why-graphql-nexus": {
         "title": "Why Nexus?",
         "sidebar_label": "Why Nexus?"
