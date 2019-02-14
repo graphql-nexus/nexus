@@ -1,7 +1,7 @@
 ---
 id: using-nexus-with-a-database
-title: Using GraphQL Nexus with a Database
-sidebar_label: Using with a Database
+title: Database Access with Prisma
+sidebar_label: Database Access w/ Prisma
 ---
 
 This page explains how to use [Prisma]((https://github.com/prisma/prisma)) and the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin to connect your GraphQL Nexus resolvers to a database. Read more about it in the [announcement article](https://www.prisma.io/blog/using-graphql-nexus-with-a-database-pmyl3660ncst/).
