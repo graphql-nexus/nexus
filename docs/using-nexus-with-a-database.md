@@ -1,5 +1,5 @@
 ---
-id: using-nexus-with-a-database
+id: database-access-with-prisma
 title: Database Access with Prisma
 sidebar_label: Database Access w/ Prisma
 ---
