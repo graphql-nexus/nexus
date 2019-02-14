@@ -7,7 +7,7 @@
       "library-authors",
       "why-graphql-nexus",
       "future-features",
-      "using-nexus-with-a-database"
+      "database-access-with-prisma"
     ],
     "API": [
       "api-core-concepts",
