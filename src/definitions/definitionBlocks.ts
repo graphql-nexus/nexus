@@ -182,17 +182,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
       name,
       ...fieldConfig,
     };
-    if (this.isList) {
-      if (field.list) {
-        console.warn(
-          `It looks like you chained .list and set list for ${name}` +
-            "You should only do one or the other"
-        );
-      } else {
-        field.list = true;
-      }
-    }
-    this.typeBuilder.addField(field);
+    this.typeBuilder.addField(this.decorateField(field));
   }
 
   protected addScalarField(
@@ -209,7 +199,21 @@ export class OutputDefinitionBlock<TypeName extends string> {
     } else {
       config = { ...config, ...opts[0] };
     }
-    this.typeBuilder.addField(config);
+    this.typeBuilder.addField(this.decorateField(config));
+  }
+
+  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+    if (this.isList) {
+      if (config.list) {
+        console.warn(
+          `It looks like you chained .list and set list for ${config.name}` +
+            "You should only do one or the other"
+        );
+      } else {
+        config.list = true;
+      }
+    }
+    return config;
   }
 }
 
@@ -279,10 +283,12 @@ export class InputDefinitionBlock<TypeName extends string> {
     fieldName: FieldName,
     fieldConfig: NexusInputFieldConfig
   ) {
-    this.typeBuilder.addField({
-      name: fieldName,
-      ...fieldConfig,
-    });
+    this.typeBuilder.addField(
+      this.decorateField({
+        name: fieldName,
+        ...fieldConfig,
+      })
+    );
   }
 
   protected addScalarField(
@@ -290,11 +296,27 @@ export class InputDefinitionBlock<TypeName extends string> {
     typeName: BaseScalars,
     opts: ScalarInputFieldConfig<any> = {}
   ) {
-    this.typeBuilder.addField({
-      name: fieldName,
-      type: typeName,
-      ...opts,
-    });
+    this.typeBuilder.addField(
+      this.decorateField({
+        name: fieldName,
+        type: typeName,
+        ...opts,
+      })
+    );
+  }
+
+  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+    if (this.isList) {
+      if (config.list) {
+        console.warn(
+          `It looks like you chained .list and set list for ${config.name}` +
+            "You should only do one or the other"
+        );
+      } else {
+        config.list = true;
+      }
+    }
+    return config;
   }
 }
 
