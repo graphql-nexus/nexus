@@ -53,6 +53,8 @@ type Post implements Node {
   messyGeo: [[Float!]]
 }
 
+union ExampleUnion = Post | User
+
 input CreatePostInput {
   name: String!
   author: ID!

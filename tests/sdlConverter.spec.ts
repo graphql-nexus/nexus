@@ -126,7 +126,7 @@ export const SomeEnum = enumType({
 
 test("convertSDL", () => {
   expect(convertSDL(EXAMPLE_SDL)).toMatchInlineSnapshot(`
-"import { objectType, arg, uuidArg, stringArg, interfaceType, inputObjectType, enumType, scalarType } from 'nexus';
+"import { objectType, arg, uuidArg, stringArg, interfaceType, inputObjectType, unionType, enumType, scalarType } from 'nexus';
 
 export const Mutation = objectType({
   name: \\"Mutation\\",
@@ -229,6 +229,13 @@ export const PostFilters = inputObjectType({
       required: true,
     })
     t.string(\\"search\\")
+  }
+});
+
+export const ExampleUnion = unionType({
+  name: \\"ExampleUnion\\",
+  definition(t) {
+    t.members(Post, User)
   }
 });
 

@@ -353,10 +353,7 @@ export class SDLConverter {
       `  name: "${type.name}",`,
       this.maybeDescription(type),
       `  definition(t) {`,
-      `    t.members(${type
-        .getTypes()
-        .map((t) => this.json.stringify(t.name))
-        .join(", ")})`,
+      `    t.members(${type.getTypes().join(", ")})`,
       `  }`,
       `});`,
     ]);

@@ -131,6 +131,7 @@ describe("typegen", () => {
   Boolean: boolean;
   ID: string;
   UUID: string;
+  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }"
 `);
   });
@@ -181,6 +182,7 @@ describe("typegen", () => {
   Boolean: boolean;
   ID: string;
   UUID: string;
+  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }"
 `);
   });
@@ -274,6 +276,7 @@ export interface NexusGenRootTypes {
   Boolean: boolean;
   ID: string;
   UUID: string;
+  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -337,6 +340,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
+  ExampleUnion: \\"Post\\" | \\"User\\"
   Node: \\"Post\\" | \\"User\\"
 }
 
@@ -352,7 +356,7 @@ export type NexusGenInterfaceNames = \\"Node\\";
 
 export type NexusGenScalarNames = \\"Boolean\\" | \\"Float\\" | \\"ID\\" | \\"Int\\" | \\"String\\" | \\"UUID\\";
 
-export type NexusGenUnionNames = never;
+export type NexusGenUnionNames = \\"ExampleUnion\\";
 
 export interface NexusGenTypes {
   context: t.TestContext;
