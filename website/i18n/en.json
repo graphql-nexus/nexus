@@ -49,6 +49,10 @@
         "title": "Best Practices",
         "sidebar_label": "Best Practices"
       },
+      "database-access-with-prisma": {
+        "title": "Database Access with Prisma",
+        "sidebar_label": "Database Access w/ Prisma"
+      },
       "future-features": {
         "title": "Potential Features",
         "sidebar_label": "Potential Future Features"
@@ -64,10 +68,6 @@
       "type-generation": {
         "title": "Type Generation Details",
         "sidebar_label": "Type Generation Details"
-      },
-      "using-nexus-with-a-database": {
-        "title": "Database Access with Prisma",
-        "sidebar_label": "Database Access w/ Prisma"
       },
       "why-graphql-nexus": {
         "title": "Why Nexus?",

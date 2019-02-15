@@ -6,13 +6,24 @@ type Query {
   posts(filters: PostFilters!): [Post!]!
 }
 
+"""
+This is a description of a Node
+"""
 interface Node {
   id: ID!
 }
 
 type User implements Node {
   id: ID!
-  name(prefix: String): String!
+  """
+  This is a description of a name
+  """
+  name(
+    """
+    And a description of an arg
+    """
+    prefix: String
+  ): String!
   email: String!
   phone: String
   posts(filters: PostFilters): [Post!]!

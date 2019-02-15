@@ -75,6 +75,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/graphql-nexus/nexus.git"
+    "url": "git://github.com/prisma/nexus.git"
   }
 }

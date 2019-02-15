@@ -27,9 +27,7 @@ function monacoRef() {
 
 export function Converter() {
   const [content, setContent] = useState(
-    [`## WIP, not all types supported yet!!`, `# Paste your SDL here:`]
-      .concat(EXAMPLE_SDL)
-      .join("\n")
+    [`# Paste your SDL here:`].concat(EXAMPLE_SDL).join("\n")
   );
   const [sdlDiv, outputDiv] = [
     useRef<null | HTMLDivElement>(null),

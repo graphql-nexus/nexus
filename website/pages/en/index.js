@@ -71,9 +71,10 @@ class HomeSplash extends React.Component {
             <Button href={pageUrl("docs/getting-started", language)}>
               Getting Started
             </Button>
-            <Button href="https://github.com/graphql-nexus/nexus/tree/develop/examples">
+            <Button href={`${siteConfig.repoUrl}/tree/develop/examples`}>
               Examples
             </Button>
+            <Button href={siteConfig.repoUrl}>GitHub</Button>
           </PromoSection>
         </div>
       </SplashContainer>

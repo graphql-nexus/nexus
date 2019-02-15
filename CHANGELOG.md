@@ -1,5 +1,20 @@
 # Changelog
 
+### 0.9.12
+
+- Fix #33, consistent `t.list` chaining output for inputs & scalars
+- Fix #34, include used imports on SDL converter
+- Fix #27, args output for SDL converter
+- Other SDL converter cleanup: reference types rather than strings, default values
+
+### 0.9.11
+
+- Fix typing regression in 0.9.10
+
+### 0.9.10
+
+- Fix #26, incorrect typing on boolean return type
+
 ### 0.9.9
 
 - `TypegenConfigSourceModule`: `sources.module` -> `sources.source`
