@@ -15,7 +15,7 @@
     "dedent": "^0.7.0",
     "graphql": "^14.0.2",
     "monaco-editor": "^0.15.5",
-    "nexus": "0.9.12",
+    "nexus": "0.9.13",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2"
   },
