@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.13
+
+- Fix #41, replace `path.sep` with '/' in `typegenAutoConfig`
+
 ### 0.9.12
 
 - Fix #33, consistent `t.list` chaining output for inputs & scalars

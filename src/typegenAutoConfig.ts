@@ -344,7 +344,7 @@ function relativePathTo(absolutePath: string, outputPath: string): string {
     path.dirname(absolutePath)
   );
   if (relative.indexOf(".") !== 0) {
-    return `.${path.sep}${path.join(relative, filename)}`;
+    return `./${path.join(relative, filename)}`;
   }
   return path.join(relative, filename);
 }
