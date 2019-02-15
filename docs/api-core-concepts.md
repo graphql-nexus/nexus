@@ -11,7 +11,9 @@ The API has been carefully designed with the following goals in mind:
 1. Developer ergonomics
 1. Playing nicely with Prettier formatting
 
-The API has evolved over the last few months of early development and internal use, and outside of implementing [additional features](future-features.md). That is, before you open a GitHub issue or pull-request with a suggested change to the API, ensure that it meets all four of those criteria listed above and prepare to explain why a change is necessary.
+The API has evolved over the last few months of early development and internal use, and outside of implementing [additional features](future-features.md) is unlikely to undergo major structural changes.
+
+That is, before you open a GitHub issue or pull-request with a suggested change to the API, ensure that it meets all four of those criteria listed above and be able to explain why a change is necessary.
 
 Each public API is documented below, feel free to open a PR with more examples/clarification:
 

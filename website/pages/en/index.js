@@ -68,13 +68,13 @@ class HomeSplash extends React.Component {
           <img src="https://i.imgur.com/Y5BgDGl.png" width="150" />
           <ProjectTitle />
           <PromoSection>
+            <Button href={siteConfig.repoUrl}>GitHub</Button>
             <Button href={pageUrl("docs/getting-started", language)}>
-              Getting Started
+              Docs
             </Button>
             <Button href={`${siteConfig.repoUrl}/tree/develop/examples`}>
               Examples
             </Button>
-            <Button href={siteConfig.repoUrl}>GitHub</Button>
           </PromoSection>
         </div>
       </SplashContainer>
