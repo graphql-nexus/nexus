@@ -1,10 +1,5 @@
 /// <reference types="jest" />
-import {
-  GraphQLEnumType,
-  GraphQLObjectType,
-  printType,
-  GraphQLNamedType,
-} from "graphql";
+import { GraphQLEnumType, GraphQLObjectType, printType } from "graphql";
 import {
   idArg,
   buildTypes,
@@ -14,7 +9,6 @@ import {
   inputObjectType,
 } from "../src";
 import { UserObject, PostObject } from "./_helpers";
-import { mapObj } from "../src/core";
 
 describe("enumType", () => {
   const PrimaryColors = enumType({
