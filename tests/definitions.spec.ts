@@ -1,7 +1,20 @@
 /// <reference types="jest" />
-import { GraphQLEnumType, GraphQLObjectType } from "graphql";
-import { idArg, buildTypes, enumType, extendType, objectType } from "../src";
+import {
+  GraphQLEnumType,
+  GraphQLObjectType,
+  printType,
+  GraphQLNamedType,
+} from "graphql";
+import {
+  idArg,
+  buildTypes,
+  enumType,
+  extendType,
+  objectType,
+  inputObjectType,
+} from "../src";
 import { UserObject, PostObject } from "./_helpers";
+import { mapObj } from "../src/core";
 
 describe("enumType", () => {
   const PrimaryColors = enumType({
@@ -119,6 +132,31 @@ Array [
   "user",
   "post",
 ]
+`);
+  });
+});
+
+describe("inputObjectType", () => {
+  it("should output lists properly, #33", () => {
+    const buildTypesMap = buildTypes([
+      inputObjectType({
+        name: "ExtraBasketInput",
+        definition(t) {
+          t.string("foo");
+        },
+      }),
+      inputObjectType({
+        name: "AddToBasketInput",
+        definition(t) {
+          t.list.field("extras", { type: "ExtraBasketInput" });
+        },
+      }),
+    ]);
+    expect(printType(buildTypesMap.typeMap.AddToBasketInput))
+      .toMatchInlineSnapshot(`
+"input AddToBasketInput {
+  extras: [ExtraBasketInput!]
+}"
 `);
   });
 });
