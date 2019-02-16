@@ -392,7 +392,7 @@ export class SDLConverter {
 
   printExports() {
     if (this.commonjs === null || this.exports.size === 0) {
-      return [];
+      return "";
     }
     const exports = Array.from(this.exports);
     if (this.commonjs) {
