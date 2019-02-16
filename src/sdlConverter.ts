@@ -49,14 +49,14 @@ export class SDLConverter {
   protected schema: GraphQLSchema | null;
   protected groupedTypes: GroupedTypes;
   protected usedImports: Set<string> = new Set();
+  protected exports: Set<string> = new Set();
 
   constructor(
     sdl: string,
     protected commonjs: null | boolean = false,
     protected json: JSON = JSON
   ) {
-    this.export =
-      commonjs === null ? "const " : commonjs ? "exports." : "export const ";
+    this.export = "const ";
     this.schema = buildSchema(sdl);
     this.groupedTypes = groupTypes(this.schema);
   }
@@ -69,6 +69,7 @@ export class SDLConverter {
       this.printUnionTypes(),
       this.printEnumTypes(),
       this.printScalarTypes(),
+      this.printExports(),
     ];
     return [this.printUsedImports()]
       .concat(body)
@@ -103,6 +104,7 @@ export class SDLConverter {
       implementing.length > 0
         ? `    t.implements(${implementing.join(", ")})`
         : "";
+    this.exports.add(type.name);
     return this.printBlock([
       `${this.export}${type.name} = objectType({`,
       `  name: "${type.name}",`,
@@ -276,6 +278,7 @@ export class SDLConverter {
   }
 
   printInterfaceType(type: GraphQLInterfaceType): string {
+    this.exports.add(type.name);
     return this.printBlock([
       `${this.export}${type.name} = interfaceType({`,
       `  name: "${type.name}",`,
@@ -306,6 +309,7 @@ export class SDLConverter {
       }
       return { description, name, deprecated: deprecationReason, value };
     });
+    this.exports.add(type.name);
     return this.printBlock([
       `${this.export}${type.name} = enumType({`,
       `  name: "${type.name}",`,
@@ -326,6 +330,7 @@ export class SDLConverter {
   }
 
   printInputObjectType(type: GraphQLInputObjectType): string {
+    this.exports.add(type.name);
     return this.printBlock([
       `${this.export}${type.name} = inputObjectType({`,
       `  name: "${type.name}",`,
@@ -348,6 +353,7 @@ export class SDLConverter {
   }
 
   printUnionType(type: GraphQLUnionType): string {
+    this.exports.add(type.name);
     return this.printBlock([
       `${this.export}${type.name} = unionType({`,
       `  name: "${type.name}",`,
@@ -371,6 +377,7 @@ export class SDLConverter {
   }
 
   printScalarType(type: GraphQLScalarType): string {
+    this.exports.add(type.name);
     return this.printBlock([
       `${this.export}${type.name} = scalarType({`,
       `  name: "${type.name}",`,
@@ -381,6 +388,18 @@ export class SDLConverter {
       `  parseLiteral() { /* Todo */ }`,
       `});`,
     ]);
+  }
+
+  printExports() {
+    if (this.commonjs === null || this.exports.size === 0) {
+      return [];
+    }
+    const exports = Array.from(this.exports);
+    if (this.commonjs) {
+      return this.printBlock(exports.map((exp) => `exports.${exp} = ${exp};`));
+    } else {
+      return this.printBlock([`export { ${exports.join(", ")} };`]);
+    }
   }
 
   maybeAsNexusType(type: GraphQLScalarType) {
