@@ -4,6 +4,7 @@ scalar UUID
 type Query {
   user: User!
   posts(filters: PostFilters!): [Post!]!
+  unionField: ExampleUnion!
 }
 
 """

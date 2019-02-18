@@ -53,6 +53,7 @@ export const Query = objectType({
         }),
       },
     })
+    t.field(\\"unionField\\", { type: ExampleUnion })
   }
 })
 export const User = objectType({
@@ -174,6 +175,7 @@ export const Query = objectType({
         }),
       },
     })
+    t.field(\\"unionField\\", { type: ExampleUnion })
   }
 })
 export const User = objectType({
@@ -308,6 +310,7 @@ const Query = objectType({
         }),
       },
     })
+    t.field(\\"unionField\\", { type: ExampleUnion })
   }
 })
 const User = objectType({

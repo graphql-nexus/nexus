@@ -203,6 +203,7 @@ describe("typegen", () => {
   }
   Query: { // field return type
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    unionField: NexusGenRootTypes['ExampleUnion']; // ExampleUnion!
     user: NexusGenRootTypes['User']; // User!
   }
   User: { // field return type
@@ -300,6 +301,7 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    unionField: NexusGenRootTypes['ExampleUnion']; // ExampleUnion!
     user: NexusGenRootTypes['User']; // User!
   }
   User: { // field return type
