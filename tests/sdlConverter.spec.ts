@@ -7,7 +7,7 @@ describe("SDLConverter", () => {
   test("printObjectTypes", () => {
     expect(new SDLConverter(EXAMPLE_SDL).printObjectTypes())
       .toMatchInlineSnapshot(`
-"const Mutation = objectType({
+"export const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
     t.field(\\"createPost\\", {
@@ -27,7 +27,7 @@ describe("SDLConverter", () => {
     })
   }
 })
-const Post = objectType({
+export const Post = objectType({
   name: \\"Post\\",
   definition(t) {
     t.implements(Node)
@@ -40,7 +40,7 @@ const Post = objectType({
     })
   }
 })
-const Query = objectType({
+export const Query = objectType({
   name: \\"Query\\",
   definition(t) {
     t.field(\\"user\\", { type: User })
@@ -55,7 +55,7 @@ const Query = objectType({
     })
   }
 })
-const User = objectType({
+export const User = objectType({
   name: \\"User\\",
   definition(t) {
     t.implements(Node)
@@ -85,11 +85,11 @@ const User = objectType({
   test("printEnumTypes", () => {
     expect(new SDLConverter(EXAMPLE_SDL).printEnumTypes())
       .toMatchInlineSnapshot(`
-"const OrderEnum = enumType({
+"export const OrderEnum = enumType({
   name: \\"OrderEnum\\",
   members: [\\"ASC\\",\\"DESC\\"],
 });
-const SomeEnum = enumType({
+export const SomeEnum = enumType({
   name: \\"SomeEnum\\",
   members: [\\"A\\",\\"B\\"],
 });"
@@ -99,7 +99,7 @@ const SomeEnum = enumType({
   test("printScalarTypes", () => {
     expect(new SDLConverter(EXAMPLE_SDL).printScalarTypes())
       .toMatchInlineSnapshot(`
-"const UUID = scalarType({
+"export const UUID = scalarType({
   name: \\"UUID\\",
   asNexusMethod: \\"uuid\\",
   serialize() { /* Todo */ },
@@ -112,7 +112,7 @@ const SomeEnum = enumType({
   test("printInterfaceTypes", () => {
     expect(new SDLConverter(EXAMPLE_SDL).printInterfaceTypes())
       .toMatchInlineSnapshot(`
-"const Node = interfaceType({
+"export const Node = interfaceType({
   name: \\"Node\\",
   description: \\"This is a description of a Node\\",
   definition(t) {
@@ -128,7 +128,7 @@ test("convertSDL", () => {
   expect(convertSDL(EXAMPLE_SDL)).toMatchInlineSnapshot(`
 "import { objectType, arg, uuidArg, stringArg, interfaceType, inputObjectType, unionType, enumType, scalarType } from 'nexus';
 
-const Mutation = objectType({
+export const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
     t.field(\\"createPost\\", {
@@ -148,7 +148,7 @@ const Mutation = objectType({
     })
   }
 })
-const Post = objectType({
+export const Post = objectType({
   name: \\"Post\\",
   definition(t) {
     t.implements(Node)
@@ -161,7 +161,7 @@ const Post = objectType({
     })
   }
 })
-const Query = objectType({
+export const Query = objectType({
   name: \\"Query\\",
   definition(t) {
     t.field(\\"user\\", { type: User })
@@ -176,7 +176,7 @@ const Query = objectType({
     })
   }
 })
-const User = objectType({
+export const User = objectType({
   name: \\"User\\",
   definition(t) {
     t.implements(Node)
@@ -201,7 +201,7 @@ const User = objectType({
   }
 })
 
-const Node = interfaceType({
+export const Node = interfaceType({
   name: \\"Node\\",
   description: \\"This is a description of a Node\\",
   definition(t) {
@@ -210,7 +210,7 @@ const Node = interfaceType({
   }
 });
 
-const CreatePostInput = inputObjectType({
+export const CreatePostInput = inputObjectType({
   name: \\"CreatePostInput\\",
   definition(t) {
     t.string(\\"name\\", { required: true })
@@ -221,7 +221,7 @@ const CreatePostInput = inputObjectType({
     })
   }
 });
-const PostFilters = inputObjectType({
+export const PostFilters = inputObjectType({
   name: \\"PostFilters\\",
   definition(t) {
     t.field(\\"order\\", {
@@ -232,31 +232,29 @@ const PostFilters = inputObjectType({
   }
 });
 
-const ExampleUnion = unionType({
+export const ExampleUnion = unionType({
   name: \\"ExampleUnion\\",
   definition(t) {
     t.members(Post, User)
   }
 });
 
-const OrderEnum = enumType({
+export const OrderEnum = enumType({
   name: \\"OrderEnum\\",
   members: [\\"ASC\\",\\"DESC\\"],
 });
-const SomeEnum = enumType({
+export const SomeEnum = enumType({
   name: \\"SomeEnum\\",
   members: [\\"A\\",\\"B\\"],
 });
 
-const UUID = scalarType({
+export const UUID = scalarType({
   name: \\"UUID\\",
   asNexusMethod: \\"uuid\\",
   serialize() { /* Todo */ },
   parseValue() { /* Todo */ },
   parseLiteral() { /* Todo */ }
-});
-
-export { Mutation, Post, Query, User, Node, CreatePostInput, PostFilters, ExampleUnion, OrderEnum, SomeEnum, UUID };"
+});"
 `);
 });
 

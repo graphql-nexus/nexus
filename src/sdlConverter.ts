@@ -56,7 +56,7 @@ export class SDLConverter {
     protected commonjs: null | boolean = false,
     protected json: JSON = JSON
   ) {
-    this.export = "const ";
+    this.export = commonjs === null || commonjs ? "const " : "export const ";
     this.schema = buildSchema(sdl);
     this.groupedTypes = groupTypes(this.schema);
   }
@@ -391,15 +391,11 @@ export class SDLConverter {
   }
 
   printExports() {
-    if (this.commonjs === null || this.exports.size === 0) {
+    if (!this.commonjs || this.exports.size === 0) {
       return "";
     }
     const exports = Array.from(this.exports);
-    if (this.commonjs) {
-      return this.printBlock(exports.map((exp) => `exports.${exp} = ${exp};`));
-    } else {
-      return this.printBlock([`export { ${exports.join(", ")} };`]);
-    }
+    return this.printBlock(exports.map((exp) => `exports.${exp} = ${exp};`));
   }
 
   maybeAsNexusType(type: GraphQLScalarType) {
