@@ -18,7 +18,7 @@
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
     "graphql": "^14.0.2",
     "isemail": "^3.2.0",
-    "nexus": "0.9.13",
+    "nexus": "0.9.14",
     "sequelize": "^4.41.1",
     "sqlite3": "^4.0.4"
   },

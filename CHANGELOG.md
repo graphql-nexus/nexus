@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.14
+
+- Fix #44, add correct typings for union type
+
 ### 0.9.13
 
 - Fix #41, replace `path.sep` with '/' in `typegenAutoConfig`
