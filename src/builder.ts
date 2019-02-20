@@ -118,7 +118,7 @@ export interface BuilderConfig {
     | false;
   /**
    * Whether the schema & types are generated when the server
-   * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV !== "development"
+   * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV === "development"
    */
   shouldGenerateArtifacts?: boolean;
   /**
