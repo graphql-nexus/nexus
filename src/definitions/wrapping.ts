@@ -8,6 +8,7 @@ import { NexusObjectTypeDef } from "./objectType";
 import { NexusScalarTypeDef } from "./scalarType";
 import { NexusUnionTypeDef } from "./unionType";
 import { NexusTypes, NexusWrappedSymbol, withNexusSymbol } from "./_types";
+import { NexusExtendInputTypeDef } from "./extendInputType";
 
 export type NexusInputTypeName<T> = T extends NexusInputObjectTypeDef<infer A>
   ? A
@@ -83,6 +84,14 @@ export function isNexusTypeDef(
 }
 export function isNexusNamedTypeDef(obj: any): obj is AllNexusNamedTypeDefs {
   return isNexusTypeDef(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol]);
+}
+export function isNexusExtendInputTypeDef(
+  obj: any
+): obj is NexusExtendInputTypeDef<string> {
+  return (
+    isNexusTypeDef(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.ExtendInputObject
+  );
 }
 export function isNexusExtendTypeDef(
   obj: any

@@ -1,6 +1,6 @@
 ---
 id: api-extendType
-title: extendType
+title: extendType / extendInputType
 sidebar_label: extendType
 ---
 
@@ -31,3 +31,5 @@ export const AddPostById = extendType({
   },
 });
 ```
+
+A similar `extendInputType` is available for extending input types.

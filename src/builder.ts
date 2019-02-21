@@ -76,6 +76,7 @@ import {
   isNexusUnionTypeDef,
   isNexusWrappedType,
   NexusWrappedType,
+  isNexusExtendInputTypeDef,
 } from "./definitions/wrapping";
 import {
   GraphQLPossibleInputs,
@@ -87,6 +88,10 @@ import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
 import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
 import { firstDefined, objValues, suggestionList, isObject } from "./utils";
+import {
+  NexusExtendInputTypeDef,
+  NexusExtendInputTypeConfig,
+} from "./definitions/extendInputType";
 
 export type Maybe<T> = T | null;
 
@@ -215,6 +220,13 @@ export class SchemaBuilder {
     NexusExtendTypeConfig<string>[] | null
   > = {};
   /**
+   * All "extensions" to input types (adding fields on types from many locations)
+   */
+  protected inputTypeExtensionMap: Record<
+    string,
+    NexusExtendInputTypeConfig<string>[] | null
+  > = {};
+  /**
    * Configures the root-level nonNullDefaults defaults
    */
   protected nonNullDefaults: NonNullConfig = {};
@@ -240,6 +252,7 @@ export class SchemaBuilder {
   addType(
     typeDef:
       | AllNexusNamedTypeDefs
+      | NexusExtendInputTypeDef<string>
       | NexusExtendTypeDef<string>
       | GraphQLNamedType
   ) {
@@ -249,6 +262,13 @@ export class SchemaBuilder {
     if (isNexusExtendTypeDef(typeDef)) {
       const typeExtensions = (this.typeExtensionMap[typeDef.name] =
         this.typeExtensionMap[typeDef.name] || []);
+      typeExtensions.push(typeDef.value);
+      return;
+    }
+
+    if (isNexusExtendInputTypeDef(typeDef)) {
+      const typeExtensions = (this.inputTypeExtensionMap[typeDef.name] =
+        this.inputTypeExtensionMap[typeDef.name] || []);
       typeExtensions.push(typeDef.value);
       return;
     }
@@ -312,6 +332,15 @@ export class SchemaBuilder {
         });
       }
     });
+    Object.keys(this.inputTypeExtensionMap).forEach((key) => {
+      // If we haven't defined the type, assume it's an object type
+      if (this.inputTypeExtensionMap[key] !== null) {
+        this.buildInputObjectType({
+          name: key,
+          definition() {},
+        });
+      }
+    });
     return {
       typeMap: this.finalTypeMap,
     };
@@ -325,6 +354,13 @@ export class SchemaBuilder {
       addField: (field) => fields.push(field),
     });
     config.definition(this.withScalarMethods(definitionBlock));
+    const extensions = this.inputTypeExtensionMap[config.name];
+    if (extensions) {
+      extensions.forEach((extension) => {
+        extension.definition(definitionBlock);
+      });
+    }
+    this.inputTypeExtensionMap[config.name] = null;
     return this.finalize(
       new GraphQLInputObjectType({
         name: config.name,
@@ -506,9 +542,9 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected withScalarMethods<T extends NexusGenCustomDefinitionMethods<string>>(
-    definitionBlock: T
-  ): T {
+  protected withScalarMethods<
+    T extends NexusGenCustomDefinitionMethods<string>
+  >(definitionBlock: T): T {
     this.customScalarMethods.forEach(([methodName, typeName]) => {
       // @ts-ignore - Yeah, yeah... we know
       definitionBlock[methodName] = function(fieldName, ...opts) {
@@ -943,6 +979,7 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (
     isNexusNamedTypeDef(types) ||
     isNexusExtendTypeDef(types) ||
+    isNexusExtendInputTypeDef(types) ||
     isNamedType(types)
   ) {
     builder.addType(types);
