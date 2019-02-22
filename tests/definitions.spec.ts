@@ -7,6 +7,7 @@ import {
   extendType,
   objectType,
   inputObjectType,
+  extendInputType,
 } from "../src";
 import { UserObject, PostObject } from "./_helpers";
 
@@ -150,6 +151,31 @@ describe("inputObjectType", () => {
       .toMatchInlineSnapshot(`
 "input AddToBasketInput {
   extras: [ExtraBasketInput!]
+}"
+`);
+  });
+});
+
+describe("extendInputType", () => {
+  it("should allow extending input objects", () => {
+    const buildTypesMap = buildTypes([
+      inputObjectType({
+        name: "InputTest",
+        definition(t) {
+          t.string("hello");
+        },
+      }),
+      extendInputType({
+        type: "InputTest",
+        definition(t) {
+          t.string("world");
+        },
+      }),
+    ]);
+    expect(printType(buildTypesMap.typeMap.InputTest)).toMatchInlineSnapshot(`
+"input InputTest {
+  hello: String
+  world: String
 }"
 `);
   });

@@ -13,6 +13,7 @@ export * from "./definitions/args";
 export * from "./definitions/definitionBlocks";
 export * from "./definitions/enumType";
 export * from "./definitions/extendType";
+export * from "./definitions/extendInputType";
 export * from "./definitions/inputObjectType";
 export * from "./definitions/interfaceType";
 export * from "./definitions/objectType";

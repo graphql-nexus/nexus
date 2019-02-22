@@ -25,4 +25,4 @@ Each public API is documented below, feel free to open a PR with more examples/c
 - [scalarType](api-scalarType.md)
 - [args](api-args.md)
 - [makeSchema](api-makeSchema.md)
-- [extendType](api-extendType.md)
+- [extendType / extendInputType](api-extendType.md)

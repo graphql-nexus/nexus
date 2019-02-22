@@ -1,6 +1,7 @@
 import { NexusTypes, withNexusSymbol } from "./_types";
 import { OutputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
+import { GetGen } from "../typegenTypeHelpers";
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName;
@@ -27,8 +28,8 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject);
  *
  * @see http://graphql-nexus.com/api/extendType
  */
-export function extendType<TypeName extends string>(
-  config: NexusExtendTypeConfig<TypeName>
-) {
+export function extendType<
+  TypeName extends GetGen<"objectNames", string> | "Query" | "Mutation"
+>(config: NexusExtendTypeConfig<TypeName>) {
   return new NexusExtendTypeDef(config.type, config);
 }

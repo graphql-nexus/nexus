@@ -27,14 +27,12 @@ export interface NexusGenEnums {
 
 export interface NexusGenRootTypes {
   Foo: { // root type
-    argsTest: boolean; // Boolean!
     name: string; // String!
     ok: boolean; // Boolean!
   }
   Query: {};
   TestObj: { // root type
     a: NexusGenRootTypes['Bar']; // Bar!
-    argsTest: boolean; // Boolean!
     item: string; // String!
     ok: boolean; // Boolean!
   }

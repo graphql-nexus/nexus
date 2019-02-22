@@ -17,6 +17,7 @@ export enum NexusTypes {
   Scalar = "Scalar",
   Union = "Union",
   ExtendObject = "ExtendObject",
+  ExtendInputObject = "ExtendInputObject",
   WrappedType = "WrappedType",
   OutputField = "OutputField",
   InputField = "InputField",
