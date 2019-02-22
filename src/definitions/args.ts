@@ -56,7 +56,7 @@ export class NexusArgDef<TypeName extends string> {
   }
 }
 
-withNexusSymbol(NexusArgDef, NexusTypes.Interface);
+withNexusSymbol(NexusArgDef, NexusTypes.Arg);
 
 /**
  * Defines an argument that can be used in any object or interface type

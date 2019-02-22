@@ -8,7 +8,16 @@ import {
   scalarType,
   extendInputType,
   intArg,
+  idArg,
 } from "nexus";
+
+export const testArgs1 = {
+  foo: idArg(),
+};
+
+export const testArgs2 = {
+  bar: idArg(),
+};
 
 export const Bar = interfaceType({
   name: "Bar",
