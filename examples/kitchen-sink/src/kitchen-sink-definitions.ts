@@ -6,6 +6,7 @@ import {
   arg,
   extendType,
   scalarType,
+  intArg,
 } from "nexus";
 
 export const Bar = interfaceType({
@@ -78,6 +79,16 @@ export const Query = objectType({
     t.field("bar", {
       type: "Bar",
       resolve: () => ({ ok: true }),
+    });
+    t.int('getNumberOrNull', {
+      nullable: true,
+      args: { a: intArg({ required: true }) },
+      async resolve(_, { a }) {
+        if (a > 0) {
+          return a;
+        }
+        return null;
+      },
     });
   },
 });
