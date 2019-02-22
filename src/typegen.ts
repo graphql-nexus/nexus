@@ -450,7 +450,11 @@ export class Typegen {
       typing.push(this.printScalar(type));
     } else if (isEnumType(type)) {
       typing.push(`NexusGenEnums['${type.name}']`);
-    } else if (isObjectType(type) || isInterfaceType(type) || isUnionType(type)) {
+    } else if (
+      isObjectType(type) ||
+      isInterfaceType(type) ||
+      isUnionType(type)
+    ) {
       typing.push(`NexusGenRootTypes['${type.name}']`);
     }
     return typing;

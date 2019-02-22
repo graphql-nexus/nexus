@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.15
+
+- Fix #55, type error for Promise numeric field return
+
 ### 0.9.14
 
 - Fix #44, add correct typings for union type

@@ -60,6 +60,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     bar: NexusGenRootTypes['Bar']; // Bar!
     extended: NexusGenRootTypes['Bar']; // Bar!
+    getNumberOrNull: number | null; // Int
   }
   TestObj: { // field return type
     a: NexusGenRootTypes['Bar']; // Bar!
@@ -81,6 +82,11 @@ export interface NexusGenArgTypes {
   Foo: {
     argsTest: { // args
       a?: NexusGenInputs['InputType'] | null; // InputType
+    }
+  }
+  Query: {
+    getNumberOrNull: { // args
+      a: number; // Int!
     }
   }
   TestObj: {

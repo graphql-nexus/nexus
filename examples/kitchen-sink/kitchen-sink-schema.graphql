@@ -30,6 +30,7 @@ input InputType {
 type Query {
   bar: Bar!
   extended: Bar!
+  getNumberOrNull(a: Int!): Int
 }
 
 type TestObj implements Bar & Baz {
