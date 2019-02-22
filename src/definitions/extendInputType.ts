@@ -1,6 +1,7 @@
 import { NexusTypes, withNexusSymbol } from "./_types";
 import { InputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
+import { GetGen } from "../typegenTypeHelpers";
 
 export interface NexusExtendInputTypeConfig<TypeName extends string> {
   type: TypeName;
@@ -27,7 +28,7 @@ withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject);
  *
  * @see http://graphql-nexus.com/api/extendType
  */
-export function extendInputType<TypeName extends string>(
+export function extendInputType<TypeName extends GetGen<"inputNames", string>>(
   config: NexusExtendInputTypeConfig<TypeName>
 ) {
   return new NexusExtendInputTypeDef(config.type, config);

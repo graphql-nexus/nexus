@@ -6,6 +6,7 @@ import {
   arg,
   extendType,
   scalarType,
+  extendInputType,
 } from "nexus";
 
 export const Bar = interfaceType({
@@ -22,6 +23,9 @@ export const Bar = interfaceType({
             answer: 2,
           },
         }),
+      },
+      resolve(root, args) {
+        return true;
       },
     });
     t.resolveType((root) => "Foo");
@@ -72,6 +76,11 @@ export const InputType = inputObjectType({
   },
 });
 
+export const ext = extendInputType({
+  type: "InputType",
+  definition(t) {},
+});
+
 export const Query = objectType({
   name: "Query",
   definition(t) {
@@ -87,6 +96,9 @@ export const MoreQueryFields = extendType({
   definition(t) {
     t.field("extended", {
       type: "Bar",
+      resolve() {
+        return { ok: true };
+      },
     });
   },
 });
