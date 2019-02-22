@@ -11,7 +11,7 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 - **Code-first**: Programmatically define your GraphQL types in JavaScript/TypeScript
 - **Compatible with the GraphQL ecosystem**: Nexus is based on `graphql-js`
 - **Type-safe**: Nexus enables auto-completion and error checks in your IDE (even for JS)
-- **Generates SDL & TS definitions**: SDL schema and typings are updated as you code 
+- **Generates SDL & TS definitions**: SDL schema and typings are updated as you code
 
 ## Features
 
@@ -31,6 +31,10 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 ## Documentation
 
 You can find the docs for GraphQL Nexus [here](https://nexus.js.org).
+
+## CI
+
+[![CircleCI](https://circleci.com/gh/prisma/nexus.svg?style=svg)](https://circleci.com/gh/prisma/nexus)
 
 ## Install
 
@@ -60,35 +64,34 @@ All examples of GraphQL Nexus can be found in the [/examples](https://github.com
 <Summary>Example: Hello World (with `graphql-yoga`)</Summary>
 
 ```ts
-import { queryType, stringArg, makeSchema } from 'nexus'
-import { GraphQLServer } from 'graphql-yoga'
+import { queryType, stringArg, makeSchema } from "nexus";
+import { GraphQLServer } from "graphql-yoga";
 
 const Query = queryType({
   definition(t) {
-    t.string('hello', {
+    t.string("hello", {
       args: { name: stringArg({ nullable: true }) },
-      resolve: (parent, { name }) => `Hello ${name || 'World'}!`,
-    })
+      resolve: (parent, { name }) => `Hello ${name || "World"}!`,
+    });
   },
-})
+});
 
 const schema = makeSchema({
   types: [Query],
   outputs: {
-    schema: __dirname + '/generated/schema.graphql',
-    typegen: __dirname + '/generated/typings.ts',
+    schema: __dirname + "/generated/schema.graphql",
+    typegen: __dirname + "/generated/typings.ts",
   },
-})
+});
 
 const server = new GraphQLServer({
   schema,
-})
+});
 
-server.start(() => `Server is running on http://localhost:4000`)
+server.start(() => `Server is running on http://localhost:4000`);
 ```
 
 </Details>
-
 
 <Details>
 <Summary>Example: Star Wars</Summary>

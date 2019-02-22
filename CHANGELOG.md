@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.9.16
+
+- Fix #52, args being incorrectly imported as types
+- Feature: extendInputType, #51
+
 ### 0.9.15
 
 - Fix #55, type error for Promise numeric field return
