@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.17
+
+- More for #55, type error on Promise/null resolve
+
 ### 0.9.16
 
 - Fix #52, args being incorrectly imported as types
