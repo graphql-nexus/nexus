@@ -32,6 +32,7 @@ import {
   isOutputType,
   isUnionType,
   isScalarType,
+  defaultFieldResolver,
 } from "graphql";
 import { NexusArgConfig, NexusArgDef } from "./definitions/args";
 import {
@@ -82,11 +83,16 @@ import {
   GraphQLPossibleInputs,
   GraphQLPossibleOutputs,
   NonNullConfig,
+  WrappedResolver,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
-import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
+import {
+  AbstractTypeResolver,
+  GetGen,
+  AuthorizeResolver,
+} from "./typegenTypeHelpers";
 import { firstDefined, objValues, suggestionList, isObject } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -924,6 +930,12 @@ export class SchemaBuilder {
     if (!resolver && !forInterface) {
       resolver = (typeConfig as NexusObjectTypeConfig<any>).defaultResolver;
     }
+    if (fieldOptions.authorize) {
+      resolver = wrapAuthorize(
+        resolver || defaultFieldResolver,
+        fieldOptions.authorize
+      );
+    }
     return resolver;
   }
 
@@ -943,6 +955,33 @@ function extendError(name: string) {
   return new Error(
     `${name} was already defined and imported as a type, check the docs for extending types`
   );
+}
+
+export function wrapAuthorize(
+  resolver: GraphQLFieldResolver<any, any>,
+  authorize: AuthorizeResolver<string, any>
+): GraphQLFieldResolver<any, any> {
+  const nexusAuthWrapped: WrappedResolver = async (root, args, ctx, info) => {
+    const authResult = await authorize(root, args, ctx, info);
+    if (authResult === true) {
+      return resolver(root, args, ctx, info);
+    }
+    if (authResult === false) {
+      throw new Error("Not authorized");
+    }
+    if (authResult instanceof Error) {
+      throw authResult;
+    }
+    const {
+      fieldName,
+      parentType: { name: parentTypeName },
+    } = info;
+    throw new Error(
+      `Nexus authorize for ${parentTypeName}.${fieldName} Expected a boolean or Error, saw ${authResult}`
+    );
+  };
+  nexusAuthWrapped.nexusWrappedResolver = resolver;
+  return nexusAuthWrapped;
 }
 
 export interface BuildTypes<

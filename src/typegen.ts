@@ -21,9 +21,11 @@ import {
   isUnionType,
   GraphQLInputObjectType,
   GraphQLEnumType,
+  defaultFieldResolver,
 } from "graphql";
 import { TypegenInfo } from "./builder";
 import { eachObj, GroupedTypes, groupTypes, mapObj } from "./utils";
+import { WrappedResolver } from "./definitions/_types";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -344,10 +346,15 @@ export class Typegen {
   }
 
   hasResolver(
-    field: GraphQLField<any, any>,
+    field: GraphQLField<any, any> & { resolve?: WrappedResolver },
     _type: GraphQLObjectType | GraphQLInterfaceType // Used in tests
   ) {
-    return Boolean(field.resolve);
+    if (field.resolve) {
+      if (field.resolve.nexusWrappedResolver !== defaultFieldResolver) {
+        return true;
+      }
+    }
+    return false;
   }
 
   printRootTypeMap() {
