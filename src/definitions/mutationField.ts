@@ -7,10 +7,10 @@ export function mutationField<FieldName extends string>(
     | FieldOutConfig<"Mutation", FieldName>
     | (() => FieldOutConfig<"Mutation", FieldName>)
 ) {
-  const finalConfig = typeof config === "function" ? config() : config;
   return extendType({
     type: "Mutation",
     definition(t) {
+      const finalConfig = typeof config === "function" ? config() : config;
       t.field(fieldName, finalConfig);
     },
   });

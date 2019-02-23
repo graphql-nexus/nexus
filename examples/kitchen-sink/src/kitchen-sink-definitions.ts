@@ -9,6 +9,8 @@ import {
   extendInputType,
   intArg,
   idArg,
+  mutationField,
+  mutationType,
 } from "nexus";
 
 export const testArgs1 = {
@@ -18,6 +20,22 @@ export const testArgs1 = {
 export const testArgs2 = {
   bar: idArg(),
 };
+
+export const Mutation = mutationType({
+  definition(t) {
+    t.boolean("ok", () => true);
+  },
+});
+
+export const SomeMutationField = mutationField("someMutationField", () => ({
+  type: Foo,
+  args: {
+    id: idArg({ required: true }),
+  },
+  resolve(root, args) {
+    return { name: `Test${args.id}`, ok: true };
+  },
+}));
 
 export const Bar = interfaceType({
   name: "Bar",

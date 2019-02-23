@@ -1,10 +1,10 @@
-import { Types } from "nexus";
+import { core } from "nexus";
 
-export function withTypeArguments(t: Types.OutputDefinitionBlock<any>) {
+export function withTypeArguments(t: core.OutputDefinitionBlock<any>) {
   t.list.field("typeArguments", { type: "Node", nullable: true });
 }
 
-export function hasTypeParameters(t: Types.OutputDefinitionBlock<any>) {
+export function hasTypeParameters(t: core.OutputDefinitionBlock<any>) {
   t.field("typeParameters", {
     type: "TypeParameterDeclaration",
     list: true,
@@ -12,7 +12,7 @@ export function hasTypeParameters(t: Types.OutputDefinitionBlock<any>) {
   });
 }
 
-export function signatureDeclarationBase(t: Types.OutputDefinitionBlock<any>) {
+export function signatureDeclarationBase(t: core.OutputDefinitionBlock<any>) {
   hasTypeParameters(t);
   t.string("nameText", {
     nullable: true,
@@ -22,13 +22,13 @@ export function signatureDeclarationBase(t: Types.OutputDefinitionBlock<any>) {
   t.field("type", { type: "Node", nullable: true });
 }
 
-export function functionLikeDeclaration(t: Types.ObjectDefinitionBlock<any>) {
+export function functionLikeDeclaration(t: core.ObjectDefinitionBlock<any>) {
   signatureDeclarationBase(t);
   t.implements("MaybeOptional");
   t.field("asteriskToken", { type: "Token", nullable: true });
   t.field("exclamationToken", { type: "Token", nullable: true });
 }
 
-export function nodeType(t: Types.ObjectDefinitionBlock<any>) {
+export function nodeType(t: core.ObjectDefinitionBlock<any>) {
   t.implements("Node");
 }

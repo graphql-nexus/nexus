@@ -11,7 +11,12 @@ export const UNKNOWN_NODE = objectType({
 export const Token = objectType({
   name: "Token",
   definition(t) {
-    t.field("kind", { type: "SyntaxKind" });
+    t.field("kind", {
+      type: "SyntaxKind",
+      resolve(root) {
+        return root.kind;
+      },
+    });
   },
 });
 
