@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.10.0
+
+- Add an optional field level authorize #32, part of a more robust authorization story in #23
+- Add mutationField abstraction, #46
+
 ### 0.9.17
 
 - More for #55, type error on Promise/null resolve

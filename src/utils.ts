@@ -209,3 +209,8 @@ export function firstDefined<T>(...args: Array<T | undefined>): T {
   }
   throw new Error("At least one of the values should be defined");
 }
+
+// eslint-disable-next-line no-redeclare
+export function isPromise(value: any): value is PromiseLike<any> {
+  return Boolean(value && typeof value.then === "function");
+}

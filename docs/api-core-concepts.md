@@ -26,3 +26,4 @@ Each public API is documented below, feel free to open a PR with more examples/c
 - [args](api-args.md)
 - [makeSchema](api-makeSchema.md)
 - [extendType / extendInputType](api-extendType.md)
+- [mutationField](api-mutationField.md)

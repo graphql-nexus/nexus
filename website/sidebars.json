@@ -19,7 +19,8 @@
       "api-enumType",
       "api-args",
       "api-makeSchema",
-      "api-extendType"
+      "api-extendType",
+      "api-mutationField"
     ]
   }
 }

@@ -83,6 +83,9 @@ exports.Mutation = objectType({
       args: {
         repoFullName: RepoNameArg,
       },
+      resolve() {
+        // todo
+      },
     });
     t.field("vote", {
       type: "Entry",
@@ -96,6 +99,9 @@ exports.Mutation = objectType({
           description: "The type of vote - UP, DOWN, or CANCEL",
         }),
       },
+      resolve() {
+        // todo
+      },
     });
     t.field("submitComment", {
       type: "Comment",
@@ -106,13 +112,16 @@ exports.Mutation = objectType({
           description: "The text content for the new comment",
         }),
       },
+      resolve() {
+        // todo
+      },
     });
   },
 });
 
 /**
  * Example of using functions to mixin fields across types
- * @type {(t: import('nexus').Types.ObjectDefinitionBlock<any>) => void}
+ * @type {(t: import('nexus').core.ObjectDefinitionBlock<any>) => void}
  */
 const commonFields = (t) => {
   t.int("id", { description: "The SQL ID of this entry" });

@@ -14,6 +14,7 @@ export { extendInputType } from "./definitions/extendInputType";
 export { inputObjectType } from "./definitions/inputObjectType";
 export { interfaceType } from "./definitions/interfaceType";
 export { objectType, queryType, mutationType } from "./definitions/objectType";
+export { mutationField } from "./definitions/mutationField";
 export { scalarType, asNexusMethod } from "./definitions/scalarType";
 export { unionType } from "./definitions/unionType";
 export { nexusWrappedType } from "./definitions/wrapping";
