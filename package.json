@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.9.14",
+  "version": "0.9.17",
   "main": "dist",
   "types": "dist",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "clean": "rm -rf dist",
     "format": "prettier --write 'src/**/*.ts'",
     "prepublish": "yarn clean && yarn lint && yarn build",
-    "postpublish": "yarn upgrade-deps",
+    "postpublish": "yarn upgrade-deps || echo 'Oops...'",
     "website": "cd website && yarn && yarn start",
     "examples": "yarn link-examples && cd website && yarn gulp run-examples",
     "deploy-site": "cd website && yarn && yarn gulp link-website && yarn build",

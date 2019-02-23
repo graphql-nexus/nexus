@@ -10,6 +10,7 @@ export {
 } from "./definitions/args";
 export { enumType } from "./definitions/enumType";
 export { extendType } from "./definitions/extendType";
+export { extendInputType } from "./definitions/extendInputType";
 export { inputObjectType } from "./definitions/inputObjectType";
 export { interfaceType } from "./definitions/interfaceType";
 export { objectType, queryType, mutationType } from "./definitions/objectType";

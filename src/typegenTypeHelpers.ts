@@ -25,15 +25,18 @@ export type MaybePromiseDeep<T> = Date extends T
   ? MaybePromise<T>
   : boolean extends T
   ? MaybePromise<T>
-  : T extends object
+  : number extends T
+  ? MaybePromise<T>
+  : object extends T
   ? MaybePromise<
-      {
-        [P in keyof T]: T[P] extends Array<infer U>
-          ? Array<MaybePromiseDeep<U>>
-          : T[P] extends ReadonlyArray<infer Y>
-          ? ReadonlyArray<MaybePromiseDeep<Y>>
-          : MaybePromiseDeep<T[P]>
-      }
+      | T
+      | {
+          [P in keyof T]: T[P] extends Array<infer U>
+            ? Array<MaybePromiseDeep<U>>
+            : T[P] extends ReadonlyArray<infer Y>
+            ? ReadonlyArray<MaybePromiseDeep<Y>>
+            : MaybePromiseDeep<T[P]>
+        }
     >
   : MaybePromise<T>;
 
@@ -80,6 +83,16 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   context: GetGen<"context">,
   info: GraphQLResolveInfo
 ) => MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
+
+export type AuthorizeResolver<
+  TypeName extends string,
+  FieldName extends string
+> = (
+  root: RootValue<TypeName>,
+  args: ArgsValue<TypeName, FieldName>,
+  context: GetGen<"context">,
+  info: GraphQLResolveInfo
+) => MaybePromise<boolean | Error>;
 
 export type AbstractResolveReturn<
   TypeName extends string

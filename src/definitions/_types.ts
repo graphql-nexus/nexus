@@ -2,7 +2,12 @@ import {
   GraphQLLeafType,
   GraphQLCompositeType,
   GraphQLInputObjectType,
+  GraphQLFieldResolver,
 } from "graphql";
+
+export type WrappedResolver = GraphQLFieldResolver<any, any> & {
+  nexusWrappedResolver?: GraphQLFieldResolver<any, any>;
+};
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
@@ -17,6 +22,7 @@ export enum NexusTypes {
   Scalar = "Scalar",
   Union = "Union",
   ExtendObject = "ExtendObject",
+  ExtendInputObject = "ExtendInputObject",
   WrappedType = "WrappedType",
   OutputField = "OutputField",
   InputField = "InputField",

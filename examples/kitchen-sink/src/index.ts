@@ -1,7 +1,7 @@
 import { ApolloServer } from "apollo-server";
 import { makeSchema } from "nexus";
 import path from "path";
-import * as types from "./definitions";
+import * as types from "./kitchen-sink-definitions";
 
 const schema = makeSchema({
   types,
