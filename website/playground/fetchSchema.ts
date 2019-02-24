@@ -1,7 +1,7 @@
 import { introspectionQuery, buildClientSchema } from "graphql";
 import { printSchema } from "graphql";
 
-export function fetchSchema(url: any) {
+export function fetchSchema(url: string) {
   const result: any = fetch(url, {
     method: "post",
     headers: {
