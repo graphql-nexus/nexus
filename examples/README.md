@@ -24,13 +24,16 @@ npm run examples
 
 - [ghost-graphql](ghost) (makes use of [schemats](https://github.com/SweetIQ/schemats) and the full power of inferred types)
 
-### JavaScript:
+### JavaScript
 
 - [githunt-api](githunt-api)
 
-### TypeScript:
+### TypeScript
 
 - [ts-ast-reader](ts-ast-reader)
 - [apollo-fullstack](apollo-fullstack)
 - [star-wars](star-wars)
 - [kitchen-sink](kitchen-sink)
+- [nexus-prisma](nexus-prisma)
+
+> The `nexus-prisma` example is not included when all examples are ran at once. You can try it by following the instructions in its [README](nexus-prisma) instead.
