@@ -13,6 +13,52 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 - **Type-safe**: Nexus enables auto-completion and error checks in your IDE (even for JS)
 - **Generates SDL & TS definitions**: SDL schema and typings are updated as you code
 
+## Examples
+
+**"Hello World" GraphQL server with `graphql-yoga`**
+
+```ts
+import { queryType, stringArg, makeSchema } from "nexus";
+import { GraphQLServer } from "graphql-yoga";
+
+const Query = queryType({
+  definition(t) {
+    t.string("hello", {
+      args: { name: stringArg({ nullable: true }) },
+      resolve: (parent, { name }) => `Hello ${name || "World"}!`,
+    });
+  },
+});
+
+const schema = makeSchema({
+  types: [Query],
+  outputs: {
+    schema: __dirname + "/generated/schema.graphql",
+    typegen: __dirname + "/generated/typings.ts",
+  },
+});
+
+const server = new GraphQLServer({
+  schema,
+});
+
+server.start(() => `Server is running on http://localhost:4000`);
+```
+
+All examples of GraphQL Nexus can be found in the [`/examples`](./examples) directory:
+
+- [githunt-api](./examples/githunt-api)
+- [ts-ast-reader](./examples/ts-ast-reader)
+- [apollo-fullstack](./examples/apollo-fullstack)
+- [star-wars](./examples/star-wars)
+- [kitchen-sink](./examples/kitchen-sink)
+
+If you're interested in examples using the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin, check out the official [`prisma-examples`](https://github.com/prisma/prisma-examples/) repo:
+
+- [GraphQL blogging app](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql)
+- [GraphQL blogging app with authentication & authorization](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-auth)
+- [GraphQL CRUD example](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-crud)
+
 ## Features
 
 - Expressive, declarative API for building schemas
@@ -55,149 +101,6 @@ yarn add nexus graphql
 If you've been following an [SDL-first](https://www.prisma.io/blog/the-problems-of-schema-first-graphql-development-x1mn4cb0tyl3/) approach to build your GraphQL server and want to see what your code looks like when written with GraphQL Nexus, you can use the [**SDL converter**](https://nexus.js.org/converter):
 
 ![](https://imgur.com/AbkFWNO.png)
-
-## Examples
-
-All examples of GraphQL Nexus can be found in the [/examples](https://github.com/prisma/nexus/tree/develop/examples) directory.
-
-<Details>
-<Summary>Example: Hello World (with `graphql-yoga`)</Summary>
-
-```ts
-import { queryType, stringArg, makeSchema } from "nexus";
-import { GraphQLServer } from "graphql-yoga";
-
-const Query = queryType({
-  definition(t) {
-    t.string("hello", {
-      args: { name: stringArg({ nullable: true }) },
-      resolve: (parent, { name }) => `Hello ${name || "World"}!`,
-    });
-  },
-});
-
-const schema = makeSchema({
-  types: [Query],
-  outputs: {
-    schema: __dirname + "/generated/schema.graphql",
-    typegen: __dirname + "/generated/typings.ts",
-  },
-});
-
-const server = new GraphQLServer({
-  schema,
-});
-
-server.start(() => `Server is running on http://localhost:4000`);
-```
-
-</Details>
-
-<Details>
-<Summary>Example: Star Wars</Summary>
-
-```ts
-import { interfaceType, objectType, enumType, arg, stringArg } from "nexus";
-
-export const Character = interfaceType({
-  name: "Character",
-  definition: (t) => {
-    t.string("id", { description: "The id of the character" });
-    t.string("name", { description: "The name of the character" });
-    t.list.field("friends", {
-      type: Character,
-      description:
-        "The friends of the character, or an empty list if they have none.",
-      resolve: (character) => getFriends(character),
-    });
-    t.list.field("appearsIn", {
-      type: "Episode",
-      description: "Which movies they appear in.",
-      resolve: (o) => o.appears_in,
-      args: {
-        id: idArg({ required: true }),
-      },
-    });
-    t.resolveType((character) => character.type);
-  },
-});
-
-export const Droid = objectType({
-  name: "Droid",
-  description: "A mechanical creature in the Star Wars universe.",
-  definition(t) {
-    t.implements(Character);
-    t.string("primaryFunction", {
-      description: "The primary function of the droid.",
-      resolve: (o) => o.primary_function || "N/A",
-    });
-  },
-});
-
-const OriginalEpisodes = [
-  { name: "NEWHOPE", value: 4, description: "Released in 1977." },
-  { name: "EMPIRE", value: 5, description: "Released in 1980." },
-  { name: "JEDI", value: 6, description: "Released in 1983" },
-];
-
-export const Episode = enumType({
-  name: "Episode",
-  description: "One of the films in the Star Wars Trilogy",
-  members: OriginalEpisodes,
-});
-
-export const Human = objectType({
-  name: "Human",
-  description: "A humanoid creature in the Star Wars universe.",
-  definition(t) {
-    t.implements(Character);
-    t.string("homePlanet", {
-      nullable: true,
-      description: "The home planet of the human, or null if unknown.",
-      resolve: (o) => o.home_planet || null,
-    });
-  },
-});
-
-const characterArgs = {
-  id: stringArg({
-    required: true,
-    description: "id of the character",
-  }),
-};
-
-const heroArgs = {
-  episode: arg({
-    type: "Episode",
-    description:
-      "If omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode.",
-  }),
-};
-
-// or queryType({...
-export const Query = objectType({
-  name: "Query",
-  definition(t) {
-    t.field("hero", {
-      type: Character,
-      args: heroArgs,
-      resolve: (_, { episode }) => getHero(episode),
-    });
-    t.field("human", {
-      type: Human,
-      args: characterArgs,
-      resolve: (_, { id }) => getHuman(id),
-    });
-    t.field("droid", {
-      type: Droid,
-      args: characterArgs,
-      resolve: (_, { id }) => getDroid(id),
-    });
-  },
-});
-```
-
-</Details>
 
 ---
 
