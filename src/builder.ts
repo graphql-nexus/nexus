@@ -129,7 +129,7 @@ export interface BuilderConfig {
     | false;
   /**
    * Whether the schema & types are generated when the server
-   * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+   * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV !== "production"
    */
   shouldGenerateArtifacts?: boolean;
   /**
@@ -1082,11 +1082,11 @@ export function makeSchemaInternal(
 export function makeSchema(options: SchemaConfig): GraphQLSchema {
   const { schema } = makeSchemaInternal(options);
 
-  // Only in development envs do we want to worry about regenerating the
+  // Only if not in production we want to worry about regenerating the
   // schema definition and/or generated types.
   const {
     shouldGenerateArtifacts = Boolean(
-      !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+      !process.env.NODE_ENV || process.env.NODE_ENV !== "production"
     ),
   } = options;
 
