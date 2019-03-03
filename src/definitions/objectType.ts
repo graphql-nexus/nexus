@@ -113,9 +113,3 @@ export function mutationType(
 ) {
   return objectType({ ...config, name: "Mutation" });
 }
-
-// export function subscriptionType(
-//   config: NexusObjectTypeConfig<"Subscription">
-// ) {
-//   return objectType({ ...config, name: "Subscription" });
-// }
