@@ -84,7 +84,6 @@ import {
   GraphQLPossibleOutputs,
   NonNullConfig,
   WrappedResolver,
-  AsyncIterator,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
