@@ -69,11 +69,10 @@ export class TypegenMetadata {
     }
     const fs = require("fs") as typeof import("fs");
     const util = require("util") as typeof import("util");
-    const [readFile, writeFile, mkdir, exists] = [
+    const [readFile, writeFile, mkdir] = [
       util.promisify(fs.readFile),
       util.promisify(fs.writeFile),
       util.promisify(fs.mkdir),
-      util.promisify(fs.exists),
     ];
     let formatTypegen: TypegenFormatFn | null = null;
     if (typeof this.config.formatTypegen === "function") {
@@ -91,9 +90,15 @@ export class TypegenMetadata {
     ]);
     if (toSave !== existing) {
       const dirPath = path.dirname(filePath);
-      const shouldCreateDir = !(await exists(dirPath));
-      if (shouldCreateDir) {
+      try {
         await mkdir(dirPath, { recursive: true });
+      } catch (e) {
+        if (e.code === "EEXIST") {
+          /* dir already exists, do nothing */
+        } else {
+          /* re throw original error*/
+          throw e;
+        }
       }
       return writeFile(filePath, toSave);
     }
