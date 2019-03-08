@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.11.1
+
+- Export `queryField` & `subscriptionField` on public API
+
 ### 0.11.0
 
 - Fix allowing nested input types (#68), fixes default type definitions for input fields

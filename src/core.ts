@@ -17,6 +17,8 @@ export * from "./definitions/extendInputType";
 export * from "./definitions/inputObjectType";
 export * from "./definitions/interfaceType";
 export * from "./definitions/mutationField";
+export * from "./definitions/queryField";
+export * from "./definitions/subscriptionField";
 export * from "./definitions/objectType";
 export * from "./definitions/scalarType";
 export * from "./definitions/unionType";
