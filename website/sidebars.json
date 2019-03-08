@@ -21,6 +21,7 @@
       "api-makeSchema",
       "api-extendType",
       "api-mutationField",
+      "api-subscriptionField",
       "api-queryField"
     ]
   }
