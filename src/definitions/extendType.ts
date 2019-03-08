@@ -29,7 +29,7 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject);
  * @see http://graphql-nexus.com/api/extendType
  */
 export function extendType<
-  TypeName extends GetGen<"objectNames", string> | "Query" | "Mutation"
+  TypeName extends GetGen<"objectNames", string> | "Query" | "Mutation" | "Subscription"
 >(config: NexusExtendTypeConfig<TypeName>) {
   return new NexusExtendTypeDef(config.type, config);
 }
