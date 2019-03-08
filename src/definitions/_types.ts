@@ -79,3 +79,9 @@ export const NexusWrappedSymbol = Symbol.for("@nexus/wrapped");
 export function withNexusSymbol(obj: Function, nexusType: NexusTypes) {
   obj.prototype[NexusWrappedSymbol] = nexusType;
 }
+
+export interface AsyncIterator<T> {
+  next(value?: any): Promise<IteratorResult<T>>;
+  return?(value?: any): Promise<IteratorResult<T>>;
+  throw?(e?: any): Promise<IteratorResult<T>>;
+}

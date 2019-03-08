@@ -14,6 +14,7 @@ import {
   AllNexusInputTypeDefs,
 } from "./wrapping";
 import { BaseScalars } from "./_types";
+import { GraphQLFieldResolver } from "graphql";
 
 export interface CommonFieldConfig {
   /**
@@ -42,7 +43,7 @@ export interface CommonFieldConfig {
   list?: true | boolean[];
 }
 
-export interface OutputScalarConfig<
+export interface CommonOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends CommonFieldConfig {
@@ -50,10 +51,6 @@ export interface OutputScalarConfig<
    * Arguments for the field
    */
   args?: Record<string, NexusArgDef<string>>;
-  /**
-   * Resolve method for the field
-   */
-  resolve?: FieldResolver<TypeName, FieldName>;
   /**
    * Authorization for an individual field. Returning "true"
    * or "Promise<true>" means the field can be accessed.
@@ -63,6 +60,16 @@ export interface OutputScalarConfig<
    * executing.
    */
   authorize?: AuthorizeResolver<TypeName, FieldName>;
+}
+
+export interface OutputScalarConfig<
+  TypeName extends string,
+  FieldName extends string
+> extends CommonOutputFieldConfig<TypeName, FieldName> {
+  /**
+   * Resolve method for the field
+   */
+  resolve?: FieldResolver<TypeName, FieldName>;
 }
 
 export interface NexusOutputFieldConfig<
@@ -77,6 +84,7 @@ export interface NexusOutputFieldConfig<
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string;
+  subscribe?: GraphQLFieldResolver<any, any>;
 };
 
 /**

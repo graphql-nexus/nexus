@@ -671,9 +671,7 @@ export class SchemaBuilder {
       resolve: this.getResolver(fieldConfig, typeConfig, forInterface),
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
-      // TODO: Need to look into subscription semantics and how
-      // resolution works for them.
-      // subscribe: fieldConfig.subscribe,
+      subscribe: forInterface ? undefined : this.getSubscribe(fieldConfig),
     };
   }
 
@@ -918,22 +916,33 @@ export class SchemaBuilder {
     return this.missingType(name, fromObject);
   }
 
+  protected getSubscribe(fieldConfig: NexusOutputFieldDef) {
+    let subscribe: undefined | GraphQLFieldResolver<any, any>;
+    if (fieldConfig.subscribe) {
+      subscribe = fieldConfig.subscribe;
+      if (fieldConfig.authorize) {
+        subscribe = wrapAuthorize(subscribe, fieldConfig.authorize);
+      }
+    }
+    return subscribe;
+  }
+
   protected getResolver(
-    fieldOptions: NexusOutputFieldDef,
+    fieldConfig: NexusOutputFieldDef,
     typeConfig: NexusObjectTypeConfig<any> | NexusInterfaceTypeConfig<any>,
     forInterface: boolean = false
   ) {
     let resolver: undefined | GraphQLFieldResolver<any, any>;
-    if (fieldOptions.resolve) {
-      resolver = fieldOptions.resolve;
+    if (fieldConfig.resolve) {
+      resolver = fieldConfig.resolve;
     }
     if (!resolver && !forInterface) {
       resolver = (typeConfig as NexusObjectTypeConfig<any>).defaultResolver;
     }
-    if (fieldOptions.authorize) {
+    if (fieldConfig.authorize && typeConfig.name !== "Subscription") {
       resolver = wrapAuthorize(
         resolver || defaultFieldResolver,
-        fieldOptions.authorize
+        fieldConfig.authorize
       );
     }
     return resolver;
