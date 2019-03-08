@@ -10,14 +10,6 @@ import { NexusUnionTypeDef } from "./unionType";
 import { NexusTypes, NexusWrappedSymbol, withNexusSymbol } from "./_types";
 import { NexusExtendInputTypeDef } from "./extendInputType";
 
-export type NexusInputTypeName<T> = T extends NexusInputObjectTypeDef<infer A>
-  ? A
-  : T extends NexusEnumTypeDef<infer B>
-  ? B
-  : T extends NexusScalarTypeDef<infer C>
-  ? C
-  : never;
-
 export type AllNexusInputTypeDefs<T extends string = string> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>

@@ -101,6 +101,15 @@ export const InputType = inputObjectType({
   definition(t) {
     t.string("key", { required: true });
     t.int("answer");
+    t.field("nestedInput", { type: InputType2 });
+  },
+});
+
+export const InputType2 = inputObjectType({
+  name: "InputType2",
+  definition(t) {
+    t.string("key", { required: true });
+    t.int("answer");
   },
 });
 

@@ -5,12 +5,13 @@ import {
   HasGen3,
   NeedsResolver,
   AuthorizeResolver,
+  GetGen3,
 } from "../typegenTypeHelpers";
 import { NexusArgDef } from "./args";
 import {
   AllNexusOutputTypeDefs,
-  NexusInputTypeName,
   NexusWrappedType,
+  AllNexusInputTypeDefs,
 } from "./wrapping";
 import { BaseScalars } from "./_types";
 
@@ -239,11 +240,14 @@ export interface ScalarInputFieldConfig<T> extends CommonFieldConfig {
   default?: T;
 }
 
-export interface NexusInputFieldConfig extends ScalarInputFieldConfig<string> {
-  type: GetGen<"allInputTypes"> | NexusInputTypeName<string>;
+export interface NexusInputFieldConfig<
+  TypeName extends string,
+  FieldName extends string
+> extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
+  type: GetGen<"allInputTypes"> | AllNexusInputTypeDefs<string>;
 }
 
-export type NexusInputFieldDef = NexusInputFieldConfig & {
+export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
   name: string;
 };
 
@@ -285,13 +289,13 @@ export class InputDefinitionBlock<TypeName extends string> {
     this.addScalarField(fieldName, "ID", opts);
   }
 
-  float(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
+  float(fieldName: string, opts?: ScalarInputFieldConfig<number>) {
     this.addScalarField(fieldName, "Float", opts);
   }
 
   field<FieldName extends string>(
     fieldName: FieldName,
-    fieldConfig: NexusInputFieldConfig
+    fieldConfig: NexusInputFieldConfig<TypeName, FieldName>
   ) {
     this.typeBuilder.addField(
       this.decorateField({
