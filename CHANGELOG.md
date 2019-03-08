@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.11.0
+
+- Fix allowing nested input types (#68), fixes default type definitions for input fields
+- Add `queryField` abstraction to mirror `mutationField`
+- Alpha release of `subscriptionField` (working, but undocumented) for GraphQL subscriptions
+
 ### 0.10.0
 
 - Add an optional field level authorize #32, part of a more robust authorization story in #23

@@ -20,7 +20,8 @@
       "api-args",
       "api-makeSchema",
       "api-extendType",
-      "api-mutationField"
+      "api-mutationField",
+      "api-queryField"
     ]
   }
 }
