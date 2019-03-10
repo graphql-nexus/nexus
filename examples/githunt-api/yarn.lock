@@ -3484,10 +3484,10 @@ negotiator@0.6.1:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
   integrity sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=
 
-nexus@0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.11.0.tgz#1ae27addee23537b3414ec2dc524f8a2ccdbfeea"
-  integrity sha512-PZtwMweipApWpViGo3Dl30S1WOpDtJJ3vrIMoRJx4iqYvtH43nYUs37mbY5p8a8KaSee3bfBB86tVp0Aulxqng==
+nexus@0.11.2:
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.11.2.tgz#10190c512dc8bdac619e6b3ab43c9f892bfc461b"
+  integrity sha512-hBcMbi0QrYBNAtIuM5ga5PBA2i5y8CXQ18ptc9k8CskOR4EKGC2KM4BG6QrctX80hZIWQXH/8adb9+BvNYOqvw==
   dependencies:
     tslib "^1.9.3"
 

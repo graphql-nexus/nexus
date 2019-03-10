@@ -9,7 +9,7 @@
     "apollo-server": "^2.2.0",
     "graphql": "^14.0.2",
     "graphql-subscriptions": "^1.0.0",
-    "nexus": "0.11.0",
+    "nexus": "0.11.2",
     "subscriptions-transport-ws": "^0.9.15",
     "ts-node-dev": "^1.0.0-pre.30"
   },
