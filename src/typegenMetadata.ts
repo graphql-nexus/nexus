@@ -89,8 +89,17 @@ export class TypegenMetadata {
       readFile(filePath, "utf8").catch(() => ""),
     ]);
     if (toSave !== existing) {
-      const dirPath = path.dirname(filePath)
-      await mkdir(dirPath, { recursive: true })
+      const dirPath = path.dirname(filePath);
+      try {
+        await mkdir(dirPath, { recursive: true });
+      } catch (e) {
+        if (e.code === "EEXIST") {
+          /* dir already exists, do nothing */
+        } else {
+          /* re throw original error*/
+          throw e;
+        }
+      }
       return writeFile(filePath, toSave);
     }
   }
