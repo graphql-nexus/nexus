@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.11.2
+
+- Fix `mkdir` for versions of node without recursive option (< 10.15.1).
+
 ### 0.11.1
 
 - Export `queryField` & `subscriptionField` on public API

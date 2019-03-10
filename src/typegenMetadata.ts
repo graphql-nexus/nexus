@@ -93,12 +93,9 @@ export class TypegenMetadata {
       try {
         await mkdir(dirPath, { recursive: true });
       } catch (e) {
-        if (e.code === "EEXIST") {
-          /* dir already exists, do nothing */
-        } else {
-          /* re throw original error*/
+        if (e.code !== "EEXIST") {
           throw e;
-        }
+        } 
       }
       return writeFile(filePath, toSave);
     }
