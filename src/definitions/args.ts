@@ -32,17 +32,17 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
    */
   default?: T;
 }
-
+export type NexusArgConfigType<T> = 
+    | T
+    | AllNexusInputTypeDefs<T>
+    | NexusWrappedType<AllNexusInputTypeDefs<T>>;
 export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
   extends CommonArgConfig {
   /**
    * The type of the argument, either the string name of the type,
    * or the concrete Nexus type definition
    */
-  type:
-    | T
-    | AllNexusInputTypeDefs<T>
-    | NexusWrappedType<AllNexusInputTypeDefs<T>>;
+  type: NexusArgConfigType<T>
   /**
    * Configure the default for the object
    */
@@ -68,7 +68,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg);
  * @see https://graphql.github.io/learn/schema/#arguments
  */
 export function arg<T extends GetGen<"allInputTypes", string>>(
-  options: { type: T | AllNexusInputTypeDefs<T> } & NexusArgConfig<T>
+  options: { type: NexusArgConfigType<T> } & NexusArgConfig<T>
 ) {
   if (!options.type) {
     throw new Error('You must provide a "type" for the arg()');
