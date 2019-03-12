@@ -27,7 +27,9 @@ export type MaybePromiseDeep<T> = Date extends T
   ? MaybePromise<T>
   : number extends T
   ? MaybePromise<T>
-  : object extends T
+  : string extends T
+  ? MaybePromise<T>
+  : T extends object
   ? MaybePromise<
       | T
       | {

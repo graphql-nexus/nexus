@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.11.3
+
+- Fix type for passing `NexusWrappedType` as arg type #81
+- Fix types on `MaybePromiseDeep`
+
 ### 0.11.2
 
 - Fix `mkdir` for versions of node without recursive option (< 10.15.1).

@@ -32,17 +32,19 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
    */
   default?: T;
 }
-export type NexusArgConfigType<T> = 
-    | T
-    | AllNexusInputTypeDefs<T>
-    | NexusWrappedType<AllNexusInputTypeDefs<T>>;
+
+export type NexusArgConfigType<T extends GetGen<"allInputTypes", string>> =
+  | T
+  | AllNexusInputTypeDefs<T>
+  | NexusWrappedType<AllNexusInputTypeDefs<T>>;
+
 export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
   extends CommonArgConfig {
   /**
    * The type of the argument, either the string name of the type,
    * or the concrete Nexus type definition
    */
-  type: NexusArgConfigType<T>
+  type: NexusArgConfigType<T>;
   /**
    * Configure the default for the object
    */
