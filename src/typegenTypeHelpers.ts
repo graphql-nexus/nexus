@@ -34,9 +34,9 @@ export type MaybePromiseDeep<T> = Date extends T
       | T
       | {
           [P in keyof T]: T[P] extends Array<infer U>
-            ? Array<MaybePromiseDeep<U>>
+            ? MaybePromise<Array<MaybePromiseDeep<U>>>
             : T[P] extends ReadonlyArray<infer Y>
-            ? ReadonlyArray<MaybePromiseDeep<Y>>
+            ? MaybePromise<ReadonlyArray<MaybePromiseDeep<Y>>>
             : MaybePromiseDeep<T[P]>
         }
     >

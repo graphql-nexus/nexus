@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.11.4
+
+- Fix import path gen on windows, #84
+- More improvements to `MaybePromiseDeep`
+
 ### 0.11.3
 
 - Fix type for passing `NexusWrappedType` as arg type #81
