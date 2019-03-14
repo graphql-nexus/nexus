@@ -321,8 +321,9 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
     Object.keys(importsMap).sort().forEach((alias) => {
       const [importPath, glob] = importsMap[alias];
+      const safeImportPath = importPath.replace(/\\+/g, '/');
       imports.push(
-        `import ${glob ? "* as " : ""}${alias} from "${importPath}"`
+        `import ${glob ? "* as " : ""}${alias} from "${safeImportPath}"`
       );
     });
 
