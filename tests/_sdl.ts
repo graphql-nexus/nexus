@@ -63,6 +63,7 @@ input CreatePostInput {
 }
 
 type Mutation {
+  someList(items: [String]!): [String]!
   createPost(input: CreatePostInput!): Post!
   registerClick(uuid: UUID): Query!
 }

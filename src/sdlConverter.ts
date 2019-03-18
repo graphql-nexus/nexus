@@ -140,7 +140,7 @@ export class SDLConverter {
     field: GraphQLField<any, any> | GraphQLInputField
   ) {
     const { list, type: fieldType, isNonNull } = unwrapType(field.type);
-    const prefix = list.length === 1 ? `t.list.` : `t.`;
+    const prefix = list.length === 1 && list[0] === true ? `t.list.` : `t.`;
     return `    ${prefix}${this.printFieldMethod(
       source,
       field,
@@ -170,7 +170,7 @@ export class SDLConverter {
     if ("deprecationReason" in field && field.deprecationReason) {
       objectMeta.deprecation = field.deprecationReason;
     }
-    if (list.length > 1) {
+    if (list.length > 1 || list[0] === false) {
       objectMeta.list = list;
     }
     if (!isNonNull && source === "output") {
@@ -249,7 +249,9 @@ export class SDLConverter {
     }
     if (list.length) {
       metaToAdd.push(
-        list.length === 1 ? `list: true` : `list: [${list.join(", ")}]`
+        list.length === 1 && list[0] === true
+          ? `list: true`
+          : `list: [${list.join(", ")}]`
       );
     }
     if (arg.defaultValue !== undefined) {

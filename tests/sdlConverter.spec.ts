@@ -10,6 +10,15 @@ describe("SDLConverter", () => {
 "export const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
+    t.string(\\"someList\\", {
+      list: [false],
+      args: {
+        items: stringArg({
+          list: [false],
+          required: true
+        }),
+      },
+    })
     t.field(\\"createPost\\", {
       type: Post,
       args: {
@@ -127,11 +136,20 @@ export const SomeEnum = enumType({
 
 test("convertSDL", () => {
   expect(convertSDL(EXAMPLE_SDL)).toMatchInlineSnapshot(`
-"import { objectType, arg, uuidArg, stringArg, interfaceType, inputObjectType, unionType, enumType, scalarType } from 'nexus';
+"import { objectType, stringArg, arg, uuidArg, interfaceType, inputObjectType, unionType, enumType, scalarType } from 'nexus';
 
 export const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
+    t.string(\\"someList\\", {
+      list: [false],
+      args: {
+        items: stringArg({
+          list: [false],
+          required: true
+        }),
+      },
+    })
     t.field(\\"createPost\\", {
       type: Post,
       args: {
@@ -262,11 +280,20 @@ export const UUID = scalarType({
 
 test("convertSDL as commonjs", () => {
   expect(convertSDL(EXAMPLE_SDL, true)).toMatchInlineSnapshot(`
-"const { objectType, arg, uuidArg, stringArg, interfaceType, inputObjectType, unionType, enumType, scalarType } = require('nexus');
+"const { objectType, stringArg, arg, uuidArg, interfaceType, inputObjectType, unionType, enumType, scalarType } = require('nexus');
 
 const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
+    t.string(\\"someList\\", {
+      list: [false],
+      args: {
+        items: stringArg({
+          list: [false],
+          required: true
+        }),
+      },
+    })
     t.field(\\"createPost\\", {
       type: Post,
       args: {
