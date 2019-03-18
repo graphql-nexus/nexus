@@ -86,6 +86,9 @@ describe("typegen", () => {
     registerClick: { // args
       uuid?: string | null; // UUID
     }
+    someList: { // args
+      items: Array<string | null>; // [String]!
+    }
   }
   Query: {
     posts: { // args
@@ -193,6 +196,7 @@ describe("typegen", () => {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
     registerClick: NexusGenRootTypes['Query']; // Query!
+    someList: Array<string | null>; // [String]!
   }
   Post: { // field return type
     author: NexusGenRootTypes['User']; // User!
@@ -291,6 +295,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
     registerClick: NexusGenRootTypes['Query']; // Query!
+    someList: Array<string | null>; // [String]!
   }
   Post: { // field return type
     author: NexusGenRootTypes['User']; // User!
@@ -324,6 +329,9 @@ export interface NexusGenArgTypes {
     }
     registerClick: { // args
       uuid?: string | null; // UUID
+    }
+    someList: { // args
+      items: Array<string | null>; // [String]!
     }
   }
   Query: {
