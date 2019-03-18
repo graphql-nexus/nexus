@@ -86,14 +86,18 @@ describe("objectType", () => {
         t.string("email", {
           description: "The email of the person whos account this is",
         });
+        t.string("nestedList", { list: [false, true] });
       },
     });
     const type = buildTypes<{ Account: GraphQLObjectType }>([Account]);
-    expect(Object.keys(type.typeMap.Account.getFields()).sort()).toEqual([
+    const fields = type.typeMap.Account.getFields();
+    expect(Object.keys(fields).sort()).toEqual([
       "email",
       "id",
       "name",
+      "nestedList",
     ]);
+    expect(fields.nestedList.type.toString()).toEqual("[[String]!]!");
   });
 });
 

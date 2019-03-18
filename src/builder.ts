@@ -774,7 +774,7 @@ export class SchemaBuilder {
     }
     if (Array.isArray(list)) {
       for (let i = 0; i < list.length; i++) {
-        const isNull = !list[0];
+        const isNull = !list[i];
         if (!isNull) {
           finalType = GraphQLNonNull(finalType) as T;
         }
