@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.11.6
+
+- More for #55, incorrect return types.
+
 ### 0.11.5
 
 - Fix lists w/ configurable depth/nullability, #89

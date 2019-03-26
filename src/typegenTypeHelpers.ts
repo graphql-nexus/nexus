@@ -84,7 +84,9 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<"context">,
   info: GraphQLResolveInfo
-) => MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
+) =>
+  | MaybePromise<ResultValue<TypeName, FieldName>>
+  | MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
 
 export type AuthorizeResolver<
   TypeName extends string,

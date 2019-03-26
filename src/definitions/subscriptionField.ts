@@ -6,6 +6,7 @@ import {
   MaybePromiseDeep,
   ArgsValue,
   GetGen,
+  MaybePromise,
 } from "../typegenTypeHelpers";
 import { AllNexusOutputTypeDefs, NexusWrappedType } from "./wrapping";
 import { AsyncIterator } from "./_types";
@@ -35,7 +36,9 @@ export interface SubscribeFieldConfig<
     args: ArgsValue<TypeName, FieldName>,
     context: GetGen<"context">,
     info: GraphQLResolveInfo
-  ): MaybePromiseDeep<ResultValue<"Subscription", FieldName>>;
+  ):
+    | MaybePromise<ResultValue<"Subscription", FieldName>>
+    | MaybePromiseDeep<ResultValue<"Subscription", FieldName>>;
 }
 
 export function subscriptionField<FieldName extends string>(
