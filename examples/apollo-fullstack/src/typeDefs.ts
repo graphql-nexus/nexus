@@ -22,7 +22,7 @@ export interface Launch {
 }
 
 export interface DBUser {
-  id: number;
+  id: string;
   createdAt: Date;
   updatedAt: Date;
   email: string;
