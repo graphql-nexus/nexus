@@ -18,4 +18,46 @@ function requiredInt(opts: core.ScalarArgConfig<number>) {
 }
 ```
 
-Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options for `arg`, or feel free to open a PR on the docs to help document!
+&nbsp;
+
+Common options available for `arg` include the following:
+
+**Required**
+
+Whether the argument is required or not. 
+
+Format: `required?: boolean;`
+
+Note, when `required: true`, `nullable: false`
+
+&nbsp;
+
+**Nullable**
+
+Whether the argument is nullable or not. 
+
+Format: `nullable?: boolean;`
+
+Note, when `nullable: true`, `required: false`
+
+&nbsp;
+
+**List**
+
+Whether the argument is a list or not.
+
+Format: `list?: null | true | boolean[];`
+
+null = not a list
+
+true = list
+
+array = nested list, where true/false decides whether the list member can be nullable
+
+&nbsp;
+
+**Description**
+
+The description to annotate the GraphQL SDL
+
+Format: `description?: string | null;`
