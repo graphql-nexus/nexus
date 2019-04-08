@@ -17,33 +17,30 @@ export const UserConnectionTypes = connectionType("User");
 Where `connectionType` is really just a wrapper creating two `objectTypes`:
 
 ```ts
-import { core } from 'nexus';
+import { core, objectType } from "nexus";
 
-export function connectionType(type: core.AllOutputTypes) {
+export function connectionType(name: core.AllOutputTypes) {
   const Connection = objectType({
-    name: `${type}Connection`,
+    name: `${name}Connection`,
     definition(t) {
-      t.field(
-        'edges',
-        { type: `${name}Edge` }
-      );
-    });
-  })
+      t.field("edges", { type: `${name}Edge` });
+    },
+  });
   const Edge = objectType({
-    name: `${type}Edge`,
+    name: `${name}Edge`,
     definition(t) {
-      t.id('cursor', root => `${name}:${root.id}`)
-      t.field('node', { type: name });
-    }
+      t.id("cursor", (root) => `${name}:${root.id}`);
+      t.field("node", { type: name });
+    },
   });
   const PageInfo = objectType({
-    name: `${type}PageInfo`,
+    name: `${name}PageInfo`,
     definition(t) {
-      t.boolean('hasNextPage')
-      t.boolean('hasPreviousPage')
-    }
+      t.boolean("hasNextPage");
+      t.boolean("hasPreviousPage");
+    },
   });
-  return { Connection, Edge, PageInfo }
+  return { Connection, Edge, PageInfo };
 }
 ```
 
