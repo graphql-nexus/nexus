@@ -6,7 +6,7 @@ sidebar_label: enumType
 
 [GraphQL Docs for Enum Types](https://graphql.org/learn/schema/#enumeration-types)
 
-Definining as an array of enum values:
+Defining as an array of enum values:
 
 ```ts
 const Episode = enumType({
