@@ -33,6 +33,7 @@ import {
   isUnionType,
   isScalarType,
   defaultFieldResolver,
+  isSchema,
 } from "graphql";
 import { NexusArgConfig, NexusArgDef } from "./definitions/args";
 import {
@@ -98,6 +99,7 @@ import {
   NexusExtendInputTypeDef,
   NexusExtendInputTypeConfig,
 } from "./definitions/extendInputType";
+import { toNexusConfig, schemaToNexusConfig } from "./toConfig";
 
 export type Maybe<T> = T | null;
 
@@ -261,7 +263,15 @@ export class SchemaBuilder {
       | NexusExtendInputTypeDef<string>
       | NexusExtendTypeDef<string>
       | GraphQLNamedType
+      | GraphQLSchema
   ) {
+    if (isSchema(typeDef)) {
+      schemaToNexusConfig(typeDef).forEach((type) => {
+        this.pendingTypeMap[type.name] = type;
+      });
+      return;
+    }
+
     const existingType =
       this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
 
@@ -305,8 +315,7 @@ export class SchemaBuilder {
     }
 
     if (isNamedType(typeDef)) {
-      this.finalTypeMap[typeDef.name] = typeDef;
-      this.definedTypeMap[typeDef.name] = typeDef;
+      this.pendingTypeMap[typeDef.name] = toNexusConfig(typeDef);
     } else {
       this.pendingTypeMap[typeDef.name] = typeDef;
     }
@@ -1028,7 +1037,8 @@ function addTypes(builder: SchemaBuilder, types: any) {
     isNexusNamedTypeDef(types) ||
     isNexusExtendTypeDef(types) ||
     isNexusExtendInputTypeDef(types) ||
-    isNamedType(types)
+    isNamedType(types) ||
+    isSchema(types)
   ) {
     builder.addType(types);
   } else if (Array.isArray(types)) {

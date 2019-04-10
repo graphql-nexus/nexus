@@ -38,7 +38,7 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/graphql": "^14.0.7",
+    "@types/graphql": "^14.2.0",
     "@types/jest": "^23.3.7",
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.15.2",
