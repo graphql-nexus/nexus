@@ -72,7 +72,7 @@ export interface TypegenAutoConfigOptions {
 export interface TypegenConfigSourceModule {
   /**
    * The module for where to look for the types.
-   * This uses the node resolution algorthm via require.resolve,
+   * This uses the node resolution algorithm via require.resolve,
    * so if this lives in node_modules, you can just provide the module name
    * otherwise you should provide the absolute path to the file.
    */
