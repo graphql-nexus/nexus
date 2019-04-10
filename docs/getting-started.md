@@ -111,7 +111,7 @@ const schema = makeSchema({
 
 _tl;dr - GraphQL Nexus assumes output fields are non-null by default_
 
-One benefit of GraphQL is the strict enforcement and guarentees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default.
+One benefit of GraphQL is the strict enforcement and guarantees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default.
 
 The GraphQL documentation provides [this explanation](https://graphql.org/learn/best-practices/#nullability):
 
