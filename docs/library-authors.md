@@ -68,4 +68,4 @@ export const WrappedType = (config) => {
 
 ```
 
-All internal apis are also exposed under a `core` namespace for you to use. Note that these may be subject to minor change, though we'll try to be considerate about this. At least there are type-safety guarentees (assuming you're using TypeScript).
+All internal apis are also exposed under a `core` namespace for you to use. Note that these may be subject to minor change, though we'll try to be considerate about this. At least there are type-safety guarantees (assuming you're using TypeScript).
