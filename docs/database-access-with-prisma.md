@@ -435,7 +435,7 @@ type Mutation {
 # ... more generated types
 ```
 
-The following llustration shows the connection between the Prisma datamodel, the generated CRUD building blocks and the final GraphQL server code:
+The following illustration shows the connection between the Prisma datamodel, the generated CRUD building blocks and the final GraphQL server code:
 
 ![](https://imgur.com/RLsS1lm.png)
 
@@ -547,7 +547,7 @@ Instead of providing just the name of the field you want to include in the array
 
 ### Customize arguments on fields
 
-Using the same technique as for renaming, we can also customize the arguments for certain fields. For exampple, the `posts` field on the `User` model in our GraphQL API looks as follows:
+Using the same technique as for renaming, we can also customize the arguments for certain fields. For example, the `posts` field on the `User` model in our GraphQL API looks as follows:
 
 ```graphql
 type User {
@@ -654,7 +654,7 @@ const Mutation = prismaObjectType({
 
 #### Optional
 
-- `nonNullDefaults` (boolean or object): Specifies whether the [nullability](https://graphql.org/learn/schema/#lists-and-non-null) behaviour for field arguments and field types. **All input arguments and return types of fields are non-null by default**. If you want the behaviour to differ for input arguments and field (outout) types, you can pass an object with these properties:
+- `nonNullDefaults` (boolean or object): Specifies whether the [nullability](https://graphql.org/learn/schema/#lists-and-non-null) behaviour for field arguments and field types. **All input arguments and return types of fields are non-null by default**. If you want the behaviour to differ for input arguments and field (output) types, you can pass an object with these properties:
   - `input` (boolean): Specifies whether input arguments should be required. Default: `true`.
   - `output` (boolean): Specifies whether return values of fields should be required. Default: `true`.
 - `description`: A string that shows up in the generated SDL schema definition to describe the type. It is also picked up by tools like the GraphQL Playground or graphiql.
