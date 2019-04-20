@@ -26,7 +26,7 @@ export interface SubscribeFieldConfig<
     args: ArgsValue<TypeName, FieldName>,
     ctx: GetGen<"context">,
     info: GraphQLResolveInfo
-  ): AsyncIterator<T>;
+  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>;
 
   /**
    * Resolve method for the field
