@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.11.7
+
+- Types: Allow Promise return value for subscriptions
+
 ### 0.11.6
 
 - More for #55, incorrect return types.
