@@ -34,7 +34,7 @@ export interface TypegenConfigSourceModule {
    *
    * If not provided, the default implementation is:
    * ```
-   * (type) => new RegExp('(?:interface|type|class)\s+(${type.name})\W')
+   * (type) => new RegExp('(?:interface|type|class|enum)\s+(${type.name})\W')
    * ```
    */
   typeMatch?: (
@@ -255,7 +255,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
       const type = schema.getType(typeName);
 
-      // For now we'll say that if it's non-enum output type it can be backed
+      // For now we'll say that if it's output type it can be backed
       if (isOutputType(type)) {
         for (let i = 0; i < typeSources.length; i++) {
           const typeSource = typeSources[i];
