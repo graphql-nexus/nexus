@@ -8,3 +8,8 @@ export interface User {
   email: string;
   fullName(): string;
 }
+
+export enum Category {
+  ONE = "ONE",
+  TWO = "TWO",
+}

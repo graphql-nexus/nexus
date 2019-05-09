@@ -1,9 +1,4 @@
-import {
-  GraphQLSchema,
-  isOutputType,
-  GraphQLNamedType,
-  isEnumType,
-} from "graphql";
+import { GraphQLSchema, isOutputType, GraphQLNamedType } from "graphql";
 import path from "path";
 import { TYPEGEN_HEADER } from "./lang";
 import { log, objValues } from "./utils";
@@ -261,7 +256,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
       const type = schema.getType(typeName);
 
       // For now we'll say that if it's non-enum output type it can be backed
-      if (isOutputType(type) && !isEnumType(type)) {
+      if (isOutputType(type)) {
         for (let i = 0; i < typeSources.length; i++) {
           const typeSource = typeSources[i];
           if (!typeSource) {
@@ -319,13 +314,15 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
     const imports: string[] = [];
 
-    Object.keys(importsMap).sort().forEach((alias) => {
-      const [importPath, glob] = importsMap[alias];
-      const safeImportPath = importPath.replace(/\\+/g, '/');
-      imports.push(
-        `import ${glob ? "* as " : ""}${alias} from "${safeImportPath}"`
-      );
-    });
+    Object.keys(importsMap)
+      .sort()
+      .forEach((alias) => {
+        const [importPath, glob] = importsMap[alias];
+        const safeImportPath = importPath.replace(/\\+/g, "/");
+        imports.push(
+          `import ${glob ? "* as " : ""}${alias} from "${safeImportPath}"`
+        );
+      });
 
     const typegenInfo = {
       headers: headers || [TYPEGEN_HEADER],
@@ -386,5 +383,7 @@ const firstMatch = (
 };
 
 const defaultTypeMatcher = (type: GraphQLNamedType) => {
-  return [new RegExp(`(?:interface|type|class)\\s+(${type.name})\\W`, "g")];
+  return [
+    new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g"),
+  ];
 };

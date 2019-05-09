@@ -244,8 +244,13 @@ export class Typegen {
   buildEnumTypeMap() {
     const enumMap: TypeMapping = {};
     this.groupedTypes.enum.forEach((e) => {
-      const values = e.getValues().map((val) => JSON.stringify(val.value));
-      enumMap[e.name] = values.join(" | ");
+      const backingType = this.typegenInfo.backingTypeMap[e.name];
+      if (backingType) {
+        enumMap[e.name] = backingType;
+      } else {
+        const values = e.getValues().map((val) => JSON.stringify(val.value));
+        enumMap[e.name] = values.join(" | ");
+      }
     });
     return enumMap;
   }
