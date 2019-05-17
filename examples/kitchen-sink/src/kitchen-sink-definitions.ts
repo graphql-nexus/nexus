@@ -147,6 +147,7 @@ export const MoreQueryFields = extendType({
         return { ok: true };
       },
     });
+    t.list.date("dateAsList");
   },
 });
 

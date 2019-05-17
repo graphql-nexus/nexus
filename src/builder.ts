@@ -39,6 +39,7 @@ import {
   InputDefinitionBlock,
   NexusInputFieldDef,
   NexusOutputFieldDef,
+  ADD_CUSTOM_FIELD,
 } from "./definitions/definitionBlocks";
 import { EnumTypeConfig } from "./definitions/enumType";
 import {
@@ -549,14 +550,13 @@ export class SchemaBuilder {
   }
 
   protected withScalarMethods<
-    T extends NexusGenCustomDefinitionMethods<string>
+    T extends
+      | InputDefinitionBlock<any>
+      | ObjectDefinitionBlock<any>
+      | InterfaceDefinitionBlock<any>
   >(definitionBlock: T): T {
     this.customScalarMethods.forEach(([methodName, typeName]) => {
-      // @ts-ignore - Yeah, yeah... we know
-      definitionBlock[methodName] = function(fieldName, ...opts) {
-        // @ts-ignore
-        this.addScalarField(fieldName, typeName, opts);
-      };
+      definitionBlock[ADD_CUSTOM_FIELD](methodName, typeName);
     });
     return definitionBlock;
   }

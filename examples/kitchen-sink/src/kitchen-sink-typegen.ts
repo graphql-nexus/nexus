@@ -70,6 +70,7 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     bar: NexusGenRootTypes['Bar']; // Bar!
+    dateAsList: any[]; // [Date!]!
     extended: NexusGenRootTypes['Bar']; // Bar!
     getNumberOrNull: number | null; // Int
   }

@@ -40,6 +40,7 @@ type Mutation {
 
 type Query {
   bar: Bar!
+  dateAsList: [Date!]!
   extended: Bar!
   getNumberOrNull(a: Int!): Int
 }
