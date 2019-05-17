@@ -1,4 +1,3 @@
-import { GraphQLField, GraphQLObjectType, GraphQLInterfaceType } from "graphql";
 import path from "path";
 import { core, makeSchema, queryType, enumType } from "../src";
 import { A, B } from "./_types";
