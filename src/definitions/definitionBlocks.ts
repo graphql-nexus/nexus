@@ -16,6 +16,8 @@ import {
 import { BaseScalars } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
 
+export const ADD_CUSTOM_FIELD = Symbol.for("@nexus/addCustomField");
+
 export interface CommonFieldConfig {
   /**
    * Whether the field can be null
@@ -140,13 +142,27 @@ export interface OutputDefinitionBlock<TypeName extends string>
  * argument of the
  */
 export class OutputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean;
+  protected hasAdded: boolean = false;
+  protected extendedFieldMap: Record<string, string> = {};
 
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
     protected isList = false
-  ) {
-    this.hasAdded = false;
+  ) {}
+
+  /**
+   * Adds a custom field to the output definition block,
+   * keeping track of the fields so they can be chained via the .list
+   */
+  [ADD_CUSTOM_FIELD](methodName: string, typeName: string) {
+    this.extendedFieldMap[methodName] = typeName;
+    // @ts-ignore
+    this[methodName] = (fieldName: string, opts: any) => {
+      this.field(fieldName, {
+        type: typeName,
+        ...opts,
+      });
+    };
   }
 
   get list() {
@@ -155,7 +171,10 @@ export class OutputDefinitionBlock<TypeName extends string> {
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, true);
+    return copyFields(
+      this.extendedFieldMap,
+      new OutputDefinitionBlock<TypeName>(this.typeBuilder, true)
+    );
   }
 
   string<FieldName extends string>(
@@ -263,13 +282,27 @@ export interface InputDefinitionBlock<TypeName extends string>
   extends NexusGenCustomDefinitionMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean;
+  protected hasAdded: boolean = false;
+  protected extendedFieldMap: Record<string, string> = {};
 
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
     protected isList = false
-  ) {
-    this.hasAdded = false;
+  ) {}
+
+  /**
+   * Adds a custom field to the output definition block,
+   * keeping track of the fields so they can be chained via the .list
+   */
+  [ADD_CUSTOM_FIELD](methodName: string, typeName: string) {
+    this.extendedFieldMap[methodName] = typeName;
+    // @ts-ignore
+    this[methodName] = (fieldName: string, opts: any) => {
+      this.field(fieldName, {
+        type: typeName,
+        ...opts,
+      });
+    };
   }
 
   get list() {
@@ -278,7 +311,10 @@ export class InputDefinitionBlock<TypeName extends string> {
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return new InputDefinitionBlock<TypeName>(this.typeBuilder, true);
+    return copyFields(
+      this.extendedFieldMap,
+      new InputDefinitionBlock<TypeName>(this.typeBuilder, true)
+    );
   }
 
   string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
@@ -346,3 +382,13 @@ export interface AbstractOutputDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
   setResolveType(fn: AbstractTypeResolver<TypeName>): void;
 }
+
+export const copyFields = <S extends { [ADD_CUSTOM_FIELD]: any }>(
+  sourceMap: Record<string, string>,
+  target: S
+): S => {
+  Object.keys(sourceMap).forEach((methodName) =>
+    target[ADD_CUSTOM_FIELD](methodName, sourceMap[methodName])
+  );
+  return target;
+};
