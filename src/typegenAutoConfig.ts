@@ -33,9 +33,12 @@ export interface TypegenConfigSourceModule {
    * Provides a custom approach to matching for the type
    *
    * If not provided, the default implementation is:
-   * ```
-   * (type) => new RegExp('(?:interface|type|class|enum)\s+(${type.name})\W')
-   * ```
+   *
+   *   (type) => [
+   *      new RegExp(`(?:interface|type|class)\\s+(${type.name})\\W`, "g"),
+   *      new RegExp(`\\w*(?<!(?:const\\s+))enum\\s+(${type.name})\\W`, "g"),
+   *   ]
+   *
    */
   typeMatch?: (
     type: GraphQLNamedType,
@@ -384,6 +387,7 @@ const firstMatch = (
 
 const defaultTypeMatcher = (type: GraphQLNamedType) => {
   return [
-    new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g"),
+    new RegExp(`(?:interface|type|class)\\s+(${type.name})\\W`, "g"),
+    new RegExp(`\\w*(?<!(?:const\\s+))enum\\s+(${type.name})\\W`, "g"),
   ];
 };
