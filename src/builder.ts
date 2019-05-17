@@ -567,9 +567,6 @@ export class SchemaBuilder {
   ): GraphQLNamedType {
     invariantGuard(typeName);
     if (typeName === "Query") {
-      console.warn(
-        "Nexus: You should define a root `Query` type for your schema"
-      );
       return new GraphQLObjectType({
         name: "Query",
         fields: {
