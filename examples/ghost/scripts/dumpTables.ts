@@ -73,6 +73,6 @@ generateTypes()
     process.exit();
   })
   .catch((e) => {
-    console.error(e);
+    console.error("mysql must be running to run ghost example");
     process.exit(1);
   });
