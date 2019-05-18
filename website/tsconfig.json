@@ -6,5 +6,5 @@
     "jsx": "react",
     "lib": ["dom", "es2015"]
   },
-  "exclude": []
+  "exclude": ["./tests"]
 }

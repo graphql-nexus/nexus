@@ -10,7 +10,7 @@
     "graphql": "^14.0.2",
     "nexus": "0.11.2",
     "ts-node-dev": "1.0.0-pre.31",
-    "typescript": "3.2.0-rc"
+    "typescript": "^3.4.5"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4"
