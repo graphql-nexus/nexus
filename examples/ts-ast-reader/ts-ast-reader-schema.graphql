@@ -1155,7 +1155,12 @@ enum SyntaxKind {
   UniqueKeyword
   Unknown
   UnknownKeyword
+  UnparsedInternalText
+  UnparsedPrepend
+  UnparsedPrologue
   UnparsedSource
+  UnparsedSyntheticReference
+  UnparsedText
   VariableDeclaration
   VariableDeclarationList
   VariableStatement
