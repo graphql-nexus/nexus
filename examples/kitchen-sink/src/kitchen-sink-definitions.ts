@@ -112,6 +112,7 @@ export const InputType2 = inputObjectType({
   definition(t) {
     t.string("key", { required: true });
     t.int("answer");
+    t.date("someDate", { required: true });
   },
 });
 
@@ -143,6 +144,7 @@ export const Query = objectType({
         testScalar: "String",
         testInput: InputType,
       },
+      resolve: () => "ok",
     });
     t.string("inlineArgs", {
       args: {

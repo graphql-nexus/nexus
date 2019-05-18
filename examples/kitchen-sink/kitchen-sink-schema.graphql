@@ -36,6 +36,7 @@ input InputType {
 input InputType2 {
   answer: Int
   key: String!
+  someDate: Date!
 }
 
 type Mutation {

@@ -94,7 +94,9 @@ export class Typegen {
     return [
       this.typegenInfo.headers.join("\n"),
       this.typegenInfo.imports.join("\n"),
-      this.printDynamicFieldDefinitions(),
+      this.printDynamicCore(),
+      this.printDynamicInputFieldDefinitions(),
+      this.printDynamicOutputFieldDefinitions(),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -125,31 +127,65 @@ export class Typegen {
       .join("\n");
   }
 
-  printDynamicFieldDefinitions() {
+  printDynamicCore() {
     const customScalars = this.buildCustomScalarMap();
     const { dynamicInputFields, dynamicOutputFields } = this.dynamicFields;
+    if (
+      [customScalars, dynamicInputFields, dynamicOutputFields].some(
+        (o) => Object.keys(o).length > 0
+      )
+    ) {
+      return [`import { core } from "nexus"`];
+    }
+    return [];
+  }
+
+  printDynamicInputFieldDefinitions() {
+    const customScalars = this.buildCustomScalarMap();
+    const { dynamicInputFields } = this.dynamicFields;
     // If there is nothing custom... exit
     if (
-      [customScalars, dynamicInputFields, dynamicOutputFields].every(
-        (o) => !Object.keys(o).length
-      )
+      [customScalars, dynamicInputFields].every((o) => !Object.keys(o).length)
     ) {
       return [];
     }
     return [
-      `import { core } from "nexus"`,
       `declare global {`,
-      `  interface NexusGenCustomDefinitionMethods<TypeName extends string> {`,
+      `  interface NexusGenCustomInputMethods<TypeName extends string> {`,
     ]
       .concat(
         mapObj(customScalars, (val, key) => {
-          return `    ${val}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+          return `    ${val}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
             key
           )};`;
         }),
         mapObj(dynamicInputFields, (val, key) => {
           return `    ${key}${val.value.typeDefinition ||
             `(...args: any): void`}`;
+        })
+      )
+      .concat([`  }`, `}`])
+      .join("\n");
+  }
+
+  printDynamicOutputFieldDefinitions() {
+    const customScalars = this.buildCustomScalarMap();
+    const { dynamicOutputFields } = this.dynamicFields;
+    // If there is nothing custom... exit
+    if (
+      [customScalars, dynamicOutputFields].every((o) => !Object.keys(o).length)
+    ) {
+      return [];
+    }
+    return [
+      `declare global {`,
+      `  interface NexusGenCustomOutputMethods<TypeName extends string> {`,
+    ]
+      .concat(
+        mapObj(customScalars, (val, key) => {
+          return `    ${val}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+            key
+          )};`;
         }),
         mapObj(dynamicOutputFields, (val, key) => {
           return `    ${key}${val.value.typeDefinition ||

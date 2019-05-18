@@ -2,7 +2,8 @@ import { GraphQLResolveInfo } from "graphql";
 
 declare global {
   interface NexusGen {}
-  interface NexusGenCustomDefinitionMethods<TypeName extends string> {}
+  interface NexusGenCustomInputMethods<TypeName extends string> {}
+  interface NexusGenCustomOutputMethods<TypeName extends string> {}
 }
 
 export type AllInputTypes = GetGen<"allInputTypes">;
