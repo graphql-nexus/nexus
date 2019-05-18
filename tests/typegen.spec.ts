@@ -35,7 +35,10 @@ describe("typegen", () => {
       },
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    typegen = new Typegen(schema, typegenInfo);
+    typegen = new Typegen(schema, typegenInfo, {
+      dynamicInputFields: {},
+      dynamicOutputFields: {},
+    });
     jest
       .spyOn(typegen, "hasResolver")
       .mockImplementation(

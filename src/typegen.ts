@@ -23,7 +23,7 @@ import {
   GraphQLEnumType,
   defaultFieldResolver,
 } from "graphql";
-import { TypegenInfo } from "./builder";
+import { TypegenInfo, DynamicFieldDefs } from "./builder";
 import { eachObj, GroupedTypes, groupTypes, mapObj } from "./utils";
 import { WrappedResolver } from "./definitions/_types";
 
@@ -63,7 +63,8 @@ export class Typegen {
 
   constructor(
     protected schema: GraphQLSchema,
-    protected typegenInfo: TypegenInfo
+    protected typegenInfo: TypegenInfo,
+    protected dynamicFields: DynamicFieldDefs
   ) {
     this.groupedTypes = groupTypes(schema);
   }
@@ -93,7 +94,7 @@ export class Typegen {
     return [
       this.typegenInfo.headers.join("\n"),
       this.typegenInfo.imports.join("\n"),
-      this.printCustomScalarMethods(),
+      this.printDynamicFieldDefinitions(),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -124,9 +125,15 @@ export class Typegen {
       .join("\n");
   }
 
-  printCustomScalarMethods() {
+  printDynamicFieldDefinitions() {
     const customScalars = this.buildCustomScalarMap();
-    if (!Object.keys(customScalars).length) {
+    const { dynamicInputFields, dynamicOutputFields } = this.dynamicFields;
+    // If there is nothing custom... exit
+    if (
+      [customScalars, dynamicInputFields, dynamicOutputFields].every(
+        (o) => !Object.keys(o).length
+      )
+    ) {
       return [];
     }
     return [
@@ -139,6 +146,14 @@ export class Typegen {
           return `    ${val}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
             key
           )};`;
+        }),
+        mapObj(dynamicInputFields, (val, key) => {
+          return `    ${key}${val.value.typeDefinition ||
+            `(...args: any): void`}`;
+        }),
+        mapObj(dynamicOutputFields, (val, key) => {
+          return `    ${key}${val.value.typeDefinition ||
+            `(...args: any): void`}`;
         })
       )
       .concat([`  }`, `}`])

@@ -8,6 +8,11 @@ interface Bar {
   ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
+type BarCollection {
+  items: [Bar!]!
+  totalCount: Int!
+}
+
 interface Baz {
   """'A' description"""
   a: Bar!
@@ -38,11 +43,24 @@ type Mutation {
   someMutationField(id: ID!): Foo!
 }
 
+input NestedType {
+  veryNested: String
+}
+
 type Query {
+  asArgExample(testAsArg: InputType!): String!
   bar: Bar!
+  collectionField(a: Int): BarCollection!
   dateAsList: [Date!]!
   extended: Bar!
   getNumberOrNull(a: Int!): Int
+  inlineArgs(someArg: SomeArg): String!
+  inputAsArgExample(testInput: InputType, testScalar: String): String!
+}
+
+input SomeArg {
+  arg: NestedType
+  someField: String
 }
 
 type TestObj implements Bar & Baz {

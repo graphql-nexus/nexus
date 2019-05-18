@@ -8,7 +8,7 @@ import {
   typegenFormatPrettier,
   TypegenFormatFn,
 } from "./typegenFormatPrettier";
-import { BuilderConfig, TypegenInfo } from "./builder";
+import { BuilderConfig, TypegenInfo, DynamicFieldDefs } from "./builder";
 
 /**
  * Passed into the SchemaBuilder, this keeps track of any necessary
@@ -33,7 +33,10 @@ export class TypegenMetadata {
    * Generates the artifacts of the build based on what we
    * know about the schema and how it was defined.
    */
-  async generateArtifacts(schema: GraphQLSchema) {
+  async generateArtifacts(
+    schema: GraphQLSchema,
+    dynamicFields: DynamicFieldDefs
+  ) {
     const sortedSchema = this.sortSchema(schema);
     if (this.config.outputs) {
       if (this.config.outputs.schema) {
@@ -45,7 +48,7 @@ export class TypegenMetadata {
       }
       const typegen = this.config.outputs.typegen;
       if (typegen) {
-        const value = await this.generateTypesFile(sortedSchema);
+        const value = await this.generateTypesFile(sortedSchema, dynamicFields);
         await this.writeFile("types", value, typegen);
       }
     }
@@ -95,7 +98,7 @@ export class TypegenMetadata {
       } catch (e) {
         if (e.code !== "EEXIST") {
           throw e;
-        } 
+        }
       }
       return writeFile(filePath, toSave);
     }
@@ -112,8 +115,15 @@ export class TypegenMetadata {
   /**
    * Generates the type definitions
    */
-  async generateTypesFile(schema: GraphQLSchema): Promise<string> {
-    return new Typegen(schema, await this.getTypegenInfo(schema)).print();
+  async generateTypesFile(
+    schema: GraphQLSchema,
+    dynamicFields: DynamicFieldDefs
+  ): Promise<string> {
+    return new Typegen(
+      schema,
+      await this.getTypegenInfo(schema),
+      dynamicFields
+    ).print();
   }
 
   async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {

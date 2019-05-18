@@ -28,6 +28,7 @@ export {
   AllOutputTypes,
   FieldType,
 } from "./typegenTypeHelpers";
-export { core, blocks };
+export { core, blocks, ext };
 import * as core from "./core";
 import * as blocks from "./blocks";
+import * as ext from "./extensions";

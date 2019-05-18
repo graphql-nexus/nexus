@@ -7,16 +7,15 @@ import {
   AuthorizeResolver,
   GetGen3,
 } from "../typegenTypeHelpers";
-import { NexusArgDef } from "./args";
+import { ArgsRecord } from "./args";
 import {
   AllNexusOutputTypeDefs,
   NexusWrappedType,
   AllNexusInputTypeDefs,
 } from "./wrapping";
-import { BaseScalars } from "./_types";
+import { BaseScalars, ADD_CUSTOM_FIELD } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
-
-export const ADD_CUSTOM_FIELD = Symbol.for("@nexus/addCustomField");
+import { DynamicInputFieldDef, DynamicOutputFieldDef } from "../dynamicField";
 
 export interface CommonFieldConfig {
   /**
@@ -52,7 +51,7 @@ export interface CommonOutputFieldConfig<
   /**
    * Arguments for the field
    */
-  args?: Record<string, NexusArgDef<string>>;
+  args?: ArgsRecord;
   /**
    * Authorization for an individual field. Returning "true"
    * or "Promise<true>" means the field can be accessed.
@@ -79,7 +78,7 @@ export interface NexusOutputFieldConfig<
   FieldName extends string
 > extends OutputScalarConfig<TypeName, FieldName> {
   type:
-    | GetGen<"allOutputTypes">
+    | GetGen<"allOutputTypes", string>
     | AllNexusOutputTypeDefs
     | NexusWrappedType<AllNexusOutputTypeDefs>;
 }
@@ -143,7 +142,10 @@ export interface OutputDefinitionBlock<TypeName extends string>
  */
 export class OutputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean = false;
-  protected extendedFieldMap: Record<string, string> = {};
+  protected extendedFieldMap: Record<
+    string,
+    string | DynamicOutputFieldDef<any>
+  > = {};
 
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
@@ -154,15 +156,29 @@ export class OutputDefinitionBlock<TypeName extends string> {
    * Adds a custom field to the output definition block,
    * keeping track of the fields so they can be chained via the .list
    */
-  [ADD_CUSTOM_FIELD](methodName: string, typeName: string) {
+  [ADD_CUSTOM_FIELD](
+    methodName: string,
+    typeName: string | DynamicOutputFieldDef<any>
+  ) {
     this.extendedFieldMap[methodName] = typeName;
-    // @ts-ignore
-    this[methodName] = (fieldName: string, opts: any) => {
-      this.field(fieldName, {
-        type: typeName,
-        ...opts,
-      });
-    };
+    if (typeof typeName === "string") {
+      // @ts-ignore
+      this[methodName] = (fieldName: string, opts: any) => {
+        this.field(fieldName, {
+          type: typeName,
+          ...opts,
+        });
+      };
+    } else {
+      // @ts-ignore
+      this[methodName] = (fieldName, config: any) => {
+        typeName.value.factory(this, {
+          ...config,
+          list: this.isList,
+          fieldName,
+        });
+      };
+    }
   }
 
   get list() {
@@ -271,7 +287,7 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes"> | AllNexusInputTypeDefs<string>;
+  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs<string>;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -283,7 +299,10 @@ export interface InputDefinitionBlock<TypeName extends string>
 
 export class InputDefinitionBlock<TypeName extends string> {
   protected hasAdded: boolean = false;
-  protected extendedFieldMap: Record<string, string> = {};
+  protected extendedFieldMap: Record<
+    string,
+    string | DynamicInputFieldDef<any>
+  > = {};
 
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
@@ -294,15 +313,29 @@ export class InputDefinitionBlock<TypeName extends string> {
    * Adds a custom field to the output definition block,
    * keeping track of the fields so they can be chained via the .list
    */
-  [ADD_CUSTOM_FIELD](methodName: string, typeName: string) {
+  [ADD_CUSTOM_FIELD](
+    methodName: string,
+    typeName: string | DynamicInputFieldDef<any>
+  ) {
     this.extendedFieldMap[methodName] = typeName;
-    // @ts-ignore
-    this[methodName] = (fieldName: string, opts: any) => {
-      this.field(fieldName, {
-        type: typeName,
-        ...opts,
-      });
-    };
+    if (typeof typeName === "string") {
+      // @ts-ignore
+      this[methodName] = (fieldName: string, opts: any) => {
+        this.field(fieldName, {
+          type: typeName,
+          ...opts,
+        });
+      };
+    } else {
+      // @ts-ignore
+      this[methodName] = (fieldName: string, config: any) => {
+        typeName.value.factory(this, {
+          ...config,
+          list: this.isList,
+          fieldName,
+        });
+      };
+    }
   }
 
   get list() {
@@ -363,7 +396,7 @@ export class InputDefinitionBlock<TypeName extends string> {
     );
   }
 
-  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+  protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
     if (this.isList) {
       if (config.list) {
         console.warn(
@@ -384,7 +417,10 @@ export interface AbstractOutputDefinitionBuilder<TypeName extends string>
 }
 
 export const copyFields = <S extends { [ADD_CUSTOM_FIELD]: any }>(
-  sourceMap: Record<string, string>,
+  sourceMap: Record<
+    string,
+    string | DynamicInputFieldDef<any> | DynamicOutputFieldDef<any>
+  >,
   target: S
 ): S => {
   Object.keys(sourceMap).forEach((methodName) =>

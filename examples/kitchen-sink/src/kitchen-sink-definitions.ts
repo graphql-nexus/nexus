@@ -6,12 +6,14 @@ import {
   arg,
   extendType,
   scalarType,
-  extendInputType,
   intArg,
   idArg,
   mutationField,
   mutationType,
+  ext,
 } from "nexus";
+
+export { ext };
 
 export const testArgs1 = {
   foo: idArg(),
@@ -113,11 +115,6 @@ export const InputType2 = inputObjectType({
   },
 });
 
-export const ext = extendInputType({
-  type: "InputType",
-  definition(t) {},
-});
-
 export const Query = objectType({
   name: "Query",
   definition(t) {
@@ -135,6 +132,52 @@ export const Query = objectType({
         return null;
       },
     });
+    t.string("asArgExample", {
+      args: {
+        testAsArg: InputType.asArg({ required: true }),
+      },
+      resolve: () => "ok",
+    });
+    t.string("inputAsArgExample", {
+      args: {
+        testScalar: "String",
+        testInput: InputType,
+      },
+    });
+    t.string("inlineArgs", {
+      args: {
+        someArg: arg({
+          type: inputObjectType({
+            name: "SomeArg",
+            definition(i) {
+              i.string("someField");
+              i.field("arg", {
+                type: inputObjectType({
+                  name: "NestedType",
+                  definition(j) {
+                    j.string("veryNested");
+                  },
+                }),
+              });
+            },
+          }),
+        }),
+      },
+      resolve: () => "ok",
+    });
+    t.list.date("dateAsList", () => []);
+    t.collection("collectionField", {
+      type: Bar,
+      args: {
+        a: intArg(),
+      },
+      items() {
+        return [];
+      },
+      totalCount(root, args, ctx, info) {
+        return args.a || 0;
+      },
+    });
   },
 });
 
@@ -147,7 +190,6 @@ export const MoreQueryFields = extendType({
         return { ok: true };
       },
     });
-    t.list.date("dateAsList");
   },
 });
 

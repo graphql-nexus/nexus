@@ -8,6 +8,22 @@ import { core } from "nexus"
 declare global {
   interface NexusGenCustomDefinitionMethods<TypeName extends string> {
     date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
+    collection<FieldName extends string>(fieldName: FieldName, opts: {
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+      items: core.SubFieldResolver<TypeName, FieldName, "items">,
+      totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
+      args?: core.ArgsRecord,
+      nullable?: boolean,
+      description?: string
+    }): void;
+    relayConnection<FieldName extends string>(fieldName: FieldName, opts: {
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+      edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
+      pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,
+      args?: Record<string, core.NexusArgDef<string>>,
+      nullable?: boolean,
+      description?: string
+    }): void
   }
 }
 
@@ -25,12 +41,23 @@ export interface NexusGenInputs {
     answer?: number | null; // Int
     key: string; // String!
   }
+  NestedType: { // input type
+    veryNested?: string | null; // String
+  }
+  SomeArg: { // input type
+    arg?: NexusGenInputs['NestedType'] | null; // NestedType
+    someField?: string | null; // String
+  }
 }
 
 export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
+  BarCollection: { // root type
+    items: NexusGenRootTypes['Bar'][]; // [Bar!]!
+    totalCount: number; // Int!
+  }
   Foo: { // root type
     name: string; // String!
     ok: boolean; // Boolean!
@@ -56,9 +83,15 @@ export interface NexusGenRootTypes {
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   InputType: NexusGenInputs['InputType'];
   InputType2: NexusGenInputs['InputType2'];
+  NestedType: NexusGenInputs['NestedType'];
+  SomeArg: NexusGenInputs['SomeArg'];
 }
 
 export interface NexusGenFieldTypes {
+  BarCollection: { // field return type
+    items: NexusGenRootTypes['Bar'][]; // [Bar!]!
+    totalCount: number; // Int!
+  }
   Foo: { // field return type
     argsTest: boolean; // Boolean!
     name: string; // String!
@@ -69,10 +102,14 @@ export interface NexusGenFieldTypes {
     someMutationField: NexusGenRootTypes['Foo']; // Foo!
   }
   Query: { // field return type
+    asArgExample: string; // String!
     bar: NexusGenRootTypes['Bar']; // Bar!
+    collectionField: NexusGenRootTypes['BarCollection']; // BarCollection!
     dateAsList: any[]; // [Date!]!
     extended: NexusGenRootTypes['Bar']; // Bar!
     getNumberOrNull: number | null; // Int
+    inlineArgs: string; // String!
+    inputAsArgExample: string; // String!
   }
   TestObj: { // field return type
     a: NexusGenRootTypes['Bar']; // Bar!
@@ -102,8 +139,21 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    asArgExample: { // args
+      testAsArg: NexusGenInputs['InputType']; // InputType!
+    }
+    collectionField: { // args
+      a?: number | null; // Int
+    }
     getNumberOrNull: { // args
       a: number; // Int!
+    }
+    inlineArgs: { // args
+      someArg?: NexusGenInputs['SomeArg'] | null; // SomeArg
+    }
+    inputAsArgExample: { // args
+      testInput?: NexusGenInputs['InputType'] | null; // InputType
+      testScalar?: string | null; // String
     }
   }
   TestObj: {
@@ -126,9 +176,9 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "Foo" | "Mutation" | "Query" | "TestObj";
+export type NexusGenObjectNames = "BarCollection" | "Foo" | "Mutation" | "Query" | "TestObj";
 
-export type NexusGenInputNames = "InputType" | "InputType2";
+export type NexusGenInputNames = "InputType" | "InputType2" | "NestedType" | "SomeArg";
 
 export type NexusGenEnumNames = never;
 
