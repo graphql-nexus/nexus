@@ -62,6 +62,14 @@ export const Bar = interfaceType({
   },
 });
 
+export const UnusedInterface = interfaceType({
+  name: "UnusedInterface",
+  definition(t) {
+    t.boolean("ok");
+    t.resolveType(() => null);
+  },
+});
+
 export const Baz = interfaceType({
   name: "Baz",
   definition(t) {
