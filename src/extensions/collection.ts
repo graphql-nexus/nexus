@@ -37,10 +37,9 @@ export const Collection = dynamicOutputField({
     }
     t.field(fieldName, {
       type: basicCollectionMap.get(type)!,
-      args: {
+      args: config.args || {
         page: intArg(),
         perPage: intArg(),
-        ...config.args,
       },
       nullable: config.nullable,
       description: config.description,
