@@ -13,9 +13,8 @@ import {
   NexusWrappedType,
   AllNexusInputTypeDefs,
 } from "./wrapping";
-import { BaseScalars, ADD_CUSTOM_FIELD } from "./_types";
+import { BaseScalars } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
-import { DynamicInputFieldDef, DynamicOutputFieldDef } from "../dynamicField";
 
 export interface CommonFieldConfig {
   /**
@@ -127,10 +126,18 @@ export type FieldOutConfig<
 
 export interface OutputDefinitionBuilder {
   addField(config: NexusOutputFieldDef): void;
+  addDynamicOutputFields(
+    block: OutputDefinitionBlock<any>,
+    isList: boolean
+  ): void;
 }
 
 export interface InputDefinitionBuilder {
   addField(config: NexusInputFieldDef): void;
+  addDynamicInputFields(
+    block: InputDefinitionBlock<any>,
+    isList: boolean
+  ): void;
 }
 
 export interface OutputDefinitionBlock<TypeName extends string>
@@ -141,44 +148,11 @@ export interface OutputDefinitionBlock<TypeName extends string>
  * argument of the
  */
 export class OutputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean = false;
-  protected extendedFieldMap: Record<
-    string,
-    string | DynamicOutputFieldDef<any>
-  > = {};
-
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
     protected isList = false
-  ) {}
-
-  /**
-   * Adds a custom field to the output definition block,
-   * keeping track of the fields so they can be chained via the .list
-   */
-  [ADD_CUSTOM_FIELD](
-    methodName: string,
-    typeName: string | DynamicOutputFieldDef<any>
   ) {
-    this.extendedFieldMap[methodName] = typeName;
-    if (typeof typeName === "string") {
-      // @ts-ignore
-      this[methodName] = (fieldName: string, opts: any) => {
-        this.field(fieldName, {
-          type: typeName,
-          ...opts,
-        });
-      };
-    } else {
-      // @ts-ignore
-      this[methodName] = (fieldName, config: any) => {
-        typeName.value.factory(this, {
-          ...config,
-          list: this.isList,
-          fieldName,
-        });
-      };
-    }
+    this.typeBuilder.addDynamicOutputFields(this, isList);
   }
 
   get list() {
@@ -187,10 +161,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return copyFields(
-      this.extendedFieldMap,
-      new OutputDefinitionBlock<TypeName>(this.typeBuilder, true)
-    );
+    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 
   string<FieldName extends string>(
@@ -298,44 +269,11 @@ export interface InputDefinitionBlock<TypeName extends string>
   extends NexusGenCustomInputMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean = false;
-  protected extendedFieldMap: Record<
-    string,
-    string | DynamicInputFieldDef<any>
-  > = {};
-
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
     protected isList = false
-  ) {}
-
-  /**
-   * Adds a custom field to the output definition block,
-   * keeping track of the fields so they can be chained via the .list
-   */
-  [ADD_CUSTOM_FIELD](
-    methodName: string,
-    typeName: string | DynamicInputFieldDef<any>
   ) {
-    this.extendedFieldMap[methodName] = typeName;
-    if (typeof typeName === "string") {
-      // @ts-ignore
-      this[methodName] = (fieldName: string, opts: any) => {
-        this.field(fieldName, {
-          type: typeName,
-          ...opts,
-        });
-      };
-    } else {
-      // @ts-ignore
-      this[methodName] = (fieldName: string, config: any) => {
-        typeName.value.factory(this, {
-          ...config,
-          list: this.isList,
-          fieldName,
-        });
-      };
-    }
+    this.typeBuilder.addDynamicInputFields(this, isList);
   }
 
   get list() {
@@ -344,10 +282,7 @@ export class InputDefinitionBlock<TypeName extends string> {
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return copyFields(
-      this.extendedFieldMap,
-      new InputDefinitionBlock<TypeName>(this.typeBuilder, true)
-    );
+    return new InputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 
   string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
@@ -415,16 +350,3 @@ export interface AbstractOutputDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
   setResolveType(fn: AbstractTypeResolver<TypeName>): void;
 }
-
-export const copyFields = <S extends { [ADD_CUSTOM_FIELD]: any }>(
-  sourceMap: Record<
-    string,
-    string | DynamicInputFieldDef<any> | DynamicOutputFieldDef<any>
-  >,
-  target: S
-): S => {
-  Object.keys(sourceMap).forEach((methodName) =>
-    target[ADD_CUSTOM_FIELD](methodName, sourceMap[methodName])
-  );
-  return target;
-};

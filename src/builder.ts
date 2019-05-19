@@ -45,6 +45,7 @@ import {
   InputDefinitionBlock,
   NexusInputFieldDef,
   NexusOutputFieldDef,
+  OutputDefinitionBlock,
 } from "./definitions/definitionBlocks";
 import { EnumTypeConfig } from "./definitions/enumType";
 import {
@@ -94,7 +95,6 @@ import {
   GraphQLPossibleOutputs,
   NonNullConfig,
   WrappedResolver,
-  ADD_CUSTOM_FIELD,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
@@ -230,6 +230,16 @@ export type TypeToWalk =
   | { type: "object"; value: NexusShapedOutput }
   | { type: "interface"; value: NexusInterfaceTypeConfig<any> };
 
+export type DynamicInputFields = Record<
+  string,
+  DynamicInputFieldDef<string> | string
+>;
+
+export type DynamicOutputFields = Record<
+  string,
+  DynamicOutputFieldDef<string> | string
+>;
+
 /**
  * Builds all of the types, properly accounts for any using "mix".
  * Since the enum types are resolved synchronously, these need to guard for
@@ -275,26 +285,14 @@ export class SchemaBuilder {
   protected nonNullDefaults: NonNullConfig = {};
 
   /**
-   * Adds custom dynamic scalar methods to the definition blocks
-   * tuple: [FieldName, TypeName]
-   */
-  protected customScalarMethods: [string, string][] = [];
-
-  /**
    * Add dynamic input fields
    */
-  protected dynamicInputFields: Record<
-    string,
-    DynamicInputFieldDef<string>
-  > = {};
+  protected dynamicInputFields: DynamicInputFields = {};
 
   /**
    * Add dynamic output fields
    */
-  protected dynamicOutputFields: Record<
-    string,
-    DynamicOutputFieldDef<string>
-  > = {};
+  protected dynamicOutputFields: DynamicOutputFields = {};
 
   /**
    * All types that need to be traversed for children types
@@ -373,19 +371,15 @@ export class SchemaBuilder {
     }
 
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
-      this.customScalarMethods.push([
-        typeDef.value.asNexusMethod,
-        typeDef.name,
-      ]);
+      this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name;
+      this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name;
     } else if (isScalarType(typeDef)) {
       const scalarDef = typeDef as GraphQLScalarType & {
         asNexusMethod?: string;
       };
       if (scalarDef.asNexusMethod) {
-        this.customScalarMethods.push([
-          scalarDef.asNexusMethod,
-          scalarDef.name,
-        ]);
+        this.dynamicInputFields[scalarDef.asNexusMethod] = scalarDef.name;
+        this.dynamicOutputFields[scalarDef.asNexusMethod] = typeDef.name;
       }
     }
 
@@ -480,8 +474,10 @@ export class SchemaBuilder {
     const fields: NexusInputFieldDef[] = [];
     const definitionBlock = new InputDefinitionBlock({
       addField: (field) => fields.push(field),
+      addDynamicInputFields: (block, isList) =>
+        this.addDynamicInputFields(block, isList),
     });
-    config.definition(this.withCustomInputFields(definitionBlock));
+    config.definition(definitionBlock);
     const extensions = this.inputTypeExtensionMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
@@ -512,8 +508,10 @@ export class SchemaBuilder {
         modifications[mods.field] = modifications[mods.field] || [];
         modifications[mods.field].push(mods);
       },
+      addDynamicOutputFields: (block, isList) =>
+        this.addDynamicOutputFields(block, isList),
     });
-    config.definition(this.withCustomOutputFields(definitionBlock));
+    config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
@@ -575,8 +573,10 @@ export class SchemaBuilder {
     const definitionBlock = new InterfaceDefinitionBlock({
       addField: (field) => fields.push(field),
       setResolveType: (fn) => (resolveType = fn),
+      addDynamicOutputFields: (block, isList) =>
+        this.addDynamicOutputFields(block, isList),
     });
-    config.definition(this.withCustomOutputFields(definitionBlock));
+    config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
@@ -637,7 +637,6 @@ export class SchemaBuilder {
     let resolveType: AbstractTypeResolver<string> | undefined;
     config.definition(
       new UnionDefinitionBlock({
-        addField() {},
         setResolveType: (fn) => (resolveType = fn),
         addUnionMembers: (unionMembers) => (members = unionMembers),
       })
@@ -668,37 +667,6 @@ export class SchemaBuilder {
   protected finalize<T extends GraphQLNamedType>(type: T): T {
     this.finalTypeMap[type.name] = type;
     return type;
-  }
-
-  protected withCustomInputFields<T extends InputDefinitionBlock<any>>(
-    definitionBlock: T
-  ): T {
-    this.withCustomFields(definitionBlock);
-    eachObj(this.dynamicInputFields, (val, key) => {
-      definitionBlock[ADD_CUSTOM_FIELD](key, val);
-    });
-    return definitionBlock;
-  }
-
-  protected withCustomOutputFields<
-    T extends ObjectDefinitionBlock<any> | InterfaceDefinitionBlock<any>
-  >(definitionBlock: T): T {
-    this.withCustomFields(definitionBlock);
-    eachObj(this.dynamicOutputFields, (val, key) => {
-      definitionBlock[ADD_CUSTOM_FIELD](key, val);
-    });
-    return definitionBlock;
-  }
-
-  protected withCustomFields(
-    definitionBlock:
-      | InputDefinitionBlock<any>
-      | ObjectDefinitionBlock<any>
-      | InterfaceDefinitionBlock<any>
-  ) {
-    this.customScalarMethods.forEach(([methodName, typeName]) => {
-      definitionBlock[ADD_CUSTOM_FIELD](methodName, typeName);
-    });
   }
 
   protected missingType(
@@ -1101,9 +1069,62 @@ export class SchemaBuilder {
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
     const definitionBlock = new InputDefinitionBlock({
       addField: (f) => this.maybeTraverseInputType(f),
+      addDynamicInputFields: (block, isList) =>
+        this.addDynamicInputFields(block, isList),
     });
-    obj.definition(this.withCustomInputFields(definitionBlock));
+    obj.definition(definitionBlock);
     return obj;
+  }
+
+  addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean) {
+    eachObj(this.dynamicInputFields, (val, methodName) => {
+      if (typeof val === "string") {
+        return this.addDynamicScalar(methodName, val, block, isList);
+      }
+      // @ts-ignore
+      block[methodName] = (...args: any[]) => {
+        const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
+        val.value.factory({
+          args: config,
+          typeDef: block,
+          builder: this,
+        });
+      };
+    });
+  }
+
+  addDynamicOutputFields(block: OutputDefinitionBlock<any>, isList: boolean) {
+    eachObj(this.dynamicOutputFields, (val, methodName) => {
+      if (typeof val === "string") {
+        return this.addDynamicScalar(methodName, val, block, isList);
+      }
+      // @ts-ignore
+      block[methodName] = (...args: any[]) => {
+        const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
+        val.value.factory({
+          args: config,
+          typeDef: block,
+          builder: this,
+        });
+      };
+    });
+  }
+
+  addDynamicScalar(
+    methodName: string,
+    typeName: string,
+    block: OutputDefinitionBlock<any> | InputDefinitionBlock<any>,
+    isList: boolean
+  ) {
+    // @ts-ignore
+    block[methodName] = (fieldName: string, opts: any) => {
+      // @ts-ignore
+      block.field(fieldName, {
+        type: typeName,
+        list: isList,
+        ...opts,
+      });
+    };
   }
 
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
@@ -1111,8 +1132,10 @@ export class SchemaBuilder {
       addFieldModifications: () => {},
       addInterfaces: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
+      addDynamicOutputFields: (block, isList) =>
+        this.addDynamicOutputFields(block, isList),
     });
-    obj.definition(this.withCustomOutputFields(definitionBlock));
+    obj.definition(definitionBlock);
     return obj;
   }
 
@@ -1120,8 +1143,10 @@ export class SchemaBuilder {
     const definitionBlock = new InterfaceDefinitionBlock({
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
+      addDynamicOutputFields: (block, isList) =>
+        this.addDynamicOutputFields(block, isList),
     });
-    obj.definition(this.withCustomOutputFields(definitionBlock));
+    obj.definition(definitionBlock);
     return obj;
   }
 
@@ -1204,8 +1229,8 @@ export function wrapAuthorize(
 }
 
 export type DynamicFieldDefs = {
-  dynamicInputFields: Record<string, DynamicInputFieldDef<string>>;
-  dynamicOutputFields: Record<string, DynamicOutputFieldDef<string>>;
+  dynamicInputFields: DynamicInputFields;
+  dynamicOutputFields: DynamicOutputFields;
 };
 
 export interface BuildTypes<

@@ -1,6 +1,7 @@
 import { dynamicOutputField } from "../dynamicField";
 import { objectType, NexusObjectTypeDef } from "../definitions/objectType";
 import { GraphQLFieldResolver } from "graphql";
+import { intArg, stringArg } from "../definitions/args";
 
 const relayConnectionMap = new Map<string, NexusObjectTypeDef<string>>();
 
@@ -16,7 +17,7 @@ export const RelayConnection = dynamicOutputField({
       nullable?: boolean,
       description?: string
     }): void`,
-  factory(t, config) {
+  factory({ typeDef: t, args: [fieldName, config] }) {
     const type =
       typeof config.type === "string" ? config.type : config.type.name;
     pageInfo =
@@ -30,7 +31,7 @@ export const RelayConnection = dynamicOutputField({
       });
     if (config.list) {
       throw new Error(
-        `Collection field ${config.fieldName}.${type} cannot be used as a list.`
+        `Collection field ${fieldName}.${type} cannot be used as a list.`
       );
     }
     if (!relayConnectionMap.has(config.type)) {
@@ -53,16 +54,22 @@ export const RelayConnection = dynamicOutputField({
         })
       );
     }
-    t.field(config.fieldName, {
+    t.field(fieldName, {
       type: relayConnectionMap.get(config.type)!,
-      args: config.args || {},
+      args: {
+        first: intArg(),
+        after: stringArg(),
+        last: intArg(),
+        before: stringArg(),
+        ...config.args,
+      },
       nullable: config.nullable,
       description: config.description,
       resolve(root, args, ctx, info) {
         const edgeResolver: GraphQLFieldResolver<any, any> = (...fArgs) =>
           config.edges(root, args, ctx, fArgs[3]);
         const pageInfoResolver: GraphQLFieldResolver<any, any> = (...fArgs) =>
-          config.edges(root, args, ctx, fArgs[3]);
+          config.pageInfo(root, args, ctx, fArgs[3]);
         return {
           edges: edgeResolver,
           pageInfo: pageInfoResolver,

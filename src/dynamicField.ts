@@ -3,8 +3,19 @@ import {
   OutputDefinitionBlock,
 } from "./definitions/definitionBlocks";
 import { withNexusSymbol, NexusTypes } from "./definitions/_types";
+import { SchemaBuilder } from "./builder";
 
-export type FactoryConfig<T> = any;
+export type OutputFactoryConfig<T> = {
+  args: any[];
+  builder: SchemaBuilder;
+  typeDef: OutputDefinitionBlock<any>;
+};
+
+export type InputFactoryConfig<T> = {
+  args: any[];
+  builder: SchemaBuilder;
+  typeDef: InputDefinitionBlock<any>;
+};
 
 export interface BaseExtensionConfig<T extends string> {
   /**
@@ -24,7 +35,7 @@ export interface DynamicOutputFieldConfig<T extends string>
   /**
    * Invoked when the field is called
    */
-  factory(t: OutputDefinitionBlock<any>, config: FactoryConfig<T>): void;
+  factory(config: OutputFactoryConfig<T>): void;
 }
 
 export interface DynamicInputFieldConfig<T extends string>
@@ -32,7 +43,7 @@ export interface DynamicInputFieldConfig<T extends string>
   /**
    * Invoked when the field is called
    */
-  factory(t: InputDefinitionBlock<any>, config: FactoryConfig<T>): void;
+  factory(config: InputFactoryConfig<T>): void;
 }
 
 export class DynamicInputFieldDef<Name extends string> {

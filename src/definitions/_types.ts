@@ -87,5 +87,3 @@ export interface AsyncIterator<T> {
   return?(value?: any): Promise<IteratorResult<T>>;
   throw?(e?: any): Promise<IteratorResult<T>>;
 }
-
-export const ADD_CUSTOM_FIELD = Symbol.for("@nexus/addCustomField");

@@ -9,7 +9,7 @@ interface Bar {
 }
 
 type BarCollection {
-  items: [Bar!]!
+  nodes: [Bar!]!
   totalCount: Int!
 }
 
@@ -73,3 +73,7 @@ type TestObj implements Bar & Baz {
 }
 
 union TestUnion = Foo
+
+interface UnusedInterface {
+  ok: Boolean!
+}

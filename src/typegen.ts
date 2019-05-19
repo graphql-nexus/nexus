@@ -94,7 +94,7 @@ export class Typegen {
     return [
       this.typegenInfo.headers.join("\n"),
       this.typegenInfo.imports.join("\n"),
-      this.printDynamicCore(),
+      this.printDynamicImport(),
       this.printDynamicInputFieldDefinitions(),
       this.printDynamicOutputFieldDefinitions(),
       GLOBAL_DECLARATION,
@@ -127,11 +127,10 @@ export class Typegen {
       .join("\n");
   }
 
-  printDynamicCore() {
-    const customScalars = this.buildCustomScalarMap();
+  printDynamicImport() {
     const { dynamicInputFields, dynamicOutputFields } = this.dynamicFields;
     if (
-      [customScalars, dynamicInputFields, dynamicOutputFields].some(
+      [dynamicInputFields, dynamicOutputFields].some(
         (o) => Object.keys(o).length > 0
       )
     ) {
@@ -141,12 +140,9 @@ export class Typegen {
   }
 
   printDynamicInputFieldDefinitions() {
-    const customScalars = this.buildCustomScalarMap();
     const { dynamicInputFields } = this.dynamicFields;
     // If there is nothing custom... exit
-    if (
-      [customScalars, dynamicInputFields].every((o) => !Object.keys(o).length)
-    ) {
+    if (!Object.keys(dynamicInputFields).length) {
       return [];
     }
     return [
@@ -154,12 +150,12 @@ export class Typegen {
       `  interface NexusGenCustomInputMethods<TypeName extends string> {`,
     ]
       .concat(
-        mapObj(customScalars, (val, key) => {
-          return `    ${val}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
-            key
-          )};`;
-        }),
         mapObj(dynamicInputFields, (val, key) => {
+          if (typeof val === "string") {
+            return `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
+              val
+            )};`;
+          }
           return `    ${key}${val.value.typeDefinition ||
             `(...args: any): void`}`;
         })
@@ -169,12 +165,9 @@ export class Typegen {
   }
 
   printDynamicOutputFieldDefinitions() {
-    const customScalars = this.buildCustomScalarMap();
     const { dynamicOutputFields } = this.dynamicFields;
     // If there is nothing custom... exit
-    if (
-      [customScalars, dynamicOutputFields].every((o) => !Object.keys(o).length)
-    ) {
+    if (!Object.keys(dynamicOutputFields).length) {
       return [];
     }
     return [
@@ -182,28 +175,18 @@ export class Typegen {
       `  interface NexusGenCustomOutputMethods<TypeName extends string> {`,
     ]
       .concat(
-        mapObj(customScalars, (val, key) => {
-          return `    ${val}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
-            key
-          )};`;
-        }),
         mapObj(dynamicOutputFields, (val, key) => {
+          if (typeof val === "string") {
+            return `    ${key}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+              val
+            )};`;
+          }
           return `    ${key}${val.value.typeDefinition ||
             `(...args: any): void`}`;
         })
       )
       .concat([`  }`, `}`])
       .join("\n");
-  }
-
-  buildCustomScalarMap() {
-    const customScalars: Record<string, string> = {};
-    this.groupedTypes.scalar.forEach((type) => {
-      if (type.asNexusMethod) {
-        customScalars[type.name] = type.asNexusMethod;
-      }
-    });
-    return customScalars;
   }
 
   printInheritedFieldMap() {
@@ -263,12 +246,6 @@ export class Typegen {
             sourceMap[type.name] = possibleNames
               .map((val) => JSON.stringify(val))
               .join(" | ");
-          } else {
-            console.warn(
-              `Nexus Warning: Interface ${
-                type.name
-              } is not implemented by any object types`
-            );
           }
         } else {
           sourceMap[type.name] = type

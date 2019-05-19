@@ -1,6 +1,7 @@
 import { dynamicOutputField } from "../dynamicField";
 import { NexusObjectTypeDef, objectType } from "../definitions/objectType";
 import { GraphQLFieldResolver } from "graphql";
+import { intArg } from "../definitions/args";
 
 const basicCollectionMap = new Map<string, NexusObjectTypeDef<string>>();
 
@@ -8,18 +9,18 @@ export const Collection = dynamicOutputField({
   name: "collection",
   typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
-      items: core.SubFieldResolver<TypeName, FieldName, "items">,
+      nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
       totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
       args?: core.ArgsRecord,
       nullable?: boolean,
       description?: string
     }): void;`,
-  factory(t, config) {
+  factory({ typeDef: t, args: [fieldName, config] }) {
     const type =
       typeof config.type === "string" ? config.type : config.type.name;
     if (config.list) {
       throw new Error(
-        `Collection field ${config.fieldName}.${type} cannot be used as a list.`
+        `Collection field ${fieldName}.${type} cannot be used as a list.`
       );
     }
     if (!basicCollectionMap.has(type)) {
@@ -29,23 +30,27 @@ export const Collection = dynamicOutputField({
           name: `${type}Collection`,
           definition(c) {
             c.int("totalCount");
-            c.list.field("items", { type: type });
+            c.list.field("nodes", { type: type });
           },
         })
       );
     }
-    t.field(config.fieldName, {
+    t.field(fieldName, {
       type: basicCollectionMap.get(type)!,
-      args: config.args || {},
+      args: {
+        page: intArg(),
+        perPage: intArg(),
+        ...config.args,
+      },
       nullable: config.nullable,
       description: config.description,
       resolve(root, args, ctx, info) {
-        const itemsResolver: GraphQLFieldResolver<any, any> = (...fArgs) =>
-          config.items(root, args, ctx, fArgs[3]);
+        const nodesResolver: GraphQLFieldResolver<any, any> = (...fArgs) =>
+          config.nodes(root, args, ctx, fArgs[3]);
         const totalCountResolver: GraphQLFieldResolver<any, any> = (...fArgs) =>
           config.totalCount(root, args, ctx, fArgs[3]);
         return {
-          items: itemsResolver,
+          nodes: nodesResolver,
           totalCount: totalCountResolver,
         };
       },
