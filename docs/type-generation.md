@@ -89,8 +89,7 @@ export interface TypegenConfigSourceModule {
    * If not provided, the default implementation is:
    *
    *   (type) => [
-   *      new RegExp(`(?:interface|type|class)\\s+(${type.name})\\W`, "g"),
-   *      new RegExp(`\\w*(?<!(?:const\\s+))enum\\s+(${type.name})\\W`, "g"),
+   *      new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g")
    *   ]
    *
    */

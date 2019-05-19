@@ -71,14 +71,14 @@ describe("backingTypes", () => {
 `);
   });
 
-  it("ignores backing types for const enums", async () => {
+  it("can match backing types for const enums", async () => {
     const schema = getSchemaWithConstEnums();
     const typegenInfo = await metadata.getTypegenInfo(schema);
     const typegen = new Typegen(schema, typegenInfo);
 
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
 "export interface NexusGenEnums {
-  B: \\"9\\" | \\"10\\"
+  B: t.B
 }"
 `);
   });
