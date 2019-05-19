@@ -490,11 +490,13 @@ export class SchemaBuilder {
         }
       });
     } else {
-      Object.keys(members).forEach((key) => {
-        values[key] = {
-          value: members[key],
-        };
-      });
+      Object.keys(members)
+        .filter((key) => isNaN(+key)) // Ensures we only consider enum keys in case a TypeScript enum was passed as the members property.
+        .forEach((key) => {
+          values[key] = {
+            value: (members as any)[key],
+          };
+        });
     }
     if (!Object.keys(values).length) {
       throw new Error(
