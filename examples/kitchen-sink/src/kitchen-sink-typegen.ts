@@ -87,7 +87,7 @@ export interface NexusGenRootTypes {
   Float: number;
   Boolean: boolean;
   ID: string;
-  Date: any;
+  Date: Date;
   TestUnion: NexusGenRootTypes['Foo'];
 }
 
