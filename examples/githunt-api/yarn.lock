@@ -3484,12 +3484,10 @@ negotiator@0.6.1:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
   integrity sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=
 
-nexus@0.12.0-beta.1:
-  version "0.12.0-beta.1"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-beta.1.tgz#d11cfb929def1d7ec03adbbbb616d377f63e9da0"
-  integrity sha512-5gHmcZ2ksQbYV5O8Jj33FY0mXmIPurGo9CbzkSa9wUhtleMz2zygmgsvgt8oRB98rZkOPwwusZ5q9JX4sfdx5w==
-  dependencies:
-    tslib "^1.9.3"
+nexus@0.12.0-beta.4:
+  version "0.12.0-beta.4"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-beta.4.tgz#bd561527e48c09012318814add492e9b5df65061"
+  integrity sha512-6wJvqyEVUY3Psc7Ywv8ngVi0BWQyFQBKe3L/E4A1OdkNgutzjCAMxwSr9PFY3tFTc6eeSMlXNsaunGkRwgJlDg==
 
 node-fetch@^2.1.2:
   version "2.3.0"
