@@ -34,6 +34,7 @@ import {
   isScalarType,
   defaultFieldResolver,
   getNamedType,
+  GraphQLField,
 } from "graphql";
 import {
   NexusArgConfig,
@@ -65,7 +66,10 @@ import {
   NexusObjectTypeDef,
   ObjectDefinitionBlock,
 } from "./definitions/objectType";
-import { NexusScalarTypeConfig } from "./definitions/scalarType";
+import {
+  NexusScalarTypeConfig,
+  NexusScalarExtensions,
+} from "./definitions/scalarType";
 import {
   NexusUnionTypeConfig,
   UnionDefinitionBlock,
@@ -95,6 +99,7 @@ import {
   GraphQLPossibleOutputs,
   NonNullConfig,
   WrappedResolver,
+  RootTypings,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
@@ -115,11 +120,6 @@ import {
   NexusExtendInputTypeDef,
   NexusExtendInputTypeConfig,
 } from "./definitions/extendInputType";
-import {
-  graphqlObjectToConfig,
-  graphqlInterfaceToConfig,
-  graphqlInputObjectToConfig,
-} from "./toConfig";
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 
 export type Maybe<T> = T | null;
@@ -300,6 +300,11 @@ export class SchemaBuilder {
   protected typesToWalk: TypeToWalk[] = [];
 
   /**
+   * Root type mapping information annotated on the type definitions
+   */
+  protected rootTypings: RootTypings = {};
+
+  /**
    * Whether we've called `getFinalTypeMap` or not
    */
   protected finalized: boolean = false;
@@ -373,13 +378,22 @@ export class SchemaBuilder {
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
       this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name;
       this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name;
+      if (typeDef.value.rootTyping) {
+        this.rootTypings[typeDef.name] = typeDef.value.rootTyping;
+      }
     } else if (isScalarType(typeDef)) {
       const scalarDef = typeDef as GraphQLScalarType & {
-        asNexusMethod?: string;
+        extensions?: NexusScalarExtensions;
       };
-      if (scalarDef.asNexusMethod) {
-        this.dynamicInputFields[scalarDef.asNexusMethod] = scalarDef.name;
-        this.dynamicOutputFields[scalarDef.asNexusMethod] = typeDef.name;
+      if (scalarDef.extensions && scalarDef.extensions.nexus) {
+        const { asNexusMethod, rootTyping } = scalarDef.extensions.nexus;
+        if (asNexusMethod) {
+          this.dynamicInputFields[asNexusMethod] = scalarDef.name;
+          this.dynamicOutputFields[asNexusMethod] = typeDef.name;
+        }
+        if (rootTyping) {
+          this.rootTypings[scalarDef.name] = rootTyping;
+        }
       }
     }
 
@@ -465,6 +479,7 @@ export class SchemaBuilder {
         dynamicInputFields: this.dynamicInputFields,
         dynamicOutputFields: this.dynamicOutputFields,
       },
+      rootTypings: this.rootTypings,
     };
   }
 
@@ -519,6 +534,9 @@ export class SchemaBuilder {
       });
     }
     this.typeExtensionMap[config.name] = null;
+    if (config.rootTyping) {
+      this.rootTypings[config.name] = config.rootTyping;
+    }
     return this.finalize(
       new GraphQLObjectType({
         name: config.name,
@@ -586,6 +604,9 @@ export class SchemaBuilder {
     if (!resolveType) {
       resolveType = this.missingResolveType(config.name, "union");
     }
+    if (config.rootTyping) {
+      this.rootTypings[config.name] = config.rootTyping;
+    }
     return this.finalize(
       new GraphQLInterfaceType({
         name,
@@ -623,6 +644,9 @@ export class SchemaBuilder {
         `GraphQL Nexus: Enum ${config.name} must have at least one member`
       );
     }
+    if (config.rootTyping) {
+      this.rootTypings[config.name] = config.rootTyping;
+    }
     return this.finalize(
       new GraphQLEnumType({
         name: config.name,
@@ -644,6 +668,9 @@ export class SchemaBuilder {
     if (!resolveType) {
       resolveType = this.missingResolveType(config.name, "union");
     }
+    if (config.rootTyping) {
+      this.rootTypings[config.name] = config.rootTyping;
+    }
     return this.finalize(
       new GraphQLUnionType({
         name: config.name,
@@ -655,13 +682,10 @@ export class SchemaBuilder {
   }
 
   buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
-    const scalar: GraphQLScalarType & {
-      asNexusMethod?: string;
-    } = new GraphQLScalarType(config);
-    if (config.asNexusMethod) {
-      scalar.asNexusMethod = config.asNexusMethod;
+    if (config.rootTyping) {
+      this.rootTypings[config.name] = config.rootTyping;
     }
-    return this.finalize(scalar);
+    return this.finalize(new GraphQLScalarType(config));
   }
 
   protected finalize<T extends GraphQLNamedType>(type: T): T {
@@ -1079,7 +1103,7 @@ export class SchemaBuilder {
   addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean) {
     eachObj(this.dynamicInputFields, (val, methodName) => {
       if (typeof val === "string") {
-        return this.addDynamicScalar(methodName, val, block, isList);
+        return this.addDynamicScalar(methodName, val, block);
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
@@ -1096,7 +1120,7 @@ export class SchemaBuilder {
   addDynamicOutputFields(block: OutputDefinitionBlock<any>, isList: boolean) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === "string") {
-        return this.addDynamicScalar(methodName, val, block, isList);
+        return this.addDynamicScalar(methodName, val, block);
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
@@ -1113,15 +1137,13 @@ export class SchemaBuilder {
   addDynamicScalar(
     methodName: string,
     typeName: string,
-    block: OutputDefinitionBlock<any> | InputDefinitionBlock<any>,
-    isList: boolean
+    block: OutputDefinitionBlock<any> | InputDefinitionBlock<any>
   ) {
     // @ts-ignore
     block[methodName] = (fieldName: string, opts: any) => {
       // @ts-ignore
       block.field(fieldName, {
         type: typeName,
-        list: isList,
         ...opts,
       });
     };
@@ -1174,23 +1196,22 @@ export class SchemaBuilder {
 
   protected walkNamedTypes(namedType: GraphQLNamedType) {
     if (isObjectType(namedType)) {
-      const objConfig = graphqlObjectToConfig(namedType);
-      eachObj(objConfig.fields, (val) => this.addObjectField(val));
+      eachObj(namedType.getFields(), (val) => this.addObjectField(val));
     }
     if (isInterfaceType(namedType)) {
-      const objConfig = graphqlInterfaceToConfig(namedType);
-      eachObj(objConfig.fields, (val) => this.addObjectField(val));
+      eachObj(namedType.getFields(), (val) => this.addObjectField(val));
     }
     if (isInputObjectType(namedType)) {
-      const objConfig = graphqlInputObjectToConfig(namedType);
-      eachObj(objConfig.fields, (val) => this.addType(getNamedType(val.type)));
+      eachObj(namedType.getFields(), (val) =>
+        this.addType(getNamedType(val.type))
+      );
     }
   }
 
-  protected addObjectField(obj: GraphQLFieldConfig<any, any>) {
+  protected addObjectField(obj: GraphQLField<any, any>) {
     this.addType(getNamedType(obj.type));
     if (obj.args) {
-      eachObj(obj.args, (val) => this.addType(getNamedType(val.type)));
+      obj.args.forEach((val) => this.addType(getNamedType(val.type)));
     }
   }
 }
@@ -1238,6 +1259,7 @@ export interface BuildTypes<
 > {
   typeMap: TypeMapDefs;
   dynamicFields: DynamicFieldDefs;
+  rootTypings: RootTypings;
 }
 
 /**
@@ -1281,6 +1303,15 @@ function addTypes(builder: SchemaBuilder, types: any) {
   }
 }
 
+export type NexusSchemaExtensions = {
+  rootTypings: RootTypings;
+  dynamicFields: DynamicFieldDefs;
+};
+
+export type NexusSchema = GraphQLSchema & {
+  extensions: Record<string, any> & { nexus: NexusSchemaExtensions };
+};
+
 /**
  * Builds the schema, we may return more than just the schema
  * from this one day.
@@ -1288,8 +1319,8 @@ function addTypes(builder: SchemaBuilder, types: any) {
 export function makeSchemaInternal(
   options: SchemaConfig,
   schemaBuilder?: SchemaBuilder
-): { schema: GraphQLSchema; dynamicFields: DynamicFieldDefs } {
-  const { typeMap, dynamicFields } = buildTypes(
+): { schema: NexusSchema } {
+  const { typeMap, dynamicFields, rootTypings } = buildTypes(
     options.types,
     options,
     schemaBuilder
@@ -1319,9 +1350,17 @@ export function makeSchemaInternal(
     mutation: Mutation,
     subscription: Subscription,
     types: objValues(typeMap),
-  });
+  }) as NexusSchema;
 
-  return { schema, dynamicFields };
+  // Loosely related to https://github.com/graphql/graphql-js/issues/1527#issuecomment-457828990
+  schema.extensions = {
+    ...schema.extensions,
+    nexus: {
+      rootTypings,
+      dynamicFields,
+    },
+  };
+  return { schema };
 }
 
 /**
@@ -1332,7 +1371,7 @@ export function makeSchemaInternal(
  * root query type.
  */
 export function makeSchema(options: SchemaConfig): GraphQLSchema {
-  const { schema, dynamicFields } = makeSchemaInternal(options);
+  const { schema } = makeSchemaInternal(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
@@ -1345,11 +1384,9 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   if (shouldGenerateArtifacts) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(options)
-      .generateArtifacts(schema, dynamicFields)
-      .catch((e) => {
-        console.error(e);
-      });
+    new TypegenMetadata(options).generateArtifacts(schema).catch((e) => {
+      console.error(e);
+    });
   }
 
   return schema;

@@ -2,7 +2,7 @@ import {
   GraphQLArgument,
   GraphQLField,
   GraphQLInputField,
-  GraphQLInputType as GraphQLType,
+  GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
@@ -23,9 +23,16 @@ import {
   GraphQLEnumType,
   defaultFieldResolver,
 } from "graphql";
-import { TypegenInfo, DynamicFieldDefs } from "./builder";
-import { eachObj, GroupedTypes, groupTypes, mapObj } from "./utils";
-import { WrappedResolver } from "./definitions/_types";
+import path from "path";
+import { TypegenInfo, NexusSchemaExtensions } from "./builder";
+import {
+  eachObj,
+  GroupedTypes,
+  groupTypes,
+  mapObj,
+  relativePathTo,
+} from "./utils";
+import { WrappedResolver, RootTypingImport } from "./definitions/_types";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -63,8 +70,8 @@ export class Typegen {
 
   constructor(
     protected schema: GraphQLSchema,
-    protected typegenInfo: TypegenInfo,
-    protected dynamicFields: DynamicFieldDefs
+    protected typegenInfo: TypegenInfo & { typegenFile: string },
+    protected extensions: NexusSchemaExtensions
   ) {
     this.groupedTypes = groupTypes(schema);
   }
@@ -128,19 +135,42 @@ export class Typegen {
   }
 
   printDynamicImport() {
-    const { dynamicInputFields, dynamicOutputFields } = this.dynamicFields;
+    const {
+      dynamicFields: { dynamicInputFields, dynamicOutputFields },
+      rootTypings,
+    } = this.extensions;
+    const imports = [];
     if (
       [dynamicInputFields, dynamicOutputFields].some(
         (o) => Object.keys(o).length > 0
       )
     ) {
-      return [`import { core } from "nexus"`];
+      imports.push(`import { core } from "nexus"`);
     }
-    return [];
+    const importMap: Record<string, Set<string>> = {};
+    const outputPath = this.typegenInfo.typegenFile;
+    eachObj(rootTypings, (val, key) => {
+      if (typeof val !== "string") {
+        const importPath = (path.isAbsolute(val.path)
+          ? relativePathTo(val.path, outputPath)
+          : val.path
+        ).replace(/(\.d)?\.ts/, "");
+        importMap[importPath] = importMap[importPath] || new Set();
+        importMap[importPath].add(
+          val.alias ? `${val.name} as ${val.alias}` : val.name
+        );
+      }
+    });
+    eachObj(importMap, (val, key) => {
+      imports.push(
+        `import { ${Array.from(val).join(", ")} } from ${JSON.stringify(key)}`
+      );
+    });
+    return imports.join("\n");
   }
 
   printDynamicInputFieldDefinitions() {
-    const { dynamicInputFields } = this.dynamicFields;
+    const { dynamicInputFields } = this.extensions.dynamicFields;
     // If there is nothing custom... exit
     if (!Object.keys(dynamicInputFields).length) {
       return [];
@@ -165,7 +195,7 @@ export class Typegen {
   }
 
   printDynamicOutputFieldDefinitions() {
-    const { dynamicOutputFields } = this.dynamicFields;
+    const { dynamicOutputFields } = this.extensions.dynamicFields;
     // If there is nothing custom... exit
     if (!Object.keys(dynamicOutputFields).length) {
       return [];
@@ -314,6 +344,15 @@ export class Typegen {
       .concat(this.groupedTypes.scalar)
       .concat(this.groupedTypes.union)
       .forEach((type) => {
+        const rootTyping = this.extensions.rootTypings[type.name];
+        if (rootTyping) {
+          if (typeof rootTyping === "string") {
+            rootTypeMap[type.name] = rootTyping;
+          } else {
+            rootTypeMap[type.name] = this.resolveExtensionRootType(rootTyping);
+          }
+          return;
+        }
         const backingType = this.typegenInfo.backingTypeMap[type.name];
         if (typeof backingType === "string") {
           rootTypeMap[type.name] = backingType;
@@ -346,7 +385,7 @@ export class Typegen {
             if (!this.hasResolver(field, type)) {
               if (typeof obj !== "string") {
                 obj[field.name] = [
-                  this.argSeparator(field.type as GraphQLType),
+                  this.argSeparator(field.type as GraphQLInputType),
                   this.printOutputType(field.type),
                 ];
               }
@@ -355,6 +394,10 @@ export class Typegen {
         }
       });
     return rootTypeMap;
+  }
+
+  resolveExtensionRootType(rootTyping: RootTypingImport) {
+    return rootTyping.alias || rootTyping.name;
   }
 
   buildAllTypesMap() {
@@ -507,14 +550,14 @@ export class Typegen {
     return [this.argSeparator(arg.type), this.argTypeRepresentation(arg.type)];
   }
 
-  argSeparator(type: GraphQLType) {
+  argSeparator(type: GraphQLInputType) {
     if (isNonNullType(type)) {
       return ":";
     }
     return "?:";
   }
 
-  argTypeRepresentation(arg: GraphQLType): string {
+  argTypeRepresentation(arg: GraphQLInputType): string {
     const argType = this.argTypeArr(arg);
     function combine(item: any[]): string {
       if (item.length === 1) {
@@ -537,7 +580,7 @@ export class Typegen {
     return `${combine(argType)}; // ${arg}`;
   }
 
-  argTypeArr(arg: GraphQLType): any[] {
+  argTypeArr(arg: GraphQLInputType): any[] {
     const typing = [];
     if (isNonNullType(arg)) {
       arg = arg.ofType;

@@ -3488,6 +3488,8 @@ nexus@0.12.0-beta.1:
   version "0.12.0-beta.1"
   resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-beta.1.tgz#d11cfb929def1d7ec03adbbbb616d377f63e9da0"
   integrity sha512-5gHmcZ2ksQbYV5O8Jj33FY0mXmIPurGo9CbzkSa9wUhtleMz2zygmgsvgt8oRB98rZkOPwwusZ5q9JX4sfdx5w==
+  dependencies:
+    tslib "^1.9.3"
 
 node-fetch@^2.1.2:
   version "2.3.0"
@@ -4855,11 +4857,6 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
-
-tslib@^1.9.3:
-  version "1.9.3"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
-  integrity sha512-4krF8scpejhaOgqzBEcGM7yDIEfi0/8+8zDRZhNZZ2kjmHJ4hv3zCbQWxoJGz1iw5U0Jl0nma13xzHXcncMavQ==
 
 type-is@^1.6.16, type-is@~1.6.15, type-is@~1.6.16:
   version "1.6.16"

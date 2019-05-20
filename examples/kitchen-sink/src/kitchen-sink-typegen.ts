@@ -5,6 +5,7 @@
 
 
 import { core } from "nexus"
+import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Date";
@@ -70,14 +71,17 @@ export interface NexusGenRootTypes {
   }
   Mutation: {};
   Query: {};
+  SomeItem: { // root type
+    id: string; // ID!
+  }
   TestObj: { // root type
-    a: NexusGenRootTypes['Bar']; // Bar!
+    a?: NexusGenRootTypes['Bar'] | null; // Bar
     item: string; // String!
     ok: boolean; // Boolean!
   }
-  Bar: NexusGenRootTypes['Foo'] | NexusGenRootTypes['TestObj'];
+  Bar: NexusGenRootTypes['TestObj'] | NexusGenRootTypes['Foo'];
   Baz: NexusGenRootTypes['TestObj'];
-  UnusedInterface: any;
+  UnusedInterface: UnusedInterfaceTypeDef;
   String: string;
   Int: number;
   Float: number;
@@ -110,16 +114,19 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     asArgExample: string; // String!
-    bar: NexusGenRootTypes['Bar']; // Bar!
+    bar: NexusGenRootTypes['TestObj']; // TestObj!
     collectionField: NexusGenRootTypes['BarCollection']; // BarCollection!
     dateAsList: any[]; // [Date!]!
-    extended: NexusGenRootTypes['Bar']; // Bar!
+    extended: NexusGenRootTypes['SomeItem']; // SomeItem!
     getNumberOrNull: number | null; // Int
     inlineArgs: string; // String!
     inputAsArgExample: string; // String!
   }
+  SomeItem: { // field return type
+    id: string; // ID!
+  }
   TestObj: { // field return type
-    a: NexusGenRootTypes['Bar']; // Bar!
+    a: NexusGenRootTypes['Bar'] | null; // Bar
     argsTest: boolean; // Boolean!
     item: string; // String!
     ok: boolean; // Boolean!
@@ -129,7 +136,7 @@ export interface NexusGenFieldTypes {
     ok: boolean; // Boolean!
   }
   Baz: { // field return type
-    a: NexusGenRootTypes['Bar']; // Bar!
+    a: NexusGenRootTypes['Bar'] | null; // Bar
     ok: boolean; // Boolean!
   }
   UnusedInterface: { // field return type
@@ -180,13 +187,13 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractResolveReturnTypes {
   TestUnion: "Foo"
-  Bar: "Foo" | "TestObj"
+  Bar: "TestObj" | "Foo"
   Baz: "TestObj"
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "BarCollection" | "Foo" | "Mutation" | "Query" | "TestObj";
+export type NexusGenObjectNames = "BarCollection" | "Foo" | "Mutation" | "Query" | "SomeItem" | "TestObj";
 
 export type NexusGenInputNames = "InputType" | "InputType2" | "NestedType" | "SomeArg";
 

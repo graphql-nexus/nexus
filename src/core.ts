@@ -10,6 +10,7 @@ export * from "./typegenTypeHelpers";
 export * from "./utils";
 export * from "./definitions/_types";
 export * from "./definitions/args";
+export * from "./definitions/decorateType";
 export * from "./definitions/definitionBlocks";
 export * from "./definitions/enumType";
 export * from "./definitions/extendType";

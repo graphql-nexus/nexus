@@ -30,7 +30,7 @@ export const Collection = dynamicOutputMethod({
           name: `${type}Collection`,
           definition(c) {
             c.int("totalCount");
-            c.list.field("nodes", { type: type });
+            c.list.field("nodes", { type });
           },
         })
       );

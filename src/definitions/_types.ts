@@ -87,3 +87,22 @@ export interface AsyncIterator<T> {
   return?(value?: any): Promise<IteratorResult<T>>;
   throw?(e?: any): Promise<IteratorResult<T>>;
 }
+
+export type RootTypingDef = string | RootTypingImport;
+
+export type RootTypings = Record<string, string | RootTypingImport>;
+
+export interface RootTypingImport {
+  /**
+   * File path to import the type from.
+   */
+  path: string;
+  /**
+   * Name of the type we want to reference in the `path`
+   */
+  name: string;
+  /**
+   * Name we want the imported type to be referenced as
+   */
+  alias?: string;
+}

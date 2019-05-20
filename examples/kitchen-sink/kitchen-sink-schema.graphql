@@ -15,7 +15,7 @@ type BarCollection {
 
 interface Baz {
   """'A' description"""
-  a: Bar!
+  a: Bar
   ok: Boolean!
 }
 
@@ -50,10 +50,10 @@ input NestedType {
 
 type Query {
   asArgExample(testAsArg: InputType!): String!
-  bar: Bar!
+  bar: TestObj!
   collectionField(a: Int): BarCollection!
   dateAsList: [Date!]!
-  extended: Bar!
+  extended: SomeItem!
   getNumberOrNull(a: Int!): Int
   inlineArgs(someArg: SomeArg): String!
   inputAsArgExample(testInput: InputType, testScalar: String): String!
@@ -64,9 +64,13 @@ input SomeArg {
   someField: String
 }
 
+type SomeItem {
+  id: ID!
+}
+
 type TestObj implements Bar & Baz {
   """'A' description"""
-  a: Bar!
+  a: Bar
   argsTest(a: InputType = {answer: 2, key: "one"}): Boolean!
   item: String!
   ok: Boolean!

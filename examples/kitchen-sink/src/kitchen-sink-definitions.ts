@@ -62,12 +62,17 @@ export const Bar = interfaceType({
   },
 });
 
+export interface UnusedInterfaceTypeDef {
+  ok: boolean;
+}
+
 export const UnusedInterface = interfaceType({
   name: "UnusedInterface",
   definition(t) {
     t.boolean("ok");
     t.resolveType(() => null);
   },
+  rootTyping: { name: "UnusedInterfaceTypeDef", path: __filename },
 });
 
 export const Baz = interfaceType({
@@ -77,6 +82,7 @@ export const Baz = interfaceType({
     t.field("a", {
       type: Bar,
       description: "'A' description",
+      nullable: true,
     });
     t.resolveType(() => "TestObj");
   },
@@ -128,8 +134,8 @@ export const Query = objectType({
   name: "Query",
   definition(t) {
     t.field("bar", {
-      type: "Bar",
-      resolve: () => ({ ok: true }),
+      type: "TestObj",
+      resolve: () => ({ ok: true, item: "test" }),
     });
     t.int("getNumberOrNull", {
       nullable: true,
@@ -181,7 +187,7 @@ export const Query = objectType({
       args: {
         a: intArg(),
       },
-      items() {
+      nodes() {
         return [];
       },
       totalCount(root, args, ctx, info) {
@@ -191,13 +197,20 @@ export const Query = objectType({
   },
 });
 
+const someItem = objectType({
+  name: "SomeItem",
+  definition(t) {
+    t.id("id");
+  },
+});
+
 export const MoreQueryFields = extendType({
   type: "Query",
   definition(t) {
     t.field("extended", {
-      type: "Bar",
-      resolve() {
-        return { ok: true };
+      type: someItem,
+      resolve(root) {
+        return { id: "SomeID" };
       },
     });
   },
@@ -209,4 +222,5 @@ export const DateScalar = scalarType({
   parseValue: (value) => new Date(value),
   parseLiteral: (ast) => (ast.kind === "IntValue" ? new Date(ast.value) : null),
   asNexusMethod: "date",
+  rootTyping: "Date",
 });

@@ -3,7 +3,13 @@ import {
   OutputDefinitionBuilder,
 } from "./definitionBlocks";
 import { GetGen2, GetGen, FieldResolver } from "../typegenTypeHelpers";
-import { NonNullConfig, NexusTypes, withNexusSymbol, Omit } from "./_types";
+import {
+  NonNullConfig,
+  NexusTypes,
+  withNexusSymbol,
+  Omit,
+  RootTypingDef,
+} from "./_types";
 import { assertValidName } from "graphql";
 import { NexusInterfaceTypeDef } from "./interfaceType";
 
@@ -80,6 +86,10 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
    * Specifies a default field resolver for all members of this type.
    */
   defaultResolver?: FieldResolver<TypeName, any>;
+  /**
+   * Root type information for this type
+   */
+  rootTyping?: RootTypingDef;
 }
 
 export class NexusObjectTypeDef<TypeName extends string> {

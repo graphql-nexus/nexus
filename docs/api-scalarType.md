@@ -11,7 +11,7 @@ Nexus allows you to provide an `asNexusMethod` property which will make the scal
 ```ts
 const DateScalar = scalarType({
   name: "Date",
-  asNexusMethod: 'date',
+  asNexusMethod: "date",
   description: "Date custom scalar type",
   parseValue(value) {
     return new Date(value);

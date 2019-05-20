@@ -1,5 +1,5 @@
 import { GetGen, AbstractTypeResolver } from "../typegenTypeHelpers";
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { assertValidName } from "graphql";
 import { NexusObjectTypeDef } from "./objectType";
 
@@ -47,6 +47,10 @@ export interface NexusUnionTypeConfig<TypeName extends string> {
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string; // | DeprecationInfo;
+  /**
+   * Root type information for this type
+   */
+  rootTyping?: RootTypingDef;
 }
 
 export class NexusUnionTypeDef<TypeName extends string> {
