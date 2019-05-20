@@ -30,7 +30,7 @@ export interface BaseExtensionConfig<T extends string> {
   typeDefinition?: string;
 }
 
-export interface DynamicOutputFieldConfig<T extends string>
+export interface DynamicOutputMethodConfig<T extends string>
   extends BaseExtensionConfig<T> {
   /**
    * Invoked when the field is called
@@ -38,7 +38,7 @@ export interface DynamicOutputFieldConfig<T extends string>
   factory(config: OutputFactoryConfig<T>): void;
 }
 
-export interface DynamicInputFieldConfig<T extends string>
+export interface DynamicInputMethodConfig<T extends string>
   extends BaseExtensionConfig<T> {
   /**
    * Invoked when the field is called
@@ -46,27 +46,27 @@ export interface DynamicInputFieldConfig<T extends string>
   factory(config: InputFactoryConfig<T>): void;
 }
 
-export class DynamicInputFieldDef<Name extends string> {
+export class DynamicInputMethodDef<Name extends string> {
   constructor(
     readonly name: Name,
-    protected config: DynamicInputFieldConfig<Name>
+    protected config: DynamicInputMethodConfig<Name>
   ) {}
   get value() {
     return this.config;
   }
 }
-withNexusSymbol(DynamicInputFieldDef, NexusTypes.DynamicInput);
+withNexusSymbol(DynamicInputMethodDef, NexusTypes.DynamicInput);
 
-export class DynamicOutputFieldDef<Name extends string> {
+export class DynamicOutputMethodDef<Name extends string> {
   constructor(
     readonly name: Name,
-    protected config: DynamicOutputFieldConfig<Name>
+    protected config: DynamicOutputMethodConfig<Name>
   ) {}
   get value() {
     return this.config;
   }
 }
-withNexusSymbol(DynamicOutputFieldDef, NexusTypes.DynamicOutput);
+withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutput);
 
 /**
  * Defines a new property on the object definition block
@@ -83,18 +83,18 @@ withNexusSymbol(DynamicOutputFieldDef, NexusTypes.DynamicOutput);
  *   }
  * })
  */
-export function dynamicOutputField<T extends string>(
-  config: DynamicOutputFieldConfig<T>
+export function dynamicOutputMethod<T extends string>(
+  config: DynamicOutputMethodConfig<T>
 ) {
-  return new DynamicOutputFieldDef(config.name, config);
+  return new DynamicOutputMethodDef(config.name, config);
 }
 
 /**
  * Same as the outputFieldExtension, but for fields that
  * should be added on as input types.
  */
-export function dynamicInputField<T extends string>(
-  config: DynamicInputFieldConfig<T>
+export function dynamicInputMethod<T extends string>(
+  config: DynamicInputMethodConfig<T>
 ) {
-  return new DynamicInputFieldDef(config.name, config);
+  return new DynamicInputMethodDef(config.name, config);
 }

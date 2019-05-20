@@ -9,7 +9,10 @@ import { NexusScalarTypeDef } from "./scalarType";
 import { NexusUnionTypeDef } from "./unionType";
 import { NexusTypes, NexusWrappedSymbol, withNexusSymbol } from "./_types";
 import { NexusExtendInputTypeDef } from "./extendInputType";
-import { DynamicOutputFieldDef, DynamicInputFieldDef } from "../dynamicField";
+import {
+  DynamicOutputMethodDef,
+  DynamicInputMethodDef,
+} from "../dynamicMethod";
 import { NexusArgDef } from "./args";
 
 export type AllNexusInputTypeDefs<T extends string = string> =
@@ -138,16 +141,16 @@ export function isNexusArgDef(obj: any): obj is NexusArgDef<string> {
   return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Arg;
 }
 
-export function isNexusDynamicOutputField<T extends string>(
+export function isNexusDynamicOutputMethod<T extends string>(
   obj: any
-): obj is DynamicOutputFieldDef<T> {
+): obj is DynamicOutputMethodDef<T> {
   return (
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicOutput
   );
 }
-export function isNexusDynamicInputField<T extends string>(
+export function isNexusDynamicInputMethod<T extends string>(
   obj: any
-): obj is DynamicInputFieldDef<T> {
+): obj is DynamicInputMethodDef<T> {
   return (
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicInput
   );

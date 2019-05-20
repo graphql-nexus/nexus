@@ -1,4 +1,4 @@
-import { dynamicOutputField } from "../dynamicField";
+import { dynamicOutputMethod } from "../dynamicMethod";
 import { objectType, NexusObjectTypeDef } from "../definitions/objectType";
 import { GraphQLFieldResolver } from "graphql";
 import { intArg, stringArg } from "../definitions/args";
@@ -7,7 +7,7 @@ const relayConnectionMap = new Map<string, NexusObjectTypeDef<string>>();
 
 let pageInfo: NexusObjectTypeDef<string>;
 
-export const RelayConnection = dynamicOutputField({
+export const RelayConnection = dynamicOutputMethod({
   name: "relayConnection",
   typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,

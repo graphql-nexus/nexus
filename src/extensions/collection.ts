@@ -1,11 +1,11 @@
-import { dynamicOutputField } from "../dynamicField";
+import { dynamicOutputMethod } from "../dynamicMethod";
 import { NexusObjectTypeDef, objectType } from "../definitions/objectType";
 import { GraphQLFieldResolver } from "graphql";
 import { intArg } from "../definitions/args";
 
 const basicCollectionMap = new Map<string, NexusObjectTypeDef<string>>();
 
-export const Collection = dynamicOutputField({
+export const Collection = dynamicOutputMethod({
   name: "collection",
   typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,

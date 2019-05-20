@@ -86,8 +86,8 @@ import {
   NexusWrappedType,
   isNexusExtendInputTypeDef,
   AllNexusOutputTypeDefs,
-  isNexusDynamicInputField,
-  isNexusDynamicOutputField,
+  isNexusDynamicInputMethod,
+  isNexusDynamicOutputMethod,
   isNexusArgDef,
 } from "./definitions/wrapping";
 import {
@@ -120,7 +120,7 @@ import {
   graphqlInterfaceToConfig,
   graphqlInputObjectToConfig,
 } from "./toConfig";
-import { DynamicInputFieldDef, DynamicOutputFieldDef } from "./dynamicField";
+import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 
 export type Maybe<T> = T | null;
 
@@ -232,12 +232,12 @@ export type TypeToWalk =
 
 export type DynamicInputFields = Record<
   string,
-  DynamicInputFieldDef<string> | string
+  DynamicInputMethodDef<string> | string
 >;
 
 export type DynamicOutputFields = Record<
   string,
-  DynamicOutputFieldDef<string> | string
+  DynamicOutputMethodDef<string> | string
 >;
 
 /**
@@ -331,14 +331,14 @@ export class SchemaBuilder {
       | NexusExtendInputTypeDef<string>
       | NexusExtendTypeDef<string>
       | GraphQLNamedType
-      | DynamicInputFieldDef<string>
-      | DynamicOutputFieldDef<string>
+      | DynamicInputMethodDef<string>
+      | DynamicOutputMethodDef<string>
   ) {
-    if (isNexusDynamicInputField(typeDef)) {
+    if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
       return;
     }
-    if (isNexusDynamicOutputField(typeDef)) {
+    if (isNexusDynamicOutputMethod(typeDef)) {
       this.dynamicOutputFields[typeDef.name] = typeDef;
       return;
     }
@@ -1270,8 +1270,8 @@ function addTypes(builder: SchemaBuilder, types: any) {
     isNexusExtendTypeDef(types) ||
     isNexusExtendInputTypeDef(types) ||
     isNamedType(types) ||
-    isNexusDynamicInputField(types) ||
-    isNexusDynamicOutputField(types)
+    isNexusDynamicInputMethod(types) ||
+    isNexusDynamicOutputMethod(types)
   ) {
     builder.addType(types);
   } else if (Array.isArray(types)) {
