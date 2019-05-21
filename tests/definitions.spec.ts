@@ -46,11 +46,22 @@ describe("enumType", () => {
     const types = buildTypes<{ Colors: GraphQLEnumType }>([Colors]);
 
     expect(types.typeMap.Colors).toBeInstanceOf(GraphQLEnumType);
-    expect(types.typeMap.Colors.getValues().map((v) => v.value)).toEqual([
-      "RED",
-      "BLUE",
-      "green",
-    ]);
+    expect(types.typeMap.Colors.getValues()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "RED",
+          value: "RED",
+        }),
+        expect.objectContaining({
+          name: "BLUE",
+          value: "BLUE",
+        }),
+        expect.objectContaining({
+          name: "GREEN",
+          value: "green",
+        }),
+      ])
+    );
   });
 
   it("builds an enum from a TypeScript enum with number values", () => {
@@ -61,11 +72,22 @@ describe("enumType", () => {
     const types = buildTypes<{ Numbers: GraphQLEnumType }>([Numbers]);
 
     expect(types.typeMap.Numbers).toBeInstanceOf(GraphQLEnumType);
-    expect(types.typeMap.Numbers.getValues().map((v) => v.value)).toEqual([
-      1,
-      2,
-      3,
-    ]);
+    expect(types.typeMap.Numbers.getValues()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "ONE",
+          value: 1,
+        }),
+        expect.objectContaining({
+          name: "TWO",
+          value: 2,
+        }),
+        expect.objectContaining({
+          name: "THREE",
+          value: 3,
+        }),
+      ])
+    );
   });
 
   it("can map internal values", () => {
