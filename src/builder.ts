@@ -33,6 +33,7 @@ import {
   isUnionType,
   isScalarType,
   defaultFieldResolver,
+  assertValidName,
 } from "graphql";
 import { NexusArgConfig, NexusArgDef } from "./definitions/args";
 import {
@@ -491,10 +492,17 @@ export class SchemaBuilder {
       });
     } else {
       Object.keys(members)
-        .filter((key) => isNaN(+key)) // Ensures we only consider enum keys in case a TypeScript enum was passed as the members property.
+        // members can potentially be a TypeScript enum.
+        // The compiled version of this enum will be the members object,
+        // numeric enums members also get a reverse mapping from enum values to enum names.
+        // In these cases we have to ensure we don't include these reverse mapping keys.
+        // See: https://www.typescriptlang.org/docs/handbook/enums.html
+        .filter((key) => isNaN(+key))
         .forEach((key) => {
+          assertValidName(key);
+
           values[key] = {
-            value: (members as any)[key],
+            value: (members as Record<string, string | number | symbol>)[key],
           };
         });
     }
