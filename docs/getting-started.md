@@ -15,7 +15,7 @@ The documentation is very new and may contain some gaps, please help us fill the
 
 GraphQL Nexus aims to combine the simplicity and ease of development of SDL development approaches like [graphql-tools](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) with the long-term maintainability of programmatic construction, as seen in [graphene-python](https://docs.graphene-python.org/en/latest/), [graphql-ruby](https://github.com/rmosolgo/graphql-ruby), or [graphql-js](https://github.com/graphql/graphql-js).
 
-Nexus builds upon the primitives of `graphql-js`, and attempts to take the simplicity of the SDL schema-first approach and pair it with the power of having the full language runtime ar your disposal.
+Nexus builds upon the primitives of `graphql-js`, and attempts to take the simplicity of the SDL schema-first approach and pair it with the power of having the full language runtime at your disposal.
 
 GraphQL Nexus was designed with TypeScript/JavaScript intellisense in mind, and combines TypeScript generics, conditional types, and type merging to provide full auto-generated type coverage out of the box.
 
