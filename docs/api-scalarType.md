@@ -28,6 +28,24 @@ const DateScalar = scalarType({
 });
 ```
 
+## Example of Upload scalar
+
+```
+import { GraphQLUpload } from 'graphql-upload';
+
+export const Upload = GraphQLUpload;
+```
+
+## Example of DateTime scalar
+
+```
+import { GraphQLDate } from "graphql-iso-date";
+
+export const DateTime = GraphQLDate;
+```
+
+## Exposing scalar as method
+
 If you have an existing GraphQL scalar and you'd like to expose it as a method on the builder, call `asNexusMethod`:
 
 ```ts
