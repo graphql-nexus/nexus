@@ -1,6 +1,5 @@
 import { interfaceType, arg } from "nexus";
 import { SyntaxKind, JSDoc } from "typescript";
-import ts from "typescript";
 import { allKnownNodes, syntaxKindFilter } from "./utils";
 
 const syntaxKindArgs = {

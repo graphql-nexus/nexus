@@ -7,7 +7,7 @@ import {
   AuthorizeResolver,
   GetGen3,
 } from "../typegenTypeHelpers";
-import { NexusArgDef } from "./args";
+import { ArgsRecord } from "./args";
 import {
   AllNexusOutputTypeDefs,
   NexusWrappedType,
@@ -50,7 +50,7 @@ export interface CommonOutputFieldConfig<
   /**
    * Arguments for the field
    */
-  args?: Record<string, NexusArgDef<string>>;
+  args?: ArgsRecord;
   /**
    * Authorization for an individual field. Returning "true"
    * or "Promise<true>" means the field can be accessed.
@@ -77,7 +77,7 @@ export interface NexusOutputFieldConfig<
   FieldName extends string
 > extends OutputScalarConfig<TypeName, FieldName> {
   type:
-    | GetGen<"allOutputTypes">
+    | GetGen<"allOutputTypes", string>
     | AllNexusOutputTypeDefs
     | NexusWrappedType<AllNexusOutputTypeDefs>;
 }
@@ -126,27 +126,33 @@ export type FieldOutConfig<
 
 export interface OutputDefinitionBuilder {
   addField(config: NexusOutputFieldDef): void;
+  addDynamicOutputFields(
+    block: OutputDefinitionBlock<any>,
+    isList: boolean
+  ): void;
 }
 
 export interface InputDefinitionBuilder {
   addField(config: NexusInputFieldDef): void;
+  addDynamicInputFields(
+    block: InputDefinitionBlock<any>,
+    isList: boolean
+  ): void;
 }
 
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomDefinitionMethods<TypeName> {}
+  extends NexusGenCustomOutputMethods<TypeName> {}
 
 /**
  * The output definition block is passed to the "definition"
  * argument of the
  */
 export class OutputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean;
-
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
     protected isList = false
   ) {
-    this.hasAdded = false;
+    this.typeBuilder.addDynamicOutputFields(this, isList);
   }
 
   get list() {
@@ -225,7 +231,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     if (this.isList) {
       if (config.list) {
         console.warn(
-          `It looks like you chained .list and set list for ${config.name}` +
+          `It looks like you chained .list and set list for ${config.name}. ` +
             "You should only do one or the other"
         );
       } else {
@@ -252,7 +258,7 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes"> | AllNexusInputTypeDefs<string>;
+  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs<string>;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -260,16 +266,14 @@ export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
 };
 
 export interface InputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomDefinitionMethods<TypeName> {}
+  extends NexusGenCustomInputMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean;
-
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
     protected isList = false
   ) {
-    this.hasAdded = false;
+    this.typeBuilder.addDynamicInputFields(this, isList);
   }
 
   get list() {
@@ -327,7 +331,7 @@ export class InputDefinitionBlock<TypeName extends string> {
     );
   }
 
-  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+  protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
     if (this.isList) {
       if (config.list) {
         console.warn(

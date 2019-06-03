@@ -12,7 +12,7 @@ Nexus was designed with TypeScript in mind. In order to fully typecheck our Grap
 
 ## Root Types
 
-A **root type** is a type representation of the value used to resolve the fields of an object type. It as the object that will be passed as the first argument of `resolve`. It can be a plain JS object, a database model, a mongoose document, a JS class, anything that fulfills the contract defined by the GraphQL object type, based on the field definitions.
+A **root type** is a type representation of the value used to resolve the fields of an object type. It is the object that will be passed as the first argument of `resolve`. It can be a plain JS object, a database model, a mongoose document, a JS class, anything that fulfills the contract defined by the GraphQL object type, based on the field definitions.
 
 Scalars can also have backing types, representing the value they are parsed into.
 

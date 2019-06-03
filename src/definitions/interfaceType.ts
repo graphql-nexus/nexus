@@ -2,7 +2,12 @@ import {
   OutputDefinitionBlock,
   AbstractOutputDefinitionBuilder,
 } from "./definitionBlocks";
-import { NexusTypes, NonNullConfig, withNexusSymbol } from "./_types";
+import {
+  NexusTypes,
+  NonNullConfig,
+  withNexusSymbol,
+  RootTypingDef,
+} from "./_types";
 import { assertValidName } from "graphql";
 import { AbstractTypeResolver } from "../typegenTypeHelpers";
 
@@ -28,6 +33,10 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
+  /**
+   * Root type information for this type
+   */
+  rootTyping?: RootTypingDef;
 };
 
 export class InterfaceDefinitionBlock<

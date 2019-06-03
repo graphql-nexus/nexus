@@ -1,4 +1,4 @@
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { assertValidName } from "graphql";
 
 type TypeScriptEnumLike = {
@@ -31,6 +31,10 @@ export interface EnumTypeConfig<TypeName extends string> {
    * The description to annotate the GraphQL SDL
    */
   description?: string | null;
+  /**
+   * Root type information for this type
+   */
+  rootTyping?: RootTypingDef;
   /**
    * All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum
    */

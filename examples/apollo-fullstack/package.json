@@ -19,7 +19,7 @@
     "graphql": "^14.0.2",
     "isemail": "^3.2.0",
     "nexus": "0.11.2",
-    "sequelize": "^4.41.1",
+    "sequelize": "^5.8.6",
     "sqlite3": "^4.0.4"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "node-fetch": "^2.2.1",
     "prettier": "^1.15.2",
     "ts-node-dev": "^1.0.0-pre.30",
-    "typescript": "^3.1.6"
+    "typescript": "^3.4.5"
   },
   "jest": {
     "testPathIgnorePatterns": [

@@ -2,7 +2,8 @@ import { GraphQLResolveInfo } from "graphql";
 
 declare global {
   interface NexusGen {}
-  interface NexusGenCustomDefinitionMethods<TypeName extends string> {}
+  interface NexusGenCustomInputMethods<TypeName extends string> {}
+  interface NexusGenCustomOutputMethods<TypeName extends string> {}
 }
 
 export type AllInputTypes = GetGen<"allInputTypes">;
@@ -88,6 +89,19 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   | MaybePromise<ResultValue<TypeName, FieldName>>
   | MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
 
+export type SubFieldResolver<
+  TypeName extends string,
+  FieldName extends string,
+  SubFieldName extends string
+> = (
+  root: RootValue<TypeName>,
+  args: ArgsValue<TypeName, FieldName>,
+  context: GetGen<"context">,
+  info: GraphQLResolveInfo
+) =>
+  | MaybePromise<ResultValue<TypeName, FieldName>[SubFieldName]>
+  | MaybePromiseDeep<ResultValue<TypeName, FieldName>[SubFieldName]>;
+
 export type AuthorizeResolver<
   TypeName extends string,
   FieldName extends string
@@ -161,14 +175,15 @@ export type GetGen2<
 export type GetGen3<
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
-  K3 extends Extract<keyof GenTypesShape[K][K2], string>
+  K3 extends Extract<keyof GenTypesShape[K][K2], string>,
+  Fallback = any
 > = NexusGen extends infer GenTypes
   ? GenTypes extends GenTypesShape
     ? K extends keyof GenTypes
       ? K2 extends keyof GenTypes[K]
         ? K3 extends keyof GenTypes[K][K2]
           ? GenTypes[K][K2][K3]
-          : any
+          : Fallback
         : any
       : any
     : any
@@ -223,7 +238,9 @@ export type RootValueField<
 export type ArgsValue<
   TypeName extends string,
   FieldName extends string
-> = GetGen3<"argTypes", TypeName, FieldName>;
+> = HasGen3<"fieldTypes", TypeName, FieldName> extends true
+  ? GetGen3<"argTypes", TypeName, FieldName, {}>
+  : any;
 
 export type ResultValue<
   TypeName extends string,

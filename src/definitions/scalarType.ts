@@ -3,7 +3,8 @@ import {
   assertValidName,
   GraphQLScalarType,
 } from "graphql";
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
+import { decorateType } from "./decorateType";
 
 export interface ScalarBase
   extends Pick<
@@ -11,11 +12,7 @@ export interface ScalarBase
     "description" | "serialize" | "parseValue" | "parseLiteral"
   > {}
 
-export interface NexusScalarTypeConfig<T extends string> extends ScalarBase {
-  /**
-   * The name of the scalar type
-   */
-  name: T;
+export interface ScalarConfig {
   /**
    * Any deprecation info for this scalar type
    */
@@ -24,6 +21,19 @@ export interface NexusScalarTypeConfig<T extends string> extends ScalarBase {
    * Adds this type as a method on the Object/Interface definition blocks
    */
   asNexusMethod?: string;
+  /**
+   * Root type information for this type
+   */
+  rootTyping?: RootTypingDef;
+}
+
+export interface NexusScalarTypeConfig<T extends string>
+  extends ScalarBase,
+    ScalarConfig {
+  /**
+   * The name of the scalar type
+   */
+  name: T;
 }
 
 export class NexusScalarTypeDef<TypeName extends string> {
@@ -40,6 +50,13 @@ export class NexusScalarTypeDef<TypeName extends string> {
 
 withNexusSymbol(NexusScalarTypeDef, NexusTypes.Scalar);
 
+export type NexusScalarExtensions = {
+  nexus: {
+    asNexusMethod?: string;
+    rootTyping?: RootTypingDef;
+  };
+};
+
 export function scalarType<TypeName extends string>(
   options: NexusScalarTypeConfig<TypeName>
 ) {
@@ -50,7 +67,7 @@ export function asNexusMethod<T extends GraphQLScalarType>(
   scalar: T,
   methodName: string
 ): T {
-  // @ts-ignore
-  scalar.asNexusMethod = methodName;
-  return scalar;
+  return decorateType(scalar, {
+    asNexusMethod: methodName,
+  });
 }

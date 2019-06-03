@@ -1,7 +1,7 @@
 import { GraphQLSchema, isOutputType, GraphQLNamedType } from "graphql";
 import path from "path";
 import { TYPEGEN_HEADER } from "./lang";
-import { log, objValues } from "./utils";
+import { log, objValues, relativePathTo } from "./utils";
 import { TypegenInfo } from "./builder";
 
 /**
@@ -335,18 +335,6 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
     return typegenInfo;
   };
-}
-
-function relativePathTo(absolutePath: string, outputPath: string): string {
-  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, "");
-  const relative = path.relative(
-    path.dirname(outputPath),
-    path.dirname(absolutePath)
-  );
-  if (relative.indexOf(".") !== 0) {
-    return `./${path.join(relative, filename)}`;
-  }
-  return path.join(relative, filename);
 }
 
 function findTypingForFile(absolutePath: string, pathOrModule: string) {

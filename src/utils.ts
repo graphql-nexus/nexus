@@ -214,3 +214,18 @@ export function firstDefined<T>(...args: Array<T | undefined>): T {
 export function isPromise(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === "function");
 }
+
+export function relativePathTo(
+  absolutePath: string,
+  outputPath: string
+): string {
+  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, "");
+  const relative = path.relative(
+    path.dirname(outputPath),
+    path.dirname(absolutePath)
+  );
+  if (relative.indexOf(".") !== 0) {
+    return `./${path.join(relative, filename)}`;
+  }
+  return path.join(relative, filename);
+}
