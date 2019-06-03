@@ -583,7 +583,7 @@ type User {
 }
 ```
 
-To remove customize the arguments, we need to provide the `args` option to the configuration object for that field. For example, if we wanted to remove all pagination arguments:
+To customize the arguments, we need to provide the `args` option to the configuration object for that field. For example, if we wanted to remove all pagination arguments:
 
 ```graphql
 const User = prismaObjectType({
