@@ -8,9 +8,14 @@ interface Bar {
   ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
+type BarCollection {
+  nodes: [Bar!]!
+  totalCount: Int!
+}
+
 interface Baz {
   """'A' description"""
-  a: Bar!
+  a: Bar
   ok: Boolean!
 }
 
@@ -31,6 +36,7 @@ input InputType {
 input InputType2 {
   answer: Int
   key: String!
+  someDate: Date!
 }
 
 type Mutation {
@@ -38,19 +44,40 @@ type Mutation {
   someMutationField(id: ID!): Foo!
 }
 
+input NestedType {
+  veryNested: String
+}
+
 type Query {
-  bar: Bar!
+  asArgExample(testAsArg: InputType!): String!
+  bar: TestObj!
+  collectionField(a: Int): BarCollection!
   dateAsList: [Date!]!
-  extended: Bar!
+  extended: SomeItem!
   getNumberOrNull(a: Int!): Int
+  inlineArgs(someArg: SomeArg): String!
+  inputAsArgExample(testInput: InputType, testScalar: String): String!
+}
+
+input SomeArg {
+  arg: NestedType
+  someField: String
+}
+
+type SomeItem {
+  id: ID!
 }
 
 type TestObj implements Bar & Baz {
   """'A' description"""
-  a: Bar!
+  a: Bar
   argsTest(a: InputType = {answer: 2, key: "one"}): Boolean!
   item: String!
   ok: Boolean!
 }
 
 union TestUnion = Foo
+
+interface UnusedInterface {
+  ok: Boolean!
+}

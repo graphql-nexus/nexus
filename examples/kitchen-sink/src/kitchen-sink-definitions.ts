@@ -6,12 +6,14 @@ import {
   arg,
   extendType,
   scalarType,
-  extendInputType,
   intArg,
   idArg,
   mutationField,
   mutationType,
+  ext,
 } from "nexus";
+
+export { ext };
 
 export const testArgs1 = {
   foo: idArg(),
@@ -60,6 +62,19 @@ export const Bar = interfaceType({
   },
 });
 
+export interface UnusedInterfaceTypeDef {
+  ok: boolean;
+}
+
+export const UnusedInterface = interfaceType({
+  name: "UnusedInterface",
+  definition(t) {
+    t.boolean("ok");
+    t.resolveType(() => null);
+  },
+  rootTyping: { name: "UnusedInterfaceTypeDef", path: __filename },
+});
+
 export const Baz = interfaceType({
   name: "Baz",
   definition(t) {
@@ -67,6 +82,7 @@ export const Baz = interfaceType({
     t.field("a", {
       type: Bar,
       description: "'A' description",
+      nullable: true,
     });
     t.resolveType(() => "TestObj");
   },
@@ -110,20 +126,16 @@ export const InputType2 = inputObjectType({
   definition(t) {
     t.string("key", { required: true });
     t.int("answer");
+    t.date("someDate", { required: true });
   },
-});
-
-export const ext = extendInputType({
-  type: "InputType",
-  definition(t) {},
 });
 
 export const Query = objectType({
   name: "Query",
   definition(t) {
     t.field("bar", {
-      type: "Bar",
-      resolve: () => ({ ok: true }),
+      type: "TestObj",
+      resolve: () => ({ ok: true, item: "test" }),
     });
     t.int("getNumberOrNull", {
       nullable: true,
@@ -135,6 +147,60 @@ export const Query = objectType({
         return null;
       },
     });
+    t.string("asArgExample", {
+      args: {
+        testAsArg: InputType.asArg({ required: true }),
+      },
+      resolve: () => "ok",
+    });
+    t.string("inputAsArgExample", {
+      args: {
+        testScalar: "String",
+        testInput: InputType,
+      },
+      resolve: () => "ok",
+    });
+    t.string("inlineArgs", {
+      args: {
+        someArg: arg({
+          type: inputObjectType({
+            name: "SomeArg",
+            definition(i) {
+              i.string("someField");
+              i.field("arg", {
+                type: inputObjectType({
+                  name: "NestedType",
+                  definition(j) {
+                    j.string("veryNested");
+                  },
+                }),
+              });
+            },
+          }),
+        }),
+      },
+      resolve: () => "ok",
+    });
+    t.list.date("dateAsList", () => []);
+    t.collection("collectionField", {
+      type: Bar,
+      args: {
+        a: intArg(),
+      },
+      nodes() {
+        return [];
+      },
+      totalCount(root, args, ctx, info) {
+        return args.a || 0;
+      },
+    });
+  },
+});
+
+const someItem = objectType({
+  name: "SomeItem",
+  definition(t) {
+    t.id("id");
   },
 });
 
@@ -142,12 +208,11 @@ export const MoreQueryFields = extendType({
   type: "Query",
   definition(t) {
     t.field("extended", {
-      type: "Bar",
-      resolve() {
-        return { ok: true };
+      type: someItem,
+      resolve(root) {
+        return { id: "SomeID" };
       },
     });
-    t.list.date("dateAsList");
   },
 });
 
@@ -157,4 +222,5 @@ export const DateScalar = scalarType({
   parseValue: (value) => new Date(value),
   parseLiteral: (ast) => (ast.kind === "IntValue" ? new Date(ast.value) : null),
   asNexusMethod: "date",
+  rootTyping: "Date",
 });

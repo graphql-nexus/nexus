@@ -18,6 +18,7 @@ export { mutationField } from "./definitions/mutationField";
 export { queryField } from "./definitions/queryField";
 export { subscriptionField } from "./definitions/subscriptionField";
 export { scalarType, asNexusMethod } from "./definitions/scalarType";
+export { decorateType } from "./definitions/decorateType";
 export { unionType } from "./definitions/unionType";
 export { nexusWrappedType } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";
@@ -28,6 +29,8 @@ export {
   AllOutputTypes,
   FieldType,
 } from "./typegenTypeHelpers";
-export { core, blocks };
+export { dynamicInputMethod, dynamicOutputMethod } from "./dynamicMethod";
+export { core, blocks, ext };
 import * as core from "./core";
 import * as blocks from "./blocks";
+import * as ext from "./extensions";

@@ -8,7 +8,12 @@ import {
   typegenFormatPrettier,
   TypegenFormatFn,
 } from "./typegenFormatPrettier";
-import { BuilderConfig, TypegenInfo } from "./builder";
+import {
+  BuilderConfig,
+  TypegenInfo,
+  NexusSchema,
+  NexusSchemaExtensions,
+} from "./builder";
 
 /**
  * Passed into the SchemaBuilder, this keeps track of any necessary
@@ -33,7 +38,7 @@ export class TypegenMetadata {
    * Generates the artifacts of the build based on what we
    * know about the schema and how it was defined.
    */
-  async generateArtifacts(schema: GraphQLSchema) {
+  async generateArtifacts(schema: NexusSchema) {
     const sortedSchema = this.sortSchema(schema);
     if (this.config.outputs) {
       if (this.config.outputs.schema) {
@@ -43,10 +48,12 @@ export class TypegenMetadata {
           this.config.outputs.schema
         );
       }
-      const typegen = this.config.outputs.typegen;
-      if (typegen) {
-        const value = await this.generateTypesFile(sortedSchema);
-        await this.writeFile("types", value, typegen);
+      if (this.typegenFile) {
+        const value = await this.generateTypesFile(
+          sortedSchema,
+          schema.extensions.nexus
+        );
+        await this.writeFile("types", value, this.typegenFile);
       }
     }
   }
@@ -95,7 +102,7 @@ export class TypegenMetadata {
       } catch (e) {
         if (e.code !== "EEXIST") {
           throw e;
-        } 
+        }
       }
       return writeFile(filePath, toSave);
     }
@@ -112,8 +119,18 @@ export class TypegenMetadata {
   /**
    * Generates the type definitions
    */
-  async generateTypesFile(schema: GraphQLSchema): Promise<string> {
-    return new Typegen(schema, await this.getTypegenInfo(schema)).print();
+  async generateTypesFile(
+    schema: GraphQLSchema,
+    extensions: NexusSchemaExtensions
+  ): Promise<string> {
+    return new Typegen(
+      schema,
+      {
+        ...(await this.getTypegenInfo(schema)),
+        typegenFile: this.typegenFile,
+      },
+      extensions
+    ).print();
   }
 
   async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {
@@ -124,7 +141,8 @@ export class TypegenMetadata {
         );
       }
       return this.config.typegenConfig(schema, this.typegenFile);
-    } else if (this.config.typegenAutoConfig) {
+    }
+    if (this.config.typegenAutoConfig) {
       return typegenAutoConfig(this.config.typegenAutoConfig)(
         schema,
         this.typegenFile

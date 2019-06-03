@@ -6,7 +6,7 @@ import {
 } from "graphql";
 import path from "path";
 import { TYPEGEN_HEADER } from "./lang";
-import { log, objValues } from "./utils";
+import { log, objValues, relativePathTo } from "./utils";
 import { TypegenInfo } from "./builder";
 
 /**
@@ -319,13 +319,15 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
     const imports: string[] = [];
 
-    Object.keys(importsMap).sort().forEach((alias) => {
-      const [importPath, glob] = importsMap[alias];
-      const safeImportPath = importPath.replace(/\\+/g, '/');
-      imports.push(
-        `import ${glob ? "* as " : ""}${alias} from "${safeImportPath}"`
-      );
-    });
+    Object.keys(importsMap)
+      .sort()
+      .forEach((alias) => {
+        const [importPath, glob] = importsMap[alias];
+        const safeImportPath = importPath.replace(/\\+/g, "/");
+        imports.push(
+          `import ${glob ? "* as " : ""}${alias} from "${safeImportPath}"`
+        );
+      });
 
     const typegenInfo = {
       headers: headers || [TYPEGEN_HEADER],
@@ -336,18 +338,6 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
     return typegenInfo;
   };
-}
-
-function relativePathTo(absolutePath: string, outputPath: string): string {
-  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, "");
-  const relative = path.relative(
-    path.dirname(outputPath),
-    path.dirname(absolutePath)
-  );
-  if (relative.indexOf(".") !== 0) {
-    return `./${path.join(relative, filename)}`;
-  }
-  return path.join(relative, filename);
 }
 
 function findTypingForFile(absolutePath: string, pathOrModule: string) {

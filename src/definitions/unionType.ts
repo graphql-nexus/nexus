@@ -1,11 +1,10 @@
 import { GetGen, AbstractTypeResolver } from "../typegenTypeHelpers";
-import { AbstractOutputDefinitionBuilder } from "./definitionBlocks";
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { assertValidName } from "graphql";
 import { NexusObjectTypeDef } from "./objectType";
 
-export interface UnionDefinitionBuilder<TypeName extends string>
-  extends AbstractOutputDefinitionBuilder<TypeName> {
+export interface UnionDefinitionBuilder<TypeName extends string> {
+  setResolveType(fn: AbstractTypeResolver<TypeName>): void;
   addUnionMembers(members: UnionMembers): void;
 }
 
@@ -48,6 +47,10 @@ export interface NexusUnionTypeConfig<TypeName extends string> {
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string; // | DeprecationInfo;
+  /**
+   * Root type information for this type
+   */
+  rootTyping?: RootTypingDef;
 }
 
 export class NexusUnionTypeDef<TypeName extends string> {

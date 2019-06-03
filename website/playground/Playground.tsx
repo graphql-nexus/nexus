@@ -101,7 +101,10 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
   useEffect(() => {
     if (debouncedSchema) {
       debouncedSchema.metadata
-        .generateTypesFile(debouncedSchema.schema)
+        .generateTypesFile(debouncedSchema.schema, {
+          dynamicInputFields: {},
+          dynamicOutputField: {},
+        })
         .then((generated) => {
           setGeneratedTypes(generated);
         });

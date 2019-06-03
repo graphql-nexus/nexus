@@ -2,6 +2,13 @@ import { GetGen, GetGen2 } from "../typegenTypeHelpers";
 import { AllNexusInputTypeDefs, NexusWrappedType } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
+export type ArgsRecord = Record<
+  string,
+  | NexusArgDef<string>
+  | GetGen<"allInputTypes", string>
+  | AllNexusInputTypeDefs<string>
+>;
+
 export interface CommonArgConfig {
   /**
    * Whether the field is required, `required: true` = `nullable: false`
@@ -38,26 +45,32 @@ export type NexusArgConfigType<T extends GetGen<"allInputTypes", string>> =
   | AllNexusInputTypeDefs<T>
   | NexusWrappedType<AllNexusInputTypeDefs<T>>;
 
-export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
+export interface NexusAsArgConfig<T extends GetGen<"allInputTypes", string>>
   extends CommonArgConfig {
-  /**
-   * The type of the argument, either the string name of the type,
-   * or the concrete Nexus type definition
-   */
-  type: NexusArgConfigType<T>;
   /**
    * Configure the default for the object
    */
   default?: GetGen2<"allTypes", T>; // TODO: Make this type-safe somehow
 }
 
+export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
+  extends NexusAsArgConfig<T> {
+  /**
+   * The type of the argument, either the string name of the type,
+   * or the concrete Nexus type definition
+   */
+  type: NexusArgConfigType<T>;
+}
+
 export class NexusArgDef<TypeName extends string> {
-  constructor(readonly name: TypeName, protected config: NexusArgConfig<any>) {}
+  constructor(
+    readonly name: TypeName,
+    protected config: NexusArgConfig<string>
+  ) {}
   get value() {
     return this.config;
   }
 }
-
 withNexusSymbol(NexusArgDef, NexusTypes.Arg);
 
 /**

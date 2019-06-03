@@ -7,7 +7,7 @@ import {
   AuthorizeResolver,
   GetGen3,
 } from "../typegenTypeHelpers";
-import { NexusArgDef } from "./args";
+import { ArgsRecord } from "./args";
 import {
   AllNexusOutputTypeDefs,
   NexusWrappedType,
@@ -15,8 +15,6 @@ import {
 } from "./wrapping";
 import { BaseScalars } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
-
-export const ADD_CUSTOM_FIELD = Symbol.for("@nexus/addCustomField");
 
 export interface CommonFieldConfig {
   /**
@@ -52,7 +50,7 @@ export interface CommonOutputFieldConfig<
   /**
    * Arguments for the field
    */
-  args?: Record<string, NexusArgDef<string>>;
+  args?: ArgsRecord;
   /**
    * Authorization for an individual field. Returning "true"
    * or "Promise<true>" means the field can be accessed.
@@ -79,7 +77,7 @@ export interface NexusOutputFieldConfig<
   FieldName extends string
 > extends OutputScalarConfig<TypeName, FieldName> {
   type:
-    | GetGen<"allOutputTypes">
+    | GetGen<"allOutputTypes", string>
     | AllNexusOutputTypeDefs
     | NexusWrappedType<AllNexusOutputTypeDefs>;
 }
@@ -128,41 +126,33 @@ export type FieldOutConfig<
 
 export interface OutputDefinitionBuilder {
   addField(config: NexusOutputFieldDef): void;
+  addDynamicOutputFields(
+    block: OutputDefinitionBlock<any>,
+    isList: boolean
+  ): void;
 }
 
 export interface InputDefinitionBuilder {
   addField(config: NexusInputFieldDef): void;
+  addDynamicInputFields(
+    block: InputDefinitionBlock<any>,
+    isList: boolean
+  ): void;
 }
 
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomDefinitionMethods<TypeName> {}
+  extends NexusGenCustomOutputMethods<TypeName> {}
 
 /**
  * The output definition block is passed to the "definition"
  * argument of the
  */
 export class OutputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean = false;
-  protected extendedFieldMap: Record<string, string> = {};
-
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
     protected isList = false
-  ) {}
-
-  /**
-   * Adds a custom field to the output definition block,
-   * keeping track of the fields so they can be chained via the .list
-   */
-  [ADD_CUSTOM_FIELD](methodName: string, typeName: string) {
-    this.extendedFieldMap[methodName] = typeName;
-    // @ts-ignore
-    this[methodName] = (fieldName: string, opts: any) => {
-      this.field(fieldName, {
-        type: typeName,
-        ...opts,
-      });
-    };
+  ) {
+    this.typeBuilder.addDynamicOutputFields(this, isList);
   }
 
   get list() {
@@ -171,10 +161,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return copyFields(
-      this.extendedFieldMap,
-      new OutputDefinitionBlock<TypeName>(this.typeBuilder, true)
-    );
+    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 
   string<FieldName extends string>(
@@ -244,7 +231,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     if (this.isList) {
       if (config.list) {
         console.warn(
-          `It looks like you chained .list and set list for ${config.name}` +
+          `It looks like you chained .list and set list for ${config.name}. ` +
             "You should only do one or the other"
         );
       } else {
@@ -271,7 +258,7 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes"> | AllNexusInputTypeDefs<string>;
+  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs<string>;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -279,30 +266,14 @@ export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
 };
 
 export interface InputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomDefinitionMethods<TypeName> {}
+  extends NexusGenCustomInputMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
-  protected hasAdded: boolean = false;
-  protected extendedFieldMap: Record<string, string> = {};
-
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
     protected isList = false
-  ) {}
-
-  /**
-   * Adds a custom field to the output definition block,
-   * keeping track of the fields so they can be chained via the .list
-   */
-  [ADD_CUSTOM_FIELD](methodName: string, typeName: string) {
-    this.extendedFieldMap[methodName] = typeName;
-    // @ts-ignore
-    this[methodName] = (fieldName: string, opts: any) => {
-      this.field(fieldName, {
-        type: typeName,
-        ...opts,
-      });
-    };
+  ) {
+    this.typeBuilder.addDynamicInputFields(this, isList);
   }
 
   get list() {
@@ -311,10 +282,7 @@ export class InputDefinitionBlock<TypeName extends string> {
         "Cannot chain list.list, in the definition block. Use `list: []` config value"
       );
     }
-    return copyFields(
-      this.extendedFieldMap,
-      new InputDefinitionBlock<TypeName>(this.typeBuilder, true)
-    );
+    return new InputDefinitionBlock<TypeName>(this.typeBuilder, true);
   }
 
   string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
@@ -363,7 +331,7 @@ export class InputDefinitionBlock<TypeName extends string> {
     );
   }
 
-  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+  protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
     if (this.isList) {
       if (config.list) {
         console.warn(
@@ -382,13 +350,3 @@ export interface AbstractOutputDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
   setResolveType(fn: AbstractTypeResolver<TypeName>): void;
 }
-
-export const copyFields = <S extends { [ADD_CUSTOM_FIELD]: any }>(
-  sourceMap: Record<string, string>,
-  target: S
-): S => {
-  Object.keys(sourceMap).forEach((methodName) =>
-    target[ADD_CUSTOM_FIELD](methodName, sourceMap[methodName])
-  );
-  return target;
-};

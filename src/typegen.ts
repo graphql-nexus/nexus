@@ -2,7 +2,7 @@ import {
   GraphQLArgument,
   GraphQLField,
   GraphQLInputField,
-  GraphQLInputType as GraphQLType,
+  GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
@@ -23,9 +23,16 @@ import {
   GraphQLEnumType,
   defaultFieldResolver,
 } from "graphql";
-import { TypegenInfo } from "./builder";
-import { eachObj, GroupedTypes, groupTypes, mapObj } from "./utils";
-import { WrappedResolver } from "./definitions/_types";
+import path from "path";
+import { TypegenInfo, NexusSchemaExtensions } from "./builder";
+import {
+  eachObj,
+  GroupedTypes,
+  groupTypes,
+  mapObj,
+  relativePathTo,
+} from "./utils";
+import { WrappedResolver, RootTypingImport } from "./definitions/_types";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -63,7 +70,8 @@ export class Typegen {
 
   constructor(
     protected schema: GraphQLSchema,
-    protected typegenInfo: TypegenInfo
+    protected typegenInfo: TypegenInfo & { typegenFile: string },
+    protected extensions: NexusSchemaExtensions
   ) {
     this.groupedTypes = groupTypes(schema);
   }
@@ -93,7 +101,9 @@ export class Typegen {
     return [
       this.typegenInfo.headers.join("\n"),
       this.typegenInfo.imports.join("\n"),
-      this.printCustomScalarMethods(),
+      this.printDynamicImport(),
+      this.printDynamicInputFieldDefinitions(),
+      this.printDynamicOutputFieldDefinitions(),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -124,35 +134,89 @@ export class Typegen {
       .join("\n");
   }
 
-  printCustomScalarMethods() {
-    const customScalars = this.buildCustomScalarMap();
-    if (!Object.keys(customScalars).length) {
+  printDynamicImport() {
+    const {
+      dynamicFields: { dynamicInputFields, dynamicOutputFields },
+      rootTypings,
+    } = this.extensions;
+    const imports = [];
+    if (
+      [dynamicInputFields, dynamicOutputFields].some(
+        (o) => Object.keys(o).length > 0
+      )
+    ) {
+      imports.push(`import { core } from "nexus"`);
+    }
+    const importMap: Record<string, Set<string>> = {};
+    const outputPath = this.typegenInfo.typegenFile;
+    eachObj(rootTypings, (val, key) => {
+      if (typeof val !== "string") {
+        const importPath = (path.isAbsolute(val.path)
+          ? relativePathTo(val.path, outputPath)
+          : val.path
+        ).replace(/(\.d)?\.ts/, "");
+        importMap[importPath] = importMap[importPath] || new Set();
+        importMap[importPath].add(
+          val.alias ? `${val.name} as ${val.alias}` : val.name
+        );
+      }
+    });
+    eachObj(importMap, (val, key) => {
+      imports.push(
+        `import { ${Array.from(val).join(", ")} } from ${JSON.stringify(key)}`
+      );
+    });
+    return imports.join("\n");
+  }
+
+  printDynamicInputFieldDefinitions() {
+    const { dynamicInputFields } = this.extensions.dynamicFields;
+    // If there is nothing custom... exit
+    if (!Object.keys(dynamicInputFields).length) {
       return [];
     }
     return [
-      `import { core } from "nexus"`,
       `declare global {`,
-      `  interface NexusGenCustomDefinitionMethods<TypeName extends string> {`,
+      `  interface NexusGenCustomInputMethods<TypeName extends string> {`,
     ]
       .concat(
-        mapObj(customScalars, (val, key) => {
-          return `    ${val}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
-            key
-          )};`;
+        mapObj(dynamicInputFields, (val, key) => {
+          if (typeof val === "string") {
+            return `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
+              val
+            )};`;
+          }
+          return `    ${key}${val.value.typeDefinition ||
+            `(...args: any): void`}`;
         })
       )
       .concat([`  }`, `}`])
       .join("\n");
   }
 
-  buildCustomScalarMap() {
-    const customScalars: Record<string, string> = {};
-    this.groupedTypes.scalar.forEach((type) => {
-      if (type.asNexusMethod) {
-        customScalars[type.name] = type.asNexusMethod;
-      }
-    });
-    return customScalars;
+  printDynamicOutputFieldDefinitions() {
+    const { dynamicOutputFields } = this.extensions.dynamicFields;
+    // If there is nothing custom... exit
+    if (!Object.keys(dynamicOutputFields).length) {
+      return [];
+    }
+    return [
+      `declare global {`,
+      `  interface NexusGenCustomOutputMethods<TypeName extends string> {`,
+    ]
+      .concat(
+        mapObj(dynamicOutputFields, (val, key) => {
+          if (typeof val === "string") {
+            return `    ${key}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+              val
+            )};`;
+          }
+          return `    ${key}${val.value.typeDefinition ||
+            `(...args: any): void`}`;
+        })
+      )
+      .concat([`  }`, `}`])
+      .join("\n");
   }
 
   printInheritedFieldMap() {
@@ -212,12 +276,6 @@ export class Typegen {
             sourceMap[type.name] = possibleNames
               .map((val) => JSON.stringify(val))
               .join(" | ");
-          } else {
-            console.warn(
-              `Nexus Warning: Interface ${
-                type.name
-              } is not implemented by any object types`
-            );
           }
         } else {
           sourceMap[type.name] = type
@@ -286,6 +344,15 @@ export class Typegen {
       .concat(this.groupedTypes.scalar)
       .concat(this.groupedTypes.union)
       .forEach((type) => {
+        const rootTyping = this.extensions.rootTypings[type.name];
+        if (rootTyping) {
+          if (typeof rootTyping === "string") {
+            rootTypeMap[type.name] = rootTyping;
+          } else {
+            rootTypeMap[type.name] = this.resolveExtensionRootType(rootTyping);
+          }
+          return;
+        }
         const backingType = this.typegenInfo.backingTypeMap[type.name];
         if (typeof backingType === "string") {
           rootTypeMap[type.name] = backingType;
@@ -318,7 +385,7 @@ export class Typegen {
             if (!this.hasResolver(field, type)) {
               if (typeof obj !== "string") {
                 obj[field.name] = [
-                  this.argSeparator(field.type as GraphQLType),
+                  this.argSeparator(field.type as GraphQLInputType),
                   this.printOutputType(field.type),
                 ];
               }
@@ -327,6 +394,10 @@ export class Typegen {
         }
       });
     return rootTypeMap;
+  }
+
+  resolveExtensionRootType(rootTyping: RootTypingImport) {
+    return rootTyping.alias || rootTyping.name;
   }
 
   buildAllTypesMap() {
@@ -479,14 +550,14 @@ export class Typegen {
     return [this.argSeparator(arg.type), this.argTypeRepresentation(arg.type)];
   }
 
-  argSeparator(type: GraphQLType) {
+  argSeparator(type: GraphQLInputType) {
     if (isNonNullType(type)) {
       return ":";
     }
     return "?:";
   }
 
-  argTypeRepresentation(arg: GraphQLType): string {
+  argTypeRepresentation(arg: GraphQLInputType): string {
     const argType = this.argTypeArr(arg);
     function combine(item: any[]): string {
       if (item.length === 1) {
@@ -509,7 +580,7 @@ export class Typegen {
     return `${combine(argType)}; // ${arg}`;
   }
 
-  argTypeArr(arg: GraphQLType): any[] {
+  argTypeArr(arg: GraphQLInputType): any[] {
     const typing = [];
     if (isNonNullType(arg)) {
       arg = arg.ofType;

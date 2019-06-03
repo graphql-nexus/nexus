@@ -7,7 +7,17 @@ import * as ctx from "../data-sources/Context";
 import * as db from "./ghost-db-types";
 import { core } from "nexus";
 declare global {
-  interface NexusGenCustomDefinitionMethods<TypeName extends string> {
+  interface NexusGenCustomInputMethods<TypeName extends string> {
+    date<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.ScalarInputFieldConfig<
+        core.GetGen3<"inputTypes", TypeName, FieldName>
+      >
+    ): void; // "Date";
+  }
+}
+declare global {
+  interface NexusGenCustomOutputMethods<TypeName extends string> {
     date<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
