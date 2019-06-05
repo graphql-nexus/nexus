@@ -125,6 +125,7 @@ export type FieldOutConfig<
   : NexusOutputFieldConfig<TypeName, FieldName>;
 
 export interface OutputDefinitionBuilder {
+  typeName: string;
   addField(config: NexusOutputFieldDef): void;
   addDynamicOutputFields(
     block: OutputDefinitionBlock<any>,
@@ -133,6 +134,7 @@ export interface OutputDefinitionBuilder {
 }
 
 export interface InputDefinitionBuilder {
+  typeName: string;
   addField(config: NexusInputFieldDef): void;
   addDynamicInputFields(
     block: InputDefinitionBlock<any>,
@@ -148,10 +150,12 @@ export interface OutputDefinitionBlock<TypeName extends string>
  * argument of the
  */
 export class OutputDefinitionBlock<TypeName extends string> {
+  readonly typeName: string;
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
     protected isList = false
   ) {
+    this.typeName = typeBuilder.typeName;
     this.typeBuilder.addDynamicOutputFields(this, isList);
   }
 
@@ -269,10 +273,12 @@ export interface InputDefinitionBlock<TypeName extends string>
   extends NexusGenCustomInputMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
+  readonly typeName: string;
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
     protected isList = false
   ) {
+    this.typeName = typeBuilder.typeName;
     this.typeBuilder.addDynamicInputFields(this, isList);
   }
 

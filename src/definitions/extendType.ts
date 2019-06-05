@@ -11,7 +11,7 @@ export interface NexusExtendTypeConfig<TypeName extends string> {
 export class NexusExtendTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusExtendTypeConfig<string>
+    protected config: NexusExtendTypeConfig<string> & { name: string }
   ) {
     assertValidName(name);
   }
@@ -31,5 +31,5 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject);
 export function extendType<
   TypeName extends GetGen<"objectNames", string> | "Query" | "Mutation"
 >(config: NexusExtendTypeConfig<TypeName>) {
-  return new NexusExtendTypeDef(config.type, config);
+  return new NexusExtendTypeDef(config.type, { ...config, name: config.type });
 }

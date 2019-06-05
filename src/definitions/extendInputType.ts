@@ -11,7 +11,7 @@ export interface NexusExtendInputTypeConfig<TypeName extends string> {
 export class NexusExtendInputTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusExtendInputTypeConfig<string>
+    protected config: NexusExtendInputTypeConfig<string> & { name: string }
   ) {
     assertValidName(name);
   }
@@ -31,5 +31,8 @@ withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject);
 export function extendInputType<TypeName extends GetGen<"inputNames", string>>(
   config: NexusExtendInputTypeConfig<TypeName>
 ) {
-  return new NexusExtendInputTypeDef(config.type, config);
+  return new NexusExtendInputTypeDef(config.type, {
+    ...config,
+    name: config.type,
+  });
 }

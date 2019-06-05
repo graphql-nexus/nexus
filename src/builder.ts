@@ -126,10 +126,12 @@ import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 export type Maybe<T> = T | null;
 
 type NexusShapedOutput = {
+  name: string;
   definition: (t: ObjectDefinitionBlock<string>) => void;
 };
 
 type NexusShapedInput = {
+  name: string;
   definition: (t: InputDefinitionBlock<string>) => void;
 };
 
@@ -489,6 +491,7 @@ export class SchemaBuilder {
   ): GraphQLInputObjectType {
     const fields: NexusInputFieldDef[] = [];
     const definitionBlock = new InputDefinitionBlock({
+      typeName: config.name,
       addField: (field) => fields.push(field),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
@@ -518,6 +521,7 @@ export class SchemaBuilder {
       FieldModificationDef<string, string>[]
     > = {};
     const definitionBlock = new ObjectDefinitionBlock({
+      typeName: config.name,
       addField: (fieldDef) => fields.push(fieldDef),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addFieldModifications(mods) {
@@ -590,6 +594,7 @@ export class SchemaBuilder {
     let resolveType: AbstractTypeResolver<string> | undefined;
     const fields: NexusOutputFieldDef[] = [];
     const definitionBlock = new InterfaceDefinitionBlock({
+      typeName: config.name,
       addField: (field) => fields.push(field),
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputFields: (block, isList) =>
@@ -1102,6 +1107,7 @@ export class SchemaBuilder {
 
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
     const definitionBlock = new InputDefinitionBlock({
+      typeName: obj.name,
       addField: (f) => this.maybeTraverseInputType(f),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
@@ -1122,6 +1128,7 @@ export class SchemaBuilder {
           args: config,
           typeDef: block,
           builder: this,
+          typeName: block.typeName,
         });
       };
     });
@@ -1139,6 +1146,7 @@ export class SchemaBuilder {
           args: config,
           typeDef: block,
           builder: this,
+          typeName: block.typeName,
         });
       };
     });
@@ -1161,6 +1169,7 @@ export class SchemaBuilder {
 
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
     const definitionBlock = new ObjectDefinitionBlock({
+      typeName: obj.name,
       addFieldModifications: () => {},
       addInterfaces: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
@@ -1173,6 +1182,7 @@ export class SchemaBuilder {
 
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
+      typeName: obj.name,
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputFields: (block, isList) =>
