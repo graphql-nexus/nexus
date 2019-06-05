@@ -9,12 +9,20 @@ export type OutputFactoryConfig<T> = {
   args: any[];
   builder: SchemaBuilder;
   typeDef: OutputDefinitionBlock<any>;
+  /**
+   * The name of the type this field is being declared on
+   */
+  typeName: string;
 };
 
 export type InputFactoryConfig<T> = {
   args: any[];
   builder: SchemaBuilder;
   typeDef: InputDefinitionBlock<any>;
+  /**
+   * The name of the type this field is being declared on
+   */
+  typeName: string;
 };
 
 export interface BaseExtensionConfig<T extends string> {
