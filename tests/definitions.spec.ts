@@ -11,19 +11,82 @@ import {
 } from "../src";
 import { UserObject, PostObject } from "./_helpers";
 
-describe("enumType", () => {
-  const PrimaryColors = enumType({
-    name: "PrimaryColors",
-    members: ["RED", "YELLOW", "BLUE"],
-  });
+enum NativeColors {
+  RED = "RED",
+  BLUE = "BLUE",
+  GREEN = "green", // lower case to ensure we grab correct keys
+}
 
+enum NativeNumbers {
+  ONE = 1,
+  TWO = 2,
+  THREE = 3,
+}
+
+describe("enumType", () => {
   it("builds an enum", () => {
+    const PrimaryColors = enumType({
+      name: "PrimaryColors",
+      members: ["RED", "YELLOW", "BLUE"],
+    });
     const types = buildTypes<{ PrimaryColors: GraphQLEnumType }>([
       PrimaryColors,
     ]);
     expect(types.typeMap.PrimaryColors).toBeInstanceOf(GraphQLEnumType);
     expect(types.typeMap.PrimaryColors.getValues().map((v) => v.value)).toEqual(
       ["RED", "YELLOW", "BLUE"]
+    );
+  });
+
+  it("builds an enum from a TypeScript enum with string values", () => {
+    const Colors = enumType({
+      name: "Colors",
+      members: NativeColors,
+    });
+    const types = buildTypes<{ Colors: GraphQLEnumType }>([Colors]);
+
+    expect(types.typeMap.Colors).toBeInstanceOf(GraphQLEnumType);
+    expect(types.typeMap.Colors.getValues()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "RED",
+          value: "RED",
+        }),
+        expect.objectContaining({
+          name: "BLUE",
+          value: "BLUE",
+        }),
+        expect.objectContaining({
+          name: "GREEN",
+          value: "green",
+        }),
+      ])
+    );
+  });
+
+  it("builds an enum from a TypeScript enum with number values", () => {
+    const Numbers = enumType({
+      name: "Numbers",
+      members: NativeNumbers,
+    });
+    const types = buildTypes<{ Numbers: GraphQLEnumType }>([Numbers]);
+
+    expect(types.typeMap.Numbers).toBeInstanceOf(GraphQLEnumType);
+    expect(types.typeMap.Numbers.getValues()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "ONE",
+          value: 1,
+        }),
+        expect.objectContaining({
+          name: "TWO",
+          value: 2,
+        }),
+        expect.objectContaining({
+          name: "THREE",
+          value: 3,
+        }),
+      ])
     );
   });
 

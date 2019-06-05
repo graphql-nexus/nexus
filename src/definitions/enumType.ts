@@ -1,6 +1,10 @@
 import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { assertValidName } from "graphql";
 
+type TypeScriptEnumLike = {
+  [key: number]: string;
+};
+
 export interface EnumMemberInfo {
   /**
    * The external "value" of the enum as displayed in the SDL
@@ -32,11 +36,12 @@ export interface EnumTypeConfig<TypeName extends string> {
    */
   rootTyping?: RootTypingDef;
   /**
-   * All members of the enum, either as an array of strings/definition objects, or as an object
+   * All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum
    */
   members:
     | Array<string | EnumMemberInfo>
-    | Record<string, string | number | object | boolean>;
+    | Record<string, string | number | object | boolean>
+    | TypeScriptEnumLike;
 }
 
 export class NexusEnumTypeDef<TypeName extends string> {

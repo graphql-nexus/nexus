@@ -1,9 +1,4 @@
-import {
-  GraphQLSchema,
-  isOutputType,
-  GraphQLNamedType,
-  isEnumType,
-} from "graphql";
+import { GraphQLSchema, isOutputType, GraphQLNamedType } from "graphql";
 import path from "path";
 import { TYPEGEN_HEADER } from "./lang";
 import { log, objValues, relativePathTo } from "./utils";
@@ -38,9 +33,11 @@ export interface TypegenConfigSourceModule {
    * Provides a custom approach to matching for the type
    *
    * If not provided, the default implementation is:
-   * ```
-   * (type) => new RegExp('(?:interface|type|class)\s+(${type.name})\W')
-   * ```
+   *
+   *   (type) => [
+   *      new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g"),
+   *   ]
+   *
    */
   typeMatch?: (
     type: GraphQLNamedType,
@@ -260,8 +257,8 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
       const type = schema.getType(typeName);
 
-      // For now we'll say that if it's non-enum output type it can be backed
-      if (isOutputType(type) && !isEnumType(type)) {
+      // For now we'll say that if it's output type it can be backed
+      if (isOutputType(type)) {
         for (let i = 0; i < typeSources.length; i++) {
           const typeSource = typeSources[i];
           if (!typeSource) {
@@ -376,5 +373,7 @@ const firstMatch = (
 };
 
 const defaultTypeMatcher = (type: GraphQLNamedType) => {
-  return [new RegExp(`(?:interface|type|class)\\s+(${type.name})\\W`, "g")];
+  return [
+    new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g"),
+  ];
 };

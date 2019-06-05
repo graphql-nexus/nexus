@@ -33,6 +33,7 @@ import {
   isUnionType,
   isScalarType,
   defaultFieldResolver,
+  assertValidName,
   getNamedType,
   GraphQLField,
 } from "graphql";
@@ -633,11 +634,20 @@ export class SchemaBuilder {
         }
       });
     } else {
-      Object.keys(members).forEach((key) => {
-        values[key] = {
-          value: members[key],
-        };
-      });
+      Object.keys(members)
+        // members can potentially be a TypeScript enum.
+        // The compiled version of this enum will be the members object,
+        // numeric enums members also get a reverse mapping from enum values to enum names.
+        // In these cases we have to ensure we don't include these reverse mapping keys.
+        // See: https://www.typescriptlang.org/docs/handbook/enums.html
+        .filter((key) => isNaN(+key))
+        .forEach((key) => {
+          assertValidName(key);
+
+          values[key] = {
+            value: (members as Record<string, string | number | symbol>)[key],
+          };
+        });
     }
     if (!Object.keys(values).length) {
       throw new Error(
