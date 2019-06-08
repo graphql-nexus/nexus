@@ -1124,7 +1124,7 @@ export class SchemaBuilder {
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
         const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
-        val.value.factory({
+        return val.value.factory({
           args: config,
           typeDef: block,
           builder: this,
@@ -1142,7 +1142,7 @@ export class SchemaBuilder {
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
         const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
-        val.value.factory({
+        return val.value.factory({
           args: config,
           typeDef: block,
           builder: this,

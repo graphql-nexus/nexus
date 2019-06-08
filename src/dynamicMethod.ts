@@ -43,7 +43,7 @@ export interface DynamicOutputMethodConfig<T extends string>
   /**
    * Invoked when the field is called
    */
-  factory(config: OutputFactoryConfig<T>): void;
+  factory(config: OutputFactoryConfig<T>): any;
 }
 
 export interface DynamicInputMethodConfig<T extends string>
@@ -51,7 +51,7 @@ export interface DynamicInputMethodConfig<T extends string>
   /**
    * Invoked when the field is called
    */
-  factory(config: InputFactoryConfig<T>): void;
+  factory(config: InputFactoryConfig<T>): any;
 }
 
 export class DynamicInputMethodDef<Name extends string> {
