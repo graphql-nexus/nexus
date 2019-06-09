@@ -52,8 +52,9 @@ import {
   interfaceType,
   queryType,
   stringArg,
+  enumType,
   intArg,
-  fieldArg,
+  arg,
   makeSchema,
 } from "nexus";
 
@@ -85,7 +86,7 @@ const Query = queryType({
       type: Account, // or "Account"
       args: {
         name: stringArg(),
-        status: fieldArg({ type: "StatusEnum" }),
+        status: arg({ type: "StatusEnum" }),
       },
     });
     t.list.field("accountsById", {
