@@ -1390,7 +1390,7 @@ export function makeSchemaInternal(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(options: SchemaConfig): GraphQLSchema {
+export function makeSchema(options: SchemaConfig): NexusSchema {
   const { schema } = makeSchemaInternal(options);
 
   // Only in development envs do we want to worry about regenerating the

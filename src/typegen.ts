@@ -32,7 +32,7 @@ import {
   mapObj,
   relativePathTo,
 } from "./utils";
-import { WrappedResolver, RootTypingImport } from "./definitions/_types";
+import { WrappedResolver } from "./definitions/_types";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -302,7 +302,7 @@ export class Typegen {
   buildEnumTypeMap() {
     const enumMap: TypeMapping = {};
     this.groupedTypes.enum.forEach((e) => {
-      const backingType = this.typegenInfo.backingTypeMap[e.name];
+      const backingType = this.resolveBackingType(e.name);
       if (backingType) {
         enumMap[e.name] = backingType;
       } else {
@@ -349,19 +349,12 @@ export class Typegen {
       .concat(this.groupedTypes.scalar)
       .concat(this.groupedTypes.union)
       .forEach((type) => {
-        const rootTyping = this.extensions.rootTypings[type.name];
+        const rootTyping = this.resolveBackingType(type.name);
         if (rootTyping) {
-          if (typeof rootTyping === "string") {
-            rootTypeMap[type.name] = rootTyping;
-          } else {
-            rootTypeMap[type.name] = this.resolveExtensionRootType(rootTyping);
-          }
+          rootTypeMap[type.name] = rootTyping;
           return;
         }
-        const backingType = this.typegenInfo.backingTypeMap[type.name];
-        if (typeof backingType === "string") {
-          rootTypeMap[type.name] = backingType;
-        } else if (isScalarType(type)) {
+        if (isScalarType(type)) {
           if (isSpecifiedScalarType(type)) {
             rootTypeMap[type.name] =
               SpecifiedScalars[type.name as SpecifiedScalarNames];
@@ -401,8 +394,12 @@ export class Typegen {
     return rootTypeMap;
   }
 
-  resolveExtensionRootType(rootTyping: RootTypingImport) {
-    return rootTyping.alias || rootTyping.name;
+  resolveBackingType(typeName: string): string | undefined {
+    const rootTyping = this.extensions.rootTypings[typeName];
+    if (rootTyping) {
+      return typeof rootTyping === "string" ? rootTyping : rootTyping.name;
+    }
+    return this.typegenInfo.backingTypeMap[typeName];
   }
 
   buildAllTypesMap() {

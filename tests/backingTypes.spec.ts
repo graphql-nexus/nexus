@@ -5,6 +5,11 @@ import { NexusSchemaExtensions } from "../src/core";
 
 const { Typegen, TypegenMetadata } = core;
 
+export enum TestEnum {
+  A = "a",
+  B = "b",
+}
+
 function getSchemaWithNormalEnums() {
   return makeSchema({
     types: [
@@ -61,21 +66,13 @@ describe("backingTypes", () => {
     });
   });
 
-  schemaExtensions = {
-    rootTypings: {},
-    dynamicFields: {
-      dynamicInputFields: {},
-      dynamicOutputFields: {},
-    },
-  };
-
   it("can match backing types to regular enums", async () => {
     const schema = getSchemaWithNormalEnums();
     const typegenInfo = await metadata.getTypegenInfo(schema);
     const typegen = new Typegen(
       schema,
       { ...typegenInfo, typegenFile: "" },
-      schemaExtensions
+      schema.extensions.nexus
     );
 
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
@@ -91,7 +88,7 @@ describe("backingTypes", () => {
     const typegen = new Typegen(
       schema,
       { ...typegenInfo, typegenFile: "" },
-      schemaExtensions
+      schema.extensions.nexus
     );
 
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
@@ -99,5 +96,31 @@ describe("backingTypes", () => {
   B: t.B
 }"
 `);
+  });
+});
+
+describe("rootTypings", () => {
+  it("can import enum via rootTyping", async () => {
+    const metadata = new TypegenMetadata({ outputs: false });
+    const schema = makeSchema({
+      types: [
+        enumType({
+          name: "TestEnumType",
+          members: TestEnum,
+          rootTyping: {
+            path: __filename,
+            name: "TestEnum",
+          },
+        }),
+      ],
+      outputs: false,
+    });
+    const typegenInfo = await metadata.getTypegenInfo(schema);
+    const typegen = new Typegen(
+      schema,
+      { ...typegenInfo, typegenFile: "" },
+      schema.extensions.nexus
+    );
+    expect(typegen.print()).toMatchSnapshot();
   });
 });
