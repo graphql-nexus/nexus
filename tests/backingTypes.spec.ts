@@ -46,7 +46,6 @@ function getSchemaWithConstEnums() {
 
 describe("backingTypes", () => {
   let metadata: core.TypegenMetadata;
-  let schemaExtensions: NexusSchemaExtensions;
 
   beforeEach(async () => {
     metadata = new TypegenMetadata({
