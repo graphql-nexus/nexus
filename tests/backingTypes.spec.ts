@@ -1,7 +1,6 @@
 import path from "path";
 import { core, makeSchema, queryType, enumType } from "../src";
 import { A, B } from "./_types";
-import { NexusSchemaExtensions } from "../src/core";
 
 const { Typegen, TypegenMetadata } = core;
 
@@ -46,7 +45,6 @@ function getSchemaWithConstEnums() {
 
 describe("backingTypes", () => {
   let metadata: core.TypegenMetadata;
-  let schemaExtensions: NexusSchemaExtensions;
 
   beforeEach(async () => {
     metadata = new TypegenMetadata({
