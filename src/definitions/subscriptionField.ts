@@ -3,10 +3,10 @@ import { CommonOutputFieldConfig } from "./definitionBlocks";
 import { GraphQLResolveInfo } from "graphql";
 import {
   ResultValue,
-  MaybePromiseDeep,
+  PromiseOrValueDeep,
   ArgsValue,
   GetGen,
-  MaybePromise,
+  PromiseOrValue,
 } from "../typegenTypeHelpers";
 import { AllNexusOutputTypeDefs, NexusWrappedType } from "./wrapping";
 import { AsyncIterator } from "./_types";
@@ -26,7 +26,7 @@ export interface SubscribeFieldConfig<
     args: ArgsValue<TypeName, FieldName>,
     ctx: GetGen<"context">,
     info: GraphQLResolveInfo
-  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>;
+  ): PromiseOrValue<AsyncIterator<T>> | PromiseOrValueDeep<AsyncIterator<T>>;
 
   /**
    * Resolve method for the field
@@ -37,8 +37,8 @@ export interface SubscribeFieldConfig<
     context: GetGen<"context">,
     info: GraphQLResolveInfo
   ):
-    | MaybePromise<ResultValue<"Subscription", FieldName>>
-    | MaybePromiseDeep<ResultValue<"Subscription", FieldName>>;
+    | PromiseOrValue<ResultValue<"Subscription", FieldName>>
+    | PromiseOrValueDeep<ResultValue<"Subscription", FieldName>>;
 }
 
 export function subscriptionField<FieldName extends string>(

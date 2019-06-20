@@ -105,11 +105,7 @@ import {
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
-import {
-  AbstractTypeResolver,
-  GetGen,
-  AuthorizeResolver,
-} from "./typegenTypeHelpers";
+import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
 import {
   firstDefined,
   objValues,
@@ -122,6 +118,13 @@ import {
   NexusExtendInputTypeConfig,
 } from "./definitions/extendInputType";
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
+import {
+  PluginDef,
+  wrapPluginsBefore,
+  PluginVisitBefore,
+  PluginVisitAfter,
+  wrapPluginsAfter,
+} from "./plugin";
 
 export type Maybe<T> = T | null;
 
@@ -196,6 +199,10 @@ export interface BuilderConfig {
    * Read more about how nexus handles nullability
    */
   nonNullDefaults?: NonNullConfig;
+  /**
+   * A list of all plugins we want to add to Nexus
+   */
+  plugins?: PluginDef[];
 }
 
 export interface TypegenInfo {
@@ -218,7 +225,9 @@ export interface TypegenInfo {
   contextType?: string;
 }
 
-export interface SchemaConfig extends BuilderConfig {
+export interface SchemaConfig
+  extends BuilderConfig,
+    NexusAugmentedSchemaConfig {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -306,6 +315,11 @@ export class SchemaBuilder {
    * Root type mapping information annotated on the type definitions
    */
   protected rootTypings: RootTypings = {};
+
+  /**
+   * All of the plugins for our server
+   */
+  protected plugins: PluginDef[] = [];
 
   /**
    * Whether we've called `getFinalTypeMap` or not
@@ -1066,9 +1080,6 @@ export class SchemaBuilder {
     let subscribe: undefined | GraphQLFieldResolver<any, any>;
     if (fieldConfig.subscribe) {
       subscribe = fieldConfig.subscribe;
-      if (fieldConfig.authorize) {
-        subscribe = wrapAuthorize(subscribe, fieldConfig.authorize);
-      }
     }
     return subscribe;
   }
@@ -1085,11 +1096,45 @@ export class SchemaBuilder {
     if (!resolver && !forInterface) {
       resolver = (typeConfig as NexusObjectTypeConfig<any>).defaultResolver;
     }
-    if (fieldConfig.authorize && typeConfig.name !== "Subscription") {
-      resolver = wrapAuthorize(
-        resolver || defaultFieldResolver,
-        fieldConfig.authorize
-      );
+    let finalResolver = resolver;
+    if (this.plugins.length) {
+      const before: [string, PluginVisitBefore][] = [];
+      const after: [string, PluginVisitAfter][] = [];
+      // Execute all of the plugins for each individual resolver.
+      for (let i = 0; i < this.plugins.length; i++) {
+        const addedPlugin = this.plugins[i].config;
+        if (addedPlugin.definition) {
+          const returnDef = addedPlugin.definition({
+            schemaConfig: this.config,
+            typeConfig,
+            fieldConfig,
+            mutableObj: {},
+          });
+          if (returnDef) {
+            if (returnDef.before) {
+              before.push([addedPlugin.name, returnDef.before]);
+            }
+            if (returnDef.after) {
+              after.push([addedPlugin.name, returnDef.after]);
+            }
+          }
+        }
+      }
+      if (before.length) {
+        finalResolver = wrapPluginsBefore(
+          resolver || defaultFieldResolver,
+          before
+        );
+      }
+      if (after.length) {
+        finalResolver = wrapPluginsAfter(
+          resolver || defaultFieldResolver,
+          after
+        );
+      }
+    }
+    if (resolver && finalResolver) {
+      (resolver as WrappedResolver).nexusWrappedResolver = finalResolver;
     }
     return resolver;
   }
@@ -1240,33 +1285,6 @@ function extendError(name: string) {
   return new Error(
     `${name} was already defined and imported as a type, check the docs for extending types`
   );
-}
-
-export function wrapAuthorize(
-  resolver: GraphQLFieldResolver<any, any>,
-  authorize: AuthorizeResolver<string, any>
-): GraphQLFieldResolver<any, any> {
-  const nexusAuthWrapped: WrappedResolver = async (root, args, ctx, info) => {
-    const authResult = await authorize(root, args, ctx, info);
-    if (authResult === true) {
-      return resolver(root, args, ctx, info);
-    }
-    if (authResult === false) {
-      throw new Error("Not authorized");
-    }
-    if (authResult instanceof Error) {
-      throw authResult;
-    }
-    const {
-      fieldName,
-      parentType: { name: parentTypeName },
-    } = info;
-    throw new Error(
-      `Nexus authorize for ${parentTypeName}.${fieldName} Expected a boolean or Error, saw ${authResult}`
-    );
-  };
-  nexusAuthWrapped.nexusWrappedResolver = resolver;
-  return nexusAuthWrapped;
 }
 
 export type DynamicFieldDefs = {

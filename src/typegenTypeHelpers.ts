@@ -4,6 +4,12 @@ declare global {
   interface NexusGen {}
   interface NexusGenCustomInputMethods<TypeName extends string> {}
   interface NexusGenCustomOutputMethods<TypeName extends string> {}
+  interface NexusAugmentedSchemaConfig {}
+  interface NexusAugmentedTypeConfig<TypeName extends string> {}
+  interface NexusAugmentedFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
 }
 
 export type AllInputTypes = GetGen<"allInputTypes">;
@@ -15,33 +21,37 @@ export type FieldType<
   FieldName extends string
 > = GetGen3<"fieldTypes", TypeName, FieldName>;
 
-export type MaybePromise<T> = PromiseLike<T> | T;
+export type PromiseOrValue<T> = PromiseLike<T> | T;
+
+export type MaybePromise<T> = PromiseOrValue<T>;
+
+export type MaybePromiseDeep<T> = PromiseOrValueDeep<T>;
 
 /**
  * Because the GraphQL field execution algorithm automatically
  * resolves promises at any level of the tree, we use this
  * to help signify that.
  */
-export type MaybePromiseDeep<T> = Date extends T
-  ? MaybePromise<T>
+export type PromiseOrValueDeep<T> = Date extends T
+  ? PromiseOrValue<T>
   : boolean extends T
-  ? MaybePromise<T>
+  ? PromiseOrValue<T>
   : number extends T
-  ? MaybePromise<T>
+  ? PromiseOrValue<T>
   : string extends T
-  ? MaybePromise<T>
+  ? PromiseOrValue<T>
   : T extends object
-  ? MaybePromise<
+  ? PromiseOrValue<
       | T
       | {
           [P in keyof T]: T[P] extends Array<infer U>
-            ? MaybePromise<Array<MaybePromiseDeep<U>>>
+            ? PromiseOrValue<Array<PromiseOrValueDeep<U>>>
             : T[P] extends ReadonlyArray<infer Y>
-            ? MaybePromise<ReadonlyArray<MaybePromiseDeep<Y>>>
-            : MaybePromiseDeep<T[P]>
+            ? PromiseOrValue<ReadonlyArray<PromiseOrValueDeep<Y>>>
+            : PromiseOrValueDeep<T[P]>
         }
     >
-  : MaybePromise<T>;
+  : PromiseOrValue<T>;
 
 /**
  * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety
@@ -63,7 +73,7 @@ export interface AbstractTypeResolver<TypeName extends string> {
     source: RootValue<TypeName>,
     context: GetGen<"context">,
     info: GraphQLResolveInfo
-  ): MaybePromise<AbstractResolveReturn<TypeName> | null>;
+  ): PromiseOrValue<AbstractResolveReturn<TypeName> | null>;
 }
 
 /**
@@ -86,8 +96,8 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   context: GetGen<"context">,
   info: GraphQLResolveInfo
 ) =>
-  | MaybePromise<ResultValue<TypeName, FieldName>>
-  | MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
+  | PromiseOrValue<ResultValue<TypeName, FieldName>>
+  | PromiseOrValueDeep<ResultValue<TypeName, FieldName>>;
 
 export type SubFieldResolver<
   TypeName extends string,
@@ -99,18 +109,8 @@ export type SubFieldResolver<
   context: GetGen<"context">,
   info: GraphQLResolveInfo
 ) =>
-  | MaybePromise<ResultValue<TypeName, FieldName>[SubFieldName]>
-  | MaybePromiseDeep<ResultValue<TypeName, FieldName>[SubFieldName]>;
-
-export type AuthorizeResolver<
-  TypeName extends string,
-  FieldName extends string
-> = (
-  root: RootValue<TypeName>,
-  args: ArgsValue<TypeName, FieldName>,
-  context: GetGen<"context">,
-  info: GraphQLResolveInfo
-) => MaybePromise<boolean | Error>;
+  | PromiseOrValue<ResultValue<TypeName, FieldName>[SubFieldName]>
+  | PromiseOrValueDeep<ResultValue<TypeName, FieldName>[SubFieldName]>;
 
 export type AbstractResolveReturn<
   TypeName extends string

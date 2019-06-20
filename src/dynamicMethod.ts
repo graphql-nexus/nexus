@@ -63,7 +63,7 @@ export class DynamicInputMethodDef<Name extends string> {
     return this.config;
   }
 }
-withNexusSymbol(DynamicInputMethodDef, NexusTypes.DynamicInput);
+withNexusSymbol(DynamicInputMethodDef, NexusTypes.DynamicInputMethod);
 
 export class DynamicOutputMethodDef<Name extends string> {
   constructor(
@@ -74,7 +74,18 @@ export class DynamicOutputMethodDef<Name extends string> {
     return this.config;
   }
 }
-withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutput);
+withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutputMethod);
+
+export class DynamicOutputPropertyDef<Name extends string> {
+  constructor(
+    readonly name: Name,
+    protected config: DynamicOutputMethodConfig<Name>
+  ) {}
+  get value() {
+    return this.config;
+  }
+}
+withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicInputProperty);
 
 /**
  * Defines a new property on the object definition block
@@ -105,4 +116,10 @@ export function dynamicInputMethod<T extends string>(
   config: DynamicInputMethodConfig<T>
 ) {
   return new DynamicInputMethodDef(config.name, config);
+}
+
+export function dynamicOutputProperty<T extends string>(
+  config: DynamicOutputPropertyConfig<T>,
+) {
+  return new 
 }

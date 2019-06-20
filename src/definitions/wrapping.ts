@@ -145,13 +145,15 @@ export function isNexusDynamicOutputMethod<T extends string>(
   obj: any
 ): obj is DynamicOutputMethodDef<T> {
   return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicOutput
+    isNexusTypeDef(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.DynamicOutputMethod
   );
 }
 export function isNexusDynamicInputMethod<T extends string>(
   obj: any
 ): obj is DynamicInputMethodDef<T> {
   return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicInput
+    isNexusTypeDef(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.DynamicInputMethod
   );
 }

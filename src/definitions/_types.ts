@@ -26,8 +26,11 @@ export enum NexusTypes {
   WrappedType = "WrappedType",
   OutputField = "OutputField",
   InputField = "InputField",
-  DynamicInput = "DynamicInput",
-  DynamicOutput = "DynamicOutput",
+  DynamicInputMethod = "DynamicInputMethod",
+  DynamicInputProperty = "DynamicInputProperty",
+  DynamicOutputMethod = "DynamicOutputMethod",
+  DynamicOutputProperty = "DynamicOutputProperty",
+  Plugin = "Plugin",
 }
 
 export interface DeprecationInfo {

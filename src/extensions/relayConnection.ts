@@ -9,14 +9,16 @@ let pageInfo: NexusObjectTypeDef<string>;
 
 export const RelayConnection = dynamicOutputMethod({
   name: "relayConnection",
-  typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
+  typeDefinition: `
+    <FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
       edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
       pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,
       args?: Record<string, core.NexusArgDef<string>>,
       nullable?: boolean,
       description?: string
-    }): void`,
+    }): void
+  `,
   factory({ typeDef: t, args: [fieldName, config] }) {
     const type =
       typeof config.type === "string" ? config.type : config.type.name;

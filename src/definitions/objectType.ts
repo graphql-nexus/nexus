@@ -68,7 +68,8 @@ export class ObjectDefinitionBlock<
   }
 }
 
-export interface NexusObjectTypeConfig<TypeName extends string> {
+export interface NexusObjectTypeConfig<TypeName extends string>
+  extends NexusAugmentedTypeConfig<TypeName> {
   name: TypeName;
   definition(t: ObjectDefinitionBlock<TypeName>): void;
   /**
