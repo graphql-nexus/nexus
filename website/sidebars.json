@@ -6,8 +6,7 @@
       "type-generation",
       "library-authors",
       "why-graphql-nexus",
-      "future-features",
-      "database-access-with-prisma"
+      "future-features"
     ],
     "API": [
       "api-core-concepts",
@@ -22,6 +21,7 @@
       "api-extendType",
       "api-mutationField",
       "api-queryField"
-    ]
+    ],
+    "Plugins": ["database-access-with-prisma", "database-access-with-prisma-v2"]
   }
 }
