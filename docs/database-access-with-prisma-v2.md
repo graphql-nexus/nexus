@@ -1,7 +1,7 @@
 ---
 id: database-access-with-prisma-v2
-title: Database Access with Prisma 2 (PREVIEW)
-sidebar_label: Prisma 2 (PREVIEW)
+title: Database Access with Prisma 2 (Preview)
+sidebar_label: Prisma 2 (Preview)
 ---
 
 This page explains how to use [Prisma](https://github.com/prisma/prisma) and the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin to connect your GraphQL Nexus resolvers to a database.
@@ -108,8 +108,8 @@ import { GraphQLServer } from "graphql-yoga";
 const Query = objectType({
   name: "Query",
   definition(t) {
-    t.crud.todo();
-    t.crud.todos();
+    t.crud.findOneTodo();
+    t.crud.findManyTodo();
   },
 });
 
@@ -599,40 +599,40 @@ type User {
 
 To customize the arguments, we can enable them using the `filtering` and `ordering` properties. By using `true`, `nexus-prisma` will expose **all** filtering and ordering properties for every field of your model.
 
-```graphql
+```ts
 const User = objectType({
-  name: 'User',
+  name: "User",
   definition(t) {
-    t.model.posts({ filtering: true, ordering: true })
-  }
-})
+    t.model.posts({ filtering: true, ordering: true });
+  },
+});
 ```
 
 If you wish to only expose some filters or orders, you can also use the following syntax:
 
-```graphql
+```ts
 const User = objectType({
-  name: 'User',
+  name: "User",
   definition(t) {
     t.model.posts({
       filtering: { id: true, title: true },
-      ordering: { title: true }
-    })
-  }
-})
+      ordering: { title: true },
+    });
+  },
+});
 ```
 
 Finally, you can also disable pagination
 
-```graphql
+```ts
 const User = objectType({
-  name: 'User',
+  name: "User",
   definition(t) {
-    t.model.posts({ pagination: false })
+    t.model.posts({ pagination: false });
 
     // or t.model.posts({ pagination: { first: true, last: true } })
-  }
-})
+  },
+});
 ```
 
 ### 9. Add more API operations
