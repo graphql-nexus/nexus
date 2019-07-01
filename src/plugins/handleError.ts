@@ -9,7 +9,10 @@ export const handleErrorPlugin = plugin({
   definition(config) {
     return {
       after(result, root, args, ctx, info) {
-        //
+        if (result instanceof Error) {
+          ctx.logError();
+        }
+        return result;
       },
     };
   },

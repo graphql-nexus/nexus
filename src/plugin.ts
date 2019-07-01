@@ -14,7 +14,7 @@ export type PluginVisitAfter = (
   args: any,
   ctx: any,
   info: GraphQLResolveInfo,
-  breakFn: typeof breakerFn
+  breakVal: typeof BREAK_RESULT_VAL
 ) => any;
 
 export type PluginVisitBefore = (
@@ -22,7 +22,7 @@ export type PluginVisitBefore = (
   args: any,
   ctx: any,
   info: GraphQLResolveInfo,
-  next: typeof nextFn
+  nextVal: typeof NEXT_RESULT_VAL
 ) => any;
 
 export type PluginVisitor = {
@@ -60,6 +60,7 @@ export interface PluginConfig {
   schemaTypes?: string;
   typeDefTypes?: string;
   fieldDefTypes?: string;
+  infoExtension?: string;
   localTypes?: string;
   definition?(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
 }
@@ -88,13 +89,11 @@ export function plugin(config: PluginConfig) {
  * in the chain
  */
 const NEXT_RESULT_VAL = Object.freeze({});
-const nextFn = () => NEXT_RESULT_VAL;
 
 /**
  * On "after" plugins, the breakerFn allows us to early-return, skipping the
  * rest of the plugin stack. Useful when encountering errors
  */
-const breakerFn = () => BREAK_RESULT_VAL;
 const BREAK_RESULT_VAL = Object.freeze({});
 
 /**
@@ -108,7 +107,7 @@ export function wrapPluginsBefore(
   return async (root, args, ctx, info) => {
     for (let i = 0; i < beforePlugins.length; i++) {
       const [name, before] = beforePlugins[i];
-      let result = before(root, args, ctx, info, nextFn);
+      let result = before(root, args, ctx, info, NEXT_RESULT_VAL);
       if (isPromise(result)) {
         result = await result;
       }
@@ -146,7 +145,14 @@ export function wrapPluginsAfter(
     }
     for (let i = 0; i < afterPlugins.length; i++) {
       const [name, after] = afterPlugins[i];
-      let returnVal = after(finalResult, root, args, ctx, info, breakerFn);
+      let returnVal = after(
+        finalResult,
+        root,
+        args,
+        ctx,
+        info,
+        BREAK_RESULT_VAL
+      );
       if (isPromise(returnVal)) {
         returnVal = await returnVal;
       }

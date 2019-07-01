@@ -94,6 +94,7 @@ export class Typegen {
       this.printTypeNames("scalar", "NexusGenScalarNames"),
       this.printTypeNames("union", "NexusGenUnionNames"),
       this.printGenTypeMap(),
+      this.printPlugins(),
     ].join("\n\n");
   }
 
@@ -677,6 +678,10 @@ export class Typegen {
     } else {
       return "any";
     }
+  }
+
+  printPlugins() {
+    return "";
   }
 }
 

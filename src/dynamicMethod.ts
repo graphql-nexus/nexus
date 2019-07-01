@@ -117,9 +117,3 @@ export function dynamicInputMethod<T extends string>(
 ) {
   return new DynamicInputMethodDef(config.name, config);
 }
-
-export function dynamicOutputProperty<T extends string>(
-  config: DynamicOutputPropertyConfig<T>,
-) {
-  return new 
-}

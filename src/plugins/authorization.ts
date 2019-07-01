@@ -36,7 +36,7 @@ export const AuthorizationPlugin = plugin({
             info
           );
           if (authResult === true) {
-            return next();
+            return next;
           }
           if (authResult === false) {
             throw new Error("Not authorized");
@@ -50,7 +50,7 @@ export const AuthorizationPlugin = plugin({
               `Nexus authorize for ${parentTypeName}.${fieldName} Expected a boolean or Error, saw ${authResult}`
             );
           }
-          return next();
+          return next;
         },
       };
     }

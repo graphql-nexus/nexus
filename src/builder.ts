@@ -200,7 +200,8 @@ export interface BuilderConfig {
    */
   nonNullDefaults?: NonNullConfig;
   /**
-   * A list of all plugins we want to add to Nexus
+   * List of plugins to apply to Nexus, with before/after hooks
+   * executed first to last: before -> resolve -> after
    */
   plugins?: PluginDef[];
 }
