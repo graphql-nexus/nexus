@@ -57,7 +57,7 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
-    me: NexusGenRootTypes["Post"] | null; // Post
+    me: NexusGenRootTypes["User"] | null; // User
     postById: NexusGenRootTypes["Post"]; // Post!
     userById: NexusGenRootTypes["User"]; // User!
   };

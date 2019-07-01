@@ -16,7 +16,7 @@ type Post {
 }
 
 type Query {
-  me: Post
+  me: User
   postById(id: ID!): Post!
   userById(id: ID!): User!
 }
