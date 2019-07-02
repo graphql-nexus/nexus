@@ -3,27 +3,28 @@ import { plugin } from "../plugin";
 export const AuthorizationPlugin = plugin({
   name: "Authorization",
   localTypes: `
-    import { GraphQLResolveInfo } from "graphql";
-    export type AuthorizeResolver<
-      TypeName extends string,
-      FieldName extends string
-    > = (
-      root: core.RootValue<TypeName>,
-      args: core.ArgsValue<TypeName, FieldName>,
-      context: core.GetGen<"context">,
-      info: GraphQLResolveInfo
-    ) => PromiseOrValue<boolean | Error>;
+import { core } from 'nexus'; 
+import { GraphQLResolveInfo } from 'graphql';
+export type AuthorizeResolver<
+  TypeName extends string,
+  FieldName extends string
+> = (
+  root: core.RootValue<TypeName>,
+  args: core.ArgsValue<TypeName, FieldName>,
+  context: core.GetGen<"context">,
+  info: GraphQLResolveInfo
+) => core.PromiseOrValue<boolean | Error>;
   `,
   fieldDefTypes: `
-    /**
-     * Authorization for an individual field. Returning "true"
-     * or "Promise<true>" means the field can be accessed.
-     * Returning "false" or "Promise<false>" will respond
-     * with a "Not Authorized" error for the field. Returning
-     * or throwing an error will also prevent the resolver from
-     * executing.
-     */  
-    authorize?: AuthorizeResolver<TypeName, FieldName>
+/**
+ * Authorization for an individual field. Returning "true"
+ * or "Promise<true>" means the field can be accessed.
+ * Returning "false" or "Promise<false>" will respond
+ * with a "Not Authorized" error for the field. Returning
+ * or throwing an error will also prevent the resolver from
+ * executing.
+ */  
+authorize?: AuthorizeResolver<TypeName, FieldName>
   `,
   definition(config) {
     if (config.fieldConfig.authorize) {

@@ -1,5 +1,5 @@
 // All of the Public API definitions
-export { buildTypes, makeSchema } from "./builder";
+export { makeSchema } from "./builder";
 export {
   arg,
   booleanArg,

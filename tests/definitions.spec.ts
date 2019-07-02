@@ -1,8 +1,12 @@
 /// <reference types="jest" />
-import { GraphQLEnumType, GraphQLObjectType, printType } from "graphql";
+import {
+  GraphQLEnumType,
+  GraphQLObjectType,
+  printType,
+  GraphQLNamedType,
+} from "graphql";
 import {
   idArg,
-  buildTypes,
   enumType,
   extendType,
   objectType,
@@ -10,6 +14,7 @@ import {
   extendInputType,
 } from "../src";
 import { UserObject, PostObject } from "./_helpers";
+import { SchemaBuilder } from "../src/core";
 
 enum NativeColors {
   RED = "RED",
@@ -21,6 +26,10 @@ enum NativeNumbers {
   ONE = 1,
   TWO = 2,
   THREE = 3,
+}
+
+function buildTypes<T extends Record<string, GraphQLNamedType>>(types: any) {
+  return new SchemaBuilder({ outputs: false, types }).getFinalTypeMap<T>();
 }
 
 describe("enumType", () => {

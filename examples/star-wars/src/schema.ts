@@ -21,5 +21,5 @@ export const schema = makeSchema({
     ],
     contextType: "swapi.ContextType",
   },
-  plugins: [plugin.AuthorizationPlugin],
+  plugins: [plugin.AuthorizationPlugin, plugin.enforceDocs],
 });

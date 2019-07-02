@@ -327,16 +327,22 @@ export class SchemaBuilder {
    */
   protected finalized: boolean = false;
 
-  constructor(protected config: BuilderConfig) {
+  constructor(protected config: SchemaConfig) {
     this.nonNullDefaults = {
       input: false,
       output: true,
       ...config.nonNullDefaults,
     };
+    addTypes(this, config.types);
+    this.plugins = config.plugins || [];
   }
 
   getConfig(): BuilderConfig {
     return this.config;
+  }
+
+  getPlugins(): PluginDef[] {
+    return this.plugins;
   }
 
   /**
@@ -454,7 +460,7 @@ export class SchemaBuilder {
     }
   }
 
-  getFinalTypeMap(): BuildTypes<any> {
+  getFinalTypeMap<T extends Record<string, GraphQLNamedType>>(): BuildTypes<T> {
     this.finalized = true;
     this.walkTypes();
     // If Query isn't defined, set it to null so it falls through to "missingType"
@@ -492,7 +498,7 @@ export class SchemaBuilder {
       }
     });
     return {
-      typeMap: this.finalTypeMap,
+      typeMap: this.finalTypeMap as any,
       dynamicFields: {
         dynamicInputFields: this.dynamicInputFields,
         dynamicOutputFields: this.dynamicOutputFields,
@@ -1294,7 +1300,7 @@ export type DynamicFieldDefs = {
 };
 
 export interface BuildTypes<
-  TypeMapDefs extends Record<string, GraphQLNamedType>
+  TypeMapDefs extends Record<string, GraphQLNamedType> = any
 > {
   typeMap: TypeMapDefs;
   dynamicFields: DynamicFieldDefs;
@@ -1306,18 +1312,6 @@ export interface BuildTypes<
  * better developer experience. This is primarily useful for testing
  * type generation
  */
-export function buildTypes<
-  TypeMapDefs extends Record<string, GraphQLNamedType> = any
->(
-  types: any,
-  config: BuilderConfig = { outputs: false },
-  schemaBuilder?: SchemaBuilder
-): BuildTypes<TypeMapDefs> {
-  const builder = schemaBuilder || new SchemaBuilder(config);
-  addTypes(builder, types);
-  return builder.getFinalTypeMap();
-}
-
 function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
@@ -1356,14 +1350,10 @@ export type NexusSchema = GraphQLSchema & {
  * from this one day.
  */
 export function makeSchemaInternal(
-  options: SchemaConfig,
-  schemaBuilder?: SchemaBuilder
-): { schema: NexusSchema } {
-  const { typeMap, dynamicFields, rootTypings } = buildTypes(
-    options.types,
-    options,
-    schemaBuilder
-  );
+  config: SchemaConfig
+): { schema: NexusSchema; builder: SchemaBuilder } {
+  const builder = new SchemaBuilder(config);
+  const { typeMap, dynamicFields, rootTypings } = builder.getFinalTypeMap();
   let { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
@@ -1399,7 +1389,7 @@ export function makeSchemaInternal(
       dynamicFields,
     },
   };
-  return { schema };
+  return { schema, builder };
 }
 
 /**
@@ -1409,8 +1399,8 @@ export function makeSchemaInternal(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(options: SchemaConfig): NexusSchema {
-  const { schema } = makeSchemaInternal(options);
+export function makeSchema(config: SchemaConfig): NexusSchema {
+  const { schema, builder } = makeSchemaInternal(config);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
@@ -1418,12 +1408,12 @@ export function makeSchema(options: SchemaConfig): NexusSchema {
     shouldGenerateArtifacts = Boolean(
       !process.env.NODE_ENV || process.env.NODE_ENV === "development"
     ),
-  } = options;
+  } = config;
 
   if (shouldGenerateArtifacts) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(options).generateArtifacts(schema).catch((e) => {
+    new TypegenMetadata(builder, schema).generateArtifacts().catch((e) => {
       console.error(e);
     });
   }

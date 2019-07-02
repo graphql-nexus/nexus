@@ -1,6 +1,6 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import path from "path";
-import { Typegen } from "./typegen";
+import { TypegenPrinter } from "./typegen";
 import { assertAbsolutePath } from "./utils";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { typegenAutoConfig } from "./typegenAutoConfig";
@@ -12,7 +12,7 @@ import {
   BuilderConfig,
   TypegenInfo,
   NexusSchema,
-  NexusSchemaExtensions,
+  SchemaBuilder,
 } from "./builder";
 
 /**
@@ -21,9 +21,16 @@ import {
  * generated types and/or SDL artifact, including but not limited to:
  */
 export class TypegenMetadata {
+  protected config: BuilderConfig;
   protected typegenFile: string = "";
+  protected sortedSchema: GraphQLSchema;
 
-  constructor(protected config: BuilderConfig) {
+  constructor(
+    protected builder: SchemaBuilder,
+    protected nexusSchema: NexusSchema
+  ) {
+    this.sortedSchema = this.sortSchema(nexusSchema);
+    const config = (this.config = builder.getConfig());
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
       if (config.outputs.typegen) {
         this.typegenFile = assertAbsolutePath(
@@ -34,31 +41,39 @@ export class TypegenMetadata {
     }
   }
 
+  getNexusSchema() {
+    return this.nexusSchema;
+  }
+
+  getBuilder() {
+    return this.builder;
+  }
+
+  getTypegenFile() {
+    return this.typegenFile;
+  }
+
   /**
    * Generates the artifacts of the build based on what we
    * know about the schema and how it was defined.
    */
-  async generateArtifacts(schema: NexusSchema) {
-    const sortedSchema = this.sortSchema(schema);
+  async generateArtifacts() {
     if (this.config.outputs) {
       if (this.config.outputs.schema) {
         await this.writeFile(
           "schema",
-          this.generateSchemaFile(sortedSchema),
+          this.generateSchemaFile(this.sortedSchema),
           this.config.outputs.schema
         );
       }
       if (this.typegenFile) {
-        const value = await this.generateTypesFile(
-          sortedSchema,
-          schema.extensions.nexus
-        );
+        const value = await this.generateTypesFile();
         await this.writeFile("types", value, this.typegenFile);
       }
     }
   }
 
-  sortSchema(schema: GraphQLSchema) {
+  protected sortSchema(schema: GraphQLSchema) {
     let sortedSchema = schema;
     if (typeof lexicographicSortSchema !== "undefined") {
       sortedSchema = lexicographicSortSchema(schema);
@@ -66,7 +81,11 @@ export class TypegenMetadata {
     return sortedSchema;
   }
 
-  async writeFile(type: "schema" | "types", output: string, filePath: string) {
+  protected async writeFile(
+    type: "schema" | "types",
+    output: string,
+    filePath: string
+  ) {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
       return Promise.reject(
         new Error(
@@ -111,7 +130,7 @@ export class TypegenMetadata {
   /**
    * Generates the schema, adding any directives as necessary
    */
-  generateSchemaFile(schema: GraphQLSchema): string {
+  protected generateSchemaFile(schema: GraphQLSchema): string {
     let printedSchema = printSchema(schema);
     return [SDL_HEADER, printedSchema].join("\n\n");
   }
@@ -119,32 +138,23 @@ export class TypegenMetadata {
   /**
    * Generates the type definitions
    */
-  async generateTypesFile(
-    schema: GraphQLSchema,
-    extensions: NexusSchemaExtensions
-  ): Promise<string> {
-    return new Typegen(
-      schema,
-      {
-        ...(await this.getTypegenInfo(schema)),
-        typegenFile: this.typegenFile,
-      },
-      extensions
-    ).print();
+  protected async generateTypesFile(): Promise<string> {
+    const typegenInfo = await this.getTypegenInfo();
+    return new TypegenPrinter(this, typegenInfo).print();
   }
 
-  async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {
+  protected async getTypegenInfo(): Promise<TypegenInfo> {
     if (this.config.typegenConfig) {
       if (this.config.typegenAutoConfig) {
         console.warn(
           `Only one of typegenConfig and typegenAutoConfig should be specified, ignoring typegenConfig`
         );
       }
-      return this.config.typegenConfig(schema, this.typegenFile);
+      return this.config.typegenConfig(this.sortedSchema, this.typegenFile);
     }
     if (this.config.typegenAutoConfig) {
       return typegenAutoConfig(this.config.typegenAutoConfig)(
-        schema,
+        this.sortedSchema,
         this.typegenFile
       );
     }

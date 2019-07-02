@@ -68,8 +68,7 @@ export class ObjectDefinitionBlock<
   }
 }
 
-export interface NexusObjectTypeConfig<TypeName extends string>
-  extends NexusAugmentedTypeConfig<TypeName> {
+export type NexusObjectTypeConfig<TypeName extends string> = {
   name: TypeName;
   definition(t: ObjectDefinitionBlock<TypeName>): void;
   /**
@@ -91,7 +90,7 @@ export interface NexusObjectTypeConfig<TypeName extends string>
    * Root type information for this type
    */
   rootTyping?: RootTypingDef;
-}
+} & NexusAugmentedTypeConfig<TypeName>;
 
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(

@@ -55,13 +55,37 @@ export interface PluginDefinitionInfo {
 }
 
 export interface PluginConfig {
+  /**
+   * A name for the plugin, useful for errors, etc.
+   */
   name: string;
+  /**
+   * A description for the plugin
+   */
   description?: string;
+  /**
+   * Any type definitions we want to add to the schema
+   */
   schemaTypes?: string;
+  /**
+   * Any type definitions we want to add to the type definition option
+   */
   typeDefTypes?: string;
+  /**
+   * Any type definitions we want to add to the field definitions
+   */
   fieldDefTypes?: string;
+  /**
+   * Any extensions to the GraphQLInfoObject
+   */
   infoExtension?: string;
+  /**
+   * Any types which should exist as standalone declarations to support this type
+   */
   localTypes?: string;
+  /**
+   * Definition for the plugin
+   */
   definition?(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
 }
 

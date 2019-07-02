@@ -8,7 +8,6 @@ import {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
-  GraphQLSchema,
   GraphQLUnionType,
   isEnumType,
   isInputObjectType,
@@ -24,7 +23,12 @@ import {
   defaultFieldResolver,
 } from "graphql";
 import path from "path";
-import { TypegenInfo, NexusSchemaExtensions } from "./builder";
+import {
+  TypegenInfo,
+  NexusSchemaExtensions,
+  NexusSchema,
+  SchemaBuilder,
+} from "./builder";
 import {
   eachObj,
   GroupedTypes,
@@ -33,6 +37,7 @@ import {
   relativePathTo,
 } from "./utils";
 import { WrappedResolver } from "./definitions/_types";
+import { TypegenMetadata } from "./typegenMetadata";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -65,15 +70,22 @@ type RootTypeMapping = Record<
  *
  * - Non-scalar types will get a dedicated "Root" type associated with it
  */
-export class Typegen {
+export class TypegenPrinter {
+  protected schema: NexusSchema;
+  protected builder: SchemaBuilder;
+  protected typegenFile: string;
+  protected extensions: NexusSchemaExtensions;
   groupedTypes: GroupedTypes;
 
   constructor(
-    protected schema: GraphQLSchema,
-    protected typegenInfo: TypegenInfo & { typegenFile: string },
-    protected extensions: NexusSchemaExtensions
+    protected typegenMetadata: TypegenMetadata,
+    protected typegenInfo: TypegenInfo
   ) {
-    this.groupedTypes = groupTypes(schema);
+    this.schema = typegenMetadata.getNexusSchema();
+    this.builder = typegenMetadata.getBuilder();
+    this.typegenFile = typegenMetadata.getTypegenFile();
+    this.extensions = this.schema.extensions.nexus;
+    this.groupedTypes = groupTypes(typegenMetadata.getNexusSchema());
   }
 
   print() {
@@ -149,7 +161,7 @@ export class Typegen {
       imports.push(`import { core } from "nexus"`);
     }
     const importMap: Record<string, Set<string>> = {};
-    const outputPath = this.typegenInfo.typegenFile;
+    const outputPath = this.typegenFile;
     eachObj(rootTypings, (val, key) => {
       if (typeof val !== "string") {
         const importPath = (path.isAbsolute(val.path)
@@ -681,8 +693,51 @@ export class Typegen {
   }
 
   printPlugins() {
-    return "";
+    const pluginSchemaExt: string[] = [
+      `  interface NexusAugmentedSchemaConfig {`,
+    ];
+    const pluginTypeExt: string[] = [
+      `  interface NexusAugmentedTypeConfig<TypeName extends string> {`,
+    ];
+    const pluginFieldExt: string[] = [
+      `  interface NexusAugmentedFieldConfig<TypeName extends string, FieldName extends string> {`,
+    ];
+    const printInlineDefs: string[] = [];
+    const plugins = this.builder.getPlugins();
+    plugins.forEach((plugin) => {
+      if (plugin.config.localTypes) {
+        printInlineDefs.push(plugin.config.localTypes);
+      }
+      if (plugin.config.fieldDefTypes) {
+        pluginFieldExt.push(padLeft(plugin.config.fieldDefTypes, "    "));
+      }
+      if (plugin.config.schemaTypes) {
+        pluginSchemaExt.push(padLeft(plugin.config.schemaTypes, "    "));
+      }
+      if (plugin.config.typeDefTypes) {
+        pluginTypeExt.push(padLeft(plugin.config.typeDefTypes, "    "));
+      }
+    });
+    return [
+      printInlineDefs.join("\n"),
+      [
+        "declare global {",
+        [
+          pluginSchemaExt.concat("  }").join("\n"),
+          pluginTypeExt.concat("  }").join("\n"),
+          pluginFieldExt.concat("  }").join("\n"),
+        ].join("\n"),
+        "}",
+      ].join("\n"),
+    ].join("\n");
   }
+}
+
+function padLeft(str: string, padding: string) {
+  return str
+    .split("\n")
+    .map((s) => `${padding}${s}`)
+    .join("\n");
 }
 
 const GLOBAL_DECLARATION = `

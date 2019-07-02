@@ -1,9 +1,13 @@
 import path from "path";
 import { core, makeSchema, queryType, enumType } from "../src";
 import { A, B } from "./_types";
-import { NexusSchemaExtensions } from "../src/core";
+import {
+  NexusSchemaExtensions,
+  SchemaBuilder,
+  makeSchemaInternal,
+} from "../src/core";
 
-const { Typegen, TypegenMetadata } = core;
+const { TypegenPrinter, TypegenMetadata } = core;
 
 export enum TestEnum {
   A = "a",
@@ -49,7 +53,8 @@ describe("backingTypes", () => {
   let schemaExtensions: NexusSchemaExtensions;
 
   beforeEach(async () => {
-    metadata = new TypegenMetadata({
+    const { builder, schema } = makeSchemaInternal({
+      types: [],
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
@@ -64,11 +69,12 @@ describe("backingTypes", () => {
         contextType: "t.TestContext",
       },
     });
+    metadata = new TypegenMetadata(builder, schema);
   });
 
   it("can match backing types to regular enums", async () => {
     const schema = getSchemaWithNormalEnums();
-    const typegenInfo = await metadata.getTypegenInfo(schema);
+    const typegenInfo = await metadata.getTypegenInfo();
     const typegen = new Typegen(
       schema,
       { ...typegenInfo, typegenFile: "" },
@@ -101,7 +107,6 @@ describe("backingTypes", () => {
 
 describe("rootTypings", () => {
   it("can import enum via rootTyping", async () => {
-    const metadata = new TypegenMetadata({ outputs: false });
     const schema = makeSchema({
       types: [
         enumType({
@@ -115,6 +120,8 @@ describe("rootTypings", () => {
       ],
       outputs: false,
     });
+    const builder = new SchemaBuilder({ outputs: false });
+    const metadata = new TypegenMetadata(builder, schema);
     const typegenInfo = await metadata.getTypegenInfo(schema);
     const typegen = new Typegen(
       schema,

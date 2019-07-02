@@ -16,8 +16,8 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  Episode: 5 | 6 | 4
-  MoreEpisodes: 5 | 6 | 4 | "OTHER"
+  Episode: 4 | 5 | 6
+  MoreEpisodes: 4 | 5 | 6 | "OTHER"
 }
 
 export interface NexusGenRootTypes {
@@ -39,29 +39,29 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   Droid: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
     id: string; // String!
     name: string; // String!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
     primaryFunction: string; // String!
   }
   Human: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
-    homePlanet: string | null; // String
     id: string; // String!
     name: string; // String!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    homePlanet: string | null; // String
   }
   Query: { // field return type
-    droid: NexusGenRootTypes['Droid']; // Droid!
     hero: NexusGenRootTypes['Character']; // Character!
     human: NexusGenRootTypes['Human']; // Human!
+    droid: NexusGenRootTypes['Droid']; // Droid!
   }
   Character: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
     id: string; // String!
     name: string; // String!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
   }
 }
 
@@ -77,13 +77,13 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
-    droid: { // args
-      id: string; // String!
-    }
     hero: { // args
       episode?: NexusGenEnums['Episode'] | null; // Episode
     }
     human: { // args
+      id: string; // String!
+    }
+    droid: { // args
       id: string; // String!
     }
   }
@@ -95,7 +95,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  Character: "Droid" | "Human"
+  Character: "Human" | "Droid"
 }
 
 export interface NexusGenInheritedFields {}
@@ -131,4 +131,39 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+
+import { core } from 'nexus'; 
+import { GraphQLResolveInfo } from 'graphql';
+export type AuthorizeResolver<
+  TypeName extends string,
+  FieldName extends string
+> = (
+  root: core.RootValue<TypeName>,
+  args: core.ArgsValue<TypeName, FieldName>,
+  context: core.GetGen<"context">,
+  info: GraphQLResolveInfo
+) => core.PromiseOrValue<boolean | Error>;
+  
+declare global {
+  interface NexusAugmentedSchemaConfig {
+  }
+  interface NexusAugmentedTypeConfig<TypeName extends string> {
+    description: string;
+  }
+  interface NexusAugmentedFieldConfig<TypeName extends string, FieldName extends string> {
+    
+    /**
+     * Authorization for an individual field. Returning "true"
+     * or "Promise<true>" means the field can be accessed.
+     * Returning "false" or "Promise<false>" will respond
+     * with a "Not Authorized" error for the field. Returning
+     * or throwing an error will also prevent the resolver from
+     * executing.
+     */  
+    authorize?: AuthorizeResolver<TypeName, FieldName>
+      
+    description: string;
+  }
 }
