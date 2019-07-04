@@ -61,15 +61,15 @@ model User {
 
 - **Queries**
 
-  - **`findOneUser(...): User!`**: Returns a single record
-  - **`findManyUser(...): [User!]!`**: Returns a list of records
+  - **`user(...): User!`**: Returns a single record
+  - **`users(...): [User!]!`**: Returns a list of records
 
 - **Mutations**
 
   - **`createUser(...): User!`**: Creates a new record
   - **`updateUser(...): User`**: Updates a record
   - **`deleteUser(...): User`**: Deletes a record
-  - **`updatesManyUsers(...): BatchPayload!`**: Updates many records in bulk
+  - **`updateManyUsers(...): BatchPayload!`**: Updates many records in bulk
   - **`deleteManyUsers(...): BatchPayload!`**: Deletes many records in bulk
 
 - [**GraphQL input types**](https://graphql.org/graphql-js/mutations-and-input-types/)
@@ -108,8 +108,8 @@ import { GraphQLServer } from "graphql-yoga";
 const Query = objectType({
   name: "Query",
   definition(t) {
-    t.crud.findOneTodo();
-    t.crud.findManyTodo();
+    t.crud.todo();
+    t.crud.todos();
   },
 });
 
@@ -376,10 +376,10 @@ import { Photon } from "@generated/photon";
 const Query = objectType({
   name: "Query",
   definition(t) {
-    t.crud.findOneUser();
-    t.crud.findManyUser();
-    t.crud.findOnePost();
-    t.crud.findManyPost();
+    t.crud.user();
+    t.crud.users();
+    t.crud.post();
+    t.crud.posts();
   },
 });
 const Mutation = objectType({
@@ -452,16 +452,16 @@ You can see the generated SDL for the GraphQL API in `./generated/schema.graphql
 
 ```graphql
 type Query {
-  findOnePost(where: PostWhereUniqueInput!): Post
-  findManyPost(
+  post(where: PostWhereUniqueInput!): Post
+  posts(
     after: String
     before: String
     first: Int
     last: Int
     skip: Int
   ): [Post!]!
-  findOneUser(where: UserWhereUniqueInput!): User
-  findManyUser(
+  user(where: UserWhereUniqueInput!): User
+  users(
     after: String
     before: String
     first: Int
@@ -716,15 +716,15 @@ As an example, assume you have a `User` type in your Prisma schema. `nexus-prism
 
 - Queries
 
-  - `findOneUser(...): User!`: Returns a single record
-  - `findManyUser(...): [User!]!`: Returns a list of records
+  - `user(...): User!`: Returns a single record
+  - `users(...): [User!]!`: Returns a list of records
 
 - Mutations
 
   - `createUser(...): User!`: Creates a new record
   - `updateUser(...): User`: Updates a record
   - `deleteUser(...): User`: Deletes a record
-  - `updatesManyUsers(...): BatchPayload!`: Updates many records in bulk
+  - `updateManyUsers(...): BatchPayload!`: Updates many records in bulk
   - `deleteManyUsers(...): BatchPayload!`: Deletes many records in bulk
 
 - [GraphQL input types](https://graphql.org/graphql-js/mutations-and-input-types/)
@@ -899,8 +899,8 @@ Given a prisma model name `User`, `t.crud` will expose the following field metho
 
 **On the `Query` type**
 
-- `t.crud.findOneUser()`
-- `t.crud.findManyUser()`
+- `t.crud.user()`
+- `t.crud.users()`
 
 `t.crud` works very much in the same way as `t.model` does. Please read the `t.model` section for more information.
 
