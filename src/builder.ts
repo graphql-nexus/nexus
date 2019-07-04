@@ -1171,10 +1171,17 @@ export class SchemaBuilder {
     // @ts-ignore
     block[methodName] = (fieldName: string, opts: any) => {
       // @ts-ignore
-      block.field(fieldName, {
+      const fieldConfig = {
         type: typeName,
-        ...opts,
-      });
+        ...opts
+      }
+
+      if (typeof opts === 'function') {
+        fieldConfig['resolve'] = opts
+      }
+
+      // @ts-ignore
+      block.field(fieldName, fieldConfig);
     };
   }
 
