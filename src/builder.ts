@@ -1177,7 +1177,7 @@ export class SchemaBuilder {
       }
 
       if (typeof opts === 'function') {
-        fieldConfig['resolve'] = opts
+        fieldConfig.resolve = opts
       }
 
       // @ts-ignore
