@@ -22,6 +22,7 @@ describe("custom scalars", () => {
         }),
         queryType({
           definition(t) {
+            // @ts-ignore 
             t.date('testDate', () => now)
           }
         })
@@ -33,7 +34,7 @@ describe("custom scalars", () => {
         testDate
       }
     `
-    const result: Result  = await graphql(schema, query)
+    const result: Result = await graphql(schema, query)
     expect(result.data!.testDate).toBe(now.getTime())
   });
 });
