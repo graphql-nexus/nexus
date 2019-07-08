@@ -34,6 +34,6 @@ describe("custom scalars", () => {
       }
     `
     const result: Result  = await graphql(schema, query)
-    expect(result.data.testDate).toBe(now.getTime())
+    expect(result.data!.testDate).toBe(now.getTime())
   });
 });
