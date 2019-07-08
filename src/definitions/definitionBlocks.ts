@@ -42,15 +42,15 @@ export interface CommonFieldConfig {
   list?: true | boolean[];
 }
 
-export interface CommonOutputFieldConfig<
+export type CommonOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
-> extends CommonFieldConfig, NexusAugmentedFieldConfig<TypeName, FieldName> {
+> = CommonFieldConfig & {
   /**
    * Arguments for the field
    */
   args?: ArgsRecord;
-}
+} & NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 export interface OutputScalarConfig<
   TypeName extends string,

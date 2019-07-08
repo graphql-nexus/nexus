@@ -31,19 +31,9 @@ export interface FieldModification<
   resolve?: FieldResolver<TypeName, FieldName>;
 }
 
-export interface FieldModificationDef<
-  TypeName extends string,
-  FieldName extends string
-> extends FieldModification<TypeName, FieldName> {
-  field: FieldName;
-}
-
 export interface ObjectDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void;
-  addFieldModifications<FieldName extends string>(
-    changes: FieldModificationDef<TypeName, FieldName>
-  ): void;
 }
 
 export class ObjectDefinitionBlock<
@@ -58,13 +48,13 @@ export class ObjectDefinitionBlock<
   implements(...interfaceName: Array<Implemented>) {
     this.typeBuilder.addInterfaces(interfaceName);
   }
-  /**
-   * Modifies a field added via an interface
-   */
+
   modify<
     FieldName extends Extract<keyof GetGen2<"fieldTypes", TypeName>, string>
   >(field: FieldName, modifications: FieldModification<TypeName, FieldName>) {
-    this.typeBuilder.addFieldModifications({ ...modifications, field });
+    throw new Error(
+      "This method has been removed, if you were using it - please open an issue so we can discuss a suitable API replacement"
+    );
   }
 }
 
@@ -90,7 +80,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef;
-} & NexusAugmentedTypeConfig<TypeName>;
+} & NexusGenPluginTypeConfig<TypeName>;
 
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(

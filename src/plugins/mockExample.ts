@@ -1,10 +1,18 @@
 import { plugin } from "../plugin";
 
-export const mockExamplePlugin = plugin({
-  name: "MockExample",
-  description:
-    "Generates an example resolver that can be used when mocking out a schema",
-  fieldDefTypes: ``,
-  schemaTypes: ``,
-  definition() {},
-});
+export type MockResolverPluginConfig = {};
+
+export const mockResolverPlugin = (config: MockResolverPluginConfig) => {
+  return plugin({
+    name: "MockResolver",
+    description:
+      "Generates an example resolver that can be used when mocking out a schema",
+    fieldDefTypes: `
+mockResolve?: core.FieldResolver<TypeName, FieldName>
+    `,
+    schemaTypes: `
+mockResolversEnabled: boolean | ((ctx: core.GetGen<"context">) => boolean)
+    `,
+    pluginDefinition(config) {},
+  });
+};

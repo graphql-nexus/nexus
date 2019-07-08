@@ -14,6 +14,8 @@ import {
   isInterfaceType,
   isEnumType,
   specifiedScalarTypes,
+  GraphQLFieldConfigArgumentMap,
+  GraphQLArgument,
 } from "graphql";
 import path from "path";
 
@@ -228,4 +230,15 @@ export function relativePathTo(
     return `./${path.join(relative, filename)}`;
   }
   return path.join(relative, filename);
+}
+
+export function argsToConfig(
+  args: GraphQLArgument[]
+): GraphQLFieldConfigArgumentMap {
+  const result: GraphQLFieldConfigArgumentMap = {};
+  args.forEach((arg) => {
+    const { name, ...argRest } = arg;
+    result[name] = argRest;
+  });
+  return result;
 }

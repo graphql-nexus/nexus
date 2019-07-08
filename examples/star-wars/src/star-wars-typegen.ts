@@ -147,12 +147,9 @@ export type AuthorizeResolver<
 ) => core.PromiseOrValue<boolean | Error>;
   
 declare global {
-  interface NexusAugmentedSchemaConfig {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {
   }
-  interface NexusAugmentedTypeConfig<TypeName extends string> {
-    description: string;
-  }
-  interface NexusAugmentedFieldConfig<TypeName extends string, FieldName extends string> {
+  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
     
     /**
      * Authorization for an individual field. Returning "true"
@@ -161,9 +158,10 @@ declare global {
      * with a "Not Authorized" error for the field. Returning
      * or throwing an error will also prevent the resolver from
      * executing.
-     */  
+     */
     authorize?: AuthorizeResolver<TypeName, FieldName>
       
-    description: string;
+  }
+  interface NexusGenPluginSchemaConfig {
   }
 }

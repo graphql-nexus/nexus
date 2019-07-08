@@ -1,4 +1,5 @@
 import { plugin } from "../plugin";
+import { GraphQLFieldResolver } from "graphql";
 
 export const AuthorizationPlugin = plugin({
   name: "Authorization",
@@ -23,19 +24,19 @@ export type AuthorizeResolver<
  * with a "Not Authorized" error for the field. Returning
  * or throwing an error will also prevent the resolver from
  * executing.
- */  
+ */
 authorize?: AuthorizeResolver<TypeName, FieldName>
   `,
-  definition(config) {
-    if (config.fieldConfig.authorize) {
+  pluginDefinition(config) {
+    if (!config.nexusFieldConfig) {
+      return;
+    }
+    const authorizeFn = (config.nexusFieldConfig as any)
+      .authorize as GraphQLFieldResolver<any, any>;
+    if (authorizeFn) {
       return {
         async before(root, args, ctx, info, next) {
-          const authResult = await config.fieldConfig.authorize(
-            root,
-            args,
-            ctx,
-            info
-          );
+          const authResult = await authorizeFn(root, args, ctx, info);
           if (authResult === true) {
             return next;
           }

@@ -25,5 +25,3 @@ const User = objectType({
   },
 });
 ```
-
-If you need to modify the description or resolver defined by an interface, you can call the `modify` method on `objectType` to change these after the fact.

@@ -36,6 +36,7 @@ import {
   assertValidName,
   getNamedType,
   GraphQLField,
+  GraphQLObjectTypeConfig,
 } from "graphql";
 import {
   NexusArgConfig,
@@ -61,7 +62,6 @@ import {
   NexusInterfaceTypeDef,
 } from "./definitions/interfaceType";
 import {
-  FieldModificationDef,
   Implemented,
   NexusObjectTypeConfig,
   NexusObjectTypeDef,
@@ -101,6 +101,7 @@ import {
   NonNullConfig,
   WrappedResolver,
   RootTypings,
+  Omit,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
@@ -112,6 +113,7 @@ import {
   suggestionList,
   isObject,
   eachObj,
+  argsToConfig,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -124,6 +126,7 @@ import {
   PluginVisitBefore,
   PluginVisitAfter,
   wrapPluginsAfter,
+  PluginDefinitionInfo,
 } from "./plugin";
 
 export type Maybe<T> = T | null;
@@ -226,16 +229,14 @@ export interface TypegenInfo {
   contextType?: string;
 }
 
-export interface SchemaConfig
-  extends BuilderConfig,
-    NexusAugmentedSchemaConfig {
+export type SchemaConfig = BuilderConfig & {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
    * valid types, ignoring invalid ones.
    */
   types: any;
-}
+} & NexusGenPluginSchemaConfig;
 
 export type TypeToWalk =
   | { type: "named"; value: GraphQLNamedType }
@@ -537,18 +538,10 @@ export class SchemaBuilder {
   buildObjectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
     const interfaces: Implemented[] = [];
-    const modifications: Record<
-      string,
-      FieldModificationDef<string, string>[]
-    > = {};
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: config.name,
       addField: (fieldDef) => fields.push(fieldDef),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      addFieldModifications(mods) {
-        modifications[mods.field] = modifications[mods.field] || [];
-        modifications[mods.field].push(mods);
-      },
       addDynamicOutputFields: (block, isList) =>
         this.addDynamicOutputFields(block, isList),
     });
@@ -563,48 +556,37 @@ export class SchemaBuilder {
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping;
     }
+
+    const partialObjectConfig: Omit<
+      GraphQLObjectTypeConfig<any, any>,
+      "fields" | "interfaces"
+    > = {
+      name: config.name,
+      description: config.description,
+    };
+
     return this.finalize(
       new GraphQLObjectType({
-        name: config.name,
+        ...partialObjectConfig,
         interfaces: () => interfaces.map((i) => this.getInterface(i)),
-        description: config.description,
         fields: () => {
           const allFieldsMap: GraphQLFieldConfigMap<any, any> = {};
           const allInterfaces = interfaces.map((i) => this.getInterface(i));
           allInterfaces.forEach((i) => {
             const interfaceFields = i.getFields();
-            // We need to take the interface fields and reconstruct them
-            // this actually simplifies things becuase if we've modified
-            // the field at all it needs to happen here.
+            // Take the interface fields and reconstruct them with plugins, etc.
             Object.keys(interfaceFields).forEach((iFieldName) => {
-              const { isDeprecated, args, ...rest } = interfaceFields[
-                iFieldName
-              ];
-              allFieldsMap[iFieldName] = {
-                ...rest,
-                args: args.reduce(
-                  (result: GraphQLFieldConfigArgumentMap, a) => {
-                    const { name, ...argRest } = a;
-                    result[name] = argRest;
-                    return result;
-                  },
-                  {}
-                ),
-              };
-              const mods = modifications[iFieldName];
-              if (mods) {
-                mods.map((mod) => {
-                  if (typeof mod.description !== "undefined") {
-                    allFieldsMap[iFieldName].description = mod.description;
-                  }
-                  if (typeof mod.resolve !== "undefined") {
-                    allFieldsMap[iFieldName].resolve = mod.resolve;
-                  }
-                });
-              }
+              const interfaceField = interfaceFields[iFieldName];
+              allFieldsMap[iFieldName] = this.buildInterfaceFieldForObject(
+                interfaceField,
+                config
+              );
             });
           });
-          return this.buildObjectFields(fields, config, allFieldsMap);
+          fields.forEach((field) => {
+            allFieldsMap[field.name] = this.buildObjectField(field, config);
+          });
+          return allFieldsMap;
         },
       })
     );
@@ -629,7 +611,7 @@ export class SchemaBuilder {
       });
     }
     if (!resolveType) {
-      resolveType = this.missingResolveType(config.name, "union");
+      resolveType = this.missingResolveType(config.name, "interface");
     }
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping;
@@ -637,7 +619,16 @@ export class SchemaBuilder {
     return this.finalize(
       new GraphQLInterfaceType({
         name,
-        fields: () => this.buildObjectFields(fields, config, {}, true),
+        fields: () => {
+          const allInterfaceFields: GraphQLFieldConfigMap<any, any> = {};
+          fields.forEach((field) => {
+            allInterfaceFields[field.name] = this.buildInterfaceField(
+              field,
+              config
+            );
+          });
+          return allInterfaceFields;
+        },
         resolveType,
         description,
       })
@@ -785,22 +776,6 @@ export class SchemaBuilder {
     return unionMembers;
   }
 
-  protected buildObjectFields(
-    fields: NexusOutputFieldDef[],
-    typeConfig: NexusObjectTypeConfig<any> | NexusInterfaceTypeConfig<any>,
-    intoObject: GraphQLFieldConfigMap<any, any>,
-    forInterface: boolean = false
-  ): GraphQLFieldConfigMap<any, any> {
-    fields.forEach((field) => {
-      intoObject[field.name] = this.buildObjectField(
-        field,
-        typeConfig,
-        forInterface
-      );
-    });
-    return intoObject;
-  }
-
   protected buildInputObjectFields(
     fields: NexusInputFieldDef[],
     typeConfig: NexusInputObjectTypeConfig<string>
@@ -814,10 +789,41 @@ export class SchemaBuilder {
 
   protected buildObjectField(
     fieldConfig: NexusOutputFieldDef,
-    typeConfig:
-      | NexusObjectTypeConfig<string>
-      | NexusInterfaceTypeConfig<string>,
-    forInterface: boolean = false
+    typeConfig: NexusObjectTypeConfig<string>
+  ): GraphQLFieldConfig<any, any> {
+    if (!fieldConfig.type) {
+      throw new Error(
+        `Missing required "type" field for ${typeConfig.name}.${
+          fieldConfig.name
+        }`
+      );
+    }
+    const partialFieldConfig: Omit<GraphQLFieldConfig<any, any>, "resolve"> = {
+      type: this.decorateType(
+        this.getOutputType(fieldConfig.type),
+        fieldConfig.list,
+        this.outputNonNull(typeConfig, fieldConfig)
+      ),
+      args: this.buildArgs(fieldConfig.args || {}, typeConfig),
+      description: fieldConfig.description,
+      deprecationReason: fieldConfig.deprecation,
+      subscribe: this.getSubscribe(fieldConfig),
+    };
+    return {
+      ...partialFieldConfig,
+      resolve: this.getResolver({
+        typeName: typeConfig.name,
+        fieldName: fieldConfig.name,
+        nexusTypeConfig: typeConfig,
+        graphqlFieldConfig: partialFieldConfig,
+        resolve: fieldConfig.resolve,
+      }),
+    };
+  }
+
+  protected buildInterfaceField(
+    fieldConfig: NexusOutputFieldDef,
+    typeConfig: NexusInterfaceTypeConfig<string>
   ): GraphQLFieldConfig<any, any> {
     if (!fieldConfig.type) {
       throw new Error(
@@ -833,10 +839,33 @@ export class SchemaBuilder {
         this.outputNonNull(typeConfig, fieldConfig)
       ),
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
-      resolve: this.getResolver(fieldConfig, typeConfig, forInterface),
+      resolve: fieldConfig.resolve,
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
-      subscribe: forInterface ? undefined : this.getSubscribe(fieldConfig),
+      subscribe: undefined,
+    };
+  }
+
+  protected buildInterfaceFieldForObject(
+    fieldConfig: GraphQLField<any, any>,
+    typeConfig: NexusObjectTypeConfig<string>
+  ): GraphQLFieldConfig<any, any> {
+    const { isDeprecated, deprecationReason, ...rest } = fieldConfig;
+    const partialFieldConfig: Omit<GraphQLFieldConfig<any, any>, "resolve"> = {
+      ...rest,
+      args: argsToConfig(rest.args),
+      deprecationReason: isDeprecated ? deprecationReason : undefined,
+    };
+    return {
+      ...partialFieldConfig,
+      resolve: this.getResolver({
+        fieldName: fieldConfig.name,
+        typeName: typeConfig.name,
+        // nexusFieldConfig: fieldConfig, - todo, get this from an interface lookup
+        nexusTypeConfig: typeConfig,
+        graphqlFieldConfig: partialFieldConfig,
+        resolve: fieldConfig.resolve,
+      }),
     };
   }
 
@@ -1091,17 +1120,15 @@ export class SchemaBuilder {
     return subscribe;
   }
 
-  protected getResolver(
-    fieldConfig: NexusOutputFieldDef,
-    typeConfig: NexusObjectTypeConfig<any> | NexusInterfaceTypeConfig<any>,
-    forInterface: boolean = false
-  ) {
+  protected getResolver(getResolverConfig: GetResolverConfig) {
     let resolver: undefined | GraphQLFieldResolver<any, any>;
-    if (fieldConfig.resolve) {
-      resolver = fieldConfig.resolve;
+    if (getResolverConfig.resolve) {
+      resolver = getResolverConfig.resolve;
     }
-    if (!resolver && !forInterface) {
-      resolver = (typeConfig as NexusObjectTypeConfig<any>).defaultResolver;
+    if (!resolver && getResolverConfig.nexusTypeConfig) {
+      resolver = (getResolverConfig.nexusTypeConfig as NexusObjectTypeConfig<
+        any
+      >).defaultResolver;
     }
     let finalResolver = resolver;
     if (this.plugins.length) {
@@ -1110,11 +1137,10 @@ export class SchemaBuilder {
       // Execute all of the plugins for each individual resolver.
       for (let i = 0; i < this.plugins.length; i++) {
         const addedPlugin = this.plugins[i].config;
-        if (addedPlugin.definition) {
-          const returnDef = addedPlugin.definition({
-            schemaConfig: this.config,
-            typeConfig,
-            fieldConfig,
+        if (addedPlugin.pluginDefinition) {
+          const returnDef = addedPlugin.pluginDefinition({
+            ...getResolverConfig,
+            nexusSchemaConfig: this.config,
             mutableObj: {},
           });
           if (returnDef) {
@@ -1222,7 +1248,6 @@ export class SchemaBuilder {
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
-      addFieldModifications: () => {},
       addInterfaces: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputFields: (block, isList) =>
@@ -1441,3 +1466,8 @@ function normalizeArg(
   }
   return arg({ type: argVal });
 }
+
+export type GetResolverConfig = Omit<
+  PluginDefinitionInfo,
+  "nexusSchemaConfig" | "mutableObj"
+> & { resolve: GraphQLFieldResolver<any, any> | undefined };

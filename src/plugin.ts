@@ -1,7 +1,13 @@
 import { SchemaConfig } from "./builder";
-import { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
+import {
+  GraphQLFieldResolver,
+  GraphQLResolveInfo,
+  GraphQLFieldConfig,
+} from "graphql";
 import { withNexusSymbol, NexusTypes, Omit } from "./definitions/_types";
 import { isPromise } from "./utils";
+import { NexusObjectTypeConfig } from "./definitions/objectType";
+import { NexusOutputFieldConfig } from "./definitions/definitionBlocks";
 
 export class PluginDef {
   constructor(readonly config: PluginConfig) {}
@@ -30,19 +36,34 @@ export type PluginVisitor = {
   before?: PluginVisitBefore;
 };
 
-export interface PluginDefinitionInfo {
+export type PluginDefinitionInfo = {
   /**
-   *
+   * The name of the type we're applying the plugin to
    */
-  typeConfig: any;
+  typeName: string;
   /**
-   *
+   * The name of the field we're applying the plugin to
    */
-  fieldConfig: any;
+  fieldName: string;
   /**
    * The root-level SchemaConfig passed
    */
-  schemaConfig: Omit<SchemaConfig, "types">;
+  nexusSchemaConfig: Omit<SchemaConfig, "types">;
+  /**
+   * The config provided to the Nexus type containing the field.
+   * Will not exist if this is a non-Nexus GraphQL type.
+   */
+  nexusTypeConfig?: Omit<NexusObjectTypeConfig<string>, "definition">;
+  /**
+   * The config provided to the Nexus type containing the field.
+   * Will not exist if this is a non-Nexus GraphQL type.
+   */
+  nexusFieldConfig?: Omit<NexusOutputFieldConfig<string, string>, "resolve">;
+  /**
+   * Info about the GraphQL Field we're decorating.
+   * Always guaranteed to exist, even for non-Nexus GraphQL types
+   */
+  graphqlFieldConfig: Omit<GraphQLFieldConfig<any, any>, "resolve">;
   /**
    * If we need to collect/reference metadata during the
    * plugin middleware definition stage, you can use this object.
@@ -51,7 +72,22 @@ export interface PluginDefinitionInfo {
    * property for their input to reference in runtime. After the schema is complete,
    * this object is frozen so it is not abused at runtime.
    */
-  mutableObj: object;
+  mutableObj: Record<string, any>;
+};
+
+export interface RootTypingImport {
+  /**
+   * File path to import the type from.
+   */
+  path: string;
+  /**
+   * Name of the type we want to reference in the `path`
+   */
+  name: string;
+  /**
+   * Name we want the imported type to be referenced as
+   */
+  alias?: string;
 }
 
 export interface PluginConfig {
@@ -76,17 +112,18 @@ export interface PluginConfig {
    */
   fieldDefTypes?: string;
   /**
-   * Any extensions to the GraphQLInfoObject
+   * Any extensions to the GraphQLInfoObject (do we need this?)
    */
-  infoExtension?: string;
+  // infoExtension?: string;
   /**
    * Any types which should exist as standalone declarations to support this type
    */
   localTypes?: string;
   /**
-   * Definition for the plugin
+   * Definition for the plugin. This will be executed against every
+   * output type field on the schema.
    */
-  definition?(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
+  pluginDefinition?(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
 }
 
 /**

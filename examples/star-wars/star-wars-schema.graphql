@@ -5,6 +5,8 @@
 interface Character {
   """Which movies they appear in."""
   appearsIn(id: ID!): [Episode!]!
+
+  """The friends of the character, or an empty list if they have none."""
   friends: [Character!]!
 
   """The id of the character"""
@@ -18,6 +20,8 @@ interface Character {
 type Droid implements Character {
   """Which movies they appear in."""
   appearsIn(id: ID!): [Episode!]!
+
+  """The friends of the character, or an empty list if they have none."""
   friends: [Character!]!
 
   """The id of the character"""
@@ -30,6 +34,7 @@ type Droid implements Character {
   primaryFunction: String!
 }
 
+"""One of the films in the Star Wars Trilogy"""
 enum Episode {
   """Released in 1980."""
   EMPIRE
@@ -45,6 +50,8 @@ enum Episode {
 type Human implements Character {
   """Which movies they appear in."""
   appearsIn(id: ID!): [Episode!]!
+
+  """The friends of the character, or an empty list if they have none."""
   friends: [Character!]!
 
   """The home planet of the human, or null if unknown."""

@@ -693,14 +693,14 @@ export class TypegenPrinter {
   }
 
   printPlugins() {
+    const pluginFieldExt: string[] = [
+      `  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {`,
+    ];
     const pluginSchemaExt: string[] = [
-      `  interface NexusAugmentedSchemaConfig {`,
+      `  interface NexusGenPluginSchemaConfig {`,
     ];
     const pluginTypeExt: string[] = [
-      `  interface NexusAugmentedTypeConfig<TypeName extends string> {`,
-    ];
-    const pluginFieldExt: string[] = [
-      `  interface NexusAugmentedFieldConfig<TypeName extends string, FieldName extends string> {`,
+      `  interface NexusGenPluginTypeConfig<TypeName extends string> {`,
     ];
     const printInlineDefs: string[] = [];
     const plugins = this.builder.getPlugins();
@@ -723,9 +723,9 @@ export class TypegenPrinter {
       [
         "declare global {",
         [
-          pluginSchemaExt.concat("  }").join("\n"),
           pluginTypeExt.concat("  }").join("\n"),
           pluginFieldExt.concat("  }").join("\n"),
+          pluginSchemaExt.concat("  }").join("\n"),
         ].join("\n"),
         "}",
       ].join("\n"),

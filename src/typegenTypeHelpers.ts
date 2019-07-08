@@ -4,9 +4,9 @@ declare global {
   interface NexusGen {}
   interface NexusGenCustomInputMethods<TypeName extends string> {}
   interface NexusGenCustomOutputMethods<TypeName extends string> {}
-  interface NexusAugmentedSchemaConfig {}
-  interface NexusAugmentedTypeConfig<TypeName extends string> {}
-  interface NexusAugmentedFieldConfig<
+  interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
     TypeName extends string,
     FieldName extends string
   > {}
