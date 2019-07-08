@@ -8,25 +8,16 @@ describe("custom scalars", () => {
       types: [
         scalarType({
           name: "Date",
+          serialize: (value) => value.getTime(),
+          parseValue: (value) => new Date(value),
+          parseLiteral: (ast) => (ast.kind === "IntValue" ? new Date(ast.value) : null),
           asNexusMethod: "date",
-          description: "Date custom scalar type",
-          parseValue(value) {
-            return new Date(value);
-          },
-          serialize(value) {
-            return value.getTime();
-          },
-          parseLiteral(ast) {
-            if (ast.kind === Kind.INT) {
-              return new Date(ast.value);
-            }
-            return null;
-          },
+          rootTyping: "Date",
         }),
         queryType({
           definition(t) {
-          t.date('testDate', () => now)
-         }
+            t.date('testDate', () => now)
+          }
         })
       ],
       outputs: false,
