@@ -18,7 +18,7 @@
         "sidebar_label": "enumType"
       },
       "api-extendType": {
-        "title": "extendType",
+        "title": "extendType / extendInputType",
         "sidebar_label": "extendType"
       },
       "api-inputObjectType": {
@@ -33,9 +33,17 @@
         "title": "makeSchema",
         "sidebar_label": "makeSchema"
       },
+      "api-mutationField": {
+        "title": "mutationField",
+        "sidebar_label": "mutationField"
+      },
       "api-objectType": {
         "title": "objectType",
         "sidebar_label": "objectType"
+      },
+      "api-queryField": {
+        "title": "queryField",
+        "sidebar_label": "queryField"
       },
       "api-scalarType": {
         "title": "scalarType",
@@ -49,9 +57,13 @@
         "title": "Best Practices",
         "sidebar_label": "Best Practices"
       },
+      "database-access-with-prisma-v2": {
+        "title": "Database Access with Prisma 2 (Preview)",
+        "sidebar_label": "Prisma 2 (Preview)"
+      },
       "database-access-with-prisma": {
         "title": "Database Access with Prisma",
-        "sidebar_label": "Database Access w/ Prisma"
+        "sidebar_label": "Prisma"
       },
       "future-features": {
         "title": "Potential Features",
@@ -83,7 +95,8 @@
     },
     "categories": {
       "Documentation": "Documentation",
-      "API": "API"
+      "API": "API",
+      "Plugins": "Plugins"
     }
   },
   "pages-strings": {
