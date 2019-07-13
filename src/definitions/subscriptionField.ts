@@ -42,7 +42,7 @@ export interface SubscribeFieldConfig<
 }
 
 export function subscriptionField<FieldName extends string>(
-  fieldName: string,
+  fieldName: FieldName,
   config:
     | SubscribeFieldConfig<"Subscription", FieldName>
     | (() => SubscribeFieldConfig<"Subscription", FieldName>)

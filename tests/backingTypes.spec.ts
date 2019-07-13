@@ -50,7 +50,6 @@ function getSchemaWithConstEnums() {
 
 describe("backingTypes", () => {
   let metadata: core.TypegenMetadata;
-  let schemaExtensions: NexusSchemaExtensions;
 
   beforeEach(async () => {
     const { builder, schema } = makeSchemaInternal({
@@ -78,7 +77,7 @@ describe("backingTypes", () => {
     const typegen = new Typegen(
       schema,
       { ...typegenInfo, typegenFile: "" },
-      schema.extensions.nexus
+      (schema as any).extensions.nexus
     );
 
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
@@ -94,7 +93,7 @@ describe("backingTypes", () => {
     const typegen = new Typegen(
       schema,
       { ...typegenInfo, typegenFile: "" },
-      schema.extensions.nexus
+      (schema as any).extensions.nexus
     );
 
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
@@ -126,7 +125,7 @@ describe("rootTypings", () => {
     const typegen = new Typegen(
       schema,
       { ...typegenInfo, typegenFile: "" },
-      schema.extensions.nexus
+      (schema as any).extensions.nexus
     );
     expect(typegen.print()).toMatchSnapshot();
   });

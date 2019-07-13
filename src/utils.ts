@@ -16,8 +16,10 @@ import {
   specifiedScalarTypes,
   GraphQLFieldConfigArgumentMap,
   GraphQLArgument,
+  GraphQLNamedType,
 } from "graphql";
 import path from "path";
+import { UNKNOWN_TYPE_SCALAR } from "./builder";
 
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
@@ -189,7 +191,11 @@ export function groupTypes(schema: GraphQLSchema) {
         groupedTypes.object.push(type);
       } else if (isInputObjectType(type)) {
         groupedTypes.input.push(type);
-      } else if (isScalarType(type) && !isSpecifiedScalarType(type)) {
+      } else if (
+        isScalarType(type) &&
+        !isSpecifiedScalarType(type) &&
+        !isUnknownType(type)
+      ) {
         groupedTypes.scalar.push(type);
       } else if (isUnionType(type)) {
         groupedTypes.union.push(type);
@@ -200,6 +206,10 @@ export function groupTypes(schema: GraphQLSchema) {
       }
     });
   return groupedTypes;
+}
+
+export function isUnknownType(type: GraphQLNamedType) {
+  return type.name === UNKNOWN_TYPE_SCALAR.name;
 }
 
 export function firstDefined<T>(...args: Array<T | undefined>): T {

@@ -102,6 +102,7 @@ import {
   WrappedResolver,
   RootTypings,
   Omit,
+  MissingType,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
@@ -114,6 +115,7 @@ import {
   isObject,
   eachObj,
   argsToConfig,
+  isUnknownType,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -148,6 +150,19 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   ID: GraphQLID,
   Boolean: GraphQLBoolean,
 };
+
+export const UNKNOWN_TYPE_SCALAR = new GraphQLScalarType({
+  name: "NEXUS__UNKNOWN__TYPE__",
+  parseValue(value) {
+    return value;
+  },
+  parseLiteral(value) {
+    return value;
+  },
+  serialize(value) {
+    return value;
+  },
+});
 
 export interface BuilderConfig {
   /**
@@ -322,6 +337,11 @@ export class SchemaBuilder {
    * All of the plugins for our server
    */
   protected plugins: PluginDef[] = [];
+
+  /*
+   * Array of missing types
+   */
+  protected missingTypes: Record<string, MissingType> = {};
 
   /**
    * Whether we've called `getFinalTypeMap` or not
@@ -505,6 +525,7 @@ export class SchemaBuilder {
         dynamicOutputFields: this.dynamicOutputFields,
       },
       rootTypings: this.rootTypings,
+      missingTypes: this.missingTypes,
     };
   }
 
@@ -736,22 +757,12 @@ export class SchemaBuilder {
         },
       });
     }
-    const suggestions = suggestionList(
-      typeName,
-      Object.keys(this.buildingTypes).concat(Object.keys(this.finalTypeMap))
-    );
-    if (fromObject) {
-      throw new Error(
-        `Looks like you forgot to import ${typeName} in the root "types" passed to Nexus makeSchema`
-      );
+
+    if (!this.missingTypes[typeName]) {
+      this.missingTypes[typeName] = { fromObject };
     }
-    let suggestionsString = "";
-    if (suggestions.length > 0) {
-      suggestionsString = ` or mean ${suggestions.join(", ")}`;
-    }
-    throw new Error(
-      `Missing type ${typeName}, did you forget to import a type to the root query${suggestionsString}?`
-    );
+
+    return UNKNOWN_TYPE_SCALAR;
   }
 
   protected buildUnionMembers(
@@ -1237,11 +1248,19 @@ export class SchemaBuilder {
   ) {
     // @ts-ignore
     block[methodName] = (fieldName: string, opts: any) => {
-      // @ts-ignore
-      block.field(fieldName, {
+      let fieldConfig = {
         type: typeName,
-        ...opts,
-      });
+      };
+
+      if (typeof opts === "function") {
+        // @ts-ignore
+        fieldConfig.resolve = opts;
+      } else {
+        fieldConfig = { ...fieldConfig, ...opts };
+      }
+
+      // @ts-ignore
+      block.field(fieldName, fieldConfig);
     };
   }
 
@@ -1330,6 +1349,7 @@ export interface BuildTypes<
   typeMap: TypeMapDefs;
   dynamicFields: DynamicFieldDefs;
   rootTypings: RootTypings;
+  missingTypes: Record<string, MissingType>;
 }
 
 /**
@@ -1376,9 +1396,18 @@ export type NexusSchema = GraphQLSchema & {
  */
 export function makeSchemaInternal(
   config: SchemaConfig
-): { schema: NexusSchema; builder: SchemaBuilder } {
+): {
+  schema: NexusSchema;
+  builder: SchemaBuilder;
+  missingTypes: Record<string, MissingType>;
+} {
   const builder = new SchemaBuilder(config);
-  const { typeMap, dynamicFields, rootTypings } = builder.getFinalTypeMap();
+  const {
+    typeMap,
+    dynamicFields,
+    rootTypings,
+    missingTypes,
+  } = builder.getFinalTypeMap();
   let { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
@@ -1414,7 +1443,7 @@ export function makeSchemaInternal(
       dynamicFields,
     },
   };
-  return { schema, builder };
+  return { schema, builder, missingTypes };
 }
 
 /**
@@ -1425,7 +1454,7 @@ export function makeSchemaInternal(
  * root query type.
  */
 export function makeSchema(config: SchemaConfig): NexusSchema {
-  const { schema, builder } = makeSchemaInternal(config);
+  const { schema, builder, missingTypes } = makeSchemaInternal(config);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
@@ -1442,6 +1471,8 @@ export function makeSchema(config: SchemaConfig): NexusSchema {
       console.error(e);
     });
   }
+
+  assertNoMissingTypes(schema, missingTypes);
 
   return schema;
 }
@@ -1471,3 +1502,38 @@ export type GetResolverConfig = Omit<
   PluginDefinitionInfo,
   "nexusSchemaConfig" | "mutableObj"
 > & { resolve: GraphQLFieldResolver<any, any> | undefined };
+
+function assertNoMissingTypes(
+  schema: GraphQLSchema,
+  missingTypes: Record<string, MissingType>
+) {
+  const missingTypesNames = Object.keys(missingTypes);
+  const schemaTypeMap = schema.getTypeMap();
+  const schemaTypeNames = Object.keys(schemaTypeMap).filter(
+    (typeName) => !isUnknownType(schemaTypeMap[typeName])
+  );
+
+  if (missingTypesNames.length > 0) {
+    const errors = missingTypesNames
+      .map((typeName) => {
+        const { fromObject } = missingTypes[typeName];
+
+        if (fromObject) {
+          return `- Looks like you forgot to import ${typeName} in the root "types" passed to Nexus makeSchema`;
+        }
+
+        const suggestions = suggestionList(typeName, schemaTypeNames);
+
+        let suggestionsString = "";
+
+        if (suggestions.length > 0) {
+          suggestionsString = ` or mean ${suggestions.join(", ")}`;
+        }
+
+        return `- Missing type ${typeName}, did you forget to import a type to the root query${suggestionsString}?`;
+      })
+      .join("\n");
+
+    throw new Error("\n" + errors);
+  }
+}

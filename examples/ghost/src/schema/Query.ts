@@ -5,7 +5,7 @@ import { User } from "./User";
 export const Query = queryType({
   definition(t) {
     t.field("me", {
-      type: Post,
+      type: User,
       nullable: true,
       resolve() {
         return null;

@@ -109,3 +109,7 @@ export interface RootTypingImport {
    */
   alias?: string;
 }
+
+export interface MissingType {
+  fromObject: boolean;
+}
