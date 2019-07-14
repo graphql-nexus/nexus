@@ -13,7 +13,7 @@ declare global {
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    collection<FieldName extends string>(fieldName: FieldName, opts: {
+    collectionField<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
       nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
       totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
@@ -21,7 +21,8 @@ declare global {
       nullable?: boolean,
       description?: string
     }): void;
-    relayConnection<FieldName extends string>(fieldName: FieldName, opts: {
+    relayConnectionField
+    <FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
       edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
       pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,
@@ -29,6 +30,7 @@ declare global {
       nullable?: boolean,
       description?: string
     }): void
+  
     date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
   }
 }
@@ -224,4 +226,14 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+
+declare global {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {
+  }
+  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
+  }
+  interface NexusGenPluginSchemaConfig {
+  }
 }

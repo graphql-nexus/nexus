@@ -105,8 +105,7 @@ import {
   MissingType,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
-import { TypegenFormatFn } from "./typegenFormatPrettier";
-import { TypegenMetadata } from "./typegenMetadata";
+import { TypegenMetadata, TypegenFormatFn } from "./typegenMetadata";
 import { AbstractTypeResolver, GetGen } from "./typegenTypeHelpers";
 import {
   firstDefined,
@@ -116,6 +115,8 @@ import {
   eachObj,
   argsToConfig,
   isUnknownType,
+  Deferred,
+  deferred,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -130,6 +131,7 @@ import {
   wrapPluginsAfter,
   PluginDefinitionInfo,
 } from "./plugin";
+import { decorateType } from "./definitions/decorateType";
 
 export type Maybe<T> = T | null;
 
@@ -151,18 +153,26 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   Boolean: GraphQLBoolean,
 };
 
-export const UNKNOWN_TYPE_SCALAR = new GraphQLScalarType({
-  name: "NEXUS__UNKNOWN__TYPE__",
-  parseValue(value) {
-    return value;
-  },
-  parseLiteral(value) {
-    return value;
-  },
-  serialize(value) {
-    return value;
-  },
-});
+export const UNKNOWN_TYPE_SCALAR = decorateType(
+  new GraphQLScalarType({
+    name: "NEXUS__UNKNOWN__TYPE",
+    description: `This scalar should never make it into production. It is used as a placeholder
+for situations where GraphQL Nexus encounters a missing type. We don't want to 
+error immedately, otherwise the TypeScript definitions will not be updated.`,
+    parseValue(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    parseLiteral(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    serialize(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+  }),
+  {
+    rootTyping: "never",
+  }
+);
 
 export interface BuilderConfig {
   /**
@@ -251,6 +261,18 @@ export type SchemaConfig = BuilderConfig & {
    * valid types, ignoring invalid ones.
    */
   types: any;
+  /**
+   * Optional callback, called when the type files have been written, or when
+   * the schema is created if the typegen should not be output. Primarily used internally
+   * for tests.
+   */
+  onReady?: (err?: Error) => void;
+  /**
+   * When a referenced type is "missing" from the schema, we can look it up via a "missing method"
+   * type dispatch. This allows us to delegate the missing types to another schema,
+   * or construct them on-the-fly.
+   */
+  onMissingType?: (typeName: string) => GraphQLNamedType | undefined;
 } & NexusGenPluginSchemaConfig;
 
 export type TypeToWalk =
@@ -746,7 +768,11 @@ export class SchemaBuilder {
     fromObject: boolean = false
   ): GraphQLNamedType {
     invariantGuard(typeName);
-    if (typeName === "Query") {
+    let foundType: GraphQLNamedType | undefined;
+    if (this.config.onMissingType instanceof Function) {
+      foundType = this.config.onMissingType(typeName);
+    }
+    if (typeName === "Query" && !foundType) {
       return new GraphQLObjectType({
         name: "Query",
         fields: {
@@ -757,11 +783,9 @@ export class SchemaBuilder {
         },
       });
     }
-
     if (!this.missingTypes[typeName]) {
       this.missingTypes[typeName] = { fromObject };
     }
-
     return UNKNOWN_TYPE_SCALAR;
   }
 
@@ -777,6 +801,9 @@ export class SchemaBuilder {
       );
     }
     members.forEach((member) => {
+      if (isNexusObjectTypeDef(member)) {
+        this.addType(member);
+      }
       unionMembers.push(this.getObjectType(member));
     });
     if (!unionMembers.length) {
@@ -1390,17 +1417,19 @@ export type NexusSchema = GraphQLSchema & {
   extensions: Record<string, any> & { nexus: NexusSchemaExtensions };
 };
 
+export type MakeSchemaInternalValue = {
+  schema: NexusSchema;
+  builder: SchemaBuilder;
+  missingTypes: Record<string, MissingType>;
+};
+
 /**
  * Builds the schema, we may return more than just the schema
  * from this one day.
  */
 export function makeSchemaInternal(
   config: SchemaConfig
-): {
-  schema: NexusSchema;
-  builder: SchemaBuilder;
-  missingTypes: Record<string, MissingType>;
-} {
+): MakeSchemaInternalValue {
   const builder = new SchemaBuilder(config);
   const {
     typeMap,
@@ -1464,15 +1493,19 @@ export function makeSchema(config: SchemaConfig): NexusSchema {
     ),
   } = config;
 
+  let dfd: Deferred | undefined;
+
   if (shouldGenerateArtifacts) {
+    dfd = deferred();
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(builder, schema).generateArtifacts().catch((e) => {
-      console.error(e);
-    });
+    new TypegenMetadata(builder, schema)
+      .generateArtifacts()
+      .then(dfd.resolve)
+      .catch(dfd.reject);
   }
 
-  assertNoMissingTypes(schema, missingTypes);
+  assertNoMissingTypes(schema, missingTypes, dfd, config.onReady);
 
   return schema;
 }
@@ -1503,37 +1536,65 @@ export type GetResolverConfig = Omit<
   "nexusSchemaConfig" | "mutableObj"
 > & { resolve: GraphQLFieldResolver<any, any> | undefined };
 
-function assertNoMissingTypes(
+/**
+ * If there are any missing types, we want to throw those after the schema is output, so
+ * we are able to generate the types properly.
+ *
+ * @param schema
+ * @param missingTypes
+ */
+export function assertNoMissingTypes(
   schema: GraphQLSchema,
-  missingTypes: Record<string, MissingType>
+  missingTypes: Record<string, MissingType>,
+  dfd?: Deferred,
+  onReady?: (err?: Error) => void
 ) {
   const missingTypesNames = Object.keys(missingTypes);
   const schemaTypeMap = schema.getTypeMap();
   const schemaTypeNames = Object.keys(schemaTypeMap).filter(
     (typeName) => !isUnknownType(schemaTypeMap[typeName])
   );
-
   if (missingTypesNames.length > 0) {
     const errors = missingTypesNames
       .map((typeName) => {
         const { fromObject } = missingTypes[typeName];
-
         if (fromObject) {
           return `- Looks like you forgot to import ${typeName} in the root "types" passed to Nexus makeSchema`;
         }
-
         const suggestions = suggestionList(typeName, schemaTypeNames);
-
         let suggestionsString = "";
-
         if (suggestions.length > 0) {
           suggestionsString = ` or mean ${suggestions.join(", ")}`;
         }
-
         return `- Missing type ${typeName}, did you forget to import a type to the root query${suggestionsString}?`;
       })
       .join("\n");
-
-    throw new Error("\n" + errors);
+    const err = new Error("\n" + errors);
+    if (dfd) {
+      dfd.promise
+        .catch((e) => {
+          console.error(e);
+        })
+        .then(() => {
+          if (onReady) {
+            onReady(err);
+          }
+          process.nextTick(() => {
+            throw err;
+          });
+        })
+        .catch(() => {});
+    } else {
+      if (onReady) {
+        onReady(err);
+      }
+      throw err;
+    }
+  } else if (onReady) {
+    if (dfd) {
+      dfd.promise.then(() => onReady(), onReady);
+    } else {
+      onReady();
+    }
   }
 }

@@ -21,6 +21,7 @@ import {
   GraphQLInputObjectType,
   GraphQLEnumType,
   defaultFieldResolver,
+  GraphQLSchema,
 } from "graphql";
 import path from "path";
 import {
@@ -38,6 +39,7 @@ import {
 } from "./utils";
 import { WrappedResolver } from "./definitions/_types";
 import { TypegenMetadata } from "./typegenMetadata";
+import { NexusTypeExtensions } from "./definitions/decorateType";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -71,7 +73,8 @@ type RootTypeMapping = Record<
  * - Non-scalar types will get a dedicated "Root" type associated with it
  */
 export class TypegenPrinter {
-  protected schema: NexusSchema;
+  protected sortedSchema: GraphQLSchema;
+  protected nexusSchema: NexusSchema;
   protected builder: SchemaBuilder;
   protected typegenFile: string;
   protected extensions: NexusSchemaExtensions;
@@ -81,11 +84,12 @@ export class TypegenPrinter {
     protected typegenMetadata: TypegenMetadata,
     protected typegenInfo: TypegenInfo
   ) {
-    this.schema = typegenMetadata.getNexusSchema();
+    this.nexusSchema = typegenMetadata.getNexusSchema();
+    this.sortedSchema = typegenMetadata.getSortedSchema();
     this.builder = typegenMetadata.getBuilder();
     this.typegenFile = typegenMetadata.getTypegenFile();
-    this.extensions = this.schema.extensions.nexus;
-    this.groupedTypes = groupTypes(typegenMetadata.getNexusSchema());
+    this.extensions = this.nexusSchema.extensions.nexus;
+    this.groupedTypes = groupTypes(this.sortedSchema);
   }
 
   print() {
@@ -249,7 +253,7 @@ export class TypegenPrinter {
       .concat(this.groupedTypes.interface)
       .forEach((type) => {
         if (isInterfaceType(type)) {
-          const possibleNames = this.schema
+          const possibleNames = this.sortedSchema
             .getPossibleTypes(type)
             .map((t) => t.name);
           if (possibleNames.length > 0) {
@@ -282,7 +286,7 @@ export class TypegenPrinter {
       .concat(this.groupedTypes.interface)
       .forEach((type) => {
         if (isInterfaceType(type)) {
-          const possibleNames = this.schema
+          const possibleNames = this.sortedSchema
             .getPossibleTypes(type)
             .map((t) => t.name);
           if (possibleNames.length > 0) {
@@ -380,7 +384,7 @@ export class TypegenPrinter {
             .map((t) => `NexusGenRootTypes['${t.name}']`)
             .join(" | ");
         } else if (isInterfaceType(type)) {
-          const possibleRoots = this.schema
+          const possibleRoots = this.sortedSchema
             .getPossibleTypes(type)
             .map((t) => `NexusGenRootTypes['${t.name}']`);
           if (possibleRoots.length > 0) {
@@ -540,7 +544,11 @@ export class TypegenPrinter {
     if (isListType(type)) {
       typing.push(this.typeToArr(type.ofType));
     } else if (isScalarType(type)) {
-      typing.push(this.printScalar(type));
+      typing.push(
+        this.printScalar(this.nexusSchema.getType(
+          type.name
+        ) as GraphQLScalarType)
+      );
     } else if (isEnumType(type)) {
       typing.push(`NexusGenEnums['${type.name}']`);
     } else if (
@@ -680,16 +688,18 @@ export class TypegenPrinter {
       .join("\n");
   };
 
-  printScalar(type: GraphQLScalarType) {
-    if (isSpecifiedScalarType(type)) {
-      return SpecifiedScalars[type.name as SpecifiedScalarNames];
-    }
+  printScalar(type: GraphQLScalarType & { extensions?: NexusTypeExtensions }) {
     const backingType = this.typegenInfo.backingTypeMap[type.name];
     if (typeof backingType === "string") {
       return backingType;
-    } else {
-      return "any";
     }
+    if (isSpecifiedScalarType(type)) {
+      return SpecifiedScalars[type.name as SpecifiedScalarNames];
+    }
+    if (type && type.extensions && type.extensions.nexus.rootTyping) {
+      return type.extensions.nexus.rootTyping;
+    }
+    return "any";
   }
 
   printPlugins() {

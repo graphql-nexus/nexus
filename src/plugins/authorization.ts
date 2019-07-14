@@ -31,7 +31,7 @@ authorize?: AuthorizeResolver<TypeName, FieldName>
     if (!config.nexusFieldConfig) {
       return;
     }
-    const authorizeFn = (config.nexusFieldConfig as any)
+    const authorizeFn = config.nexusFieldConfig
       .authorize as GraphQLFieldResolver<any, any>;
     if (authorizeFn) {
       return {

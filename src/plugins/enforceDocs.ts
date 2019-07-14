@@ -8,4 +8,5 @@ export const enforceDocs = plugin({
   `,
   typeDefTypes: `description: string;`,
   fieldDefTypes: `description: string;`,
+  pluginDefinition() {},
 });

@@ -2,7 +2,7 @@ import { GraphQLNamedType } from "graphql";
 import { RootTypingDef } from "./_types";
 
 export interface TypeExtensionConfig {
-  asNexusMethod: string;
+  asNexusMethod?: string;
   rootTyping?: RootTypingDef;
 }
 

@@ -48,17 +48,19 @@ export type PluginDefinitionInfo = {
   /**
    * The root-level SchemaConfig passed
    */
-  nexusSchemaConfig: Omit<SchemaConfig, "types">;
+  nexusSchemaConfig: Omit<SchemaConfig, "types"> & Record<string, unknown>;
   /**
    * The config provided to the Nexus type containing the field.
    * Will not exist if this is a non-Nexus GraphQL type.
    */
-  nexusTypeConfig?: Omit<NexusObjectTypeConfig<string>, "definition">;
+  nexusTypeConfig?: Omit<NexusObjectTypeConfig<string>, "definition"> &
+    Record<string, unknown>;
   /**
    * The config provided to the Nexus type containing the field.
    * Will not exist if this is a non-Nexus GraphQL type.
    */
-  nexusFieldConfig?: Omit<NexusOutputFieldConfig<string, string>, "resolve">;
+  nexusFieldConfig?: Omit<NexusOutputFieldConfig<string, string>, "resolve"> &
+    Record<string, unknown>;
   /**
    * Info about the GraphQL Field we're decorating.
    * Always guaranteed to exist, even for non-Nexus GraphQL types
@@ -123,7 +125,7 @@ export interface PluginConfig {
    * Definition for the plugin. This will be executed against every
    * output type field on the schema.
    */
-  pluginDefinition?(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
+  pluginDefinition(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
 }
 
 /**

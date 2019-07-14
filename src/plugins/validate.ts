@@ -16,7 +16,7 @@ type ValidatePluginValidateArgs<TypeName extends string, FieldName extends strin
       config.typeName === "Mutation" ||
       config.typeName === "Subscription";
     const fieldValidateArgs =
-      config.nexusFieldConfig && (config.nexusFieldConfig as any).validateArgs;
+      config.nexusFieldConfig && config.nexusFieldConfig.validateArgs;
     // Collect all of the validateArgs in a map so we can validate the input args
     // for any fields that have them.
     if (fieldValidateArgs instanceof Function) {

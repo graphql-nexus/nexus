@@ -8,8 +8,8 @@ import {
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
 import {
-  AllNexusOutputTypeDefs,
   NexusWrappedType,
+  AllNexusOutputTypeDefs,
   AllNexusInputTypeDefs,
 } from "./wrapping";
 import { BaseScalars } from "./_types";

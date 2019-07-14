@@ -1,19 +1,21 @@
-import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import path from "path";
+import { Options } from "prettier";
+import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import { TypegenPrinter } from "./typegen";
-import { assertAbsolutePath } from "./utils";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { typegenAutoConfig } from "./typegenAutoConfig";
-import {
-  typegenFormatPrettier,
-  TypegenFormatFn,
-} from "./typegenFormatPrettier";
 import {
   BuilderConfig,
   TypegenInfo,
   NexusSchema,
   SchemaBuilder,
 } from "./builder";
+import { FileSystem } from "./fileSystem";
+
+export type TypegenFormatFn = (
+  content: string,
+  type: "types" | "schema"
+) => string | Promise<string>;
 
 /**
  * Passed into the SchemaBuilder, this keeps track of any necessary
@@ -24,16 +26,17 @@ export class TypegenMetadata {
   protected config: BuilderConfig;
   protected typegenFile: string = "";
   protected sortedSchema: GraphQLSchema;
+  protected finalPrettierConfig?: Options;
 
   constructor(
     protected builder: SchemaBuilder,
     protected nexusSchema: NexusSchema
   ) {
-    this.sortedSchema = this.sortSchema(nexusSchema);
+    this.sortedSchema = lexicographicSortSchema(nexusSchema);
     const config = (this.config = builder.getConfig());
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
       if (config.outputs.typegen) {
-        this.typegenFile = assertAbsolutePath(
+        this.typegenFile = this.assertAbsolutePath(
           config.outputs.typegen,
           "outputs.typegen"
         );
@@ -53,6 +56,18 @@ export class TypegenMetadata {
     return this.typegenFile;
   }
 
+  getSortedSchema() {
+    return this.sortedSchema;
+  }
+
+  /**
+   * Generates the type definitions
+   */
+  protected async generateTypesFile(): Promise<string> {
+    const typegenInfo = await this.getTypegenInfo();
+    return new TypegenPrinter(this, typegenInfo).print();
+  }
+
   /**
    * Generates the artifacts of the build based on what we
    * know about the schema and how it was defined.
@@ -60,7 +75,7 @@ export class TypegenMetadata {
   async generateArtifacts() {
     if (this.config.outputs) {
       if (this.config.outputs.schema) {
-        await this.writeFile(
+        await this.writeTypeFile(
           "schema",
           this.generateSchemaFile(this.sortedSchema),
           this.config.outputs.schema
@@ -68,62 +83,24 @@ export class TypegenMetadata {
       }
       if (this.typegenFile) {
         const value = await this.generateTypesFile();
-        await this.writeFile("types", value, this.typegenFile);
+        await this.writeTypeFile("types", value, this.typegenFile);
       }
     }
   }
 
-  protected sortSchema(schema: GraphQLSchema) {
-    let sortedSchema = schema;
-    if (typeof lexicographicSortSchema !== "undefined") {
-      sortedSchema = lexicographicSortSchema(schema);
-    }
-    return sortedSchema;
-  }
-
-  protected async writeFile(
+  protected async writeTypeFile(
     type: "schema" | "types",
     output: string,
     filePath: string
   ) {
-    if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
-      return Promise.reject(
-        new Error(
-          `Expected an absolute path to output the GraphQL Nexus ${type}, saw ${filePath}`
-        )
-      );
-    }
-    const fs = require("fs") as typeof import("fs");
-    const util = require("util") as typeof import("util");
-    const [readFile, writeFile, mkdir] = [
-      util.promisify(fs.readFile),
-      util.promisify(fs.writeFile),
-      util.promisify(fs.mkdir),
-    ];
-    let formatTypegen: TypegenFormatFn | null = null;
-    if (typeof this.config.formatTypegen === "function") {
-      formatTypegen = this.config.formatTypegen;
-    } else if (this.config.prettierConfig) {
-      formatTypegen = typegenFormatPrettier(this.config.prettierConfig);
-    }
-    const content =
-      typeof formatTypegen === "function"
-        ? await formatTypegen(output, type)
-        : output;
     const [toSave, existing] = await Promise.all([
-      content,
-      readFile(filePath, "utf8").catch(() => ""),
+      this.formatTypegen(output, type),
+      FileSystem.getInstance()
+        .getFile(filePath)
+        .catch(() => ""),
     ]);
     if (toSave !== existing) {
-      const dirPath = path.dirname(filePath);
-      try {
-        await mkdir(dirPath, { recursive: true });
-      } catch (e) {
-        if (e.code !== "EEXIST") {
-          throw e;
-        }
-      }
-      return writeFile(filePath, toSave);
+      return FileSystem.getInstance().replaceFile(filePath, toSave);
     }
   }
 
@@ -135,15 +112,7 @@ export class TypegenMetadata {
     return [SDL_HEADER, printedSchema].join("\n\n");
   }
 
-  /**
-   * Generates the type definitions
-   */
-  protected async generateTypesFile(): Promise<string> {
-    const typegenInfo = await this.getTypegenInfo();
-    return new TypegenPrinter(this, typegenInfo).print();
-  }
-
-  protected async getTypegenInfo(): Promise<TypegenInfo> {
+  async getTypegenInfo(): Promise<TypegenInfo> {
     if (this.config.typegenConfig) {
       if (this.config.typegenAutoConfig) {
         console.warn(
@@ -164,5 +133,50 @@ export class TypegenMetadata {
       contextType: "any",
       backingTypeMap: {},
     };
+  }
+
+  /**
+   * Takes "content", which is a string representing the GraphQL schema
+   * or the TypeScript types (as indicated by the "fileType"), and formats them
+   * with prettier if it is installed.
+   * @param content
+   * @param fileType
+   */
+  protected async formatTypegen(content: string, fileType: "types" | "schema") {
+    if (this.config.formatTypegen instanceof Function) {
+      return this.config.formatTypegen(content, fileType);
+    }
+    if (!this.config.prettierConfig) {
+      return content;
+    }
+    try {
+      const prettierConfig = this.config.prettierConfig;
+      const prettier = require("prettier") as typeof import("prettier");
+      if (typeof prettierConfig === "string") {
+        if (!this.finalPrettierConfig) {
+          this.finalPrettierConfig = JSON.parse(
+            await FileSystem.getInstance().getFile(prettierConfig)
+          ) as Options;
+        }
+      } else {
+        this.finalPrettierConfig = prettierConfig;
+      }
+      return prettier.format(content, {
+        ...this.finalPrettierConfig,
+        parser: fileType === "schema" ? "graphql" : "typescript",
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    return content;
+  }
+
+  protected assertAbsolutePath(pathName: string, property: string) {
+    if (!path.isAbsolute(pathName)) {
+      throw new Error(
+        `Expected path for ${property} to be a string, saw ${pathName}`
+      );
+    }
+    return pathName;
   }
 }

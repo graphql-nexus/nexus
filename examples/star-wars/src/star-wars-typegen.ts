@@ -16,8 +16,8 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  Episode: 4 | 5 | 6
-  MoreEpisodes: 4 | 5 | 6 | "OTHER"
+  Episode: 5 | 6 | 4
+  MoreEpisodes: 5 | 6 | 4 | "OTHER"
 }
 
 export interface NexusGenRootTypes {
@@ -39,29 +39,29 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   Droid: { // field return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
     id: string; // String!
     name: string; // String!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
     primaryFunction: string; // String!
   }
   Human: { // field return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+    homePlanet: string | null; // String
     id: string; // String!
     name: string; // String!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    homePlanet: string | null; // String
   }
   Query: { // field return type
+    droid: NexusGenRootTypes['Droid']; // Droid!
     hero: NexusGenRootTypes['Character']; // Character!
     human: NexusGenRootTypes['Human']; // Human!
-    droid: NexusGenRootTypes['Droid']; // Droid!
   }
   Character: { // field return type
+    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
+    friends: NexusGenRootTypes['Character'][]; // [Character!]!
     id: string; // String!
     name: string; // String!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
   }
 }
 
@@ -77,13 +77,13 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    droid: { // args
+      id: string; // String!
+    }
     hero: { // args
       episode?: NexusGenEnums['Episode'] | null; // Episode
     }
     human: { // args
-      id: string; // String!
-    }
-    droid: { // args
       id: string; // String!
     }
   }
@@ -95,7 +95,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  Character: "Human" | "Droid"
+  Character: "Droid" | "Human"
 }
 
 export interface NexusGenInheritedFields {}

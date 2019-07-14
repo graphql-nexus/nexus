@@ -1,11 +1,7 @@
 import path from "path";
-import { core, makeSchema, queryType, enumType } from "../src";
+import { core, queryType, enumType } from "../src";
 import { A, B } from "./_types";
-import {
-  NexusSchemaExtensions,
-  SchemaBuilder,
-  makeSchemaInternal,
-} from "../src/core";
+import { makeSchemaInternal } from "../src/core";
 
 const { TypegenPrinter, TypegenMetadata } = core;
 
@@ -15,7 +11,7 @@ export enum TestEnum {
 }
 
 function getSchemaWithNormalEnums() {
-  return makeSchema({
+  return makeSchemaInternal({
     types: [
       enumType({
         name: "A",
@@ -32,7 +28,7 @@ function getSchemaWithNormalEnums() {
 }
 
 function getSchemaWithConstEnums() {
-  return makeSchema({
+  return core.makeSchemaInternal({
     types: [
       enumType({
         name: "B",
@@ -52,7 +48,7 @@ describe("backingTypes", () => {
   let metadata: core.TypegenMetadata;
 
   beforeEach(async () => {
-    const { builder, schema } = makeSchemaInternal({
+    const { builder, schema } = core.makeSchemaInternal({
       types: [],
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
@@ -72,33 +68,30 @@ describe("backingTypes", () => {
   });
 
   it("can match backing types to regular enums", async () => {
-    const schema = getSchemaWithNormalEnums();
-    const typegenInfo = await metadata.getTypegenInfo();
-    const typegen = new Typegen(
-      schema,
-      { ...typegenInfo, typegenFile: "" },
-      (schema as any).extensions.nexus
+    const { schema, builder } = getSchemaWithNormalEnums();
+    const metadata = new TypegenMetadata(builder, schema);
+    const typegen = new TypegenPrinter(
+      metadata,
+      await metadata.getTypegenInfo()
     );
 
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
 "export interface NexusGenEnums {
-  A: t.A
+  A: \\"ONE\\" | \\"TWO\\"
 }"
 `);
   });
 
   it("can match backing types for const enums", async () => {
-    const schema = getSchemaWithConstEnums();
-    const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
-      schema,
-      { ...typegenInfo, typegenFile: "" },
-      (schema as any).extensions.nexus
+    const { schema, builder } = getSchemaWithConstEnums();
+    const metadata = new TypegenMetadata(builder, schema);
+    const typegen = new TypegenPrinter(
+      metadata,
+      await metadata.getTypegenInfo()
     );
-
     expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
 "export interface NexusGenEnums {
-  B: t.B
+  B: \\"9\\" | \\"10\\"
 }"
 `);
   });
@@ -106,7 +99,7 @@ describe("backingTypes", () => {
 
 describe("rootTypings", () => {
   it("can import enum via rootTyping", async () => {
-    const schema = makeSchema({
+    const { schema, builder } = makeSchemaInternal({
       types: [
         enumType({
           name: "TestEnumType",
@@ -119,13 +112,10 @@ describe("rootTypings", () => {
       ],
       outputs: false,
     });
-    const builder = new SchemaBuilder({ outputs: false });
     const metadata = new TypegenMetadata(builder, schema);
-    const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
-      schema,
-      { ...typegenInfo, typegenFile: "" },
-      (schema as any).extensions.nexus
+    const typegen = new TypegenPrinter(
+      metadata,
+      await metadata.getTypegenInfo()
     );
     expect(typegen.print()).toMatchSnapshot();
   });

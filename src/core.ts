@@ -4,7 +4,6 @@ export * from "./builder";
 export * from "./sdlConverter";
 export * from "./typegen";
 export * from "./typegenAutoConfig";
-export * from "./typegenFormatPrettier";
 export * from "./typegenMetadata";
 export * from "./typegenTypeHelpers";
 export * from "./utils";

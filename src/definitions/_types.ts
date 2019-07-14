@@ -27,7 +27,6 @@ export enum NexusTypes {
   OutputField = "OutputField",
   InputField = "InputField",
   DynamicInputMethod = "DynamicInputMethod",
-  DynamicInputProperty = "DynamicInputProperty",
   DynamicOutputMethod = "DynamicOutputMethod",
   DynamicOutputProperty = "DynamicOutputProperty",
   Plugin = "Plugin",

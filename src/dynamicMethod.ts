@@ -85,14 +85,14 @@ export class DynamicOutputPropertyDef<Name extends string> {
     return this.config;
   }
 }
-withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicInputProperty);
+withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicOutputProperty);
 
 /**
  * Defines a new property on the object definition block
  * for an output type, taking arbitrary input to define
  * additional types.
  *
- * t.collection('posts', {
+ * t.collectionField('posts', {
  *   nullable: true,
  *   totalCount(root, args, ctx, info) {
  *     return ctx.user.getTotalPostCount(root.id, args)

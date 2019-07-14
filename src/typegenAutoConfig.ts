@@ -205,7 +205,6 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
           }
           return null;
         }
-
         const importPath = (path.isAbsolute(pathOrModule)
           ? relativePathTo(resolvedPath, outputPath)
           : pathOrModule
@@ -352,7 +351,6 @@ function findTypingForFile(absolutePath: string, pathOrModule: string) {
 
   // TODO: need to figure out cases where it's a node module
   // and "typings" is set in the package.json
-
   throw new Error(
     `Unable to find typings associated with ${pathOrModule}, skipping`
   );

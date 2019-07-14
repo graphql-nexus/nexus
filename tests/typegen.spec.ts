@@ -8,15 +8,16 @@ import {
 import path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
+import { makeSchemaInternal } from "../src/core";
 
-const { Typegen, TypegenMetadata } = core;
+const { TypegenMetadata, TypegenPrinter } = core;
 
-describe("typegen", () => {
-  let typegen: core.Typegen;
+describe("TypegenPrinter", () => {
   let metadata: core.TypegenMetadata;
+  let typegen: core.TypegenPrinter;
   beforeEach(async () => {
     const schema = lexicographicSortSchema(buildSchema(EXAMPLE_SDL));
-    metadata = new TypegenMetadata({
+    const builder = makeSchemaInternal({
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
@@ -33,24 +34,10 @@ describe("typegen", () => {
         ],
         contextType: "t.TestContext",
       },
+      types: schema.getTypeMap(),
     });
-    const typegenInfo = await metadata.getTypegenInfo(schema);
-    typegen = new Typegen(
-      schema,
-      {
-        ...typegenInfo,
-        typegenFile: "",
-      },
-      {
-        rootTypings: {},
-        dynamicFields: {
-          dynamicInputFields: {},
-          dynamicOutputFields: {},
-        },
-      }
-    );
     jest
-      .spyOn(typegen, "hasResolver")
+      .spyOn(TypegenPrinter.prototype, "hasResolver")
       .mockImplementation(
         (
           field: GraphQLField<any, any>,
@@ -62,6 +49,8 @@ describe("typegen", () => {
           return false;
         }
       );
+    metadata = new TypegenMetadata(builder.builder, builder.schema);
+    typegen = new TypegenPrinter(metadata, await metadata.getTypegenInfo());
   });
 
   it("builds the enum object type defs", () => {
@@ -86,7 +75,8 @@ describe("typegen", () => {
     // If the field has a resolver, we assume it's derived, otherwise
     // you'll need to supply a backing root type with more information.
     jest
-      .spyOn(typegen, "hasResolver")
+      .clearAllMocks()
+      .spyOn(TypegenPrinter.prototype, "hasResolver")
       .mockImplementation(
         (
           field: GraphQLField<any, any>,

@@ -7,8 +7,8 @@ const relayConnectionMap = new Map<string, NexusObjectTypeDef<string>>();
 
 let pageInfo: NexusObjectTypeDef<string>;
 
-export const RelayConnection = dynamicOutputMethod({
-  name: "relayConnection",
+export const RelayConnectionMethod = dynamicOutputMethod({
+  name: "relayConnectionField",
   typeDefinition: `
     <FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
@@ -20,7 +20,12 @@ export const RelayConnection = dynamicOutputMethod({
     }): void
   `,
   factory({ typeDef: t, args: [fieldName, config] }) {
-    const type =
+    if (!config.type) {
+      throw new Error(
+        `Missing required property "type" from relayConnection field ${fieldName}`
+      );
+    }
+    const typeName =
       typeof config.type === "string" ? config.type : config.type.name;
     pageInfo =
       pageInfo ||
@@ -33,18 +38,18 @@ export const RelayConnection = dynamicOutputMethod({
       });
     if (config.list) {
       throw new Error(
-        `Collection field ${fieldName}.${type} cannot be used as a list.`
+        `Collection field ${fieldName}.${typeName} cannot be used as a list.`
       );
     }
-    if (!relayConnectionMap.has(config.type)) {
+    if (!relayConnectionMap.has(typeName)) {
       relayConnectionMap.set(
-        config.type,
+        typeName,
         objectType({
-          name: `${config.type}RelayConnection`,
+          name: `${typeName}RelayConnection`,
           definition(c) {
             c.list.field("edges", {
               type: objectType({
-                name: `${config.type}Edge`,
+                name: `${typeName}Edge`,
                 definition(e) {
                   e.id("cursor");
                   e.field("node", { type: config.type });
@@ -57,7 +62,7 @@ export const RelayConnection = dynamicOutputMethod({
       );
     }
     t.field(fieldName, {
-      type: relayConnectionMap.get(config.type)!,
+      type: relayConnectionMap.get(typeName)!,
       args: {
         first: intArg(),
         after: stringArg(),

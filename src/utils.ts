@@ -1,22 +1,22 @@
 import {
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLSchema,
-  GraphQLInputObjectType,
-  GraphQLUnionType,
+  GraphQLArgument,
   GraphQLEnumType,
+  GraphQLFieldConfigArgumentMap,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  GraphQLObjectType,
   GraphQLScalarType,
-  isObjectType,
+  GraphQLSchema,
+  GraphQLUnionType,
+  isEnumType,
   isInputObjectType,
+  isInterfaceType,
+  isObjectType,
   isScalarType,
   isSpecifiedScalarType,
   isUnionType,
-  isInterfaceType,
-  isEnumType,
   specifiedScalarTypes,
-  GraphQLFieldConfigArgumentMap,
-  GraphQLArgument,
-  GraphQLNamedType,
 } from "graphql";
 import path from "path";
 import { UNKNOWN_TYPE_SCALAR } from "./builder";
@@ -152,15 +152,6 @@ export function eachObj<T>(
 export const isObject = (obj: any): boolean =>
   obj !== null && typeof obj === "object";
 
-export const assertAbsolutePath = (pathName: string, property: string) => {
-  if (!path.isAbsolute(pathName)) {
-    throw new Error(
-      `Expected path for ${property} to be a string, saw ${pathName}`
-    );
-  }
-  return pathName;
-};
-
 export interface GroupedTypes {
   input: GraphQLInputObjectType[];
   interface: GraphQLInterfaceType[];
@@ -251,4 +242,24 @@ export function argsToConfig(
     result[name] = argRest;
   });
   return result;
+}
+
+export type Deferred<T = any> = {
+  resolve: (val?: T) => void;
+  reject: (err: Error) => void;
+  promise: Promise<T>;
+};
+
+export function deferred<T = any>() {
+  const dfd = {} as Deferred<T>;
+  dfd.promise = new Promise((_resolve, _reject) => {
+    dfd.resolve = (val) => {
+      if (val && val instanceof Error) {
+        return _reject(val);
+      }
+      _resolve(val);
+    };
+    dfd.reject = _reject;
+  });
+  return dfd;
 }

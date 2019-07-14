@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.12.0-beta.6",
+  "version": "0.12.0-beta.7",
   "main": "dist",
   "types": "dist",
   "license": "MIT",
@@ -8,8 +8,8 @@
   "homepage": "https://nexus.js.org",
   "scripts": {
     "dev": "yarn link-examples && tsc -w",
-    "test": "jest",
-    "test:ci": "jest -i",
+    "test": "jest --watch",
+    "test:ci": "jest -i --coverage",
     "build": "tsc && prettier --write 'dist/**/*.ts'",
     "lint": "tslint -p tsconfig.json",
     "clean": "rm -rf dist",
@@ -52,7 +52,8 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "source-map-support": "^0.5.12"
   },
   "peerDependencies": {
     "graphql": "^0.12.0 || ^0.13.0 || ^14.0.0"
