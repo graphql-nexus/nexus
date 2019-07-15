@@ -127,7 +127,7 @@ export type FieldOutConfig<
 export interface OutputDefinitionBuilder {
   typeName: string;
   addField(config: NexusOutputFieldDef): void;
-  addDynamicOutputFields(
+  addDynamicOutputMembers(
     block: OutputDefinitionBlock<any>,
     isList: boolean
   ): void;
@@ -156,7 +156,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     protected isList = false
   ) {
     this.typeName = typeBuilder.typeName;
-    this.typeBuilder.addDynamicOutputFields(this, isList);
+    this.typeBuilder.addDynamicOutputMembers(this, isList);
   }
 
   get list() {

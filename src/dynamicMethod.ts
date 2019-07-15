@@ -74,7 +74,7 @@ export class DynamicOutputMethodDef<Name extends string> {
     return this.config;
   }
 }
-withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutput);
+withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutputMethod);
 
 /**
  * Defines a new property on the object definition block

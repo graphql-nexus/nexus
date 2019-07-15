@@ -46,6 +46,7 @@ describe("typegen", () => {
         dynamicFields: {
           dynamicInputFields: {},
           dynamicOutputFields: {},
+          dynamicOutputProperties: {},
         },
       }
     );
