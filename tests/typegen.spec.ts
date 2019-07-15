@@ -4,11 +4,12 @@ import {
   GraphQLField,
   GraphQLObjectType,
   GraphQLInterfaceType,
+  GraphQLScalarType,
 } from "graphql";
 import path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
-import { makeSchemaInternal } from "../src/core";
+import { makeSchemaInternal, scalarType, decorateType } from "../src/core";
 
 const { TypegenMetadata, TypegenPrinter } = core;
 
@@ -34,7 +35,27 @@ describe("TypegenPrinter", () => {
         ],
         contextType: "t.TestContext",
       },
-      types: schema.getTypeMap(),
+      types: [
+        schema.getTypeMap(),
+        scalarType({
+          name: "CustomScalarMethod",
+          parseLiteral() {},
+          parseValue() {},
+          serialize() {},
+          asNexusMethod: "CustomScalarMethod",
+        }),
+        decorateType(
+          new GraphQLScalarType({
+            name: "DecoratedCustomScalar",
+            parseLiteral() {},
+            parseValue() {},
+            serialize() {},
+          }),
+          {
+            asNexusMethod: "DecoratedCustomScalar",
+          }
+        ),
+      ],
     });
     jest
       .spyOn(TypegenPrinter.prototype, "hasResolver")

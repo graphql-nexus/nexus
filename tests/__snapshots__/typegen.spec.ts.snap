@@ -74,6 +74,8 @@ exports[`TypegenPrinter should not print roots for fields with resolvers 1`] = `
   Float: number;
   Boolean: boolean;
   ID: string;
+  CustomScalarMethod: any;
+  DecoratedCustomScalar: any;
   UUID: string;
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }"
@@ -137,6 +139,8 @@ exports[`TypegenPrinter should print a root type map 1`] = `
   Float: number;
   Boolean: boolean;
   ID: string;
+  CustomScalarMethod: any;
+  DecoratedCustomScalar: any;
   UUID: string;
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }"
@@ -149,9 +153,19 @@ exports[`TypegenPrinter should print the full output 1`] = `
  */
 
 import * as t from \\"./_helpers\\"
-
-
-
+import { core } from \\"nexus\\"
+declare global {
+  interface NexusGenCustomInputMethods<TypeName extends string> {
+    CustomScalarMethod<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<\\"inputTypes\\", TypeName, FieldName>>): void // \\"CustomScalarMethod\\";
+    DecoratedCustomScalar<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<\\"inputTypes\\", TypeName, FieldName>>): void // \\"DecoratedCustomScalar\\";
+  }
+}
+declare global {
+  interface NexusGenCustomOutputMethods<TypeName extends string> {
+    CustomScalarMethod<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // \\"CustomScalarMethod\\";
+    DecoratedCustomScalar<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // \\"DecoratedCustomScalar\\";
+  }
+}
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -198,6 +212,8 @@ export interface NexusGenRootTypes {
   Float: number;
   Boolean: boolean;
   ID: string;
+  CustomScalarMethod: any;
+  DecoratedCustomScalar: any;
   UUID: string;
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }
@@ -282,7 +298,7 @@ export type NexusGenEnumNames = \\"OrderEnum\\" | \\"SomeEnum\\";
 
 export type NexusGenInterfaceNames = \\"Node\\";
 
-export type NexusGenScalarNames = \\"Boolean\\" | \\"Float\\" | \\"ID\\" | \\"Int\\" | \\"String\\" | \\"UUID\\";
+export type NexusGenScalarNames = \\"Boolean\\" | \\"CustomScalarMethod\\" | \\"DecoratedCustomScalar\\" | \\"Float\\" | \\"ID\\" | \\"Int\\" | \\"String\\" | \\"UUID\\";
 
 export type NexusGenUnionNames = \\"ExampleUnion\\";
 

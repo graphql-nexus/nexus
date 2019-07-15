@@ -37,6 +37,7 @@ export function convertSDL(
   try {
     return new SDLConverter(sdl, commonjs, json).print();
   } catch (e) {
+    /* istanbul ignore next */
     return `Error Parsing SDL into Schema: ${e.stack}`;
   }
 }

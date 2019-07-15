@@ -76,17 +76,6 @@ export class DynamicOutputMethodDef<Name extends string> {
 }
 withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutputMethod);
 
-export class DynamicOutputPropertyDef<Name extends string> {
-  constructor(
-    readonly name: Name,
-    protected config: DynamicOutputMethodConfig<Name>
-  ) {}
-  get value() {
-    return this.config;
-  }
-}
-withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicOutputProperty);
-
 /**
  * Defines a new property on the object definition block
  * for an output type, taking arbitrary input to define

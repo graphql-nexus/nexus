@@ -8,12 +8,12 @@ import {
   inputObjectType,
   dynamicInputMethod,
   decorateType,
-  dynamicOutputMethod,
 } from "../src/core";
 import { RelayConnectionMethod, CollectionMethod } from "../src/extensions";
 import { FileSystem } from "../src/fileSystem";
 import { graphql } from "graphql";
 import { CatListFixture } from "./_fixtures";
+import { dynamicOutputProperty } from "../src/dynamicProperty";
 
 let spy: jest.SpyInstance;
 beforeEach(() => {
@@ -221,14 +221,14 @@ describe("dynamicOutputProperty", () => {
           rootTyping: "Date",
         }),
         objectType({
-          name: "SomeInput",
+          name: "DynamicPropObject",
           definition(t) {
             t.id("id");
             // @ts-ignore
             t.model.timestamps();
           },
         }),
-        dynamicOutputMethod({
+        dynamicOutputProperty({
           name: "model",
           factory({ typeDef }) {
             return {

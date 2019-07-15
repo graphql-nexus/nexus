@@ -94,6 +94,7 @@ import {
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
   isNexusArgDef,
+  isNexusDynamicOutputProperty,
 } from "./definitions/wrapping";
 import {
   GraphQLPossibleInputs,
@@ -103,6 +104,7 @@ import {
   RootTypings,
   Omit,
   MissingType,
+  GraphQLNamedInputType,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenMetadata, TypegenFormatFn } from "./typegenMetadata";
@@ -132,6 +134,7 @@ import {
   PluginDefinitionInfo,
 } from "./plugin";
 import { decorateType } from "./definitions/decorateType";
+import { DynamicOutputPropertyDef } from "./dynamicProperty";
 
 export type Maybe<T> = T | null;
 
@@ -291,6 +294,11 @@ export type DynamicOutputFields = Record<
   DynamicOutputMethodDef<string> | string
 >;
 
+export type DynamicOutputProperties = Record<
+  string,
+  DynamicOutputPropertyDef<string>
+>;
+
 /**
  * Builds all of the types, properly accounts for any using "mix".
  * Since the enum types are resolved synchronously, these need to guard for
@@ -344,6 +352,11 @@ export class SchemaBuilder {
    * Add dynamic output fields
    */
   protected dynamicOutputFields: DynamicOutputFields = {};
+
+  /**
+   * Add dynamic output properties
+   */
+  protected dynamicOutputProperties: DynamicOutputProperties = {};
 
   /**
    * All types that need to be traversed for children types
@@ -405,6 +418,7 @@ export class SchemaBuilder {
       | GraphQLNamedType
       | DynamicInputMethodDef<string>
       | DynamicOutputMethodDef<string>
+      | DynamicOutputPropertyDef<string>
   ) {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
@@ -412,6 +426,10 @@ export class SchemaBuilder {
     }
     if (isNexusDynamicOutputMethod(typeDef)) {
       this.dynamicOutputFields[typeDef.name] = typeDef;
+      return;
+    }
+    if (isNexusDynamicOutputProperty(typeDef)) {
+      this.dynamicOutputProperties[typeDef.name] = typeDef;
       return;
     }
 
@@ -545,6 +563,7 @@ export class SchemaBuilder {
       dynamicFields: {
         dynamicInputFields: this.dynamicInputFields,
         dynamicOutputFields: this.dynamicOutputFields,
+        dynamicOutputProperties: this.dynamicOutputProperties,
       },
       rootTypings: this.rootTypings,
       missingTypes: this.missingTypes,
@@ -585,8 +604,8 @@ export class SchemaBuilder {
       typeName: config.name,
       addField: (fieldDef) => fields.push(fieldDef),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      addDynamicOutputFields: (block, isList) =>
-        this.addDynamicOutputFields(block, isList),
+      addDynamicOutputMembers: (block, isList) =>
+        this.addDynamicOutputMembers(block, isList),
     });
     config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
@@ -643,8 +662,8 @@ export class SchemaBuilder {
       typeName: config.name,
       addField: (field) => fields.push(field),
       setResolveType: (fn) => (resolveType = fn),
-      addDynamicOutputFields: (block, isList) =>
-        this.addDynamicOutputFields(block, isList),
+      addDynamicOutputMembers: (block, isList) =>
+        this.addDynamicOutputMembers(block, isList),
     });
     config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
@@ -1063,9 +1082,13 @@ export class SchemaBuilder {
   protected getInputType(
     name:
       | string
+      | GraphQLNamedInputType
       | AllNexusInputTypeDefs
       | NexusWrappedType<AllNexusInputTypeDefs>
   ): GraphQLPossibleInputs {
+    if (isNamedType(name)) {
+      return name;
+    }
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type) && !isLeafType(type)) {
       throw new Error(
@@ -1250,7 +1273,7 @@ export class SchemaBuilder {
     });
   }
 
-  addDynamicOutputFields(block: OutputDefinitionBlock<any>, isList: boolean) {
+  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === "string") {
         return this.addDynamicScalar(methodName, val, block);
@@ -1265,6 +1288,18 @@ export class SchemaBuilder {
           typeName: block.typeName,
         });
       };
+    });
+    eachObj(this.dynamicOutputProperties, (val, propertyName) => {
+      Object.defineProperty(block, propertyName, {
+        get() {
+          return val.value.factory({
+            typeDef: block,
+            builder: this,
+            typeName: block.typeName,
+          });
+        },
+        enumerable: true,
+      });
     });
   }
 
@@ -1296,8 +1331,8 @@ export class SchemaBuilder {
       typeName: obj.name,
       addInterfaces: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
-      addDynamicOutputFields: (block, isList) =>
-        this.addDynamicOutputFields(block, isList),
+      addDynamicOutputMembers: (block, isList) =>
+        this.addDynamicOutputMembers(block, isList),
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1308,8 +1343,8 @@ export class SchemaBuilder {
       typeName: obj.name,
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
-      addDynamicOutputFields: (block, isList) =>
-        this.addDynamicOutputFields(block, isList),
+      addDynamicOutputMembers: (block, isList) =>
+        this.addDynamicOutputMembers(block, isList),
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1368,6 +1403,7 @@ function extendError(name: string) {
 export type DynamicFieldDefs = {
   dynamicInputFields: DynamicInputFields;
   dynamicOutputFields: DynamicOutputFields;
+  dynamicOutputProperties: DynamicOutputProperties;
 };
 
 export interface BuildTypes<
@@ -1398,7 +1434,8 @@ function addTypes(builder: SchemaBuilder, types: any) {
     isNexusExtendInputTypeDef(types) ||
     isNamedType(types) ||
     isNexusDynamicInputMethod(types) ||
-    isNexusDynamicOutputMethod(types)
+    isNexusDynamicOutputMethod(types) ||
+    isNexusDynamicOutputProperty(types)
   ) {
     builder.addType(types);
   } else if (Array.isArray(types)) {
@@ -1572,18 +1609,15 @@ export function assertNoMissingTypes(
     const err = new Error("\n" + errors);
     if (dfd) {
       dfd.promise
+        .then(() => Promise.reject(err))
         .catch((e) => {
-          console.error(e);
-        })
-        .then(() => {
           if (onReady) {
-            onReady(err);
+            onReady(e);
           }
           process.nextTick(() => {
             throw err;
           });
-        })
-        .catch(() => {});
+        });
     } else {
       if (onReady) {
         onReady(err);

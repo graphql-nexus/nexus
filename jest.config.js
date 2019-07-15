@@ -15,5 +15,6 @@ module.exports = {
   moduleNameMapper: {
     "package.json": "<rootDir>/tests/stubs/package.json",
   },
+  collectCoverageFrom: ["<rootDir>/src/**/*.ts"],
   coverageReporters: ["lcov", "text", "html"],
 };
