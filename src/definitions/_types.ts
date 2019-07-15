@@ -3,6 +3,11 @@ import {
   GraphQLCompositeType,
   GraphQLInputObjectType,
   GraphQLFieldResolver,
+  GraphQLScalarType,
+  GraphQLObjectType,
+  GraphQLInterfaceType,
+  GraphQLUnionType,
+  GraphQLEnumType,
 } from "graphql";
 
 export type WrappedResolver = GraphQLFieldResolver<any, any> & {
@@ -112,3 +117,15 @@ export interface RootTypingImport {
 export interface MissingType {
   fromObject: boolean;
 }
+
+export type GraphQLNamedOutputType =
+  | GraphQLScalarType
+  | GraphQLObjectType
+  | GraphQLInterfaceType
+  | GraphQLUnionType
+  | GraphQLEnumType;
+
+export type GraphQLNamedInputType =
+  | GraphQLScalarType
+  | GraphQLInputObjectType
+  | GraphQLEnumType;

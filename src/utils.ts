@@ -244,6 +244,12 @@ export function argsToConfig(
   return result;
 }
 
+export type MaybeDeferred<T = any> = {
+  resolve: (val?: T) => void;
+  reject: (err: Error) => void;
+  value: Promise<T>;
+};
+
 export type Deferred<T = any> = {
   resolve: (val?: T) => void;
   reject: (err: Error) => void;
@@ -262,4 +268,12 @@ export function deferred<T = any>() {
     dfd.reject = _reject;
   });
   return dfd;
+}
+
+/**
+ * Container for a possibly-deferred value.
+ */
+export function maybeDeferred<T = any>() {
+  const maybeDfd = {} as MaybeDeferred<T>;
+  return maybeDfd;
 }

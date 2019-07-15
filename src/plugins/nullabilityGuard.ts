@@ -1,21 +1,6 @@
 import { plugin } from "../plugin";
-import {
-  isWrappingType,
-  GraphQLEnumType,
-  GraphQLUnionType,
-  GraphQLInterfaceType,
-  GraphQLObjectType,
-  GraphQLScalarType,
-  isNonNullType,
-  isListType,
-} from "graphql";
-
-export type GraphQLNamedOutputType =
-  | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLInterfaceType
-  | GraphQLUnionType
-  | GraphQLEnumType;
+import { isWrappingType, isNonNullType, isListType } from "graphql";
+import { GraphQLNamedOutputType } from "../definitions/_types";
 
 export type NullabilityGuardConfig = {
   onGuarded?(): void;

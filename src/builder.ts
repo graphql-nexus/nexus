@@ -272,7 +272,7 @@ export type SchemaConfig = BuilderConfig & {
    * type dispatch. This allows us to delegate the missing types to another schema,
    * or construct them on-the-fly.
    */
-  onMissingType?: (typeName: string) => GraphQLNamedType | undefined;
+  findMissingType?: (typeName: string) => GraphQLNamedType | undefined;
 } & NexusGenPluginSchemaConfig;
 
 export type TypeToWalk =
@@ -769,8 +769,8 @@ export class SchemaBuilder {
   ): GraphQLNamedType {
     invariantGuard(typeName);
     let foundType: GraphQLNamedType | undefined;
-    if (this.config.onMissingType instanceof Function) {
-      foundType = this.config.onMissingType(typeName);
+    if (this.config.findMissingType instanceof Function) {
+      foundType = this.config.findMissingType(typeName);
     }
     if (typeName === "Query" && !foundType) {
       return new GraphQLObjectType({

@@ -12,7 +12,7 @@ import {
   AllNexusOutputTypeDefs,
   AllNexusInputTypeDefs,
 } from "./wrapping";
-import { BaseScalars } from "./_types";
+import { BaseScalars, GraphQLNamedInputType } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
 
 export interface CommonFieldConfig {
@@ -252,7 +252,10 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs<string>;
+  type:
+    | GetGen<"allInputTypes", string>
+    | AllNexusInputTypeDefs<string>
+    | GraphQLNamedInputType;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {

@@ -1,25 +1,35 @@
 import path from "path";
-import { makeSchema, objectType, queryType, deferred } from "../src/core";
+import { GraphQLDateTime } from "graphql-iso-date";
+import {
+  makeSchema,
+  objectType,
+  queryType,
+  deferred,
+  inputObjectType,
+  dynamicInputMethod,
+  decorateType,
+  dynamicOutputMethod,
+} from "../src/core";
 import { RelayConnectionMethod, CollectionMethod } from "../src/extensions";
 import { FileSystem } from "../src/fileSystem";
 import { graphql } from "graphql";
 import { CatListFixture } from "./_fixtures";
 
-describe("nexus: dynamicOutputMethod", () => {
+let spy: jest.SpyInstance;
+beforeEach(() => {
+  jest.clearAllMocks();
+  spy = jest
+    .spyOn(FileSystem.prototype, "replaceFile")
+    .mockImplementation(async () => null);
+});
+
+describe("dynamicOutputMethod", () => {
   const Cat = objectType({
     name: "Cat",
     definition(t) {
       t.id("id");
       t.string("name");
     },
-  });
-
-  let spy: jest.SpyInstance;
-  beforeEach(() => {
-    jest.clearAllMocks();
-    spy = jest
-      .spyOn(FileSystem.prototype, "replaceFile")
-      .mockImplementation(async () => null);
   });
 
   test("RelayConnectionMethod example", async () => {
@@ -162,5 +172,83 @@ describe("nexus: dynamicOutputMethod", () => {
       ],
       outputs: false,
     });
+  });
+});
+
+describe("dynamicInputMethod", () => {
+  it("should provide a method on the input definition", async () => {
+    const dfd = deferred();
+    makeSchema({
+      types: [
+        decorateType(GraphQLDateTime, {
+          rootTyping: "Date",
+        }),
+        inputObjectType({
+          name: "SomeInput",
+          definition(t) {
+            t.id("id");
+            // @ts-ignore
+            t.timestamps();
+          },
+        }),
+        dynamicInputMethod({
+          name: "timestamps",
+          factory({ typeDef }) {
+            typeDef.field("createdAt", { type: "DateTime" });
+            typeDef.field("updatedAt", { type: "DateTime" });
+          },
+        }),
+      ],
+      outputs: {
+        typegen: path.join(__dirname, "test-output.ts"),
+        schema: path.join(__dirname, "schema.graphql"),
+      },
+      onReady: dfd.resolve,
+      shouldGenerateArtifacts: true,
+    });
+    await dfd.promise;
+    expect(spy.mock.calls[0]).toMatchSnapshot();
+    expect(spy.mock.calls[1]).toMatchSnapshot();
+  });
+});
+
+describe("dynamicOutputProperty", () => {
+  it("should provide a way for adding a chainable api on the output definition", async () => {
+    const dfd = deferred();
+    makeSchema({
+      types: [
+        decorateType(GraphQLDateTime, {
+          rootTyping: "Date",
+        }),
+        objectType({
+          name: "SomeInput",
+          definition(t) {
+            t.id("id");
+            // @ts-ignore
+            t.model.timestamps();
+          },
+        }),
+        dynamicOutputMethod({
+          name: "model",
+          factory({ typeDef }) {
+            return {
+              timestamps() {
+                typeDef.field("createdAt", { type: "DateTime" });
+                typeDef.field("updatedAt", { type: "DateTime" });
+              },
+            };
+          },
+        }),
+      ],
+      outputs: {
+        typegen: path.join(__dirname, "test-output.ts"),
+        schema: path.join(__dirname, "schema.graphql"),
+      },
+      onReady: dfd.resolve,
+      shouldGenerateArtifacts: true,
+    });
+    await dfd.promise;
+    expect(spy.mock.calls[0]).toMatchSnapshot();
+    expect(spy.mock.calls[1]).toMatchSnapshot();
   });
 });
