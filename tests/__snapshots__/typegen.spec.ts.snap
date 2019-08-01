@@ -75,7 +75,7 @@ exports[`typegen should not print roots for fields with resolvers 1`] = `
   Boolean: boolean;
   ID: string;
   UUID: string;
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  ExampleUnion: NexusGenRootTypes['Post'] & { __typename?: 'Post'} | NexusGenRootTypes['User'] & { __typename?: 'User'};
 }"
 `;
 
@@ -138,7 +138,7 @@ exports[`typegen should print a root type map 1`] = `
   Boolean: boolean;
   ID: string;
   UUID: string;
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  ExampleUnion: NexusGenRootTypes['Post'] & { __typename?: 'Post'} | NexusGenRootTypes['User'] & { __typename?: 'User'};
 }"
 `;
 
@@ -199,7 +199,7 @@ export interface NexusGenRootTypes {
   Boolean: boolean;
   ID: string;
   UUID: string;
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  ExampleUnion: NexusGenRootTypes['Post'] & { __typename?: 'Post'} | NexusGenRootTypes['User'] & { __typename?: 'User'};
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {

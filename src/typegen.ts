@@ -364,7 +364,7 @@ export class Typegen {
         } else if (isUnionType(type)) {
           rootTypeMap[type.name] = type
             .getTypes()
-            .map((t) => `NexusGenRootTypes['${t.name}']`)
+            .map((t) => `NexusGenRootTypes['${t.name}'] & { __typename?: '${t.name}'}`)
             .join(" | ");
         } else if (isInterfaceType(type)) {
           const possibleRoots = this.schema
