@@ -10,26 +10,19 @@ This page explains how to use [Prisma](https://github.com/prisma/prisma) and the
 
 ### What is Prisma?
 
-Prisma is a replacement for traditional ORMs. It enables simplified and type-safe database access through [Photon](https://photonjs.prisma.io/). Photon is an auto-generated and type-safe database client. Combined with GraphQL Nexus, it provides a powerful solution for implementing database access in GraphQL resolvers.
+Prisma is a toolchain replacing traditional ORMs. Developers leverage it to drive their database schemas, migrations, type-safe client access, and more.
 
-Prisma currently supports the following databases:
+Developers use the Prisma Definition Language (PDL) to define their database schema. They use [Photon](https://photonjs.prisma.io/) to derive (generate) type-safe database clients that access that databse. As they invariably evolve their database schema, [Lift](https://lift.prisma.io/) is there to carry out complex migrations as needed.
 
-- PostgreSQL
-- MySQL
+Developers can start on brand new projects or integrate with existing ones by importing an existing database schema. When paired with GraphQL Nexus, implementing database access in GraphQL resolvers becomes easy and reliable.
 
-You can use Prisma to start out from scratch or connect it to a legacy database.
-
-With Prisma, you can use a declarative syntax to define database models. Prisma optionally handles database migrations for you using [Lift](https://lift.prisma.io/). If you're starting with a legacy database, the Prisma CLI performs an introspection against your database and generates a Prisma schema for you.
-
-Learn how to get started with Prisma [here](https://github.com/prisma/prisma2-docs/).
+More information can be found in the [Prisma docs](https://github.com/prisma/prisma2).
 
 ### What is the `nexus-prisma` plugin?
 
-The [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin is the glue between Photon and GraphQL Nexus. It generates CRUD building blocks for your Prisma models.
+[`nexus-prisma`](https://github.com/prisma/nexus-prisma) is a plugin for Nexus that extends its DSL such that you can expose Prisma models when constructing your GraphQL schema. Included in the DSL extension are CRUD functions over each prisma model which are ideal for implementing database access in your resolvers.
 
 ![](https://imgur.com/dbEMHd5.png)
-
-When constructing your GraphQL schema with GraphQL Nexus, you build upon these building blocks and expose/customize them to your own API needs.
 
 ### Generated CRUD building blocks
 
