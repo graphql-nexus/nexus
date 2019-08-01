@@ -24,7 +24,9 @@ More information can be found in the [Prisma docs](https://github.com/prisma/pri
 
 ![](https://imgur.com/dbEMHd5.png)
 
-### Generated CRUD building blocks
+### Generated CRUD Functions aka Photon
+
+Before diving into mechanics of the plugin, lets get a sense for what a Photon client API looks like.
 
 Assume you have a `User` type in your Prisma schema:
 
@@ -35,7 +37,7 @@ model User {
 }
 ```
 
-Define a prisma generator in your Prisma schema to generate the following building blocks for it:
+Add the following generators to the schema:
 
 ```groovy
 generator nexus_prisma {
@@ -51,6 +53,8 @@ model User {
   name  String
 }
 ```
+
+Now, the following functions could be generated as a package, ready to import. So this is Photon, and its exact contents vary from Prisma schema to prisma schema, but the pattern is thus:
 
 - **Queries**
 
@@ -83,13 +87,13 @@ Here's a minimal example for using `nexus-prisma`:
 
 ```groovy
 model Todo {
-  id    Int @id
+  id    Int     @id
   title String
   done  Boolean @default(false)
 }
 ```
 
-**GraphQL server code** (based on `graphql-yoga`):
+**GraphQL server code**
 
 ```ts
 import { nexusPrismaPlugin } from "@generated/nexus-prisma";
@@ -155,10 +159,11 @@ const server = new GraphQLServer({
   schema,
   context: { photon },
 });
+
 server.start(() => console.log("Server is running on http://localhost:4000"));
 ```
 
-<Details><Summary>Expand to view the generated SDL for the final GraphQL API</Summary>
+<Details><Summary>Expand to see the generated GraphQL API schema (aka. SDL)</Summary>
 
 ```graphql
 # The fully exposed "Query" building block
@@ -193,10 +198,10 @@ type Todo {
 </Details>
 <br />
 
-You can find some easy-to-run example projects based on `nexus-prisma` in the [`photonjs repository`](https://github.com/prisma/photonjs/tree/master/examples):
+You can find some runnable `nexus-prisma`-based example projects in the [`photonjs repository`](https://github.com/prisma/photonjs/tree/master/examples):
 
 - [GraphQL](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql): Simple setup keeping the entire schema in a single file.
-- [GraphQL + Auth](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql-auth): Advanced setup including authentication and authorization and a modularized schema.
+- [GraphQL + Auth](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql-auth): Advanced setup including authentication, authorization, and a modularized schema.
 
 ## Getting started
 
