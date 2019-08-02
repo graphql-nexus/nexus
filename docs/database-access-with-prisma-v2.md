@@ -54,7 +54,7 @@ model User {
 }
 ```
 
-Now, the following functions could be generated as a package, ready to import. So this is Photon, and its exact contents vary from Prisma schema to prisma schema, but the pattern is thus:
+Now, the following functions could be generated as a ready-to-import package:
 
 - **Queries**
 
@@ -81,9 +81,15 @@ Now, the following functions could be generated as a package, ready to import. S
 
 ## Examples
 
-Here's a minimal example for using `nexus-prisma`:
+You can find runnable `nexus-prisma`-based example projects in the [`photonjs repository`](https://github.com/prisma/photonjs/tree/master/examples):
 
-**Prisma schema**:
+- [GraphQL](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql): Simple setup keeping the entire schema in a single file.
+- [GraphQL + Auth](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql-auth): Advanced setup including authentication, authorization, and a modularized schema.
+
+
+Here's a minimal taster:
+
+**Prisma schema**
 
 ```groovy
 model Todo {
@@ -198,10 +204,6 @@ type Todo {
 </Details>
 <br />
 
-You can find some runnable `nexus-prisma`-based example projects in the [`photonjs repository`](https://github.com/prisma/photonjs/tree/master/examples):
-
-- [GraphQL](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql): Simple setup keeping the entire schema in a single file.
-- [GraphQL + Auth](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql-auth): Advanced setup including authentication, authorization, and a modularized schema.
 
 ## Getting started
 
