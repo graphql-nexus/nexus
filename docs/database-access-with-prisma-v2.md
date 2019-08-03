@@ -207,62 +207,49 @@ type Todo {
 
 ## Getting started
 
-Let's walk through a practical example of using the `nexus-prisma` plugin to build a GraphQL API for a blogging application.
+Now let's build an example blogging app to see `nexus-prisma` in action.
 
 ### 1. Setup
 
-#### 1.1. Installation
+#### 1.1 Install Prisma
 
 ```bash
 npm install -g prisma2
 ```
 
-#### 1.2. Create Prisma project
+#### 1.2 Create Project
 
 ```bash
 prisma2 init myblog
+cd myblog
 ```
 
-In the interactive prompt, select the following options:
+Navigate through the subsequent prompts like so:
 
-1. Select **SQLite** (for a simple local database seteup)
-2. Select **Photon** & **Lift**
-3. Select **TypeScript** (or JavaScript if you prefer)
-4. Select **From scratch**
+1. database: **SQLite**
+2. addons: **Photon** & **Lift**
+3. language: **TypeScript** (JavaScript if you prefer)
+4. template: **From scratch**
 
-#### 1.3. Add dependencies
+#### 1.3 Install dependencies
 
 ```bash
-npm init -y
-npm install --save @prisma/nexus graphql nexus-prisma graphql-yoga
+npm install --save @prisma/nexus graphql nexus-prisma apollo-server
 npm install --save-dev typescript ts-node-dev
 ```
 
-Here's an overview of the installed dependencies:
+About the dependencies:
 
-- `@prisma/nexus` & `graphql`: Required to use GraphQL Nexus
-- `graphql-yoga`: Your GraphQL server (note that you might as well use `apollo-server`)
-- `ts-node-dev`: Runs our development server in the background
+- `@prisma/nexus` & `graphql`: For Nexus
+- `apollo-server`: Your GraphQL server
+- `ts-node-dev`:  Runs your development server
 
-#### 1.4. Add `tsconfig.json`
-
-```json
-{
-  "compilerOptions": {
-    "sourceMap": true,
-    "outDir": "dist",
-    "strict": true,
-    "lib": ["esnext", "dom"]
-  }
-}
-```
-
-#### 1.5. Configure `start` script in `package.json`
+#### 1.4 Configure `dev` command
 
 ```json
 "scripts": {
-  "start": "ts-node-dev --no-notify --respawn --transpileOnly ./"
-},
+  "dev": "ts-node-dev --no-notify --respawn --transpileOnly src/script.ts"
+}
 ```
 
 ### 2. Define models & generators
