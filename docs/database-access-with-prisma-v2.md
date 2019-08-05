@@ -292,13 +292,13 @@ This will generate both `photon` and `nexus-prisma` in the `node_modules/@genera
 
 ### 2. Expose full CRUD GraphQL API
 
-We will begin our GraphQL API by exposing all CRUD operations for our Prisma models in `src/main.ts`. These operations come from the `nexus-prisma` generator.
+We will begin our GraphQL API by exposing all CRUD operations for our Prisma models in `src/main.ts`. These operations are exposed on `t` by the `nexus-prisma` generator.
 
 ```ts
-import * as path from "path";
-import { GraphQLServer } from "graphql-yoga";
-import { nexusPrismaPlugin } from "@generated/nexus-prisma";
-import { Photon } from "@generated/photon";
+import * as path from "path"
+import { GraphQLServer } from "graphql-yoga"
+import { nexusPrismaPlugin } from "@generated/nexus-prisma"
+import { Photon } from "@generated/photon"
 
 const Query = objectType({
   name: "Query",
@@ -308,7 +308,8 @@ const Query = objectType({
     t.crud.findOnePost();
     t.crud.findManyPost();
   },
-});
+})
+
 const Mutation = objectType({
   name: "Mutation",
   definition(t) {
@@ -322,7 +323,7 @@ const Mutation = objectType({
     t.crud.deletePost();
     t.crud.upsertPost();
   },
-});
+})
 
 const User = objectType({
   name: "User",
@@ -332,7 +333,7 @@ const User = objectType({
     t.model.name();
     t.model.posts();
   },
-});
+})
 
 const Post = objectType({
   name: "Post",
@@ -345,13 +346,13 @@ const Post = objectType({
     t.model.content();
     t.model.author();
   },
-});
+})
 
 const photon = new Photon();
 
 const nexusPrisma = nexusPrismaPlugin({
   photon: (ctx) => ctx.photon,
-});
+})
 
 const schema = makePrismaSchema({
   types: [Query, Mutation, User, Post, nexusPrisma],
@@ -360,13 +361,14 @@ const schema = makePrismaSchema({
     schema: path.join(__dirname, "./generated/schema.graphql"),
     typegen: path.join(__dirname, "./generated/nexus.ts"),
   },
-});
+})
 
 const server = new GraphQLServer({
   schema,
   context: { photon },
-});
-server.start(() => console.log(`Server is running on http://localhost:4000`));
+})
+
+server.start(() => console.log(`Server is running on http://localhost:4000`))
 ```
 
 Start your development `ts-node-dev`-based development server with:
