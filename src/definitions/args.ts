@@ -65,7 +65,7 @@ export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
 export class NexusArgDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusArgConfig<string>
+    protected config: NexusArgConfig<GetGen<"allInputTypes", string>>
   ) {}
   get value() {
     return this.config;
