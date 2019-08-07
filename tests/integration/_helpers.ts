@@ -24,16 +24,12 @@ const printTypescriptErrors = (diagnotics: ReadonlyArray<ts.Diagnostic>) => {
 export const compileTypescript = (fileNames: string[]) => {
   const errors = ts
     .createProgram(fileNames, {
-      // moduleResolution:
       sourceMap: false,
       noEmitOnError: true,
       esModuleInterop: true,
       strict: true,
-      // lib: ["esnext", "dom"],
       target: ts.ScriptTarget.ES5,
-      // module: ts.ModuleKind.CommonJS,
-      // outDir: `/tmp/nexus-integration-test-${Date.now()}`,
-      outDir: __dirname,
+      outDir: `/tmp/nexus-integration-test-${Date.now()}`,
       noErrorTruncation: false,
     })
     .emit().diagnostics;
