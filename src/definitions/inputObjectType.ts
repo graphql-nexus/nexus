@@ -1,3 +1,4 @@
+import { GetGen } from "../typegenTypeHelpers";
 import { NexusTypes, NonNullConfig, withNexusSymbol } from "./_types";
 import { InputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
@@ -25,7 +26,9 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
   nonNullDefaults?: NonNullConfig;
 }
 
-export class NexusInputObjectTypeDef<TypeName extends string> {
+export class NexusInputObjectTypeDef<
+  TypeName extends GetGen<"allInputTypes", string>
+> {
   constructor(
     readonly name: TypeName,
     protected config: NexusInputObjectTypeConfig<string>
@@ -41,8 +44,8 @@ export class NexusInputObjectTypeDef<TypeName extends string> {
 }
 withNexusSymbol(NexusInputObjectTypeDef, NexusTypes.InputObject);
 
-export function inputObjectType<TypeName extends string>(
-  config: NexusInputObjectTypeConfig<TypeName>
-) {
+export function inputObjectType<
+  TypeName extends GetGen<"allInputTypes", string>
+>(config: NexusInputObjectTypeConfig<TypeName>) {
   return new NexusInputObjectTypeDef(config.name, config);
 }

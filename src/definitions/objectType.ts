@@ -39,7 +39,7 @@ export interface FieldModificationDef<
 }
 
 export interface ObjectDefinitionBuilder<TypeName extends string>
-  extends OutputDefinitionBuilder {
+  extends OutputDefinitionBuilder<TypeName> {
   addInterfaces(toAdd: Implemented[]): void;
   addFieldModifications<FieldName extends string>(
     changes: FieldModificationDef<TypeName, FieldName>
@@ -95,7 +95,7 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusObjectTypeConfig<string>
+    protected config: NexusObjectTypeConfig<TypeName>
   ) {
     assertValidName(name);
   }

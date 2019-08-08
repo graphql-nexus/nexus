@@ -58,7 +58,7 @@ export class InterfaceDefinitionBlock<
 export class NexusInterfaceTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusInterfaceTypeConfig<string>
+    protected config: NexusInterfaceTypeConfig<TypeName>
   ) {
     assertValidName(name);
   }

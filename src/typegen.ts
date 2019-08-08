@@ -399,7 +399,7 @@ export class Typegen {
     if (rootTyping) {
       return typeof rootTyping === "string" ? rootTyping : rootTyping.name;
     }
-    return this.typegenInfo.backingTypeMap[typeName];
+    return (this.typegenInfo.backingTypeMap as any)[typeName];
   }
 
   buildAllTypesMap() {
@@ -671,7 +671,7 @@ export class Typegen {
     if (isSpecifiedScalarType(type)) {
       return SpecifiedScalars[type.name as SpecifiedScalarNames];
     }
-    const backingType = this.typegenInfo.backingTypeMap[type.name];
+    const backingType = (this.typegenInfo.backingTypeMap as any)[type.name];
     if (typeof backingType === "string") {
       return backingType;
     } else {

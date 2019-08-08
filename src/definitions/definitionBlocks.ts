@@ -82,7 +82,9 @@ export interface NexusOutputFieldConfig<
     | NexusWrappedType<AllNexusOutputTypeDefs>;
 }
 
-export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
+export type NexusOutputFieldDef<
+  T extends string = string
+> = NexusOutputFieldConfig<T, any> & {
   name: string;
   subscribe?: GraphQLFieldResolver<any, any>;
 };
@@ -124,9 +126,9 @@ export type FieldOutConfig<
     }
   : NexusOutputFieldConfig<TypeName, FieldName>;
 
-export interface OutputDefinitionBuilder {
-  typeName: string;
-  addField(config: NexusOutputFieldDef): void;
+export interface OutputDefinitionBuilder<TypeName extends string> {
+  typeName: TypeName;
+  addField(config: NexusOutputFieldDef<TypeName>): void;
   addDynamicOutputMembers(
     block: OutputDefinitionBlock<any>,
     isList: boolean
@@ -152,7 +154,7 @@ export interface OutputDefinitionBlock<TypeName extends string>
 export class OutputDefinitionBlock<TypeName extends string> {
   readonly typeName: string;
   constructor(
-    protected typeBuilder: OutputDefinitionBuilder,
+    protected typeBuilder: OutputDefinitionBuilder<TypeName>,
     protected isList = false
   ) {
     this.typeName = typeBuilder.typeName;
@@ -207,7 +209,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     name: FieldName,
     fieldConfig: FieldOutConfig<TypeName, FieldName>
   ) {
-    const field: NexusOutputFieldDef = {
+    const field: NexusOutputFieldDef<TypeName> = {
       name,
       ...fieldConfig,
     };
@@ -219,7 +221,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     typeName: BaseScalars,
     opts: [] | ScalarOutSpread<TypeName, any>
   ) {
-    let config: NexusOutputFieldDef = {
+    let config: NexusOutputFieldDef<TypeName> = {
       name: fieldName,
       type: typeName,
     };
@@ -231,7 +233,9 @@ export class OutputDefinitionBlock<TypeName extends string> {
     this.typeBuilder.addField(this.decorateField(config));
   }
 
-  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+  protected decorateField(
+    config: NexusOutputFieldDef<TypeName>
+  ): NexusOutputFieldDef<TypeName> {
     if (this.isList) {
       if (config.list) {
         console.warn(
@@ -262,7 +266,7 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs<string>;
+  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -353,6 +357,6 @@ export class InputDefinitionBlock<TypeName extends string> {
 }
 
 export interface AbstractOutputDefinitionBuilder<TypeName extends string>
-  extends OutputDefinitionBuilder {
+  extends OutputDefinitionBuilder<TypeName> {
   setResolveType(fn: AbstractTypeResolver<TypeName>): void;
 }

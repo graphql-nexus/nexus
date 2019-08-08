@@ -11,7 +11,7 @@ export interface NexusExtendTypeConfig<TypeName extends string> {
 export class NexusExtendTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusExtendTypeConfig<string> & { name: string }
+    protected config: NexusExtendTypeConfig<TypeName> & { name: TypeName }
   ) {
     assertValidName(name);
   }
