@@ -828,9 +828,7 @@ export class SchemaBuilder {
   ): GraphQLFieldConfig<any, any> {
     if (!fieldConfig.type) {
       throw new Error(
-        `Missing required "type" field for ${typeConfig.name}.${
-          fieldConfig.name
-        }`
+        `Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`
       );
     }
     return {
@@ -992,9 +990,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type)) {
       throw new Error(
-        `Expected ${name} to be a valid input type, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a valid input type, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -1009,9 +1005,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type) && !isLeafType(type)) {
       throw new Error(
-        `Expected ${name} to be a possible input type, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a possible input type, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -1023,9 +1017,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isOutputType(type)) {
       throw new Error(
-        `Expected ${name} to be a valid output type, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a valid output type, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -1409,9 +1401,7 @@ export function makeSchemaInternal(
   }
   if (Subscription && !isObjectType(Subscription)) {
     throw new Error(
-      `Expected Subscription to be a objectType, saw ${
-        Subscription.constructor.name
-      }`
+      `Expected Subscription to be a objectType, saw ${Subscription.constructor.name}`
     );
   }
 
@@ -1475,9 +1465,9 @@ function invariantGuard(val: any) {
 
 function normalizeArg(
   argVal:
-    | NexusArgDef<string>
+    | NexusArgDef<GetGen<"allInputTypes", string>>
     | GetGen<"allInputTypes", string>
-    | AllNexusInputTypeDefs<string>
+    | AllNexusInputTypeDefs<GetGen<"allInputTypes", string>>
 ): NexusArgDef<string> {
   if (isNexusArgDef(argVal)) {
     return argVal;

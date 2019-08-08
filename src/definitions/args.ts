@@ -4,9 +4,9 @@ import { NexusTypes, withNexusSymbol } from "./_types";
 
 export type ArgsRecord = Record<
   string,
-  | NexusArgDef<string>
+  | NexusArgDef<GetGen<"allInputTypes", string>>
   | GetGen<"allInputTypes", string>
-  | AllNexusInputTypeDefs<string>
+  | AllNexusInputTypeDefs<GetGen<"allInputTypes", string>>
 >;
 
 export interface CommonArgConfig {
