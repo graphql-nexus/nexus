@@ -1,28 +1,7 @@
 import ts from "typescript";
 
-const printTypescriptErrors = (diagnotics: ReadonlyArray<ts.Diagnostic>) => {
-  diagnotics.forEach((diagnostic) => {
-    if (diagnostic.file) {
-      const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-        diagnostic.start!
-      );
-      const message = ts.flattenDiagnosticMessageText(
-        diagnostic.messageText,
-        "\n"
-      );
-      console.log(
-        `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`
-      );
-    } else {
-      console.log(
-        `${ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")}`
-      );
-    }
-  });
-};
-
 export const compileTypescript = (fileNames: string[]) => {
-  const errors = ts
+  const diagnostics = ts
     .createProgram(fileNames, {
       sourceMap: false,
       noEmitOnError: true,
@@ -34,10 +13,18 @@ export const compileTypescript = (fileNames: string[]) => {
     })
     .emit().diagnostics;
 
-  if (errors.length > 0) {
-    printTypescriptErrors(errors);
+  const formatHost: ts.FormatDiagnosticsHost = {
+    getCanonicalFileName: (path) => path,
+    getCurrentDirectory: ts.sys.getCurrentDirectory,
+    getNewLine: () => ts.sys.newLine,
+  };
+
+  if (diagnostics.length > 0) {
+    console.log(
+      ts.formatDiagnosticsWithColorAndContext(diagnostics, formatHost)
+    );
     throw new Error(
-      `TypeScript failed to compile with ${errors.length} errors`
+      `TypeScript failed to compile with ${diagnostics.length} errors`
     );
   }
 };
