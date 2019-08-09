@@ -16,6 +16,7 @@ Prisma currently supports the following databases:
 
 - PostgreSQL
 - MySQL
+- SQLite
 
 You can use Prisma to start out from scratch or connect it to a legacy database.
 
