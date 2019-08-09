@@ -1454,6 +1454,15 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   return schema;
 }
 
+export async function generateSchema(
+  options: SchemaConfig
+): Promise<NexusSchema> {
+  const { schema, missingTypes } = makeSchemaInternal(options);
+  assertNoMissingTypes(schema, missingTypes);
+  await new TypegenMetadata(options).generateArtifacts(schema);
+  return schema;
+}
+
 function invariantGuard(val: any) {
   if (!Boolean(val)) {
     throw new Error(

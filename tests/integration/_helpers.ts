@@ -1,4 +1,7 @@
+import { join } from "path";
+import { generateSchema as doGenerateSchema } from "../../src/builder";
 import ts from "typescript";
+import { unlinkSync } from "fs";
 
 export const compileTypescript = (fileNames: string[]) => {
   const diagnostics = ts
@@ -27,4 +30,24 @@ export const compileTypescript = (fileNames: string[]) => {
       `TypeScript failed to compile with ${diagnostics.length} errors`
     );
   }
+};
+
+export const testSchema = (name: string) => {
+  it(`can be compiled with types generated from ${name} schema`, async () => {
+    const appFilePath = join(__dirname, `./_${name}.ts`);
+    const typegenFilePath = join(__dirname, `./${name}.d.ts`);
+    await doGenerateSchema({
+      types: require(`./_${name}`),
+      outputs: {
+        typegen: typegenFilePath,
+        schema: false,
+      },
+    });
+
+    try {
+      compileTypescript([appFilePath, typegenFilePath]);
+    } finally {
+      unlinkSync(typegenFilePath);
+    }
+  });
 };
