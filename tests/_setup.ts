@@ -1,6 +1,6 @@
 import ts from "typescript";
 
-(global as any).PROJECT_ROOT = "src/";
+(global as any).TS_FORMAT_PROJECT_ROOT = "src/";
 
 const formatTSDiagonsticsForJest = (
   diagnostics: readonly ts.Diagnostic[]
@@ -17,11 +17,17 @@ const formatTSDiagonsticsForJest = (
   );
 
   const sourcePath =
-    process.cwd() + "/" + (((global as any).PROJECT_ROOT as string) || "");
+    process.cwd() +
+    "/" +
+    (((global as any).TS_FORMAT_PROJECT_ROOT as string) || "");
 
-  const jestReport = `${diagnostics.length} Type Error(s):\n\n${diagnostics
-    .map((d) => `${d.file.fileName.replace(sourcePath, "")}`)
-    .join("\n")}\n\n${tsReport}`;
+  const summaryReport = `${
+    diagnostics.length
+  } Type Error(s):\n\n${diagnostics
+    .map((d) => d.file.fileName.replace(sourcePath, ""))
+    .join("\n")}`;
+
+  const jestReport = `${summaryReport}\n\n${tsReport}`;
 
   return jestReport;
 };
