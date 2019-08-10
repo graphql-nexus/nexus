@@ -1,3 +1,3 @@
 import { testSchema } from "./_helpers";
 
-testSchema("simple");
+testSchema("xs");
