@@ -16,7 +16,8 @@ export const user = objectType({
 
 export const query = queryType({
   definition(t) {
-    t.string("user", {
+    t.field("user", {
+      type: "User",
       args: { id: idArg() },
       resolve: (_root) => ({ firstName: "", lastName: "" }),
     });
