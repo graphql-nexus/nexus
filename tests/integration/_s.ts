@@ -4,7 +4,29 @@ import {
   queryType,
   mutationType,
   stringArg,
+  inputObjectType,
 } from "../../src";
+
+const mockData = {
+  posts: [{ title: "", body: "" }],
+  user: { firstName: "", lastName: "" },
+};
+
+export const postSearchInput = inputObjectType({
+  name: "PostSearchInput",
+  definition(t) {
+    t.string("title", { nullable: true });
+    t.string("body", { nullable: true });
+  },
+});
+
+export const post = objectType({
+  name: "Post",
+  definition(t) {
+    t.string("title");
+    t.string("body");
+  },
+});
 
 export const user = objectType({
   name: "User",
@@ -16,10 +38,15 @@ export const user = objectType({
 
 export const query = queryType({
   definition(t) {
+    t.list.field("searchPosts", {
+      type: "Post",
+      args: { input: postSearchInput },
+      resolve: () => mockData.posts,
+    });
     t.field("user", {
       type: "User",
       args: { id: idArg() },
-      resolve: (_root) => ({ firstName: "", lastName: "" }),
+      resolve: () => mockData.user,
     });
   },
 });
