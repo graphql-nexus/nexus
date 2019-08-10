@@ -3,7 +3,7 @@ import { generateSchema as doGenerateSchema } from "../../src/builder";
 import ts from "typescript";
 
 export const testSchema = (name: string) => {
-  it(`can be compiled with typegen from ${name} schema`, async () => {
+  it(`can compile ${name} app with its typegen`, async () => {
     const appFilePath = join(__dirname, `./_${name}.ts`);
     const typegenFilePath = `/tmp/nexus-integration-test-typegen-${name}-${Date.now()}.d.ts`;
     await doGenerateSchema({
