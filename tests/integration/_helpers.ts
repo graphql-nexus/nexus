@@ -35,7 +35,7 @@ export const compileTypescript = (fileNames: string[]) => {
 export const testSchema = (name: string) => {
   it(`can be compiled with types generated from ${name} schema`, async () => {
     const appFilePath = join(__dirname, `./_${name}.ts`);
-    const typegenFilePath = join(__dirname, `./${name}.d.ts`);
+    const typegenFilePath = `/tmp/nexus-integration-test-typegen-${name}-${Date.now()}.d.ts`;
     await doGenerateSchema({
       types: require(`./_${name}`),
       outputs: {
