@@ -14,7 +14,7 @@ const mockData = {
   user: { firstName: "", lastName: "" },
 };
 
-export const postSearchInput = inputObjectType({
+export const PostSearchInput = inputObjectType({
   name: "PostSearchInput",
   definition(t) {
     t.string("title", { nullable: true });
@@ -22,7 +22,7 @@ export const postSearchInput = inputObjectType({
   },
 });
 
-export const post = objectType({
+export const Post = objectType({
   name: "Post",
   definition(t) {
     t.string("title");
@@ -30,7 +30,7 @@ export const post = objectType({
   },
 });
 
-export const user = objectType({
+export const User = objectType({
   name: "User",
   definition(t) {
     t.string("firstName");
@@ -38,12 +38,12 @@ export const user = objectType({
   },
 });
 
-export const queryExtensions = extendType({
+export const Query = extendType({
   type: "Query",
   definition(t) {
     t.list.field("searchPosts", {
       type: "Post",
-      args: { input: postSearchInput },
+      args: { input: PostSearchInput },
       resolve: () => mockData.posts,
     });
     t.field("user", {
@@ -54,7 +54,7 @@ export const queryExtensions = extendType({
   },
 });
 
-export const mutation = mutationType({
+export const Mutation = mutationType({
   definition(t) {
     t.field("createUser", {
       type: "User",
