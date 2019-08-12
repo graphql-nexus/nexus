@@ -6,6 +6,7 @@ import {
   NeedsResolver,
   AuthorizeResolver,
   GetGen3,
+  AllInputTypes,
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
 import {
@@ -82,9 +83,7 @@ export interface NexusOutputFieldConfig<
     | NexusWrappedType<AllNexusOutputTypeDefs>;
 }
 
-export type NexusOutputFieldDef<
-  T extends string = string
-> = NexusOutputFieldConfig<T, any> & {
+export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string;
   subscribe?: GraphQLFieldResolver<any, any>;
 };
@@ -126,9 +125,9 @@ export type FieldOutConfig<
     }
   : NexusOutputFieldConfig<TypeName, FieldName>;
 
-export interface OutputDefinitionBuilder<TypeName extends string> {
-  typeName: TypeName;
-  addField(config: NexusOutputFieldDef<TypeName>): void;
+export interface OutputDefinitionBuilder {
+  typeName: string;
+  addField(config: NexusOutputFieldDef): void;
   addDynamicOutputMembers(
     block: OutputDefinitionBlock<any>,
     isList: boolean
@@ -154,7 +153,7 @@ export interface OutputDefinitionBlock<TypeName extends string>
 export class OutputDefinitionBlock<TypeName extends string> {
   readonly typeName: string;
   constructor(
-    protected typeBuilder: OutputDefinitionBuilder<TypeName>,
+    protected typeBuilder: OutputDefinitionBuilder,
     protected isList = false
   ) {
     this.typeName = typeBuilder.typeName;
@@ -209,7 +208,12 @@ export class OutputDefinitionBlock<TypeName extends string> {
     name: FieldName,
     fieldConfig: FieldOutConfig<TypeName, FieldName>
   ) {
-    const field: NexusOutputFieldDef<TypeName> = {
+    // FIXME
+    // 1. FieldOutConfig<TypeName is constrained to any string subtype
+    // 2. NexusOutputFieldDef is contrained to be be a string
+    // 3. so `name` is not compatible
+    // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
+    const field: any = {
       name,
       ...fieldConfig,
     };
@@ -221,21 +225,20 @@ export class OutputDefinitionBlock<TypeName extends string> {
     typeName: BaseScalars,
     opts: [] | ScalarOutSpread<TypeName, any>
   ) {
-    let config: NexusOutputFieldDef<TypeName> = {
+    let config: NexusOutputFieldDef = {
       name: fieldName,
       type: typeName,
     };
     if (typeof opts[0] === "function") {
-      config.resolve = opts[0];
+      // FIXME ditto to the one in `field` method
+      config.resolve = opts[0] as any;
     } else {
       config = { ...config, ...opts[0] };
     }
     this.typeBuilder.addField(this.decorateField(config));
   }
 
-  protected decorateField(
-    config: NexusOutputFieldDef<TypeName>
-  ): NexusOutputFieldDef<TypeName> {
+  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
     if (this.isList) {
       if (config.list) {
         console.warn(
@@ -266,7 +269,7 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs;
+  type: AllInputTypes | AllNexusInputTypeDefs<string>;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -357,6 +360,6 @@ export class InputDefinitionBlock<TypeName extends string> {
 }
 
 export interface AbstractOutputDefinitionBuilder<TypeName extends string>
-  extends OutputDefinitionBuilder<TypeName> {
+  extends OutputDefinitionBuilder {
   setResolveType(fn: AbstractTypeResolver<TypeName>): void;
 }

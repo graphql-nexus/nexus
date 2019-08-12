@@ -39,7 +39,7 @@ export interface FieldModificationDef<
 }
 
 export interface ObjectDefinitionBuilder<TypeName extends string>
-  extends OutputDefinitionBuilder<TypeName> {
+  extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void;
   addFieldModifications<FieldName extends string>(
     changes: FieldModificationDef<TypeName, FieldName>
@@ -109,7 +109,7 @@ withNexusSymbol(NexusObjectTypeDef, NexusTypes.Object);
 export function objectType<TypeName extends string>(
   config: NexusObjectTypeConfig<TypeName>
 ) {
-  return new NexusObjectTypeDef(config.name, config);
+  return new NexusObjectTypeDef<TypeName>(config.name, config);
 }
 
 export function queryType(

@@ -6,9 +6,19 @@ declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {}
 }
 
-export type AllInputTypes = GetGen<"allInputTypes">;
+export type AllInputTypes = GetGen<"allInputTypes", string>;
 
-export type AllOutputTypes = GetGen<"allOutputTypes">;
+export type AllOutputTypes = GetGen<"allOutputTypes", string>;
+
+/**
+ * This type captures all output types defined in the app
+ * as well as core GraphQL spec objects.
+ */
+export type AllOutputTypesPossible =
+  | AllOutputTypes
+  | "Query"
+  | "Mutation"
+  | "Subscription";
 
 export type FieldType<
   TypeName extends string,

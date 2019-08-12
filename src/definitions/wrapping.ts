@@ -15,11 +15,12 @@ import {
 } from "../dynamicMethod";
 import { NexusArgDef } from "./args";
 import { DynamicOutputPropertyDef } from "../dynamicProperty";
-import { GetGen } from "../typegenTypeHelpers";
+import { AllInputTypes } from "../typegenTypeHelpers";
 
-export type AllNexusInputTypeDefs<
-  T extends GetGen<"scalarNames", string> = GetGen<"scalarNames", string>
-> = NexusInputObjectTypeDef<T> | NexusEnumTypeDef<T> | NexusScalarTypeDef<T>;
+export type AllNexusInputTypeDefs<T extends string = string> =
+  | NexusInputObjectTypeDef<T>
+  | NexusEnumTypeDef<T>
+  | NexusScalarTypeDef<T>;
 
 export type AllNexusOutputTypeDefs =
   | NexusObjectTypeDef<string>
@@ -111,7 +112,7 @@ export function isNexusEnumTypeDef(obj: any): obj is NexusEnumTypeDef<string> {
 }
 export function isNexusInputObjectTypeDef(
   obj: any
-): obj is NexusInputObjectTypeDef<GetGen<"inputNames">> {
+): obj is NexusInputObjectTypeDef<string> {
   return (
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.InputObject
   );
@@ -138,7 +139,7 @@ export function isNexusInterfaceTypeDef(
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Interface
   );
 }
-export function isNexusArgDef(obj: any): obj is NexusArgDef<string> {
+export function isNexusArgDef(obj: any): obj is NexusArgDef<AllInputTypes> {
   return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Arg;
 }
 

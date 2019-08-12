@@ -1,12 +1,11 @@
-import { GetGen, GetGen2 } from "../typegenTypeHelpers";
+import { GetGen2, AllInputTypes } from "../typegenTypeHelpers";
 import { AllNexusInputTypeDefs, NexusWrappedType } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
+// HERE 1
 export type ArgsRecord = Record<
   string,
-  | NexusArgDef<GetGen<"allInputTypes", string>>
-  | GetGen<"allInputTypes", string>
-  | AllNexusInputTypeDefs<GetGen<"allInputTypes", string>>
+  NexusArgDef<AllInputTypes> | AllInputTypes | AllNexusInputTypeDefs<string>
 >;
 
 export interface CommonArgConfig {
@@ -40,12 +39,12 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
   default?: T;
 }
 
-export type NexusArgConfigType<T extends GetGen<"allInputTypes", string>> =
+export type NexusArgConfigType<T extends AllInputTypes> =
   | T
   | AllNexusInputTypeDefs<T>
   | NexusWrappedType<AllNexusInputTypeDefs<T>>;
 
-export interface NexusAsArgConfig<T extends GetGen<"allInputTypes", string>>
+export interface NexusAsArgConfig<T extends AllInputTypes>
   extends CommonArgConfig {
   /**
    * Configure the default for the object
@@ -53,7 +52,7 @@ export interface NexusAsArgConfig<T extends GetGen<"allInputTypes", string>>
   default?: GetGen2<"allTypes", T>; // TODO: Make this type-safe somehow
 }
 
-export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
+export interface NexusArgConfig<T extends AllInputTypes>
   extends NexusAsArgConfig<T> {
   /**
    * The type of the argument, either the string name of the type,
@@ -62,10 +61,10 @@ export interface NexusArgConfig<T extends GetGen<"allInputTypes", string>>
   type: NexusArgConfigType<T>;
 }
 
-export class NexusArgDef<TypeName extends string> {
+export class NexusArgDef<TypeName extends AllInputTypes> {
   constructor(
-    readonly name: TypeName,
-    protected config: NexusArgConfig<GetGen<"allInputTypes", string>>
+    readonly name: string,
+    protected config: NexusArgConfig<TypeName>
   ) {}
   get value() {
     return this.config;
@@ -82,7 +81,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg);
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg<T extends GetGen<"allInputTypes", string>>(
+export function arg<T extends AllInputTypes>(
   options: { type: NexusArgConfigType<T> } & NexusArgConfig<T>
 ) {
   if (!options.type) {
