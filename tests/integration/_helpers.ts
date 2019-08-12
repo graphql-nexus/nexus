@@ -5,7 +5,7 @@ import ts from "typescript";
 export const testSchema = (name: string) => {
   it(`can compile ${name} app with its typegen`, async () => {
     const appFilePath = join(__dirname, `./_${name}.ts`);
-    const typegenFilePath = `/tmp/nexus-integration-test-typegen-${name}-${Date.now()}.d.ts`;
+    const typegenFilePath = join(__dirname, `_${name}.typegen.ts`);
     await doGenerateSchema({
       types: require(`./_${name}`),
       outputs: {
@@ -14,7 +14,7 @@ export const testSchema = (name: string) => {
       },
     });
 
-    expect([appFilePath, typegenFilePath]).toTypeCheck({
+    expect([appFilePath]).toTypeCheck({
       sourceMap: false,
       noEmitOnError: true,
       esModuleInterop: true,

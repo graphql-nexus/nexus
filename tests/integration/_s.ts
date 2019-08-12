@@ -1,7 +1,7 @@
+import "./_s.typegen";
 import {
   objectType,
   idArg,
-  queryType,
   mutationType,
   stringArg,
   inputObjectType,

@@ -1,3 +1,4 @@
+import "./_s.typegen";
 import { queryType } from "../../src";
 
 export const query = queryType({
