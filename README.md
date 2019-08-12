@@ -59,7 +59,7 @@ All examples of GraphQL Nexus can be found in the [`/examples`](./examples) dire
 If you're interested in examples using the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin, check out the official [`prisma-examples`](https://github.com/prisma/prisma-examples/) repo:
 
 - [GraphQL blogging app](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql)
-- [GraphQL blogging app with authentication & authorization](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-auth)
+- [GraphQL blogging app with authentication & permissions](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-auth)
 - [GraphQL CRUD example](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-crud)
 
 ## Features
