@@ -5,7 +5,9 @@ import {
   mutationType,
   stringArg,
   inputObjectType,
+  extendType,
 } from "../../src";
+export * from "./_xs";
 
 const mockData = {
   posts: [{ title: "", body: "" }],
@@ -36,7 +38,8 @@ export const user = objectType({
   },
 });
 
-export const query = queryType({
+export const queryExtensions = extendType({
+  type: "Query",
   definition(t) {
     t.list.field("searchPosts", {
       type: "Post",
