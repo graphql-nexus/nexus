@@ -24,7 +24,9 @@ const formatTSDiagonsticsForJest = (
   const summaryReport = `${
     diagnostics.length
   } Type Error(s):\n\n${diagnostics
-    .map((d) => d.file.fileName.replace(sourcePath, ""))
+    .map((d) =>
+      d.file ? d.file.fileName.replace(sourcePath, "") : "<unknown file>"
+    )
     .join("\n")}`;
 
   const jestReport = `${summaryReport}\n\n${tsReport}`;
