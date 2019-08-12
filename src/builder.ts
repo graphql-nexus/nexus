@@ -1461,6 +1461,10 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   return schema;
 }
 
+/**
+ * Like makeSchema except that typegen is always run
+ * and waited upon.
+ */
 export async function generateSchema(
   options: SchemaConfig
 ): Promise<NexusSchema> {
@@ -1479,12 +1483,6 @@ function invariantGuard(val: any) {
   }
 }
 
-// Type '"Boolean" | "Float" | "ID" | "Int" | "String" | NexusInputObjectTypeDef<string> | NexusEnumTypeDef<string> | NexusScalarTypeDef<string>
-// T = NexusGenScalarNames
-// T | NexusInputObjectTypeDef<T> | NexusEnumTypeDef<T> | NexusScalarTypeDef<T> | NexusWrappedType<AllNexusInputTypeDefs<T>>
-
-// Type 'string' is not assignable to type 'NexusGenScalarNames'
-// HERE 2
 function normalizeArg(
   argVal:
     | NexusArgDef<AllInputTypes>

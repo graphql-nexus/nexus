@@ -1,12 +1,12 @@
 import { join } from "path";
-import { generateSchema as doGenerateSchema } from "../../src/builder";
+import { generateSchema } from "../../src/builder";
 import ts from "typescript";
 
 export const testSchema = (name: string) => {
   it(`can compile ${name} app with its typegen`, async () => {
     const appFilePath = join(__dirname, `./_${name}.ts`);
     const typegenFilePath = join(__dirname, `_${name}.typegen.ts`);
-    await doGenerateSchema({
+    await generateSchema({
       types: require(`./_${name}`),
       outputs: {
         typegen: typegenFilePath,

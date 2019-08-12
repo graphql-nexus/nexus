@@ -2,7 +2,6 @@ import { GetGen2, AllInputTypes } from "../typegenTypeHelpers";
 import { AllNexusInputTypeDefs, NexusWrappedType } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
-// HERE 1
 export type ArgsRecord = Record<
   string,
   NexusArgDef<AllInputTypes> | AllInputTypes | AllNexusInputTypeDefs<string>
