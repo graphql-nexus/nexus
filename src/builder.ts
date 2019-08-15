@@ -111,6 +111,7 @@ import {
   AbstractTypeResolver,
   GetGen,
   AuthorizeResolver,
+  AllInputTypes,
 } from "./typegenTypeHelpers";
 import {
   firstDefined,
@@ -554,15 +555,21 @@ export class SchemaBuilder {
   buildObjectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
     const interfaces: Implemented[] = [];
+    // FIXME
+    // We use `any` because otherwise TypeScript fails to compile. It states:
+    // 'string' is assignable to the constraint of type 'FieldName', but 'FieldName' could be instantiated with a different subtype of constraint 'string'
+    // How can we tell TypeScript that `modifications` index is polymorphic over
+    // any string subtype? Using `any` here does not affect the end user since its
+    // visibility is limited to the implementation of buildObjectType.
     const modifications: Record<
       string,
-      FieldModificationDef<string, string>[]
+      FieldModificationDef<string, any>[]
     > = {};
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: config.name,
       addField: (fieldDef) => fields.push(fieldDef),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      addFieldModifications(mods) {
+      addFieldModifications: (mods) => {
         modifications[mods.field] = modifications[mods.field] || [];
         modifications[mods.field].push(mods);
       },
@@ -828,9 +835,7 @@ export class SchemaBuilder {
   ): GraphQLFieldConfig<any, any> {
     if (!fieldConfig.type) {
       throw new Error(
-        `Missing required "type" field for ${typeConfig.name}.${
-          fieldConfig.name
-        }`
+        `Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`
       );
     }
     return {
@@ -992,9 +997,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type)) {
       throw new Error(
-        `Expected ${name} to be a valid input type, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a valid input type, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -1009,9 +1012,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type) && !isLeafType(type)) {
       throw new Error(
-        `Expected ${name} to be a possible input type, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a possible input type, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -1023,9 +1024,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name);
     if (!isOutputType(type)) {
       throw new Error(
-        `Expected ${name} to be a valid output type, saw ${
-          type.constructor.name
-        }`
+        `Expected ${name} to be a valid output type, saw ${type.constructor.name}`
       );
     }
     return type;
@@ -1409,9 +1408,7 @@ export function makeSchemaInternal(
   }
   if (Subscription && !isObjectType(Subscription)) {
     throw new Error(
-      `Expected Subscription to be a objectType, saw ${
-        Subscription.constructor.name
-      }`
+      `Expected Subscription to be a objectType, saw ${Subscription.constructor.name}`
     );
   }
 
@@ -1464,6 +1461,19 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   return schema;
 }
 
+/**
+ * Like makeSchema except that typegen is always run
+ * and waited upon.
+ */
+export async function generateSchema(
+  options: SchemaConfig
+): Promise<NexusSchema> {
+  const { schema, missingTypes } = makeSchemaInternal(options);
+  assertNoMissingTypes(schema, missingTypes);
+  await new TypegenMetadata(options).generateArtifacts(schema);
+  return schema;
+}
+
 function invariantGuard(val: any) {
   if (!Boolean(val)) {
     throw new Error(
@@ -1475,14 +1485,14 @@ function invariantGuard(val: any) {
 
 function normalizeArg(
   argVal:
-    | NexusArgDef<string>
-    | GetGen<"allInputTypes", string>
+    | NexusArgDef<AllInputTypes>
+    | AllInputTypes
     | AllNexusInputTypeDefs<string>
-): NexusArgDef<string> {
+): NexusArgDef<AllInputTypes> {
   if (isNexusArgDef(argVal)) {
     return argVal;
   }
-  return arg({ type: argVal });
+  return arg({ type: argVal } as any);
 }
 
 function assertNoMissingTypes(

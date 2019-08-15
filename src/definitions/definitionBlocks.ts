@@ -6,6 +6,7 @@ import {
   NeedsResolver,
   AuthorizeResolver,
   GetGen3,
+  AllInputTypes,
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
 import {
@@ -207,7 +208,12 @@ export class OutputDefinitionBlock<TypeName extends string> {
     name: FieldName,
     fieldConfig: FieldOutConfig<TypeName, FieldName>
   ) {
-    const field: NexusOutputFieldDef = {
+    // FIXME
+    // 1. FieldOutConfig<TypeName is constrained to any string subtype
+    // 2. NexusOutputFieldDef is contrained to be be a string
+    // 3. so `name` is not compatible
+    // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
+    const field: any = {
       name,
       ...fieldConfig,
     };
@@ -224,7 +230,8 @@ export class OutputDefinitionBlock<TypeName extends string> {
       type: typeName,
     };
     if (typeof opts[0] === "function") {
-      config.resolve = opts[0];
+      // FIXME ditto to the one in `field` method
+      config.resolve = opts[0] as any;
     } else {
       config = { ...config, ...opts[0] };
     }
@@ -262,7 +269,7 @@ export interface NexusInputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends ScalarInputFieldConfig<GetGen3<"inputTypes", TypeName, FieldName>> {
-  type: GetGen<"allInputTypes", string> | AllNexusInputTypeDefs<string>;
+  type: AllInputTypes | AllNexusInputTypeDefs<string>;
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {

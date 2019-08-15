@@ -2,6 +2,7 @@
  * @type {jest.InitialOptions}
  */
 module.exports = {
+  setupFilesAfterEnv: ["<rootDir>/tests/_setup.ts"],
   preset: "ts-jest",
   testEnvironment: "node",
   watchPlugins: [
@@ -15,8 +16,5 @@ module.exports = {
         warnOnly: !process.env.CI,
       },
     },
-  },
-  moduleNameMapper: {
-    "package.json": "<rootDir>/tests/stubs/package.json",
   },
 };
