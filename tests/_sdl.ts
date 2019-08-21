@@ -46,6 +46,9 @@ input PostFilters {
   search: String
 }
 
+"""
+This is a description of a Post
+"""
 type Post implements Node {
   id: ID!
   uuid: UUID!

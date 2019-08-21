@@ -38,6 +38,7 @@ describe("SDLConverter", () => {
 })
 export const Post = objectType({
   name: \\"Post\\",
+  description: \\"This is a description of a Post\\",
   definition(t) {
     t.implements(Node)
     t.uuid(\\"uuid\\")
@@ -169,6 +170,7 @@ export const Mutation = objectType({
 })
 export const Post = objectType({
   name: \\"Post\\",
+  description: \\"This is a description of a Post\\",
   definition(t) {
     t.implements(Node)
     t.uuid(\\"uuid\\")
@@ -313,6 +315,7 @@ const Mutation = objectType({
 })
 const Post = objectType({
   name: \\"Post\\",
+  description: \\"This is a description of a Post\\",
   definition(t) {
     t.implements(Node)
     t.uuid(\\"uuid\\")

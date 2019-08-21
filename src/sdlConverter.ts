@@ -108,6 +108,7 @@ export class SDLConverter {
     return this.printBlock([
       `${this.export}${type.name} = objectType({`,
       `  name: "${type.name}",`,
+      this.maybeDescription(type),
       `  definition(t) {`,
       implementsInterfaces,
       this.printObjectFields(type),
