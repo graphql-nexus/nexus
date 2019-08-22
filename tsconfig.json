@@ -13,7 +13,8 @@
     "declaration": true,
     "importHelpers": true,
     "resolveJsonModule": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "declarationMap": true
   },
   "exclude": [
     "./examples",
