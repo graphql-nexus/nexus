@@ -33,7 +33,7 @@ type User implements Node {
 
 enum SomeEnum {
   A
-  B
+  B @deprecated(reason: "This is a deprecation reason for B")
 }
 
 enum OrderEnum {

@@ -102,7 +102,7 @@ export const User = objectType({
 });
 export const SomeEnum = enumType({
   name: \\"SomeEnum\\",
-  members: [\\"A\\",\\"B\\"],
+  members: [\\"A\\",{\\"name\\":\\"B\\",\\"deprecation\\":\\"This is a deprecation reason for B\\",\\"value\\":\\"B\\"}],
 });"
 `);
   });
@@ -267,7 +267,7 @@ export const OrderEnum = enumType({
 });
 export const SomeEnum = enumType({
   name: \\"SomeEnum\\",
-  members: [\\"A\\",\\"B\\"],
+  members: [\\"A\\",{\\"name\\":\\"B\\",\\"deprecation\\":\\"This is a deprecation reason for B\\",\\"value\\":\\"B\\"}],
 });
 
 export const UUID = scalarType({
@@ -412,7 +412,7 @@ const OrderEnum = enumType({
 });
 const SomeEnum = enumType({
   name: \\"SomeEnum\\",
-  members: [\\"A\\",\\"B\\"],
+  members: [\\"A\\",{\\"name\\":\\"B\\",\\"deprecation\\":\\"This is a deprecation reason for B\\",\\"value\\":\\"B\\"}],
 });
 
 const UUID = scalarType({
