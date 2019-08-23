@@ -1149,15 +1149,17 @@ export class SchemaBuilder {
         return this.addDynamicScalar(methodName, val, block);
       }
       // @ts-ignore
-      block[methodName] = (...args: any[]) => {
-        const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
-        return val.value.factory({
-          args: config,
-          typeDef: block,
-          builder: this,
-          typeName: block.typeName,
-        });
-      };
+      Object.defineProperty(block, methodName, {
+        get() {
+          return val.value.factory({
+            args: [],
+            typeDef: block,
+            builder: this,
+            typeName: block.typeName,
+          })
+        },
+        enumerable: true,
+      })
     });
   }
 
