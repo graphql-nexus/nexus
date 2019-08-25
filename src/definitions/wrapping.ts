@@ -148,7 +148,7 @@ export function isNexusDynamicOutputProperty<T extends string>(
 ): obj is DynamicOutputPropertyDef<T> {
   return (
     isNexusTypeDef(obj) &&
-    obj[NexusWrappedSymbol] === NexusTypes.DynamicOutputMethod
+    obj[NexusWrappedSymbol] === NexusTypes.DynamicOutputProperty
   );
 }
 export function isNexusDynamicOutputMethod<T extends string>(

@@ -374,6 +374,7 @@ export class SchemaBuilder {
       | GraphQLNamedType
       | DynamicInputMethodDef<string>
       | DynamicOutputMethodDef<string>
+      | DynamicOutputPropertyDef<string>
   ) {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
@@ -1362,7 +1363,8 @@ function addTypes(builder: SchemaBuilder, types: any) {
     isNexusExtendInputTypeDef(types) ||
     isNamedType(types) ||
     isNexusDynamicInputMethod(types) ||
-    isNexusDynamicOutputMethod(types)
+    isNexusDynamicOutputMethod(types) ||
+    isNexusDynamicOutputProperty(types)
   ) {
     builder.addType(types);
   } else if (Array.isArray(types)) {
