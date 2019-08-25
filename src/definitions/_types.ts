@@ -29,7 +29,6 @@ export enum NexusTypes {
   DynamicInput = "DynamicInput",
   DynamicOutputMethod = "DynamicOutputMethod",
   DynamicOutputProperty = "DynamicOutputProperty",
-  DynamicInputProperty = "DynamicInputProperty",
 }
 
 export interface DeprecationInfo {
