@@ -30,7 +30,6 @@ export {
   FieldType,
 } from "./typegenTypeHelpers";
 export { dynamicInputMethod, dynamicOutputMethod } from "./dynamicMethod";
-export { dynamicInputProperty, dynamicOutputProperty } from "./dynamicProperty";
 export { core, blocks, ext };
 import * as core from "./core";
 import * as blocks from "./blocks";

@@ -1,14 +1,7 @@
 import { withNexusSymbol, NexusTypes } from "./definitions/_types";
 import { BaseExtensionConfig } from "./dynamicMethod";
 import { SchemaBuilder } from "./builder";
-import {
-  OutputDefinitionBlock,
-  InputDefinitionBlock,
-} from "./definitions/definitionBlocks";
-
-//
-// Ouput
-//
+import { OutputDefinitionBlock } from "./definitions/definitionBlocks";
 
 export type OutputPropertyFactoryConfig<T> = {
   builder: SchemaBuilder;
@@ -49,40 +42,4 @@ export function dynamicOutputProperty<T extends string>(
   config: DynamicOutputPropertyConfig<T>
 ) {
   return new DynamicOutputPropertyDef(config.name, config);
-}
-
-//
-// Input
-//
-
-export type InputFactoryConfig<T> = {
-  args: any[];
-  builder: SchemaBuilder;
-  typeDef: InputDefinitionBlock<any>;
-  /**
-   * The name of the type this field is being declared on
-   */
-  typeName: string;
-};
-
-export type InputConfig<T extends string> = BaseExtensionConfig<T> & {
-  /**
-   * Invoked when the property is accessed (as a getter)
-   */
-  factory(config: InputFactoryConfig<T>): any;
-};
-
-export class DynamicInputPropertyDef<Name extends string> {
-  constructor(readonly name: Name, protected config: InputConfig<Name>) {}
-  get value() {
-    return this.config;
-  }
-}
-
-/**
- * Same as the outputFieldExtension, but for fields that
- * should be added on as input types.
- */
-export function dynamicInputProperty<T extends string>(config: InputConfig<T>) {
-  return new DynamicInputPropertyDef(config.name, config);
 }
