@@ -1148,12 +1148,7 @@ export class SchemaBuilder {
       if (typeof val === "string") {
         return this.addDynamicScalar(methodName, val, block);
       }
-
-      // At this point `methodName` identifier name can be a misnormer. If the
-      // given factory returns a function then methodName is accurate, but not
-      // if the factory returns something else. For example it may return an
-      // object of methods (aka. methods under a namespace/field/property)
-      // in which case a better identifier might be `namespace`, `propName`, ...
+      // @ts-ignore
       Object.defineProperty(block, methodName, {
         get() {
           return val.value.factory({
@@ -1161,10 +1156,10 @@ export class SchemaBuilder {
             typeDef: block,
             builder: this,
             typeName: block.typeName,
-          });
+          })
         },
         enumerable: true,
-      });
+      })
     });
   }
 
