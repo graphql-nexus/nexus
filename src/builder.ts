@@ -126,7 +126,10 @@ import {
   NexusExtendInputTypeConfig,
 } from "./definitions/extendInputType";
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
-import { DynamicOutputPropertyDef } from "./dynamicProperty";
+import {
+  DynamicOutputPropertyDef,
+  DynamicInputPropertyDef,
+} from "./dynamicProperty";
 
 export type Maybe<T> = T | null;
 
@@ -266,6 +269,11 @@ export type DynamicOutputProperties = Record<
   DynamicOutputPropertyDef<string>
 >;
 
+export type DynamicInputProperties = Record<
+  string,
+  DynamicInputPropertyDef<string>
+>;
+
 /**
  * Builds all of the types, properly accounts for any using "mix".
  * Since the enum types are resolved synchronously, these need to guard for
@@ -324,6 +332,11 @@ export class SchemaBuilder {
    * Add dynamic output properties
    */
   protected dynamicOutputProperties: DynamicOutputProperties = {};
+
+  /**
+   * Add dynamic input properties
+   */
+  protected dynamicInputProperties: DynamicInputProperties = {};
 
   /**
    * All types that need to be traversed for children types
@@ -1143,18 +1156,27 @@ export class SchemaBuilder {
     return obj;
   }
 
+  // MARK
   addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean) {
     eachObj(this.dynamicInputFields, (val, methodName) => {
       if (typeof val === "string") {
         return this.addDynamicScalar(methodName, val, block);
       }
 
-      // At this point `methodName` identifier name can be a misnormer. If the
-      // given factory returns a function then methodName is accurate, but not
-      // if the factory returns something else. For example it may return an
-      // object of methods (aka. methods under a namespace/field/property)
-      // in which case a better identifier might be `namespace`, `propName`, ...
-      Object.defineProperty(block, methodName, {
+      // @ts-ignore
+      block[methodName] = (...args: any[]) => {
+        const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
+        return val.value.factory({
+          args: config,
+          typeDef: block,
+          builder: this,
+          typeName: block.typeName,
+        });
+      };
+    });
+
+    eachObj(this.dynamicInputProperties, (val, propertyName) => {
+      Object.defineProperty(block, propertyName, {
         get() {
           return val.value.factory({
             args: [],
@@ -1168,6 +1190,7 @@ export class SchemaBuilder {
     });
   }
 
+  // MARK
   addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === "string") {
@@ -1198,6 +1221,7 @@ export class SchemaBuilder {
     });
   }
 
+  // MARK
   addDynamicScalar(
     methodName: string,
     typeName: string,
