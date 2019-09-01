@@ -17,31 +17,31 @@ const mockData = {
   user: { firstName: "", lastName: "" },
 };
 
-export const d1 = dynamicOutputMethod({
-  name: "d1",
+export const dom = dynamicOutputMethod({
+  name: "title",
   factory: ({ typeDef: t }) => {
-    t.boolean("boolViaDynamic");
+    t.string("title");
   },
 });
 
-export const d2 = dynamicInputMethod({
-  name: "d2",
+export const dim = dynamicInputMethod({
+  name: "title",
   factory: ({ typeDef: t }) => {
-    t.boolean("boolViaDynamic");
+    t.string("title", { nullable: true });
   },
 });
 
-export const d3 = dynamicOutputProperty({
-  name: "d3",
+export const dop = dynamicOutputProperty({
+  name: "body",
   factory: ({ typeDef: t }) => {
-    t.boolean("boolViaDynamic");
+    t.string("body");
   },
 });
 
 export const PostSearchInput = inputObjectType({
   name: "PostSearchInput",
   definition(t) {
-    t.string("title", { nullable: true });
+    t.title();
     t.string("body", { nullable: true });
   },
 });
@@ -49,8 +49,9 @@ export const PostSearchInput = inputObjectType({
 export const Post = objectType({
   name: "Post",
   definition(t) {
-    t.string("title");
-    t.string("body");
+    t.title();
+    // tslint:disable-next-line: no-unused-expression
+    t.body;
   },
 });
 
@@ -59,7 +60,6 @@ export const User = objectType({
   definition(t) {
     t.string("firstName");
     t.string("lastName");
-    // t.test()
   },
 });
 

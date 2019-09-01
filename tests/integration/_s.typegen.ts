@@ -7,12 +7,17 @@
 import { core } from "nexus"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
-    d2(...args: any): void
+    title(...args: any): void
   }
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    d1(...args: any): void
+    title(...args: any): void
+  }
+}
+declare global {
+  interface NexusGenCustomOutputProperties<TypeName extends string> {
+    body: any
   }
 }
 

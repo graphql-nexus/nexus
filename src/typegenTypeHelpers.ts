@@ -4,6 +4,7 @@ declare global {
   interface NexusGen {}
   interface NexusGenCustomInputMethods<TypeName extends string> {}
   interface NexusGenCustomOutputMethods<TypeName extends string> {}
+  interface NexusGenCustomOutputProperties<TypeName extends string> {}
 }
 
 export type AllInputTypes = GetGen<"allInputTypes", string>;

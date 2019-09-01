@@ -104,6 +104,7 @@ export class Typegen {
       this.printDynamicImport(),
       this.printDynamicInputFieldDefinitions(),
       this.printDynamicOutputFieldDefinitions(),
+      this.printDynamicOutputPropertyDefinitions(),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -213,6 +214,25 @@ export class Typegen {
           }
           return `    ${key}${val.value.typeDefinition ||
             `(...args: any): void`}`;
+        })
+      )
+      .concat([`  }`, `}`])
+      .join("\n");
+  }
+
+  printDynamicOutputPropertyDefinitions() {
+    const { dynamicOutputProperties } = this.extensions.dynamicFields;
+    // If there is nothing custom... exit
+    if (!Object.keys(dynamicOutputProperties).length) {
+      return [];
+    }
+    return [
+      `declare global {`,
+      `  interface NexusGenCustomOutputProperties<TypeName extends string> {`,
+    ]
+      .concat(
+        mapObj(dynamicOutputProperties, (val, key) => {
+          return `    ${key}${val.value.typeDefinition || `: any`}`;
         })
       )
       .concat([`  }`, `}`])
