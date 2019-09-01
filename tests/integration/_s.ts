@@ -6,6 +6,7 @@ import {
   stringArg,
   inputObjectType,
   extendType,
+  dynamicOutputMethod,
 } from "../../src";
 export * from "./_xs";
 
@@ -13,6 +14,13 @@ const mockData = {
   posts: [{ title: "", body: "" }],
   user: { firstName: "", lastName: "" },
 };
+
+dynamicOutputMethod({
+  name: "test",
+  factory: ({ typeDef }) => {
+    typeDef.boolean("boolViaDynamic");
+  },
+});
 
 export const PostSearchInput = inputObjectType({
   name: "PostSearchInput",
@@ -35,6 +43,7 @@ export const User = objectType({
   definition(t) {
     t.string("firstName");
     t.string("lastName");
+    // t.test()
   },
 });
 
