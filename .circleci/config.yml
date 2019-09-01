@@ -9,7 +9,7 @@ jobs:
       - run: yarn install
       - run: yarn build
       - run: yarn lint
-      - run: yarn jest --ci
+      - run: yarn test:ci
 
 workflows:
   nexus:
