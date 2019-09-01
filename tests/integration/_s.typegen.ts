@@ -4,9 +4,17 @@
  */
 
 
-
-
-
+import { core } from "nexus"
+declare global {
+  interface NexusGenCustomInputMethods<TypeName extends string> {
+    d2(...args: any): void
+  }
+}
+declare global {
+  interface NexusGenCustomOutputMethods<TypeName extends string> {
+    d1(...args: any): void
+  }
+}
 
 declare global {
   interface NexusGen extends NexusGenTypes {}

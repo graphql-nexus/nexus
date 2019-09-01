@@ -24,14 +24,14 @@ export const d1 = dynamicOutputMethod({
   },
 });
 
-export const d2 = dynamicOutputMethod({
+export const d2 = dynamicInputMethod({
   name: "d2",
   factory: ({ typeDef: t }) => {
     t.boolean("boolViaDynamic");
   },
 });
 
-export const d3 = dynamicOutputMethod({
+export const d3 = dynamicOutputProperty({
   name: "d3",
   factory: ({ typeDef: t }) => {
     t.boolean("boolViaDynamic");
