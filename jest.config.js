@@ -12,13 +12,10 @@ module.exports = {
   globals: {
     "ts-jest": {
       isolatedModules: !process.env.CI,
-      tsConfig: {
+      diagnostics: {
         // FIXME: sloppy, can we make { core } not output in
         // typegen when its not needed?
-        noUnusedLocals: false,
-      },
-      diagnostics: {
-        warnOnly: !process.env.CI,
+        ignoreCodes: ["6133"],
       },
     },
   },
