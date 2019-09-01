@@ -7,6 +7,8 @@ import {
   inputObjectType,
   extendType,
   dynamicOutputMethod,
+  dynamicInputMethod,
+  dynamicOutputProperty,
 } from "../../src";
 export * from "./_xs";
 
@@ -15,10 +17,24 @@ const mockData = {
   user: { firstName: "", lastName: "" },
 };
 
-dynamicOutputMethod({
-  name: "test",
-  factory: ({ typeDef }) => {
-    typeDef.boolean("boolViaDynamic");
+export const d1 = dynamicOutputMethod({
+  name: "d1",
+  factory: ({ typeDef: t }) => {
+    t.boolean("boolViaDynamic");
+  },
+});
+
+export const d2 = dynamicOutputMethod({
+  name: "d2",
+  factory: ({ typeDef: t }) => {
+    t.boolean("boolViaDynamic");
+  },
+});
+
+export const d3 = dynamicOutputMethod({
+  name: "d3",
+  factory: ({ typeDef: t }) => {
+    t.boolean("boolViaDynamic");
   },
 });
 
