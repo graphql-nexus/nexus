@@ -13,7 +13,9 @@ module.exports = {
     "ts-jest": {
       isolatedModules: !process.env.CI,
       diagnostics: {
-        warnOnly: !process.env.CI,
+        // FIXME: sloppy, can we make { core } not output in
+        // typegen when its not needed?
+        ignoreCodes: ["6133"],
       },
     },
   },

@@ -144,7 +144,8 @@ export interface InputDefinitionBuilder {
 }
 
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomOutputMethods<TypeName> {}
+  extends NexusGenCustomOutputMethods<TypeName>,
+    NexusGenCustomOutputProperties<TypeName> {}
 
 /**
  * The output definition block is passed to the "definition"

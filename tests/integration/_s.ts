@@ -6,6 +6,9 @@ import {
   stringArg,
   inputObjectType,
   extendType,
+  dynamicOutputMethod,
+  dynamicInputMethod,
+  dynamicOutputProperty,
 } from "../../src";
 export * from "./_xs";
 
@@ -14,10 +17,31 @@ const mockData = {
   user: { firstName: "", lastName: "" },
 };
 
+export const dom = dynamicOutputMethod({
+  name: "title",
+  factory: ({ typeDef: t }) => {
+    t.string("title");
+  },
+});
+
+export const dim = dynamicInputMethod({
+  name: "title",
+  factory: ({ typeDef: t }) => {
+    t.string("title", { nullable: true });
+  },
+});
+
+export const dop = dynamicOutputProperty({
+  name: "body",
+  factory: ({ typeDef: t }) => {
+    t.string("body");
+  },
+});
+
 export const PostSearchInput = inputObjectType({
   name: "PostSearchInput",
   definition(t) {
-    t.string("title", { nullable: true });
+    t.title();
     t.string("body", { nullable: true });
   },
 });
@@ -25,8 +49,9 @@ export const PostSearchInput = inputObjectType({
 export const Post = objectType({
   name: "Post",
   definition(t) {
-    t.string("title");
-    t.string("body");
+    t.title();
+    // tslint:disable-next-line: no-unused-expression
+    t.body;
   },
 });
 
