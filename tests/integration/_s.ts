@@ -19,6 +19,7 @@ const mockData = {
 
 export const dom = dynamicOutputMethod({
   name: "title",
+  typeDefinition: "(options: { escape: boolean }): void",
   factory: ({ typeDef: t }) => {
     t.string("title");
   },
@@ -49,7 +50,7 @@ export const PostSearchInput = inputObjectType({
 export const Post = objectType({
   name: "Post",
   definition(t) {
-    t.title();
+    t.title({ escape: true });
     // tslint:disable-next-line: no-unused-expression
     t.body;
   },

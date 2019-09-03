@@ -102,7 +102,7 @@ model Todo {
 ```ts
 import { nexusPrismaPlugin } from "@generated/nexus-prisma";
 import { Photon } from "@generated/photon";
-import { objectType, makeSchema, idArg } from "@prisma/nexus";
+import { objectType, makeSchema, idArg } from "nexus";
 import { GraphQLServer } from "graphql-yoga";
 
 // Expose the full "Query" building block
@@ -235,13 +235,13 @@ In the interactive prompt, select the following options:
 
 ```bash
 npm init -y
-npm install --save @prisma/nexus graphql nexus-prisma graphql-yoga
+npm install --save nexus graphql nexus-prisma graphql-yoga
 npm install --save-dev typescript ts-node-dev
 ```
 
 Here's an overview of the installed dependencies:
 
-- `@prisma/nexus` & `graphql`: Required to use GraphQL Nexus
+- `nexus` & `graphql`: Required to use GraphQL Nexus
 - `graphql-yoga`: Your GraphQL server (note that you might as well use `apollo-server`)
 - `ts-node-dev`: Runs our development server in the background
 
@@ -763,7 +763,7 @@ The `photon` property needs to be a function, that'll retrieve the photon instan
 import { nexusPrismaPlugin } from "@generated/nexus-prisma";
 import { Photon } from "@generated/photon";
 import { GraphQLServer } from "graphql-yoga";
-import { makeSchema } from "@prisma/nexus";
+import { makeSchema } from "nexus";
 
 const photon = new Photon();
 

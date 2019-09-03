@@ -12,7 +12,7 @@ declare global {
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    title(...args: any): void
+    title(options: { escape: boolean }): void
   }
 }
 declare global {
