@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.12.0-beta.8",
+  "version": "0.12.0-beta.9",
   "main": "dist",
   "types": "dist/index.d.ts",
   "license": "MIT",
