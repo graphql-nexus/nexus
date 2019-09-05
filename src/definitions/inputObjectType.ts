@@ -35,8 +35,13 @@ export class NexusInputObjectTypeDef<TypeName extends string> {
   get value() {
     return this.config;
   }
-  asArg(cfg?: NexusAsArgConfig<TypeName>): NexusArgDef<TypeName> {
-    return arg({ ...cfg, type: this });
+  // FIXME
+  // Instead of `any` we want to pass the name of this type...
+  // so that the correct `cfg.default` type can be looked up
+  // from the typegen.
+  asArg(cfg?: NexusAsArgConfig<any>): NexusArgDef<any> {
+    // FIXME
+    return arg({ ...cfg, type: this } as any);
   }
 }
 withNexusSymbol(NexusInputObjectTypeDef, NexusTypes.InputObject);

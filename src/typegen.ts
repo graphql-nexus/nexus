@@ -104,6 +104,7 @@ export class Typegen {
       this.printDynamicImport(),
       this.printDynamicInputFieldDefinitions(),
       this.printDynamicOutputFieldDefinitions(),
+      this.printDynamicOutputPropertyDefinitions(),
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -213,6 +214,25 @@ export class Typegen {
           }
           return `    ${key}${val.value.typeDefinition ||
             `(...args: any): void`}`;
+        })
+      )
+      .concat([`  }`, `}`])
+      .join("\n");
+  }
+
+  printDynamicOutputPropertyDefinitions() {
+    const { dynamicOutputProperties } = this.extensions.dynamicFields;
+    // If there is nothing custom... exit
+    if (!Object.keys(dynamicOutputProperties).length) {
+      return [];
+    }
+    return [
+      `declare global {`,
+      `  interface NexusGenCustomOutputProperties<TypeName extends string> {`,
+    ]
+      .concat(
+        mapObj(dynamicOutputProperties, (val, key) => {
+          return `    ${key}${val.value.typeDefinition || `: any`}`;
         })
       )
       .concat([`  }`, `}`])
@@ -399,7 +419,7 @@ export class Typegen {
     if (rootTyping) {
       return typeof rootTyping === "string" ? rootTyping : rootTyping.name;
     }
-    return this.typegenInfo.backingTypeMap[typeName];
+    return (this.typegenInfo.backingTypeMap as any)[typeName];
   }
 
   buildAllTypesMap() {
@@ -671,7 +691,7 @@ export class Typegen {
     if (isSpecifiedScalarType(type)) {
       return SpecifiedScalars[type.name as SpecifiedScalarNames];
     }
-    const backingType = this.typegenInfo.backingTypeMap[type.name];
+    const backingType = (this.typegenInfo.backingTypeMap as any)[type.name];
     if (typeof backingType === "string") {
       return backingType;
     } else {

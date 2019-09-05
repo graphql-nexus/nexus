@@ -1,7 +1,7 @@
 import { NexusTypes, withNexusSymbol } from "./_types";
 import { OutputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
-import { GetGen } from "../typegenTypeHelpers";
+import { AllOutputTypesPossible } from "../typegenTypeHelpers";
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName;
@@ -11,7 +11,7 @@ export interface NexusExtendTypeConfig<TypeName extends string> {
 export class NexusExtendTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusExtendTypeConfig<string> & { name: string }
+    protected config: NexusExtendTypeConfig<TypeName> & { name: TypeName }
   ) {
     assertValidName(name);
   }
@@ -28,8 +28,8 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject);
  *
  * @see http://graphql-nexus.com/api/extendType
  */
-export function extendType<
-  TypeName extends GetGen<"objectNames", string> | "Query" | "Mutation"
->(config: NexusExtendTypeConfig<TypeName>) {
+export function extendType<TypeName extends AllOutputTypesPossible>(
+  config: NexusExtendTypeConfig<TypeName>
+) {
   return new NexusExtendTypeDef(config.type, { ...config, name: config.type });
 }

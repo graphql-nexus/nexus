@@ -51,9 +51,7 @@ type Entry {
 
 """A list of options for the sort order of the feed"""
 enum FeedType {
-  """
-  Sort by a combination of freshness and score, using Reddit's algorithm
-  """
+  """Sort by a combination of freshness and score, using Reddit's algorithm"""
   HOT
 
   """Newest entries first"""

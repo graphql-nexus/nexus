@@ -95,7 +95,7 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(
     readonly name: TypeName,
-    protected config: NexusObjectTypeConfig<string>
+    protected config: NexusObjectTypeConfig<TypeName>
   ) {
     assertValidName(name);
   }
@@ -109,7 +109,7 @@ withNexusSymbol(NexusObjectTypeDef, NexusTypes.Object);
 export function objectType<TypeName extends string>(
   config: NexusObjectTypeConfig<TypeName>
 ) {
-  return new NexusObjectTypeDef(config.name, config);
+  return new NexusObjectTypeDef<TypeName>(config.name, config);
 }
 
 export function queryType(

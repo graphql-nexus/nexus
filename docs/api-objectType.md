@@ -16,7 +16,7 @@ const User = objectType({
   definition(t) {
     t.int("id", { description: "Id of the user" });
     t.string("fullName", { description: "Full name of the user" });
-    t.field("status", "StatusEnum");
+    t.field("status", { type: "StatusEnum" });
     t.list.field("posts", {
       type: Post, // or "Post"
       resolve(root, args, ctx) {

@@ -38,6 +38,7 @@ describe("SDLConverter", () => {
 })
 export const Post = objectType({
   name: \\"Post\\",
+  description: \\"This is a description of a Post\\",
   definition(t) {
     t.implements(Node)
     t.uuid(\\"uuid\\")
@@ -101,7 +102,7 @@ export const User = objectType({
 });
 export const SomeEnum = enumType({
   name: \\"SomeEnum\\",
-  members: [\\"A\\",\\"B\\"],
+  members: [\\"A\\",{\\"name\\":\\"B\\",\\"deprecation\\":\\"This is a deprecation reason for B\\",\\"value\\":\\"B\\"}],
 });"
 `);
   });
@@ -169,6 +170,7 @@ export const Mutation = objectType({
 })
 export const Post = objectType({
   name: \\"Post\\",
+  description: \\"This is a description of a Post\\",
   definition(t) {
     t.implements(Node)
     t.uuid(\\"uuid\\")
@@ -265,7 +267,7 @@ export const OrderEnum = enumType({
 });
 export const SomeEnum = enumType({
   name: \\"SomeEnum\\",
-  members: [\\"A\\",\\"B\\"],
+  members: [\\"A\\",{\\"name\\":\\"B\\",\\"deprecation\\":\\"This is a deprecation reason for B\\",\\"value\\":\\"B\\"}],
 });
 
 export const UUID = scalarType({
@@ -313,6 +315,7 @@ const Mutation = objectType({
 })
 const Post = objectType({
   name: \\"Post\\",
+  description: \\"This is a description of a Post\\",
   definition(t) {
     t.implements(Node)
     t.uuid(\\"uuid\\")
@@ -409,7 +412,7 @@ const OrderEnum = enumType({
 });
 const SomeEnum = enumType({
   name: \\"SomeEnum\\",
-  members: [\\"A\\",\\"B\\"],
+  members: [\\"A\\",{\\"name\\":\\"B\\",\\"deprecation\\":\\"This is a deprecation reason for B\\",\\"value\\":\\"B\\"}],
 });
 
 const UUID = scalarType({
