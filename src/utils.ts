@@ -153,7 +153,7 @@ export const isObject = (obj: any): boolean =>
 export const assertAbsolutePath = (pathName: string, property: string) => {
   if (!path.isAbsolute(pathName)) {
     throw new Error(
-      `Expected path for ${property} to be a string, saw ${pathName}`
+      `Expected path for ${property} to be an absolute path, saw ${pathName}`
     );
   }
   return pathName;
