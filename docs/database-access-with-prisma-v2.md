@@ -148,7 +148,7 @@ const Todo = objectType({
 const photon = new Photon();
 
 const nexusPrisma = nexusPrismaPlugin({
-  photon: (ctx) => photon,
+  photon: (ctx) => ctx.photon,
 });
 
 const schema = makeSchema({
