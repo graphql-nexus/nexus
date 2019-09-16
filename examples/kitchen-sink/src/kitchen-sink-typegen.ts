@@ -5,6 +5,7 @@
 
 
 import { core } from "nexus"
+import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Date";
@@ -12,10 +13,9 @@ declare global {
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
     collection<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
-      items: core.SubFieldResolver<TypeName, FieldName, "items">,
+      nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
       totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
       args?: core.ArgsRecord,
       nullable?: boolean,
@@ -29,6 +29,7 @@ declare global {
       nullable?: boolean,
       description?: string
     }): void
+    date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
   }
 }
 
@@ -61,7 +62,7 @@ export interface NexusGenEnums {
 
 export interface NexusGenRootTypes {
   BarCollection: { // root type
-    items: NexusGenRootTypes['Bar'][]; // [Bar!]!
+    nodes: NexusGenRootTypes['Bar'][]; // [Bar!]!
     totalCount: number; // Int!
   }
   Foo: { // root type
@@ -80,13 +81,13 @@ export interface NexusGenRootTypes {
   }
   Bar: NexusGenRootTypes['TestObj'] | NexusGenRootTypes['Foo'];
   Baz: NexusGenRootTypes['TestObj'];
-  UnusedInterface: any;
+  UnusedInterface: UnusedInterfaceTypeDef;
   String: string;
   Int: number;
   Float: number;
   Boolean: boolean;
   ID: string;
-  Date: any;
+  Date: Date;
   TestUnion: NexusGenRootTypes['Foo'];
 }
 
@@ -99,7 +100,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   BarCollection: { // field return type
-    items: NexusGenRootTypes['Bar'][]; // [Bar!]!
+    nodes: NexusGenRootTypes['Bar'][]; // [Bar!]!
     totalCount: number; // Int!
   }
   Foo: { // field return type
