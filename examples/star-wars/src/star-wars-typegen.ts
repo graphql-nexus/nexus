@@ -8,6 +8,7 @@ import * as swapi from "./types/backingTypes"
 
 
 
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
