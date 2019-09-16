@@ -8,6 +8,7 @@
 
 
 
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
