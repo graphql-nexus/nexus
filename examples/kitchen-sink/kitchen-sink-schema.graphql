@@ -9,7 +9,7 @@ interface Bar {
 }
 
 type BarCollection {
-  nodes: [Bar!]!
+  items: [Bar!]!
   totalCount: Int!
 }
 
