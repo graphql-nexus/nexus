@@ -17,7 +17,7 @@ export const DeclarationName = unionType({
     );
     t.resolveType((obj) => {
       if ("kind" in obj) {
-        if (obj.kind === ts.SyntaxKind.FirstNode) {
+        if ((obj.kind as unknown) === ts.SyntaxKind.FirstNode) {
           return "QualifiedName";
         }
         return ts.SyntaxKind[

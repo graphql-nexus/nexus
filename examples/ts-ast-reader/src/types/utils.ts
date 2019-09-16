@@ -1,10 +1,6 @@
 import { GraphQLSchema, isObjectType, GraphQLResolveInfo } from "graphql";
 import ts from "typescript";
-import {
-  SourceFileStatementsArgs,
-  NodeModifiersArgs,
-} from "../ts-ast-reader-typegen";
-import { ContextType } from ".";
+import { NexusGenArgTypes } from "../ts-ast-reader-typegen";
 
 export function convertTsEnum(toConvert: any) {
   const converted: { [key: string]: number } = {};
@@ -38,7 +34,7 @@ export function allKnownNodes(schema: GraphQLSchema) {
 }
 
 export const filteredNodesList = <T extends ts.Node>(
-  args: SourceFileStatementsArgs,
+  args: NexusGenArgTypes["SourceFile"]["statements"],
   nodes: T[]
 ) => {
   const { skip, only } = args;
@@ -57,7 +53,7 @@ export const filteredNodesList = <T extends ts.Node>(
 };
 
 export const syntaxKindFilter = <T extends { kind: ts.SyntaxKind }>(
-  args: NodeModifiersArgs,
+  args: NexusGenArgTypes["Node"]["modifiers"],
   items: T[]
 ) => {
   const { skip, only } = args;
