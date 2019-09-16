@@ -1,17 +1,87 @@
 version: 2.1
 
 jobs:
-  build_lint_test:
+  nexus:
     docker:
       - image: circleci/node:10
     steps:
       - checkout
-      - run: yarn install
+      - run: yarn --frozen-lockfile
       - run: yarn build
       - run: yarn lint
       - run: yarn test:ci
 
+  example_apollo-fullstack:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/apollo-fullstack --frozen-lockfile
+      - run: yarn --cwd=examples/apollo-fullstack tsc
+
+  example_ghost:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/ghost --frozen-lockfile
+      - run: yarn --cwd=examples/ghost tsc
+
+  example_githunt-api:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/githunt-api --frozen-lockfile
+      - run: yarn --cwd=examples/githunt-api tsc
+
+  example_kitchen-sink:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/kitchen-sink --frozen-lockfile
+      - run: yarn --cwd=examples/kitchen-sink tsc
+
+  example_nexus-prisma:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/nexus-prisma --frozen-lockfile
+      - run: yarn --cwd=examples/nexus-prisma tsc
+
+  example_star-wars:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/star-wars --frozen-lockfile
+      - run: yarn --cwd=examples/star-wars tsc
+
+  example_ts-ast-reader:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn --cwd=examples/ts-ast-reader --frozen-lockfile
+      - run: yarn --cwd=examples/ts-ast-reader tsc
+
 workflows:
   nexus:
     jobs:
-      - build_lint_test
+      - nexus
+      - example_apollo-fullstack
+      - example_ghost
+      - example_githunt-api
+      - example_kitchen-sink
+      - example_nexus-prisma
+      - example_star-wars
+      - example_ts-ast-reader
