@@ -31,7 +31,7 @@ jobs:
 
   example_githunt-api:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:8
     steps:
       - checkout
       - run: yarn --frozen-lockfile
