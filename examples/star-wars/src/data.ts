@@ -102,9 +102,7 @@ function getCharacter(id: string) {
 /**
  * Allows us to query for a character's friends.
  */
-export function getFriends(
-  character: Character
-): Array<Promise<Human | Droid>> {
+export function getFriends(character: Character) {
   // Notice that GraphQL accepts Arrays of Promises.
   return character.friends.map((id) => getCharacter(id));
 }
