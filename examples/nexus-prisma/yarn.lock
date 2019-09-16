@@ -1313,10 +1313,10 @@ negotiator@0.6.1:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
   integrity sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=
 
-nexus-prisma@0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/nexus-prisma/-/nexus-prisma-0.3.3.tgz#eace1d5b77eab386c7a213cfa23aca156ca49432"
-  integrity sha512-oTt9zwnD7ggScRUF5Ao46VzKQKCN8wU35Cqv9kjC6BvZg8q7BZDjai9rVCQ8QzReWvPaB9tucKp7czOuQa7Q3Q==
+nexus-prisma@0.3.8:
+  version "0.3.8"
+  resolved "https://registry.yarnpkg.com/nexus-prisma/-/nexus-prisma-0.3.8.tgz#19a94663903c7af17d63873476baeff845689d3c"
+  integrity sha512-F+i6nKnT+a7RzvnYTwBTV5V6mW+euYm7nUbQUKw1DRJSWQfWbrHG/Jh3y0fx6iz6nIb8bDY9AozqILwNlhxFXA==
 
 nexus@0.10.0:
   version "0.10.0"
