@@ -10,12 +10,18 @@ export const schema = makeSchema({
   types: allTypes,
   outputs: {
     schema: path.join(__dirname, "../star-wars-schema.graphql"),
-    typegen: path.join(__dirname, "./star-wars-typegen.ts"),
+    typegen: path.join(
+      __dirname.replace(/\/dist$/, "/src"),
+      "./star-wars-typegen.ts"
+    ),
   },
   typegenAutoConfig: {
     sources: [
       {
-        source: path.join(__dirname, "./types/backingTypes.ts"),
+        source: path.join(
+          __dirname.replace(/\/dist$/, "/src"),
+          "./types/backingTypes.ts"
+        ),
         alias: "swapi",
       },
     ],

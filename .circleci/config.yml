@@ -68,6 +68,12 @@ jobs:
       - run: yarn --cwd=examples/star-wars --frozen-lockfile
       - run: yarn --cwd=examples/star-wars link nexus
       - run: yarn --cwd=examples/star-wars tsc
+      - run:
+          command: |
+            rm examples/star-wars/src/star-wars-typegen.ts
+            rm examples/star-wars/star-wars-schema.graphql
+            node examples/star-wars/dist/schema.js
+            git diff --exit-code
 
   example_ts-ast-reader:
     docker:
