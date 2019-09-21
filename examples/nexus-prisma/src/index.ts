@@ -5,6 +5,7 @@ import * as path from 'path'
 import datamodelInfo from './generated/nexus-prisma'
 import { prisma } from './generated/prisma-client'
 
+// @ts-ignore "Expression produces a union type that is too complex to represent."
 const User = prismaObjectType({
   name: 'User',
   definition(t) {

@@ -9,6 +9,7 @@ import ts from "typescript"
 
 
 
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }

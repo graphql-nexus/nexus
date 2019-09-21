@@ -1,4 +1,4 @@
-import { interfaceType, objectType, core, Types } from "nexus";
+import { interfaceType, objectType, blocks } from "nexus";
 import ts from "typescript";
 
 export const JSDoc = objectType({
@@ -26,7 +26,7 @@ export const JSDocTag = interfaceType({
   },
 });
 
-const jsDocTag = (t: Types.ObjectDefinitionBlock<any>) =>
+const jsDocTag = (t: blocks.ObjectDefinitionBlock<any>) =>
   t.implements("JSDocTag");
 
 export const JSDocUnknownTag = objectType({

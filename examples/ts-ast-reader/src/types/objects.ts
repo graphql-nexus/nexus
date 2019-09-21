@@ -67,13 +67,13 @@ export const TypeReference = objectType({
     t.string("text", {
       nullable: true,
       resolve: (root) => {
-        return root.typeName && root.typeName.text;
+        return root.typeName && (root.typeName as any).text;
       },
     });
     t.string("nameText", {
       nullable: true,
       resolve: (root) => {
-        return root.typeName && root.typeName.escapedText;
+        return root.typeName && (root.typeName as any).escapedText;
       },
     });
     t.list.field("typeArguments", { type: "Node", nullable: true });
