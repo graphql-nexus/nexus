@@ -55,6 +55,7 @@ describe("interfaceType", () => {
     ).toMatchSnapshot();
   });
   it("throws if the arg is not provided to the type", async () => {
+    // @ts-ignore
     expect(() => arg({ type: null })).toThrowErrorMatchingSnapshot();
   });
 });
