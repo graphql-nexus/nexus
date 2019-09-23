@@ -988,36 +988,6 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected getEnum(name: string): GraphQLEnumType {
-    const type = this.getOrBuildType(name);
-    if (!isEnumType(type)) {
-      throw new Error(
-        `Expected ${name} to be an enumType, saw ${type.constructor.name}`
-      );
-    }
-    return type;
-  }
-
-  protected getUnion(name: string): GraphQLUnionType {
-    const type = this.getOrBuildType(name);
-    if (!isUnionType(type)) {
-      throw new Error(
-        `Expected ${name} to be a unionType, saw ${type.constructor.name}`
-      );
-    }
-    return type;
-  }
-
-  protected getInputObjectType(name: string): GraphQLInputObjectType {
-    const type = this.getOrBuildType(name);
-    if (!isInputObjectType(type)) {
-      throw new Error(
-        `Expected ${name} to be a valid input type, saw ${type.constructor.name}`
-      );
-    }
-    return type;
-  }
-
   protected getInputType(
     name:
       | string
@@ -1139,7 +1109,7 @@ export class SchemaBuilder {
   missingResolveType(name: string, location: "union" | "interface") {
     console.error(
       new Error(
-        `Missing resolveType for the ${name} ${location}.` +
+        `Missing resolveType for the ${name} ${location}. ` +
           `Be sure to add one in the definition block for the type, ` +
           `or t.resolveType(() => null) if you don't want to implement yet`
       )
