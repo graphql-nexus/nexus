@@ -11,24 +11,14 @@ describe("nonNullDefaults", () => {
         output: true,
       },
     });
-    expect(printSchema(schema)).toMatchInlineSnapshot(`
-"type Query {
-  test(test: Int!): Boolean!
-}
-"
-`);
+    expect(printSchema(schema)).toMatchSnapshot();
   });
   test("true/true on type", () => {
     const schema = makeSchema({
       types: [makeQuery({ nonNullDefaults: { input: true, output: true } })],
       outputs: false,
     });
-    expect(printSchema(schema)).toMatchInlineSnapshot(`
-"type Query {
-  test(test: Int!): Boolean!
-}
-"
-`);
+    expect(printSchema(schema)).toMatchSnapshot();
   });
   test("false/false on schema", () => {
     const schema = makeSchema({
@@ -39,24 +29,14 @@ describe("nonNullDefaults", () => {
         output: false,
       },
     });
-    expect(printSchema(schema)).toMatchInlineSnapshot(`
-"type Query {
-  test(test: Int): Boolean
-}
-"
-`);
+    expect(printSchema(schema)).toMatchSnapshot();
   });
   test("false/false on type", () => {
     const schema = makeSchema({
       types: [makeQuery({ nonNullDefaults: { input: false, output: false } })],
       outputs: false,
     });
-    expect(printSchema(schema)).toMatchInlineSnapshot(`
-"type Query {
-  test(test: Int): Boolean
-}
-"
-`);
+    expect(printSchema(schema)).toMatchSnapshot();
   });
 });
 

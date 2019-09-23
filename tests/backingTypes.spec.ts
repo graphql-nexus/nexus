@@ -73,11 +73,7 @@ describe("backingTypes", () => {
       (schema as any).extensions.nexus
     );
 
-    expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
-"export interface NexusGenEnums {
-  A: t.A
-}"
-`);
+    expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
 
   it("can match backing types for const enums", async () => {
@@ -89,11 +85,7 @@ describe("backingTypes", () => {
       (schema as any).extensions.nexus
     );
 
-    expect(typegen.printEnumTypeMap()).toMatchInlineSnapshot(`
-"export interface NexusGenEnums {
-  B: t.B
-}"
-`);
+    expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
 });
 

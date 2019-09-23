@@ -1,3 +1,5 @@
+const path = require("path");
+
 /**
  * @type {jest.InitialOptions}
  */
@@ -11,12 +13,8 @@ module.exports = {
   ],
   globals: {
     "ts-jest": {
-      isolatedModules: !process.env.CI,
-      diagnostics: {
-        // FIXME: sloppy, can we make { core } not output in
-        // typegen when its not needed?
-        ignoreCodes: ["6133"],
-      },
+      tsConfig: path.join(__dirname, "tests/tsconfig.json"),
     },
   },
+  collectCoverageFrom: ["src/**/*"],
 };

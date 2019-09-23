@@ -1,4 +1,5 @@
-import { objectType, makeSchemaInternal, makeSchema } from "../src/core";
+import { objectType, makeSchemaInternal, makeSchema, UNKNOWN_TYPE_SCALAR } from "../src/core";
+import { Kind } from "graphql";
 
 describe("unknownType", () => {
   const Query = objectType({
@@ -59,10 +60,23 @@ describe("unknownType", () => {
         shouldGenerateArtifacts: true,
       });
     } catch (e) {
-      expect(e).toMatchInlineSnapshot(`
-[Error: 
-- Missing type User, did you forget to import a type to the root query?]
-`);
+      expect(e).toMatchSnapshot()
     }
+  });
+
+  test("UNKNOWN_TYPE_SCALAR is a scalar, with identity for the implementation", () => {
+    const obj = {};
+    expect(() => {
+      UNKNOWN_TYPE_SCALAR.parseLiteral(
+        { value: "123.45", kind: Kind.FLOAT },
+        {}
+      );
+    }).toThrowError("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    expect(() => UNKNOWN_TYPE_SCALAR.parseValue(obj)).toThrowError(
+      "Error: NEXUS__UNKNOWN__TYPE is not a valid scalar."
+    );
+    expect(() => UNKNOWN_TYPE_SCALAR.serialize(obj)).toThrowError(
+      "Error: NEXUS__UNKNOWN__TYPE is not a valid scalar."
+    );
   });
 });

@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`objectType builds creates an object type 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "floatField": 123.4,
+      "id": "User:1",
+      "name": "Test User",
+    },
+  },
+}
+`;
+
+exports[`objectType throws when chaining .list twice 1`] = `"Cannot chain list.list, in the definition block. Use \`list: []\` config value"`;
+
+exports[`objectType warns when specifying .list and list: true 1`] = `
+Array [
+  "It looks like you chained .list and set list for someField. You should only do one or the other",
+]
+`;

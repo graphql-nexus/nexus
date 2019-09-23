@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`inputObject builds creates an inputObject type 1`] = `
+Object {
+  "errors": Array [
+    [GraphQLError: Unknown argument "input" on field "user" of type "Query".],
+  ],
+}
+`;
+
+exports[`inputObject has asArg for using one-off inputObjects inline 1`] = `
+Object {
+  "errors": Array [
+    [GraphQLError: Unknown argument "input" on field "user" of type "Query".],
+  ],
+}
+`;
+
+exports[`inputObject throws when chaining .list twice 1`] = `"Cannot chain list.list, in the definition block. Use \`list: []\` config value"`;
+
+exports[`inputObject warns when specifying .list and list: true 1`] = `
+Array [
+  "It looks like you chained .list and set list for someFieldYou should only do one or the other",
+]
+`;

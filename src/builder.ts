@@ -23,14 +23,12 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLUnionType,
-  isEnumType,
   isInputObjectType,
   isInterfaceType,
   isLeafType,
   isNamedType,
   isObjectType,
   isOutputType,
-  isUnionType,
   isScalarType,
   defaultFieldResolver,
   assertValidName,
@@ -127,6 +125,7 @@ import {
 } from "./definitions/extendInputType";
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
+import { decorateType } from "./definitions/decorateType";
 
 export type Maybe<T> = T | null;
 
@@ -148,18 +147,28 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   Boolean: GraphQLBoolean,
 };
 
-export const UNKNOWN_TYPE_SCALAR = new GraphQLScalarType({
-  name: "NEXUS__UNKNOWN__TYPE__",
-  parseValue(value) {
-    return value;
-  },
-  parseLiteral(value) {
-    return value;
-  },
-  serialize(value) {
-    return value;
-  },
-});
+export const UNKNOWN_TYPE_SCALAR = decorateType(
+  new GraphQLScalarType({
+    name: "NEXUS__UNKNOWN__TYPE",
+    description: `
+    This scalar should never make it into production. It is used as a placeholder for situations
+    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    the TypeScript definitions will not be updated.
+  `,
+    parseValue(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    parseLiteral(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    serialize(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+  }),
+  {
+    rootTyping: "never",
+  }
+);
 
 export interface BuilderConfig {
   /**
@@ -535,6 +544,7 @@ export class SchemaBuilder {
       addField: (field) => fields.push(field),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
+      warn: consoleWarn,
     });
     config.definition(definitionBlock);
     const extensions = this.inputTypeExtensionMap[config.name];
@@ -576,6 +586,7 @@ export class SchemaBuilder {
       },
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: consoleWarn,
     });
     config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
@@ -645,6 +656,7 @@ export class SchemaBuilder {
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: consoleWarn,
     });
     config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
@@ -974,36 +986,6 @@ export class SchemaBuilder {
     return type;
   }
 
-  protected getEnum(name: string): GraphQLEnumType {
-    const type = this.getOrBuildType(name);
-    if (!isEnumType(type)) {
-      throw new Error(
-        `Expected ${name} to be an enumType, saw ${type.constructor.name}`
-      );
-    }
-    return type;
-  }
-
-  protected getUnion(name: string): GraphQLUnionType {
-    const type = this.getOrBuildType(name);
-    if (!isUnionType(type)) {
-      throw new Error(
-        `Expected ${name} to be a unionType, saw ${type.constructor.name}`
-      );
-    }
-    return type;
-  }
-
-  protected getInputObjectType(name: string): GraphQLInputObjectType {
-    const type = this.getOrBuildType(name);
-    if (!isInputObjectType(type)) {
-      throw new Error(
-        `Expected ${name} to be a valid input type, saw ${type.constructor.name}`
-      );
-    }
-    return type;
-  }
-
   protected getInputType(
     name:
       | string
@@ -1125,9 +1107,9 @@ export class SchemaBuilder {
   missingResolveType(name: string, location: "union" | "interface") {
     console.error(
       new Error(
-        `Missing resolveType for the ${name} ${location}.` +
+        `Missing resolveType for the ${name} ${location}. ` +
           `Be sure to add one in the definition block for the type, ` +
-          `or t.resolveType(() => null) if you don't want to implement yet`
+          `or t.resolveType(() => null) if you don't want or need to implement.`
       )
     );
     return () => null;
@@ -1139,6 +1121,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseInputType(f),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
+      warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1223,6 +1206,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1235,6 +1219,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1530,4 +1515,8 @@ function assertNoMissingTypes(
 
     throw new Error("\n" + errors);
   }
+}
+
+function consoleWarn(msg: string) {
+  console.warn(msg);
 }

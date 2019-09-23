@@ -23,10 +23,6 @@ export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
 }
 
-export function withDeprecationComment(description?: string | null) {
-  return description;
-}
-
 export const isInterfaceField = (
   type: GraphQLObjectType,
   fieldName: string
@@ -217,6 +213,7 @@ export function firstDefined<T>(...args: Array<T | undefined>): T {
       return arg;
     }
   }
+  /* istanbul ignore next */
   throw new Error("At least one of the values should be defined");
 }
 
