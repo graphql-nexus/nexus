@@ -127,6 +127,7 @@ import {
 } from "./definitions/extendInputType";
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
+import { decorateType } from "./definitions/decorateType";
 
 export type Maybe<T> = T | null;
 
@@ -148,18 +149,28 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   Boolean: GraphQLBoolean,
 };
 
-export const UNKNOWN_TYPE_SCALAR = new GraphQLScalarType({
-  name: "NEXUS__UNKNOWN__TYPE__",
-  parseValue(value) {
-    return value;
-  },
-  parseLiteral(value) {
-    return value;
-  },
-  serialize(value) {
-    return value;
-  },
-});
+export const UNKNOWN_TYPE_SCALAR = decorateType(
+  new GraphQLScalarType({
+    name: "NEXUS__UNKNOWN__TYPE",
+    description: `
+    This scalar should never make it into production. It is used as a placeholder for situations
+    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    the TypeScript definitions will not be updated.
+  `,
+    parseValue(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    parseLiteral(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    serialize(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+  }),
+  {
+    rootTyping: "never",
+  }
+);
 
 export interface BuilderConfig {
   /**
@@ -535,6 +546,7 @@ export class SchemaBuilder {
       addField: (field) => fields.push(field),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
+      warn: consoleWarn,
     });
     config.definition(definitionBlock);
     const extensions = this.inputTypeExtensionMap[config.name];
@@ -576,6 +588,7 @@ export class SchemaBuilder {
       },
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: consoleWarn,
     });
     config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
@@ -645,6 +658,7 @@ export class SchemaBuilder {
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: consoleWarn,
     });
     config.definition(definitionBlock);
     const extensions = this.typeExtensionMap[config.name];
@@ -1139,6 +1153,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseInputType(f),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
+      warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1223,6 +1238,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1235,6 +1251,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList),
+      warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
@@ -1530,4 +1547,8 @@ function assertNoMissingTypes(
 
     throw new Error("\n" + errors);
   }
+}
+
+function consoleWarn(msg: string) {
+  console.warn(msg);
 }

@@ -132,6 +132,7 @@ export interface OutputDefinitionBuilder {
     block: OutputDefinitionBlock<any>,
     isList: boolean
   ): void;
+  warn(msg: string): void;
 }
 
 export interface InputDefinitionBuilder {
@@ -141,6 +142,7 @@ export interface InputDefinitionBuilder {
     block: InputDefinitionBlock<any>,
     isList: boolean
   ): void;
+  warn(msg: string): void;
 }
 
 export interface OutputDefinitionBlock<TypeName extends string>
@@ -242,7 +244,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
   protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
     if (this.isList) {
       if (config.list) {
-        console.warn(
+        this.typeBuilder.warn(
           `It looks like you chained .list and set list for ${config.name}. ` +
             "You should only do one or the other"
         );
@@ -348,7 +350,7 @@ export class InputDefinitionBlock<TypeName extends string> {
   protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
     if (this.isList) {
       if (config.list) {
-        console.warn(
+        this.typeBuilder.warn(
           `It looks like you chained .list and set list for ${config.name}` +
             "You should only do one or the other"
         );

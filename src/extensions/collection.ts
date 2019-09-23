@@ -5,8 +5,8 @@ import { intArg } from "../definitions/args";
 
 const basicCollectionMap = new Map<string, NexusObjectTypeDef<string>>();
 
-export const Collection = dynamicOutputMethod({
-  name: "collection",
+export const CollectionFieldMethod = dynamicOutputMethod({
+  name: "collectionField",
   typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
       nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
@@ -16,27 +16,32 @@ export const Collection = dynamicOutputMethod({
       description?: string
     }): void;`,
   factory({ typeDef: t, args: [fieldName, config] }) {
-    const type =
+    if (!config.type) {
+      throw new Error(
+        `Missing required property "type" from collectionField ${fieldName}`
+      );
+    }
+    const typeName =
       typeof config.type === "string" ? config.type : config.type.name;
     if (config.list) {
       throw new Error(
-        `Collection field ${fieldName}.${type} cannot be used as a list.`
+        `Collection field ${fieldName}.${typeName} cannot be used as a list.`
       );
     }
-    if (!basicCollectionMap.has(type)) {
+    if (!basicCollectionMap.has(typeName)) {
       basicCollectionMap.set(
-        type,
+        typeName,
         objectType({
-          name: `${type}Collection`,
+          name: `${typeName}Collection`,
           definition(c) {
             c.int("totalCount");
-            c.list.field("nodes", { type });
+            c.list.field("nodes", { type: config.type });
           },
         })
       );
     }
     t.field(fieldName, {
-      type: basicCollectionMap.get(type)!,
+      type: basicCollectionMap.get(typeName)!,
       args: config.args || {
         page: intArg(),
         perPage: intArg(),

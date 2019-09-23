@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`scalarType asNexusMethod: should wrap a scalar and make it available on the builder 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "dateTimeField": "2020-01-01T00:00:00.000Z",
+      "id": "User:1",
+    },
+  },
+}
+`;

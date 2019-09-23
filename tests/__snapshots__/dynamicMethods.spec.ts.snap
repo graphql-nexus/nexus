@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dynamicOutputMethod CollectionFieldMethod example 1`] = `
+Object {
+  "data": Object {
+    "cats": Object {
+      "nodes": Array [
+        Object {
+          "id": "Cat:1",
+          "name": "Felix",
+        },
+        Object {
+          "id": "Cat:2",
+          "name": "Booker",
+        },
+      ],
+      "totalCount": 2,
+    },
+  },
+}
+`;
+
+exports[`dynamicOutputMethod RelayConnectionFieldMethod example 1`] = `
+Object {
+  "data": Object {
+    "cats": Object {
+      "edges": Array [
+        Object {
+          "node": Object {
+            "id": "Cat:1",
+            "name": "Felix",
+          },
+        },
+        Object {
+          "node": Object {
+            "id": "Cat:2",
+            "name": "Booker",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+      },
+    },
+  },
+}
+`;

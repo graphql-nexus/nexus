@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`interfaceType can be implemented by object types 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "id": "User:1",
+      "name": "Test User",
+    },
+  },
+}
+`;

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`unionType unionType 1`] = `
+Object {
+  "data": Object {
+    "deletedUserTest": Object {
+      "__typename": "DeletedUser",
+      "message": "This user 1 was deleted",
+    },
+    "userTest": Object {
+      "__typename": "User",
+      "id": 1,
+      "name": "Test User",
+    },
+  },
+}
+`;

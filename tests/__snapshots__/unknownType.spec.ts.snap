@@ -1,0 +1,6 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`unknownType should render the typegen but throw 1`] = `
+[Error: 
+- Missing type User, did you forget to import a type to the root query?]
+`;

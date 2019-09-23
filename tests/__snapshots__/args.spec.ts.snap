@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`interfaceType can be implemented by object types 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "id": "User:1",
+      "name": "Test User",
+    },
+  },
+}
+`;
+
+exports[`interfaceType throws if the arg is not provided to the type 1`] = `"You must provide a \\"type\\" for the arg()"`;

@@ -1,8 +1,9 @@
 import { GraphQLNamedType } from "graphql";
 import { RootTypingDef } from "./_types";
+import { Maybe } from "../core";
 
 export interface TypeExtensionConfig {
-  asNexusMethod: string;
+  asNexusMethod?: string;
   rootTyping?: RootTypingDef;
 }
 
@@ -11,7 +12,7 @@ export type NexusTypeExtensions = {
 };
 
 export function decorateType<T extends GraphQLNamedType>(
-  type: T & { extensions?: NexusTypeExtensions },
+  type: T & { extensions?: Maybe<Readonly<Record<string, any>>> },
   config: TypeExtensionConfig
 ): T & { extensions: NexusTypeExtensions } {
   type.extensions = {

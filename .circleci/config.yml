@@ -10,6 +10,8 @@ jobs:
       - run: yarn build
       - run: yarn lint
       - run: yarn test:ci
+      - store_artifacts:
+          path: coverage
 
   example_apollo-fullstack:
     docker:
