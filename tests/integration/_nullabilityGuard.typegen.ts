@@ -13,6 +13,10 @@ export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
   Query: {};
+  User: {
+    // root type
+    id: string; // ID!
+  };
   String: string;
   Int: number;
   Float: number;
@@ -25,7 +29,13 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {}
 export interface NexusGenFieldTypes {
   Query: {
     // field return type
-    foo: string; // String!
+    getUser: NexusGenRootTypes["User"]; // User!
+    getUserWithGuard: NexusGenRootTypes["User"]; // User!
+  };
+  User: {
+    // field return type
+    id: string; // ID!
+    usersList: NexusGenRootTypes["User"][]; // [User!]!
   };
 }
 
@@ -35,7 +45,7 @@ export interface NexusGenAbstractResolveReturnTypes {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "Query";
+export type NexusGenObjectNames = "Query" | "User";
 
 export type NexusGenInputNames = never;
 
@@ -83,6 +93,13 @@ declare global {
   interface NexusGenPluginFieldConfig<
     TypeName extends string,
     FieldName extends string
-  > {}
+  > {
+    /**
+     * The nullability guard can be helpful, but is also a potentially expensive operation for lists.
+     * We need to iterate the entire list to check for null items to guard against. Set this to
+     * true to skip the null guard on a specific field if you know there's no potential for unsafe types.
+     */
+    skipNullGuard?: boolean;
+  }
   interface NexusGenPluginSchemaConfig {}
 }

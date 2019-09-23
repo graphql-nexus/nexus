@@ -445,9 +445,9 @@ function unwrapType(type: GraphQLType) {
 function isCommonScalar(field: GraphQLNamedType): boolean {
   if (isScalarType(field)) {
     return (
-      isSpecifiedScalarType(field) ||
       field.name === "UUID" ||
-      field.name === "Date"
+      field.name === "Date" ||
+      isSpecifiedScalarType(field)
     );
   }
   return false;

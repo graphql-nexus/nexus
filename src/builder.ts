@@ -126,6 +126,13 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
+import {
+  PluginDef,
+  PluginVisitBefore,
+  PluginVisitAfter,
+  wrapPluginsBefore,
+  wrapPluginsAfter,
+} from "./plugin";
 
 export type Maybe<T> = T | null;
 
@@ -223,6 +230,11 @@ export interface BuilderConfig {
    * Read more about how nexus handles nullability
    */
   nonNullDefaults?: NonNullConfig;
+  /**
+   * List of plugins to apply to Nexus, with before/after hooks
+   * executed first to last: before -> resolve -> after
+   */
+  plugins?: PluginDef[];
 }
 
 export interface TypegenInfo {
@@ -245,14 +257,14 @@ export interface TypegenInfo {
   contextType?: string;
 }
 
-export interface SchemaConfig extends BuilderConfig {
+export type SchemaConfig = BuilderConfig & {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
    * valid types, ignoring invalid ones.
    */
   types: any;
-}
+} & NexusGenPluginSchemaConfig;
 
 export type TypeToWalk =
   | { type: "named"; value: GraphQLNamedType }
@@ -318,21 +330,10 @@ export class SchemaBuilder {
    * Configures the root-level nonNullDefaults defaults
    */
   protected nonNullDefaults: NonNullConfig = {};
-
-  /**
-   * Add dynamic input fields
-   */
   protected dynamicInputFields: DynamicInputFields = {};
-
-  /**
-   * Add dynamic output fields
-   */
   protected dynamicOutputFields: DynamicOutputFields = {};
-
-  /**
-   * Add dynamic output properties
-   */
   protected dynamicOutputProperties: DynamicOutputProperties = {};
+  protected plugins: PluginDef[] = [];
 
   /**
    * All types that need to be traversed for children types
@@ -360,10 +361,15 @@ export class SchemaBuilder {
       output: true,
       ...config.nonNullDefaults,
     };
+    this.plugins = config.plugins || [];
   }
 
   getConfig(): BuilderConfig {
     return this.config;
+  }
+
+  getPlugins(): PluginDef[] {
+    return this.plugins;
   }
 
   /**
@@ -515,7 +521,7 @@ export class SchemaBuilder {
       }
     });
     Object.keys(this.inputTypeExtensionMap).forEach((key) => {
-      // If we haven't defined the type, assume it's an object type
+      // If we haven't defined the type, assume it's an input object type
       if (this.inputTypeExtensionMap[key] !== null) {
         this.buildInputObjectType({
           name: key,
@@ -524,6 +530,7 @@ export class SchemaBuilder {
       }
     });
     return {
+      builder: this,
       typeMap: this.finalTypeMap,
       dynamicFields: {
         dynamicInputFields: this.dynamicInputFields,
@@ -1101,6 +1108,37 @@ export class SchemaBuilder {
         fieldConfig.authorize
       );
     }
+    if (this.plugins.length) {
+      const before: [string, PluginVisitBefore][] = [];
+      const after: [string, PluginVisitAfter][] = [];
+      // Execute all of the plugins for each individual resolver.
+      for (let i = 0; i < this.plugins.length; i++) {
+        const addedPlugin = this.plugins[i].config;
+        if (addedPlugin.pluginDefinition) {
+          const returnDef = addedPlugin.pluginDefinition({
+            typeName: typeConfig.name,
+            fieldName: fieldConfig.name,
+            nexusSchemaConfig: this.config as any,
+            graphqlFieldConfig: fieldConfig as any,
+            mutableObj: {},
+          });
+          if (returnDef) {
+            if (returnDef.before) {
+              before.push([addedPlugin.name, returnDef.before]);
+            }
+            if (returnDef.after) {
+              after.push([addedPlugin.name, returnDef.after]);
+            }
+          }
+        }
+      }
+      if (before.length) {
+        resolver = wrapPluginsBefore(resolver || defaultFieldResolver, before);
+      }
+      if (after.length) {
+        resolver = wrapPluginsAfter(resolver || defaultFieldResolver, after);
+      }
+    }
     return resolver;
   }
 
@@ -1311,6 +1349,7 @@ export type DynamicFieldDefs = {
 export interface BuildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType>
 > {
+  builder: SchemaBuilder;
   typeMap: TypeMapDefs;
   dynamicFields: DynamicFieldDefs;
   rootTypings: RootTypings;
@@ -1375,12 +1414,14 @@ export type NexusSchema = GraphQLSchema & {
 export function makeSchemaInternal(
   options: SchemaConfig,
   schemaBuilder?: SchemaBuilder
-): { schema: NexusSchema; missingTypes: Record<string, MissingType> } {
-  const { typeMap, dynamicFields, rootTypings, missingTypes } = buildTypes(
-    options.types,
-    options,
-    schemaBuilder
-  );
+) {
+  const {
+    builder,
+    typeMap,
+    dynamicFields,
+    rootTypings,
+    missingTypes,
+  } = buildTypes(options.types, options, schemaBuilder);
   let { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
@@ -1414,7 +1455,7 @@ export function makeSchemaInternal(
       dynamicFields,
     },
   };
-  return { schema, missingTypes };
+  return { builder, schema, missingTypes };
 }
 
 /**
@@ -1425,7 +1466,7 @@ export function makeSchemaInternal(
  * root query type.
  */
 export function makeSchema(options: SchemaConfig): GraphQLSchema {
-  const { schema, missingTypes } = makeSchemaInternal(options);
+  const { builder, schema, missingTypes } = makeSchemaInternal(options);
 
   // Only in development envs do we want to worry about regenerating the
   // schema definition and/or generated types.
@@ -1438,13 +1479,13 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
   if (shouldGenerateArtifacts) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(options).generateArtifacts(schema).catch((e) => {
-      console.error(e);
-    });
+    new TypegenMetadata(builder, options)
+      .generateArtifacts(schema)
+      .catch((e) => {
+        console.error(e);
+      });
   }
-
   assertNoMissingTypes(schema, missingTypes);
-
   return schema;
 }
 
@@ -1455,9 +1496,9 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
 export async function generateSchema(
   options: SchemaConfig
 ): Promise<NexusSchema> {
-  const { schema, missingTypes } = makeSchemaInternal(options);
+  const { builder, schema, missingTypes } = makeSchemaInternal(options);
   assertNoMissingTypes(schema, missingTypes);
-  await new TypegenMetadata(options).generateArtifacts(schema);
+  await new TypegenMetadata(builder, options).generateArtifacts(schema);
   return schema;
 }
 

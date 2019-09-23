@@ -1,6 +1,6 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import path from "path";
-import { Typegen } from "./typegen";
+import { TypegenPrinter } from "./typegenPrinter";
 import { assertAbsolutePath } from "./utils";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { typegenAutoConfig } from "./typegenAutoConfig";
@@ -13,6 +13,7 @@ import {
   TypegenInfo,
   NexusSchema,
   NexusSchemaExtensions,
+  SchemaBuilder,
 } from "./builder";
 
 /**
@@ -23,7 +24,10 @@ import {
 export class TypegenMetadata {
   protected typegenFile: string = "";
 
-  constructor(protected config: BuilderConfig) {
+  constructor(
+    protected builder: SchemaBuilder,
+    protected config: BuilderConfig
+  ) {
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
       if (config.outputs.typegen) {
         this.typegenFile = assertAbsolutePath(
@@ -123,7 +127,8 @@ export class TypegenMetadata {
     schema: GraphQLSchema,
     extensions: NexusSchemaExtensions
   ): Promise<string> {
-    return new Typegen(
+    return new TypegenPrinter(
+      this.builder,
       schema,
       {
         ...(await this.getTypegenInfo(schema)),

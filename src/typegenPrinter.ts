@@ -24,7 +24,7 @@ import {
   defaultFieldResolver,
 } from "graphql";
 import path from "path";
-import { TypegenInfo, NexusSchemaExtensions } from "./builder";
+import { TypegenInfo, NexusSchemaExtensions, SchemaBuilder } from "./builder";
 import {
   eachObj,
   GroupedTypes,
@@ -65,10 +65,11 @@ type RootTypeMapping = Record<
  *
  * - Non-scalar types will get a dedicated "Root" type associated with it
  */
-export class Typegen {
+export class TypegenPrinter {
   groupedTypes: GroupedTypes;
 
   constructor(
+    protected builder: SchemaBuilder,
     protected schema: GraphQLSchema,
     protected typegenInfo: TypegenInfo & { typegenFile: string },
     protected extensions: NexusSchemaExtensions
@@ -94,6 +95,7 @@ export class Typegen {
       this.printTypeNames("scalar", "NexusGenScalarNames"),
       this.printTypeNames("union", "NexusGenUnionNames"),
       this.printGenTypeMap(),
+      this.printPlugins(),
     ].join("\n\n");
   }
 
@@ -698,6 +700,53 @@ export class Typegen {
       return "any";
     }
   }
+
+  printPlugins() {
+    const pluginFieldExt: string[] = [
+      `  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {`,
+    ];
+    const pluginSchemaExt: string[] = [
+      `  interface NexusGenPluginSchemaConfig {`,
+    ];
+    const pluginTypeExt: string[] = [
+      `  interface NexusGenPluginTypeConfig<TypeName extends string> {`,
+    ];
+    const printInlineDefs: string[] = [];
+    const plugins = this.builder.getPlugins();
+    plugins.forEach((plugin) => {
+      if (plugin.config.localTypes) {
+        printInlineDefs.push(plugin.config.localTypes);
+      }
+      if (plugin.config.fieldDefTypes) {
+        pluginFieldExt.push(padLeft(plugin.config.fieldDefTypes, "    "));
+      }
+      if (plugin.config.schemaTypes) {
+        pluginSchemaExt.push(padLeft(plugin.config.schemaTypes, "    "));
+      }
+      if (plugin.config.typeDefTypes) {
+        pluginTypeExt.push(padLeft(plugin.config.typeDefTypes, "    "));
+      }
+    });
+    return [
+      printInlineDefs.join("\n"),
+      [
+        "declare global {",
+        [
+          pluginTypeExt.concat("  }").join("\n"),
+          pluginFieldExt.concat("  }").join("\n"),
+          pluginSchemaExt.concat("  }").join("\n"),
+        ].join("\n"),
+        "}",
+      ].join("\n"),
+    ].join("\n");
+  }
+}
+
+function padLeft(str: string, padding: string) {
+  return str
+    .split("\n")
+    .map((s) => `${padding}${s}`)
+    .join("\n");
 }
 
 const GLOBAL_DECLARATION = `

@@ -2,7 +2,7 @@
 // For anyone who wants to use the internals
 export * from "./builder";
 export * from "./sdlConverter";
-export * from "./typegen";
+export * from "./typegenPrinter";
 export * from "./typegenAutoConfig";
 export * from "./typegenFormatPrettier";
 export * from "./typegenMetadata";

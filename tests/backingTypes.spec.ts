@@ -2,7 +2,9 @@ import path from "path";
 import { core, makeSchema, queryType, enumType } from "../src";
 import { A, B } from "./_types";
 
-const { Typegen, TypegenMetadata } = core;
+const { TypegenPrinter, TypegenMetadata, SchemaBuilder } = core;
+
+const builder = new SchemaBuilder({ outputs: false });
 
 export enum TestEnum {
   A = "a",
@@ -47,7 +49,7 @@ describe("backingTypes", () => {
   let metadata: core.TypegenMetadata;
 
   beforeEach(async () => {
-    metadata = new TypegenMetadata({
+    metadata = new TypegenMetadata(builder, {
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
@@ -67,7 +69,8 @@ describe("backingTypes", () => {
   it("can match backing types to regular enums", async () => {
     const schema = getSchemaWithNormalEnums();
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
+    const typegen = new TypegenPrinter(
+      builder,
       schema,
       { ...typegenInfo, typegenFile: "" },
       (schema as any).extensions.nexus
@@ -79,7 +82,8 @@ describe("backingTypes", () => {
   it("can match backing types for const enums", async () => {
     const schema = getSchemaWithConstEnums();
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
+    const typegen = new TypegenPrinter(
+      builder,
       schema,
       { ...typegenInfo, typegenFile: "" },
       (schema as any).extensions.nexus
@@ -91,7 +95,7 @@ describe("backingTypes", () => {
 
 describe("rootTypings", () => {
   it("can import enum via rootTyping", async () => {
-    const metadata = new TypegenMetadata({ outputs: false });
+    const metadata = new TypegenMetadata(builder, { outputs: false });
     const schema = makeSchema({
       types: [
         enumType({
@@ -106,7 +110,8 @@ describe("rootTypings", () => {
       outputs: false,
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
+    const typegen = new TypegenPrinter(
+      builder,
       schema,
       { ...typegenInfo, typegenFile: "" },
       (schema as any).extensions.nexus

@@ -8,15 +8,17 @@ import {
 import path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
+import { SchemaBuilder } from "../src/core";
 
-const { Typegen, TypegenMetadata } = core;
+const { TypegenPrinter, TypegenMetadata } = core;
 
 describe("typegen", () => {
-  let typegen: core.Typegen;
+  let typegen: core.TypegenPrinter;
   let metadata: core.TypegenMetadata;
+  const builder = new SchemaBuilder({ outputs: false });
   beforeEach(async () => {
     const schema = lexicographicSortSchema(buildSchema(EXAMPLE_SDL));
-    metadata = new TypegenMetadata({
+    metadata = new TypegenMetadata(builder, {
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
@@ -35,7 +37,8 @@ describe("typegen", () => {
       },
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    typegen = new Typegen(
+    typegen = new TypegenPrinter(
+      builder,
       schema,
       {
         ...typegenInfo,

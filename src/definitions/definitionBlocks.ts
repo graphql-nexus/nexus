@@ -44,10 +44,10 @@ export interface CommonFieldConfig {
   list?: true | boolean[];
 }
 
-export interface CommonOutputFieldConfig<
+export type CommonOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
-> extends CommonFieldConfig {
+> = CommonFieldConfig & {
   /**
    * Arguments for the field
    */
@@ -61,7 +61,7 @@ export interface CommonOutputFieldConfig<
    * executing.
    */
   authorize?: AuthorizeResolver<TypeName, FieldName>;
-}
+} & NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 export interface OutputScalarConfig<
   TypeName extends string,
