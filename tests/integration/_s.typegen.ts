@@ -3,21 +3,20 @@
  * Do not make changes to this file directly
  */
 
-
-import { core } from "nexus"
+import { core } from "../..";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
-    title(...args: any): void
+    title(...args: any): void;
   }
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    title(options: { escape: boolean }): void
+    title(options: { escape: boolean }): void;
   }
 }
 declare global {
   interface NexusGenCustomOutputProperties<TypeName extends string> {
-    body: any
+    body: any;
   }
 }
 
@@ -26,26 +25,28 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  PostSearchInput: { // input type
+  PostSearchInput: {
+    // input type
     body?: string | null; // String
     title?: string | null; // String
-  }
+  };
 }
 
-export interface NexusGenEnums {
-}
+export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
   Mutation: {};
-  Post: { // root type
+  Post: {
+    // root type
     body: string; // String!
     title: string; // String!
-  }
+  };
   Query: {};
-  User: { // root type
+  User: {
+    // root type
     firstName: string; // String!
     lastName: string; // String!
-  }
+  };
   String: string;
   Int: number;
   Float: number;
@@ -54,47 +55,53 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  PostSearchInput: NexusGenInputs['PostSearchInput'];
+  PostSearchInput: NexusGenInputs["PostSearchInput"];
 }
 
 export interface NexusGenFieldTypes {
-  Mutation: { // field return type
-    createUser: NexusGenRootTypes['User']; // User!
-  }
-  Post: { // field return type
+  Mutation: {
+    // field return type
+    createUser: NexusGenRootTypes["User"]; // User!
+  };
+  Post: {
+    // field return type
     body: string; // String!
     title: string; // String!
-  }
-  Query: { // field return type
+  };
+  Query: {
+    // field return type
     foo: string; // String!
-    searchPosts: NexusGenRootTypes['Post'][]; // [Post!]!
-    user: NexusGenRootTypes['User']; // User!
-  }
-  User: { // field return type
+    searchPosts: NexusGenRootTypes["Post"][]; // [Post!]!
+    user: NexusGenRootTypes["User"]; // User!
+  };
+  User: {
+    // field return type
     firstName: string; // String!
     lastName: string; // String!
-  }
+  };
 }
 
 export interface NexusGenArgTypes {
   Mutation: {
-    createUser: { // args
+    createUser: {
+      // args
       firstName?: string | null; // String
       lastName?: string | null; // String
-    }
-  }
+    };
+  };
   Query: {
-    searchPosts: { // args
-      input?: NexusGenInputs['PostSearchInput'] | null; // PostSearchInput
-    }
-    user: { // args
+    searchPosts: {
+      // args
+      input?: NexusGenInputs["PostSearchInput"] | null; // PostSearchInput
+    };
+    user: {
+      // args
       id?: string | null; // ID
-    }
-  }
+    };
+  };
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
-}
+export interface NexusGenAbstractResolveReturnTypes {}
 
 export interface NexusGenInheritedFields {}
 
@@ -124,9 +131,19 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
-  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  allInputTypes:
+    | NexusGenTypes["inputNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["scalarNames"];
+  allOutputTypes:
+    | NexusGenTypes["objectNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["unionNames"]
+    | NexusGenTypes["interfaceNames"]
+    | NexusGenTypes["scalarNames"];
+  allNamedTypes:
+    | NexusGenTypes["allInputTypes"]
+    | NexusGenTypes["allOutputTypes"];
+  abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
