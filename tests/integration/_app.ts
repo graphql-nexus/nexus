@@ -1,7 +1,8 @@
-import "./_s.typegen";
+import "./_app.typegen";
 import {
   objectType,
   idArg,
+  queryType,
   mutationType,
   stringArg,
   inputObjectType,
@@ -10,7 +11,12 @@ import {
   dynamicInputMethod,
   dynamicOutputProperty,
 } from "../../src";
-export * from "./_xs";
+
+export const query = queryType({
+  definition(t) {
+    t.string("foo", () => "bar");
+  },
+});
 
 const mockData = {
   posts: [{ title: "", body: "" }],
