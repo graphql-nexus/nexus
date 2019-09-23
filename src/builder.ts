@@ -1111,7 +1111,7 @@ export class SchemaBuilder {
       new Error(
         `Missing resolveType for the ${name} ${location}. ` +
           `Be sure to add one in the definition block for the type, ` +
-          `or t.resolveType(() => null) if you don't want to implement yet`
+          `or t.resolveType(() => null) if you don't want or need to implement.`
       )
     );
     return () => null;

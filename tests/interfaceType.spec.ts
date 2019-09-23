@@ -1,11 +1,6 @@
 import { graphql } from "graphql";
 import path from "path";
-import {
-  interfaceType,
-  makeSchema,
-  objectType,
-  queryField,
-} from "../src/core";
+import { interfaceType, makeSchema, objectType, queryField } from "../src/core";
 
 describe("interfaceType", () => {
   it("can be implemented by object types", async () => {
@@ -49,5 +44,23 @@ describe("interfaceType", () => {
         `
       )
     ).toMatchSnapshot();
+  });
+  it("logs error when resolveType is not provided for an interface", async () => {
+    const spy = jest.spyOn(console, "error").mockImplementation();
+    makeSchema({
+      types: [
+        interfaceType({
+          name: "Node",
+          definition(t) {
+            t.id("id");
+          },
+        }),
+      ],
+      outputs: false,
+      shouldGenerateArtifacts: false,
+    });
+    expect(spy.mock.calls[0]).toMatchSnapshot();
+    expect(spy).toBeCalledTimes(1);
+    spy.mockRestore();
   });
 });
