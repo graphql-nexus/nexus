@@ -189,12 +189,7 @@ describe("extendType", () => {
           UserObject,
         ]).typeMap.Query.getFields()
       )
-    ).toMatchInlineSnapshot(`
-Array [
-  "user",
-  "post",
-]
-`);
+    ).toMatchSnapshot();
   });
 });
 
@@ -214,12 +209,7 @@ describe("inputObjectType", () => {
         },
       }),
     ]);
-    expect(printType(buildTypesMap.typeMap.AddToBasketInput))
-      .toMatchInlineSnapshot(`
-"input AddToBasketInput {
-  extras: [ExtraBasketInput!]
-}"
-`);
+    expect(printType(buildTypesMap.typeMap.AddToBasketInput)).toMatchSnapshot();
   });
 });
 
@@ -239,11 +229,6 @@ describe("extendInputType", () => {
         },
       }),
     ]);
-    expect(printType(buildTypesMap.typeMap.InputTest)).toMatchInlineSnapshot(`
-"input InputTest {
-  hello: String
-  world: String
-}"
-`);
+    expect(printType(buildTypesMap.typeMap.InputTest)).toMatchSnapshot();
   });
 });

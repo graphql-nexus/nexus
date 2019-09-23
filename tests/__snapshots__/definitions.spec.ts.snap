@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`extendInputType should allow extending input objects 1`] = `
+"input InputTest {
+  hello: String
+  world: String
+}"
+`;
+
+exports[`extendType should allow adding types to the Query type 1`] = `
+Array [
+  "user",
+  "post",
+]
+`;
+
+exports[`inputObjectType should output lists properly, #33 1`] = `
+"input AddToBasketInput {
+  extras: [ExtraBasketInput!]
+}"
+`;
