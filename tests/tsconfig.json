@@ -2,6 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "types": ["node", "jest"],
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "noEmit": true,
+    "rootDir": "."
   }
 }

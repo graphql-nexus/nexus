@@ -1,6 +1,8 @@
+/// <reference path="../_setup.ts" />
 import { join } from "path";
 import { generateSchema } from "../../src/builder";
 import ts from "typescript";
+import { typegenFormatPrettier } from "../../src/core";
 
 export const testSchema = (name: string) => {
   it(`can compile ${name} app with its typegen`, async () => {
@@ -11,6 +13,10 @@ export const testSchema = (name: string) => {
       outputs: {
         typegen: typegenFilePath,
         schema: false,
+      },
+      async formatTypegen(content, type) {
+        const result = await typegenFormatPrettier({})(content, type);
+        return result.replace('"nexus"', '"../.."');
       },
     });
 

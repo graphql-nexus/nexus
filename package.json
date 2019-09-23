@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "yarn link-examples && tsc -w",
     "test": "jest",
-    "test:ci": "yarn add file:. && jest -i --coverage",
+    "test:ci": "jest -i --coverage",
     "build": "tsc",
     "lint": "tslint -p tsconfig.json",
     "clean": "rm -rf dist",
@@ -50,7 +50,6 @@
     "graphql-iso-date": "^3.6.1",
     "jest-watch-typeahead": "^0.3.1",
     "lint-staged": "^7.3.0",
-    "nexus": "file:.",
     "prettier": "^1.16.0",
     "ts-jest": "^24",
     "ts-node": "^7.0.1",
