@@ -1,7 +1,6 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import path from "path";
 import { Typegen } from "./typegen";
-import { assertAbsolutePath } from "./utils";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { typegenAutoConfig } from "./typegenAutoConfig";
 import {
@@ -9,10 +8,10 @@ import {
   TypegenFormatFn,
 } from "./typegenFormatPrettier";
 import {
-  BuilderConfig,
   TypegenInfo,
   NexusSchema,
   NexusSchemaExtensions,
+  BuilderConfig,
 } from "./builder";
 
 /**
@@ -23,29 +22,7 @@ import {
 export class TypegenMetadata {
   protected typegenFile: string = "";
 
-  constructor(protected config: BuilderConfig) {
-    if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
-      /**
-       * If the user provides a typegen path we validate it, otherwise we fallback
-       * to a default of creating an extraneous pacakge in @types. This default is
-       * chosen based on the privledge TypeScript gives to such pacakges. For
-       * details refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types.
-       * The short of it is that their app will reliably pick up these types without
-       * any specical config needed on their side.
-       */
-      let typegenOutputPath: string;
-      if (config.outputs.typegen) {
-        assertAbsolutePath(config.outputs.typegen, "outputs.typegen");
-        typegenOutputPath = config.outputs.typegen;
-      } else {
-        typegenOutputPath = path.join(
-          __dirname,
-          "../../@types/__nexus-typegen__core/index.d.ts"
-        );
-      }
-      this.typegenFile = typegenOutputPath;
-    }
-  }
+  constructor(protected config: BuilderConfig) {}
 
   /**
    * Generates the artifacts of the build based on what we
@@ -53,21 +30,19 @@ export class TypegenMetadata {
    */
   async generateArtifacts(schema: NexusSchema) {
     const sortedSchema = this.sortSchema(schema);
-    if (this.config.outputs) {
-      if (this.config.outputs.schema) {
-        await this.writeFile(
-          "schema",
-          this.generateSchemaFile(sortedSchema),
-          this.config.outputs.schema
-        );
-      }
-      if (this.typegenFile) {
-        const value = await this.generateTypesFile(
-          sortedSchema,
-          schema.extensions.nexus
-        );
-        await this.writeFile("types", value, this.typegenFile);
-      }
+    if (this.config.schemaGeneration.enabled) {
+      await this.writeFile(
+        "schema",
+        this.generateSchemaFile(sortedSchema),
+        this.config.schemaGeneration.path
+      );
+    }
+    if (this.config.typeGeneration.enabled) {
+      const value = await this.generateTypesFile(
+        sortedSchema,
+        schema.extensions.nexus
+      );
+      await this.writeFile("types", value, this.config.typeGeneration.path);
     }
   }
 
