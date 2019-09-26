@@ -25,12 +25,25 @@ export class TypegenMetadata {
 
   constructor(protected config: BuilderConfig) {
     if (config.outputs !== false && config.shouldGenerateArtifacts !== false) {
+      /**
+       * If the user provides a typegen path we validate it, otherwise we fallback
+       * to a default of creating an extraneous pacakge in @types. This default is
+       * chosen based on the privledge TypeScript gives to such pacakges. For
+       * details refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types.
+       * The short of it is that their app will reliably pick up these types without
+       * any specical config needed on their side.
+       */
+      let typegenOutputPath: string;
       if (config.outputs.typegen) {
-        this.typegenFile = assertAbsolutePath(
-          config.outputs.typegen,
-          "outputs.typegen"
+        assertAbsolutePath(config.outputs.typegen, "outputs.typegen");
+        typegenOutputPath = config.outputs.typegen;
+      } else {
+        typegenOutputPath = path.join(
+          __dirname,
+          "../../@types/__nexus-typegen__core/index.d.ts"
         );
       }
+      this.typegenFile = typegenOutputPath;
     }
   }
 

@@ -245,7 +245,7 @@ export interface TypegenInfo {
   contextType?: string;
 }
 
-export interface SchemaConfig extends BuilderConfig {
+export interface SchemaOptions extends BuilderConfig {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -1373,7 +1373,7 @@ export type NexusSchema = GraphQLSchema & {
  * from this one day.
  */
 export function makeSchemaInternal(
-  options: SchemaConfig,
+  options: SchemaOptions,
   schemaBuilder?: SchemaBuilder
 ): { schema: NexusSchema; missingTypes: Record<string, MissingType> } {
   const { typeMap, dynamicFields, rootTypings, missingTypes } = buildTypes(
@@ -1381,7 +1381,7 @@ export function makeSchemaInternal(
     options,
     schemaBuilder
   );
-  let { Query, Mutation, Subscription } = typeMap;
+  const { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
     throw new Error(
@@ -1424,7 +1424,7 @@ export function makeSchemaInternal(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(options: SchemaConfig): GraphQLSchema {
+export function makeSchema(options: SchemaOptions): GraphQLSchema {
   const { schema, missingTypes } = makeSchemaInternal(options);
 
   // Only in development envs do we want to worry about regenerating the
@@ -1453,7 +1453,7 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
  * and waited upon.
  */
 export async function generateSchema(
-  options: SchemaConfig
+  options: SchemaOptions
 ): Promise<NexusSchema> {
   const { schema, missingTypes } = makeSchemaInternal(options);
   assertNoMissingTypes(schema, missingTypes);
