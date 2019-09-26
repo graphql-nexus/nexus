@@ -1461,11 +1461,14 @@ export async function generateSchema(
   return schema;
 }
 
+/**
+ * Assertion utility with nexus-aware feedback for users.
+ */
 function invariantGuard(val: any) {
-  if (!Boolean(val)) {
+  if (Boolean(val) === false) {
     throw new Error(
       "Nexus Error: This should never happen, " +
-        "please check your code or open a GitHub ticket if you believe this is an issue with Nexus"
+        "please check your code or if you think this is a bug open a GitHub issue https://github.com/prisma-labs/nexus/issues/new."
     );
   }
 }
