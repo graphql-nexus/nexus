@@ -177,17 +177,17 @@ export interface BuilderConfig {
    * the schema
    */
   outputs:
+    | false
     | {
         /**
          * Absolute path where the GraphQL IDL file should be written
          */
-        schema: string | false;
+        schema?: string;
         /**
          * File path where generated types should be saved
          */
-        typegen: string | false;
-      }
-    | false;
+        typegen?: string;
+      };
   /**
    * Whether the schema & types are generated when the server
    * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV === "development"
