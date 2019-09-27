@@ -289,7 +289,7 @@ function resolveBuilderOptions(config: BuilderOptions): BuilderConfig {
     typeof config.outputs === "object" &&
     typeof config.outputs.schema === "string"
   ) {
-    assertAbsolutePath(config.outputs.schema, "config.outputs.schema");
+    assertAbsolutePath(config.outputs.schema, "outputs.schema");
   }
 
   const defaultSchemaPath = process.cwd();
