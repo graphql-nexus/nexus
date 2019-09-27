@@ -13,7 +13,7 @@
     "build": "tsc",
     "lint": "tslint -p tsconfig.json",
     "clean": "rm -rf dist",
-    "format": "prettier --write 'src/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
     "prepublish": "yarn clean && yarn lint && yarn build",
     "postpublish": "yarn upgrade-deps || echo 'Oops...'",
     "website": "cd website && yarn && yarn start",
