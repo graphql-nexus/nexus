@@ -1557,14 +1557,12 @@ export function makeSchema(options: SchemaOptions): GraphQLSchema {
  * and waited upon.
  */
 export async function generateSchema(
-  config: SchemaOptions
+  options: SchemaOptions
 ): Promise<NexusSchema> {
-  const $config = resolveSchemaOptions(config);
-  const { schema, missingTypes } = makeSchemaInternal($config);
+  const config = resolveSchemaOptions(options);
+  const { schema, missingTypes } = makeSchemaInternal(config);
   assertNoMissingTypes(schema, missingTypes);
-  await new TypegenMetadata(resolveBuilderOptions(config)).generateArtifacts(
-    schema
-  );
+  await new TypegenMetadata(config).generateArtifacts(schema);
   return schema;
 }
 
