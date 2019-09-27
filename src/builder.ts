@@ -450,16 +450,16 @@ export class SchemaBuilder {
    */
   protected finalized: boolean = false;
 
-  constructor(protected config: BuilderOptions) {
+  constructor(protected options: BuilderOptions) {
     this.nonNullDefaults = {
       input: false,
       output: true,
-      ...config.nonNullDefaults,
+      ...options.nonNullDefaults,
     };
   }
 
   getConfig(): BuilderOptions {
-    return this.config;
+    return this.options;
   }
 
   /**
