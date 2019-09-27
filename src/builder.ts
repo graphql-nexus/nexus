@@ -198,7 +198,7 @@ export interface BuilderOptions {
         typegen?: boolean | string;
         /**
          * GraphQL SDL generation settings. This file is not necessary but
-         * may be nice for teams wishing to SDL in pull-request reivews or
+         * may be nice for teams wishing to review SDL in pull-requests or
          * just generally transitioning from a schema-first workflow.
          *
          * Defaults to false (disabled). Set to true to enable and emit into
