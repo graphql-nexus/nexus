@@ -1535,14 +1535,14 @@ export function makeSchemaInternal(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(config: SchemaOptions): GraphQLSchema {
-  const $config = resolveSchemaOptions(config);
-  const { schema, missingTypes } = makeSchemaInternal($config);
+export function makeSchema(options: SchemaOptions): GraphQLSchema {
+  const config = resolveSchemaOptions(options);
+  const { schema, missingTypes } = makeSchemaInternal(config);
 
-  if ($config.outputs.schema || $config.outputs.typegen) {
+  if (config.outputs.schema || config.outputs.typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata($config).generateArtifacts(schema).catch((e) => {
+    new TypegenMetadata(config).generateArtifacts(schema).catch((e) => {
       console.error(e);
     });
   }
