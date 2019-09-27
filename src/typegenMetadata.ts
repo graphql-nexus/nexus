@@ -30,19 +30,19 @@ export class TypegenMetadata {
    */
   async generateArtifacts(schema: NexusSchema) {
     const sortedSchema = this.sortSchema(schema);
-    if (this.config.schemaGeneration.enabled) {
+    if (this.config.outputs.schema) {
       await this.writeFile(
         "schema",
         this.generateSchemaFile(sortedSchema),
-        this.config.schemaGeneration.path
+        this.config.outputs.schema
       );
     }
-    if (this.config.typeGeneration.enabled) {
+    if (this.config.outputs.typegen) {
       const value = await this.generateTypesFile(
         sortedSchema,
         schema.extensions.nexus
       );
-      await this.writeFile("types", value, this.config.typeGeneration.path);
+      await this.writeFile("types", value, this.config.outputs.typegen);
     }
   }
 
