@@ -286,7 +286,8 @@ export interface BuilderConfig extends BuilderOptions {
 
 function resolveBuilderOptions(config: BuilderOptions): BuilderConfig {
   if (
-    typeof config.outputs === "object" &&
+    config.outputs !== undefined &&
+    typeof config.outputs !== "boolean" &&
     typeof config.outputs.schema === "string"
   ) {
     assertAbsolutePath(config.outputs.schema, "outputs.schema");
