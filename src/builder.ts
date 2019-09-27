@@ -1422,7 +1422,7 @@ export function buildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(
   types: any,
-  options?: BuilderOptions,
+  options: BuilderOptions = { outputs: false },
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const config = resolveBuilderOptions(options || {});
