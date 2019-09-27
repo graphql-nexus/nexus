@@ -148,7 +148,7 @@ exports[`typegen should print the full output 1`] = `
  * Do not make changes to this file directly
  */
 
-import * as t from \\"./tests/_helpers\\"
+import * as t from \\"./_helpers\\"
 
 
 

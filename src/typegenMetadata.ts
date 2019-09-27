@@ -20,8 +20,6 @@ import {
  * generated types and/or SDL artifact, including but not limited to:
  */
 export class TypegenMetadata {
-  protected typegenFile: string = "";
-
   constructor(protected config: BuilderConfig) {}
 
   /**
@@ -40,7 +38,8 @@ export class TypegenMetadata {
     if (this.config.outputs.typegen) {
       const value = await this.generateTypesFile(
         sortedSchema,
-        schema.extensions.nexus
+        schema.extensions.nexus,
+        this.config.outputs.typegen
       );
       await this.writeFile("types", value, this.config.outputs.typegen);
     }
@@ -109,13 +108,14 @@ export class TypegenMetadata {
    */
   async generateTypesFile(
     schema: GraphQLSchema,
-    extensions: NexusSchemaExtensions
+    extensions: NexusSchemaExtensions,
+    typegenFile: string
   ): Promise<string> {
     return new Typegen(
       schema,
       {
         ...(await this.getTypegenInfo(schema)),
-        typegenFile: this.typegenFile,
+        typegenFile,
       },
       extensions
     ).print();
@@ -128,14 +128,19 @@ export class TypegenMetadata {
           `Only one of typegenConfig and typegenAutoConfig should be specified, ignoring typegenConfig`
         );
       }
-      return this.config.typegenConfig(schema, this.typegenFile);
+      return this.config.typegenConfig(
+        schema,
+        this.config.outputs.typegen || ""
+      );
     }
+
     if (this.config.typegenAutoConfig) {
       return typegenAutoConfig(this.config.typegenAutoConfig)(
         schema,
-        this.typegenFile
+        this.config.outputs.typegen || ""
       );
     }
+
     return {
       headers: [TYPEGEN_HEADER],
       imports: [],
