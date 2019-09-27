@@ -1,4 +1,9 @@
-import { objectType, makeSchemaInternal, makeSchema, UNKNOWN_TYPE_SCALAR } from "../src/core";
+import {
+  objectType,
+  makeSchemaInternal,
+  makeSchema,
+  UNKNOWN_TYPE_SCALAR,
+} from "../src/core";
 import { Kind } from "graphql";
 
 describe("unknownType", () => {
@@ -34,7 +39,7 @@ describe("unknownType", () => {
     expect(() => {
       makeSchemaInternal({
         types: [Query, User],
-        outputs: false,
+        outputs: { typegen: false, schema: false },
       });
     }).not.toThrowError();
   });
@@ -42,7 +47,7 @@ describe("unknownType", () => {
   test("there should be some missing types", () => {
     const { missingTypes } = makeSchemaInternal({
       types: [Query, User],
-      outputs: false,
+      outputs: { schema: false, typegen: false },
     });
 
     expect(Object.keys(missingTypes).length).toEqual(1);
@@ -60,7 +65,7 @@ describe("unknownType", () => {
         shouldGenerateArtifacts: true,
       });
     } catch (e) {
-      expect(e).toMatchSnapshot()
+      expect(e).toMatchSnapshot();
     }
   });
 
