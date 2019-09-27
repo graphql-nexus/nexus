@@ -1483,7 +1483,7 @@ export type NexusSchema = GraphQLSchema & {
  * from this one day.
  */
 export function makeSchemaInternal(
-  options: SchemaConfig,
+  config: SchemaConfig,
   schemaBuilder?: SchemaBuilder
 ): { schema: NexusSchema; missingTypes: Record<string, MissingType> } {
   const {
@@ -1491,7 +1491,7 @@ export function makeSchemaInternal(
     dynamicFields,
     rootTypings,
     missingTypes,
-  } = buildTypesInternal(options.types, options, schemaBuilder);
+  } = buildTypesInternal(config.types, config, schemaBuilder);
   const { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
