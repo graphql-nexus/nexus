@@ -345,9 +345,9 @@ export interface SchemaConfig extends BuilderConfig {
   types: any;
 }
 
-function resolveSchemaOptions(optionsSelected: SchemaOptions): SchemaConfig {
+function resolveSchemaOptions(options: SchemaOptions): SchemaConfig {
   // There is no additional processing for schema options
-  return resolveBuilderOptions(optionsSelected) as SchemaConfig;
+  return resolveBuilderOptions(options) as SchemaConfig;
 }
 
 export type TypeToWalk =
@@ -1413,6 +1413,11 @@ export interface BuildTypes<
   missingTypes: Record<string, MissingType>;
 }
 
+/**
+ * Builds the types, normalizing the "types" passed into the schema for a
+ * better developer experience. This is primarily useful for testing
+ * type generation
+ */
 export function buildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(
@@ -1425,9 +1430,7 @@ export function buildTypes<
 }
 
 /**
- * Builds the types, normalizing the "types" passed into the schema for a
- * better developer experience. This is primarily useful for testing
- * type generation
+ * Internal build types woring with config rather than options.
  */
 export function buildTypesInternal<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
