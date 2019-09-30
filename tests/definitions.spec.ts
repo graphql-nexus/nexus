@@ -29,9 +29,10 @@ describe("enumType", () => {
       name: "PrimaryColors",
       members: ["RED", "YELLOW", "BLUE"],
     });
-    const types = buildTypes<{ PrimaryColors: GraphQLEnumType }>([
-      PrimaryColors,
-    ]);
+    const types = buildTypes<{ PrimaryColors: GraphQLEnumType }>({
+      types: [PrimaryColors],
+      outputs: false,
+    });
     expect(types.typeMap.PrimaryColors).toBeInstanceOf(GraphQLEnumType);
     expect(types.typeMap.PrimaryColors.getValues().map((v) => v.value)).toEqual(
       ["RED", "YELLOW", "BLUE"]
@@ -43,7 +44,10 @@ describe("enumType", () => {
       name: "Colors",
       members: NativeColors,
     });
-    const types = buildTypes<{ Colors: GraphQLEnumType }>([Colors]);
+    const types = buildTypes<{ Colors: GraphQLEnumType }>({
+      types: [Colors],
+      outputs: false,
+    });
 
     expect(types.typeMap.Colors).toBeInstanceOf(GraphQLEnumType);
     expect(types.typeMap.Colors.getValues()).toEqual(
@@ -69,7 +73,10 @@ describe("enumType", () => {
       name: "Numbers",
       members: NativeNumbers,
     });
-    const types = buildTypes<{ Numbers: GraphQLEnumType }>([Numbers]);
+    const types = buildTypes<{ Numbers: GraphQLEnumType }>({
+      types: [Numbers],
+      outputs: false,
+    });
 
     expect(types.typeMap.Numbers).toBeInstanceOf(GraphQLEnumType);
     expect(types.typeMap.Numbers.getValues()).toEqual(
@@ -95,7 +102,10 @@ describe("enumType", () => {
       name: "Internal",
       members: [{ name: "A", value: "--A--" }, { name: "B", value: "--B--" }],
     });
-    const types = buildTypes<{ Internal: GraphQLEnumType }>([Internal]);
+    const types = buildTypes<{ Internal: GraphQLEnumType }>({
+      types: [Internal],
+      outputs: false,
+    });
     expect(types.typeMap.Internal.getValues().map((v) => v.name)).toEqual([
       "A",
       "B",
@@ -116,7 +126,7 @@ describe("enumType", () => {
     });
     const types = buildTypes<{
       MappedObj: GraphQLEnumType;
-    }>([MappedObj]);
+    }>({ types: [MappedObj], outputs: false });
     expect(types.typeMap.MappedObj.getValues().map((v) => v.name)).toEqual([
       "a",
       "b",
@@ -133,7 +143,10 @@ describe("enumType", () => {
         name: "NoMembers",
         members: [],
       });
-      const types = buildTypes<{ NoMembers: GraphQLEnumType }>([NoMembers]);
+      const types = buildTypes<{ NoMembers: GraphQLEnumType }>({
+        types: [NoMembers],
+        outputs: false,
+      });
       expect(types.typeMap.NoMembers.getValues()).toHaveLength(0);
     }).toThrow("must have at least one member");
   });
@@ -152,7 +165,10 @@ describe("objectType", () => {
         t.string("nestedList", { list: [false, true] });
       },
     });
-    const type = buildTypes<{ Account: GraphQLObjectType }>([Account]);
+    const type = buildTypes<{ Account: GraphQLObjectType }>({
+      types: [Account],
+      outputs: false,
+    });
     const fields = type.typeMap.Account.getFields();
     expect(Object.keys(fields).sort()).toEqual([
       "email",
@@ -182,12 +198,10 @@ describe("extendType", () => {
     });
     expect(
       Object.keys(
-        buildTypes<{ Query: GraphQLObjectType }>([
-          GetUser,
-          GetPost,
-          PostObject,
-          UserObject,
-        ]).typeMap.Query.getFields()
+        buildTypes<{ Query: GraphQLObjectType }>({
+          types: [GetUser, GetPost, PostObject, UserObject],
+          outputs: false,
+        }).typeMap.Query.getFields()
       )
     ).toMatchSnapshot();
   });
@@ -195,40 +209,46 @@ describe("extendType", () => {
 
 describe("inputObjectType", () => {
   it("should output lists properly, #33", () => {
-    const buildTypesMap = buildTypes([
-      inputObjectType({
-        name: "ExtraBasketInput",
-        definition(t) {
-          t.string("foo");
-        },
-      }),
-      inputObjectType({
-        name: "AddToBasketInput",
-        definition(t) {
-          t.list.field("extras", { type: "ExtraBasketInput" });
-        },
-      }),
-    ]);
+    const buildTypesMap = buildTypes({
+      types: [
+        inputObjectType({
+          name: "ExtraBasketInput",
+          definition(t) {
+            t.string("foo");
+          },
+        }),
+        inputObjectType({
+          name: "AddToBasketInput",
+          definition(t) {
+            t.list.field("extras", { type: "ExtraBasketInput" });
+          },
+        }),
+      ],
+      outputs: false,
+    });
     expect(printType(buildTypesMap.typeMap.AddToBasketInput)).toMatchSnapshot();
   });
 });
 
 describe("extendInputType", () => {
   it("should allow extending input objects", () => {
-    const buildTypesMap = buildTypes([
-      inputObjectType({
-        name: "InputTest",
-        definition(t) {
-          t.string("hello");
-        },
-      }),
-      extendInputType({
-        type: "InputTest",
-        definition(t) {
-          t.string("world");
-        },
-      }),
-    ]);
+    const buildTypesMap = buildTypes({
+      types: [
+        inputObjectType({
+          name: "InputTest",
+          definition(t) {
+            t.string("hello");
+          },
+        }),
+        extendInputType({
+          type: "InputTest",
+          definition(t) {
+            t.string("world");
+          },
+        }),
+      ],
+      outputs: false,
+    });
     expect(printType(buildTypesMap.typeMap.InputTest)).toMatchSnapshot();
   });
 });

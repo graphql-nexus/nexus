@@ -1325,12 +1325,11 @@ export interface BuildTypes<
 export function buildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(
-  types: any,
-  config: BuilderConfig = { outputs: false },
+  config: SchemaConfig,
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
-  addTypes(builder, types);
+  addTypes(builder, config.types);
   return builder.getFinalTypeMap();
 }
 
@@ -1377,7 +1376,6 @@ export function makeSchemaInternal(
   schemaBuilder?: SchemaBuilder
 ): { schema: NexusSchema; missingTypes: Record<string, MissingType> } {
   const { typeMap, dynamicFields, rootTypings, missingTypes } = buildTypes(
-    options.types,
     options,
     schemaBuilder
   );
