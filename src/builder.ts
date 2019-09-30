@@ -170,7 +170,13 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
   }
 );
 
+export interface Plugin {
+  // TODO TS 3.6 Generator type
+  onBuild?: (types: any, builder: SchemaBuilder) => Generator; //Generator<void, void, void>;
+}
+
 export interface BuilderConfig {
+  plugins?: Plugin[];
   /**
    * When the schema starts and `process.env.NODE_ENV !== "production"`,
    * artifact files are auto-generated containing the .graphql definitions of
@@ -1318,6 +1324,24 @@ export interface BuildTypes<
 }
 
 /**
+ * Middleware runner
+ * TODO generalize
+ * TODO types
+ */
+const withMiddleware = (middlewares: any[], action: any) => {
+  const runningStack = [];
+  for (const middleware of middlewares) {
+    const running = middleware();
+    running.next();
+    runningStack.push(running);
+  }
+  action();
+  for (const running of runningStack) {
+    running.next();
+  }
+};
+
+/**
  * Builds the types, normalizing the "types" passed into the schema for a
  * better developer experience. This is primarily useful for testing
  * type generation
@@ -1330,7 +1354,12 @@ export function buildTypes<
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
-  addTypes(builder, types);
+  withMiddleware(
+    (config.plugins || [])
+      .filter((p) => p.onBuild)
+      .map((p) => () => p.onBuild!(types, builder)),
+    () => addTypes(builder, types)
+  );
   return builder.getFinalTypeMap();
 }
 
