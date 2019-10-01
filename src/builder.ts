@@ -1336,9 +1336,8 @@ export function buildTypes<
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
-  (config.plugins || [])
-    .filter((p) => p.onBuild)
-    .forEach((p) => () => p.onBuild!(types, builder));
+  const plugins = config.plugins || [];
+  plugins.filter((p) => p.onBuild).forEach((p) => p.onBuild!(types, builder));
   addTypes(builder, types);
   return builder.getFinalTypeMap();
 }
