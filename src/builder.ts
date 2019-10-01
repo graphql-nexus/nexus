@@ -171,8 +171,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
 );
 
 export interface Plugin {
-  // TODO TS 3.6 Generator type
-  onBuild?: (types: any, builder: SchemaBuilder) => Generator; //Generator<void, void, void>;
+  onBeforeBuild?: (types: BlockDef[]) => BlockDef[];
 }
 
 export interface BuilderConfig {
@@ -281,6 +280,16 @@ export type DynamicOutputProperties = Record<
   DynamicOutputPropertyDef<string>
 >;
 
+export type TypeDef = AllNexusNamedTypeDefs | GraphQLNamedType;
+
+export type BlockDef =
+  | TypeDef
+  | NexusExtendInputTypeDef<string>
+  | NexusExtendTypeDef<string>
+  | DynamicInputMethodDef<string>
+  | DynamicOutputMethodDef<string>
+  | DynamicOutputPropertyDef<string>;
+
 /**
  * Builds all of the types, properly accounts for any using "mix".
  * Since the enum types are resolved synchronously, these need to guard for
@@ -372,6 +381,15 @@ export class SchemaBuilder {
     return this.config;
   }
 
+  // /**
+  //  * Find out if a type has been defined or not, and if it has been, return it.
+  //  * This is useful, for example, for plugins that want to somehow adapt to the
+  //  * user's type defs.
+  //  */
+  // getNamedType(name: string): null | GraphQLNamedType {
+  //   return this.finalTypeMap[name] || null;
+  // }
+
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls
    * it into an internal "type registry". It also does an initial pass
@@ -381,16 +399,7 @@ export class SchemaBuilder {
    *
    * @param typeDef
    */
-  addType(
-    typeDef:
-      | AllNexusNamedTypeDefs
-      | NexusExtendInputTypeDef<string>
-      | NexusExtendTypeDef<string>
-      | GraphQLNamedType
-      | DynamicInputMethodDef<string>
-      | DynamicOutputMethodDef<string>
-      | DynamicOutputPropertyDef<string>
-  ) {
+  addType(typeDef: BlockDef) {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
       return;
@@ -1337,34 +1346,62 @@ export function buildTypes<
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
   const plugins = config.plugins || [];
-  plugins.filter((p) => p.onBuild).forEach((p) => p.onBuild!(types, builder));
-  addTypes(builder, types);
+  const blocks = unwrapBlocks(types, builder);
+  const pluggedBlocks = plugins
+    .filter((p) => p.onBeforeBuild)
+    .reduce((blocksAcc, p) => p.onBeforeBuild!(blocksAcc), blocks);
+  pluggedBlocks.forEach(builder.addType);
   return builder.getFinalTypeMap();
 }
 
-function addTypes(builder: SchemaBuilder, types: any) {
-  if (!types) {
-    return;
+function unwrapBlocks(blocks: any, builder: SchemaBuilder): BlockDef[] {
+  if (!blocks) {
+    return [];
   }
-  if (isNexusWrappedType(types)) {
-    addTypes(builder, types.fn(builder));
-    return;
+
+  return unwrapBlocksDo([], blocks, builder);
+}
+
+function unwrapBlocksDo(
+  acc: BlockDef[],
+  givenBlockDefs: object,
+  builder: SchemaBuilder
+): BlockDef[] {
+  // NOTE We mutate `acc` over purity for performance.
+
+  if (isNexusWrappedType(givenBlockDefs)) {
+    acc.push(givenBlockDefs.fn(builder));
+    return acc;
   }
+
   if (
-    isNexusNamedTypeDef(types) ||
-    isNexusExtendTypeDef(types) ||
-    isNexusExtendInputTypeDef(types) ||
-    isNamedType(types) ||
-    isNexusDynamicInputMethod(types) ||
-    isNexusDynamicOutputMethod(types) ||
-    isNexusDynamicOutputProperty(types)
+    isNexusNamedTypeDef(givenBlockDefs) ||
+    isNexusExtendTypeDef(givenBlockDefs) ||
+    isNexusExtendInputTypeDef(givenBlockDefs) ||
+    isNamedType(givenBlockDefs) ||
+    isNexusDynamicInputMethod(givenBlockDefs) ||
+    isNexusDynamicOutputMethod(givenBlockDefs) ||
+    isNexusDynamicOutputProperty(givenBlockDefs)
   ) {
-    builder.addType(types);
-  } else if (Array.isArray(types)) {
-    types.forEach((typeDef) => addTypes(builder, typeDef));
-  } else if (isObject(types)) {
-    Object.keys(types).forEach((key) => addTypes(builder, types[key]));
+    acc.push(givenBlockDefs);
+    return acc;
   }
+
+  if (Array.isArray(givenBlockDefs)) {
+    return givenBlockDefs.reduce(
+      (acc2, typeDef) => unwrapBlocksDo(acc2, typeDef, builder),
+      acc
+    );
+  }
+
+  if (isObject(givenBlockDefs)) {
+    return Object.values(givenBlockDefs).reduce(
+      (acc2, typeDef) => unwrapBlocksDo(acc2, typeDef, builder),
+      acc
+    );
+  }
+
+  return acc;
 }
 
 export type NexusSchemaExtensions = {
