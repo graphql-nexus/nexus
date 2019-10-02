@@ -127,6 +127,13 @@ import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
 
+/**
+ * TODO Refactor builder e.g.
+ * this.walkTypes()
+ * this.walkDeferredDynamics() => { this.deferredDynamics.forEach(f => f()); this.walkTypes() }
+ * this.buildTypes() =>
+ */
+
 export type Maybe<T> = T | null;
 
 type NexusShapedOutput = {
@@ -169,6 +176,18 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
     rootTyping: "never",
   }
 );
+
+const createNoop = () =>
+  new Proxy(
+    {},
+    {
+      get(target, prop, receiver) {
+        const fn = () => receiver;
+        Object.setPrototypeOf(fn, receiver);
+        return fn;
+      },
+    }
+  );
 
 export interface BuilderConfig {
   /**
@@ -300,6 +319,10 @@ export class SchemaBuilder {
    * GraphQL Nexus and haven't been processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {};
+  /**
+   * TBD
+   */
+  protected deferredDynamics: Function[] = []; // FIXME type
   /**
    * All "extensions" to types (adding fields on types from many locations)
    */
@@ -488,6 +511,8 @@ export class SchemaBuilder {
 
   getFinalTypeMap(): BuildTypes<any> {
     this.finalized = true;
+    this.walkTypes();
+    this.deferredDynamics.forEach((f) => f());
     this.walkTypes();
     // If Query isn't defined, set it to null so it falls through to "missingType"
     if (!this.pendingTypeMap.Query) {
@@ -1120,55 +1145,94 @@ export class SchemaBuilder {
       typeName: obj.name,
       addField: (f) => this.maybeTraverseInputType(f),
       addDynamicInputFields: (block, isList) =>
-        this.addDynamicInputFields(block, isList),
+        this.addDynamicInputFields(block, isList, true),
       warn: () => {},
     });
     obj.definition(definitionBlock);
     return obj;
   }
 
-  addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean) {
+  addDynamicInputFields(
+    block: InputDefinitionBlock<any>,
+    isList: boolean,
+    defer: boolean = false
+  ) {
     eachObj(this.dynamicInputFields, (val, methodName) => {
       if (typeof val === "string") {
         return this.addDynamicScalar(methodName, val, block);
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
-        const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
-        return val.value.factory({
-          args: config,
-          typeDef: block,
-          builder: this,
-          typeName: block.typeName,
-        });
+        const dynamicDefinition = () => {
+          const config = isList
+            ? [args[0], { list: isList, ...args[1] }]
+            : args;
+          return val.value.factory({
+            args: config,
+            typeDef: block,
+            builder: this,
+            typeName: block.typeName,
+          });
+        };
+
+        if (defer) {
+          this.deferredDynamics.push(dynamicDefinition);
+          return createNoop();
+        } else {
+          return dynamicDefinition();
+        }
       };
     });
   }
 
-  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean) {
+  addDynamicOutputMembers(
+    block: OutputDefinitionBlock<any>,
+    isList: boolean,
+    defer: boolean = false
+  ) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === "string") {
         return this.addDynamicScalar(methodName, val, block);
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
-        const config = isList ? [args[0], { list: isList, ...args[1] }] : args;
-        return val.value.factory({
-          args: config,
-          typeDef: block,
-          builder: this,
-          typeName: block.typeName,
-        });
-      };
-    });
-    eachObj(this.dynamicOutputProperties, (val, propertyName) => {
-      Object.defineProperty(block, propertyName, {
-        get() {
+        const dynamicDefinition = () => {
+          const config = isList
+            ? [args[0], { list: isList, ...args[1] }]
+            : args;
           return val.value.factory({
+            args: config,
             typeDef: block,
             builder: this,
             typeName: block.typeName,
           });
+        };
+
+        if (defer) {
+          this.deferredDynamics.push(dynamicDefinition);
+          return createNoop();
+        } else {
+          return dynamicDefinition();
+        }
+      };
+    });
+    eachObj(this.dynamicOutputProperties, (val, propertyName) => {
+      Object.defineProperty(block, propertyName, {
+        get: () => {
+          const dynamicDefinition = () => {
+            return val.value.factory({
+              typeDef: block,
+              builder: this,
+              typeName: block.typeName,
+            });
+          };
+
+          if (defer) {
+            this.deferredDynamics.push(dynamicDefinition);
+            return createNoop();
+          } else {
+            return dynamicDefinition();
+          }
         },
         enumerable: true,
       });
@@ -1205,7 +1269,7 @@ export class SchemaBuilder {
       addInterfaces: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
-        this.addDynamicOutputMembers(block, isList),
+        this.addDynamicOutputMembers(block, isList, true),
       warn: () => {},
     });
     obj.definition(definitionBlock);
@@ -1218,7 +1282,7 @@ export class SchemaBuilder {
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
-        this.addDynamicOutputMembers(block, isList),
+        this.addDynamicOutputMembers(block, isList, true),
       warn: () => {},
     });
     obj.definition(definitionBlock);

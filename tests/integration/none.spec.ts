@@ -2,7 +2,7 @@ import ts from "typescript";
 import { join } from "path";
 
 it("can be compiled with no generated types present", () => {
-  expect([join(__dirname, "./_app.ts")]).toTypeCheck({
+  (expect([join(__dirname, "./_app.ts")]) as any).toTypeCheck({
     sourceMap: false,
     noEmitOnError: true,
     esModuleInterop: true,
