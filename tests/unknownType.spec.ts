@@ -1,4 +1,9 @@
-import { objectType, makeSchemaInternal, makeSchema, UNKNOWN_TYPE_SCALAR } from "../src/core";
+import {
+  objectType,
+  makeSchemaInternal,
+  makeSchema,
+  UNKNOWN_TYPE_SCALAR,
+} from "../src/core";
 import { Kind } from "graphql";
 
 describe("unknownType", () => {
@@ -60,7 +65,7 @@ describe("unknownType", () => {
         shouldGenerateArtifacts: true,
       });
     } catch (e) {
-      expect(e).toMatchSnapshot()
+      expect(e).toMatchSnapshot();
     }
   });
 
