@@ -254,16 +254,6 @@ export interface SchemaConfig extends BuilderConfig {
   types: any;
 }
 
-export type Plugin = (lifecycle: Lifecycle) => void;
-
-export type Lifecycle = {
-  onBuild: onBuildHook;
-};
-
-export type onBuildHook = (
-  lifecycleBuildEventHandler: (builder: SchemaBuilder) => void
-) => void;
-
 export type TypeToWalk =
   | { type: "named"; value: GraphQLNamedType }
   | { type: "input"; value: NexusShapedInput }
