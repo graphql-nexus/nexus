@@ -285,9 +285,13 @@ export interface BuilderConfig extends BuilderOptions {
 }
 
 function resolveBuilderOptions(config: BuilderOptions): BuilderConfig {
+  // For JS
+  if (config.outputs === null) {
+    throw new Error("config.outputs cannot be of type `null`.");
+  }
+
   if (
-    config.outputs !== undefined &&
-    typeof config.outputs !== "boolean" &&
+    typeof config.outputs === "object" &&
     typeof config.outputs.schema === "string"
   ) {
     assertAbsolutePath(config.outputs.schema, "outputs.schema");
