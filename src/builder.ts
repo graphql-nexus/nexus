@@ -172,7 +172,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
   }
 );
 
-export interface BuilderOptions {
+export interface BuilderConfig {
   /**
    * Generated artifact settings. Set to false to disable all.
    * Set to true to enable all and use default paths. Leave
@@ -244,7 +244,7 @@ export interface BuilderOptions {
   nonNullDefaults?: NonNullConfig;
 }
 
-export interface SchemaOptions extends BuilderOptions {
+export interface SchemaConfig extends BuilderConfig {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -274,17 +274,17 @@ export interface TypegenInfo {
 }
 
 /**
- * The resolved builder options wherein optional fields have been
+ * The resolved builder config wherein optional fields have been
  * given their fallbacks, etc.
  */
-export interface BuilderConfig extends BuilderOptions {
+export interface InternalBuilderConfig extends BuilderConfig {
   outputs: {
     schema: false | string;
     typegen: false | string;
   };
 }
 
-function resolveBuilderOptions(config: BuilderOptions): BuilderConfig {
+function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
   // For JS
   if (config.outputs === null) {
     throw new Error("config.outputs cannot be of type `null`.");
@@ -341,18 +341,18 @@ function resolveBuilderOptions(config: BuilderOptions): BuilderConfig {
   }
 
   // HACK Using `any` becuase TypeScript doesn't seem to be smart enough
-  // yet to understand the above checks make `config` a valid `ResolvedSchemaOptions`.
+  // yet to understand the above checks make `config` a valid `internalConfig`.
   //
-  return config as BuilderConfig;
+  return config as InternalBuilderConfig;
 }
 
-export interface SchemaConfig extends BuilderConfig {
+export interface InternalSchemaConfig extends InternalBuilderConfig {
   types: any;
 }
 
-function resolveSchemaOptions(options: SchemaOptions): SchemaConfig {
-  // There is no additional processing for schema options
-  return resolveBuilderOptions(options) as SchemaConfig;
+function resolveSchemaConfig(config: SchemaConfig): InternalSchemaConfig {
+  // There is no additional processing for schema config
+  return resolveBuilderConfig(config) as InternalSchemaConfig;
 }
 
 export type TypeToWalk =
@@ -455,16 +455,16 @@ export class SchemaBuilder {
    */
   protected finalized: boolean = false;
 
-  constructor(protected options: BuilderOptions) {
+  constructor(protected config: BuilderConfig) {
     this.nonNullDefaults = {
       input: false,
       output: true,
-      ...options.nonNullDefaults,
+      ...config.nonNullDefaults,
     };
   }
 
-  getConfig(): BuilderOptions {
-    return this.options;
+  getConfig(): BuilderConfig {
+    return this.config;
   }
 
   /**
@@ -1427,11 +1427,11 @@ export function buildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(
   types: any,
-  options: BuilderOptions = { outputs: false },
+  config: BuilderConfig = { outputs: false },
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
-  const config = resolveBuilderOptions(options || {});
-  return buildTypesInternal<TypeMapDefs>(types, config, schemaBuilder);
+  const internalConfig = resolveBuilderConfig(config || {});
+  return buildTypesInternal<TypeMapDefs>(types, internalConfig, schemaBuilder);
 }
 
 /**
@@ -1441,7 +1441,7 @@ export function buildTypesInternal<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(
   types: any,
-  config: BuilderConfig,
+  config: InternalBuilderConfig,
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
@@ -1488,7 +1488,7 @@ export type NexusSchema = GraphQLSchema & {
  * from this one day.
  */
 export function makeSchemaInternal(
-  config: SchemaConfig,
+  config: InternalSchemaConfig,
   schemaBuilder?: SchemaBuilder
 ): { schema: NexusSchema; missingTypes: Record<string, MissingType> } {
   const {
@@ -1540,14 +1540,14 @@ export function makeSchemaInternal(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(options: SchemaOptions): GraphQLSchema {
-  const config = resolveSchemaOptions(options);
-  const { schema, missingTypes } = makeSchemaInternal(config);
+export function makeSchema(config: SchemaConfig): GraphQLSchema {
+  const internalConfig = resolveSchemaConfig(config);
+  const { schema, missingTypes } = makeSchemaInternal(internalConfig);
 
-  if (config.outputs.schema || config.outputs.typegen) {
+  if (internalConfig.outputs.schema || internalConfig.outputs.typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(config).generateArtifacts(schema).catch((e) => {
+    new TypegenMetadata(internalConfig).generateArtifacts(schema).catch((e) => {
       console.error(e);
     });
   }
@@ -1562,12 +1562,12 @@ export function makeSchema(options: SchemaOptions): GraphQLSchema {
  * and waited upon.
  */
 export async function generateSchema(
-  options: SchemaOptions
+  config: SchemaConfig
 ): Promise<NexusSchema> {
-  const config = resolveSchemaOptions(options);
-  const { schema, missingTypes } = makeSchemaInternal(config);
+  const internalConfig = resolveSchemaConfig(config);
+  const { schema, missingTypes } = makeSchemaInternal(internalConfig);
   assertNoMissingTypes(schema, missingTypes);
-  await new TypegenMetadata(config).generateArtifacts(schema);
+  await new TypegenMetadata(internalConfig).generateArtifacts(schema);
   return schema;
 }
 

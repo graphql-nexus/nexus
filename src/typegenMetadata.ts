@@ -9,7 +9,7 @@ import {
 } from "./typegenFormatPrettier";
 import {
   TypegenInfo,
-  NexusSchema,
+  InternalBuilderConfig
   NexusSchemaExtensions,
   BuilderConfig,
 } from "./builder";
@@ -23,7 +23,7 @@ export class TypegenMetadata {
   constructor(protected config: BuilderConfig) {}
 
   /**
-   * Generates the artifacts of the build based on what we
+   * Generates the artifacts of BuilderConfigInternaled on what we
    * know about the schema and how it was defined.
    */
   async generateArtifacts(schema: NexusSchema) {
