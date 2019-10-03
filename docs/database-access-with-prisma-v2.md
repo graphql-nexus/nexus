@@ -119,7 +119,7 @@ const Mutation = objectType({
   name: "Mutation",
   definition(t) {
     // Expose only the `createTodo` mutation (`updateTodo` and `deleteTodo` not exposed)
-    t.crud.createTodo();
+    t.crud.createOneTodo();
 
     // Add a custom `markAsDone` mutation
     t.field("markAsDone", {
@@ -183,7 +183,7 @@ type Query {
 
 # The customized "Mutation" building block
 type Mutation {
-  createTodo(data: TodoCreateInput!): Todo!
+  createOneTodo(data: TodoCreateInput!): Todo!
   markAsDone(id: ID): Todo
 }
 
@@ -203,8 +203,8 @@ type Todo {
 
 You can find some easy-to-run example projects based on `nexus-prisma` in the [`photonjs repository`](https://github.com/prisma/photonjs/tree/master/examples):
 
-- [GraphQL](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql): Simple setup keeping the entire schema in a single file.
-- [GraphQL + Auth](https://github.com/prisma/photonjs/tree/master/examples/typescript/graphql-auth): Advanced setup including authentication and authorization and a modularized schema.
+- [GraphQL](https://github.com/prisma/prisma-examples/blob/prisma2/typescript/graphql/README.md): This example shows how to implement a GraphQL server with TypeScript based on Photon.js, graphql-yoga and GraphQL Nexus.
+- [GraphQL + Auth](https://github.com/prisma/prisma-examples/blob/prisma2/typescript/graphql-auth/README.md): This example shows how to implement a GraphQL server with an email-password-based authentication workflow and authentication rules, based on Prisma, graphql-yoga, graphql-shield & GraphQL Nexus.
 
 ## Getting started
 
@@ -288,7 +288,7 @@ model User {
 
 type Post {
   id        Int       @id
-  createdAt DateTime  @createdAt
+  createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   published Boolean   @default(false)
   title     String
@@ -327,7 +327,7 @@ model User {
 
 model Post {
   id        Int       @id
-  createdAt DateTime  @createdAt
+  createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   published Boolean   @default(false)
   title     String
@@ -386,15 +386,15 @@ const Query = objectType({
 const Mutation = objectType({
   name: "Mutation",
   definition(t) {
-    t.crud.createUser();
-    t.crud.updateUser();
-    t.crud.deleteUser();
-    t.crud.upsertUser();
+    t.crud.createOneUser();
+    t.crud.updateOneUser();
+    t.crud.deleteOneUser();
+    t.crud.upsertOneUser();
 
-    t.crud.createPost();
-    t.crud.updatePost();
-    t.crud.deletePost();
-    t.crud.upsertPost();
+    t.crud.createOnePost();
+    t.crud.updateOnePost();
+    t.crud.deleteOnePost();
+    t.crud.upsertOnePost();
   },
 });
 
@@ -472,18 +472,18 @@ type Query {
 }
 
 type Mutation {
-  createPost(data: PostCreateInput!): Post!
-  createUser(data: UserCreateInput!): User!
-  deletePost(where: PostWhereUniqueInput!): Post
-  deleteUser(where: UserWhereUniqueInput!): User
-  updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  upsertPost(
+  createOnePost(data: PostCreateInput!): Post!
+  createOneUser(data: UserCreateInput!): User!
+  deleteOnePost(where: PostWhereUniqueInput!): Post
+  deleteOneUser(where: UserWhereUniqueInput!): User
+  updateOnePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
+  updateOneUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  upsertOnePost(
     create: PostCreateInput!
     update: PostUpdateInput!
     where: PostWhereUniqueInput!
   ): Post!
-  upsertUser(
+  upsertOneUser(
     create: UserCreateInput!
     update: UserUpdateInput!
     where: UserWhereUniqueInput!
@@ -653,10 +653,10 @@ Here's how to implement them in your GraphQL server code:
 const Mutation = objectType({
   name: "Mutation",
   definition(t) {
-    t.crud.createUser();
-    t.crud.updateUser();
-    t.crud.deleteUser();
-    t.crud.deletePost();
+    t.crud.createOneUser();
+    t.crud.updateOneUser();
+    t.crud.deleteOneUser();
+    t.crud.deleteOnePost();
 
     t.field("createDraft", {
       type: "Post",
@@ -722,9 +722,10 @@ As an example, assume you have a `User` type in your Prisma schema. `nexus-prism
 
 - Mutations
 
-  - `createUser(...): User!`: Creates a new record
-  - `updateUser(...): User`: Updates a record
-  - `deleteUser(...): User`: Deletes a record
+  - `createOneUser(...): User!`: Creates a new record
+  - `updateOneUser(...): User`: Updates a record
+  - `upsertOneUser(...): User`: Updates an existing or creates a new record
+  - `deleteOneUser(...): User`: Deletes a record
   - `updateManyUsers(...): BatchPayload!`: Updates many records in bulk
   - `deleteManyUsers(...): BatchPayload!`: Deletes many records in bulk
 
@@ -891,10 +892,10 @@ Given a prisma model name `User`, `t.crud` will expose the following field metho
 
 **On the `Mutation` type**
 
-- `t.crud.createUser()`
-- `t.crud.deleteUser()`
-- `t.crud.updateUser()`
-- `t.crud.upsertUser()`
+- `t.crud.createOneUser()`
+- `t.crud.deleteOneUser()`
+- `t.crud.updateOneUser()`
+- `t.crud.upsertOneUser()`
 - `t.crud.updateManyUser()`
 - `t.crud.deleteManyUser()`
 
