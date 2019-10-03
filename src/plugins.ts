@@ -1,5 +1,4 @@
 import { SchemaBuilder, NexusAcceptedTypeDef } from "./builder";
-import { id } from "./utils";
 
 /**
  * This is a read-only builder-like api exposed to plugins in the onInstall
@@ -15,19 +14,13 @@ type BuilderFacade = {
  * particular extension points. Plugins are just functions that receive hooks
  * which can then be registered upon with callbacks.
  */
-export type Plugin = (hooks: Hooks) => void;
-
-type Hooks = {
-  onInstall: OnInstallHook;
+export type Plugin = {
+  onInstall: OnInstallHandler;
 };
-
-type OnInstallHook = (onInstallHandler: OnInstallHandler) => void;
 
 type OnInstallHandler = (
   builder: BuilderFacade
-) => {
-  types: NexusAcceptedTypeDef[];
-};
+) => { types: NexusAcceptedTypeDef[] };
 
 /**
  * This is the interface that Nexus uses to drive plugins meaning triggering the
@@ -35,26 +28,6 @@ type OnInstallHandler = (
  */
 type PluginController = {
   triggerOnInstall: () => void;
-};
-
-/**
- * This represents the internal data of a plugin controller.
- */
-type PluginControllerState = {
-  onInstallHandler: OnInstallHandler;
-};
-
-/**
- * Create new plugin controller state data with default values.
- */
-const createControllerState = (): PluginControllerState => {
-  const defaultOnInstallHandler = () => ({
-    types: [],
-  });
-
-  return {
-    onInstallHandler: defaultOnInstallHandler,
-  };
 };
 
 /**
@@ -66,20 +39,14 @@ export const initializePlugin = (
   builder: SchemaBuilder,
   plugin: Plugin
 ): PluginController => {
-  const state = createControllerState();
-
-  plugin({
-    onInstall: (handler) => {
-      state.onInstallHandler = handler;
-    },
-  });
-
   return {
     triggerOnInstall: () => {
-      const { types } = state.onInstallHandler({
-        hasType: builder.hasType,
-      });
-      types.forEach(builder.addType);
+      if (plugin.onInstall) {
+        const { types } = plugin.onInstall({
+          hasType: builder.hasType,
+        });
+        types.forEach(builder.addType);
+      }
     },
   };
 };
@@ -89,7 +56,7 @@ export const initializePlugin = (
  * import the Plugin type. Feel free to do this instead:
  *
  *     import { Plugin } from "nexus"
- *     export myPlugin: Plugin = (hooks) => { ... }
+ *     export default { ... } as Plugin
  *
  */
-export const create = <Plugin>id;
+export const create = (plugin: Plugin): Plugin => plugin;
