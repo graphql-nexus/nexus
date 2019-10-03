@@ -1,7 +1,7 @@
 // All of the Public API definitions
 export {
-  Config as PluginConfig,
   create as createPlugin,
+  Config as PluginConfig,
   BuilderLens as PluginBuilderLens,
 } from "./plugins";
 export { buildTypes, makeSchema } from "./builder";
