@@ -243,10 +243,3 @@ export function relativePathTo(
  * indexed by some property, e.g. a list of users indexed by email.
  */
 export type Index<T> = Record<string, T>;
-
-/**
- * Returns its input. For example:
- *
- *     id(1) // -> 1
- */
-export const id = <T extends unknown>(x: T): T => x;
