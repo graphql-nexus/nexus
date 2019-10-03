@@ -5,7 +5,7 @@ import { SchemaBuilder, NexusAcceptedTypeDef } from "./builder";
  * hook. It proxies the Nexus Builder which is a much bigger beast that we do
  * not want to directly expose to plugins.
  */
-type BuilderFacade = {
+export type OnInstallBuilder = {
   hasType: (typeName: string) => boolean;
 };
 
@@ -19,7 +19,7 @@ export type Plugin = {
 };
 
 type OnInstallHandler = (
-  builder: BuilderFacade
+  builder: OnInstallBuilder
 ) => { types: NexusAcceptedTypeDef[] };
 
 /**
