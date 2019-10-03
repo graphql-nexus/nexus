@@ -394,9 +394,11 @@ export type DynamicOutputProperties = Record<
  */
 export class SchemaBuilder {
   /**
-   * Used to track all types that have been added to the builder.
+   * Used to track all _GraphQL_ types that have been added to the builder.
+   * This supports hasType method which permits asking the question "Will
+   * the GraphQL schema have _this_ type (name)".
    */
-  protected allTypes: Record<string, NexusAcceptedTypeDef> = {};
+  protected allTypeDefs: Record<string, NexusAcceptedTypeDef> = {};
   /**
    * Used to check for circular references.
    */
@@ -483,7 +485,7 @@ export class SchemaBuilder {
   }
 
   hasType = (typeName: string): boolean => {
-    return Boolean(this.allTypes[typeName]);
+    return Boolean(this.allTypeDefs[typeName]);
   };
 
   /**
@@ -493,10 +495,6 @@ export class SchemaBuilder {
    * define types anonymously, without exporting them.
    */
   addType = (typeDef: NexusAcceptedTypeDef) => {
-    if (!this.allTypes[typeDef.name]) {
-      this.allTypes[typeDef.name] = typeDef;
-    }
-
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
       return;
@@ -535,6 +533,10 @@ export class SchemaBuilder {
         return;
       }
       throw extendError(typeDef.name);
+    }
+
+    if (!this.allTypeDefs[typeDef.name]) {
+      this.allTypeDefs[typeDef.name] = typeDef;
     }
 
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
