@@ -340,7 +340,7 @@ function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
     config.outputs.typegen = defaultTypesPath;
   }
 
-  // HACK Using `any` becuase TypeScript doesn't seem to be smart enough
+  // HACK Using cast becuase TypeScript doesn't seem to be smart enough
   // yet to understand the above checks make `config` a valid `internalConfig`.
   //
   return config as InternalBuilderConfig;
