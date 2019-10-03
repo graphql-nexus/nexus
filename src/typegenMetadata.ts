@@ -9,9 +9,9 @@ import {
 } from "./typegenFormatPrettier";
 import {
   TypegenInfo,
-  InternalBuilderConfig
+  InternalBuilderConfig,
   NexusSchemaExtensions,
-  BuilderConfig,
+  NexusSchema,
 } from "./builder";
 
 /**
@@ -20,10 +20,10 @@ import {
  * generated types and/or SDL artifact, including but not limited to:
  */
 export class TypegenMetadata {
-  constructor(protected config: BuilderConfig) {}
+  constructor(protected config: InternalBuilderConfig) {}
 
   /**
-   * Generates the artifacts of BuilderConfigInternaled on what we
+   * Generates the artifacts of the buid based on what we
    * know about the schema and how it was defined.
    */
   async generateArtifacts(schema: NexusSchema) {
