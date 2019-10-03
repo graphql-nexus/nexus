@@ -119,7 +119,6 @@ import {
   isObject,
   eachObj,
   isUnknownType,
-  Index,
   assertAbsolutePath,
 } from "./utils";
 import {
@@ -397,7 +396,7 @@ export class SchemaBuilder {
   /**
    * Used to track all types that have been added to the builder.
    */
-  protected allTypes: Index<NexusAcceptedTypeDef> = {};
+  protected allTypes: Record<string, NexusAcceptedTypeDef> = {};
   /**
    * Used to check for circular references.
    */
@@ -405,28 +404,30 @@ export class SchemaBuilder {
   /**
    * The "final type" map contains all types as they are built.
    */
-  protected finalTypeMap: Index<GraphQLNamedType> = {};
+  protected finalTypeMap: Record<string, GraphQLNamedType> = {};
   /**
    * The "defined type" map keeps track of all of the types that were
    * defined directly as `GraphQL*Type` objects, so we don't accidentally
    * overwrite any.
    */
-  protected definedTypeMap: Index<GraphQLNamedType> = {};
+  protected definedTypeMap: Record<string, GraphQLNamedType> = {};
   /**
    * The "pending type" map keeps track of all types that were defined w/
    * GraphQL Nexus and haven't been processed into concrete types yet.
    */
-  protected pendingTypeMap: Index<AllNexusNamedTypeDefs> = {};
+  protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {};
   /**
    * All "extensions" to types (adding fields on types from many locations)
    */
-  protected typeExtensionMap: Index<
+  protected typeExtensionMap: Record<
+    string,
     NexusExtendTypeConfig<string>[] | null
   > = {};
   /**
    * All "extensions" to input types (adding fields on types from many locations)
    */
-  protected inputTypeExtensionMap: Index<
+  protected inputTypeExtensionMap: Record<
+    string,
     NexusExtendInputTypeConfig<string>[] | null
   > = {};
   /**
@@ -462,7 +463,7 @@ export class SchemaBuilder {
   /**
    * Array of missing types
    */
-  protected missingTypes: Index<MissingType> = {};
+  protected missingTypes: Record<string, MissingType> = {};
 
   /**
    * Whether we've called `getFinalTypeMap` or not
