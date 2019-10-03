@@ -16,8 +16,10 @@ export type BuilderLens = {
  * which can then be registered upon with callbacks.
  */
 export type Config = {
-  onInstall: OnInstallHandler;
+  onInstall?: OnInstallHandler;
 };
+
+export type InternalConfig = Required<Config>;
 
 type OnInstallHandler = (
   builder: BuilderLens
@@ -40,14 +42,12 @@ export const initialize = (
   builder: SchemaBuilder,
   plugin: PluginDef
 ): PluginController => {
+  const builderLens: BuilderLens = {
+    hasType: builder.hasType,
+  };
   return {
     triggerOnInstall: () => {
-      if (plugin.config.onInstall) {
-        const { types } = plugin.config.onInstall({
-          hasType: builder.hasType,
-        });
-        types.forEach(builder.addType);
-      }
+      plugin.config.onInstall(builderLens).types.forEach(builder.addType);
     },
   };
 };
@@ -57,9 +57,13 @@ export const initialize = (
  * on makeSchema
  */
 export class PluginDef {
-  constructor(readonly config: Config) {}
+  constructor(readonly config: InternalConfig) {}
 }
 withNexusSymbol(PluginDef, NexusTypes.Plugin);
+
+const configDefaults = {
+  onInstall: () => ({ types: [] }),
+};
 
 /**
  * A plugin defines configuration which can document additional metadata options
@@ -76,5 +80,5 @@ withNexusSymbol(PluginDef, NexusTypes.Plugin);
  * resolver and the "result" of the resolver, respectively.
  */
 export const create = (config: Config): PluginDef => {
-  return new PluginDef(config);
+  return new PluginDef({ ...configDefaults, ...config });
 };
