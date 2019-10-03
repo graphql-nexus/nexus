@@ -128,7 +128,7 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
-import { Plugin, initializePlugin } from "./plugins";
+import * as Plugins from "./plugins";
 
 export type Maybe<T> = T | null;
 
@@ -183,7 +183,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
 );
 
 export interface BuilderConfig {
-  plugins?: Plugin[];
+  plugins?: Plugins.PluginDef[];
   /**
    * Generated artifact settings. Set to false to disable all.
    * Set to true to enable all and use default paths. Leave
@@ -1458,7 +1458,7 @@ export function buildTypesInternal<
   const builder = schemaBuilder || new SchemaBuilder(config);
   const plugins = config.plugins || [];
   const pluginControllers = plugins.map((plugin) =>
-    initializePlugin(builder, plugin)
+    Plugins.initialize(builder, plugin)
   );
   addTypes(builder, types);
   pluginControllers.forEach((pluginController) =>

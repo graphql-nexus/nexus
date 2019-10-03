@@ -1,11 +1,12 @@
 import { SchemaBuilder, NexusAcceptedTypeDef } from "./builder";
+import { withNexusSymbol, NexusTypes } from "./definitions/_types";
 
 /**
  * This is a read-only builder-like api exposed to plugins in the onInstall
  * hook. It proxies the Nexus Builder which is a much bigger beast that we do
  * not want to directly expose to plugins.
  */
-export type OnInstallBuilder = {
+export type BuilderLens = {
   hasType: (typeName: string) => boolean;
 };
 
@@ -14,12 +15,12 @@ export type OnInstallBuilder = {
  * particular extension points. Plugins are just functions that receive hooks
  * which can then be registered upon with callbacks.
  */
-export type Plugin = {
+export type Config = {
   onInstall: OnInstallHandler;
 };
 
 type OnInstallHandler = (
-  builder: OnInstallBuilder
+  builder: BuilderLens
 ) => { types: NexusAcceptedTypeDef[] };
 
 /**
@@ -35,14 +36,14 @@ type PluginController = {
  * event handlers) that the plugin has registered for. A controller is returned
  * that permits Nexus to trigger the hooks so executing the hook handlers.
  */
-export const initializePlugin = (
+export const initialize = (
   builder: SchemaBuilder,
-  plugin: Plugin
+  plugin: PluginDef
 ): PluginController => {
   return {
     triggerOnInstall: () => {
-      if (plugin.onInstall) {
-        const { types } = plugin.onInstall({
+      if (plugin.config.onInstall) {
+        const { types } = plugin.config.onInstall({
           hasType: builder.hasType,
         });
         types.forEach(builder.addType);
@@ -52,11 +53,28 @@ export const initializePlugin = (
 };
 
 /**
- * Create a Nexus Plugin. This function is just a convenience for not having to
- * import the Plugin type. Feel free to do this instead:
- *
- *     import { Plugin } from "nexus"
- *     export default { ... } as Plugin
- *
+ * A definition for a plugin. Should be passed to the `plugins: []` option
+ * on makeSchema
  */
-export const create = (plugin: Plugin): Plugin => plugin;
+export class PluginDef {
+  constructor(readonly config: Config) {}
+}
+withNexusSymbol(PluginDef, NexusTypes.Plugin);
+
+/**
+ * A plugin defines configuration which can document additional metadata options
+ * for a type definition. This metadata can be used to decorate the "resolve" function
+ * to provide custom functionality, such as logging, error handling, additional type
+ * validation.
+ *
+ * You can specify options which can be defined on the schema,
+ * the type or the plugin. The config from each of these will be
+ * passed in during schema construction time, and used to augment the field as necessary.
+ *
+ * You can either return a function, with the new defintion of a resolver implementation,
+ * or you can return an "enter" / "leave" pairing which will wrap the pre-execution of the
+ * resolver and the "result" of the resolver, respectively.
+ */
+export const create = (config: Config): PluginDef => {
+  return new PluginDef(config);
+};
