@@ -482,11 +482,11 @@ export class TypegenPrinter {
           if (field.args.length > 0) {
             argTypeMap[type.name] = argTypeMap[type.name] || {};
             argTypeMap[type.name][field.name] = field.args.reduce(
-              (obj: Record<string, string[]>, arg) => {
+              (obj, arg) => {
                 obj[arg.name] = this.normalizeArg(arg);
                 return obj;
               },
-              {}
+              {} as Record<string, [string, string]>
             );
           }
         });
@@ -714,17 +714,20 @@ export class TypegenPrinter {
     const printInlineDefs: string[] = [];
     const plugins = this.builder.getPlugins();
     plugins.forEach((plugin) => {
-      if (plugin.config.localTypes) {
-        printInlineDefs.push(plugin.config.localTypes);
-      }
       if (plugin.config.fieldDefTypes) {
-        pluginFieldExt.push(padLeft(plugin.config.fieldDefTypes, "    "));
+        pluginFieldExt.push(
+          padLeft(plugin.config.fieldDefTypes.toString(), "    ")
+        );
       }
-      if (plugin.config.schemaTypes) {
-        pluginSchemaExt.push(padLeft(plugin.config.schemaTypes, "    "));
+      if (plugin.config.schemaDefTypes) {
+        pluginSchemaExt.push(
+          padLeft(plugin.config.schemaDefTypes.toString(), "    ")
+        );
       }
       if (plugin.config.typeDefTypes) {
-        pluginTypeExt.push(padLeft(plugin.config.typeDefTypes, "    "));
+        pluginTypeExt.push(
+          padLeft(plugin.config.typeDefTypes.toString(), "    ")
+        );
       }
     });
     return [

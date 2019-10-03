@@ -36,15 +36,15 @@
     "url": "https://github.com/tgriesser"
   },
   "dependencies": {
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "iterall": "^1.2.2"
   },
   "devDependencies": {
-    "@types/graphql": "14.0.7",
     "@types/jest": "^23.3.7",
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.15.2",
     "@types/graphql-iso-date": "^3.3.3",
-    "graphql": "^14.0.2",
+    "graphql": "^14.5.8",
     "husky": "^1.1.2",
     "jest": "^24",
     "graphql-iso-date": "^3.6.1",
@@ -55,10 +55,10 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   },
   "peerDependencies": {
-    "graphql": "^0.12.0 || ^0.13.0 || ^14.0.0"
+    "graphql": "^14.5.0"
   },
   "husky": {
     "hooks": {

@@ -1,5 +1,10 @@
 import "./_nullabilityGuard.typegen";
-import { plugins as nexusPlugins, objectType, queryField } from "../..";
+import {
+  plugins as nexusPlugins,
+  objectType,
+  queryField,
+  makeSchema,
+} from "../..";
 
 export const userType = objectType({
   name: "User",

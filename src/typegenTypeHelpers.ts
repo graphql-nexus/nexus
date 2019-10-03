@@ -280,3 +280,10 @@ export type NeedsResolver<
     ? true
     : false
   : false;
+
+export type GenericFieldResolver<TReturn = any> = (
+  source: any,
+  args: any,
+  context: GetGen<"context">,
+  info: GraphQLResolveInfo
+) => TReturn;

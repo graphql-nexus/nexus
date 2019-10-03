@@ -217,8 +217,7 @@ export function firstDefined<T>(...args: Array<T | undefined>): T {
   throw new Error("At least one of the values should be defined");
 }
 
-// eslint-disable-next-line no-redeclare
-export function isPromise(value: any): value is PromiseLike<any> {
+export function isPromiseLike(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === "function");
 }
 
@@ -235,4 +234,34 @@ export function relativePathTo(
     return `./${path.join(relative, filename)}`;
   }
   return path.join(relative, filename);
+}
+
+interface PrintedTypegenConfig {
+  name: string;
+  optional: boolean;
+  type: string;
+  description?: string;
+}
+
+export class PrintedTypeGen {
+  constructor(protected config: PrintedTypegenConfig) {}
+  toString() {
+    let str = ``;
+    if (this.config.description) {
+      const descriptionLines = this.config.description
+        .split("\n")
+        .map((s) => s.trim())
+        .filter((s) => s)
+        .map((s) => ` * ${s}`)
+        .join("\n");
+      str = `/**\n${descriptionLines}\n */`;
+    }
+    const field = `${this.config.name}${this.config.optional ? "?" : ""}`;
+    str += `${field}: ${this.config.type}`;
+    return str;
+  }
+}
+
+export function printedGenType(config: PrintedTypegenConfig) {
+  return new PrintedTypeGen(config);
 }

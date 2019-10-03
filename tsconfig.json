@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2016",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["es2015"],
+    "lib": ["es2016"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,

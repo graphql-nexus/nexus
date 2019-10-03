@@ -1,96 +1,70 @@
-import { SchemaConfig } from "./builder";
+import { SchemaConfig, SchemaBuilder, BuilderLens } from "./builder";
 import {
-  GraphQLFieldResolver,
+  ASTKindToNode,
   GraphQLResolveInfo,
   GraphQLFieldConfig,
+  GraphQLFieldResolver,
+  GraphQLObjectTypeConfig,
+  GraphQLInterfaceTypeConfig,
+  Visitor,
 } from "graphql";
 import { withNexusSymbol, NexusTypes, Omit } from "./definitions/_types";
-import { isPromise } from "./utils";
-import { NexusObjectTypeConfig } from "./definitions/objectType";
-import { NexusOutputFieldConfig } from "./definitions/definitionBlocks";
+import { isPromiseLike, PrintedTypeGen } from "./utils";
+import {
+  NexusFieldExtension,
+  NexusObjectTypeExtension,
+  NexusSchemaExtension,
+  NexusInterfaceTypeExtension,
+} from "./extensions";
+import { NexusTypeExtensions } from "./definitions/decorateType";
 
-export class PluginDef {
-  constructor(readonly config: PluginConfig) {}
-}
-withNexusSymbol(PluginDef, NexusTypes.Plugin);
-
-export type PluginVisitAfter = (
-  result: any,
-  root: any,
-  args: any,
-  ctx: any,
-  info: GraphQLResolveInfo,
-  breakVal: typeof BREAK_RESULT_VAL
-) => any;
-
-export type PluginVisitBefore = (
-  root: any,
-  args: any,
-  ctx: any,
-  info: GraphQLResolveInfo,
-  nextVal: typeof NEXT_RESULT_VAL
-) => any;
-
-export type PluginVisitor = {
-  after?: PluginVisitAfter;
-  before?: PluginVisitBefore;
-};
-
-export type PluginDefinitionInfo = {
+export type CreateFieldResolverInfo = {
   /**
-   * The name of the type we're applying the plugin to
+   * The internal Nexus "builder" object
    */
-  typeName: string;
-  /**
-   * The name of the field we're applying the plugin to
-   */
-  fieldName: string;
-  /**
-   * The root-level SchemaConfig passed
-   */
-  nexusSchemaConfig: Omit<SchemaConfig, "types"> & Record<string, unknown>;
-  /**
-   * The config provided to the Nexus type containing the field.
-   * Will not exist if this is a non-Nexus GraphQL type.
-   */
-  nexusTypeConfig?: Omit<NexusObjectTypeConfig<string>, "definition"> &
-    Record<string, unknown>;
-  /**
-   * The config provided to the Nexus type containing the field.
-   * Will not exist if this is a non-Nexus GraphQL type.
-   */
-  nexusFieldConfig?: Omit<NexusOutputFieldConfig<string, string>, "resolve"> &
-    Record<string, unknown>;
+  builder: SchemaBuilder;
   /**
    * Info about the GraphQL Field we're decorating.
    * Always guaranteed to exist, even for non-Nexus GraphQL types
    */
-  graphqlFieldConfig: Omit<GraphQLFieldConfig<any, any>, "resolve">;
+  fieldConfig: Omit<GraphQLFieldConfig<any, any>, "resolve"> & {
+    extensions: { nexus: NexusFieldExtension };
+  };
   /**
-   * If we need to collect/reference metadata during the
-   * plugin middleware definition stage, you can use this object.
-   *
-   * An example use would be to collect all fields that have a "validation"
-   * property for their input to reference in runtime. After the schema is complete,
-   * this object is frozen so it is not abused at runtime.
+   * The config provided to the Nexus type containing the field.
+   * Will not exist if this is a non-Nexus GraphQL type.
    */
-  mutableObj: Record<string, any>;
+  parentTypeConfig:
+    | Omit<GraphQLObjectTypeConfig<any, any>, "fields"> & {
+        extensions: { nexus: NexusObjectTypeExtension };
+      }
+    | Omit<GraphQLInterfaceTypeConfig<any, any>, "fields"> & {
+        extensions: { nexus: NexusInterfaceTypeExtension };
+      };
+  /**
+   * The root-level SchemaConfig passed
+   */
+  schemaConfig: Omit<SchemaConfig, "types"> & {
+    extensions: { nexus: NexusSchemaExtension };
+  };
+  /**
+   * Nexus specific metadata provided to the schema.
+   * Shorthand for `schemaConfig.extensions.nexus`
+   */
+  schemaExtension: NexusSchemaExtension;
+  /**
+   * Nexus specific metadata provided to the parent type
+   * Shorthand for `typeConfig.extensions.nexus`
+   */
+  typeExtension: NexusTypeExtensions;
+  /**
+   * Nexus specific metadata provided to the field
+   * Shorthand for `fieldConfig.extensions.nexus`
+   */
+  fieldExtension: NexusFieldExtension;
 };
 
-export interface RootTypingImport {
-  /**
-   * File path to import the type from.
-   */
-  path: string;
-  /**
-   * Name of the type we want to reference in the `path`
-   */
-  name: string;
-  /**
-   * Name we want the imported type to be referenced as
-   */
-  alias?: string;
-}
+export type StringLike = PrintedTypeGen | string;
 
 export interface PluginConfig {
   /**
@@ -102,38 +76,114 @@ export interface PluginConfig {
    */
   description?: string;
   /**
-   * Any type definitions we want to add to the schema
+   * Any type definitions we want to add to the field definitions
    */
-  schemaTypes?: string;
+  fieldDefTypes?: StringLike | StringLike[];
   /**
    * Any type definitions we want to add to the type definition option
    */
-  typeDefTypes?: string;
+  objectTypeDefTypes?: StringLike | StringLike[];
   /**
-   * Any type definitions we want to add to the field definitions
+   * Any type definitions we want to add to the schema
    */
-  fieldDefTypes?: string;
+  schemaDefTypes?: StringLike | StringLike[];
   /**
-   * Any extensions to the GraphQLInfoObject (do we need this?)
+   * Executed once, just before the types are walked. Useful for defining custom extensions
+   * to the "definition" builders that are needed while traversing the type definitions, as
+   * are defined by `dynamicOutput{Method,Property}` / `dynamicInput{Method,Property}`
    */
-  // infoExtension?: string;
+  onInstall?: (builder: BuilderLens) => void;
   /**
-   * Any types which should exist as standalone declarations to support this type
+   * Executed once, just after types have been walked but also before the schema definition
+   * types are materialized into GraphQL types. Use this opportunity to add / modify / remove
+   * any types before we go through the resolution step.
    */
-  localTypes?: string;
+  onBeforeBuild?: (builder: BuilderLens) => void;
   /**
-   * Definition for the plugin. This will be executed against every
-   * output type field on the schema.
+   * Executed any time a field resolver is created. Returning a function here will add its in the
+   * stack of middlewares with the (root, args, ctx, info, next) signature, where the `next` is the
+   * next middleware or resolver to be executed.
    */
-  pluginDefinition(pluginInfo: PluginDefinitionInfo): PluginVisitor | void;
+  onCreateFieldResolver?: (
+    createResolverInfo: CreateFieldResolverInfo
+  ) => MiddlewareFn | undefined;
+  /**
+   * Executed any time a "subscribe" handler is created. Returning a function here will add its in the
+   * stack of middlewares with the (root, args, ctx, info, next) signature, where the `next` is the
+   * next middleware or resolver to be executed.
+   */
+  onCreateFieldSubscribe?: (
+    createSubscribeInfo: CreateFieldResolverInfo
+  ) => MiddlewareFn | undefined;
+  /**
+   * Executed when a field is going to be printed to the nexus "generated types". Gives
+   * an opportunity to override the standard behavior for printing our inferrred type info
+   */
+  onPrint?: (visitor: Visitor<ASTKindToNode>) => void;
 }
 
 /**
- * A plugin defines configuration which can document additional metadata options
- * for a type definition.
+ * Helper for allowing plugins to fulfill the return of the `next` resolver,
+ * without paying the cost of the Promise if not required.
+ */
+export function completeValue<T>(
+  valOrPromise: PromiseLike<T> | T,
+  onSuccess: (completedVal: T) => T,
+  onError?: (errVal: any) => T
+) {
+  if (isPromiseLike(valOrPromise)) {
+    return valOrPromise.then((completedValue) => {
+      return onSuccess(completedValue);
+    }, onError);
+  }
+  // No need to handle onError, this should just be a try/catch inside the `onSuccess` block
+  return onSuccess(valOrPromise);
+}
+
+export type MiddlewareFn = (
+  source: any,
+  args: any,
+  context: any,
+  info: GraphQLResolveInfo,
+  next: GraphQLFieldResolver<any, any>
+) => any;
+
+/**
+ * Takes a list of middlewares and executes them sequentially, passing the
+ * "next" member of the chain to execute as the 5th arg.
  *
- * Ultimately everything comes down to the "resolve" function
- * which executes the fields, and our plugin system will take that into account.
+ * @param middleware
+ * @param resolver
+ */
+export function composeMiddlewareFns<T>(
+  middlewareFns: MiddlewareFn[],
+  resolver: GraphQLFieldResolver<any, any>
+) {
+  let lastResolver = resolver;
+  for (const middleware of middlewareFns.reverse()) {
+    const currentNext = middleware;
+    const previousNext = lastResolver;
+    lastResolver = (root, args, ctx, info) => {
+      return currentNext(root, args, ctx, info, previousNext);
+    };
+  }
+  return lastResolver;
+}
+
+/**
+ * A definition for a plugin. Should be passed to the `plugins: []` option
+ * on makeSchema
+ */
+export class PluginDef {
+  constructor(readonly config: PluginConfig) {}
+}
+withNexusSymbol(PluginDef, NexusTypes.Plugin);
+
+/**
+ * A plugin defines configuration which can document additional metadata options
+ * for a type definition. This metadata can be used to decorate the "resolve" function
+ * to provide custom functionality, such as logging, error handling, additional type
+ * validation.
  *
  * You can specify options which can be defined on the schema,
  * the type or the plugin. The config from each of these will be
@@ -146,88 +196,4 @@ export interface PluginConfig {
 export function plugin(config: PluginConfig) {
   return new PluginDef(config);
 }
-
-/**
- * On "before" plugins, the nextFn allows us to skip to the next resolver
- * in the chain
- */
-const NEXT_RESULT_VAL = Object.freeze({});
-
-/**
- * On "after" plugins, the breakerFn allows us to early-return, skipping the
- * rest of the plugin stack. Useful when encountering errors
- */
-const BREAK_RESULT_VAL = Object.freeze({});
-
-/**
- * Wraps a resolver with a plugin, "before" the resolver executes.
- * Returns a new resolver, which may subsequently be wrapped
- */
-export function wrapPluginsBefore(
-  resolver: GraphQLFieldResolver<any, any>,
-  beforePlugins: [string, PluginVisitBefore][]
-): GraphQLFieldResolver<any, any> {
-  return async (root, args, ctx, info) => {
-    for (let i = 0; i < beforePlugins.length; i++) {
-      const [name, before] = beforePlugins[i];
-      let result = before(root, args, ctx, info, NEXT_RESULT_VAL);
-      if (isPromise(result)) {
-        result = await result;
-      }
-      if (result === NEXT_RESULT_VAL) {
-        continue;
-      }
-      if (result === undefined) {
-        throw new Error(
-          `Nexus: Expected return value from plugin ${name}:before, saw undefined`
-        );
-      }
-      return result;
-    }
-    return resolver(root, args, ctx, info);
-  };
-}
-
-/**
- * Wraps a resolver with a plugin, "after" the resolver executes.
- * May return a new value for the return type
- */
-export function wrapPluginsAfter(
-  resolver: GraphQLFieldResolver<any, any>,
-  afterPlugins: [string, PluginVisitAfter][]
-): GraphQLFieldResolver<any, any> {
-  return async (root, args, ctx, info) => {
-    let finalResult: any;
-    try {
-      finalResult = resolver(root, args, ctx, info);
-      if (isPromise(finalResult)) {
-        finalResult = await finalResult;
-      }
-    } catch (e) {
-      finalResult = e;
-    }
-    for (let i = 0; i < afterPlugins.length; i++) {
-      const [name, after] = afterPlugins[i];
-      let returnVal = after(
-        finalResult,
-        root,
-        args,
-        ctx,
-        info,
-        BREAK_RESULT_VAL
-      );
-      if (isPromise(returnVal)) {
-        returnVal = await returnVal;
-      }
-      if (returnVal === BREAK_RESULT_VAL) {
-        return finalResult;
-      }
-      if (returnVal === undefined) {
-        throw new Error(
-          `Nexus: Expected return value from plugin ${name}:after, saw undefined`
-        );
-      }
-    }
-    return finalResult;
-  };
-}
+plugin.completeValue = completeValue;

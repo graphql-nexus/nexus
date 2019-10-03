@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "dedent": "^0.7.0",
-    "graphql": "^14.0.2",
+    "graphql": "^14.5.8",
     "monaco-editor": "^0.15.5",
     "nexus": "0.12.0-beta.4",
     "react": "^16.7.0-alpha.2",
@@ -29,7 +29,6 @@
     "@types/dedent": "^0.7.0",
     "@types/fs-extra": "^5.0.4",
     "@types/get-port": "^4.0.0",
-    "@types/graphql": "^14.0.3",
     "@types/gulp": "3.8.36",
     "@types/json5": "^0.0.30",
     "@types/lodash.debounce": "^4.0.4",
