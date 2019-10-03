@@ -1,5 +1,6 @@
 // All of the Public API definitions
-export { buildTypes, makeSchema, Plugin } from "./builder";
+export { Plugin, create as createPlugin } from "./plugins";
+export { buildTypes, makeSchema } from "./builder";
 export {
   arg,
   booleanArg,

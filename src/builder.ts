@@ -118,6 +118,7 @@ import {
   isObject,
   eachObj,
   isUnknownType,
+  Index,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -126,8 +127,18 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
+import { Plugin, initializePlugin } from "./plugins";
 
 export type Maybe<T> = T | null;
+
+export type NexusAcceptedTypeDef =
+  | AllNexusNamedTypeDefs
+  | NexusExtendInputTypeDef<string>
+  | NexusExtendTypeDef<string>
+  | GraphQLNamedType
+  | DynamicInputMethodDef<string>
+  | DynamicOutputMethodDef<string>
+  | DynamicOutputPropertyDef<string>;
 
 type NexusShapedOutput = {
   name: string;
@@ -171,6 +182,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
 );
 
 export interface BuilderConfig {
+  plugins?: Plugin[];
   /**
    * When the schema starts and `process.env.NODE_ENV !== "production"`,
    * artifact files are auto-generated containing the .graphql definitions of
@@ -282,36 +294,38 @@ export type DynamicOutputProperties = Record<
  */
 export class SchemaBuilder {
   /**
+   * Used to track all types that have been added to the builder.
+   */
+  protected allTypes: Index<NexusAcceptedTypeDef> = {};
+  /**
    * Used to check for circular references.
    */
   protected buildingTypes = new Set();
   /**
    * The "final type" map contains all types as they are built.
    */
-  protected finalTypeMap: Record<string, GraphQLNamedType> = {};
+  protected finalTypeMap: Index<GraphQLNamedType> = {};
   /**
    * The "defined type" map keeps track of all of the types that were
    * defined directly as `GraphQL*Type` objects, so we don't accidentally
    * overwrite any.
    */
-  protected definedTypeMap: Record<string, GraphQLNamedType> = {};
+  protected definedTypeMap: Index<GraphQLNamedType> = {};
   /**
    * The "pending type" map keeps track of all types that were defined w/
    * GraphQL Nexus and haven't been processed into concrete types yet.
    */
-  protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {};
+  protected pendingTypeMap: Index<AllNexusNamedTypeDefs> = {};
   /**
    * All "extensions" to types (adding fields on types from many locations)
    */
-  protected typeExtensionMap: Record<
-    string,
+  protected typeExtensionMap: Index<
     NexusExtendTypeConfig<string>[] | null
   > = {};
   /**
    * All "extensions" to input types (adding fields on types from many locations)
    */
-  protected inputTypeExtensionMap: Record<
-    string,
+  protected inputTypeExtensionMap: Index<
     NexusExtendInputTypeConfig<string>[] | null
   > = {};
   /**
@@ -347,7 +361,7 @@ export class SchemaBuilder {
   /**
    * Array of missing types
    */
-  protected missingTypes: Record<string, MissingType> = {};
+  protected missingTypes: Index<MissingType> = {};
 
   /**
    * Whether we've called `getFinalTypeMap` or not
@@ -366,6 +380,10 @@ export class SchemaBuilder {
     return this.config;
   }
 
+  hasType = (typeName: string): boolean => {
+    return Boolean(this.allTypes[typeName]);
+  };
+
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls
    * it into an internal "type registry". It also does an initial pass
@@ -375,16 +393,11 @@ export class SchemaBuilder {
    *
    * @param typeDef
    */
-  addType(
-    typeDef:
-      | AllNexusNamedTypeDefs
-      | NexusExtendInputTypeDef<string>
-      | NexusExtendTypeDef<string>
-      | GraphQLNamedType
-      | DynamicInputMethodDef<string>
-      | DynamicOutputMethodDef<string>
-      | DynamicOutputPropertyDef<string>
-  ) {
+  addType(typeDef: NexusAcceptedTypeDef) {
+    if (!this.allTypes[typeDef.name]) {
+      this.allTypes[typeDef.name] = typeDef;
+    }
+
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
       return;
@@ -1330,7 +1343,14 @@ export function buildTypes<
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
+  const plugins = config.plugins || [];
+  const pluginControllers = plugins.map((plugin) =>
+    initializePlugin(builder, plugin)
+  );
   addTypes(builder, types);
+  pluginControllers.forEach((pluginController) =>
+    pluginController.triggerOnInstall()
+  );
   return builder.getFinalTypeMap();
 }
 
