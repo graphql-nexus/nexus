@@ -91,7 +91,9 @@ describe("backingTypes", () => {
 
 describe("rootTypings", () => {
   it("can import enum via rootTyping", async () => {
-    const metadata = new TypegenMetadata({ outputs: false });
+    const metadata = new TypegenMetadata({
+      outputs: { typegen: false, schema: false },
+    });
     const schema = makeSchema({
       types: [
         enumType({

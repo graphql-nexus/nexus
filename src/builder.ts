@@ -1,3 +1,4 @@
+import * as path from "path";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -118,6 +119,7 @@ import {
   isObject,
   eachObj,
   isUnknownType,
+  assertAbsolutePath,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -172,22 +174,39 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
 
 export interface BuilderConfig {
   /**
-   * When the schema starts and `process.env.NODE_ENV !== "production"`,
-   * artifact files are auto-generated containing the .graphql definitions of
-   * the schema
+   * Generated artifact settings. Set to false to disable all.
+   * Set to true to enable all and use default paths. Leave
+   * undefined for default behaviour of each artifact.
    */
-  outputs:
+  outputs?:
+    | boolean
     | {
         /**
-         * Absolute path where the GraphQL IDL file should be written
+         * TypeScript declaration file generation settings. This file
+         * contains types reflected off your source code. It is how
+         * Nexus imbues dynamic code with static guarnatees.
+         *
+         * Defaults to being enabled when `process.env.NODE_ENV !== "production"`.
+         * Set to true to enable and emit into default path (see below).
+         * Set to false to disable. Set to a string to specify absolute path.
+         *
+         * The default path is node_modules/@types/__nexus-typegen__core/index.d.ts.
+         * This is chosen becuase TypeScript will pick it up without
+         * any configuration needed by you. For more details about the @types
+         * system refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types
          */
-        schema: string | false;
+        typegen?: boolean | string;
         /**
-         * File path where generated types should be saved
+         * GraphQL SDL generation settings. This file is not necessary but
+         * may be nice for teams wishing to review SDL in pull-requests or
+         * just generally transitioning from a schema-first workflow.
+         *
+         * Defaults to false (disabled). Set to true to enable and emit into
+         * default path (current working directory). Set to a string to specify
+         * absolute path.
          */
-        typegen: string | false;
-      }
-    | false;
+        schema?: boolean | string;
+      };
   /**
    * Whether the schema & types are generated when the server
    * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV === "development"
@@ -225,6 +244,15 @@ export interface BuilderConfig {
   nonNullDefaults?: NonNullConfig;
 }
 
+export interface SchemaConfig extends BuilderConfig {
+  /**
+   * All of the GraphQL types. This is an any for simplicity of developer experience,
+   * if it's an object we get the values, if it's an array we flatten out the
+   * valid types, ignoring invalid ones.
+   */
+  types: any;
+}
+
 export interface TypegenInfo {
   /**
    * Headers attached to the generate type output
@@ -245,13 +273,86 @@ export interface TypegenInfo {
   contextType?: string;
 }
 
-export interface SchemaConfig extends BuilderConfig {
-  /**
-   * All of the GraphQL types. This is an any for simplicity of developer experience,
-   * if it's an object we get the values, if it's an array we flatten out the
-   * valid types, ignoring invalid ones.
-   */
+/**
+ * The resolved builder config wherein optional fields have been
+ * given their fallbacks, etc.
+ */
+export interface InternalBuilderConfig extends BuilderConfig {
+  outputs: {
+    schema: false | string;
+    typegen: false | string;
+  };
+}
+
+function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
+  // For JS
+  if (config.outputs === null) {
+    throw new Error("config.outputs cannot be of type `null`.");
+  }
+
+  if (
+    typeof config.outputs === "object" &&
+    typeof config.outputs.schema === "string"
+  ) {
+    assertAbsolutePath(config.outputs.schema, "outputs.schema");
+  }
+
+  const defaultSchemaPath = process.cwd();
+  const defaultTypesPath = path.join(
+    __dirname,
+    "../../@types/__nexus-typegen__core/index.d.ts"
+  );
+  const isDev = Boolean(
+    !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+  );
+
+  if (config.shouldGenerateArtifacts === false) {
+    config.outputs = {
+      schema: false,
+      typegen: false,
+    };
+  } else if (config.outputs === undefined) {
+    config.outputs = {
+      schema: false,
+      typegen: isDev ? defaultTypesPath : false,
+    };
+  } else if (config.outputs === false) {
+    config.outputs = {
+      schema: false,
+      typegen: false,
+    };
+  } else if (config.outputs === true) {
+    config.outputs = {
+      schema: defaultSchemaPath,
+      typegen: defaultTypesPath,
+    };
+  }
+
+  if (config.outputs.schema === undefined) {
+    config.outputs.schema = false;
+  } else if (config.outputs.schema === true) {
+    config.outputs.schema = defaultSchemaPath;
+  }
+
+  if (config.outputs.typegen === undefined) {
+    config.outputs.typegen = isDev ? defaultTypesPath : false;
+  } else if (config.outputs.typegen === true) {
+    config.outputs.typegen = defaultTypesPath;
+  }
+
+  // HACK Using `any` becuase TypeScript doesn't seem to be smart enough
+  // yet to understand the above checks make `config` a valid `internalConfig`.
+  //
+  return config as InternalBuilderConfig;
+}
+
+export interface InternalSchemaConfig extends InternalBuilderConfig {
   types: any;
+}
+
+function resolveSchemaConfig(config: SchemaConfig): InternalSchemaConfig {
+  // There is no additional processing for schema config
+  return resolveBuilderConfig(config) as InternalSchemaConfig;
 }
 
 export type TypeToWalk =
@@ -1329,6 +1430,20 @@ export function buildTypes<
   config: BuilderConfig = { outputs: false },
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
+  const internalConfig = resolveBuilderConfig(config || {});
+  return buildTypesInternal<TypeMapDefs>(types, internalConfig, schemaBuilder);
+}
+
+/**
+ * Internal build types woring with config rather than options.
+ */
+export function buildTypesInternal<
+  TypeMapDefs extends Record<string, GraphQLNamedType> = any
+>(
+  types: any,
+  config: InternalBuilderConfig,
+  schemaBuilder?: SchemaBuilder
+): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
   addTypes(builder, types);
   return builder.getFinalTypeMap();
@@ -1373,15 +1488,16 @@ export type NexusSchema = GraphQLSchema & {
  * from this one day.
  */
 export function makeSchemaInternal(
-  options: SchemaConfig,
+  config: InternalSchemaConfig,
   schemaBuilder?: SchemaBuilder
 ): { schema: NexusSchema; missingTypes: Record<string, MissingType> } {
-  const { typeMap, dynamicFields, rootTypings, missingTypes } = buildTypes(
-    options.types,
-    options,
-    schemaBuilder
-  );
-  let { Query, Mutation, Subscription } = typeMap;
+  const {
+    typeMap,
+    dynamicFields,
+    rootTypings,
+    missingTypes,
+  } = buildTypesInternal(config.types, config, schemaBuilder);
+  const { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
     throw new Error(
@@ -1424,21 +1540,14 @@ export function makeSchemaInternal(
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(options: SchemaConfig): GraphQLSchema {
-  const { schema, missingTypes } = makeSchemaInternal(options);
+export function makeSchema(config: SchemaConfig): GraphQLSchema {
+  const internalConfig = resolveSchemaConfig(config);
+  const { schema, missingTypes } = makeSchemaInternal(internalConfig);
 
-  // Only in development envs do we want to worry about regenerating the
-  // schema definition and/or generated types.
-  const {
-    shouldGenerateArtifacts = Boolean(
-      !process.env.NODE_ENV || process.env.NODE_ENV === "development"
-    ),
-  } = options;
-
-  if (shouldGenerateArtifacts) {
+  if (internalConfig.outputs.schema || internalConfig.outputs.typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(options).generateArtifacts(schema).catch((e) => {
+    new TypegenMetadata(internalConfig).generateArtifacts(schema).catch((e) => {
       console.error(e);
     });
   }
@@ -1453,11 +1562,12 @@ export function makeSchema(options: SchemaConfig): GraphQLSchema {
  * and waited upon.
  */
 export async function generateSchema(
-  options: SchemaConfig
+  config: SchemaConfig
 ): Promise<NexusSchema> {
-  const { schema, missingTypes } = makeSchemaInternal(options);
+  const internalConfig = resolveSchemaConfig(config);
+  const { schema, missingTypes } = makeSchemaInternal(internalConfig);
   assertNoMissingTypes(schema, missingTypes);
-  await new TypegenMetadata(options).generateArtifacts(schema);
+  await new TypegenMetadata(internalConfig).generateArtifacts(schema);
   return schema;
 }
 
