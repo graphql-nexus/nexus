@@ -236,3 +236,13 @@ export function relativePathTo(
   }
   return path.join(relative, filename);
 }
+
+export const resetEnvironmentAfterEach = () => {
+  let env: NodeJS.ProcessEnv;
+  beforeAll(() => {
+    env = { ...process.env };
+  });
+  afterEach(() => {
+    process.env = env;
+  });
+};
