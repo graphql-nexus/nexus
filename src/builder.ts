@@ -120,6 +120,7 @@ import {
   eachObj,
   isUnknownType,
   assertAbsolutePath,
+  copyObject,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -285,8 +286,10 @@ export interface InternalBuilderConfig extends BuilderConfig {
 }
 
 export function resolveBuilderConfig(
-  config: BuilderConfig
+  configGiven: BuilderConfig
 ): InternalBuilderConfig {
+  const config = copyObject(configGiven);
+
   // For JS
   if (config.outputs === null) {
     throw new Error("config.outputs cannot be of type `null`.");
@@ -304,11 +307,20 @@ export function resolveBuilderConfig(
     __dirname,
     "../node_modules/@types/__nexus-typegen__core/index.d.ts"
   );
-  const isDev = Boolean(
-    !process.env.NODE_ENV || process.env.NODE_ENV === "development"
-  );
 
-  if (config.shouldGenerateArtifacts === false) {
+  const should_generate_artifacts =
+    config.shouldGenerateArtifacts !== undefined
+      ? config.shouldGenerateArtifacts
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
+      ? false
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
+      ? true
+      : Boolean(
+          !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+        );
+
+  // console.log("%j %j", config, should_build_artifacts, process.env.NODE_ENV);
+  if (should_generate_artifacts === false) {
     config.outputs = {
       schema: false,
       typegen: false,
@@ -316,7 +328,7 @@ export function resolveBuilderConfig(
   } else if (config.outputs === undefined) {
     config.outputs = {
       schema: false,
-      typegen: isDev ? defaultTypesPath : false,
+      typegen: should_generate_artifacts ? defaultTypesPath : false,
     };
   } else if (config.outputs === false) {
     config.outputs = {
@@ -337,7 +349,7 @@ export function resolveBuilderConfig(
   }
 
   if (config.outputs.typegen === undefined) {
-    config.outputs.typegen = isDev ? defaultTypesPath : false;
+    config.outputs.typegen = should_generate_artifacts ? defaultTypesPath : false;
   } else if (config.outputs.typegen === true) {
     config.outputs.typegen = defaultTypesPath;
   }

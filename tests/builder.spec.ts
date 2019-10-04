@@ -15,90 +15,101 @@ const typegenDefaultPath = Path.join(
 const schemaDefaultPath = relativePath("../schema.graphql");
 
 describe("resolveBuilderConfig", () => {
-  type Scenarios = [BuilderConfig, InternalBuilderConfig][];
+  type Scenario = Record<string, InternalBuilderConfig | BuilderConfig>;
+  type Scenarios = Scenario[];
+  type ScenariosExpanded = [
+    Record<string, string>,
+    BuilderConfig,
+    InternalBuilderConfig
+  ];
+
   let NODE_ENV: string | undefined;
   beforeAll(() => {
     NODE_ENV = process.env.NODE_ENV;
   });
   afterEach(() => {
     process.env.NODE_ENV = NODE_ENV;
+    delete process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS;
   });
 
-  const productionCases: Scenarios = [
-    [{}, { outputs: { schema: false, typegen: false } }],
-    [
-      { outputs: true },
-      {
-        outputs: {
-          schema: schemaDefaultPath,
-          typegen: typegenDefaultPath,
-        },
+  const dev = "NODE_ENV=development";
+  const prod = "NODE_ENV=production";
+  const devGenOff =
+    "NODE_ENV=development, NEXUS_SHOULD_GENERATE_ARTIFACTS=false";
+  const prodGenOn = "NODE_ENV=production, NEXUS_SHOULD_GENERATE_ARTIFACTS=true";
+  const genOff = "NEXUS_SHOULD_GENERATE_ARTIFACTS=false";
+  const genOn = "NEXUS_SHOULD_GENERATE_ARTIFACTS=true";
+  const cases: any = [
+    {
+      given: {},
+      [dev]: {
+        outputs: { schema: false, typegen: typegenDefaultPath },
       },
-    ],
-    [{ outputs: false }, { outputs: { schema: false, typegen: false } }],
-    [
-      { outputs: { schema: false, typegen: true } },
-      { outputs: { schema: false, typegen: typegenDefaultPath } },
-    ],
-    [
-      { outputs: { schema: true, typegen: false } },
-      { outputs: { schema: schemaDefaultPath, typegen: false } },
-    ],
-    [
-      { outputs: { schema: true, typegen: true } },
-      { outputs: { schema: schemaDefaultPath, typegen: typegenDefaultPath } },
-    ],
-    [
-      { outputs: { schema: "/foo", typegen: true } },
-      { outputs: { schema: "/foo", typegen: typegenDefaultPath } },
-    ],
-    [
-      { outputs: { schema: true, typegen: "/foo" } },
-      { outputs: { schema: schemaDefaultPath, typegen: "/foo" } },
-    ],
-    [
-      { outputs: { typegen: "/foo" } },
-      { outputs: { schema: false, typegen: "/foo" } },
-    ],
-    [
-      { outputs: { schema: "/foo" } },
-      { outputs: { schema: "/foo", typegen: false } },
-    ],
+      [devGenOff]: { outputs: { schema: false, typegen: false } },
+      [prod]: { outputs: { schema: false, typegen: false } },
+      [prodGenOn]: { outputs: { schema: false, typegen: typegenDefaultPath } },
+    },
+    {
+      given: { outputs: true },
+      [prod]: { outputs: { schema: false, typegen: false } },
+      [dev]: {
+        outputs: { schema: schemaDefaultPath, typegen: typegenDefaultPath },
+      },
+    },
+    {
+      given: { outputs: false },
+      [prod]: { outputs: { schema: false, typegen: false } },
+    },
+    {
+      given: { outputs: { schema: false, typegen: true } },
+      [prod]: { outputs: { schema: false, typegen: false } },
+      [dev]: { outputs: { schema: false, typegen: typegenDefaultPath } },
+    },
+    {
+      given: { outputs: { schema: true, typegen: false } },
+      [dev]: { outputs: { schema: schemaDefaultPath, typegen: false } },
+    },
+    {
+      given: { outputs: { schema: true, typegen: true } },
+      [dev]: {
+        outputs: { schema: schemaDefaultPath, typegen: typegenDefaultPath },
+      },
+    },
+    {
+      given: { outputs: { schema: "/foo", typegen: true } },
+      [dev]: { outputs: { schema: "/foo", typegen: typegenDefaultPath } },
+    },
+    {
+      given: { outputs: { schema: true, typegen: "/foo" } },
+      [dev]: { outputs: { schema: schemaDefaultPath, typegen: "/foo" } },
+    },
+    {
+      given: { outputs: { typegen: "/foo" } },
+      [dev]: { outputs: { schema: false, typegen: "/foo" } },
+    },
+    {
+      given: { outputs: { schema: "/foo" } },
+      [dev]: { outputs: { schema: "/foo", typegen: typegenDefaultPath } },
+    },
   ];
+  const casesExpanded: any = cases.reduce((acc: any, kase: any) => {
+    const { given, ...expectedUnderEnvs } = kase;
+    return [
+      ...acc,
+      ...Object.entries(expectedUnderEnvs).map(([env, expected]) => [
+        env
+          .trim()
+          .split(",")
+          .map((kv) => kv.trim().split("="))
+          .reduce((envAcc, [k, v]) => Object.assign(envAcc, { [k]: v }), {}),
+        given,
+        expected,
+      ]),
+    ] as any;
+  }, []);
 
-  it.each(productionCases)("%j", (given, expected) => {
-    process.env.NODE_ENV = "production";
-    expect(resolveBuilderConfig(given)).toEqual(expected);
-  });
-
-  it.each(productionCases)("%j", (given, expected) => {
-    process.env.NODE_ENV = "anything else";
-    expect(resolveBuilderConfig(given)).toEqual(expected);
-  });
-
-  const devCases: Scenarios = [
-    [{}, { outputs: { schema: false, typegen: typegenDefaultPath } }],
-    [
-      { outputs: { schema: "/foo" } },
-      { outputs: { schema: "/foo", typegen: typegenDefaultPath } },
-    ],
-    [
-      { outputs: { schema: "/foo", typegen: "/bar" } },
-      { outputs: { schema: "/foo", typegen: "/bar" } },
-    ],
-    [
-      { outputs: { typegen: "/bar" } },
-      { outputs: { schema: false, typegen: "/bar" } },
-    ],
-  ];
-
-  it.each(devCases)("%j", (given, expected) => {
-    process.env.NODE_ENV = "development";
-    expect(resolveBuilderConfig(given)).toEqual(expected);
-  });
-
-  it.each(devCases)("%j", (given, expected) => {
-    process.env.NODE_ENV = "";
+  it.each(casesExpanded)("env %j & config %j", (env, given, expected) => {
+    Object.assign(process.env, env);
     expect(resolveBuilderConfig(given)).toEqual(expected);
   });
 });

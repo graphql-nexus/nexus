@@ -18,6 +18,7 @@ import {
 } from "graphql";
 import path from "path";
 import { UNKNOWN_TYPE_SCALAR } from "./builder";
+import { objectType } from "./definitions/objectType";
 
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
@@ -235,4 +236,16 @@ export function relativePathTo(
     return `./${path.join(relative, filename)}`;
   }
   return path.join(relative, filename);
+}
+
+export function copyObject<T extends object>(obj: T): T {
+  const copy: { [k: string]: unknown } = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== null && typeof v === "object") {
+      copy[k] = copyObject(v);
+    } else {
+      copy[k] = v;
+    }
+  }
+  return copy as any;
 }
