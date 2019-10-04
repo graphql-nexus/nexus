@@ -284,7 +284,9 @@ export interface InternalBuilderConfig extends BuilderConfig {
   };
 }
 
-function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
+export function resolveBuilderConfig(
+  config: BuilderConfig
+): InternalBuilderConfig {
   // For JS
   if (config.outputs === null) {
     throw new Error("config.outputs cannot be of type `null`.");
@@ -297,10 +299,10 @@ function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
     assertAbsolutePath(config.outputs.schema, "outputs.schema");
   }
 
-  const defaultSchemaPath = process.cwd();
+  const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
   const defaultTypesPath = path.join(
     __dirname,
-    "../../@types/__nexus-typegen__core/index.d.ts"
+    "../node_modules/@types/__nexus-typegen__core/index.d.ts"
   );
   const isDev = Boolean(
     !process.env.NODE_ENV || process.env.NODE_ENV === "development"
