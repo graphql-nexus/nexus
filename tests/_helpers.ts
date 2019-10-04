@@ -25,3 +25,10 @@ export const InputObject = inputObjectType({
     t.int("id");
   },
 });
+
+export const restoreEnvBeforeEach = () => {
+  let envBackup = { ...process.env };
+  beforeEach(() => {
+    process.env = { ...envBackup };
+  });
+};

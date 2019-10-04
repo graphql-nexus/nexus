@@ -236,10 +236,3 @@ export function relativePathTo(
   }
   return path.join(relative, filename);
 }
-
-export const restoreEnvBeforeEach = () => {
-  let envBackup = { ...process.env };
-  beforeEach(() => {
-    process.env = { ...envBackup };
-  });
-};

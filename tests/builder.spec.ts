@@ -4,7 +4,7 @@ import {
   BuilderConfig,
 } from "../src/builder";
 import * as Path from "path";
-import { restoreEnvBeforeEach } from "../src/core";
+import { restoreEnvBeforeEach } from "./_helpers";
 
 const relativePath = (...paths: string[]): string => Path.join(__dirname, ...paths); // prettier-ignore
 const atTypesPath = relativePath("../node_modules/@types");
