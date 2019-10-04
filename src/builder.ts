@@ -128,7 +128,6 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
-import { cloneDeep } from "lodash";
 
 export type Maybe<T> = T | null;
 

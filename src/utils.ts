@@ -18,7 +18,6 @@ import {
 } from "graphql";
 import path from "path";
 import { UNKNOWN_TYPE_SCALAR } from "./builder";
-import { POINT_CONVERSION_COMPRESSED } from "constants";
 
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
