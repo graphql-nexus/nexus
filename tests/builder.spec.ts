@@ -31,38 +31,37 @@ describe("resolveBuilderConfig() outputs", () => {
   restoreEnvBeforeEach();
 
   type Cases = [BuilderConfig, InternalBuilderConfig][];
-  const genOn: Cases = [
+  const onCases: Cases = [
     // defaults
-    [{}, outputs.justTypegen], // prettier-ignore
-    [{ outputs: {} }, outputs.justTypegen], // prettier-ignore
+    [{}, outputs.justTypegen],
+    [{ outputs: {} }, outputs.justTypegen],
     // selective
-    [{ outputs: { schema: true } }, outputs.all], // prettier-ignore
-    [{ outputs: { typegen: false } }, outputs.none], // prettier-ignore
-    [{ outputs: { typegen:true } }, outputs.justTypegen], // prettier-ignore
-    [{ outputs: { schema: true, typegen:false } }, outputs.justSchema], // prettier-ignore
+    [{ outputs: { schema: true } }, outputs.all],
+    [{ outputs: { typegen: false } }, outputs.none],
+    [{ outputs: { typegen:true } }, outputs.justTypegen],
+    [{ outputs: { schema: true, typegen:false } }, outputs.justSchema],
     // custom paths
-    [{ outputs: { schema: '/schema.graphql', typegen:'/typegen.ts' } }, outputs.custom.all], // prettier-ignore
-    [{ outputs: { typegen:'/typegen.ts' } }, outputs.custom.justTypegen], // prettier-ignore
-    [{ outputs: { schema: '/schema.graphql', typegen:false } }, outputs.custom.justSchema], // prettier-ignore
-  ];
+    [{ outputs: { schema: '/schema.graphql', typegen:'/typegen.ts' } }, outputs.custom.all],
+    [{ outputs: { typegen:'/typegen.ts' } }, outputs.custom.justTypegen],
+    [{ outputs: { schema: '/schema.graphql', typegen:false } }, outputs.custom.justSchema],
+  ]; // prettier-ignore
 
-  const genOff: Cases = [
-    [{}, outputs.none], // prettier-ignore
-    [{ outputs: true }, outputs.none], // prettier-ignore
-  ];
+  const offCases: Cases = [
+    [{}, outputs.none],
+    [{ outputs: true }, outputs.none],
+  ]; // prettier-ignore
 
-  it.each(genOn)("with shouldGenerateArtifacts: true %j", (given, expected) => {
-    const internalConfig = resolveBuilderConfig({ ...given, shouldGenerateArtifacts: true }) // prettier-ignore
-    expect(internalConfig.outputs).toEqual(expected.outputs);
-  });
-
-  it.each(genOff)(
-    "with shouldGenerateArtifacts: false %j",
-    (given, expected) => {
-      const internalConfig = resolveBuilderConfig({...given, shouldGenerateArtifacts: false }); // prettier-ignore
+  it.each(onCases)("with shouldGenerateArtifacts: true + %j", (given, expected) => {
+      const internalConfig = resolveBuilderConfig({ ...given, shouldGenerateArtifacts: true })
       expect(internalConfig.outputs).toEqual(expected.outputs);
     }
-  );
+  ) // prettier-ignore
+
+  it.each(offCases)("with shouldGenerateArtifacts: false + %j", (given, expected) => {
+      const internalConfig = resolveBuilderConfig({...given, shouldGenerateArtifacts: false });
+      expect(internalConfig.outputs).toEqual(expected.outputs);
+    }
+  ); // prettier-ignore
 });
 
 describe("Environment variable influence over builder config shouldGenerateArtifacts", () => {
@@ -71,37 +70,33 @@ describe("Environment variable influence over builder config shouldGenerateArtif
   it.each([
     [{ NODE_ENV: "production" }, { shouldGenerateArtifacts: true }],
     [{ NODE_ENV: "development" }, { shouldGenerateArtifacts: false }],
-    [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false" }, { shouldGenerateArtifacts: true }], // prettier-ignore
-    [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true" }, { shouldGenerateArtifacts: false }], // prettier-ignore
+    [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false" }, { shouldGenerateArtifacts: true }],
+    [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true" }, { shouldGenerateArtifacts: false }],
   ])(
     "when defined, overrules environment variables %j",
     (envEntries, config) => {
       Object.assign(process.env, envEntries);
       const internalConfig = resolveBuilderConfig(config);
-      const expectedOutputs = config.shouldGenerateArtifacts
-        ? outputs.default.outputs
-        : outputs.none.outputs;
+      const expectedOutputs = config.shouldGenerateArtifacts ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
-  );
+  ); // prettier-ignore
 
   it.each([
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true" }, true],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false" }, false],
     // Test that NODE_ENV is overruled
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true", NODE_ENV: "production" }, true],
-    [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false", NODE_ENV: "development" }, false], // prettier-ignore
+    [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false", NODE_ENV: "development" }, false],
   ])(
     "when undefined, NEXUS_SHOULD_GENERATE_ARTIFACTS is used (%j)",
     (envEntries, isGenOn) => {
       Object.assign(process.env, envEntries);
       const internalConfig = resolveBuilderConfig({});
-      const expectedOutputs = isGenOn
-        ? outputs.default.outputs
-        : outputs.none.outputs;
+      const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
-  );
+  ); // prettier-ignore
 
   it.each([
     [{ NODE_ENV: "production" }, false],
@@ -114,10 +109,8 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     (envEntries, isGenOn) => {
       Object.assign(process.env, envEntries);
       const internalConfig = resolveBuilderConfig({});
-      const expectedOutputs = isGenOn
-        ? outputs.default.outputs
-        : outputs.none.outputs;
+      const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
-  );
+  ); // prettier-ignore
 });
