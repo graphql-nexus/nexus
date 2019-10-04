@@ -4,7 +4,7 @@ import {
   BuilderConfig,
 } from "../src/builder";
 import * as Path from "path";
-import { resetEnvironmentAfterEach } from "../src/core";
+import { restoreEnvAfterEach } from "../src/core";
 
 const relativePath = (...paths: string[]): string => Path.join(__dirname, ...paths); // prettier-ignore
 const atTypesPath = relativePath("../node_modules/@types");
@@ -12,7 +12,7 @@ const typegenDefault = Path.join(atTypesPath, "/__nexus-typegen__core/index.d.ts
 const schemaDefaultPath = relativePath("../schema.graphql");
 
 describe("resolveBuilderConfig() outputs", () => {
-  resetEnvironmentAfterEach();
+  restoreEnvAfterEach();
 
   /**
    * These are outputs that the internalConfig can have. Reference these to
