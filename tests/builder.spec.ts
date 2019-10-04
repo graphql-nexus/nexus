@@ -72,9 +72,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NODE_ENV: "development" }, { shouldGenerateArtifacts: false }],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false" }, { shouldGenerateArtifacts: true }],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true" }, { shouldGenerateArtifacts: false }],
-  ])(
-    "when defined, overrules environment variables %j",
-    (envEntries, config) => {
+  ])("when defined, overrules environment variables %j", (envEntries, config) => {
       Object.assign(process.env, envEntries);
       const internalConfig = resolveBuilderConfig(config);
       const expectedOutputs = config.shouldGenerateArtifacts ? outputs.default.outputs : outputs.none.outputs;
@@ -88,9 +86,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     // Test that NODE_ENV is overruled
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true", NODE_ENV: "production" }, true],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false", NODE_ENV: "development" }, false],
-  ])(
-    "when undefined, NEXUS_SHOULD_GENERATE_ARTIFACTS is used (%j)",
-    (envEntries, isGenOn) => {
+  ])("when undefined, NEXUS_SHOULD_GENERATE_ARTIFACTS is used (%j)", (envEntries, isGenOn) => {
       Object.assign(process.env, envEntries);
       const internalConfig = resolveBuilderConfig({});
       const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
@@ -104,9 +100,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NODE_ENV: "development" }, true],
     [{ NODE_ENV: "" }, true],
     [{ NODE_ENV: undefined }, true],
-  ])(
-    "when undefined, and no NEXUS_SHOULD_GENERATE_ARTIFACTS, NODE_ENV is used (%j)",
-    (envEntries, isGenOn) => {
+  ])("when undefined, and no NEXUS_SHOULD_GENERATE_ARTIFACTS, NODE_ENV is used (%j)", (envEntries, isGenOn) => {
       Object.assign(process.env, envEntries);
       const internalConfig = resolveBuilderConfig({});
       const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
