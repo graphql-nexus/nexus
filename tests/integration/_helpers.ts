@@ -1,8 +1,8 @@
 /// <reference path="../_setup.ts" />
 import { join } from "path";
 import { core } from "../..";
-import ts from "typescript";
-const { generateSchema, typegenFormatPrettier } = core;
+import * as ts from "typescript";
+import { generateSchema, typegenFormatPrettier } from "../../src/core";
 
 const NO_OP = () => {};
 

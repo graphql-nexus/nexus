@@ -213,9 +213,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
-            `GraphQL Nexus Typegen: Cannot have multiple type sources ${
-              importsMap[alias]
-            } and ${pathOrModule} with the same alias ${alias}, skipping`
+            `GraphQL Nexus Typegen: Cannot have multiple type sources ${importsMap[alias]} and ${pathOrModule} with the same alias ${alias}, skipping`
           );
         }
         allImportsMap[alias] = importPath;
@@ -290,9 +288,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
           if (matched) {
             if (debug) {
               log(
-                `Matched type - ${typeName} in "${importPath}" - ${alias}.${
-                  matched[1]
-                }`
+                `Matched type - ${typeName} in "${importPath}" - ${alias}.${matched[1]}`
               );
             }
             importsMap[alias] = [importPath, glob];

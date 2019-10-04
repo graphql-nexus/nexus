@@ -5,7 +5,7 @@ import {
   GraphQLObjectType,
   GraphQLInterfaceType,
 } from "graphql";
-import path from "path";
+import * as path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
 import { SchemaBuilder } from "../src/core";

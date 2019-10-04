@@ -17,7 +17,8 @@ import {
   GraphQLNamedType,
 } from "graphql";
 import path from "path";
-import { UNKNOWN_TYPE_SCALAR } from "./builder";
+import { UNKNOWN_TYPE_SCALAR, BuilderConfig } from "./builder";
+import { TypegenMetadataConfig } from "./typegenMetadata";
 
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
@@ -264,4 +265,67 @@ export class PrintedTypeGen {
 
 export function printedGenType(config: PrintedTypegenConfig) {
   return new PrintedTypeGen(config);
+}
+
+/**
+ * Normalizes the builder config into the config we need for typegen
+ *
+ * @param config {BuilderConfig}
+ */
+export function resolveTypegenConfig(
+  config: BuilderConfig
+): TypegenMetadataConfig {
+  const { outputs, shouldGenerateArtifacts, ...rest } = config;
+
+  if (outputs && typeof outputs === "object") {
+    if (typeof outputs.schema === "string") {
+      assertAbsolutePath(outputs.schema, "outputs.schema");
+    }
+    if (typeof outputs.typegen === "string") {
+      assertAbsolutePath(outputs.typegen, "outputs.typegen");
+    }
+  }
+
+  const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
+  const defaultTypesPath = path.join(
+    __dirname,
+    "../../@types/__nexus-typegen__core/index.d.ts"
+  );
+  const isDev = Boolean(
+    !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+  );
+
+  let finalSchemaPath: false | string = false;
+  let finalTypegenPath: false | string = false;
+
+  if (shouldGenerateArtifacts === false || outputs === false) {
+    finalSchemaPath = false;
+    finalTypegenPath = false;
+  } else if (outputs === undefined) {
+    finalSchemaPath = false;
+    finalTypegenPath = isDev ? defaultTypesPath : false;
+  } else if (outputs === true) {
+    finalSchemaPath = defaultSchemaPath;
+    finalTypegenPath = defaultTypesPath;
+  } else if (typeof outputs === "object") {
+    if (outputs.schema === undefined) {
+      finalSchemaPath = false;
+    } else if (outputs.schema === true) {
+      finalSchemaPath = defaultSchemaPath;
+    }
+    if (outputs.typegen === undefined) {
+      finalTypegenPath = isDev ? defaultTypesPath : false;
+    } else if (outputs.typegen === true) {
+      finalTypegenPath = defaultTypesPath;
+    }
+  }
+
+  return {
+    ...rest,
+    shouldGenerateArtifacts,
+    outputs: {
+      typegen: finalTypegenPath,
+      schema: finalSchemaPath,
+    },
+  };
 }

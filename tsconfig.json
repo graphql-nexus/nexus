@@ -12,9 +12,7 @@
     "declaration": true,
     "importHelpers": true,
     "resolveJsonModule": true,
-    "sourceMap": true,
-    "declarationMap": true,
-    "types": ["node"]
+    "sourceMap": true
   },
   "exclude": [
     "./examples",

@@ -1,31 +1,32 @@
-import { graphql } from 'graphql'
+import { graphql } from "graphql";
 import { makeSchema, queryType, scalarType } from "../src";
 
 interface Result {
-  data?: { 
-    testDate: Date; 
-  }
+  data?: {
+    testDate: Date;
+  };
 }
 
 describe("custom scalars", () => {
   it("resolve custom scalar with inline functions", async () => {
-    const now = new Date()
+    const now = new Date();
     const schema = makeSchema({
       types: [
         scalarType({
           name: "Date",
           serialize: (value) => value.getTime(),
           parseValue: (value) => new Date(value),
-          parseLiteral: (ast) => (ast.kind === "IntValue" ? new Date(ast.value) : null),
+          parseLiteral: (ast) =>
+            ast.kind === "IntValue" ? new Date(ast.value) : null,
           asNexusMethod: "date",
           rootTyping: "Date",
         }),
         queryType({
           definition(t) {
-            // @ts-ignore 
-            t.date('testDate', () => now)
-          }
-        })
+            // @ts-ignore
+            t.date("testDate", () => now);
+          },
+        }),
       ],
       outputs: false,
     });
@@ -33,8 +34,8 @@ describe("custom scalars", () => {
       {
         testDate
       }
-    `
-    const result: Result = await graphql(schema, query)
-    expect(result.data!.testDate).toBe(now.getTime())
+    `;
+    const result: Result = await graphql(schema, query);
+    expect(result.data!.testDate).toBe(now.getTime());
   });
 });
