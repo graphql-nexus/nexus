@@ -324,7 +324,6 @@ export function resolveBuilderConfig(
     delete config.shouldGenerateArtifacts;
   }
 
-  // console.log("%j %j", config, should_build_artifacts, process.env.NODE_ENV);
   if (shouldGenerateArtifacts === false) {
     config.outputs = {
       schema: false,
