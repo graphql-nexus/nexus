@@ -120,7 +120,6 @@ import {
   eachObj,
   isUnknownType,
   assertAbsolutePath,
-  copyObject,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -129,6 +128,7 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
+import { cloneDeep } from "lodash";
 
 export type Maybe<T> = T | null;
 
@@ -288,7 +288,7 @@ export interface InternalBuilderConfig extends BuilderConfig {
 export function resolveBuilderConfig(
   configGiven: BuilderConfig
 ): InternalBuilderConfig {
-  const config = copyObject(configGiven);
+  const config = cloneDeep(configGiven);
 
   // For JS
   if (config.outputs === null) {
@@ -308,7 +308,7 @@ export function resolveBuilderConfig(
     "../node_modules/@types/__nexus-typegen__core/index.d.ts"
   );
 
-  const should_generate_artifacts =
+  const shouldGenerateArtifacts =
     config.shouldGenerateArtifacts !== undefined
       ? config.shouldGenerateArtifacts
       : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
@@ -319,8 +319,13 @@ export function resolveBuilderConfig(
           !process.env.NODE_ENV || process.env.NODE_ENV === "development"
         );
 
+  // TODO strip `shouldGenerateArtifacts` from internal config type
+  if (config.shouldGenerateArtifacts !== undefined) {
+    delete config.shouldGenerateArtifacts;
+  }
+
   // console.log("%j %j", config, should_build_artifacts, process.env.NODE_ENV);
-  if (should_generate_artifacts === false) {
+  if (shouldGenerateArtifacts === false) {
     config.outputs = {
       schema: false,
       typegen: false,
@@ -328,7 +333,7 @@ export function resolveBuilderConfig(
   } else if (config.outputs === undefined) {
     config.outputs = {
       schema: false,
-      typegen: should_generate_artifacts ? defaultTypesPath : false,
+      typegen: shouldGenerateArtifacts ? defaultTypesPath : false,
     };
   } else if (config.outputs === false) {
     config.outputs = {
@@ -349,7 +354,7 @@ export function resolveBuilderConfig(
   }
 
   if (config.outputs.typegen === undefined) {
-    config.outputs.typegen = should_generate_artifacts ? defaultTypesPath : false;
+    config.outputs.typegen = shouldGenerateArtifacts ? defaultTypesPath : false;
   } else if (config.outputs.typegen === true) {
     config.outputs.typegen = defaultTypesPath;
   }
