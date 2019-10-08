@@ -95,11 +95,13 @@ export class TypegenMetadata {
       // VSCode reacts to file changes better if a file is first deleted,
       // apparently. See issue motivating this logic here:
       // https://github.com/prisma-labs/nexus/issues/247.
-      removeFile(filePath).catch((error) => {
-        return error.code !== "ENOENT"
-          ? Promise.reject(error)
-          : Promise.resolve();
-      });
+      try {
+        await removeFile(filePath);
+      } catch (e) {
+        if (e.code !== "ENOENT") {
+          throw e;
+        }
+      }
       return writeFile(filePath, toSave);
     }
   }
