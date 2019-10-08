@@ -8,7 +8,7 @@
 
 Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript
 
-> GraphQL Nexus is independent from Prisma. To learn how it can best be combined with Prisma, check out the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin.
+> GraphQL Nexus can be used independently from [Prisma](https://www.prisma.io). To learn how it can best be combined with Prisma, check out the [`nexus-prisma`](https://github.com/prisma-labs/nexus-prisma) plugin.
 
 ## Overview
 
