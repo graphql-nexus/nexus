@@ -303,7 +303,7 @@ export function resolveBuilderConfig(
   const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
   const defaultTypesPath = path.join(
     __dirname,
-    "../node_modules/@types/__nexus-typegen__core/index.d.ts"
+    "../node_modules/@types/nexus-typegen/index.d.ts"
   );
   const defaults = {
     outputs: {
