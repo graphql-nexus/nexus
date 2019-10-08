@@ -325,6 +325,10 @@ export function resolveBuilderConfig(
   const shouldGenerateArtifacts =
     config.shouldGenerateArtifacts !== undefined
       ? config.shouldGenerateArtifacts
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
+      ? true
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
+      ? false
       : Boolean(
           !process.env.NODE_ENV || process.env.NODE_ENV === "development"
         );
