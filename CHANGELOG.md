@@ -1,5 +1,33 @@
 # Changelog
 
+### 0.12.0 (next)
+
+#### beta.10
+
+- feat(config): env var for should-generate-artifacts (#244)
+
+  You can now set the `shouldGenerateArtifacts` config option by env var
+  `NEXUS_SHOULD_GENERATE_ARTIFACTS=true|false`.
+
+- fix(typegen): delete prev file before writing next (#252)
+
+  Before, sometimes, you would have to open the typegen file to make VSCode pick
+  up its changed version. This change should reduce/remove the need for this
+  workaround.
+
+* feat: by default typegen as an @types package (#230)
+
+  BREAKING CHANGE
+
+  You should not have to configure typegen manually anymore. We
+  generate by default into `node_modules/@types/nexus-typegen` which TypeScript
+  will automatically pick up. If you use the `types` `tsc` compiler option
+  however, make sure to include `nexus-typegen`.
+
+  This is a breaking change because typegen is enabled even when config
+  `outputs` have not been configured (before, they were required). The
+  heuristics of `shouldGenerateArtifacts` remain unchanged.
+
 ### 0.11.7
 
 - Types: Allow Promise return value for subscriptions
