@@ -7,7 +7,7 @@ import * as Path from "path";
 import { restoreEnvBeforeEach } from "./_helpers";
 
 const relativePath = (...paths: string[]): string => Path.join(__dirname, ...paths); // prettier-ignore
-const atTypesPath = relativePath("../../node_modules/@types");
+const atTypesPath = relativePath("../../@types");
 const typegenDefault = Path.join(atTypesPath, "/nexus-typegen/index.d.ts"); // prettier-ignore
 const schemaDefaultPath = relativePath("../schema.graphql");
 /**
