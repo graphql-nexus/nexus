@@ -7,11 +7,8 @@ import {
   inputObjectType,
   dynamicInputMethod,
   decorateType,
-} from "../src/core";
-import {
-  RelayConnectionFieldMethod,
-  CollectionFieldMethod,
-} from "../src/extensions";
+  ext,
+} from "..";
 import { graphql } from "graphql";
 import { CatListFixture } from "./_fixtures";
 import { dynamicOutputProperty } from "../src/dynamicProperty";
@@ -46,7 +43,7 @@ describe("dynamicOutputMethod", () => {
       },
     });
     const schema = makeSchema({
-      types: [Query, RelayConnectionFieldMethod],
+      types: [Query, ext.RelayConnectionFieldMethod],
       outputs: {
         typegen: path.join(__dirname, "test-output.ts"),
         schema: path.join(__dirname, "schema.graphql"),
@@ -89,7 +86,7 @@ describe("dynamicOutputMethod", () => {
     });
 
     const schema = makeSchema({
-      types: [dynamicOutputMethod, CollectionFieldMethod],
+      types: [dynamicOutputMethod, ext.CollectionFieldMethod],
       outputs: {
         typegen: path.join(__dirname, "test-output"),
         schema: path.join(__dirname, "schema.graphql"),
@@ -128,7 +125,7 @@ describe("dynamicOutputMethod", () => {
             });
           },
         }),
-        CollectionFieldMethod,
+        ext.CollectionFieldMethod,
       ],
       outputs: false,
     });
@@ -154,7 +151,7 @@ describe("dynamicOutputMethod", () => {
             });
           },
         }),
-        RelayConnectionFieldMethod,
+        ext.RelayConnectionFieldMethod,
       ],
       outputs: false,
     });

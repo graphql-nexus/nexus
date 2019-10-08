@@ -2,7 +2,7 @@
 import { join } from "path";
 import { core } from "../..";
 import * as ts from "typescript";
-import { generateSchema, typegenFormatPrettier } from "../../src/core";
+const { generateSchema, typegenFormatPrettier } = core;
 
 const NO_OP = () => {};
 

@@ -1,4 +1,3 @@
-import * as path from "path";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -102,6 +101,7 @@ import {
   NonNullConfig,
   RootTypings,
   MissingType,
+  NexusGraphQLFieldConfig,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
@@ -127,7 +127,13 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
-import { PluginDef } from "./plugin";
+import {
+  PluginDef,
+  composeMiddlewareFns,
+  PluginConfig,
+  CreateFieldResolverInfo,
+  MiddlewareFn,
+} from "./plugin";
 import { NexusFieldExtension } from "./extensions";
 
 export type Maybe<T> = T | null;
@@ -344,14 +350,14 @@ export class SchemaBuilder {
   /**
    * All "extensions" to types (adding fields on types from many locations)
    */
-  protected typeExtensionMap: Record<
+  protected typeExtendMap: Record<
     string,
     NexusExtendTypeConfig<string>[] | null
   > = {};
   /**
    * All "extensions" to input types (adding fields on types from many locations)
    */
-  protected inputTypeExtensionMap: Record<
+  protected inputTypeExtendMap: Record<
     string,
     NexusExtendInputTypeConfig<string>[] | null
   > = {};
@@ -392,7 +398,10 @@ export class SchemaBuilder {
   /**
    * Created just before types are walked, this keeps track of all of the resolvers
    */
-  protected onCreateResolverFns: PluginDef["config"]["onCreateFieldResolver"][] = [];
+  protected onCreateResolverFns: Exclude<
+    PluginConfig["onCreateFieldResolver"],
+    undefined
+  >[] = [];
 
   constructor(protected config: BuilderConfig) {
     this.nonNullDefaults = {
@@ -448,16 +457,16 @@ export class SchemaBuilder {
       this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
 
     if (isNexusExtendTypeDef(typeDef)) {
-      const typeExtensions = (this.typeExtensionMap[typeDef.name] =
-        this.typeExtensionMap[typeDef.name] || []);
+      const typeExtensions = (this.typeExtendMap[typeDef.name] =
+        this.typeExtendMap[typeDef.name] || []);
       typeExtensions.push(typeDef.value);
       this.typesToWalk.push({ type: "object", value: typeDef.value });
       return;
     }
 
     if (isNexusExtendInputTypeDef(typeDef)) {
-      const typeExtensions = (this.inputTypeExtensionMap[typeDef.name] =
-        this.inputTypeExtensionMap[typeDef.name] || []);
+      const typeExtensions = (this.inputTypeExtendMap[typeDef.name] =
+        this.inputTypeExtendMap[typeDef.name] || []);
       typeExtensions.push(typeDef.value);
       this.typesToWalk.push({ type: "input", value: typeDef.value });
       return;
@@ -560,18 +569,18 @@ export class SchemaBuilder {
       this.finalTypeMap[key] = this.getOrBuildType(key);
       this.buildingTypes.clear();
     });
-    Object.keys(this.typeExtensionMap).forEach((key) => {
+    Object.keys(this.typeExtendMap).forEach((key) => {
       // If we haven't defined the type, assume it's an object type
-      if (this.typeExtensionMap[key] !== null) {
+      if (this.typeExtendMap[key] !== null) {
         this.buildObjectType({
           name: key,
           definition() {},
         });
       }
     });
-    Object.keys(this.inputTypeExtensionMap).forEach((key) => {
+    Object.keys(this.inputTypeExtendMap).forEach((key) => {
       // If we haven't defined the type, assume it's an input object type
-      if (this.inputTypeExtensionMap[key] !== null) {
+      if (this.inputTypeExtendMap[key] !== null) {
         this.buildInputObjectType({
           name: key,
           definition() {},
@@ -610,13 +619,13 @@ export class SchemaBuilder {
       warn: consoleWarn,
     });
     config.definition(definitionBlock);
-    const extensions = this.inputTypeExtensionMap[config.name];
+    const extensions = this.inputTypeExtendMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
         extension.definition(definitionBlock);
       });
     }
-    this.inputTypeExtensionMap[config.name] = null;
+    this.inputTypeExtendMap[config.name] = null;
     return this.finalize(
       new GraphQLInputObjectType({
         name: config.name,
@@ -629,12 +638,6 @@ export class SchemaBuilder {
   buildObjectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
     const interfaces: Implemented[] = [];
-    // FIXME
-    // We use `any` because otherwise TypeScript fails to compile. It states:
-    // 'string' is assignable to the constraint of type 'FieldName', but 'FieldName' could be instantiated with a different subtype of constraint 'string'
-    // How can we tell TypeScript that `modifications` index is polymorphic over
-    // any string subtype? Using `any` here does not affect the end user since its
-    // visibility is limited to the implementation of buildObjectType.
     const modifications: Record<
       string,
       FieldModificationDef<string, any>[]
@@ -652,13 +655,13 @@ export class SchemaBuilder {
       warn: consoleWarn,
     });
     config.definition(definitionBlock);
-    const extensions = this.typeExtensionMap[config.name];
+    const extensions = this.typeExtendMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
         extension.definition(definitionBlock);
       });
     }
-    this.typeExtensionMap[config.name] = null;
+    this.typeExtendMap[config.name] = null;
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping;
     }
@@ -679,7 +682,7 @@ export class SchemaBuilder {
             };
             const localModifications = modifications[iFieldName];
             const fieldExtensionConfig = {
-              ...extensions.nexus.fieldConfig,
+              ...((extensions || {}).nexus || {}).fieldConfig,
             } as NexusOutputFieldConfig<any, any>;
             // TODO(tim): Not sure if all this is really even necessary, t.modify is probably the
             // weakest API we have currently, revisit at some point in the near future.
@@ -724,7 +727,7 @@ export class SchemaBuilder {
       warn: consoleWarn,
     });
     config.definition(definitionBlock);
-    const extensions = this.typeExtensionMap[config.name];
+    const extensions = this.typeExtendMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
         extension.definition(definitionBlock);
@@ -942,8 +945,9 @@ export class SchemaBuilder {
         `Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`
       );
     }
+    const fieldExtension = new NexusFieldExtension(fieldConfig);
     const builderFieldConfig: Omit<
-      GraphQLFieldConfig<any, any>,
+      NexusGraphQLFieldConfig,
       "resolve" | "subscribe"
     > = {
       type: this.decorateType(
@@ -955,21 +959,36 @@ export class SchemaBuilder {
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
       extensions: {
-        nexus: new NexusFieldExtension(fieldConfig),
+        nexus: fieldExtension,
       },
     };
-
-    let finalResolver = fieldConfig.resolve || defaultFieldResolver;
-
-    if (this.onCreateResolverFns) {
-      // this.onCreateResolverFns
-    }
-
     return {
-      resolve: finalResolver,
+      resolve: this.makeFinalResolver({
+        builder: this,
+        fieldConfig: builderFieldConfig,
+        fieldExtension,
+        parentTypeConfig: typeConfig,
+        typeExtension: typeConfig,
+      }),
       subscribe: fieldConfig.subscribe,
       ...builderFieldConfig,
     };
+  }
+
+  protected makeFinalResolver(
+    info: CreateFieldResolverInfo,
+    resolver?: GraphQLFieldResolver<any, any>
+  ) {
+    const resolveFn = resolver || defaultFieldResolver;
+    if (this.onCreateResolverFns.length) {
+      const toCompose = this.onCreateResolverFns
+        .map((fn) => fn(info))
+        .filter((f) => f) as MiddlewareFn[];
+      if (toCompose.length) {
+        return composeMiddlewareFns(toCompose, resolveFn);
+      }
+    }
+    return resolveFn;
   }
 
   protected buildInputObjectField(

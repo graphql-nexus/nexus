@@ -724,9 +724,9 @@ export class TypegenPrinter {
           padLeft(plugin.config.schemaDefTypes.toString(), "    ")
         );
       }
-      if (plugin.config.typeDefTypes) {
+      if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(
-          padLeft(plugin.config.typeDefTypes.toString(), "    ")
+          padLeft(plugin.config.objectTypeDefTypes.toString(), "    ")
         );
       }
     });

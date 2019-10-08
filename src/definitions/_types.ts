@@ -8,7 +8,15 @@ import {
   GraphQLInterfaceType,
   GraphQLUnionType,
   GraphQLEnumType,
+  GraphQLFieldConfig,
+  GraphQLObjectTypeConfig,
+  GraphQLInterfaceTypeConfig,
 } from "graphql";
+import {
+  NexusFieldExtension,
+  NexusObjectTypeExtension,
+  NexusInterfaceTypeExtension,
+} from "../extensions";
 
 export type WrappedResolver = GraphQLFieldResolver<any, any> & {
   nexusWrappedResolver?: GraphQLFieldResolver<any, any>;
@@ -129,3 +137,22 @@ export type GraphQLNamedInputType =
   | GraphQLScalarType
   | GraphQLInputObjectType
   | GraphQLEnumType;
+
+export type NexusGraphQLFieldConfig = Omit<
+  GraphQLFieldConfig<any, any>,
+  "extensions"
+> & { extensions: { nexus: NexusFieldExtension } };
+
+export type NexusGraphQLObjectTypeConfig = Omit<
+  GraphQLObjectTypeConfig<any, any>,
+  "extensions"
+> & {
+  extensions: { nexus: NexusObjectTypeExtension };
+};
+
+export type NexusGraphQLInterfaceTypeConfig = Omit<
+  GraphQLInterfaceTypeConfig<any, any>,
+  "fields"
+> & {
+  extensions: { nexus: NexusInterfaceTypeExtension };
+};

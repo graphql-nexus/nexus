@@ -2,20 +2,19 @@ import { SchemaConfig, SchemaBuilder, BuilderLens } from "./builder";
 import {
   ASTKindToNode,
   GraphQLResolveInfo,
-  GraphQLFieldConfig,
   GraphQLFieldResolver,
-  GraphQLObjectTypeConfig,
-  GraphQLInterfaceTypeConfig,
   Visitor,
 } from "graphql";
-import { withNexusSymbol, NexusTypes, Omit } from "./definitions/_types";
-import { isPromiseLike, PrintedTypeGen } from "./utils";
 import {
-  NexusFieldExtension,
-  NexusObjectTypeExtension,
-  NexusSchemaExtension,
-  NexusInterfaceTypeExtension,
-} from "./extensions";
+  withNexusSymbol,
+  NexusTypes,
+  Omit,
+  NexusGraphQLFieldConfig,
+  NexusGraphQLObjectTypeConfig,
+  NexusGraphQLInterfaceTypeConfig,
+} from "./definitions/_types";
+import { isPromiseLike, PrintedTypeGen } from "./utils";
+import { NexusFieldExtension, NexusSchemaExtension } from "./extensions";
 import { NexusTypeExtensions } from "./definitions/decorateType";
 
 export type CreateFieldResolverInfo = {
@@ -27,20 +26,14 @@ export type CreateFieldResolverInfo = {
    * Info about the GraphQL Field we're decorating.
    * Always guaranteed to exist, even for non-Nexus GraphQL types
    */
-  fieldConfig: Omit<GraphQLFieldConfig<any, any>, "resolve"> & {
-    extensions: { nexus: NexusFieldExtension };
-  };
+  fieldConfig: Omit<NexusGraphQLFieldConfig, "resolve">;
   /**
    * The config provided to the Nexus type containing the field.
    * Will not exist if this is a non-Nexus GraphQL type.
    */
   parentTypeConfig:
-    | Omit<GraphQLObjectTypeConfig<any, any>, "fields"> & {
-        extensions: { nexus: NexusObjectTypeExtension };
-      }
-    | Omit<GraphQLInterfaceTypeConfig<any, any>, "fields"> & {
-        extensions: { nexus: NexusInterfaceTypeExtension };
-      };
+    | NexusGraphQLObjectTypeConfig
+    | NexusGraphQLInterfaceTypeConfig;
   /**
    * The root-level SchemaConfig passed
    */

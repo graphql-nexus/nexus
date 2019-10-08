@@ -1,3 +1,4 @@
+/// <reference path="../_setup.ts" />
 import ts from "typescript";
 import { join } from "path";
 

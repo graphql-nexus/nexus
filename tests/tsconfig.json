@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noUnusedLocals": false, // FIXME
     "noEmit": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "types": ["jest", "node", "./setup.ts"]
   }
 }

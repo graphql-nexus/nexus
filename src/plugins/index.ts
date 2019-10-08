@@ -1,2 +1,2 @@
-// export * from "./nullabilityGuardPlugin";
+export * from "./nullabilityGuardPlugin";
 export * from "./authorizePlugin";

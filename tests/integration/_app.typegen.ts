@@ -36,17 +36,9 @@ export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
   Mutation: {};
-  Post: {
-    // root type
-    body: string; // String!
-    title: string; // String!
-  };
+  Post: {};
   Query: {};
-  User: {
-    // root type
-    firstName: string; // String!
-    lastName: string; // String!
-  };
+  User: {};
   String: string;
   Int: number;
   Float: number;
