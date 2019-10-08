@@ -63,9 +63,10 @@ export class TypegenMetadata {
     }
     const fs = require("fs") as typeof import("fs");
     const util = require("util") as typeof import("util");
-    const [readFile, writeFile, mkdir] = [
+    const [readFile, writeFile, removeFile, mkdir] = [
       util.promisify(fs.readFile),
       util.promisify(fs.writeFile),
+      util.promisify(fs.unlink),
       util.promisify(fs.mkdir),
     ];
     let formatTypegen: TypegenFormatFn | null = null;
@@ -91,6 +92,14 @@ export class TypegenMetadata {
           throw e;
         }
       }
+      // VSCode reacts to file changes better if a file is first deleted,
+      // apparently. See issue motivating this logic here:
+      // https://github.com/prisma-labs/nexus/issues/247.
+      removeFile(filePath).catch((error) => {
+        return error.code !== "ENOENT"
+          ? Promise.reject(error)
+          : Promise.resolve();
+      });
       return writeFile(filePath, toSave);
     }
   }
