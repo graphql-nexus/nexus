@@ -480,7 +480,7 @@ export class Typegen {
           if (field.args.length > 0) {
             argTypeMap[type.name] = argTypeMap[type.name] || {};
             argTypeMap[type.name][field.name] = field.args.reduce(
-              (obj: Record<string, string[]>, arg) => {
+              (obj: Record<string, [string, string]>, arg) => {
                 obj[arg.name] = this.normalizeArg(arg);
                 return obj;
               },
