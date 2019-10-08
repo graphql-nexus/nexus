@@ -2,7 +2,7 @@
 
 ### 0.12.0 (next)
 
-#### beta.10
+#### beta.12
 
 - feat(config): env var for should-generate-artifacts (#244)
 
