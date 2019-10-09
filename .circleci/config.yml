@@ -20,6 +20,7 @@ jobs:
     steps:
       - checkout
       - run: yarn --frozen-lockfile
+      - run: yarn link
       - run: yarn --cwd=examples/apollo-fullstack --frozen-lockfile
       - run: yarn --cwd=examples/apollo-fullstack link nexus
       - run: yarn --cwd=examples/apollo-fullstack tsc
@@ -52,6 +53,7 @@ jobs:
     steps:
       - checkout
       - run: yarn --frozen-lockfile
+      - run: yarn link
       - run: yarn --cwd=examples/kitchen-sink --frozen-lockfile
       - run: yarn --cwd=examples/kitchen-sink link nexus
       - run: yarn --cwd=examples/kitchen-sink tsc
@@ -62,6 +64,7 @@ jobs:
     steps:
       - checkout
       - run: yarn --frozen-lockfile
+      - run: yarn link
       - run: yarn --cwd=examples/nexus-prisma --frozen-lockfile
       - run: yarn --cwd=examples/nexus-prisma link nexus
       - run: yarn --cwd=examples/nexus-prisma tsc
