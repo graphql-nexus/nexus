@@ -13,9 +13,7 @@ import {
 import { assertValidName } from "graphql";
 import { NexusInterfaceTypeDef } from "./interfaceType";
 
-export type Implemented =
-  | GetGen<"interfaceNames">
-  | NexusInterfaceTypeDef<string>;
+export type Implemented = GetGen<"interfaceNames"> | NexusInterfaceTypeDef<any>;
 
 export interface FieldModification<
   TypeName extends string,

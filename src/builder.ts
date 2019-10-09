@@ -1172,7 +1172,7 @@ export class SchemaBuilder {
   }
 
   protected getInterface(
-    name: string | NexusInterfaceTypeDef<string>
+    name: string | NexusInterfaceTypeDef<any>
   ): GraphQLInterfaceType {
     const type = this.getOrBuildType(name);
     if (!isInterfaceType(type)) {

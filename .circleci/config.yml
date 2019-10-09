@@ -21,6 +21,7 @@ jobs:
       - checkout
       - run: yarn --frozen-lockfile
       - run: yarn --cwd=examples/apollo-fullstack --frozen-lockfile
+      - run: yarn --cwd=examples/apollo-fullstack link nexus
       - run: yarn --cwd=examples/apollo-fullstack tsc
 
   example_ghost:
@@ -31,7 +32,7 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: yarn link
       - run: yarn --cwd=examples/ghost --frozen-lockfile
-      - run: yarn --cwd=examples/githunt-api link nexus
+      - run: yarn --cwd=examples/ghost link nexus
       - run: yarn --cwd=examples/ghost tsc
 
   example_githunt-api:
@@ -52,6 +53,7 @@ jobs:
       - checkout
       - run: yarn --frozen-lockfile
       - run: yarn --cwd=examples/kitchen-sink --frozen-lockfile
+      - run: yarn --cwd=examples/kitchen-sink link nexus
       - run: yarn --cwd=examples/kitchen-sink tsc
 
   example_nexus-prisma:
@@ -61,6 +63,7 @@ jobs:
       - checkout
       - run: yarn --frozen-lockfile
       - run: yarn --cwd=examples/nexus-prisma --frozen-lockfile
+      - run: yarn --cwd=examples/nexus-prisma link nexus
       - run: yarn --cwd=examples/nexus-prisma tsc
 
   example_star-wars:
