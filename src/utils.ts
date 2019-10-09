@@ -275,7 +275,20 @@ export function printedGenType(config: PrintedTypegenConfig) {
 export function resolveTypegenConfig(
   config: BuilderConfig
 ): TypegenMetadataConfig {
-  const { outputs, shouldGenerateArtifacts, ...rest } = config;
+  // NOTE(tim): is this really useful? Can the user just define this on their own?
+  // This allows decoupling NODE_ENV from artifact gen config in a flexible way.
+  const shouldGenerateArtifactsEnv =
+    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
+      ? true
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
+      ? false
+      : undefined;
+
+  const {
+    outputs,
+    shouldGenerateArtifacts = shouldGenerateArtifactsEnv,
+    ...rest
+  } = config;
 
   if (outputs && typeof outputs === "object") {
     if (typeof outputs.schema === "string") {

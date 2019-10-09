@@ -1,14 +1,14 @@
-<p align="center"><a href="https://nexus.js.org"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /><a></p>
-
-# GraphQL Nexus
+<p align="center">
+  <a href="https://nexus.js.org"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /><a>
+  <h1 align="center">Nexus</h1>
+</p>
 
 [![CircleCI](https://img.shields.io/circleci/build/github/prisma-labs/nexus)](https://circleci.com/gh/prisma/nexus)
 [![npm version](https://badge.fury.io/js/nexus.svg)](https://badge.fury.io/js/nexus)
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/nexus)
 
 Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript
 
-> GraphQL Nexus is independent from Prisma. To learn how it can best be combined with Prisma, check out the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin.
+> GraphQL Nexus can be used independently from [Prisma](https://www.prisma.io). To learn how it can best be combined with Prisma, check out the [`nexus-prisma`](https://github.com/prisma-labs/nexus-prisma) plugin.
 
 ## Overview
 
