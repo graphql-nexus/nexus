@@ -1,4 +1,4 @@
-import { makeSchema, queryType, intArg, core } from "../src";
+import { makeSchema, queryType, intArg, core } from "..";
 import { printSchema } from "graphql";
 
 describe("nonNullDefaults", () => {

@@ -1,4 +1,4 @@
-import "./_app.typegen";
+/// <reference path="_app.typegen.ts" />
 import {
   objectType,
   idArg,
@@ -10,7 +10,7 @@ import {
   dynamicOutputMethod,
   dynamicInputMethod,
   dynamicOutputProperty,
-} from "../../src";
+} from "../..";
 
 export const query = queryType({
   definition(t) {

@@ -5,11 +5,9 @@ import {
   GraphQLInterfaceType,
 } from "graphql";
 import * as path from "path";
-import { core } from "../src";
+import { core } from "..";
 import { EXAMPLE_SDL } from "./_sdl";
-import { NexusGraphQLSchema, makeSchema } from "../src/core";
-
-const { TypegenPrinter, TypegenMetadata } = core;
+const { makeSchema, TypegenPrinter, TypegenMetadata } = core;
 
 describe("typegen", () => {
   let typegen: core.TypegenPrinter;
@@ -17,7 +15,7 @@ describe("typegen", () => {
   beforeEach(async () => {
     const schema = makeSchema({
       types: [buildSchema(EXAMPLE_SDL)],
-    }) as NexusGraphQLSchema;
+    }) as core.NexusGraphQLSchema;
     metadata = new TypegenMetadata({
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
