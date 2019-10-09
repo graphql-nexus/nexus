@@ -23,8 +23,8 @@ interface OnGuardedInfo {
 
 export type NullabilityGuardConfig = {
   shouldGuard?: boolean;
-  onGuarded?(obj: OnGuardedInfo): void;
-  fallbackValue?(type: GraphQLNamedOutputType): any;
+  onGuarded?: (obj: OnGuardedInfo) => void;
+  fallbackValue?: (type: GraphQLNamedOutputType) => any;
 };
 
 const schemaDefTypes = printedGenTyping({
@@ -148,10 +148,10 @@ const nonNullListGuard = (finalConfig: TypeGuardMeta): NullGuardFn => (
   let resultArr: any[] = [];
   let hasPromise = false;
   if (isCollection(val)) {
-    forEach(val as any, (val: any, i) => {
-      if (isPromiseLike(val)) {
+    forEach(val as any, (item: any) => {
+      if (isPromiseLike(item)) {
         hasPromise = true;
-      } else if (val == null) {
+      } else if (item == null) {
         finalConfig.onGuarded({ root, args, ctx, info });
       }
       resultArr.push(val);

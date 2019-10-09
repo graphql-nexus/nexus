@@ -738,15 +738,17 @@ export class SchemaBuilder {
         const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {};
         interfaceConfigs.forEach((i) => {
           Object.keys(i.fields).forEach((iFieldName) => {
-            const config = i.fields[iFieldName] as MaybeNexusGraphQLFieldConfig;
+            const iConfig = i.fields[
+              iFieldName
+            ] as MaybeNexusGraphQLFieldConfig;
             const fieldConfig: NexusGraphQLFieldConfig = {
-              ...config,
+              ...iConfig,
               extensions: {
-                ...config.extensions,
+                ...iConfig.extensions,
                 nexus:
-                  getExt(config) ||
+                  getExt(iConfig) ||
                   new NexusFieldExtension({
-                    type: unwrapType(config.type).type.name as any,
+                    type: unwrapType(iConfig.type).type.name as any,
                   }),
               },
             };
