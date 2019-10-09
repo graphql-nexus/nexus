@@ -7,13 +7,8 @@ import {
   typegenFormatPrettier,
   TypegenFormatFn,
 } from "./typegenFormatPrettier";
-import {
-  TypegenInfo,
-  NexusSchemaExtensions,
-  NexusSchema,
-  SchemaBuilder,
-  BuilderConfig,
-} from "./builder";
+import { TypegenInfo, BuilderConfig } from "./builder";
+import { NexusGraphQLSchema } from "./definitions/_types";
 
 export interface TypegenMetadataConfig extends Omit<BuilderConfig, "outputs"> {
   outputs: {
@@ -28,16 +23,13 @@ export interface TypegenMetadataConfig extends Omit<BuilderConfig, "outputs"> {
  * generated types and/or SDL artifact, including but not limited to:
  */
 export class TypegenMetadata {
-  constructor(
-    protected builder: SchemaBuilder,
-    protected config: TypegenMetadataConfig
-  ) {}
+  constructor(protected config: TypegenMetadataConfig) {}
 
   /**
    * Generates the artifacts of the buid based on what we
    * know about the schema and how it was defined.
    */
-  async generateArtifacts(schema: NexusSchema) {
+  async generateArtifacts(schema: NexusGraphQLSchema) {
     const sortedSchema = this.sortSchema(schema);
     if (this.config.outputs.schema) {
       await this.writeFile(
@@ -49,17 +41,16 @@ export class TypegenMetadata {
     if (this.config.outputs.typegen) {
       const value = await this.generateTypesFile(
         sortedSchema,
-        schema.extensions.nexus,
         this.config.outputs.typegen
       );
       await this.writeFile("types", value, this.config.outputs.typegen);
     }
   }
 
-  sortSchema(schema: GraphQLSchema) {
+  sortSchema(schema: NexusGraphQLSchema) {
     let sortedSchema = schema;
     if (typeof lexicographicSortSchema !== "undefined") {
-      sortedSchema = lexicographicSortSchema(schema);
+      sortedSchema = lexicographicSortSchema(schema) as NexusGraphQLSchema;
     }
     return sortedSchema;
   }
@@ -129,19 +120,13 @@ export class TypegenMetadata {
    * Generates the type definitions
    */
   async generateTypesFile(
-    schema: GraphQLSchema,
-    extensions: NexusSchemaExtensions,
+    schema: NexusGraphQLSchema,
     typegenFile: string
   ): Promise<string> {
-    return new TypegenPrinter(
-      this.builder,
-      schema,
-      {
-        ...(await this.getTypegenInfo(schema)),
-        typegenFile,
-      },
-      extensions
-    ).print();
+    return new TypegenPrinter(schema, {
+      ...(await this.getTypegenInfo(schema)),
+      typegenFile,
+    }).print();
   }
 
   async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {

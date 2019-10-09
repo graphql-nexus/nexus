@@ -8,17 +8,18 @@ import {
 import * as path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
-import { SchemaBuilder } from "../src/core";
+import { NexusGraphQLSchema } from "../src/core";
 
 const { TypegenPrinter, TypegenMetadata } = core;
 
 describe("typegen", () => {
   let typegen: core.TypegenPrinter;
   let metadata: core.TypegenMetadata;
-  const builder = new SchemaBuilder({ outputs: false });
   beforeEach(async () => {
-    const schema = lexicographicSortSchema(buildSchema(EXAMPLE_SDL));
-    metadata = new TypegenMetadata(builder, {
+    const schema = lexicographicSortSchema(
+      buildSchema(EXAMPLE_SDL)
+    ) as NexusGraphQLSchema;
+    metadata = new TypegenMetadata({
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
@@ -37,22 +38,10 @@ describe("typegen", () => {
       },
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    typegen = new TypegenPrinter(
-      builder,
-      schema,
-      {
-        ...typegenInfo,
-        typegenFile: "",
-      },
-      {
-        rootTypings: {},
-        dynamicFields: {
-          dynamicInputFields: {},
-          dynamicOutputFields: {},
-          dynamicOutputProperties: {},
-        },
-      }
-    );
+    typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
     jest
       .spyOn(typegen, "hasResolver")
       .mockImplementation(

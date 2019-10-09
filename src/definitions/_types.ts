@@ -11,11 +11,13 @@ import {
   GraphQLFieldConfig,
   GraphQLObjectTypeConfig,
   GraphQLInterfaceTypeConfig,
+  GraphQLSchema,
 } from "graphql";
 import {
   NexusFieldExtension,
   NexusObjectTypeExtension,
   NexusInterfaceTypeExtension,
+  NexusSchemaExtension,
 } from "../extensions";
 
 export type WrappedResolver = GraphQLFieldResolver<any, any> & {
@@ -145,7 +147,7 @@ export type NexusGraphQLFieldConfig = Omit<
 
 export type NexusGraphQLObjectTypeConfig = Omit<
   GraphQLObjectTypeConfig<any, any>,
-  "extensions"
+  "extensions" | "fields"
 > & {
   extensions: { nexus: NexusObjectTypeExtension };
 };
@@ -155,4 +157,14 @@ export type NexusGraphQLInterfaceTypeConfig = Omit<
   "fields"
 > & {
   extensions: { nexus: NexusInterfaceTypeExtension };
+};
+
+export type NexusGraphQLSchema = GraphQLSchema & {
+  extensions: { nexus: NexusSchemaExtension };
+};
+export type MaybeNexusGraphQLFieldConfig = Omit<
+  NexusGraphQLFieldConfig,
+  "extensions"
+> & {
+  extensions: { nexus?: NexusObjectTypeExtension };
 };

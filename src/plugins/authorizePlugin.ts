@@ -4,7 +4,7 @@ export const authorizePlugin = plugin({
   name: "Authorize",
   description: "The authorize plugin makes it possible to guard against types",
   onCreateFieldResolver(builder) {
-    const { authorize } = builder.fieldExtension.fieldConfig;
+    const { authorize } = builder.fieldExtension.config;
     if (!authorize) {
       return;
     }

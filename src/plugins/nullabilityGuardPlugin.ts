@@ -71,7 +71,7 @@ export const nullabilityGuard = (pluginConfig: NullabilityGuardConfig) => {
     fieldDefTypes,
     schemaDefTypes,
     onCreateFieldResolver(config) {
-      const { fieldConfig } = config.fieldExtension;
+      const { config: fieldConfig } = config.fieldExtension;
       if ((fieldConfig as any).skipNullGuard) {
         return;
       }

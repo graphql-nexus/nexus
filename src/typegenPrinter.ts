@@ -8,7 +8,6 @@ import {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
-  GraphQLSchema,
   GraphQLUnionType,
   isEnumType,
   isInputObjectType,
@@ -24,7 +23,7 @@ import {
   defaultFieldResolver,
 } from "graphql";
 import path from "path";
-import { TypegenInfo, NexusSchemaExtensions, SchemaBuilder } from "./builder";
+import { TypegenInfo } from "./builder";
 import {
   eachObj,
   GroupedTypes,
@@ -32,7 +31,8 @@ import {
   mapObj,
   relativePathTo,
 } from "./utils";
-import { WrappedResolver } from "./definitions/_types";
+import { WrappedResolver, NexusGraphQLSchema } from "./definitions/_types";
+import { NexusSchemaExtension } from "./extensions";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -67,14 +67,14 @@ type RootTypeMapping = Record<
  */
 export class TypegenPrinter {
   groupedTypes: GroupedTypes;
+  extensions: NexusSchemaExtension;
 
   constructor(
-    protected builder: SchemaBuilder,
-    protected schema: GraphQLSchema,
-    protected typegenInfo: TypegenInfo & { typegenFile: string },
-    protected extensions: NexusSchemaExtensions
+    protected schema: NexusGraphQLSchema,
+    protected typegenInfo: TypegenInfo & { typegenFile: string }
   ) {
     this.groupedTypes = groupTypes(schema);
+    this.extensions = schema.extensions.nexus;
   }
 
   print() {
@@ -712,7 +712,7 @@ export class TypegenPrinter {
       `  interface NexusGenPluginTypeConfig<TypeName extends string> {`,
     ];
     const printInlineDefs: string[] = [];
-    const plugins = this.builder.getPlugins();
+    const plugins = this.schema.extensions.nexus.config.plugins || [];
     plugins.forEach((plugin) => {
       if (plugin.config.fieldDefTypes) {
         pluginFieldExt.push(

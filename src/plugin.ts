@@ -14,8 +14,11 @@ import {
   NexusGraphQLInterfaceTypeConfig,
 } from "./definitions/_types";
 import { isPromiseLike, PrintedTypeGen } from "./utils";
-import { NexusFieldExtension, NexusSchemaExtension } from "./extensions";
-import { NexusTypeExtensions } from "./definitions/decorateType";
+import {
+  NexusFieldExtension,
+  NexusSchemaExtension,
+  NexusTypeExtensions,
+} from "./extensions";
 
 export type CreateFieldResolverInfo = {
   /**
