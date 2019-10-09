@@ -29,7 +29,9 @@ jobs:
     steps:
       - checkout
       - run: yarn --frozen-lockfile
+      - run: yarn link
       - run: yarn --cwd=examples/ghost --frozen-lockfile
+      - run: yarn --cwd=examples/githunt-api link nexus
       - run: yarn --cwd=examples/ghost tsc
 
   example_githunt-api:

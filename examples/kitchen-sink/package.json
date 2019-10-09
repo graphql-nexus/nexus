@@ -17,6 +17,6 @@
     "jest": "^23.6.0",
     "prettier": "^1.15.2",
     "ts-jest": "^23.10.4",
-    "typescript": "^3.4.5"
+    "typescript": "^3.6.4"
   }
 }

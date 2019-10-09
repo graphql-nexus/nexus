@@ -90,9 +90,13 @@ export interface NexusGenRootTypes {
     end: number; // Int!
     flags: NexusGenEnums['NodeFlags']; // NodeFlags!
     kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers?: NexusGenRootTypes['Token'][] | null; // [Token!]
     name?: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    nameText?: string | null; // String
     parent: NexusGenRootTypes['Node']; // Node!
     pos: number; // Int!
+    rawText: string; // String!
     typeName?: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
   }
   UnionType: ts.UnionTypeNode;
@@ -1594,4 +1598,14 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+
+declare global {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {
+  }
+  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
+  }
+  interface NexusGenPluginSchemaConfig {
+  }
 }

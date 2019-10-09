@@ -844,6 +844,7 @@ enum SyntaxKind {
   AtToken
   AwaitExpression
   AwaitKeyword
+  BacktickToken
   BarBarToken
   BarEqualsToken
   BarToken
@@ -981,11 +982,13 @@ enum SyntaxKind {
   IsKeyword
   JSDocAllType
   JSDocAugmentsTag
+  JSDocAuthorTag
   JSDocCallbackTag
   JSDocClassTag
   JSDocComment
   JSDocEnumTag
   JSDocFunctionType
+  JSDocNamepathType
   JSDocNonNullableType
   JSDocNullableType
   JSDocOptionalType
