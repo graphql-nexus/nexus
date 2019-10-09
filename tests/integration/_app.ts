@@ -1,4 +1,4 @@
-/// <reference path="_app.typegen.ts" />
+import "./_app.typegen";
 import {
   objectType,
   idArg,
