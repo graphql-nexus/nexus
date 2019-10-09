@@ -1,4 +1,4 @@
-import { objectType, inputObjectType } from "..";
+import { objectType, inputObjectType } from "../src";
 
 /**
  * Used in testing, creates a generic "User" object

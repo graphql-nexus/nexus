@@ -11,10 +11,10 @@ export const RelayConnectionFieldMethod = dynamicOutputMethod({
   name: "relayConnectionField",
   typeDefinition: `
     <FieldName extends string>(fieldName: FieldName, opts: {
-      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
       pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,
-      args?: Record<string, core.NexusArgDef<string>>,
+      args?: Record<string, core.NexusArgDef<any>>,
       nullable?: boolean,
       description?: string
     }): void

@@ -13,7 +13,7 @@ module.exports = {
   ],
   globals: {
     "ts-jest": {
-      diagnostics: false, // (temp) true
+      diagnostics: true, // (temp) true
       tsConfig: path.join(__dirname, "tests/tsconfig.json"),
     },
   },
