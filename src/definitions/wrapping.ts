@@ -1,5 +1,4 @@
 import { GraphQLNamedType } from "graphql";
-import { SchemaBuilder } from "../builder";
 import { NexusEnumTypeDef } from "./enumType";
 import { NexusExtendTypeDef } from "./extendType";
 import { NexusInputObjectTypeDef } from "./inputObjectType";
@@ -7,7 +6,7 @@ import { NexusInterfaceTypeDef } from "./interfaceType";
 import { NexusObjectTypeDef } from "./objectType";
 import { NexusScalarTypeDef } from "./scalarType";
 import { NexusUnionTypeDef } from "./unionType";
-import { NexusTypes, NexusWrappedSymbol, withNexusSymbol } from "./_types";
+import { NexusTypes, NexusWrappedSymbol } from "./_types";
 import { NexusExtendInputTypeDef } from "./extendInputType";
 import {
   DynamicOutputMethodDef,
@@ -16,6 +15,7 @@ import {
 import { NexusArgDef } from "./args";
 import { DynamicOutputPropertyDef } from "../dynamicProperty";
 import { AllInputTypes } from "../typegenTypeHelpers";
+import { PrintedGenTyping, PrintedGenTypingImport } from "../utils";
 
 export type AllNexusInputTypeDefs<T extends string = string> =
   | NexusInputObjectTypeDef<T>
@@ -23,11 +23,11 @@ export type AllNexusInputTypeDefs<T extends string = string> =
   | NexusScalarTypeDef<T>;
 
 export type AllNexusOutputTypeDefs =
-  | NexusObjectTypeDef<string>
-  | NexusInterfaceTypeDef<string>
-  | NexusUnionTypeDef<string>
-  | NexusEnumTypeDef<string>
-  | NexusScalarTypeDef<string>;
+  | NexusObjectTypeDef<any>
+  | NexusInterfaceTypeDef<any>
+  | NexusUnionTypeDef<any>
+  | NexusEnumTypeDef<any>
+  | NexusScalarTypeDef<any>;
 
 export type AllNexusNamedTypeDefs =
   | AllNexusInputTypeDefs
@@ -37,35 +37,6 @@ export type AllTypeDefs =
   | AllNexusInputTypeDefs
   | AllNexusOutputTypeDefs
   | GraphQLNamedType;
-
-export type WrappedTypeFn<T extends AllNexusNamedTypeDefs> = (
-  builder: SchemaBuilder
-) => T;
-
-/**
- * Container object for a "wrapped function"
- */
-export class NexusWrappedType<T extends AllNexusNamedTypeDefs> {
-  constructor(readonly name: string, protected wrappedFn: WrappedTypeFn<T>) {}
-  get fn(): WrappedTypeFn<T> {
-    return this.wrappedFn;
-  }
-}
-
-withNexusSymbol(NexusWrappedType, NexusTypes.WrappedType);
-
-/**
- * Useful primarily for plugins, where you want to delay the execution
- * of a block until other metadata exists from the root.
- *
- * @param fn
- */
-export function nexusWrappedType<T extends AllNexusNamedTypeDefs>(
-  name: string,
-  fn: WrappedTypeFn<T>
-) {
-  return new NexusWrappedType(name, fn);
-}
 
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
@@ -97,13 +68,6 @@ export function isNexusExtendTypeDef(
 ): obj is NexusExtendTypeDef<string> {
   return (
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.ExtendObject
-  );
-}
-export function isNexusWrappedType(
-  obj: any
-): obj is NexusWrappedType<AllNexusNamedTypeDefs> {
-  return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.WrappedType
   );
 }
 
@@ -164,5 +128,21 @@ export function isNexusDynamicInputMethod<T extends string>(
 ): obj is DynamicInputMethodDef<T> {
   return (
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicInput
+  );
+}
+export function isNexusPrintedGenTyping<T extends string>(
+  obj: any
+): obj is PrintedGenTyping {
+  return (
+    isNexusTypeDef(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.PrintedGenTyping
+  );
+}
+export function isNexusPrintedGenTypingImport<T extends string>(
+  obj: any
+): obj is PrintedGenTypingImport {
+  return (
+    isNexusTypeDef(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.PrintedGenTypingImport
   );
 }

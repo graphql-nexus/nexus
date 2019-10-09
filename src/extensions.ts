@@ -3,13 +3,24 @@ import { NexusObjectTypeConfig } from "./definitions/objectType";
 import { SchemaConfig, DynamicFieldDefs } from "./builder";
 import { NexusInterfaceTypeConfig } from "./definitions/interfaceType";
 import { RootTypings } from "./definitions/_types";
+import { NexusInputObjectTypeConfig } from "./definitions/inputObjectType";
 
 export type NexusTypeExtensions =
   | NexusObjectTypeExtension
   | NexusInterfaceTypeExtension;
 
-export class NexusGenericExtension {
-  constructor(readonly config: Record<string, any>) {}
+type PossibleTypes =
+  | "ObjectType"
+  | "UnionType"
+  | "ScalarType"
+  | "IntefaceType"
+  | "InputObjectType"
+  | "Schema";
+
+type ExtensionConfigFor<T extends PossibleTypes> = any;
+
+export class NexusExtension<T extends PossibleTypes> {
+  constructor(readonly type: T, readonly config: ExtensionConfigFor<T>) {}
 }
 
 /**
@@ -29,6 +40,17 @@ export class NexusFieldExtension<
     const { resolve, ...rest } = config;
     this.config = rest;
     this.hasDefinedResolver = Boolean(resolve);
+  }
+}
+
+/**
+ * Container object living on `inputObjectType.extensions.nexus`
+ */
+export class NexusInputObjectTypeExtension<TypeName extends string = any> {
+  readonly config: Omit<NexusInputObjectTypeConfig<TypeName>, "definition">;
+  constructor(config: NexusInputObjectTypeConfig<TypeName>) {
+    const { definition, ...rest } = config;
+    this.config = rest;
   }
 }
 

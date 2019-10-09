@@ -2,7 +2,6 @@ import {
   GraphQLLeafType,
   GraphQLCompositeType,
   GraphQLInputObjectType,
-  GraphQLFieldResolver,
   GraphQLScalarType,
   GraphQLObjectType,
   GraphQLInterfaceType,
@@ -12,17 +11,15 @@ import {
   GraphQLObjectTypeConfig,
   GraphQLInterfaceTypeConfig,
   GraphQLSchema,
+  GraphQLInputObjectTypeConfig,
 } from "graphql";
 import {
   NexusFieldExtension,
   NexusObjectTypeExtension,
   NexusInterfaceTypeExtension,
   NexusSchemaExtension,
+  NexusInputObjectTypeExtension,
 } from "../extensions";
-
-export type WrappedResolver = GraphQLFieldResolver<any, any> & {
-  nexusWrappedResolver?: GraphQLFieldResolver<any, any>;
-};
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
@@ -38,13 +35,14 @@ export enum NexusTypes {
   Union = "Union",
   ExtendObject = "ExtendObject",
   ExtendInputObject = "ExtendInputObject",
-  WrappedType = "WrappedType",
   OutputField = "OutputField",
   InputField = "InputField",
   DynamicInput = "DynamicInput",
   DynamicOutputMethod = "DynamicOutputMethod",
   DynamicOutputProperty = "DynamicOutputProperty",
   Plugin = "Plugin",
+  PrintedGenTyping = "PrintedGenTyping",
+  PrintedGenTypingImport = "PrintedGenTypingImport",
 }
 
 export interface DeprecationInfo {
@@ -140,31 +138,35 @@ export type GraphQLNamedInputType =
   | GraphQLInputObjectType
   | GraphQLEnumType;
 
-export type NexusGraphQLFieldConfig = Omit<
+type WithExt<T extends { extensions?: any }, Ext> = Omit<T, "extensions"> & {
+  extensions: { nexus: Ext };
+};
+
+export type NexusGraphQLFieldConfig = WithExt<
+  GraphQLFieldConfig<any, any>,
+  NexusFieldExtension
+>;
+
+export type NexusGraphQLObjectTypeConfig = WithExt<
+  GraphQLObjectTypeConfig<any, any>,
+  NexusObjectTypeExtension
+>;
+
+export type NexusGraphQLInputObjectTypeConfig = WithExt<
+  GraphQLInputObjectTypeConfig,
+  NexusInputObjectTypeExtension
+>;
+
+export type NexusGraphQLInterfaceTypeConfig = WithExt<
+  GraphQLInterfaceTypeConfig<any, any>,
+  NexusInterfaceTypeExtension
+>;
+
+export type NexusGraphQLSchema = WithExt<GraphQLSchema, NexusSchemaExtension>;
+
+export type MaybeNexusGraphQLFieldConfig = Omit<
   GraphQLFieldConfig<any, any>,
   "extensions"
-> & { extensions: { nexus: NexusFieldExtension } };
-
-export type NexusGraphQLObjectTypeConfig = Omit<
-  GraphQLObjectTypeConfig<any, any>,
-  "extensions" | "fields"
 > & {
-  extensions: { nexus: NexusObjectTypeExtension };
-};
-
-export type NexusGraphQLInterfaceTypeConfig = Omit<
-  GraphQLInterfaceTypeConfig<any, any>,
-  "fields"
-> & {
-  extensions: { nexus: NexusInterfaceTypeExtension };
-};
-
-export type NexusGraphQLSchema = GraphQLSchema & {
-  extensions: { nexus: NexusSchemaExtension };
-};
-export type MaybeNexusGraphQLFieldConfig = Omit<
-  NexusGraphQLFieldConfig,
-  "extensions"
-> & {
-  extensions: { nexus?: NexusObjectTypeExtension };
+  extensions: { nexus?: NexusFieldExtension };
 };

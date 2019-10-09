@@ -3,7 +3,6 @@
  * Do not make changes to this file directly
  */
 
-import { core } from "../..";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     title(...args: any): void;
@@ -36,9 +35,13 @@ export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
   Mutation: {};
-  Post: {};
+  Post: {
+    // root type
+    body: string; // String!
+    title: string; // String!
+  };
   Query: {};
-  User: {};
+  User: { firstName: string; lastName: string };
   String: string;
   Int: number;
   Float: number;

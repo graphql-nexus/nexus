@@ -8,9 +8,9 @@ const NO_OP = () => {};
 
 export const testSchema = (
   name: string,
-  additionalTests: (getSchema: () => core.NexusSchema) => void = NO_OP
+  additionalTests: (getSchema: () => core.NexusGraphQLSchema) => void = NO_OP
 ) => {
-  let schema: core.NexusSchema;
+  let schema: core.NexusGraphQLSchema;
   const typegenFilePath = join(__dirname, `_${name}.typegen.ts`);
   const { plugins, ...rest } = require(`./_${name}`);
 
@@ -21,6 +21,7 @@ export const testSchema = (
         typegen: typegenFilePath,
         schema: false,
       },
+      shouldGenerateArtifacts: true,
       plugins: plugins || [],
       async formatTypegen(source, type) {
         const content = await typegenFormatPrettier({

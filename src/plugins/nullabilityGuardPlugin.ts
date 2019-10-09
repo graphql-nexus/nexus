@@ -7,7 +7,11 @@ import {
   GraphQLResolveInfo,
 } from "graphql";
 import { GraphQLNamedOutputType } from "../definitions/_types";
-import { printedGenType, isPromiseLike } from "../utils";
+import {
+  isPromiseLike,
+  printedGenTyping,
+  printedGenTypingImport,
+} from "../utils";
 import { GetGen, GenericFieldResolver } from "../typegenTypeHelpers";
 
 interface OnGuardedInfo {
@@ -18,38 +22,51 @@ interface OnGuardedInfo {
 }
 
 export type NullabilityGuardConfig = {
+  shouldGuard?: boolean;
   onGuarded?(obj: OnGuardedInfo): void;
   fallbackValue?(type: GraphQLNamedOutputType): any;
 };
 
-const schemaDefTypes = printedGenType({
+const schemaDefTypes = printedGenTyping({
   name: "nullGuardFallback",
   optional: true,
-  type: "(root, arg, ctx, info) => any",
+  type:
+    "<TypeName extends string>(typeName: TypeName, args: any, ctx: NexusGenTypes['context'], info: GraphQLResolveInfo) => core.GetGen2<'rootTypes', TypeName>",
   description: `
-    When there's a null value for this type, we should recover by supplying this value instead.
+    When there's a null value for any, we can recover by supplying this value instead.
     This can be added at the schema, to define global guards.
   `,
 });
 
-const objectTypeDefTypes = printedGenType({
+const objectTypeDefTypes = printedGenTyping({
   name: "nullGuardFallback",
   optional: true,
-  type: "(root, arg, ctx, info) => any",
+  type:
+    "(args: any, ctx: NexusGenTypes['context'], info: GraphQLResolveInfo) => core.GetGen2<'rootTypes', TypeName>",
   description: `
     When there's a null value for this type, we should recover by supplying this value instead.
     This can be added to any object type
   `,
+  imports: [
+    printedGenTypingImport({
+      module: "graphql",
+      bindings: ["GraphQLResolveInfo"],
+    }),
+    printedGenTypingImport({
+      module: "nexus",
+      bindings: ["core"],
+    }),
+  ],
 });
 
-const fieldDefTypes = printedGenType({
+const fieldDefTypes = printedGenTyping({
   name: "skipNullGuard",
   optional: true,
   type: "boolean",
   description: `
     The nullability guard can be helpful, but is also a pottentially expensive operation for lists.
     We need to iterate the entire list to check for null items to guard against. Set this to true
-    to skip the null guardd on a specific field if you know there's no potential for unsafe types.
+    to skip the null guard on a specific field if you know there's no potential for unsafe types.
   `,
 });
 
@@ -77,9 +94,8 @@ export const nullabilityGuard = (pluginConfig: NullabilityGuardConfig) => {
       }
       let finalConfig = {
         onGuarded: pluginConfig.onGuarded || (() => {}),
-        fallbackValue: pluginConfig.fallbackValue,
       } as TypeGuardMeta;
-      let type = config.parentTypeConfig;
+      let type = config.fieldConfig.type;
       if (isNonNullType(type)) {
         finalConfig.outerNonNull = true;
         type = type.ofType;
@@ -150,12 +166,36 @@ const nonNullValueGuard = (finalConfig: TypeGuardMeta): NullGuardFn => (
   ctx,
   info
 ) => (val) => {
-  //
+  if (val != null) {
+    return val;
+  }
+  finalConfig.onGuarded({ root, args, ctx, info });
+  const type = info.schema.getType(info.parentType.name);
+  if (
+    type &&
+    type.extensions &&
+    type.extensions.nexus &&
+    typeof type.extensions.nexus.config.nullGuardFallback === "function"
+  ) {
+    const fallback = type.extensions.nexus.config.nullGuardFallback(
+      args,
+      ctx,
+      info
+    );
+    return (fallback || {})[info.fieldName];
+  }
+  if (
+    info.schema.extensions &&
+    info.schema.extensions.nexus &&
+    typeof info.schema.extensions.nexus.config.nullGuardFallback === "function"
+  ) {
+    const fallback = info.schema.extensions.nullGuardFallback(
+      info.parentType.name,
+      args,
+      ctx,
+      info
+    );
+    return (fallback || {})[info.fieldName];
+  }
+  return type;
 };
-
-export function getFallbackValue(
-  type: GraphQLNamedOutputType,
-  config: NullabilityGuardConfig
-) {
-  //
-}

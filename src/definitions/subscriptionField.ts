@@ -8,7 +8,7 @@ import {
   GetGen,
   MaybePromise,
 } from "../typegenTypeHelpers";
-import { AllNexusOutputTypeDefs, NexusWrappedType } from "./wrapping";
+import { AllNexusOutputTypeDefs } from "./wrapping";
 import { AsyncIterator } from "./_types";
 
 export interface SubscribeFieldConfig<
@@ -16,10 +16,7 @@ export interface SubscribeFieldConfig<
   FieldName extends string,
   T = any
 > extends CommonOutputFieldConfig<TypeName, FieldName> {
-  type:
-    | GetGen<"allOutputTypes">
-    | AllNexusOutputTypeDefs
-    | NexusWrappedType<AllNexusOutputTypeDefs>;
+  type: GetGen<"allOutputTypes"> | AllNexusOutputTypeDefs;
 
   subscribe(
     root: object,

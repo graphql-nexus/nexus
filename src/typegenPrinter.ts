@@ -20,7 +20,6 @@ import {
   isUnionType,
   GraphQLInputObjectType,
   GraphQLEnumType,
-  defaultFieldResolver,
 } from "graphql";
 import path from "path";
 import { TypegenInfo } from "./builder";
@@ -30,9 +29,12 @@ import {
   groupTypes,
   mapObj,
   relativePathTo,
+  getExt,
 } from "./utils";
-import { WrappedResolver, NexusGraphQLSchema } from "./definitions/_types";
+import { NexusGraphQLSchema } from "./definitions/_types";
 import { NexusSchemaExtension } from "./extensions";
+import { isNexusPrintedGenTyping } from "./definitions/wrapping";
+import { StringLike } from "./plugin";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -68,18 +70,19 @@ type RootTypeMapping = Record<
 export class TypegenPrinter {
   groupedTypes: GroupedTypes;
   extensions: NexusSchemaExtension;
+  printImports: Record<string, Record<string, any>>;
 
   constructor(
     protected schema: NexusGraphQLSchema,
     protected typegenInfo: TypegenInfo & { typegenFile: string }
   ) {
     this.groupedTypes = groupTypes(schema);
-    this.extensions = schema.extensions.nexus;
+    this.extensions = getExt(schema);
+    this.printImports = {};
   }
 
   print() {
-    return [
-      this.printHeaders(),
+    const body = [
       this.printInputTypeMap(),
       this.printEnumTypeMap(),
       this.printRootTypeMap(),
@@ -97,16 +100,20 @@ export class TypegenPrinter {
       this.printGenTypeMap(),
       this.printPlugins(),
     ].join("\n\n");
+    return [this.printHeaders(), body].join("\n\n");
   }
 
   printHeaders() {
+    const fieldDefs = [
+      this.printDynamicInputFieldDefinitions(),
+      this.printDynamicOutputFieldDefinitions(),
+      this.printDynamicOutputPropertyDefinitions(),
+    ];
     return [
       this.typegenInfo.headers.join("\n"),
       this.typegenInfo.imports.join("\n"),
       this.printDynamicImport(),
-      this.printDynamicInputFieldDefinitions(),
-      this.printDynamicOutputFieldDefinitions(),
-      this.printDynamicOutputPropertyDefinitions(),
+      ...fieldDefs,
       GLOBAL_DECLARATION,
     ].join("\n");
   }
@@ -138,18 +145,8 @@ export class TypegenPrinter {
   }
 
   printDynamicImport() {
-    const {
-      dynamicFields: { dynamicInputFields, dynamicOutputFields },
-      rootTypings,
-    } = this.extensions;
-    const imports = [];
-    if (
-      [dynamicInputFields, dynamicOutputFields].some(
-        (o) => Object.keys(o).length > 0
-      )
-    ) {
-      imports.push(`import { core } from "nexus"`);
-    }
+    const { rootTypings } = this.extensions;
+    const imports: string[] = [];
     const importMap: Record<string, Set<string>> = {};
     const outputPath = this.typegenInfo.typegenFile;
     eachObj(rootTypings, (val, key) => {
@@ -168,6 +165,21 @@ export class TypegenPrinter {
       imports.push(
         `import { ${Array.from(val).join(", ")} } from ${JSON.stringify(key)}`
       );
+    });
+    eachObj(this.printImports, (val, key) => {
+      const { default: def, ...rest } = val;
+      const idents = [];
+      if (def) {
+        idents.push(def);
+      }
+      let bindings: string[] = [];
+      eachObj(rest, (alias, binding) => {
+        bindings.push(alias !== true ? `${binding} as ${alias}` : `${binding}`);
+      });
+      if (bindings.length) {
+        idents.push(`{ ${bindings.join(", ")} }`);
+      }
+      imports.push(`import ${idents.join(", ")} from ${JSON.stringify(key)}`);
     });
     return imports.join("\n");
   }
@@ -441,15 +453,14 @@ export class TypegenPrinter {
   }
 
   hasResolver(
-    field: GraphQLField<any, any> & { resolve?: WrappedResolver },
-    _type: GraphQLObjectType | GraphQLInterfaceType // Used in tests
+    field: GraphQLField<any, any>,
+    // Used in test mocking
+    _type: GraphQLObjectType
   ) {
-    if (field.resolve) {
-      if (field.resolve.nexusWrappedResolver !== defaultFieldResolver) {
-        return true;
-      }
+    if (field.extensions && field.extensions.nexus) {
+      return field.extensions.nexus.hasDefinedResolver;
     }
-    return false;
+    return Boolean(field.resolve);
   }
 
   printRootTypeMap() {
@@ -716,17 +727,17 @@ export class TypegenPrinter {
     plugins.forEach((plugin) => {
       if (plugin.config.fieldDefTypes) {
         pluginFieldExt.push(
-          padLeft(plugin.config.fieldDefTypes.toString(), "    ")
+          padLeft(this.printType(plugin.config.fieldDefTypes), "    ")
         );
       }
       if (plugin.config.schemaDefTypes) {
         pluginSchemaExt.push(
-          padLeft(plugin.config.schemaDefTypes.toString(), "    ")
+          padLeft(this.printType(plugin.config.schemaDefTypes), "    ")
         );
       }
       if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(
-          padLeft(plugin.config.objectTypeDefTypes.toString(), "    ")
+          padLeft(this.printType(plugin.config.objectTypeDefTypes), "    ")
         );
       }
     });
@@ -742,6 +753,32 @@ export class TypegenPrinter {
         "}",
       ].join("\n"),
     ].join("\n");
+  }
+
+  printType(strLike: StringLike | StringLike[]): string {
+    if (Array.isArray(strLike)) {
+      return strLike.map((s) => this.printType(s)).join("\n");
+    }
+    if (isNexusPrintedGenTyping(strLike)) {
+      strLike.imports.forEach((i) => {
+        this.printImports[i.config.module] =
+          this.printImports[i.config.module] || {};
+        if (i.config.default) {
+          this.printImports[i.config.module].default = i.config.default;
+        }
+        if (i.config.bindings) {
+          i.config.bindings.forEach((binding) => {
+            if (typeof binding === "string") {
+              this.printImports[i.config.module][binding] = true;
+            } else {
+              this.printImports[i.config.module][binding[0]] = binding[1];
+            }
+          });
+        }
+      });
+      return strLike.toString();
+    }
+    return strLike;
   }
 }
 

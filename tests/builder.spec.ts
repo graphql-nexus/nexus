@@ -1,10 +1,8 @@
-import {
-  resolveBuilderConfig,
-  InternalBuilderConfig,
-  BuilderConfig,
-} from "../src/builder";
+import { BuilderConfig } from "../src/builder";
 import * as Path from "path";
 import { restoreEnvBeforeEach } from "./_helpers";
+import { resolveTypegenConfig } from "../src/utils";
+import { TypegenMetadataConfig } from "../src/core";
 
 const relativePath = (...paths: string[]): string => Path.join(__dirname, ...paths); // prettier-ignore
 const atTypesPath = relativePath("../../@types");
@@ -30,7 +28,7 @@ const outputs = {
 describe("resolveBuilderConfig() outputs", () => {
   restoreEnvBeforeEach();
 
-  type Cases = [BuilderConfig, InternalBuilderConfig][];
+  type Cases = [BuilderConfig, TypegenMetadataConfig][];
   const onCases: Cases = [
     // defaults
     [{}, outputs.justTypegen],
@@ -52,13 +50,13 @@ describe("resolveBuilderConfig() outputs", () => {
   ]; // prettier-ignore
 
   it.each(onCases)("with shouldGenerateArtifacts: true + %j", (given, expected) => {
-      const internalConfig = resolveBuilderConfig({ ...given, shouldGenerateArtifacts: true })
+      const internalConfig = resolveTypegenConfig({ ...given, shouldGenerateArtifacts: true })
       expect(internalConfig.outputs).toEqual(expected.outputs);
     }
   ) // prettier-ignore
 
   it.each(offCases)("with shouldGenerateArtifacts: false + %j", (given, expected) => {
-      const internalConfig = resolveBuilderConfig({...given, shouldGenerateArtifacts: false });
+      const internalConfig = resolveTypegenConfig({...given, shouldGenerateArtifacts: false });
       expect(internalConfig.outputs).toEqual(expected.outputs);
     }
   ); // prettier-ignore
@@ -74,7 +72,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true" }, { shouldGenerateArtifacts: false }],
   ])("when defined, overrules environment variables %j", (envEntries, config) => {
       Object.assign(process.env, envEntries);
-      const internalConfig = resolveBuilderConfig(config);
+      const internalConfig = resolveTypegenConfig(config);
       const expectedOutputs = config.shouldGenerateArtifacts ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
@@ -88,7 +86,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false", NODE_ENV: "development" }, false],
   ])("when undefined, NEXUS_SHOULD_GENERATE_ARTIFACTS is used (%j)", (envEntries, isGenOn) => {
       Object.assign(process.env, envEntries);
-      const internalConfig = resolveBuilderConfig({});
+      const internalConfig = resolveTypegenConfig({});
       const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
@@ -102,7 +100,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NODE_ENV: undefined }, true],
   ])("when undefined, and no NEXUS_SHOULD_GENERATE_ARTIFACTS, NODE_ENV is used (%j)", (envEntries, isGenOn) => {
       Object.assign(process.env, envEntries);
-      const internalConfig = resolveBuilderConfig({});
+      const internalConfig = resolveTypegenConfig({});
       const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }

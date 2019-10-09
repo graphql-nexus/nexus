@@ -3,6 +3,9 @@
  * Do not make changes to this file directly
  */
 
+import { GraphQLResolveInfo } from "graphql";
+import { core } from "../..";
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
@@ -13,10 +16,7 @@ export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
   Query: {};
-  User: {
-    // root type
-    id: string; // ID!
-  };
+  User: { id: string };
   String: string;
   Int: number;
   Float: number;
@@ -89,17 +89,38 @@ export interface NexusGenTypes {
 }
 
 declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginTypeConfig<TypeName extends string> {
+    /**
+     * When there's a null value for this type, we should recover by supplying this value instead.
+     * This can be added to any object type
+     */
+    nullGuardFallback?: (
+      args: any,
+      ctx: NexusGenTypes["context"],
+      info: GraphQLResolveInfo
+    ) => core.GetGen2<"rootTypes", TypeName>;
+  }
   interface NexusGenPluginFieldConfig<
     TypeName extends string,
     FieldName extends string
   > {
     /**
-     * The nullability guard can be helpful, but is also a potentially expensive operation for lists.
-     * We need to iterate the entire list to check for null items to guard against. Set this to
-     * true to skip the null guard on a specific field if you know there's no potential for unsafe types.
+     * The nullability guard can be helpful, but is also a pottentially expensive operation for lists.
+     * We need to iterate the entire list to check for null items to guard against. Set this to true
+     * to skip the null guard on a specific field if you know there's no potential for unsafe types.
      */
     skipNullGuard?: boolean;
   }
-  interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginSchemaConfig {
+    /**
+     * When there's a null value for any, we can recover by supplying this value instead.
+     * This can be added at the schema, to define global guards.
+     */
+    nullGuardFallback?: <TypeName extends string>(
+      typeName: TypeName,
+      args: any,
+      ctx: NexusGenTypes["context"],
+      info: GraphQLResolveInfo
+    ) => core.GetGen2<"rootTypes", TypeName>;
+  }
 }

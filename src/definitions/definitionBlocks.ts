@@ -9,11 +9,7 @@ import {
   AllInputTypes,
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
-import {
-  AllNexusOutputTypeDefs,
-  NexusWrappedType,
-  AllNexusInputTypeDefs,
-} from "./wrapping";
+import { AllNexusOutputTypeDefs, AllNexusInputTypeDefs } from "./wrapping";
 import { BaseScalars } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
 
@@ -77,10 +73,7 @@ export interface NexusOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends OutputScalarConfig<TypeName, FieldName> {
-  type:
-    | GetGen<"allOutputTypes", string>
-    | AllNexusOutputTypeDefs
-    | NexusWrappedType<AllNexusOutputTypeDefs>;
+  type: GetGen<"allOutputTypes", string> | AllNexusOutputTypeDefs;
 }
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {

@@ -20,7 +20,6 @@ export { subscriptionField } from "./definitions/subscriptionField";
 export { scalarType, asNexusMethod } from "./definitions/scalarType";
 export { decorateType } from "./definitions/decorateType";
 export { unionType } from "./definitions/unionType";
-export { nexusWrappedType } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";
 export { groupTypes } from "./utils";
 export {

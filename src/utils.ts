@@ -15,14 +15,16 @@ import {
   isEnumType,
   specifiedScalarTypes,
   GraphQLNamedType,
+  GraphQLType,
+  isWrappingType,
+  isListType,
+  isNonNullType,
+  GraphQLFieldConfig,
 } from "graphql";
 import path from "path";
 import { UNKNOWN_TYPE_SCALAR, BuilderConfig } from "./builder";
 import { TypegenMetadataConfig } from "./typegenMetadata";
-
-export function log(msg: string) {
-  console.log(`GraphQL Nexus: ${msg}`);
-}
+import { MissingType, withNexusSymbol, NexusTypes } from "./definitions/_types";
 
 export const isInterfaceField = (
   type: GraphQLObjectType,
@@ -237,15 +239,36 @@ export function relativePathTo(
   return path.join(relative, filename);
 }
 
-interface PrintedTypegenConfig {
+export interface PrintedGenTypingImportConfig {
+  module: string;
+  default?: string;
+  bindings?: Array<string | [string, string]>; // import { X } or import { X as Y }
+}
+
+export class PrintedGenTypingImport {
+  constructor(readonly config: PrintedGenTypingImportConfig) {}
+}
+withNexusSymbol(PrintedGenTypingImport, NexusTypes.PrintedGenTypingImport);
+
+export function printedGenTypingImport(config: PrintedGenTypingImportConfig) {
+  return new PrintedGenTypingImport(config);
+}
+
+export interface PrintedGenTypingConfig {
   name: string;
   optional: boolean;
   type: string;
   description?: string;
+  imports?: PrintedGenTypingImport[];
 }
 
-export class PrintedTypeGen {
-  constructor(protected config: PrintedTypegenConfig) {}
+export class PrintedGenTyping {
+  constructor(protected config: PrintedGenTypingConfig) {}
+
+  get imports() {
+    return this.config.imports || [];
+  }
+
   toString() {
     let str = ``;
     if (this.config.description) {
@@ -255,16 +278,17 @@ export class PrintedTypeGen {
         .filter((s) => s)
         .map((s) => ` * ${s}`)
         .join("\n");
-      str = `/**\n${descriptionLines}\n */`;
+      str = `/**\n${descriptionLines}\n */\n`;
     }
     const field = `${this.config.name}${this.config.optional ? "?" : ""}`;
     str += `${field}: ${this.config.type}`;
     return str;
   }
 }
+withNexusSymbol(PrintedGenTyping, NexusTypes.PrintedGenTyping);
 
-export function printedGenType(config: PrintedTypegenConfig) {
-  return new PrintedTypeGen(config);
+export function printedGenTyping(config: PrintedGenTypingConfig) {
+  return new PrintedGenTyping(config);
 }
 
 /**
@@ -275,20 +299,7 @@ export function printedGenType(config: PrintedTypegenConfig) {
 export function resolveTypegenConfig(
   config: BuilderConfig
 ): TypegenMetadataConfig {
-  // NOTE(tim): is this really useful? Can the user just define this on their own?
-  // This allows decoupling NODE_ENV from artifact gen config in a flexible way.
-  const shouldGenerateArtifactsEnv =
-    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
-      ? true
-      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
-      ? false
-      : undefined;
-
-  const {
-    outputs,
-    shouldGenerateArtifacts = shouldGenerateArtifactsEnv,
-    ...rest
-  } = config;
+  const { outputs, ...rest } = config;
 
   if (outputs && typeof outputs === "object") {
     if (typeof outputs.schema === "string") {
@@ -299,37 +310,43 @@ export function resolveTypegenConfig(
     }
   }
 
-  const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
-  const defaultTypesPath = path.join(
-    __dirname,
-    "../../@types/__nexus-typegen__core/index.d.ts"
-  );
-  const isDev = Boolean(
-    !process.env.NODE_ENV || process.env.NODE_ENV === "development"
-  );
+  const shouldGenerateArtifacts =
+    typeof config.shouldGenerateArtifacts === "boolean"
+      ? config.shouldGenerateArtifacts
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
+      ? true
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
+      ? false
+      : Boolean(
+          !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+        );
 
+  const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
+  const defaultTypegenPath = path.join(
+    __dirname,
+    "../../@types/nexus-typegen/index.d.ts"
+  );
   let finalSchemaPath: false | string = false;
   let finalTypegenPath: false | string = false;
 
   if (shouldGenerateArtifacts === false || outputs === false) {
-    finalSchemaPath = false;
     finalTypegenPath = false;
-  } else if (outputs === undefined) {
     finalSchemaPath = false;
-    finalTypegenPath = isDev ? defaultTypesPath : false;
-  } else if (outputs === true) {
-    finalSchemaPath = defaultSchemaPath;
-    finalTypegenPath = defaultTypesPath;
+  } else if (outputs === undefined || outputs === true) {
+    finalTypegenPath = defaultTypegenPath;
+    finalSchemaPath = outputs === true ? defaultSchemaPath : false;
   } else if (typeof outputs === "object") {
+    if (outputs.typegen === undefined || outputs.typegen === true) {
+      finalTypegenPath = defaultTypegenPath;
+    } else if (typeof outputs.typegen === "string") {
+      finalTypegenPath = outputs.typegen;
+    }
     if (outputs.schema === undefined) {
       finalSchemaPath = false;
     } else if (outputs.schema === true) {
       finalSchemaPath = defaultSchemaPath;
-    }
-    if (outputs.typegen === undefined) {
-      finalTypegenPath = isDev ? defaultTypesPath : false;
-    } else if (outputs.typegen === true) {
-      finalTypegenPath = defaultTypesPath;
+    } else if (typeof outputs.schema === "string") {
+      finalSchemaPath = outputs.schema;
     }
   }
 
@@ -341,4 +358,79 @@ export function resolveTypegenConfig(
       schema: finalSchemaPath,
     },
   };
+}
+
+export function unwrapType(
+  type: GraphQLType
+): { type: GraphQLNamedType; isNonNull: boolean; list: boolean[] } {
+  let finalType = type;
+  let isNonNull = false;
+  const list = [];
+  while (isWrappingType(finalType)) {
+    while (isListType(finalType)) {
+      finalType = finalType.ofType;
+      if (isNonNullType(finalType)) {
+        finalType = finalType.ofType;
+        list.unshift(true);
+      } else {
+        list.unshift(false);
+      }
+    }
+    if (isNonNullType(finalType)) {
+      isNonNull = true;
+      finalType = finalType.ofType;
+    }
+  }
+  return { type: finalType, isNonNull, list };
+}
+
+// export function hasExt<T extends GraphQLNamedType>(t: T): NexusExtension<T> {}
+
+export function getExt<
+  T extends GraphQLNamedType | GraphQLSchema | GraphQLFieldConfig<any, any>
+>(type: T, fallback: any = {}) {
+  return type.extensions ? type.extensions.nexus || fallback : fallback;
+}
+
+export function assertNoMissingTypes(
+  schema: GraphQLSchema,
+  missingTypes: Record<string, MissingType>
+) {
+  const missingTypesNames = Object.keys(missingTypes);
+  const schemaTypeMap = schema.getTypeMap();
+  const schemaTypeNames = Object.keys(schemaTypeMap).filter(
+    (typeName) => !isUnknownType(schemaTypeMap[typeName])
+  );
+
+  if (missingTypesNames.length > 0) {
+    const errors = missingTypesNames
+      .map((typeName) => {
+        const { fromObject } = missingTypes[typeName];
+
+        if (fromObject) {
+          return `- Looks like you forgot to import ${typeName} in the root "types" passed to Nexus makeSchema`;
+        }
+
+        const suggestions = suggestionList(typeName, schemaTypeNames);
+
+        let suggestionsString = "";
+
+        if (suggestions.length > 0) {
+          suggestionsString = ` or mean ${suggestions.join(", ")}`;
+        }
+
+        return `- Missing type ${typeName}, did you forget to import a type to the root query${suggestionsString}?`;
+      })
+      .join("\n");
+
+    throw new Error("\n" + errors);
+  }
+}
+
+export function consoleWarn(msg: string) {
+  console.warn(msg);
+}
+
+export function log(msg: string) {
+  console.log(`GraphQL Nexus: ${msg}`);
 }

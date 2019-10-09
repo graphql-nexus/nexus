@@ -3,7 +3,7 @@ import { graphql } from "graphql";
 
 testSchema("nullabilityGuard", (getSchema) => {
   it("should trigger the nullability guard", async () => {
-    const data = await graphql(
+    const { errors = [], data } = await graphql(
       getSchema(),
       `
         {
@@ -13,7 +13,7 @@ testSchema("nullabilityGuard", (getSchema) => {
         }
       `
     );
-    expect(data.errors).toEqual([]);
-    expect(data.data).toEqual({ id: "N/A" });
+    expect(errors).toEqual([]);
+    expect(data.getUserWithGuard).toEqual({ id: "N/A" });
   });
 });

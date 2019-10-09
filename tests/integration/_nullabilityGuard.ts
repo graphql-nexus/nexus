@@ -1,5 +1,5 @@
 import "./_nullabilityGuard.typegen";
-import { plugins as nexusPlugins, objectType, queryField } from "../..";
+import { plugins as nexusPlugins, objectType, queryField, core } from "../..";
 
 export const userType = objectType({
   name: "User",
@@ -13,6 +13,10 @@ export const userType = objectType({
       },
     });
   },
+  nullGuardFallback(args, ctx, info) {
+    return { id: "N/A" };
+  },
+  rootTyping: "{ id: string }",
 });
 
 export const userField = queryField("getUser", {

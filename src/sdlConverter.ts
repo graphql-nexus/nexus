@@ -10,16 +10,12 @@ import {
   GraphQLNamedType,
   isSpecifiedScalarType,
   GraphQLField,
-  isWrappingType,
-  isNonNullType,
-  isListType,
   GraphQLOutputType,
   GraphQLWrappingType,
   isScalarType,
   isObjectType,
   GraphQLInputField,
   GraphQLArgument,
-  GraphQLType,
 } from "graphql";
 import {
   groupTypes,
@@ -27,6 +23,7 @@ import {
   isInterfaceField,
   objValues,
   eachObj,
+  unwrapType,
 } from "./utils";
 
 export function convertSDL(
@@ -418,28 +415,6 @@ export class SDLConverter {
   printBlock(block: (string | null)[]) {
     return block.filter((t) => t !== null && t !== "").join("\n");
   }
-}
-
-function unwrapType(type: GraphQLType) {
-  let finalType = type;
-  let isNonNull = false;
-  const list = [];
-  while (isWrappingType(finalType)) {
-    while (isListType(finalType)) {
-      finalType = finalType.ofType;
-      if (isNonNullType(finalType)) {
-        finalType = finalType.ofType;
-        list.unshift(true);
-      } else {
-        list.unshift(false);
-      }
-    }
-    if (isNonNullType(finalType)) {
-      isNonNull = true;
-      finalType = finalType.ofType;
-    }
-  }
-  return { type: finalType, isNonNull, list };
 }
 
 function isCommonScalar(field: GraphQLNamedType): boolean {

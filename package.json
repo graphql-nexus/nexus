@@ -45,6 +45,7 @@
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.15.2",
     "@types/graphql-iso-date": "^3.3.3",
+    "codecov": "^3.6.1",
     "graphql": "^14.5.8",
     "graphql-iso-date": "^3.6.1",
     "husky": "^1.1.2",

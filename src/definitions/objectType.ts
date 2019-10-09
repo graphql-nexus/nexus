@@ -2,7 +2,7 @@ import {
   OutputDefinitionBlock,
   OutputDefinitionBuilder,
 } from "./definitionBlocks";
-import { GetGen2, GetGen, FieldResolver } from "../typegenTypeHelpers";
+import { GetGen, FieldResolver } from "../typegenTypeHelpers";
 import {
   NonNullConfig,
   NexusTypes,
@@ -41,9 +41,6 @@ export interface FieldModificationDef<
 export interface ObjectDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void;
-  addFieldModifications<FieldName extends string>(
-    changes: FieldModificationDef<TypeName, FieldName>
-  ): void;
 }
 
 export class ObjectDefinitionBlock<
@@ -61,10 +58,11 @@ export class ObjectDefinitionBlock<
   /**
    * Modifies a field added via an interface
    */
-  modify<
-    FieldName extends Extract<keyof GetGen2<"fieldTypes", TypeName>, string>
-  >(field: FieldName, modifications: FieldModification<TypeName, FieldName>) {
-    this.typeBuilder.addFieldModifications({ ...modifications, field });
+  modify(field: any, modifications: any) {
+    throw new Error(`
+      The modify API has been removed. If you were using this API, please open an issue on 
+      GitHub to discuss your use case so we can discuss a suitable replacement.
+    `);
   }
 }
 

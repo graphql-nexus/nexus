@@ -44,28 +44,4 @@ export function connectionType(name: core.AllOutputTypes) {
 }
 ```
 
-## Advanced Wrapping
-
-We export a function which allows you to "tap-in" to the builder core-apis at construction time. Check out the https://github.com/prisma/nexus-prisma for an example of how to make effective use of this.
-
-```ts
-import { nexusWrappedType } from 'nexus'
-
-export const WrappedType = (config) => {
-  return nexusWrappedType((builder) => {
-    return objectType({
-      ...config,
-      definition(t) {
-        // read some data from a subclassed builder
-        t.myMethod = () => {
-          // ...
-        }
-        config.definition(t)
-      }
-    })
-  }
-})
-
-```
-
 All internal apis are also exposed under a `core` namespace for you to use. Note that these may be subject to minor change, though we'll try to be considerate about this. At least there are type-safety guarantees (assuming you're using TypeScript).

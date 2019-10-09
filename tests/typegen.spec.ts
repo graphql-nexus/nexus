@@ -1,6 +1,5 @@
 import {
   buildSchema,
-  lexicographicSortSchema,
   GraphQLField,
   GraphQLObjectType,
   GraphQLInterfaceType,
@@ -8,7 +7,7 @@ import {
 import * as path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
-import { NexusGraphQLSchema } from "../src/core";
+import { NexusGraphQLSchema, makeSchema } from "../src/core";
 
 const { TypegenPrinter, TypegenMetadata } = core;
 
@@ -16,9 +15,9 @@ describe("typegen", () => {
   let typegen: core.TypegenPrinter;
   let metadata: core.TypegenMetadata;
   beforeEach(async () => {
-    const schema = lexicographicSortSchema(
-      buildSchema(EXAMPLE_SDL)
-    ) as NexusGraphQLSchema;
+    const schema = makeSchema({
+      types: [buildSchema(EXAMPLE_SDL)],
+    }) as NexusGraphQLSchema;
     metadata = new TypegenMetadata({
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
@@ -38,7 +37,7 @@ describe("typegen", () => {
       },
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    typegen = new TypegenPrinter(schema, {
+    typegen = new TypegenPrinter(metadata.sortSchema(schema), {
       ...typegenInfo,
       typegenFile: "",
     });

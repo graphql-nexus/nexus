@@ -1,10 +1,5 @@
-import { SchemaConfig, SchemaBuilder, BuilderLens } from "./builder";
-import {
-  ASTKindToNode,
-  GraphQLResolveInfo,
-  GraphQLFieldResolver,
-  Visitor,
-} from "graphql";
+import { SchemaConfig, BuilderLens } from "./builder";
+import { GraphQLResolveInfo, GraphQLFieldResolver } from "graphql";
 import {
   withNexusSymbol,
   NexusTypes,
@@ -13,7 +8,7 @@ import {
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
 } from "./definitions/_types";
-import { isPromiseLike, PrintedTypeGen } from "./utils";
+import { isPromiseLike, PrintedGenTyping } from "./utils";
 import {
   NexusFieldExtension,
   NexusSchemaExtension,
@@ -24,7 +19,7 @@ export type CreateFieldResolverInfo = {
   /**
    * The internal Nexus "builder" object
    */
-  builder: SchemaBuilder;
+  builder: BuilderLens;
   /**
    * Info about the GraphQL Field we're decorating.
    * Always guaranteed to exist, even for non-Nexus GraphQL types
@@ -40,9 +35,7 @@ export type CreateFieldResolverInfo = {
   /**
    * The root-level SchemaConfig passed
    */
-  schemaConfig: Omit<SchemaConfig, "types"> & {
-    extensions: { nexus: NexusSchemaExtension };
-  };
+  schemaConfig: Omit<SchemaConfig, "types">;
   /**
    * Nexus specific metadata provided to the schema.
    * Shorthand for `schemaConfig.extensions.nexus`
@@ -60,7 +53,7 @@ export type CreateFieldResolverInfo = {
   fieldExtension: NexusFieldExtension;
 };
 
-export type StringLike = PrintedTypeGen | string;
+export type StringLike = PrintedGenTyping | string;
 
 export interface PluginConfig {
   /**
@@ -96,6 +89,12 @@ export interface PluginConfig {
    */
   onBeforeBuild?: (builder: BuilderLens) => void;
   /**
+   * If a type is not defined in the schema, our plugins can register an `onMissingType` handler,
+   * which will intercept the missing type name and give us an opportunity to respond with a valid
+   * type.
+   */
+  onMissingType?: (missingTypeName: string) => any;
+  /**
    * Executed any time a field resolver is created. Returning a function here will add its in the
    * stack of middlewares with the (root, args, ctx, info, next) signature, where the `next` is the
    * next middleware or resolver to be executed.
@@ -115,7 +114,7 @@ export interface PluginConfig {
    * Executed when a field is going to be printed to the nexus "generated types". Gives
    * an opportunity to override the standard behavior for printing our inferrred type info
    */
-  onPrint?: (visitor: Visitor<ASTKindToNode>) => void;
+  // onPrint?: (visitor: Visitor<ASTKindToNode>) => void;
 }
 
 /**
