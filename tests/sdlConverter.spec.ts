@@ -1,4 +1,4 @@
-import { convertSDL, core } from "..";
+import { convertSDL, core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
 
 const { SDLConverter } = core;

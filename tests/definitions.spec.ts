@@ -8,7 +8,7 @@ import {
   objectType,
   inputObjectType,
   extendInputType,
-} from "..";
+} from "../src";
 import { UserObject, PostObject } from "./_helpers";
 
 enum NativeColors {

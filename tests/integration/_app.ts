@@ -10,7 +10,7 @@ import {
   dynamicOutputMethod,
   dynamicInputMethod,
   dynamicOutputProperty,
-} from "../..";
+} from "../../src";
 
 export const query = queryType({
   definition(t) {

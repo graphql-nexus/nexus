@@ -1,6 +1,6 @@
 import { graphql } from "graphql";
 import path from "path";
-import { makeSchema, objectType, queryField, unionType } from "..";
+import { makeSchema, objectType, queryField, unionType } from "../src";
 
 describe("unionType", () => {
   test("unionType", async () => {

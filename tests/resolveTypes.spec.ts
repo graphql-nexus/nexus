@@ -1,5 +1,5 @@
 import { graphql } from "graphql";
-import { makeSchema, queryType, scalarType } from "..";
+import { makeSchema, queryType, scalarType } from "../src";
 
 describe("custom scalars", () => {
   it("resolve custom scalar with inline functions", async () => {

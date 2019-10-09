@@ -8,7 +8,7 @@ import {
   dynamicInputMethod,
   decorateType,
   ext,
-} from "..";
+} from "../src";
 import { graphql } from "graphql";
 import { CatListFixture } from "./_fixtures";
 import { dynamicOutputProperty } from "../src/dynamicProperty";
