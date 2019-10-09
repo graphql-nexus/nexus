@@ -2,6 +2,10 @@
 
 ### 0.12.0 (next)
 
+#### beta.13
+
+- fix(typegen): explicitly await removeFile before write (#254)
+
 #### beta.12
 
 - feat(config): env var for should-generate-artifacts (#244)
