@@ -8,7 +8,7 @@
   "homepage": "https://nexus.js.org",
   "scripts": {
     "test": "jest",
-    "test:ci": "jest -i --coverage",
+    "test:ci": "jest -i --no-cache --coverage",
     "build": "tsc",
     "dev": "tsc -w",
     "dev:examples": "yarn -s link-examples && tsc -w",
