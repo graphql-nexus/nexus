@@ -9,8 +9,7 @@ let pageInfo: NexusObjectTypeDef<string>;
 
 export const RelayConnectionFieldMethod = dynamicOutputMethod({
   name: "relayConnectionField",
-  typeDefinition: `
-    <FieldName extends string>(fieldName: FieldName, opts: {
+  typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
       type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
       pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,

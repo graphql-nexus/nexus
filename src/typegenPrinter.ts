@@ -145,10 +145,23 @@ export class TypegenPrinter {
   }
 
   printDynamicImport() {
-    const { rootTypings } = this.extensions;
+    const {
+      rootTypings,
+      dynamicFields: { dynamicInputFields, dynamicOutputFields },
+    } = this.extensions;
     const imports: string[] = [];
     const importMap: Record<string, Set<string>> = {};
     const outputPath = this.typegenInfo.typegenFile;
+    // For backward compat.
+    if (!this.printImports.nexus) {
+      if (
+        [dynamicInputFields, dynamicOutputFields].some(
+          (o) => Object.keys(o).length > 0
+        )
+      ) {
+        this.printImports.nexus = { core: true };
+      }
+    }
     eachObj(rootTypings, (val, key) => {
       if (typeof val !== "string") {
         const importPath = (path.isAbsolute(val.path)

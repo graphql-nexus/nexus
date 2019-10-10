@@ -4,8 +4,8 @@
  */
 
 
-import { core } from "nexus"
 import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions"
+import { core } from "nexus"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Date";
@@ -13,25 +13,28 @@ declare global {
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    collection<FieldName extends string>(fieldName: FieldName, opts: {
-      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+    collectionField<FieldName extends string>(fieldName: FieldName, opts: {
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
       totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
       args?: core.ArgsRecord,
       nullable?: boolean,
       description?: string
     }): void;
-    relayConnection<FieldName extends string>(fieldName: FieldName, opts: {
-      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+    relayConnectionField
+    <FieldName extends string>(fieldName: FieldName, opts: {
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
       pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,
-      args?: Record<string, core.NexusArgDef<string>>,
+      args?: Record<string, core.NexusArgDef<any>>,
       nullable?: boolean,
       description?: string
     }): void
+  
     date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
   }
 }
+
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -224,4 +227,14 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+
+declare global {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {
+  }
+  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
+  }
+  interface NexusGenPluginSchemaConfig {
+  }
 }

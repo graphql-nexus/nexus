@@ -17,7 +17,7 @@ import { DynamicOutputPropertyDef } from "../dynamicProperty";
 import { AllInputTypes } from "../typegenTypeHelpers";
 import { PrintedGenTyping, PrintedGenTypingImport } from "../utils";
 
-export type AllNexusInputTypeDefs<T extends string = string> =
+export type AllNexusInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>;

@@ -101,7 +101,6 @@ import {
   NexusGraphQLInterfaceTypeConfig,
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLSchema,
-  MaybeNexusGraphQLFieldConfig,
   NexusGraphQLInputObjectTypeConfig,
 } from "./definitions/_types";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
@@ -118,10 +117,8 @@ import {
   isObject,
   eachObj,
   resolveTypegenConfig,
-  unwrapType,
   assertNoMissingTypes,
   consoleWarn,
-  getExt,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -477,8 +474,6 @@ export class SchemaBuilder {
    * on any types that are referenced on the "types" field and pulls
    * those in too, so you can define types anonymously, without
    * exporting them.
-   *
-   * @param typeDef
    */
   addType(typeDef: TypeDef | DynamicBlockDef) {
     if (isNexusDynamicInputMethod(typeDef)) {
@@ -738,24 +733,10 @@ export class SchemaBuilder {
         const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {};
         interfaceConfigs.forEach((i) => {
           Object.keys(i.fields).forEach((iFieldName) => {
-            const iConfig = i.fields[
-              iFieldName
-            ] as MaybeNexusGraphQLFieldConfig;
-            const fieldConfig: NexusGraphQLFieldConfig = {
-              ...iConfig,
-              extensions: {
-                ...iConfig.extensions,
-                nexus:
-                  getExt(iConfig) ||
-                  new NexusFieldExtension({
-                    type: unwrapType(iConfig.type).type.name as any,
-                  }),
-              },
-            };
-            interfaceFieldsMap[iFieldName] = fieldConfig;
+            interfaceFieldsMap[iFieldName] = i.fields[iFieldName];
           });
         });
-        return this.buildObjectFields(
+        return this.buildOutputFields(
           fields,
           objectTypeConfig,
           interfaceFieldsMap
@@ -797,10 +778,10 @@ export class SchemaBuilder {
       name,
       resolveType,
       description,
+      fields: () => this.buildOutputFields(fields, interfaceTypeConfig, {}),
       extensions: {
         nexus: new NexusInterfaceTypeExtension(config),
       },
-      fields: () => this.buildInterfaceFields(fields, interfaceTypeConfig, {}),
     };
     return this.finalize(new GraphQLInterfaceType(interfaceTypeConfig));
   }
@@ -946,24 +927,13 @@ export class SchemaBuilder {
     return unionMembers;
   }
 
-  protected buildInterfaceFields(
+  protected buildOutputFields(
     fields: NexusOutputFieldDef[],
-    typeConfig: NexusGraphQLInterfaceTypeConfig,
+    typeConfig: NexusGraphQLInterfaceTypeConfig | NexusGraphQLObjectTypeConfig,
     intoObject: GraphQLFieldConfigMap<any, any>
   ) {
     fields.forEach((field) => {
-      intoObject[field.name] = this.buildInterfaceField(field, typeConfig);
-    });
-    return intoObject;
-  }
-
-  protected buildObjectFields(
-    fields: NexusOutputFieldDef[],
-    typeConfig: NexusGraphQLObjectTypeConfig,
-    intoObject: GraphQLFieldConfigMap<any, any>
-  ): GraphQLFieldConfigMap<any, any> {
-    fields.forEach((field) => {
-      intoObject[field.name] = this.buildObjectField(field, typeConfig);
+      intoObject[field.name] = this.buildOutputField(field, typeConfig);
     });
     return intoObject;
   }
@@ -979,32 +949,9 @@ export class SchemaBuilder {
     return fieldMap;
   }
 
-  protected buildInterfaceField(
+  protected buildOutputField(
     fieldConfig: NexusOutputFieldDef,
-    typeConfig: NexusGraphQLInterfaceTypeConfig
-  ): GraphQLFieldConfig<any, any> {
-    if (!fieldConfig.type) {
-      throw new Error(
-        `Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`
-      );
-    }
-    return {
-      type: this.decorateType(
-        this.getOutputType(fieldConfig.type),
-        fieldConfig.list,
-        this.outputNonNull(typeConfig, fieldConfig)
-      ),
-      args: this.buildArgs(fieldConfig.args || {}, typeConfig),
-      resolve: fieldConfig.resolve,
-      description: fieldConfig.description,
-      deprecationReason: fieldConfig.deprecation,
-      subscribe: fieldConfig.subscribe,
-    };
-  }
-
-  protected buildObjectField(
-    fieldConfig: NexusOutputFieldDef,
-    typeConfig: NexusGraphQLObjectTypeConfig
+    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
   ): GraphQLFieldConfig<any, any> {
     if (!fieldConfig.type) {
       throw new Error(

@@ -163,10 +163,3 @@ export type NexusGraphQLInterfaceTypeConfig = WithExt<
 >;
 
 export type NexusGraphQLSchema = WithExt<GraphQLSchema, NexusSchemaExtension>;
-
-export type MaybeNexusGraphQLFieldConfig = Omit<
-  GraphQLFieldConfig<any, any>,
-  "extensions"
-> & {
-  extensions: { nexus?: NexusFieldExtension };
-};

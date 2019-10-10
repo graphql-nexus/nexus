@@ -8,7 +8,7 @@ const basicCollectionMap = new Map<string, NexusObjectTypeDef<string>>();
 export const CollectionFieldMethod = dynamicOutputMethod({
   name: "collectionField",
   typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
-      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
       totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
       args?: core.ArgsRecord,
