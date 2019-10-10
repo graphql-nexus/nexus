@@ -105,6 +105,6 @@ workflows:
       - example_ghost
       - example_githunt-api
       - example_kitchen-sink
-      - example_nexus-prisma
+      # - example_nexus-prisma
       - example_star-wars
       - example_ts-ast-reader
