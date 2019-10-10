@@ -58,16 +58,16 @@ jobs:
       - run: yarn --cwd=examples/kitchen-sink link nexus
       - run: yarn --cwd=examples/kitchen-sink tsc
 
-  example_nexus-prisma:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn link
-      - run: yarn --cwd=examples/nexus-prisma --frozen-lockfile
-      - run: yarn --cwd=examples/nexus-prisma link nexus
-      - run: yarn --cwd=examples/nexus-prisma tsc
+  # example_nexus-prisma:
+  #   docker:
+  #     - image: circleci/node:10
+  #   steps:
+  #     - checkout
+  #     - run: yarn --frozen-lockfile
+  #     - run: yarn link
+  #     - run: yarn --cwd=examples/nexus-prisma --frozen-lockfile
+  #     - run: yarn --cwd=examples/nexus-prisma link nexus
+  #     - run: yarn --cwd=examples/nexus-prisma tsc
 
   example_star-wars:
     docker:

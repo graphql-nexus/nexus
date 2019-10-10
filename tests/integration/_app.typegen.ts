@@ -3,6 +3,7 @@
  * Do not make changes to this file directly
  */
 
+import { core } from "../..";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     title(...args: any): void;
