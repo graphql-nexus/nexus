@@ -10,6 +10,7 @@ jobs:
       - run: yarn build
       - run: yarn lint
       - run: yarn test:ci
+      - run: yarn codecov
       - store_artifacts:
           path: coverage
 
