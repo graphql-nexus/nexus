@@ -104,5 +104,5 @@ export function dynamicOutputMethod<T extends string>(
 export function dynamicInputMethod<T extends string>(
   config: DynamicInputMethodConfig<T>
 ) {
-  return new DynamicInputMethodDef(config.name, config);
+  return new DynamicInputMethodDef(config.name, config.id, config);
 }
