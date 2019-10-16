@@ -237,6 +237,14 @@ export function relativePathTo(
   return path.join(relative, filename);
 }
 
+/**
+ * Calculate the venn diagram between two iterables based on reference equality checks.
+ *
+ * The returned tripple contains items thusly:
+ *    * items only present in the first arg go into the first tripple slot
+ *    * items present in both the arguments go into the second tripple slot
+ *    * items only present in the second arg go into the third tripple slot
+ */
 export function venn<T>(
   xs: Iterable<T>,
   ys: Iterable<T>
