@@ -236,3 +236,29 @@ export function relativePathTo(
   }
   return path.join(relative, filename);
 }
+
+export function venn<T>(
+  xs: Iterable<T>,
+  ys: Iterable<T>
+): [Set<T>, Set<T>, Set<T>] {
+  const lefts: Set<T> = new Set(xs);
+  const boths: Set<T> = new Set();
+  const rights: Set<T> = new Set(ys);
+
+  for (const l of lefts) {
+    if (rights.has(l)) {
+      boths.add(l);
+      lefts.delete(l);
+      rights.delete(l);
+    }
+  }
+  for (const r of rights) {
+    if (lefts.has(r)) {
+      boths.add(r);
+      lefts.delete(r);
+      rights.delete(r);
+    }
+  }
+
+  return [lefts, boths, rights];
+}
