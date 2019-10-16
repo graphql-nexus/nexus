@@ -2,11 +2,10 @@ import { SchemaBuilder, NexusAcceptedTypeDef } from "./builder";
 import { withNexusSymbol, NexusTypes } from "./definitions/_types";
 
 /**
- * This is a read-only builder-like api exposed to plugins in the onInstall
- * hook. It proxies the Nexus Builder which is a much bigger beast that we do
- * not want to directly expose to plugins.
+ * This is a read-only builder api exposed to plugins in the onInstall
+ * hook which proxies very limited functionality into the internal Nexus Builder.
  */
-export type BuilderLens = {
+export type PluginBuilderLens = {
   hasType: (typeName: string) => boolean;
 };
 
@@ -16,27 +15,24 @@ export type BuilderLens = {
  * which can then be registered upon with callbacks.
  */
 export type PluginConfig = {
-  onInstall?: OnInstallHandler;
+  onInstall?: PluginOnInstallHandler;
 };
 
-export type InternalPluginConfig = Required<PluginConfig>;
-
-type OnInstallHandler = (
-  builder: BuilderLens
+export type PluginOnInstallHandler = (
+  builder: PluginBuilderLens
 ) => { types: NexusAcceptedTypeDef[] };
 
 /**
- * This is the interface that Nexus uses to drive plugins meaning triggering the
- * lifecycle events that plugins have registered for.
+ * The interface used to drive plugin execution via lifecycle event triggering.
  */
 type PluginController = {
   triggerOnInstall: () => void;
 };
 
 /**
- * Initialize a plugin. This will gather the hook handlers (aka. callbacks,
- * event handlers) that the plugin has registered for. A controller is returned
- * that permits Nexus to trigger the hooks so executing the hook handlers.
+ * This will gather the hook handlers (aka. callbacks, event handlers) a the
+ * plugin has registered for and return a controller  to trigger said hooks,
+ * thus controlling execution of the plugins' hook handlers.
  */
 export const initialize = (
   builder: SchemaBuilder,
@@ -45,7 +41,7 @@ export const initialize = (
   const state = {
     onInstallTriggered: false,
   };
-  const builderLens: BuilderLens = {
+  const builderLens: PluginBuilderLens = {
     hasType: builder.hasType,
   };
   return {
@@ -63,8 +59,14 @@ export const initialize = (
 };
 
 /**
+ * The processed version of a plugin config. This lower level version has
+ * defaults provided for optionals etc.
+ */
+export type InternalPluginConfig = Required<PluginConfig>;
+
+/**
  * A definition for a plugin. Should be passed to the `plugins: []` option
- * on makeSchema
+ * on makeSchema. Refer to `createPlugin` factory for full doc.
  */
 export class PluginDef {
   constructor(readonly config: InternalPluginConfig) {}
