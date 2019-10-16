@@ -11,6 +11,7 @@
     "test:ci": "jest -i --coverage",
     "build": "tsc",
     "dev": "tsc -w",
+    "dev:test": "jest --watch",
     "dev:examples": "yarn -s link-examples && tsc -w",
     "lint": "tslint -p tsconfig.json",
     "clean": "rm -rf dist",

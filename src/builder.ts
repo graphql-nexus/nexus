@@ -128,8 +128,18 @@ import {
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
 import { decorateType } from "./definitions/decorateType";
+import * as Plugins from "./plugins";
 
 export type Maybe<T> = T | null;
+
+export type NexusAcceptedTypeDef =
+  | AllNexusNamedTypeDefs
+  | NexusExtendInputTypeDef<string>
+  | NexusExtendTypeDef<string>
+  | GraphQLNamedType
+  | DynamicInputMethodDef<string>
+  | DynamicOutputMethodDef<string>
+  | DynamicOutputPropertyDef<string>;
 
 type NexusShapedOutput = {
   name: string;
@@ -173,6 +183,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
 );
 
 export interface BuilderConfig {
+  plugins?: Plugins.PluginDef[];
   /**
    * Generated artifact settings. Set to false to disable all.
    * Set to true to enable all and use default paths. Leave
@@ -397,6 +408,12 @@ export type DynamicOutputProperties = Record<
  */
 export class SchemaBuilder {
   /**
+   * Used to track all _GraphQL_ types that have been added to the builder.
+   * This supports hasType method which permits asking the question "Will
+   * the GraphQL schema have _this_ type (name)".
+   */
+  protected allTypeDefs: Record<string, NexusAcceptedTypeDef> = {};
+  /**
    * Used to check for circular references.
    */
   protected buildingTypes = new Set();
@@ -481,25 +498,17 @@ export class SchemaBuilder {
     return this.config;
   }
 
+  hasType = (typeName: string): boolean => {
+    return Boolean(this.allTypeDefs[typeName]);
+  };
+
   /**
-   * Add type takes a Nexus type, or a GraphQL type and pulls
-   * it into an internal "type registry". It also does an initial pass
-   * on any types that are referenced on the "types" field and pulls
-   * those in too, so you can define types anonymously, without
-   * exporting them.
-   *
-   * @param typeDef
+   * Add type takes a Nexus type, or a GraphQL type and pulls it into an
+   * internal "type registry". It also does an initial pass on any types that
+   * are referenced on the "types" field and pulls those in too, so you can
+   * define types anonymously, without exporting them.
    */
-  addType(
-    typeDef:
-      | AllNexusNamedTypeDefs
-      | NexusExtendInputTypeDef<string>
-      | NexusExtendTypeDef<string>
-      | GraphQLNamedType
-      | DynamicInputMethodDef<string>
-      | DynamicOutputMethodDef<string>
-      | DynamicOutputPropertyDef<string>
-  ) {
+  addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
       return;
@@ -538,6 +547,10 @@ export class SchemaBuilder {
         return;
       }
       throw extendError(typeDef.name);
+    }
+
+    if (!this.allTypeDefs[typeDef.name]) {
+      this.allTypeDefs[typeDef.name] = typeDef;
     }
 
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
@@ -579,7 +592,7 @@ export class SchemaBuilder {
     if (isNexusInterfaceTypeDef(typeDef)) {
       this.typesToWalk.push({ type: "interface", value: typeDef.value });
     }
-  }
+  };
 
   walkTypes() {
     let obj;
@@ -1459,7 +1472,14 @@ export function buildTypesInternal<
   schemaBuilder?: SchemaBuilder
 ): BuildTypes<TypeMapDefs> {
   const builder = schemaBuilder || new SchemaBuilder(config);
+  const plugins = config.plugins || [];
+  const pluginControllers = plugins.map((plugin) =>
+    Plugins.initialize(builder, plugin)
+  );
   addTypes(builder, types);
+  pluginControllers.forEach((pluginController) =>
+    pluginController.triggerOnInstall()
+  );
   return builder.getFinalTypeMap();
 }
 

@@ -22,6 +22,7 @@ export const testSchema = (name: string) => {
 
     expect([appFilePath]).toTypeCheck({
       sourceMap: false,
+      downlevelIteration: true,
       noEmitOnError: true,
       esModuleInterop: true,
       strict: true,
