@@ -2,8 +2,8 @@ import { SchemaBuilder, NexusAcceptedTypeDef } from "./builder";
 import { withNexusSymbol, NexusTypes } from "./definitions/_types";
 
 /**
- * This is a read-only builder api exposed to plugins in the onInstall
- * hook which proxies very limited functionality into the internal Nexus Builder.
+ * A read-only builder api exposed to plugins in the onInstall hook which
+ * proxies very limited functionality into the internal Nexus Builder.
  */
 export type PluginBuilderLens = {
   hasType: (typeName: string) => boolean;
@@ -18,6 +18,13 @@ export type PluginConfig = {
   onInstall?: PluginOnInstallHandler;
 };
 
+/**
+ * The plugin callback to execute when onInstall lifecycle event occurs.
+ * OnInstall event occurs before type walking which means inline types are not
+ * visible at this point yet. `builderLens.hasType` will only return true
+ * for types the user has defined top level in their app, and any types added by
+ * upstream plugins.
+ */
 export type PluginOnInstallHandler = (
   builder: PluginBuilderLens
 ) => { types: NexusAcceptedTypeDef[] };
@@ -53,6 +60,9 @@ export const initialize = (
       } else {
         state.onInstallTriggered = true;
       }
+      // By doing addType on the types returned by a plugin right after it has
+      // done so we make it possible for downstream plugins to see types added
+      // by upstream plugins.
       plugin.config.onInstall(builderLens).types.forEach(builder.addType);
     },
   };
