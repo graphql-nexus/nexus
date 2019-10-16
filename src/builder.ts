@@ -190,7 +190,7 @@ export interface BuilderConfig {
          * Set to true to enable and emit into default path (see below).
          * Set to false to disable. Set to a string to specify absolute path.
          *
-         * The default path is node_modules/@types/__nexus-typegen__core/index.d.ts.
+         * The default path is node_modules/@types/nexus-typegen/index.d.ts.
          * This is chosen becuase TypeScript will pick it up without
          * any configuration needed by you. For more details about the @types
          * system refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types
