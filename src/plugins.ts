@@ -15,11 +15,11 @@ export type BuilderLens = {
  * particular extension points. Plugins are just functions that receive hooks
  * which can then be registered upon with callbacks.
  */
-export type Config = {
+export type PluginConfig = {
   onInstall?: OnInstallHandler;
 };
 
-export type InternalConfig = Required<Config>;
+export type InternalPluginConfig = Required<PluginConfig>;
 
 type OnInstallHandler = (
   builder: BuilderLens
@@ -52,7 +52,7 @@ export const initialize = (
     triggerOnInstall: () => {
       if (state.onInstallTriggered) {
         throw new Error(
-          "Multiple triggers of onInstall hook. This should never happen. This is an internal error."
+          "Multiple triggers of onInstall hook detected. This should never happen. This is an internal error."
         );
       } else {
         state.onInstallTriggered = true;
@@ -67,7 +67,7 @@ export const initialize = (
  * on makeSchema
  */
 export class PluginDef {
-  constructor(readonly config: InternalConfig) {}
+  constructor(readonly config: InternalPluginConfig) {}
 }
 withNexusSymbol(PluginDef, NexusTypes.Plugin);
 
@@ -89,6 +89,6 @@ const configDefaults = {
  * or you can return an "enter" / "leave" pairing which will wrap the pre-execution of the
  * resolver and the "result" of the resolver, respectively.
  */
-export const create = (config: Config): PluginDef => {
+export const createPlugin = (config: PluginConfig): PluginDef => {
   return new PluginDef({ ...configDefaults, ...config });
 };
