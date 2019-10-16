@@ -168,7 +168,7 @@ function validatePluginConfig(plugin: PluginConfig): void {
   }
 
   if (plugin.onInstall) {
-    const onInstallType = typeof plugin.name;
+    const onInstallType = typeof plugin.onInstall;
     if (onInstallType !== "function") {
       throw new Error(
         `Plugin "${plugin.name}" is giving an invalid value for onInstall hook: expected "function" type, got ${onInstallType} type`
