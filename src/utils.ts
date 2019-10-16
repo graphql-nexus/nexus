@@ -238,12 +238,12 @@ export function relativePathTo(
 }
 
 /**
- * Calculate the venn diagram between two iterables based on reference equality checks.
+ * Calculate the venn diagram between two iterables based on reference equality
+ * checks. The returned tripple contains items thusly:
  *
- * The returned tripple contains items thusly:
- *    * items only present in the first arg go into the first tripple slot
- *    * items present in both the arguments go into the second tripple slot
- *    * items only present in the second arg go into the third tripple slot
+ *    * items only in arg 1 --> first tripple slot
+ *    * items in args 1 & 2 --> second tripple slot
+ *    * items only in arg 2 --> third tripple slot
  */
 export function venn<T>(
   xs: Iterable<T>,
