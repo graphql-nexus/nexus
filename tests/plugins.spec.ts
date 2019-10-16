@@ -1,4 +1,33 @@
-import { createPlugin, makeSchema } from "../src";
+import {
+  createPlugin,
+  makeSchema,
+  PluginConfig,
+  queryType,
+  objectType,
+  PluginOnInstallHandler,
+} from "../src";
+import { printSchema } from "graphql";
+import {
+  NexusAcceptedTypeDef,
+  buildTypes,
+  inputObjectType,
+  extendType,
+  buildTypesInternal,
+} from "../src/core";
+
+const fooObject = objectType({
+  name: "foo",
+  definition(t) {
+    t.string("bar");
+  },
+});
+
+const queryField = extendType({
+  type: "Query",
+  definition(t) {
+    t.string("something");
+  },
+});
 
 describe("runtime config validation", () => {
   const whenGiven = (config: any) => () => createPlugin(config);
@@ -87,21 +116,9 @@ got:
       whenGiven(() => {
         throw new Error("plugin failed somehow oops");
       })
-    ).toThrowErrorMatchingInlineSnapshot(`
-"Plugin x failed on \\"onInstall\\" hook:
-
-Error: plugin failed somehow oops
-    at Object.onInstall (/Users/jasonkuhrt/projects/prisma/nexus/tests/plugins.spec.ts:88:15)
-    at Object.triggerOnInstall (/Users/jasonkuhrt/projects/prisma/nexus/src/plugins.ts:113:36)
-    at /Users/jasonkuhrt/projects/prisma/nexus/src/builder.ts:1481:22
-    at Array.forEach (<anonymous>)
-    at buildTypesInternal (/Users/jasonkuhrt/projects/prisma/nexus/src/builder.ts:1480:21)
-    at makeSchemaInternal (/Users/jasonkuhrt/projects/prisma/nexus/src/builder.ts:1528:9)
-    at Object.makeSchema (/Users/jasonkuhrt/projects/prisma/nexus/src/builder.ts:1579:9)
-    at /Users/jasonkuhrt/projects/prisma/nexus/tests/plugins.spec.ts:41:5
-    at _toThrowErrorMatchingSnapshot (/Users/jasonkuhrt/projects/prisma/nexus/node_modules/jest-snapshot/build/index.js:471:7)
-    at Object.toThrowErrorMatchingInlineSnapshot (/Users/jasonkuhrt/projects/prisma/nexus/node_modules/jest-snapshot/build/index.js:424:10)"
-`);
+    ).toThrow(
+      /Plugin x failed on "onInstall" hook:\n\nError: plugin failed somehow oops\n    at.*/
+    );
   });
 
   it("does not validate types array members yet", () => {
@@ -110,5 +127,133 @@ Error: plugin failed somehow oops
     ).toThrowErrorMatchingInlineSnapshot(
       `"Cannot read property 'name' of null"`
     );
+  });
+});
+
+describe("a plugin may", () => {
+  const whenGiven = (pluginConfig: PluginConfig) => () =>
+    makeSchema({
+      types: [],
+      plugins: [createPlugin(pluginConfig)],
+    });
+
+  it("do nothing", () => {
+    expect(whenGiven({ name: "x" }));
+  });
+});
+
+describe("onInstall plugins", () => {
+  const whenGiven = ({
+    onInstall,
+    plugin,
+    appTypes,
+  }: {
+    onInstall?: PluginOnInstallHandler;
+    plugin?: Omit<PluginConfig, "name">;
+    appTypes?: NexusAcceptedTypeDef[];
+  }) => {
+    const xPluginConfig = plugin || { onInstall };
+
+    return printSchema(
+      makeSchema({
+        types: appTypes || [],
+        plugins: [createPlugin({ name: "x", ...xPluginConfig })],
+      })
+    );
+  };
+
+  it("is an optional hook", () => {
+    expect(whenGiven({ plugin: {} }));
+  });
+
+  it("may return an empty array of types", () => {
+    expect(whenGiven({ onInstall: () => ({ types: [] }) }));
+  });
+
+  it("may contribute types", () => {
+    expect(
+      whenGiven({
+        onInstall: () => ({
+          types: [queryField],
+        }),
+      })
+    ).toMatchInlineSnapshot(`
+            "type Query {
+              something: String!
+            }
+            "
+        `);
+  });
+
+  it("has access to top-level types", () => {
+    expect(
+      whenGiven({
+        onInstall: (builder) => ({
+          types: builder.hasType("foo") ? [] : [queryField],
+        }),
+        appTypes: [fooObject],
+      })
+    ).toMatchInlineSnapshot(`
+      "type foo {
+        bar: String!
+      }
+
+      type Query {
+        ok: Boolean!
+      }
+      "
+    `);
+  });
+
+  it("does not see fallback ok-query", () => {
+    expect(
+      whenGiven({
+        onInstall(builder) {
+          return {
+            types: builder.hasType("Query") ? [queryField] : [],
+          };
+        },
+      })
+    ).toMatchInlineSnapshot(`
+                        "type Query {
+                          ok: Boolean!
+                        }
+                        "
+                `);
+  });
+
+  it("does not have access to inline types", () => {
+    expect(
+      whenGiven({
+        onInstall: (builder) => ({
+          types: builder.hasType("Inline") ? [queryField] : [],
+        }),
+        appTypes: [
+          queryType({
+            definition(t) {
+              t.string("bar", {
+                args: {
+                  inline: inputObjectType({
+                    name: "Inline",
+                    definition(t2) {
+                      t2.string("hidden");
+                    },
+                  }),
+                },
+              });
+            },
+          }),
+        ],
+      })
+    ).toMatchInlineSnapshot(`
+                              "input Inline {
+                                hidden: String
+                              }
+
+                              type Query {
+                                bar(inline: Inline): String!
+                              }
+                              "
+                    `);
   });
 });
