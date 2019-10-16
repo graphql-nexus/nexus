@@ -22,6 +22,6 @@
       "api-mutationField",
       "api-queryField"
     ],
-    "Plugins": ["database-access-with-prisma", "database-access-with-prisma-v2"]
+    "Ecosystem": ["ecosystem-plugins"]
   }
 }
