@@ -42,11 +42,21 @@ export const initialize = (
   builder: SchemaBuilder,
   plugin: PluginDef
 ): PluginController => {
+  const state = {
+    onInstallTriggered: false,
+  };
   const builderLens: BuilderLens = {
     hasType: builder.hasType,
   };
   return {
     triggerOnInstall: () => {
+      if (state.onInstallTriggered) {
+        throw new Error(
+          "Multiple triggers of onInstall hook. This should never happen. This is an internal error."
+        );
+      } else {
+        state.onInstallTriggered = true;
+      }
       plugin.config.onInstall(builderLens).types.forEach(builder.addType);
     },
   };
