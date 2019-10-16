@@ -190,7 +190,7 @@ function validateOnInstallHookResult(
     !Array.isArray(hookResult.types)
   ) {
     throw new Error(
-      `Plugin "${plugin.config.name}" returned invalid data for "onInstall" hook: expected\n\n  { types: NexusAcceptedTypeDef[] }\n\n  got: ${hookResult}`
+      `Plugin "${plugin.config.name}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
     );
   }
   // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
