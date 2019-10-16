@@ -201,7 +201,7 @@ export interface BuilderConfig {
          * Set to true to enable and emit into default path (see below).
          * Set to false to disable. Set to a string to specify absolute path.
          *
-         * The default path is node_modules/@types/__nexus-typegen__core/index.d.ts.
+         * The default path is node_modules/@types/nexus-typegen/index.d.ts.
          * This is chosen becuase TypeScript will pick it up without
          * any configuration needed by you. For more details about the @types
          * system refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types
@@ -295,7 +295,9 @@ export interface InternalBuilderConfig extends BuilderConfig {
   };
 }
 
-function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
+export function resolveBuilderConfig(
+  config: BuilderConfig
+): InternalBuilderConfig {
   // For JS
   if (config.outputs === null) {
     throw new Error("config.outputs cannot be of type `null`.");
@@ -308,53 +310,65 @@ function resolveBuilderConfig(config: BuilderConfig): InternalBuilderConfig {
     assertAbsolutePath(config.outputs.schema, "outputs.schema");
   }
 
-  const defaultSchemaPath = process.cwd();
+  // Setup defaults
+  const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
   const defaultTypesPath = path.join(
     __dirname,
-    "../../@types/__nexus-typegen__core/index.d.ts"
+    "../../@types/nexus-typegen/index.d.ts"
   );
-  const isDev = Boolean(
-    !process.env.NODE_ENV || process.env.NODE_ENV === "development"
-  );
-
-  if (config.shouldGenerateArtifacts === false) {
-    config.outputs = {
-      schema: false,
-      typegen: false,
-    };
-  } else if (config.outputs === undefined) {
-    config.outputs = {
-      schema: false,
-      typegen: isDev ? defaultTypesPath : false,
-    };
-  } else if (config.outputs === false) {
-    config.outputs = {
-      schema: false,
-      typegen: false,
-    };
-  } else if (config.outputs === true) {
-    config.outputs = {
+  const defaults = {
+    outputs: {
       schema: defaultSchemaPath,
       typegen: defaultTypesPath,
-    };
+    },
+    outputsUndefined: {
+      schema: false,
+      typegen: defaultTypesPath,
+    },
+  } as const;
+
+  // Build internal config
+  const internalConfig = {
+    ...config,
+    outputs: {},
+  } as InternalBuilderConfig;
+
+  const shouldGenerateArtifacts =
+    config.shouldGenerateArtifacts !== undefined
+      ? config.shouldGenerateArtifacts
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
+      ? true
+      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
+      ? false
+      : Boolean(
+          !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+        );
+
+  if (shouldGenerateArtifacts === false || config.outputs === false) {
+    internalConfig.outputs = { schema: false, typegen: false };
+  } else if (config.outputs === true) {
+    internalConfig.outputs = defaults.outputs;
+  } else if (config.outputs === undefined) {
+    internalConfig.outputs = defaults.outputsUndefined;
+  } else {
+    if (config.outputs.schema === undefined) {
+      internalConfig.outputs.schema = false;
+    } else if (config.outputs.schema === true) {
+      internalConfig.outputs.schema = defaults.outputs.schema;
+    } else {
+      internalConfig.outputs.schema = config.outputs.schema;
+    }
+    if (
+      config.outputs.typegen === undefined ||
+      config.outputs.typegen === true
+    ) {
+      internalConfig.outputs.typegen = defaults.outputs.typegen;
+    } else {
+      internalConfig.outputs.typegen = config.outputs.typegen;
+    }
   }
 
-  if (config.outputs.schema === undefined) {
-    config.outputs.schema = false;
-  } else if (config.outputs.schema === true) {
-    config.outputs.schema = defaultSchemaPath;
-  }
-
-  if (config.outputs.typegen === undefined) {
-    config.outputs.typegen = isDev ? defaultTypesPath : false;
-  } else if (config.outputs.typegen === true) {
-    config.outputs.typegen = defaultTypesPath;
-  }
-
-  // HACK Using cast becuase TypeScript doesn't seem to be smart enough
-  // yet to understand the above checks make `config` a valid `internalConfig`.
-  //
-  return config as InternalBuilderConfig;
+  return internalConfig;
 }
 
 export interface InternalSchemaConfig extends InternalBuilderConfig {

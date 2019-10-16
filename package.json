@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.0.0-pr.236.5bdf659",
+  "version": "0.12.0-beta.13",
   "main": "dist",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -56,7 +56,8 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "codecov": "^3.6.1"
   },
   "peerDependencies": {
     "graphql": "^0.12.0 || ^0.13.0 || ^14.0.0"

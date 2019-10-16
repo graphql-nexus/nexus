@@ -27,15 +27,24 @@ const runService = (
   }
 };
 
-gulp.task("docusaurus", () => {
-  runService("yarn", "docusaurus-start", { stdio: "inherit" }, true);
-});
 gulp.task("webpack", () => {
   runService("yarn", "webpack", { stdio: "ignore" });
 });
+
+gulp.task("link-examples", async () => {
+  await linkNexus();
+  await linkExamples();
+  console.log("All examples linked");
+});
+
+gulp.task("docusaurus", () => {
+  runService("yarn", "docusaurus-start", { stdio: "inherit" }, true);
+});
+
 gulp.task("api-tsc", () => {
   runService("yarn", "tsc -w -p api/tsconfig.json", { stdio: "ignore" });
 });
+
 gulp.task("core-tsc", () => {
   runService("yarn", "tsc -w -p tsconfig.json", {
     stdio: "ignore",
@@ -45,11 +54,10 @@ gulp.task("core-tsc", () => {
 
 gulp.task(
   "start",
-  ["docusaurus", "link-examples", "webpack", "core-tsc"],
-  () => {
+  gulp.series("docusaurus", "link-examples", "webpack", "core-tsc", () => {
     console.log("Server starting, please wait...");
-    gulp.watch(path.join(__dirname, "siteConfig.js"), ["docusaurus"]);
-  }
+    gulp.watch("./siteConfig.js", gulp.task("docusaurus"));
+  })
 );
 
 gulp.task("run-examples", async () => {
@@ -85,13 +93,7 @@ gulp.task("run-examples", async () => {
   }
 });
 
-gulp.task("check-examples", ["link-examples"], async () => {});
-
-gulp.task("link-examples", async () => {
-  await linkNexus();
-  await linkExamples();
-  console.log("All examples linked");
-});
+gulp.task("check-examples", gulp.series("link-examples", async () => {}));
 
 gulp.task("link-website", async () => {
   await linkNexus();

@@ -57,13 +57,9 @@
         "title": "Best Practices",
         "sidebar_label": "Best Practices"
       },
-      "database-access-with-prisma-v2": {
-        "title": "Database Access with Prisma 2 (Preview)",
-        "sidebar_label": "Prisma 2 (Preview)"
-      },
-      "database-access-with-prisma": {
-        "title": "Database Access with Prisma",
-        "sidebar_label": "Prisma"
+      "ecosystem-plugins": {
+        "title": "Plugins",
+        "sidebar_label": "Plugins"
       },
       "future-features": {
         "title": "Potential Features",
@@ -96,7 +92,7 @@
     "categories": {
       "Documentation": "Documentation",
       "API": "API",
-      "Plugins": "Plugins"
+      "Ecosystem": "Ecosystem"
     }
   },
   "pages-strings": {
