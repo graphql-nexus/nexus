@@ -48,7 +48,6 @@
     "@types/jest": "^23.3.7",
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.15.2",
-    "@types/yargs": "^13.0.3",
     "codecov": "^3.6.1",
     "globby": "^10.0.1",
     "graphql": "^14.0.2",
