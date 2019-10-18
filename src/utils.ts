@@ -17,7 +17,6 @@ import {
   GraphQLNamedType,
 } from "graphql";
 import path from "path";
-import * as fs from "fs";
 import { UNKNOWN_TYPE_SCALAR } from "./builder";
 
 export function log(msg: string) {
@@ -296,12 +295,4 @@ function range(times: number): number[] {
     list.push(list.length + 1);
   }
   return list;
-}
-
-export function getPackageVersion(): string {
-  return JSON.parse(
-    fs.readFileSync(path.join(__dirname, "../package.json"), {
-      encoding: "utf8",
-    })
-  ).version as string;
 }

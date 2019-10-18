@@ -1,9 +1,7 @@
 import * as path from "path";
 import * as cp from "child_process";
 import Command from "@oclif/command";
-import { indentBlock, getPackageVersion } from "../../utils";
-
-getPackageVersion();
+import { indentBlock } from "../../utils";
 
 // tslint:disable-next-line
 export default class Typegen extends Command {
