@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
     "downlevelIteration": true,
-    "target": "es5",
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["es2015"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
