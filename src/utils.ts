@@ -17,6 +17,7 @@ import {
   GraphQLNamedType,
 } from "graphql";
 import path from "path";
+import * as fs from "fs";
 import { UNKNOWN_TYPE_SCALAR } from "./builder";
 
 export function log(msg: string) {
@@ -269,4 +270,38 @@ export function venn<T>(
   }
 
   return [lefts, boths, rights];
+}
+
+export function indentBlock(size: number, block: string): string {
+  return block
+    .split("\n")
+    .map(
+      (line) =>
+        range(size)
+          .map(constant(" "))
+          .join("") + line
+    )
+    .join("\n");
+}
+
+function constant<T>(x: T): () => T {
+  return function() {
+    return x;
+  };
+}
+
+function range(times: number): number[] {
+  const list: number[] = [];
+  while (list.length < times) {
+    list.push(list.length + 1);
+  }
+  return list;
+}
+
+export function getPackageVersion(): string {
+  return JSON.parse(
+    fs.readFileSync(path.join(__dirname, "../package.json"), {
+      encoding: "utf8",
+    })
+  ).version as string;
 }

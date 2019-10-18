@@ -6,6 +6,7 @@
   "license": "MIT",
   "description": "Scalable, strongly typed GraphQL schema development",
   "homepage": "https://nexus.js.org",
+  "bin": "dist/bin/index.js",
   "scripts": {
     "test": "jest",
     "test:ci": "jest -i --coverage",
@@ -38,7 +39,9 @@
     "url": "https://github.com/tgriesser"
   },
   "dependencies": {
-    "tslib": "^1.9.3"
+    "commander": "^3.0.2",
+    "tslib": "^1.9.3",
+    "yargs": "^14.2.0"
   },
   "devDependencies": {
     "@types/graphql": "14.0.7",
@@ -46,6 +49,7 @@
     "@types/jest": "^23.3.7",
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.15.2",
+    "@types/yargs": "^13.0.3",
     "codecov": "^3.6.1",
     "graphql": "^14.0.2",
     "graphql-iso-date": "^3.6.1",
@@ -55,7 +59,7 @@
     "lint-staged": "^7.3.0",
     "prettier": "^1.16.0",
     "ts-jest": "^24",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.4.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.5.3"
