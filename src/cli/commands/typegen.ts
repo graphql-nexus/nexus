@@ -3,8 +3,8 @@ import * as cp from "child_process";
 import Command from "@oclif/command";
 import { indentBlock } from "../../utils";
 
-// tslint:disable-next-line
-export default class Typegen extends Command {
+export class Typegen extends Command {
+  static aliases = ["tg"];
   static description =
     "\nGenerate TypeScript types derived from your schema for complete type safety across all your definition blocks and resolvers.";
 
@@ -35,11 +35,7 @@ Relative path (from cwd) to your app's TypeScript module that will run directly 
     const {
       args: { entrypoint },
     } = this.parse(Typegen);
-
-    console.log(1);
     const entryPoint = path.join(process.cwd(), entrypoint);
-    console.log(2);
-
     let result: cp.SpawnSyncReturns<string>;
     try {
       result = cp.spawnSync(
@@ -63,7 +59,6 @@ Relative path (from cwd) to your app's TypeScript module that will run directly 
       );
       process.exit(1);
     }
-
     if (result!.stderr !== "") {
       console.error(
         `\nSomething went wrong while running Nexus typegen:\n\n${indentBlock(
@@ -73,7 +68,6 @@ Relative path (from cwd) to your app's TypeScript module that will run directly 
       );
       process.exit(1);
     }
-
     console.log(result!.stdout);
     console.log(
       "Success! Tailored TypeScript declaration for your GraphQL types and resolvers generated."

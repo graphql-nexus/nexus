@@ -7,6 +7,7 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/tests/_setup.ts"],
   preset: "ts-jest",
   testEnvironment: "node",
+  watchPathIgnorePatterns: [".*.tmp.*"],
   watchPlugins: [
     "jest-watch-typeahead/filename",
     "jest-watch-typeahead/testname",
