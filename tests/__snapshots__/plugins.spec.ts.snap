@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`onInstall plugins does not have access to inline types 1`] = `
+"input Inline {
+  hidden: String
+}
+
+type Query {
+  bar(inline: Inline): String!
+}
+"
+`;
+
+exports[`onInstall plugins does not see fallback ok-query 1`] = `
+"type Query {
+  ok: Boolean!
+}
+"
+`;
+
+exports[`onInstall plugins has access to top-level types 1`] = `
+"type foo {
+  bar: String!
+}
+
+type Query {
+  ok: Boolean!
+}
+"
+`;
+
+exports[`onInstall plugins may contribute types 1`] = `
+"type Query {
+  something: String!
+}
+"
+`;
+
+exports[`runtime config validation checks name is not empty 1`] = `"Plugin \\"\\" is giving an invalid value for property name: empty string"`;
+
+exports[`runtime config validation checks name is string 1`] = `"Plugin \\"1\\" is giving an invalid value for property name: expected \\"string\\" type, got number type"`;
+
+exports[`runtime config validation checks name present 1`] = `"Plugin \\"undefined\\" is missing required properties: name"`;
+
+exports[`runtime config validation checks onInstall is a function if defined 1`] = `"Plugin \\"x\\" is giving an invalid value for onInstall hook: expected \\"function\\" type, got string type"`;
+
+exports[`runtime config validation checks onInstall is a function if defined 2`] = `"Plugin \\"x\\" is giving an invalid value for onInstall hook: expected \\"function\\" type, got object type"`;
+
+exports[`runtime onInstall hook handler does not validate types array members yet 1`] = `"Cannot read property 'name' of null"`;
+
+exports[`runtime onInstall hook handler validates return value against shallow schema 1`] = `
+"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
+
+expected structure:
+
+  { types: NexusAcceptedTypeDef[] }
+
+got:
+
+  null"
+`;
+
+exports[`runtime onInstall hook handler validates return value against shallow schema 2`] = `
+"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
+
+expected structure:
+
+  { types: NexusAcceptedTypeDef[] }
+
+got:
+
+  [object Object]"
+`;
+
+exports[`runtime onInstall hook handler validates return value against shallow schema 3`] = `
+"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
+
+expected structure:
+
+  { types: NexusAcceptedTypeDef[] }
+
+got:
+
+  [object Object]"
+`;

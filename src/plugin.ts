@@ -203,6 +203,7 @@ withNexusSymbol(PluginDef, NexusTypes.Plugin);
  * resolver and the "result" of the resolver, respectively.
  */
 export function plugin(config: PluginConfig) {
+  validatePluginConfig(config);
   return new PluginDef(config);
 }
 plugin.completeValue = completeValue;
@@ -213,9 +214,19 @@ export const createPlugin = plugin;
 /**
  * Validate that the configuration given by a plugin is valid.
  */
-export function validatePluginConfig(pluginConfig: PluginConfig): void {
+function validatePluginConfig(pluginConfig: PluginConfig): void {
   const validRequiredProps = ["name"];
-  const validOptionalProps = ["onInstall"];
+  const validOptionalProps = [
+    "description",
+    "fieldDefTypes",
+    "objectTypeDefTypes",
+    "schemaDefTypes",
+    "onInstall",
+    "onBeforeBuild",
+    "onMissingType",
+    "onCreateFieldResolver",
+    "onCreateFieldSubscribe",
+  ];
   const validProps = [...validRequiredProps, ...validOptionalProps];
   const givenProps = Object.keys(pluginConfig);
 

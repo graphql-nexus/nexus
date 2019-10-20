@@ -25,6 +25,7 @@ import path from "path";
 import { UNKNOWN_TYPE_SCALAR, BuilderConfig } from "./builder";
 import { TypegenMetadataConfig } from "./typegenMetadata";
 import { MissingType, withNexusSymbol, NexusTypes } from "./definitions/_types";
+import { PluginConfig } from "./plugin";
 
 export const isInterfaceField = (
   type: GraphQLObjectType,
@@ -467,4 +468,23 @@ export function venn<T>(
   }
 
   return [lefts, boths, rights];
+}
+
+/**
+ * Validate that the data returned from a plugin from the `onInstall` hook is valid.
+ */
+export function validateOnInstallHookResult(
+  pluginName: string,
+  hookResult: ReturnType<Exclude<PluginConfig["onInstall"], undefined>>
+): void {
+  if (
+    hookResult === null ||
+    typeof hookResult !== "object" ||
+    !Array.isArray(hookResult.types)
+  ) {
+    throw new Error(
+      `Plugin "${pluginName}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
+    );
+  }
+  // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
 }

@@ -4,7 +4,6 @@ import {
   PluginConfig,
   queryType,
   objectType,
-  PluginOnInstallHandler,
 } from "../src";
 import { printSchema } from "graphql";
 import { NexusAcceptedTypeDef, inputObjectType, extendType } from "../src/core";
@@ -62,16 +61,6 @@ describe("runtime onInstall hook handler", () => {
     expect(whenGiven(() => ({ types: null }))).toThrowErrorMatchingSnapshot();
 
     expect(whenGiven(() => ({}))).toThrowErrorMatchingSnapshot();
-  });
-
-  it("gracefully handles thrown errors", () => {
-    expect(
-      whenGiven(() => {
-        throw new Error("plugin failed somehow oops");
-      })
-    ).toThrow(
-      /Plugin x failed on "onInstall" hook:\n\nError: plugin failed somehow oops\n    at.*/
-    );
   });
 
   it("does not validate types array members yet", () => {

@@ -119,6 +119,7 @@ import {
   resolveTypegenConfig,
   assertNoMissingTypes,
   consoleWarn,
+  validateOnInstallHookResult,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -141,7 +142,6 @@ import {
   NexusObjectTypeExtension,
   NexusInputObjectTypeExtension,
 } from "./extensions";
-import * as Plugins from "./plugins-current";
 
 export type Maybe<T> = T | null;
 
@@ -575,7 +575,9 @@ export class SchemaBuilder {
   beforeWalkTypes() {
     this.plugins.forEach(({ config: pluginConfig }) => {
       if (pluginConfig.onInstall) {
-        pluginConfig.onInstall(this.builderLens);
+        const installResult = pluginConfig.onInstall(this.builderLens);
+        validateOnInstallHookResult(pluginConfig.name, installResult);
+        installResult.types.forEach((t) => this.addType(t));
       }
       if (pluginConfig.onCreateFieldResolver) {
         this.onCreateResolverFns.push(pluginConfig.onCreateFieldResolver);
