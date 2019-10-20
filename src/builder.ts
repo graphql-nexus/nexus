@@ -1652,13 +1652,12 @@ export function makeSchema(config: SchemaConfig): GraphQLSchema {
   assertNoMissingTypes(schema, missingTypes);
 
   if (internalConfig.shouldExitAfterGenerateArtifacts) {
-    const outputs = Object.entries(internalConfig.outputs);
-    for (const [outputType, outputPath] of outputs) {
-      const message = outputPath
-        ? `${outputType} generated to ${outputPath}`
-        : `${outputType} not enabled`;
-      console.log(message);
-    }
+    console.log(`Generatd Artifacts:
+
+    TypeScript Types  ==>  ${internalConfig.outputs.typegen || "(not enabled)"}
+    GraphQL Schema    ==>  ${internalConfig.outputs.schema ||
+      "(not enabled)"}`);
+
     process.exit(0);
   }
 

@@ -129,27 +129,37 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
     }
   );
 
-  it.skip("will exit the process after artifact generation", () => {
-    const appPath = Path.join(__dirname, "./app.ts");
+  it("will exit the process after artifact generation", () => {
+    const appPath = Path.join(__dirname, "./app.tmp.ts");
     const app = `
-import { makeSchema, queryType } from '../src'
+      import { makeSchema, queryType } from '../src'
 
-makeSchema({
-  shouldGenerateArtifacts: true,
-  shouldExitAfterGenerateArtifacts: true,
-  outputs: { schema: false, types: true },
-  types: [queryType({ definition(t){ t.string('hello', () => 'world') }})],
-})
+      makeSchema({
+        shouldGenerateArtifacts: true,
+        shouldExitAfterGenerateArtifacts: true,
+        outputs: { schema: false, typegen: true },
+        types: [queryType({ definition(t){ t.string('hello', () => 'world') }})],
+      })
 
-setInterval(() => { console.log('<some long running process>' ) }, 10000)
-`;
+      setInterval(() => { console.log('<some long running process>' ) }, 10000)
+    `;
     writeFileSync(appPath, app);
-    const { stderr, stdout, status } = spawnSync(`ts-node ${appPath}`);
+    let { stderr, stdout, status } = spawnSync("npx", ["ts-node", appPath], {
+      encoding: "utf8",
+    });
+    stdout = stdout.replace(
+      /\/.*(\/@types\/nexus-typegen\/index.d.ts)/,
+      "__DYNAMIC__$1"
+    );
     expect({ stderr, stdout, status }).toMatchInlineSnapshot(`
       Object {
-        "status": null,
-        "stderr": null,
-        "stdout": null,
+        "status": 0,
+        "stderr": "",
+        "stdout": "Generatd Artifacts:
+
+          TypeScript Types  ==>  __DYNAMIC__/@types/nexus-typegen/index.d.ts
+          GraphQL Schema    ==>  (not enabled)
+      ",
       }
     `);
     unlinkSync(appPath);
