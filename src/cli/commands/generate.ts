@@ -116,7 +116,7 @@ Path to your app's TypeScript module that will run directly or indirectly Nexus.
       );
     } catch (error) {
       console.error(
-        `\nSomething went wrong while running Nexus typegen:\n\n${indentBlock(
+        `\nSomething went wrong while generating artifacts:\n\n${indentBlock(
           4,
           error.stack
         )}`
@@ -126,7 +126,7 @@ Path to your app's TypeScript module that will run directly or indirectly Nexus.
 
     if (result!.stderr !== "") {
       console.error(
-        `\nSomething went wrong while running Nexus typegen:\n\n${indentBlock(
+        `\nSomething went wrong while generating artifacts:\n\n${indentBlock(
           4,
           result!.stderr
         )}`
