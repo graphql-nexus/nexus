@@ -226,7 +226,7 @@ export interface BuilderConfig {
    *
    * @default process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === "true"
    */
-  shouldExitAfterGeneratedArtifacts?: boolean;
+  shouldExitAfterGenerateArtifacts?: boolean;
   /**
    * Whether the schema & types are generated when the server
    * starts.
@@ -300,7 +300,7 @@ export interface TypegenInfo {
  * given their fallbacks, etc.
  */
 export interface InternalBuilderConfig extends BuilderConfig {
-  shouldExitAfterGeneratedArtifacts: boolean;
+  shouldExitAfterGenerateArtifacts: boolean;
   outputs: {
     schema: false | string;
     typegen: false | string;
@@ -383,9 +383,9 @@ Received:
   }
 
   // calculate dynamic defaults
-  const shouldExitAfterGeneratedArtifacts =
-    config.shouldExitAfterGeneratedArtifacts !== undefined
-      ? config.shouldExitAfterGeneratedArtifacts
+  const shouldExitAfterGenerateArtifacts =
+    config.shouldExitAfterGenerateArtifacts !== undefined
+      ? config.shouldExitAfterGenerateArtifacts
       : process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === "true";
 
   const shouldGenerateArtifacts =
@@ -405,7 +405,7 @@ Received:
     outputs: {},
   } as InternalBuilderConfig;
 
-  internalConfig.shouldExitAfterGeneratedArtifacts = shouldExitAfterGeneratedArtifacts;
+  internalConfig.shouldExitAfterGenerateArtifacts = shouldExitAfterGenerateArtifacts;
 
   if (shouldGenerateArtifacts === false || config.outputs === false) {
     internalConfig.outputs = { schema: false, typegen: false };
@@ -1651,7 +1651,7 @@ export function makeSchema(config: SchemaConfig): GraphQLSchema {
 
   assertNoMissingTypes(schema, missingTypes);
 
-  if (internalConfig.shouldExitAfterGeneratedArtifacts) {
+  if (internalConfig.shouldExitAfterGenerateArtifacts) {
     const outputs = Object.entries(internalConfig.outputs);
     for (const [outputType, outputPath] of outputs) {
       const message = outputPath

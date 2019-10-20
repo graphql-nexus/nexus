@@ -52,7 +52,7 @@ describe("backingTypes", () => {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
       },
-      shouldExitAfterGeneratedArtifacts: false,
+      shouldExitAfterGenerateArtifacts: false,
       typegenAutoConfig: {
         sources: [
           {
@@ -94,7 +94,7 @@ describe("rootTypings", () => {
   it("can import enum via rootTyping", async () => {
     const metadata = new TypegenMetadata({
       outputs: { typegen: false, schema: false },
-      shouldExitAfterGeneratedArtifacts: false,
+      shouldExitAfterGenerateArtifacts: false,
     });
     const schema = makeSchema({
       types: [

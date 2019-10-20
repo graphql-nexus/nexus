@@ -40,7 +40,7 @@ describe("unknownType", () => {
       makeSchemaInternal({
         types: [Query, User],
         outputs: { typegen: false, schema: false },
-        shouldExitAfterGeneratedArtifacts: false,
+        shouldExitAfterGenerateArtifacts: false,
       });
     }).not.toThrowError();
   });
@@ -49,7 +49,7 @@ describe("unknownType", () => {
     const { missingTypes } = makeSchemaInternal({
       types: [Query, User],
       outputs: { schema: false, typegen: false },
-      shouldExitAfterGeneratedArtifacts: false,
+      shouldExitAfterGenerateArtifacts: false,
     });
 
     expect(Object.keys(missingTypes).length).toEqual(1);

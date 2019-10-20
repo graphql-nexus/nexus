@@ -5,6 +5,8 @@ import {
 } from "../src/builder";
 import * as Path from "path";
 import { restoreEnvBeforeEach } from "./_helpers";
+import { spawnSync } from "child_process";
+import { writeFileSync, unlinkSync } from "fs";
 
 const relativePath = (...paths: string[]): string => Path.join(__dirname, ...paths); // prettier-ignore
 const atTypesPath = relativePath("../../@types");
@@ -15,15 +17,15 @@ const schemaDefaultPath = relativePath("../schema.graphql");
  * reduce duplication in test cases.
  */
 const outputs = {
-  default: { outputs: { schema: false, typegen: typegenDefault }, shouldExitAfterGeneratedArtifacts: false },
-  none: { outputs: { schema: false, typegen: false }, shouldExitAfterGeneratedArtifacts: false },
-  justTypegen: { outputs: { schema: false, typegen: typegenDefault }, shouldExitAfterGeneratedArtifacts: false },
-  justSchema: { outputs: { schema: schemaDefaultPath, typegen: false }, shouldExitAfterGeneratedArtifacts: false },
-  all: { outputs: { schema: schemaDefaultPath, typegen: typegenDefault }, shouldExitAfterGeneratedArtifacts: false, },
+  default: { outputs: { schema: false, typegen: typegenDefault }, shouldExitAfterGenerateArtifacts: false },
+  none: { outputs: { schema: false, typegen: false }, shouldExitAfterGenerateArtifacts: false },
+  justTypegen: { outputs: { schema: false, typegen: typegenDefault }, shouldExitAfterGenerateArtifacts: false },
+  justSchema: { outputs: { schema: schemaDefaultPath, typegen: false }, shouldExitAfterGenerateArtifacts: false },
+  all: { outputs: { schema: schemaDefaultPath, typegen: typegenDefault }, shouldExitAfterGenerateArtifacts: false, },
   custom: {
-    justTypegen: { outputs: { schema: false, typegen: "/typegen.ts" }, shouldExitAfterGeneratedArtifacts: false },
-    justSchema: { outputs: { schema: "/schema.graphql", typegen: false }, shouldExitAfterGeneratedArtifacts: false },
-    all: { outputs: { schema: "/schema.graphql", typegen: "/typegen.ts" }, shouldExitAfterGeneratedArtifacts: false },
+    justTypegen: { outputs: { schema: false, typegen: "/typegen.ts" }, shouldExitAfterGenerateArtifacts: false },
+    justSchema: { outputs: { schema: "/schema.graphql", typegen: false }, shouldExitAfterGenerateArtifacts: false },
+    all: { outputs: { schema: "/schema.graphql", typegen: "/typegen.ts" }, shouldExitAfterGenerateArtifacts: false },
   },
 } as const; // prettier-ignore
 
@@ -83,7 +85,7 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
       NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "true",
     });
 
-    expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
+    expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
       true
     );
   });
@@ -93,13 +95,13 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
       NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
       NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "false",
     });
-    expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
+    expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
       false
     );
   });
 
   it("when not present then uses default", () => {
-    expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
+    expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
       false
     );
   });
@@ -110,8 +112,8 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
       NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "false",
     });
     expect(
-      resolveBuilderConfig({ shouldExitAfterGeneratedArtifacts: false })
-        .shouldExitAfterGeneratedArtifacts
+      resolveBuilderConfig({ shouldExitAfterGenerateArtifacts: false })
+        .shouldExitAfterGenerateArtifacts
     ).toEqual(false);
   });
 
@@ -126,6 +128,32 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
       );
     }
   );
+
+  it.skip("will exit the process after artifact generation", () => {
+    const appPath = Path.join(__dirname, "./app.ts");
+    const app = `
+import { makeSchema, queryType } from '../src'
+
+makeSchema({
+  shouldGenerateArtifacts: true,
+  shouldExitAfterGenerateArtifacts: true,
+  outputs: { schema: false, types: true },
+  types: [queryType({ definition(t){ t.string('hello', () => 'world') }})],
+})
+
+setInterval(() => { console.log('<some long running process>' ) }, 10000)
+`;
+    writeFileSync(appPath, app);
+    const { stderr, stdout, status } = spawnSync(`ts-node ${appPath}`);
+    expect({ stderr, stdout, status }).toMatchInlineSnapshot(`
+      Object {
+        "status": null,
+        "stderr": null,
+        "stdout": null,
+      }
+    `);
+    unlinkSync(appPath);
+  });
 });
 
 describe("Environment variable influence over builder config shouldGenerateArtifacts", () => {
