@@ -15,17 +15,17 @@ const schemaDefaultPath = relativePath("../schema.graphql");
  * reduce duplication in test cases.
  */
 const outputs = {
-  default: { outputs: { schema: false, typegen: typegenDefault } },
-  none: { outputs: { schema: false, typegen: false } },
-  justTypegen: { outputs: { schema: false, typegen: typegenDefault } },
-  justSchema: { outputs: { schema: schemaDefaultPath, typegen: false } },
-  all: { outputs: { schema: schemaDefaultPath, typegen: typegenDefault } },
+  default: { outputs: { schema: false, typegen: typegenDefault }, shouldExitOnGeneratedArtifacts: false },
+  none: { outputs: { schema: false, typegen: false }, shouldExitOnGeneratedArtifacts: false },
+  justTypegen: { outputs: { schema: false, typegen: typegenDefault }, shouldExitOnGeneratedArtifacts: false },
+  justSchema: { outputs: { schema: schemaDefaultPath, typegen: false }, shouldExitOnGeneratedArtifacts: false },
+  all: { outputs: { schema: schemaDefaultPath, typegen: typegenDefault }, shouldExitOnGeneratedArtifacts: false, },
   custom: {
-    justTypegen: { outputs: { schema: false, typegen: "/typegen.ts" } },
-    justSchema: { outputs: { schema: "/schema.graphql", typegen: false } },
-    all: { outputs: { schema: "/schema.graphql", typegen: "/typegen.ts" } },
+    justTypegen: { outputs: { schema: false, typegen: "/typegen.ts" }, shouldExitOnGeneratedArtifacts: false },
+    justSchema: { outputs: { schema: "/schema.graphql", typegen: false }, shouldExitOnGeneratedArtifacts: false },
+    all: { outputs: { schema: "/schema.graphql", typegen: "/typegen.ts" }, shouldExitOnGeneratedArtifacts: false },
   },
-} as const;
+} as const; // prettier-ignore
 
 describe("resolveBuilderConfig() outputs", () => {
   restoreEnvBeforeEach();
