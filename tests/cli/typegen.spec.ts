@@ -21,7 +21,10 @@ describe("$ nexus typgen", () => {
     return { stderr, stdout, status };
   };
 
-  it("has helpful documentation", () => {
+  // Does not render exactly the same on CI, thus failing there.
+  // https://github.com/oclif/command/issues/77
+  //
+  it.skip("has helpful documentation", () => {
     expect(run("typegen", "--help")).toMatchInlineSnapshot(`
       Object {
         "status": 0,
@@ -31,27 +34,27 @@ describe("$ nexus typgen", () => {
 
       ARGUMENTS
         ENTRYPOINT
-            
-            Relative path (from cwd) to your app's TypeScript module that will run 
-            directly or indirectly Nexus.makeSchema. By default the following paths will 
+
+            Relative path (from cwd) to your app's TypeScript module that will run
+            directly or indirectly Nexus.makeSchema. By default the following paths will
             be searched, picking the first match, or erroring out
-            
+
                 * src/schema/index.ts
                 * src/schema.ts
                 * src/server.ts
                 * src/main.ts
                 * src/index.ts
-            
+
                 * schema/index.ts
                 * schema.ts
                 * server.ts
                 * main.ts
                 * index.ts
-            
+
                   ERROR
 
       DESCRIPTION
-        Generate TypeScript types derived from your schema for complete type safety 
+        Generate TypeScript types derived from your schema for complete type safety
         across all your definition blocks and resolvers.
 
       ALIASES
