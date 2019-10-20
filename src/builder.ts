@@ -224,7 +224,7 @@ export interface BuilderConfig {
    * (something that runs to completion) where you do not want e.g. the server
    * to boot and keep the process from exiting.
    *
-   * @default process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS === "true"
+   * @default process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === "true"
    */
   shouldExitAfterGeneratedArtifacts?: boolean;
   /**
@@ -341,13 +341,13 @@ export function resolveBuilderConfig(
 
   // Typecheck environment variables
   if (
-    "NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS" in process.env &&
-    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS !== "true" &&
-    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS !== "false"
+    "NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS" in process.env &&
+    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS !== "true" &&
+    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS !== "false"
   ) {
     throw new TypeError(`
 
-    Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS with invalid type of value.
+    Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS with invalid type of value.
     This may represent a bug in your configuration and should be fixed.
 
 Expected:
@@ -356,7 +356,7 @@ Expected:
 
 Received:
 
-    ${process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS}
+    ${process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS}
 
 `);
   }
@@ -386,7 +386,7 @@ Received:
   const shouldExitAfterGeneratedArtifacts =
     config.shouldExitAfterGeneratedArtifacts !== undefined
       ? config.shouldExitAfterGeneratedArtifacts
-      : process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS === "true";
+      : process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === "true";
 
   const shouldGenerateArtifacts =
     config.shouldGenerateArtifacts !== undefined
@@ -398,28 +398,6 @@ Received:
       : Boolean(
           !process.env.NODE_ENV || process.env.NODE_ENV === "development"
         );
-
-  // check dynamic invariants
-  if (shouldExitAfterGeneratedArtifacts && !shouldGenerateArtifacts) {
-    throw new Error(`
-Please check your \`makeSchema\` config:
-
-    \`shouldExitAfterGeneratedArtifacts\` is true but nothing would be generated because \`shouldGenerateArtifacts\` is false.
-
-    This was probably not your intention. Environment variables were:
-
-    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS === ${
-      "NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS" in process.env
-        ? process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS
-        : "(not set)"
-    }
-    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS          === ${
-      "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env
-        ? process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS
-        : "(not set)"
-    }
-`);
-  }
 
   // Build internal config
   const internalConfig = {

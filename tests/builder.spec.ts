@@ -76,11 +76,11 @@ describe("resolveBuilderConfig() outputs", () => {
   ); // prettier-ignore
 });
 
-describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
+describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
   it("when true then sets config", () => {
     assignEnv({
       NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
-      NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "true",
+      NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "true",
     });
 
     expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
@@ -91,7 +91,7 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
   it("when false then sets config", () => {
     assignEnv({
       NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
-      NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "false",
+      NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "false",
     });
     expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
       false
@@ -107,7 +107,7 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
   it("overruled by code config", () => {
     assignEnv({
       NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
-      NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "false",
+      NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "false",
     });
     expect(
       resolveBuilderConfig({ shouldExitAfterGeneratedArtifacts: false })
@@ -117,12 +117,12 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
 
   it.each([["invalid", undefined, null, 1, false]])(
     "when invalid type then raises error",
-    (NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS) => {
+    (NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS) => {
       assignEnv({
-        NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS,
+        NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS,
       });
       expect(() => resolveBuilderConfig({})).toThrowError(
-        /.*Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS with invalid type of value.*/
+        /.*Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS with invalid type of value.*/
       );
     }
   );
