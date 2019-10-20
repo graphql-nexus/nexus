@@ -1651,6 +1651,17 @@ export function makeSchema(config: SchemaConfig): GraphQLSchema {
 
   assertNoMissingTypes(schema, missingTypes);
 
+  if (internalConfig.shouldExitAfterGeneratedArtifacts) {
+    const outputs = Object.entries(internalConfig.outputs);
+    for (const [outputType, outputPath] of outputs) {
+      const message = outputPath
+        ? `${outputType} generated to ${outputPath}`
+        : `${outputType} not enabled`;
+      console.log(message);
+    }
+    process.exit(0);
+  }
+
   return schema;
 }
 

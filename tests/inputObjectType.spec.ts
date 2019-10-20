@@ -102,6 +102,7 @@ describe("inputObject", () => {
               args: {
                 input: inputObjectType({
                   name: "InputObj",
+                  //tslint:disable-next-line
                   definition(t) {
                     t.id("idInput");
                     t.boolean("boolInput");
