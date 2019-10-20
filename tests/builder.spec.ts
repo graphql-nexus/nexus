@@ -83,17 +83,8 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
       NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "true",
     });
 
-    expect(resolveBuilderConfig({})).toMatchInlineSnapshot(
-      matchers.typegenDefault,
-      `
-                  Object {
-                    "outputs": Object {
-                      "schema": false,
-                      "typegen": StringMatching /\\.\\+\\\\/@types\\\\/nexus-typegen\\\\/index\\.d\\.ts/,
-                    },
-                    "shouldExitAfterGeneratedArtifacts": true,
-                  }
-            `
+    expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
+      true
     );
   });
 
@@ -102,30 +93,26 @@ describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
       NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
       NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "false",
     });
-    expect(resolveBuilderConfig({})).toMatchInlineSnapshot(
-      matchers.typegenDefault,
-      `
-                  Object {
-                    "outputs": Object {
-                      "schema": false,
-                      "typegen": StringMatching /\\.\\+\\\\/@types\\\\/nexus-typegen\\\\/index\\.d\\.ts/,
-                    },
-                    "shouldExitAfterGeneratedArtifacts": false,
-                  }
-            `
+    expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
+      false
     );
   });
 
   it("when not present then uses default", () => {
-    expect(resolveBuilderConfig({})).toMatchInlineSnapshot(`
-            Object {
-              "outputs": Object {
-                "schema": false,
-                "typegen": false,
-              },
-              "shouldExitAfterGeneratedArtifacts": false,
-            }
-        `);
+    expect(resolveBuilderConfig({}).shouldExitAfterGeneratedArtifacts).toEqual(
+      false
+    );
+  });
+
+  it("overruled by code config", () => {
+    assignEnv({
+      NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
+      NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "false",
+    });
+    expect(
+      resolveBuilderConfig({ shouldExitAfterGeneratedArtifacts: false })
+        .shouldExitAfterGeneratedArtifacts
+    ).toEqual(false);
   });
 
   it.each([["invalid", undefined, null, 1, false]])(
