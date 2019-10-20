@@ -21,6 +21,7 @@ describe("typegen", () => {
         typegen: path.join(__dirname, "test-gen.ts"),
         schema: path.join(__dirname, "test-gen.graphql"),
       },
+      shouldExitAfterGeneratedArtifacts: false,
       typegenAutoConfig: {
         backingTypeMap: {
           UUID: "string",
