@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.0.0-pr.275.ce823ef",
+  "version": "0.0.0-pr.275.004e62d",
   "main": "dist",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -58,6 +58,7 @@
     "jest-watch-typeahead": "^0.3.1",
     "lint-staged": "^7.3.0",
     "prettier": "^1.16.0",
+    "strip-ansi": "^5.2.0",
     "ts-jest": "^24",
     "ts-node": "^8.4.1",
     "tslint": "^5.11.0",
