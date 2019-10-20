@@ -224,9 +224,9 @@ export interface BuilderConfig {
    * (something that runs to completion) where you do not want e.g. the server
    * to boot and keep the process from exiting.
    *
-   * @default process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS === "true"
+   * @default process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS === "true"
    */
-  shouldExitOnGeneratedArtifacts?: boolean;
+  shouldExitAfterGeneratedArtifacts?: boolean;
   /**
    * Whether the schema & types are generated when the server
    * starts.
@@ -300,7 +300,7 @@ export interface TypegenInfo {
  * given their fallbacks, etc.
  */
 export interface InternalBuilderConfig extends BuilderConfig {
-  shouldExitOnGeneratedArtifacts: boolean;
+  shouldExitAfterGeneratedArtifacts: boolean;
   outputs: {
     schema: false | string;
     typegen: false | string;
@@ -339,16 +339,54 @@ export function resolveBuilderConfig(
     },
   } as const;
 
-  // Build internal config
-  const internalConfig = {
-    ...config,
-    outputs: {},
-  } as InternalBuilderConfig;
+  // Typecheck environment variables
+  if (
+    "NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS" in process.env &&
+    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS !== "true" &&
+    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS !== "false"
+  ) {
+    throw new TypeError(`
 
-  const shouldExitOnGeneratedArtifacts =
-    config.shouldExitOnGeneratedArtifacts !== undefined
-      ? config.shouldExitOnGeneratedArtifacts
-      : process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS === "true";
+    Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS with invalid type of value.
+    This may represent a bug in your configuration and should be fixed.
+
+Expected:
+
+    "false" | "true"
+
+Received:
+
+    ${process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS}
+
+`);
+  }
+
+  if (
+    "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env &&
+    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS !== "true" &&
+    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS !== "false"
+  ) {
+    throw new TypeError(`
+
+    Found env var NEXUS_SHOULD_GENERATE_ARTIFACTS with invalid type of value.
+    This may represent a bug in your configuration and should be fixed.
+
+Expected:
+
+    "false" | "true"
+
+Received:
+
+    ${process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS}
+
+`);
+  }
+
+  // calculate dynamic defaults
+  const shouldExitAfterGeneratedArtifacts =
+    config.shouldExitAfterGeneratedArtifacts !== undefined
+      ? config.shouldExitAfterGeneratedArtifacts
+      : process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS === "true";
 
   const shouldGenerateArtifacts =
     config.shouldGenerateArtifacts !== undefined
@@ -361,17 +399,18 @@ export function resolveBuilderConfig(
           !process.env.NODE_ENV || process.env.NODE_ENV === "development"
         );
 
-  if (shouldExitOnGeneratedArtifacts && !shouldGenerateArtifacts) {
+  // check dynamic invariants
+  if (shouldExitAfterGeneratedArtifacts && !shouldGenerateArtifacts) {
     throw new Error(`
 Please check your \`makeSchema\` config:
 
-    \`shouldExitOnGeneratedArtifacts\` is true but nothing would be generated because \`shouldGenerateArtifacts\` is false.
+    \`shouldExitAfterGeneratedArtifacts\` is true but nothing would be generated because \`shouldGenerateArtifacts\` is false.
 
     This was probably not your intention. Environment variables were:
 
-    process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS === ${
-      "NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS" in process.env
-        ? process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS
+    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS === ${
+      "NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS" in process.env
+        ? process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS
         : "(not set)"
     }
     process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS          === ${
@@ -382,7 +421,13 @@ Please check your \`makeSchema\` config:
 `);
   }
 
-  internalConfig.shouldExitOnGeneratedArtifacts = shouldExitOnGeneratedArtifacts;
+  // Build internal config
+  const internalConfig = {
+    ...config,
+    outputs: {},
+  } as InternalBuilderConfig;
+
+  internalConfig.shouldExitAfterGeneratedArtifacts = shouldExitAfterGeneratedArtifacts;
 
   if (shouldGenerateArtifacts === false || config.outputs === false) {
     internalConfig.outputs = { schema: false, typegen: false };

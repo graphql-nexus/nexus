@@ -15,21 +15,33 @@ const schemaDefaultPath = relativePath("../schema.graphql");
  * reduce duplication in test cases.
  */
 const outputs = {
-  default: { outputs: { schema: false, typegen: typegenDefault }, shouldExitOnGeneratedArtifacts: false },
-  none: { outputs: { schema: false, typegen: false }, shouldExitOnGeneratedArtifacts: false },
-  justTypegen: { outputs: { schema: false, typegen: typegenDefault }, shouldExitOnGeneratedArtifacts: false },
-  justSchema: { outputs: { schema: schemaDefaultPath, typegen: false }, shouldExitOnGeneratedArtifacts: false },
-  all: { outputs: { schema: schemaDefaultPath, typegen: typegenDefault }, shouldExitOnGeneratedArtifacts: false, },
+  default: { outputs: { schema: false, typegen: typegenDefault }, shouldExitAfterGeneratedArtifacts: false },
+  none: { outputs: { schema: false, typegen: false }, shouldExitAfterGeneratedArtifacts: false },
+  justTypegen: { outputs: { schema: false, typegen: typegenDefault }, shouldExitAfterGeneratedArtifacts: false },
+  justSchema: { outputs: { schema: schemaDefaultPath, typegen: false }, shouldExitAfterGeneratedArtifacts: false },
+  all: { outputs: { schema: schemaDefaultPath, typegen: typegenDefault }, shouldExitAfterGeneratedArtifacts: false, },
   custom: {
-    justTypegen: { outputs: { schema: false, typegen: "/typegen.ts" }, shouldExitOnGeneratedArtifacts: false },
-    justSchema: { outputs: { schema: "/schema.graphql", typegen: false }, shouldExitOnGeneratedArtifacts: false },
-    all: { outputs: { schema: "/schema.graphql", typegen: "/typegen.ts" }, shouldExitOnGeneratedArtifacts: false },
+    justTypegen: { outputs: { schema: false, typegen: "/typegen.ts" }, shouldExitAfterGeneratedArtifacts: false },
+    justSchema: { outputs: { schema: "/schema.graphql", typegen: false }, shouldExitAfterGeneratedArtifacts: false },
+    all: { outputs: { schema: "/schema.graphql", typegen: "/typegen.ts" }, shouldExitAfterGeneratedArtifacts: false },
   },
 } as const; // prettier-ignore
 
-describe("resolveBuilderConfig() outputs", () => {
-  restoreEnvBeforeEach();
+const assignEnv = (entries: object): NodeJS.ProcessEnv => {
+  return Object.assign(process.env, entries);
+};
 
+const matchers = {
+  typegenDefault: {
+    outputs: {
+      typegen: expect.stringMatching(/.+\/@types\/nexus-typegen\/index.d.ts/),
+    },
+  },
+};
+
+restoreEnvBeforeEach();
+
+describe("resolveBuilderConfig() outputs", () => {
   type Cases = [BuilderConfig, InternalBuilderConfig][];
   const onCases: Cases = [
     // defaults
@@ -64,16 +76,79 @@ describe("resolveBuilderConfig() outputs", () => {
   ); // prettier-ignore
 });
 
-describe("Environment variable influence over builder config shouldGenerateArtifacts", () => {
-  restoreEnvBeforeEach();
+describe("NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS", () => {
+  it("when true then sets config", () => {
+    assignEnv({
+      NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
+      NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "true",
+    });
 
+    expect(resolveBuilderConfig({})).toMatchInlineSnapshot(
+      matchers.typegenDefault,
+      `
+                  Object {
+                    "outputs": Object {
+                      "schema": false,
+                      "typegen": StringMatching /\\.\\+\\\\/@types\\\\/nexus-typegen\\\\/index\\.d\\.ts/,
+                    },
+                    "shouldExitAfterGeneratedArtifacts": true,
+                  }
+            `
+    );
+  });
+
+  it("when false then sets config", () => {
+    assignEnv({
+      NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
+      NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS: "false",
+    });
+    expect(resolveBuilderConfig({})).toMatchInlineSnapshot(
+      matchers.typegenDefault,
+      `
+                  Object {
+                    "outputs": Object {
+                      "schema": false,
+                      "typegen": StringMatching /\\.\\+\\\\/@types\\\\/nexus-typegen\\\\/index\\.d\\.ts/,
+                    },
+                    "shouldExitAfterGeneratedArtifacts": false,
+                  }
+            `
+    );
+  });
+
+  it("when not present then uses default", () => {
+    expect(resolveBuilderConfig({})).toMatchInlineSnapshot(`
+            Object {
+              "outputs": Object {
+                "schema": false,
+                "typegen": false,
+              },
+              "shouldExitAfterGeneratedArtifacts": false,
+            }
+        `);
+  });
+
+  it.each([["invalid", undefined, null, 1, false]])(
+    "when invalid type then raises error",
+    (NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS) => {
+      assignEnv({
+        NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS,
+      });
+      expect(() => resolveBuilderConfig({})).toThrowError(
+        /.*Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATED_ARTIFACTS with invalid type of value.*/
+      );
+    }
+  );
+});
+
+describe("Environment variable influence over builder config shouldGenerateArtifacts", () => {
   it.each([
     [{ NODE_ENV: "production" }, { shouldGenerateArtifacts: true }],
     [{ NODE_ENV: "development" }, { shouldGenerateArtifacts: false }],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false" }, { shouldGenerateArtifacts: true }],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true" }, { shouldGenerateArtifacts: false }],
   ])("when defined, overrules environment variables %j", (envEntries, config) => {
-      Object.assign(process.env, envEntries);
+      assignEnv(envEntries)
       const internalConfig = resolveBuilderConfig(config);
       const expectedOutputs = config.shouldGenerateArtifacts ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
@@ -87,7 +162,7 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "true", NODE_ENV: "production" }, true],
     [{ NEXUS_SHOULD_GENERATE_ARTIFACTS: "false", NODE_ENV: "development" }, false],
   ])("when undefined, NEXUS_SHOULD_GENERATE_ARTIFACTS is used (%j)", (envEntries, isGenOn) => {
-      Object.assign(process.env, envEntries);
+      assignEnv(envEntries)
       const internalConfig = resolveBuilderConfig({});
       const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
@@ -101,10 +176,22 @@ describe("Environment variable influence over builder config shouldGenerateArtif
     [{ NODE_ENV: "" }, true],
     [{ NODE_ENV: undefined }, true],
   ])("when undefined, and no NEXUS_SHOULD_GENERATE_ARTIFACTS, NODE_ENV is used (%j)", (envEntries, isGenOn) => {
-      Object.assign(process.env, envEntries);
+      assignEnv(envEntries)
       const internalConfig = resolveBuilderConfig({});
       const expectedOutputs = isGenOn ? outputs.default.outputs : outputs.none.outputs;
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
   ); // prettier-ignore
+
+  it.each([["invalid", undefined, null, 1, false]])(
+    "when invalid type then raises error",
+    (NEXUS_SHOULD_GENERATE_ARTIFACTS) => {
+      assignEnv({
+        NEXUS_SHOULD_GENERATE_ARTIFACTS,
+      });
+      expect(() => resolveBuilderConfig({})).toThrowError(
+        /.*Found env var NEXUS_SHOULD_GENERATE_ARTIFACTS with invalid type of value.*/
+      );
+    }
+  );
 });
