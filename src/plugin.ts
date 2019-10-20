@@ -1,4 +1,8 @@
-import { SchemaConfig, BuilderLens } from "./builder";
+import {
+  SchemaConfig,
+  PluginBuilderLens,
+  NexusAcceptedTypeDef,
+} from "./builder";
 import { GraphQLResolveInfo, GraphQLFieldResolver } from "graphql";
 import {
   withNexusSymbol,
@@ -8,18 +12,20 @@ import {
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
 } from "./definitions/_types";
-import { isPromiseLike, PrintedGenTyping } from "./utils";
+import { isPromiseLike, PrintedGenTyping, venn } from "./utils";
 import {
   NexusFieldExtension,
   NexusSchemaExtension,
   NexusTypeExtensions,
 } from "./extensions";
 
+export { PluginBuilderLens };
+
 export type CreateFieldResolverInfo = {
   /**
    * The internal Nexus "builder" object
    */
-  builder: BuilderLens;
+  builder: PluginBuilderLens;
   /**
    * Info about the GraphQL Field we're decorating.
    * Always guaranteed to exist, even for non-Nexus GraphQL types
@@ -81,13 +87,21 @@ export interface PluginConfig {
    * to the "definition" builders that are needed while traversing the type definitions, as
    * are defined by `dynamicOutput{Method,Property}` / `dynamicInput{Method,Property}`
    */
-  onInstall?: (builder: BuilderLens) => void;
+  /**
+   * Existing Description:
+   * The plugin callback to execute when onInstall lifecycle event occurs.
+   * OnInstall event occurs before type walking which means inline types are not
+   * visible at this point yet. `builderLens.hasType` will only return true
+   * for types the user has defined top level in their app, and any types added by
+   * upstream plugins.
+   */
+  onInstall?: (builder: PluginBuilderLens) => { types: NexusAcceptedTypeDef[] };
   /**
    * Executed once, just after types have been walked but also before the schema definition
    * types are materialized into GraphQL types. Use this opportunity to add / modify / remove
    * any types before we go through the resolution step.
    */
-  onBeforeBuild?: (builder: BuilderLens) => void;
+  onBeforeBuild?: (builder: PluginBuilderLens) => void;
   /**
    * If a type is not defined in the schema, our plugins can register an `onMissingType` handler,
    * which will intercept the missing type name and give us an opportunity to respond with a valid
@@ -192,3 +206,60 @@ export function plugin(config: PluginConfig) {
   return new PluginDef(config);
 }
 plugin.completeValue = completeValue;
+
+// For backward compat
+export const createPlugin = plugin;
+
+/**
+ * Validate that the configuration given by a plugin is valid.
+ */
+export function validatePluginConfig(pluginConfig: PluginConfig): void {
+  const validRequiredProps = ["name"];
+  const validOptionalProps = ["onInstall"];
+  const validProps = [...validRequiredProps, ...validOptionalProps];
+  const givenProps = Object.keys(pluginConfig);
+
+  const printProps = (props: Iterable<string>): string => {
+    return [...props].join(", ");
+  };
+
+  const [missingRequiredProps, ,] = venn(validRequiredProps, givenProps);
+  if (missingRequiredProps.size > 0) {
+    throw new Error(
+      `Plugin "${
+        pluginConfig.name
+      }" is missing required properties: ${printProps(missingRequiredProps)}`
+    );
+  }
+
+  const nameType = typeof pluginConfig.name;
+  if (nameType !== "string") {
+    throw new Error(
+      `Plugin "${pluginConfig.name}" is giving an invalid value for property name: expected "string" type, got ${nameType} type`
+    );
+  }
+
+  if (pluginConfig.name === "") {
+    throw new Error(
+      `Plugin "${pluginConfig.name}" is giving an invalid value for property name: empty string`
+    );
+  }
+
+  const [, , invalidGivenProps] = venn(validProps, givenProps);
+  if (invalidGivenProps.size > 0) {
+    throw new Error(
+      `Plugin "${
+        pluginConfig.name
+      }" is giving unexpected properties: ${printProps(invalidGivenProps)}`
+    );
+  }
+
+  if (pluginConfig.onInstall) {
+    const onInstallType = typeof pluginConfig.onInstall;
+    if (onInstallType !== "function") {
+      throw new Error(
+        `Plugin "${pluginConfig.name}" is giving an invalid value for onInstall hook: expected "function" type, got ${onInstallType} type`
+      );
+    }
+  }
+}

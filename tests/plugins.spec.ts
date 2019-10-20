@@ -7,13 +7,7 @@ import {
   PluginOnInstallHandler,
 } from "../src";
 import { printSchema } from "graphql";
-import {
-  NexusAcceptedTypeDef,
-  buildTypes,
-  inputObjectType,
-  extendType,
-  buildTypesInternal,
-} from "../src/core";
+import { NexusAcceptedTypeDef, inputObjectType, extendType } from "../src/core";
 
 const fooObject = objectType({
   name: "foo",
@@ -33,35 +27,25 @@ describe("runtime config validation", () => {
   const whenGiven = (config: any) => () => createPlugin(config);
 
   it("checks name present", () => {
-    expect(whenGiven({})).toThrowErrorMatchingInlineSnapshot(
-      `"Plugin \\"undefined\\" is missing required properties: name"`
-    );
+    expect(whenGiven({})).toThrowErrorMatchingSnapshot();
   });
 
   it("checks name is string", () => {
-    expect(whenGiven({ name: 1 })).toThrowErrorMatchingInlineSnapshot(
-      `"Plugin \\"1\\" is giving an invalid value for property name: expected \\"string\\" type, got number type"`
-    );
+    expect(whenGiven({ name: 1 })).toThrowErrorMatchingSnapshot();
   });
 
   it("checks name is not empty", () => {
-    expect(whenGiven({ name: "" })).toThrowErrorMatchingInlineSnapshot(
-      `"Plugin \\"\\" is giving an invalid value for property name: empty string"`
-    );
+    expect(whenGiven({ name: "" })).toThrowErrorMatchingSnapshot();
   });
 
   it("checks onInstall is a function if defined", () => {
     expect(
       whenGiven({ name: "x", onInstall: "foo" })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Plugin \\"x\\" is giving an invalid value for onInstall hook: expected \\"function\\" type, got string type"`
-    );
+    ).toThrowErrorMatchingSnapshot();
 
     expect(
       whenGiven({ name: "x", onInstall: {} })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Plugin \\"x\\" is giving an invalid value for onInstall hook: expected \\"function\\" type, got object type"`
-    );
+    ).toThrowErrorMatchingSnapshot();
   });
 });
 
@@ -73,42 +57,11 @@ describe("runtime onInstall hook handler", () => {
     });
 
   it("validates return value against shallow schema", () => {
-    expect(whenGiven(() => null)).toThrowErrorMatchingInlineSnapshot(`
-"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
+    expect(whenGiven(() => null)).toThrowErrorMatchingSnapshot();
 
-expected structure:
+    expect(whenGiven(() => ({ types: null }))).toThrowErrorMatchingSnapshot();
 
-  { types: NexusAcceptedTypeDef[] }
-
-got:
-
-  null"
-`);
-
-    expect(whenGiven(() => ({ types: null })))
-      .toThrowErrorMatchingInlineSnapshot(`
-"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
-
-expected structure:
-
-  { types: NexusAcceptedTypeDef[] }
-
-got:
-
-  [object Object]"
-`);
-
-    expect(whenGiven(() => ({}))).toThrowErrorMatchingInlineSnapshot(`
-"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
-
-expected structure:
-
-  { types: NexusAcceptedTypeDef[] }
-
-got:
-
-  [object Object]"
-`);
+    expect(whenGiven(() => ({}))).toThrowErrorMatchingSnapshot();
   });
 
   it("gracefully handles thrown errors", () => {
@@ -124,9 +77,7 @@ got:
   it("does not validate types array members yet", () => {
     expect(
       whenGiven(() => ({ types: [null, 1, "bad"] }))
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot read property 'name' of null"`
-    );
+    ).toThrowErrorMatchingSnapshot();
   });
 });
 
@@ -148,7 +99,7 @@ describe("onInstall plugins", () => {
     plugin,
     appTypes,
   }: {
-    onInstall?: PluginOnInstallHandler;
+    onInstall?: PluginConfig["onInstall"];
     plugin?: Omit<PluginConfig, "name">;
     appTypes?: NexusAcceptedTypeDef[];
   }) => {
@@ -177,12 +128,7 @@ describe("onInstall plugins", () => {
           types: [queryField],
         }),
       })
-    ).toMatchInlineSnapshot(`
-            "type Query {
-              something: String!
-            }
-            "
-        `);
+    ).toMatchSnapshot();
   });
 
   it("has access to top-level types", () => {
@@ -193,16 +139,7 @@ describe("onInstall plugins", () => {
         }),
         appTypes: [fooObject],
       })
-    ).toMatchInlineSnapshot(`
-      "type foo {
-        bar: String!
-      }
-
-      type Query {
-        ok: Boolean!
-      }
-      "
-    `);
+    ).toMatchSnapshot();
   });
 
   it("does not see fallback ok-query", () => {
@@ -214,12 +151,7 @@ describe("onInstall plugins", () => {
           };
         },
       })
-    ).toMatchInlineSnapshot(`
-                        "type Query {
-                          ok: Boolean!
-                        }
-                        "
-                `);
+    ).toMatchSnapshot();
   });
 
   it("does not have access to inline types", () => {
@@ -245,15 +177,6 @@ describe("onInstall plugins", () => {
           }),
         ],
       })
-    ).toMatchInlineSnapshot(`
-                              "input Inline {
-                                hidden: String
-                              }
-
-                              type Query {
-                                bar(inline: Inline): String!
-                              }
-                              "
-                    `);
+    ).toMatchSnapshot();
   });
 });

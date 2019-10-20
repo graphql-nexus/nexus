@@ -1,6 +1,6 @@
 import { SchemaBuilder, NexusAcceptedTypeDef } from "./builder";
 import { withNexusSymbol, NexusTypes } from "./definitions/_types";
-import { venn } from "./utils";
+import { validatePluginConfig } from "./plugin";
 
 /**
  * A read-only builder api exposed to plugins in the onInstall hook which
@@ -20,13 +20,6 @@ export type PluginConfig = {
   onInstall?: PluginOnInstallHandler;
 };
 
-/**
- * The plugin callback to execute when onInstall lifecycle event occurs.
- * OnInstall event occurs before type walking which means inline types are not
- * visible at this point yet. `builderLens.hasType` will only return true
- * for types the user has defined top level in their app, and any types added by
- * upstream plugins.
- */
 export type PluginOnInstallHandler = (
   builder: PluginBuilderLens
 ) => { types: NexusAcceptedTypeDef[] };
@@ -118,63 +111,9 @@ export function initialize(
       }
 
       validateOnInstallHookResult(plugin, hookResult);
-      hookResult.types.forEach(builder.addType);
+      hookResult.types.forEach((t) => builder.addType(t));
     },
   };
-}
-
-/**
- * Validate that the configuration given by a plugin is valid.
- */
-function validatePluginConfig(plugin: PluginConfig): void {
-  const validRequiredProps = ["name"];
-  const validOptionalProps = ["onInstall"];
-  const validProps = [...validRequiredProps, ...validOptionalProps];
-  const givenProps = Object.keys(plugin);
-
-  const printProps = (props: Iterable<string>): string => {
-    return [...props].join(", ");
-  };
-
-  const [missingRequiredProps, ,] = venn(validRequiredProps, givenProps);
-  if (missingRequiredProps.size > 0) {
-    throw new Error(
-      `Plugin "${plugin.name}" is missing required properties: ${printProps(
-        missingRequiredProps
-      )}`
-    );
-  }
-
-  const nameType = typeof plugin.name;
-  if (nameType !== "string") {
-    throw new Error(
-      `Plugin "${plugin.name}" is giving an invalid value for property name: expected "string" type, got ${nameType} type`
-    );
-  }
-
-  if (plugin.name === "") {
-    throw new Error(
-      `Plugin "${plugin.name}" is giving an invalid value for property name: empty string`
-    );
-  }
-
-  const [, , invalidGivenProps] = venn(validProps, givenProps);
-  if (invalidGivenProps.size > 0) {
-    throw new Error(
-      `Plugin "${plugin.name}" is giving unexpected properties: ${printProps(
-        invalidGivenProps
-      )}`
-    );
-  }
-
-  if (plugin.onInstall) {
-    const onInstallType = typeof plugin.onInstall;
-    if (onInstallType !== "function") {
-      throw new Error(
-        `Plugin "${plugin.name}" is giving an invalid value for onInstall hook: expected "function" type, got ${onInstallType} type`
-      );
-    }
-  }
 }
 
 /**

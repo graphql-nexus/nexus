@@ -145,15 +145,6 @@ import * as Plugins from "./plugins-current";
 
 export type Maybe<T> = T | null;
 
-export type NexusAcceptedTypeDef =
-  | AllNexusNamedTypeDefs
-  | NexusExtendInputTypeDef<string>
-  | NexusExtendTypeDef<string>
-  | GraphQLNamedType
-  | DynamicInputMethodDef<string>
-  | DynamicOutputMethodDef<string>
-  | DynamicOutputPropertyDef<string>;
-
 type NexusShapedOutput = {
   name: string;
   definition: (t: ObjectDefinitionBlock<string>) => void;
@@ -269,7 +260,7 @@ export interface BuilderConfig {
    * List of plugins to apply to Nexus, with before/after hooks
    * executed first to last: before -> resolve -> after
    */
-  plugins?: Plugins.PluginDef[];
+  plugins?: PluginDef[];
 }
 
 export type SchemaConfig = BuilderConfig & {
@@ -333,7 +324,9 @@ export type DynamicBlockDef =
   | DynamicOutputMethodDef<string>
   | DynamicOutputPropertyDef<string>;
 
-export type BuilderLens = {
+export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef;
+
+export type PluginBuilderLens = {
   hasType: SchemaBuilder["hasType"];
   addType: SchemaBuilder["addType"];
 };
@@ -344,12 +337,6 @@ export type BuilderLens = {
  * circular references at this step, while fields will guard for it during lazy evaluation.
  */
 export class SchemaBuilder {
-  /**
-   * Used to track all _GraphQL_ types that have been added to the builder.
-   * This supports hasType method which permits asking the question "Will
-   * the GraphQL schema have _this_ type (name)".
-   */
-  protected allTypeDefs: Record<string, NexusAcceptedTypeDef> = {};
   /**
    * Used to check for circular references.
    */
@@ -410,7 +397,7 @@ export class SchemaBuilder {
   /**
    * Methods we are able to access to read/modify builder state from plugins
    */
-  protected builderLens: BuilderLens;
+  protected builderLens: PluginBuilderLens;
 
   /**
    * Created just before types are walked, this keeps track of all of the resolvers
@@ -476,10 +463,6 @@ export class SchemaBuilder {
     );
   }
 
-  getConfig(): BuilderConfig {
-    return this.config;
-  }
-
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls
    * it into an internal "type registry". It also does an initial pass
@@ -526,10 +509,6 @@ export class SchemaBuilder {
         return;
       }
       throw extendError(typeDef.name);
-    }
-
-    if (!this.allTypeDefs[typeDef.name]) {
-      this.allTypeDefs[typeDef.name] = typeDef;
     }
 
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
@@ -1446,14 +1425,7 @@ export function buildTypesInternal<
   TypeMapDefs extends Record<string, GraphQLNamedType> = any
 >(types: any, config: BuilderConfig): BuildTypes<TypeMapDefs> {
   const builder = new SchemaBuilder(config);
-  const plugins = config.plugins || [];
-  const pluginControllers = plugins.map((plugin) =>
-    Plugins.initialize(builder, plugin)
-  );
   addTypes(builder, types);
-  pluginControllers.forEach((pluginController) =>
-    pluginController.triggerOnInstall()
-  );
   return builder.getFinalTypeMap();
 }
 
