@@ -219,8 +219,19 @@ export interface BuilderConfig {
         schema?: boolean | string;
       };
   /**
+   * Whether the process should exit once artifacts have been generated. This
+   * can be useful when attempting to perform artifact generation as a task
+   * (something that runs to completion) where you do not want e.g. the server
+   * to boot and keep the process from exiting.
+   *
+   * @default process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS === "true"
+   */
+  shouldExitOnGeneratedArtifacts?: boolean;
+  /**
    * Whether the schema & types are generated when the server
-   * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+   * starts.
+   *
+   * @default !process.env.NODE_ENV || process.env.NODE_ENV === "development"
    */
   shouldGenerateArtifacts?: boolean;
   /**
@@ -289,6 +300,7 @@ export interface TypegenInfo {
  * given their fallbacks, etc.
  */
 export interface InternalBuilderConfig extends BuilderConfig {
+  shouldExitOnGeneratedArtifacts: boolean;
   outputs: {
     schema: false | string;
     typegen: false | string;
@@ -333,6 +345,11 @@ export function resolveBuilderConfig(
     outputs: {},
   } as InternalBuilderConfig;
 
+  const shouldExitOnGeneratedArtifacts =
+    config.shouldExitOnGeneratedArtifacts !== undefined
+      ? config.shouldExitOnGeneratedArtifacts
+      : process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS === "true";
+
   const shouldGenerateArtifacts =
     config.shouldGenerateArtifacts !== undefined
       ? config.shouldGenerateArtifacts
@@ -343,6 +360,29 @@ export function resolveBuilderConfig(
       : Boolean(
           !process.env.NODE_ENV || process.env.NODE_ENV === "development"
         );
+
+  if (shouldExitOnGeneratedArtifacts && !shouldGenerateArtifacts) {
+    throw new Error(`
+Please check your \`makeSchema\` config:
+
+    \`shouldExitOnGeneratedArtifacts\` is true but nothing would be generated because \`shouldGenerateArtifacts\` is false.
+
+    This was probably not your intention. Environment variables were:
+
+    process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS === ${
+      "NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS" in process.env
+        ? process.env.NEXUS_SHOULD_EXIT_ON_GENERATED_ARTIFACTS
+        : "(not set)"
+    }
+    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS          === ${
+      "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env
+        ? process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS
+        : "(not set)"
+    }
+`);
+  }
+
+  internalConfig.shouldExitOnGeneratedArtifacts = shouldExitOnGeneratedArtifacts;
 
   if (shouldGenerateArtifacts === false || config.outputs === false) {
     internalConfig.outputs = { schema: false, typegen: false };
