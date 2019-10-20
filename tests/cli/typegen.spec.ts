@@ -13,8 +13,8 @@ describe("$ nexus typgen", () => {
       encoding: "utf8",
     });
     stderr = stderr.replace(
-      /(Cannot find module )'\/.*\/(.*)/,
-      "$1__DYNAMIC_ONTENT__/$2"
+      /(Cannot find module '\/).*(\/.*)/,
+      "$1__DYNAMIC_ONTENT__$2"
     );
     stderr = stripANSI(stderr);
     stdout = stripANSI(stdout);
@@ -26,75 +26,72 @@ describe("$ nexus typgen", () => {
   //
   it.skip("has helpful documentation", () => {
     expect(run("typegen", "--help")).toMatchInlineSnapshot(`
-      Object {
-        "status": 0,
-        "stderr": "",
-        "stdout": "USAGE
-        $ nexus typegen [ENTRYPOINT]
+                              Object {
+                                "status": 0,
+                                "stderr": "",
+                                "stdout": "USAGE
+                                $ nexus typegen [ENTRYPOINT]
 
-      ARGUMENTS
-        ENTRYPOINT
+                              ARGUMENTS
+                                ENTRYPOINT
 
-            Relative path (from cwd) to your app's TypeScript module that will run
-            directly or indirectly Nexus.makeSchema. By default the following paths will
-            be searched, picking the first match, or erroring out
+                                    Relative path (from cwd) to your app's TypeScript module that will run
+                                    directly or indirectly Nexus.makeSchema. By default the following paths will
+                                    be searched, picking the first match, or erroring out
 
-                * src/schema/index.ts
-                * src/schema.ts
-                * src/server.ts
-                * src/main.ts
-                * src/index.ts
+                                        * src/schema/index.ts
+                                        * src/schema.ts
+                                        * src/server.ts
+                                        * src/main.ts
+                                        * src/index.ts
 
-                * schema/index.ts
-                * schema.ts
-                * server.ts
-                * main.ts
-                * index.ts
+                                        * schema/index.ts
+                                        * schema.ts
+                                        * server.ts
+                                        * main.ts
+                                        * index.ts
 
-                  ERROR
+                                          ERROR
 
-      DESCRIPTION
-        Generate TypeScript types derived from your schema for complete type safety
-        across all your definition blocks and resolvers.
+                              DESCRIPTION
+                                Generate TypeScript types derived from your schema for complete type safety
+                                across all your definition blocks and resolvers.
 
-      ALIASES
-        $ nexus tg
+                              ALIASES
+                                $ nexus tg
 
-      ",
-      }
-    `);
+                              ",
+                              }
+                    `);
   });
 
   it("reports failure if the given entrypoint could not be found", () => {
     expect(run("typegen", "entrypoint.tmp.ts")).toMatchInlineSnapshot(`
-                  Object {
-                    "status": 1,
-                    "stderr": "
-                  Something went wrong while running Nexus typegen:
+      Object {
+        "status": 1,
+        "stderr": "
+      Something went wrong while running Nexus typegen:
 
-                      Cannot find module __DYNAMIC_ONTENT__/entrypoint.tmp.ts'
-                      
-                  ",
-                    "stdout": "",
-                  }
-            `);
+          Cannot find module '/__DYNAMIC_ONTENT__/entrypoint.tmp.ts'
+          
+      ",
+        "stdout": "",
+      }
+    `);
   });
 
   it("runs the given entrypoint with ts-node --transpile-only if found", () => {
     writeFileSync(
       entrypointFilePath,
-      'let a: string = 1; console.log("RAN DESPITE TYPE ERROR")'
+      'let a: string = 1; process.stdout.write("RAN DESPITE TYPE ERROR")'
     );
     expect(run("typegen", "entrypoint.tmp.ts")).toMatchInlineSnapshot(`
-                                          Object {
-                                            "status": 0,
-                                            "stderr": "",
-                                            "stdout": "RAN DESPITE TYPE ERROR
-
-                                          Success! Tailored TypeScript declaration for your GraphQL types and resolvers generated.
-                                          ",
-                                          }
-                            `);
+            Object {
+              "status": 0,
+              "stderr": "",
+              "stdout": "RAN DESPITE TYPE ERROR",
+            }
+        `);
   });
 
   it("runs with NEXUS_SHOULD_GENERATE_ARTIFACTS and NEXUS_EXIT_AFTER_TYPEGEN enabled", () => {
@@ -104,16 +101,14 @@ describe("$ nexus typgen", () => {
       console.log(process.env.NEXUS_EXIT_AFTER_TYPEGEN)`
     );
     expect(run("typegen", "entrypoint.tmp.ts")).toMatchInlineSnapshot(`
-                                          Object {
-                                            "status": 0,
-                                            "stderr": "",
-                                            "stdout": "true
-                                          true
-
-                                          Success! Tailored TypeScript declaration for your GraphQL types and resolvers generated.
-                                          ",
-                                          }
-                            `);
+                  Object {
+                    "status": 0,
+                    "stderr": "",
+                    "stdout": "true
+                  true
+                  ",
+                  }
+            `);
   });
 
   afterEach(() => {

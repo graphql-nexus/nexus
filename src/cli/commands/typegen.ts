@@ -59,6 +59,7 @@ Relative path (from cwd) to your app's TypeScript module that will run directly 
       );
       process.exit(1);
     }
+
     if (result!.stderr !== "") {
       console.error(
         `\nSomething went wrong while running Nexus typegen:\n\n${indentBlock(
@@ -68,9 +69,7 @@ Relative path (from cwd) to your app's TypeScript module that will run directly 
       );
       process.exit(1);
     }
-    console.log(result!.stdout);
-    console.log(
-      "Success! Tailored TypeScript declaration for your GraphQL types and resolvers generated."
-    );
+
+    process.stdout.write(result!.stdout);
   }
 }
