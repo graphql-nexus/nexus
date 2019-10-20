@@ -39,6 +39,6 @@
     "whitespace": false
   },
   "linterOptions": {
-    "exclude": ["**/*.json"]
+    "exclude": ["**/*.json", "examples/zeit-typescript/**/*"]
   }
 }

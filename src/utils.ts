@@ -434,3 +434,37 @@ export function consoleWarn(msg: string) {
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
 }
+
+/**
+ * Calculate the venn diagram between two iterables based on reference equality
+ * checks. The returned tripple contains items thusly:
+ *
+ *    * items only in arg 1 --> first tripple slot
+ *    * items in args 1 & 2 --> second tripple slot
+ *    * items only in arg 2 --> third tripple slot
+ */
+export function venn<T>(
+  xs: Iterable<T>,
+  ys: Iterable<T>
+): [Set<T>, Set<T>, Set<T>] {
+  const lefts: Set<T> = new Set(xs);
+  const boths: Set<T> = new Set();
+  const rights: Set<T> = new Set(ys);
+
+  for (const l of lefts) {
+    if (rights.has(l)) {
+      boths.add(l);
+      lefts.delete(l);
+      rights.delete(l);
+    }
+  }
+  for (const r of rights) {
+    if (lefts.has(r)) {
+      boths.add(r);
+      lefts.delete(r);
+      rights.delete(r);
+    }
+  }
+
+  return [lefts, boths, rights];
+}

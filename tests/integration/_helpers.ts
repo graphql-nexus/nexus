@@ -37,6 +37,7 @@ export const testSchema = (
     const appFilePath = join(__dirname, `./_${name}.ts`);
     expect([appFilePath]).toTypeCheck({
       sourceMap: false,
+      downlevelIteration: true,
       noEmitOnError: true,
       esModuleInterop: true,
       strict: true,

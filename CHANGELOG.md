@@ -2,6 +2,11 @@
 
 ### 0.12.0 (next)
 
+#### beta.14
+
+- feat(plugins): onInstall hook (#236)
+- feat(deps): add support for TypeScript 3.6 (#255)
+
 #### beta.13
 
 - fix(typegen): explicitly await removeFile before write (#254)

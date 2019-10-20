@@ -24,7 +24,7 @@ Common options available for `arg` include the following:
 
 **Required**
 
-Whether the argument is required or not. 
+Whether the argument is required or not.
 
 Format: `required?: boolean;`
 
@@ -34,7 +34,7 @@ Note, when `required: true`, `nullable: false`
 
 **Nullable**
 
-Whether the argument is nullable or not. 
+Whether the argument is nullable or not.
 
 Format: `nullable?: boolean;`
 
