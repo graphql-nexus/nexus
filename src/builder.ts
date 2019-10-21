@@ -42,6 +42,7 @@ import {
   ArgsRecord,
   arg,
 } from "./definitions/args";
+import deepMerge from "deepmerge";
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
@@ -120,6 +121,7 @@ import {
   eachObj,
   isUnknownType,
   assertAbsolutePath,
+  indentBlock,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -339,28 +341,37 @@ export function resolveBuilderConfig(
     },
   } as const;
 
-  // Typecheck environment variables
-  if (
-    "NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS" in process.env &&
-    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS !== "true" &&
-    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS !== "false"
-  ) {
-    throw new TypeError(`
+  // Integrate NEXUS_CONFIG env var
+  // TODO exhaustive runtime type check
+  let nexusConfigEnv: BuilderConfig = {};
+  if ("NEXUS_CONFIG" in process.env) {
+    if (typeof process.env.NEXUS_CONFIG !== "string") {
+      throw new Error(
+        "Found env var NEXUS_CONFIG key but value was undefined. Did you or something tamper with process.env?"
+      );
+    }
 
-    Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS with invalid type of value.
-    This may represent a bug in your configuration and should be fixed.
-
-Expected:
-
-    "false" | "true"
-
-Received:
-
-    ${process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS}
-
-`);
+    try {
+      nexusConfigEnv = JSON.parse(process.env.NEXUS_CONFIG);
+    } catch (error) {
+      throw new Error(
+        `Found env var NEXUS_CONFIG but it was not valid JSON:\n\n${indentBlock(
+          4,
+          error.stack
+        )}`
+      );
+    }
   }
 
+  // REFACTOR
+  // * types property is not according to the types but if it is not handled
+  //   here tests fail.
+  // * Remove deepmerge dependency
+  const { types, plugins, ...basicConfig } = config as any;
+  config = { ...deepMerge(basicConfig, nexusConfigEnv), types, plugins } as any;
+
+  // Typecheck environment variables
+  // DEPRECATED, use NEXUS_CONFIG instead
   if (
     "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env &&
     process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS !== "true" &&

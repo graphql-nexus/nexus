@@ -35,6 +35,10 @@ describe("$ nexus generate", () => {
     expect(run("generate", "--help")).toMatchInlineSnapshot();
   });
 
+  //
+  // --entrypoint
+  //
+
   describe("--entrypoint controls the target passed to ts-node", () => {
     it("runs the given entrypoint with ts-node --transpile-only if found", () => {
       writeFileSync(

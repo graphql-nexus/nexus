@@ -12,6 +12,7 @@ const relativePath = (...paths: string[]): string => Path.join(__dirname, ...pat
 const atTypesPath = relativePath("../../@types");
 const typegenDefault = Path.join(atTypesPath, "/nexus-typegen/index.d.ts"); // prettier-ignore
 const schemaDefaultPath = relativePath("../schema.graphql");
+
 /**
  * These are outputs that the internalConfig can have. Reference these to
  * reduce duplication in test cases.
@@ -29,9 +30,15 @@ const outputs = {
   },
 } as const; // prettier-ignore
 
-const assignEnv = (entries: object): NodeJS.ProcessEnv => {
+function assignEnv(entries: object): NodeJS.ProcessEnv {
   return Object.assign(process.env, entries);
-};
+}
+
+function nexusConfigEnv(config: BuilderConfig): NodeJS.ProcessEnv {
+  return assignEnv({
+    NEXUS_CONFIG: JSON.stringify(config),
+  });
+}
 
 const matchers = {
   typegenDefault: {
@@ -78,56 +85,44 @@ describe("resolveBuilderConfig() outputs", () => {
   ); // prettier-ignore
 });
 
-describe("NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS", () => {
-  it("when true then sets config", () => {
-    assignEnv({
-      NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
-      NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "true",
-    });
+// describe('NEXUS_CONFIG')
 
-    expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
-      true
-    );
-  });
-
-  it("when false then sets config", () => {
-    assignEnv({
-      NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
-      NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "false",
-    });
+describe("shouldExitAfterGenerateArtifacts", () => {
+  it("takes default of false", () => {
     expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
       false
     );
   });
-
-  it("when not present then uses default", () => {
-    expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
-      false
-    );
-  });
-
-  it("overruled by code config", () => {
-    assignEnv({
-      NEXUS_SHOULD_GENERATE_ARTIFACTS: "true",
-      NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS: "false",
-    });
-    expect(
-      resolveBuilderConfig({ shouldExitAfterGenerateArtifacts: false })
-        .shouldExitAfterGenerateArtifacts
-    ).toEqual(false);
-  });
-
-  it.each([["invalid", undefined, null, 1, false]])(
-    "when invalid type then raises error",
-    (NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS) => {
-      assignEnv({
-        NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS,
+  describe("via NEXUS_CONFIG", () => {
+    it("can be set true ", () => {
+      nexusConfigEnv({
+        shouldExitAfterGenerateArtifacts: true,
       });
-      expect(() => resolveBuilderConfig({})).toThrowError(
-        /.*Found env var NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS with invalid type of value.*/
+
+      expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
+        true
       );
-    }
-  );
+    });
+
+    it("can be set false", () => {
+      nexusConfigEnv({
+        shouldExitAfterGenerateArtifacts: false,
+      });
+      expect(resolveBuilderConfig({}).shouldExitAfterGenerateArtifacts).toEqual(
+        false
+      );
+    });
+    it("overrules code config", () => {
+      nexusConfigEnv({
+        shouldExitAfterGenerateArtifacts: true,
+      });
+
+      expect(
+        resolveBuilderConfig({ shouldExitAfterGenerateArtifacts: false })
+          .shouldExitAfterGenerateArtifacts
+      ).toEqual(true);
+    });
+  });
 
   it("will exit the process after artifact generation", () => {
     const appPath = Path.join(__dirname, "./app.tmp.ts");
