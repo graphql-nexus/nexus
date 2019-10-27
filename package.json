@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "@oclif/command": "^1.5.19",
-    "deepmerge": "^4.1.1",
     "tslib": "^1.9.3"
   },
   "devDependencies": {

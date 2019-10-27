@@ -18,6 +18,7 @@ import {
 } from "graphql";
 import path from "path";
 import { UNKNOWN_TYPE_SCALAR } from "./builder";
+import { isIterable } from "iterall";
 
 export function log(msg: string) {
   console.log(`GraphQL Nexus: ${msg}`);
@@ -295,4 +296,30 @@ function range(times: number): number[] {
     list.push(list.length + 1);
   }
   return list;
+}
+
+/**
+ * Like Object.assign except recursive where object-value keys collide. If `source` has a property
+ * that is also in `target` then the `target` property is overriden.
+ * @param target The target object. It will be mutated.
+ * @param source The source object. All properties will be copied from here into `target`.
+ */
+export function deepAssign<T extends object, U extends object>(
+  target: T,
+  source: U
+): any {
+  for (const [k, v] of Object.entries(source)) {
+    if (
+      typeof v !== null &&
+      isIterable(v) === false &&
+      typeof v === "object" &&
+      typeof (target as any)[k] !== null &&
+      typeof (target as any)[k] === "object"
+    ) {
+      deepAssign((target as any)[k], v);
+    } else {
+      (target as any)[k] = v;
+    }
+  }
+  return target;
 }

@@ -42,7 +42,6 @@ import {
   ArgsRecord,
   arg,
 } from "./definitions/args";
-import deepMerge from "deepmerge";
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
@@ -122,6 +121,7 @@ import {
   isUnknownType,
   assertAbsolutePath,
   indentBlock,
+  deepAssign,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -364,14 +364,34 @@ export function resolveBuilderConfig(
   }
 
   // REFACTOR
-  // * types property is not according to the types but if it is not handled
-  //   here tests fail.
-  // * Remove deepmerge dependency
-  const { types, plugins, ...basicConfig } = config as any;
-  config = { ...deepMerge(basicConfig, nexusConfigEnv), types, plugins } as any;
+  // * types property is not present according to the types but if we don't
+  //   forward it then tests fail.
+  const {
+    types,
+    plugins,
+    typegenAutoConfig,
+    formatTypegen,
+    ...basicConfig
+  } = config as any;
+  config = {
+    ...deepAssign(basicConfig, nexusConfigEnv),
+    types,
+    plugins,
+    typegenAutoConfig,
+    formatTypegen,
+  } as any;
+
+  // Warn on deprecations
+  if (
+    "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env &&
+    process.env.NODE_ENV !== "test"
+  ) {
+    console.warn(
+      "DEPRECATED: please use NEXUS_CONFIG instead of NEXUS_SHOULD_GENERATE_ARTIFACTS.\n\nFor example:\n\n    NEXUS_CONFIG='{ \"shouldGenerateArtifacts\": true }'"
+    );
+  }
 
   // Typecheck environment variables
-  // DEPRECATED, use NEXUS_CONFIG instead
   if (
     "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env &&
     process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS !== "true" &&
