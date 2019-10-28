@@ -1,12 +1,11 @@
 {
   "name": "nexus",
-  "version": "0.0.0-pr.275.004e62d",
+  "version": "0.12.0-beta.14",
   "main": "dist",
   "types": "dist/index.d.ts",
   "license": "MIT",
   "description": "Scalable, strongly typed GraphQL schema development",
   "homepage": "https://nexus.js.org",
-  "bin": "bin/run",
   "scripts": {
     "test": "jest",
     "test:ci": "jest -i --coverage",
@@ -30,7 +29,6 @@
   "files": [
     "src",
     "dist",
-    "bin",
     "LICENSE.md",
     "README.md",
     "yarn.lock"
@@ -40,7 +38,6 @@
     "url": "https://github.com/tgriesser"
   },
   "dependencies": {
-    "@oclif/command": "^1.5.19",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
@@ -50,7 +47,6 @@
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.15.2",
     "codecov": "^3.6.1",
-    "globby": "^10.0.1",
     "graphql": "^14.0.2",
     "graphql-iso-date": "^3.6.1",
     "husky": "^1.1.2",
@@ -58,7 +54,6 @@
     "jest-watch-typeahead": "^0.3.1",
     "lint-staged": "^7.3.0",
     "prettier": "^1.16.0",
-    "strip-ansi": "^5.2.0",
     "ts-jest": "^24",
     "ts-node": "^8.4.1",
     "tslint": "^5.11.0",
@@ -72,10 +67,6 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "oclif": {
-    "commands": "./dist/cli/commands",
-    "bin": "nexus"
   },
   "lint-staged": {
     "*.{ts,js,json,css,md}": [
