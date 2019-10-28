@@ -40,14 +40,6 @@ function nexusConfigEnv(config: BuilderConfig): NodeJS.ProcessEnv {
   });
 }
 
-const matchers = {
-  typegenDefault: {
-    outputs: {
-      typegen: expect.stringMatching(/.+\/@types\/nexus-typegen\/index.d.ts/),
-    },
-  },
-};
-
 restoreEnvBeforeEach();
 
 describe("resolveBuilderConfig() outputs", () => {
@@ -84,8 +76,6 @@ describe("resolveBuilderConfig() outputs", () => {
     }
   ); // prettier-ignore
 });
-
-// describe('NEXUS_CONFIG')
 
 describe("shouldExitAfterGenerateArtifacts", () => {
   it("takes default of false", () => {
