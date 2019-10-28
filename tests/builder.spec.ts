@@ -202,16 +202,4 @@ describe("Environment variable influence over builder config shouldGenerateArtif
       expect(internalConfig.outputs).toEqual(expectedOutputs);
     }
   ); // prettier-ignore
-
-  it.each([["invalid", undefined, null, 1, false]])(
-    "when invalid type then raises error",
-    (NEXUS_SHOULD_GENERATE_ARTIFACTS) => {
-      assignEnv({
-        NEXUS_SHOULD_GENERATE_ARTIFACTS,
-      });
-      expect(() => resolveBuilderConfig({})).toThrowError(
-        /.*Found env var NEXUS_SHOULD_GENERATE_ARTIFACTS with invalid type of value.*/
-      );
-    }
-  );
 });

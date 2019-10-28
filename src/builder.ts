@@ -226,7 +226,7 @@ export interface BuilderConfig {
    * (something that runs to completion) where you do not want e.g. the server
    * to boot and keep the process from exiting.
    *
-   * @default process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === "true"
+   * @default false
    */
   shouldExitAfterGenerateArtifacts?: boolean;
   /**
@@ -371,10 +371,10 @@ export function resolveBuilderConfig(
     plugins,
     typegenAutoConfig,
     formatTypegen,
-    ...basicConfig
+    ...overridableConfig
   } = config as any;
   config = {
-    ...deepAssign(basicConfig, nexusConfigEnv),
+    ...deepAssign(overridableConfig, nexusConfigEnv),
     types,
     plugins,
     typegenAutoConfig,
@@ -391,33 +391,11 @@ export function resolveBuilderConfig(
     );
   }
 
-  // Typecheck environment variables
-  if (
-    "NEXUS_SHOULD_GENERATE_ARTIFACTS" in process.env &&
-    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS !== "true" &&
-    process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS !== "false"
-  ) {
-    throw new TypeError(`
-
-    Found env var NEXUS_SHOULD_GENERATE_ARTIFACTS with invalid type of value.
-    This may represent a bug in your configuration and should be fixed.
-
-Expected:
-
-    "false" | "true"
-
-Received:
-
-    ${process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS}
-
-`);
-  }
-
   // calculate dynamic defaults
   const shouldExitAfterGenerateArtifacts =
     config.shouldExitAfterGenerateArtifacts !== undefined
       ? config.shouldExitAfterGenerateArtifacts
-      : process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === "true";
+      : false;
 
   const shouldGenerateArtifacts =
     config.shouldGenerateArtifacts !== undefined
