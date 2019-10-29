@@ -47,7 +47,7 @@ export interface AuthorizePluginErrorConfig {
 }
 
 export interface AuthorizePluginConfig {
-  formatError?: (config: AuthorizePluginErrorConfig) => Error;
+  formatError?: (authConfig: AuthorizePluginErrorConfig) => Error;
 }
 
 export const defaultFormatError = ({
@@ -58,8 +58,8 @@ export const defaultFormatError = ({
   return err;
 };
 
-export const authorizePlugin = (config: AuthorizePluginConfig = {}) => {
-  const { formatError = defaultFormatError } = config;
+export const authorizePlugin = (authConfig: AuthorizePluginConfig = {}) => {
+  const { formatError = defaultFormatError } = authConfig;
   const ensureError = (
     root: any,
     args: any,
