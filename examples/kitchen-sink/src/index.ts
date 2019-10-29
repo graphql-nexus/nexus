@@ -1,5 +1,5 @@
 import { ApolloServer } from "apollo-server";
-import { makeSchema } from "nexus";
+import { makeSchema, nullabilityGuardPlugin, authorizePlugin } from "nexus";
 import path from "path";
 import * as types from "./kitchen-sink-definitions";
 
@@ -9,6 +9,19 @@ const schema = makeSchema({
     schema: path.join(__dirname, "../kitchen-sink-schema.graphql"),
     typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
   },
+  plugins: [
+    authorizePlugin(),
+    nullabilityGuardPlugin({
+      shouldGuard: true,
+      fallbackValues: {
+        ID: () => "MISSING_ID",
+        Int: () => -1,
+        Date: () => new Date(0),
+        Boolean: () => false,
+        String: () => "",
+      },
+    }),
+  ],
 });
 
 const server = new ApolloServer({

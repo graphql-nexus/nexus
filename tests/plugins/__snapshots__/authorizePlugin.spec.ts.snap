@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`authorizePlugin always throws an error, even when formatError is wrong 1`] = `
+Array [
+  "Non-Error value undefined returned from custom formatError in authorize plugin",
+]
+`;
+
+exports[`authorizePlugin field-level authorize fails returning a Promise for an error 1`] = `
+Array [
+  "Guarded error Not authorized",
+]
+`;
+
+exports[`authorizePlugin field-level authorize fails returning a Promise for false 1`] = `
+Array [
+  "Guarded error Not authorized",
+]
+`;
+
+exports[`authorizePlugin field-level authorize fails returning an error 1`] = `
+Array [
+  "Guarded error You shall not pass.",
+]
+`;
+
+exports[`authorizePlugin field-level authorize fails returning false 1`] = `
+Array [
+  "Guarded error Not authorized",
+]
+`;
+
+exports[`authorizePlugin field-level authorize fails throwing an error 1`] = `
+Array [
+  "Guarded error You shall not pass.",
+]
+`;
+
+exports[`authorizePlugin field-level authorize fails with any other value 1`] = `
+Array [
+  "Guarded error Nexus authorize for Query.userInvalidValue Expected a boolean or Error, saw 1",
+]
+`;
+
+exports[`authorizePlugin warns and adds the authorize plugin when a schema has an authorize prop but no plugins 1`] = `
+Array [
+  "The GraphQL Nexus \\"authorize\\" feature has been moved to a plugin, add plugins: [authorizePlugin()] to your makeSchema config to remove this warning.",
+]
+`;
+
+exports[`authorizePlugin warns when a field has a non-function authorize prop 1`] = `undefined`;

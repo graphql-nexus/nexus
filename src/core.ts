@@ -26,3 +26,4 @@ export * from "./definitions/unionType";
 export * from "./definitions/wrapping";
 export * from "./dynamicMethod";
 export * from "./plugin";
+export * from "./plugins";

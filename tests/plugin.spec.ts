@@ -1,23 +1,15 @@
 import {
-  isPromiseLike,
   makeSchema,
   objectType,
   plugin,
   queryField,
   MiddlewareFn,
 } from "../src/core";
-import {
-  GraphQLObjectType,
-  buildSchema,
-  GraphQLSchema,
-  graphql,
-  printSchema,
-  lexicographicSortSchema,
-} from "graphql";
+import { buildSchema, GraphQLSchema, graphql, printSchema } from "graphql";
 import { EXAMPLE_SDL } from "./_sdl";
-import { nullabilityGuard } from "../src/plugins";
+import { nullabilityGuardPlugin } from "../src/plugins";
 
-const nullGuardPlugin = nullabilityGuard({
+const nullGuardPlugin = nullabilityGuardPlugin({
   shouldGuard: true,
   fallbackValues: {
     ID: () => "UNKNOWN_ID",

@@ -13,7 +13,7 @@ export type NexusTypeExtensions = {
 export function decorateType<T extends GraphQLNamedType>(
   type: T,
   config: TypeExtensionConfig
-) {
+): T {
   type.extensions = {
     ...type.extensions,
     nexus: {

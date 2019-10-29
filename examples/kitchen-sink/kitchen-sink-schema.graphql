@@ -57,6 +57,7 @@ type Query {
   getNumberOrNull(a: Int!): Int
   inlineArgs(someArg: SomeArg): String!
   inputAsArgExample(testInput: InputType, testScalar: String): String!
+  protectedField: Int!
 }
 
 input SomeArg {

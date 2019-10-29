@@ -21,10 +21,11 @@ import {
   isNonNullType,
 } from "graphql";
 import path from "path";
-import { UNKNOWN_TYPE_SCALAR, BuilderConfig } from "./builder";
+import { BuilderConfig } from "./builder";
 import { TypegenMetadataConfig } from "./typegenMetadata";
 import { MissingType, withNexusSymbol, NexusTypes } from "./definitions/_types";
 import { PluginConfig } from "./plugin";
+import { decorateType } from "./definitions/decorateType";
 
 export const isInterfaceField = (
   type: GraphQLObjectType,
@@ -454,20 +455,20 @@ export function venn<T>(
   const boths: Set<T> = new Set();
   const rights: Set<T> = new Set(ys);
 
-  for (const l of lefts) {
+  lefts.forEach((l) => {
     if (rights.has(l)) {
       boths.add(l);
       lefts.delete(l);
       rights.delete(l);
     }
-  }
-  for (const r of rights) {
+  });
+  rights.forEach((r) => {
     if (lefts.has(r)) {
       boths.add(r);
       lefts.delete(r);
       rights.delete(r);
     }
-  }
+  });
 
   return [lefts, boths, rights];
 }
@@ -486,3 +487,26 @@ export function validateOnInstallHookResult(
   }
   // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
 }
+
+export const UNKNOWN_TYPE_SCALAR = decorateType(
+  new GraphQLScalarType({
+    name: "NEXUS__UNKNOWN__TYPE",
+    description: `
+    This scalar should never make it into production. It is used as a placeholder for situations
+    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    the TypeScript definitions will not be updated.
+  `,
+    parseValue(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    parseLiteral(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    serialize(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+  }),
+  {
+    rootTyping: "never",
+  }
+);

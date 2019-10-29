@@ -126,6 +126,7 @@ import {
   consoleWarn,
   validateOnInstallHookResult,
   mapValues,
+  UNKNOWN_TYPE_SCALAR,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -133,7 +134,6 @@ import {
 } from "./definitions/extendInputType";
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
 import { DynamicOutputPropertyDef } from "./dynamicProperty";
-import { decorateType } from "./definitions/decorateType";
 import {
   NexusPlugin,
   composeMiddlewareFns,
@@ -148,6 +148,7 @@ import {
   NexusObjectTypeExtension,
   NexusInputObjectTypeExtension,
 } from "./extensions";
+import { authorizePlugin } from "./plugins/authorizePlugin";
 
 type NexusShapedOutput = {
   name: string;
@@ -166,29 +167,6 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   ID: GraphQLID,
   Boolean: GraphQLBoolean,
 };
-
-export const UNKNOWN_TYPE_SCALAR = decorateType(
-  new GraphQLScalarType({
-    name: "NEXUS__UNKNOWN__TYPE",
-    description: `
-    This scalar should never make it into production. It is used as a placeholder for situations
-    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
-    the TypeScript definitions will not be updated.
-  `,
-    parseValue(value) {
-      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
-    },
-    parseLiteral(value) {
-      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
-    },
-    serialize(value) {
-      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
-    },
-  }),
-  {
-    rootTyping: "never",
-  }
-);
 
 export interface BuilderConfig {
   /**
@@ -463,7 +441,7 @@ export class SchemaBuilder {
       output: true,
       ...config.nonNullDefaults,
     };
-    this.plugins = config.plugins || [];
+    this.plugins = config.plugins || [authorizePlugin()];
     this.builderLens = Object.freeze({
       hasType: this.hasType.bind(this),
       addType: this.addType.bind(this),
@@ -674,7 +652,11 @@ export class SchemaBuilder {
   }
 
   beforeWalkTypes() {
-    this.plugins.forEach(({ config: pluginConfig }) => {
+    this.plugins.forEach((obj, i) => {
+      if (!isNexusPlugin(obj)) {
+        throw new Error(`Expected a plugin in plugins[${i}], saw ${obj}`);
+      }
+      const { config: pluginConfig } = obj;
       if (pluginConfig.onInstall) {
         const installResult = pluginConfig.onInstall(this.builderLens);
         validateOnInstallHookResult(pluginConfig.name, installResult);

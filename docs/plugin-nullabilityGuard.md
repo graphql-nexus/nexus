@@ -5,7 +5,9 @@ This plugin helps us guard against non-null values crashing our queries in produ
 #### Use:
 
 ```ts
-nullabilityGuard({
+import { nullabilityGuardPlugin } from "nexus";
+
+const guardPlugin = nullabilityGuardPlugin({
   onNullGuarded(ctx, info) {
     // This could report to a service like Sentry, or log internally - up to you!
     console.error(

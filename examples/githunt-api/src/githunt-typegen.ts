@@ -3,60 +3,58 @@
  * Do not make changes to this file directly
  */
 
-
-
-
-
-
-
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface NexusGenInputs {
-}
+export interface NexusGenInputs {}
 
 export interface NexusGenEnums {
-  FeedType: "HOT" | "NEW" | "TOP"
-  VoteType: "CANCEL" | "DOWN" | "UP"
+  FeedType: "HOT" | "NEW" | "TOP";
+  VoteType: "CANCEL" | "DOWN" | "UP";
 }
 
 export interface NexusGenRootTypes {
-  Comment: { // root type
+  Comment: {
+    // root type
     content: string; // String!
     id: number; // Int!
-    postedBy?: NexusGenRootTypes['User'] | null; // User
+    postedBy?: NexusGenRootTypes["User"] | null; // User
     repoName: string; // String!
-  }
-  Entry: { // root type
+  };
+  Entry: {
+    // root type
     commentCount: number; // Int!
-    comments: NexusGenRootTypes['Comment'][]; // [Comment!]!
+    comments: NexusGenRootTypes["Comment"][]; // [Comment!]!
     createdAt: number; // Float!
     id: number; // Int!
-    postedBy?: NexusGenRootTypes['User'] | null; // User
-    repository: NexusGenRootTypes['Repository']; // Repository!
+    postedBy?: NexusGenRootTypes["User"] | null; // User
+    repository: NexusGenRootTypes["Repository"]; // Repository!
     score: number; // Int!
-    vote: NexusGenRootTypes['Vote']; // Vote!
-  }
+    vote: NexusGenRootTypes["Vote"]; // Vote!
+  };
   Mutation: {};
   Query: {};
-  Repository: { // root type
+  Repository: {
+    // root type
     description?: string | null; // String
     full_name: string; // String!
     html_url: string; // String!
     name: string; // String!
     open_issues_count?: number | null; // Int
-    owner?: NexusGenRootTypes['User'] | null; // User
+    owner?: NexusGenRootTypes["User"] | null; // User
     stargazers_count: number; // Int!
-  }
-  User: { // root type
+  };
+  User: {
+    // root type
     avatar_url: string; // String!
     html_url: string; // String!
     login: string; // String!
-  }
-  Vote: { // root type
+  };
+  Vote: {
+    // root type
     vote_value: number; // Int!
-  }
+  };
   String: string;
   Int: number;
   Float: number;
@@ -65,96 +63,115 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  FeedType: NexusGenEnums['FeedType'];
-  VoteType: NexusGenEnums['VoteType'];
+  FeedType: NexusGenEnums["FeedType"];
+  VoteType: NexusGenEnums["VoteType"];
 }
 
 export interface NexusGenFieldTypes {
-  Comment: { // field return type
+  Comment: {
+    // field return type
     content: string; // String!
     createdAt: number; // Float!
     id: number; // Int!
-    postedBy: NexusGenRootTypes['User'] | null; // User
+    postedBy: NexusGenRootTypes["User"] | null; // User
     repoName: string; // String!
-  }
-  Entry: { // field return type
+  };
+  Entry: {
+    // field return type
     commentCount: number; // Int!
-    comments: NexusGenRootTypes['Comment'][]; // [Comment!]!
+    comments: NexusGenRootTypes["Comment"][]; // [Comment!]!
     createdAt: number; // Float!
     hotScore: number; // Float!
     id: number; // Int!
-    postedBy: NexusGenRootTypes['User'] | null; // User
-    repository: NexusGenRootTypes['Repository']; // Repository!
+    postedBy: NexusGenRootTypes["User"] | null; // User
+    repository: NexusGenRootTypes["Repository"]; // Repository!
     score: number; // Int!
-    vote: NexusGenRootTypes['Vote']; // Vote!
-  }
-  Mutation: { // field return type
-    submitComment: NexusGenRootTypes['Comment']; // Comment!
-    submitRepository: NexusGenRootTypes['Entry']; // Entry!
-    vote: NexusGenRootTypes['Entry']; // Entry!
-  }
-  Query: { // field return type
-    currentUser: NexusGenRootTypes['User'] | null; // User
-    entry: NexusGenRootTypes['Entry'] | null; // Entry
-    feed: NexusGenRootTypes['Entry'][]; // [Entry!]!
-  }
-  Repository: { // field return type
+    vote: NexusGenRootTypes["Vote"]; // Vote!
+  };
+  Mutation: {
+    // field return type
+    submitComment: NexusGenRootTypes["Comment"]; // Comment!
+    submitRepository: NexusGenRootTypes["Entry"]; // Entry!
+    vote: NexusGenRootTypes["Entry"]; // Entry!
+  };
+  Query: {
+    // field return type
+    currentUser: NexusGenRootTypes["User"] | null; // User
+    entry: NexusGenRootTypes["Entry"] | null; // Entry
+    feed: NexusGenRootTypes["Entry"][]; // [Entry!]!
+  };
+  Repository: {
+    // field return type
     description: string | null; // String
     full_name: string; // String!
     html_url: string; // String!
     name: string; // String!
     open_issues_count: number | null; // Int
-    owner: NexusGenRootTypes['User'] | null; // User
+    owner: NexusGenRootTypes["User"] | null; // User
     stargazers_count: number; // Int!
-  }
-  User: { // field return type
+  };
+  User: {
+    // field return type
     avatar_url: string; // String!
     html_url: string; // String!
     login: string; // String!
-  }
-  Vote: { // field return type
+  };
+  Vote: {
+    // field return type
     vote_value: number; // Int!
-  }
+  };
 }
 
 export interface NexusGenArgTypes {
   Entry: {
-    comments: { // args
+    comments: {
+      // args
       limit?: number | null; // Int
       offset?: number | null; // Int
-    }
-  }
+    };
+  };
   Mutation: {
-    submitComment: { // args
+    submitComment: {
+      // args
       commentContent: string; // String!
       repoFullName: string; // String!
-    }
-    submitRepository: { // args
+    };
+    submitRepository: {
+      // args
       repoFullName: string; // String!
-    }
-    vote: { // args
+    };
+    vote: {
+      // args
       repoFullName: string; // String!
-      type: NexusGenEnums['VoteType']; // VoteType!
-    }
-  }
+      type: NexusGenEnums["VoteType"]; // VoteType!
+    };
+  };
   Query: {
-    entry: { // args
+    entry: {
+      // args
       repoFullName: string; // String!
-    }
-    feed: { // args
+    };
+    feed: {
+      // args
       limit?: number | null; // Int
       offset?: number | null; // Int
-      type: NexusGenEnums['FeedType']; // FeedType!
-    }
-  }
+      type: NexusGenEnums["FeedType"]; // FeedType!
+    };
+  };
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
-}
+export interface NexusGenAbstractResolveReturnTypes {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "Comment" | "Entry" | "Mutation" | "Query" | "Repository" | "User" | "Vote";
+export type NexusGenObjectNames =
+  | "Comment"
+  | "Entry"
+  | "Mutation"
+  | "Query"
+  | "Repository"
+  | "User"
+  | "Vote";
 
 export type NexusGenInputNames = never;
 
@@ -180,9 +197,28 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
-  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  allInputTypes:
+    | NexusGenTypes["inputNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["scalarNames"];
+  allOutputTypes:
+    | NexusGenTypes["objectNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["unionNames"]
+    | NexusGenTypes["interfaceNames"]
+    | NexusGenTypes["scalarNames"];
+  allNamedTypes:
+    | NexusGenTypes["allInputTypes"]
+    | NexusGenTypes["allOutputTypes"];
+  abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+declare global {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
+  interface NexusGenPluginSchemaConfig {}
 }

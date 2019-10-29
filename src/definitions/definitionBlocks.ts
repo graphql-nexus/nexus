@@ -4,7 +4,6 @@ import {
   GetGen,
   HasGen3,
   NeedsResolver,
-  AuthorizeResolver,
   GetGen3,
   AllInputTypes,
 } from "../typegenTypeHelpers";
@@ -48,15 +47,6 @@ export type CommonOutputFieldConfig<
    * Arguments for the field
    */
   args?: ArgsRecord;
-  /**
-   * Authorization for an individual field. Returning "true"
-   * or "Promise<true>" means the field can be accessed.
-   * Returning "false" or "Promise<false>" will respond
-   * with a "Not Authorized" error for the field. Returning
-   * or throwing an error will also prevent the resolver from
-   * executing.
-   */
-  authorize?: AuthorizeResolver<TypeName, FieldName>;
 } & NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 export interface OutputScalarConfig<

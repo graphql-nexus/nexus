@@ -31,9 +31,9 @@ export {
 } from "./typegenTypeHelpers";
 export { dynamicInputMethod, dynamicOutputMethod } from "./dynamicMethod";
 export { dynamicOutputProperty } from "./dynamicProperty";
-export { core, blocks, ext, plugins };
+export { core, blocks, ext };
 export { plugin } from "./plugin";
-import * as plugins from "./plugins";
+export * from "./plugins";
 import * as core from "./core";
 import * as blocks from "./blocks";
 import * as ext from "./dynamicMethods";

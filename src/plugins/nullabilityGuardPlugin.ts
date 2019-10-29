@@ -13,9 +13,8 @@ import {
 } from "graphql";
 import { forEach } from "iterall";
 import { plugin, CreateFieldResolverInfo } from "../plugin";
-import { GetGen, GetGen2 } from "../typegenTypeHelpers";
+import { GetGen, GetGen2, AllOutputTypes } from "../typegenTypeHelpers";
 import { printedGenTyping, isPromiseLike } from "../utils";
-import { core } from "..";
 import { GraphQLPossibleOutputs } from "../definitions/_types";
 import { NexusGraphQLNamedType } from "../extensions";
 
@@ -34,7 +33,7 @@ export interface NullabilityPluginOnGuardedConfig {
 
 export type NullFallbackValues = Partial<
   {
-    [K in core.AllOutputTypes]: (
+    [K in AllOutputTypes]: (
       obj: NullabilityPluginFallbackFn
     ) => GetGen2<"rootTypes", K>;
   }
@@ -68,7 +67,9 @@ const fieldDefTypes = printedGenTyping({
   `,
 });
 
-export const nullabilityGuard = (pluginConfig: NullabilityGuardConfig) => {
+export const nullabilityGuardPlugin = (
+  pluginConfig: NullabilityGuardConfig
+) => {
   const {
     shouldGuard = process.env.NODE_ENV === "production",
     fallbackValues = {},
