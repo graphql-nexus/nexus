@@ -106,7 +106,7 @@ export interface PluginConfig {
    * which will intercept the missing type name and give us an opportunity to respond with a valid
    * type.
    */
-  onMissingType?: (missingTypeName: string) => any;
+  onMissingType?: (missingTypeName: string, builder: PluginBuilderLens) => any;
   /**
    * Executed any time a field resolver is created. Returning a function here will add its in the
    * stack of middlewares with the (root, args, ctx, info, next) signature, where the `next` is the
@@ -182,10 +182,10 @@ export function composeMiddlewareFns<T>(
  * A definition for a plugin. Should be passed to the `plugins: []` option
  * on makeSchema
  */
-export class PluginDef {
+export class NexusPlugin {
   constructor(readonly config: PluginConfig) {}
 }
-withNexusSymbol(PluginDef, NexusTypes.Plugin);
+withNexusSymbol(NexusPlugin, NexusTypes.Plugin);
 
 /**
  * A plugin defines configuration which can document additional metadata options
@@ -203,7 +203,7 @@ withNexusSymbol(PluginDef, NexusTypes.Plugin);
  */
 export function plugin(config: PluginConfig) {
   validatePluginConfig(config);
-  return new PluginDef(config);
+  return new NexusPlugin(config);
 }
 plugin.completeValue = completeValue;
 
