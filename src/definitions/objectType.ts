@@ -58,7 +58,7 @@ export class ObjectDefinitionBlock<
    */
   modify(field: any, modifications: any) {
     throw new Error(`
-      The modify API has been removed. If you were using this API, please open an issue on 
+      The Nexus objectType.modify API has been removed. If you were using this API, please open an issue on 
       GitHub to discuss your use case so we can discuss a suitable replacement.
     `);
   }

@@ -34,6 +34,9 @@ import {
   getNamedType,
   GraphQLField,
   defaultFieldResolver,
+  isSchema,
+  GraphQLType,
+  isWrappingType,
 } from "graphql";
 import {
   NexusArgConfig,
@@ -120,6 +123,7 @@ import {
   assertNoMissingTypes,
   consoleWarn,
   validateOnInstallHookResult,
+  mapValues,
 } from "./utils";
 import {
   NexusExtendInputTypeDef,
@@ -142,8 +146,6 @@ import {
   NexusObjectTypeExtension,
   NexusInputObjectTypeExtension,
 } from "./extensions";
-
-export type Maybe<T> = T | null;
 
 type NexusShapedOutput = {
   name: string;
@@ -432,12 +434,21 @@ export class SchemaBuilder {
   >[] = [];
 
   /**
+   * Executed after the schema is constructed, for any final verification
+   */
+  protected onAfterBuildFns: Exclude<
+    PluginConfig["onAfterBuild"],
+    undefined
+  >[] = [];
+
+  /**
    * The `schemaExtension` is created just after the types are walked,
    * but before the fields are materialized.
    */
   protected _schemaExtension?: NexusSchemaExtension;
 
   get schemaExtension() {
+    /* istanbul ignore if */
     if (!this._schemaExtension) {
       throw new Error("Cannot reference schemaExtension before it is created");
     }
@@ -485,7 +496,7 @@ export class SchemaBuilder {
     }
 
     const existingType =
-      this.finalTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
+      this.definedTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name];
 
     if (isNexusExtendTypeDef(typeDef)) {
       const typeExtensions = (this.typeExtendMap[typeDef.name] =
@@ -504,11 +515,7 @@ export class SchemaBuilder {
     }
 
     if (existingType) {
-      // Allow importing the same exact type more than once.
-      if (existingType === typeDef) {
-        return;
-      }
-      throw extendError(typeDef.name);
+      return;
     }
 
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
@@ -534,9 +541,23 @@ export class SchemaBuilder {
     }
 
     if (isNamedType(typeDef)) {
-      this.finalTypeMap[typeDef.name] = typeDef;
+      let finalTypeDef = typeDef;
+      if (isObjectType(typeDef)) {
+        const config = typeDef.toConfig();
+        finalTypeDef = new GraphQLObjectType({
+          ...config,
+          fields: () => this.rebuildFields(config),
+        });
+      } else if (isInterfaceType(typeDef)) {
+        const config = typeDef.toConfig();
+        finalTypeDef = new GraphQLInterfaceType({
+          ...config,
+          fields: () => this.rebuildFields(config),
+        });
+      }
+      this.finalTypeMap[typeDef.name] = finalTypeDef;
       this.definedTypeMap[typeDef.name] = typeDef;
-      this.typesToWalk.push({ type: "named", value: typeDef });
+      this.typesToWalk.push({ type: "named", value: finalTypeDef });
     } else {
       this.pendingTypeMap[typeDef.name] = typeDef;
     }
@@ -550,6 +571,36 @@ export class SchemaBuilder {
     if (isNexusInterfaceTypeDef(typeDef)) {
       this.typesToWalk.push({ type: "interface", value: typeDef.value });
     }
+  }
+
+  rebuildFields(
+    config: ReturnType<
+      GraphQLObjectType["toConfig"] | GraphQLInterfaceType["toConfig"]
+    >
+  ) {
+    const { fields, ...rest } = config;
+    const fieldConfig = typeof fields === "function" ? fields() : fields;
+    return mapValues(fieldConfig, (val, key) => {
+      const { resolve, type, ...fieldConfig } = val;
+      const finalType = this.replaceNamedType(type);
+      return {
+        ...fieldConfig,
+        type: this.replaceNamedType(type),
+        resolve: this.makeFinalResolver(
+          {
+            builder: this.builderLens,
+            fieldConfig: {
+              ...fieldConfig,
+              type: finalType,
+            },
+            schemaConfig: this.config,
+            parentTypeConfig: rest,
+            schemaExtension: this.schemaExtension,
+          },
+          resolve
+        ),
+      };
+    });
   }
 
   walkTypes() {
@@ -591,6 +642,9 @@ export class SchemaBuilder {
       if (pluginConfig.onMissingType) {
         this.onMissingTypeFns.push(pluginConfig.onMissingType);
       }
+      if (pluginConfig.onAfterBuild) {
+        this.onAfterBuildFns.push(pluginConfig.onAfterBuild);
+      }
     });
   }
 
@@ -603,7 +657,7 @@ export class SchemaBuilder {
     });
   }
 
-  reifyTypes() {
+  buildNexusTypes() {
     // If Query isn't defined, set it to null so it falls through to "missingType"
     if (!this.pendingTypeMap.Query) {
       this.pendingTypeMap.Query = null as any;
@@ -645,7 +699,7 @@ export class SchemaBuilder {
 
   createSchemaExtension() {
     this._schemaExtension = new NexusSchemaExtension({
-      config: this.config,
+      ...this.config,
       dynamicFields: {
         dynamicInputFields: this.dynamicInputFields,
         dynamicOutputFields: this.dynamicOutputFields,
@@ -657,14 +711,15 @@ export class SchemaBuilder {
 
   getFinalTypeMap(): BuildTypes<any> {
     this.beforeWalkTypes();
-    this.walkTypes();
     this.createSchemaExtension();
-    // this.beforeBuildTypes();
-    this.reifyTypes();
+    this.walkTypes();
+    this.beforeBuildTypes();
+    this.buildNexusTypes();
     return {
       typeMap: this.finalTypeMap,
       schemaExtension: this.schemaExtension!,
       missingTypes: this.missingTypes,
+      onAfterBuildFns: this.onAfterBuildFns,
     };
   }
 
@@ -977,9 +1032,7 @@ export class SchemaBuilder {
         {
           builder: this.builderLens,
           fieldConfig: builderFieldConfig,
-          fieldExtension,
           parentTypeConfig: typeConfig,
-          typeExtension: typeConfig.extensions.nexus,
           schemaConfig: this.config,
           schemaExtension: this.schemaExtension,
         },
@@ -1049,7 +1102,8 @@ export class SchemaBuilder {
     field: NexusInputFieldDef | NexusArgConfig<any>
   ): boolean {
     const { nullable, required } = field;
-    const { name, nonNullDefaults = {} } = typeDef.extensions.nexus.config;
+    const { name, nonNullDefaults = {} } =
+      typeDef.extensions?.nexus?.config || {};
     if (typeof nullable !== "undefined" && typeof required !== "undefined") {
       throw new Error(`Cannot set both nullable & required on ${name}`);
     }
@@ -1072,7 +1126,7 @@ export class SchemaBuilder {
     field: NexusOutputFieldDef
   ): boolean {
     const { nullable } = field;
-    const { nonNullDefaults = {} } = typeDef.extensions.nexus.config;
+    const { nonNullDefaults = {} } = typeDef.extensions?.nexus?.config ?? {};
     if (typeof nullable !== "undefined") {
       return !nullable;
     }
@@ -1205,20 +1259,6 @@ export class SchemaBuilder {
       }
     }
     return this.missingType(name, fromObject);
-  }
-
-  protected getResolver(
-    fieldConfig: NexusOutputFieldDef,
-    typeConfig: NexusObjectTypeConfig<any>
-  ) {
-    let resolver: undefined | GraphQLFieldResolver<any, any>;
-    if (fieldConfig.resolve) {
-      resolver = fieldConfig.resolve;
-    }
-    if (!resolver && typeConfig.defaultResolver) {
-      resolver = typeConfig.defaultResolver;
-    }
-    return resolver;
   }
 
   missingResolveType(name: string, location: "union" | "interface") {
@@ -1383,6 +1423,20 @@ export class SchemaBuilder {
       obj.args.forEach((val) => this.addType(getNamedType(val.type)));
     }
   }
+
+  protected replaceNamedType(type: GraphQLType) {
+    let wrappingTypes: any[] = [];
+    while (isWrappingType(type)) {
+      wrappingTypes.push(type.constructor);
+      type = type.ofType;
+    }
+    if (this.finalTypeMap[type.name] === this.definedTypeMap[type.name]) {
+      return type;
+    }
+    return wrappingTypes.reduce((result, Wrapper) => {
+      return new Wrapper(result);
+    }, this.finalTypeMap[type.name]);
+  }
 }
 
 function extendError(name: string) {
@@ -1403,6 +1457,7 @@ export interface BuildTypes<
   typeMap: TypeMapDefs;
   missingTypes: Record<string, MissingType>;
   schemaExtension: NexusSchemaExtension;
+  onAfterBuildFns: SchemaBuilder["onAfterBuildFns"];
 }
 
 /**
@@ -1435,6 +1490,9 @@ function addTypes(builder: SchemaBuilder, types: any) {
   if (!types) {
     return;
   }
+  if (isSchema(types)) {
+    addTypes(builder, types.getTypeMap());
+  }
   if (
     isNexusNamedTypeDef(types) ||
     isNexusExtendTypeDef(types) ||
@@ -1457,10 +1515,12 @@ function addTypes(builder: SchemaBuilder, types: any) {
  * from this one day.
  */
 export function makeSchemaInternal(config: SchemaConfig) {
-  const { typeMap, missingTypes, schemaExtension } = buildTypesInternal(
-    config.types,
-    config
-  );
+  const {
+    typeMap,
+    missingTypes,
+    schemaExtension,
+    onAfterBuildFns,
+  } = buildTypesInternal(config.types, config);
   const { Query, Mutation, Subscription } = typeMap;
 
   if (!isObjectType(Query)) {
@@ -1488,6 +1548,9 @@ export function makeSchemaInternal(config: SchemaConfig) {
       nexus: schemaExtension,
     },
   }) as NexusGraphQLSchema;
+
+  onAfterBuildFns.forEach((fn) => fn(schema));
+
   return { schema, missingTypes };
 }
 

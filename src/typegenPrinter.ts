@@ -29,10 +29,8 @@ import {
   groupTypes,
   mapObj,
   relativePathTo,
-  getExt,
 } from "./utils";
 import { NexusGraphQLSchema } from "./definitions/_types";
-import { NexusSchemaExtension } from "./extensions";
 import { isNexusPrintedGenTyping } from "./definitions/wrapping";
 import { StringLike } from "./plugin";
 
@@ -69,7 +67,6 @@ type RootTypeMapping = Record<
  */
 export class TypegenPrinter {
   groupedTypes: GroupedTypes;
-  extensions: NexusSchemaExtension;
   printImports: Record<string, Record<string, any>>;
 
   constructor(
@@ -77,7 +74,6 @@ export class TypegenPrinter {
     protected typegenInfo: TypegenInfo & { typegenFile: string }
   ) {
     this.groupedTypes = groupTypes(schema);
-    this.extensions = getExt(schema);
     this.printImports = {};
   }
 
@@ -148,7 +144,7 @@ export class TypegenPrinter {
     const {
       rootTypings,
       dynamicFields: { dynamicInputFields, dynamicOutputFields },
-    } = this.extensions;
+    } = this.schema.extensions.nexus.config;
     const imports: string[] = [];
     const importMap: Record<string, Set<string>> = {};
     const outputPath = this.typegenInfo.typegenFile;
@@ -198,7 +194,9 @@ export class TypegenPrinter {
   }
 
   printDynamicInputFieldDefinitions() {
-    const { dynamicInputFields } = this.extensions.dynamicFields;
+    const {
+      dynamicInputFields,
+    } = this.schema.extensions.nexus.config.dynamicFields;
     // If there is nothing custom... exit
     if (!Object.keys(dynamicInputFields).length) {
       return [];
@@ -223,7 +221,9 @@ export class TypegenPrinter {
   }
 
   printDynamicOutputFieldDefinitions() {
-    const { dynamicOutputFields } = this.extensions.dynamicFields;
+    const {
+      dynamicOutputFields,
+    } = this.schema.extensions.nexus.config.dynamicFields;
     // If there is nothing custom... exit
     if (!Object.keys(dynamicOutputFields).length) {
       return [];
@@ -248,7 +248,9 @@ export class TypegenPrinter {
   }
 
   printDynamicOutputPropertyDefinitions() {
-    const { dynamicOutputProperties } = this.extensions.dynamicFields;
+    const {
+      dynamicOutputProperties,
+    } = this.schema.extensions.nexus.config.dynamicFields;
     // If there is nothing custom... exit
     if (!Object.keys(dynamicOutputProperties).length) {
       return [];
@@ -389,7 +391,8 @@ export class TypegenPrinter {
       | GraphQLInterfaceType
       | GraphQLObjectType
       | GraphQLScalarType
-      | GraphQLUnionType)[] = [];
+      | GraphQLUnionType
+    )[] = [];
     hasFields
       .concat(this.groupedTypes.object)
       .concat(this.groupedTypes.interface)
@@ -442,7 +445,9 @@ export class TypegenPrinter {
   }
 
   resolveBackingType(typeName: string): string | undefined {
-    const rootTyping = this.extensions.rootTypings[typeName];
+    const rootTyping = this.schema.extensions.nexus.config.rootTypings[
+      typeName
+    ];
     if (rootTyping) {
       return typeof rootTyping === "string" ? rootTyping : rootTyping.name;
     }

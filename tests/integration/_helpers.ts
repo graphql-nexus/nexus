@@ -8,11 +8,15 @@ const NO_OP = () => {};
 
 export const testSchema = (
   name: string,
-  additionalTests: (getSchema: () => core.NexusGraphQLSchema) => void = NO_OP
+  additionalTests: (
+    getSchema: () => core.NexusGraphQLSchema,
+    getImported: () => any
+  ) => void = NO_OP
 ) => {
   let schema: core.NexusGraphQLSchema;
   const typegenFilePath = join(__dirname, `_${name}.typegen.ts`);
-  const { plugins, ...rest } = require(`./_${name}`);
+  const imported = require(`./_${name}`);
+  const { plugins, ...rest } = imported;
 
   beforeAll(async () => {
     schema = await generateSchema({
@@ -33,6 +37,10 @@ export const testSchema = (
     });
   });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
   it(`can compile ${name} app with its typegen`, async () => {
     const appFilePath = join(__dirname, `./_${name}.ts`);
     expect([appFilePath]).toTypeCheck({
@@ -47,5 +55,8 @@ export const testSchema = (
     });
   });
 
-  additionalTests(() => schema);
+  additionalTests(
+    () => schema,
+    () => imported
+  );
 };

@@ -21,6 +21,8 @@ import {
   NexusInputObjectTypeExtension,
 } from "../extensions";
 
+export type Maybe<T> = T | null;
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export type BaseScalars = "String" | "Int" | "Float" | "ID" | "Boolean";
@@ -139,7 +141,7 @@ export type GraphQLNamedInputType =
   | GraphQLEnumType;
 
 type WithExt<T extends { extensions?: any }, Ext> = Omit<T, "extensions"> & {
-  extensions: { nexus: Ext };
+  extensions?: Maybe<{ nexus?: Ext }>;
 };
 
 export type NexusGraphQLFieldConfig = WithExt<
@@ -162,4 +164,6 @@ export type NexusGraphQLInterfaceTypeConfig = WithExt<
   NexusInterfaceTypeExtension
 >;
 
-export type NexusGraphQLSchema = WithExt<GraphQLSchema, NexusSchemaExtension>;
+export type NexusGraphQLSchema = Omit<GraphQLSchema, "extensions"> & {
+  extensions: { nexus: NexusSchemaExtension };
+};

@@ -4,7 +4,8 @@ export const authorizePlugin = plugin({
   name: "Authorize",
   description: "The authorize plugin makes it possible to guard against types",
   onCreateFieldResolver(config) {
-    const { authorize } = config.fieldExtension.config;
+    const authorize =
+      config.fieldConfig?.extensions?.nexus?.config.authorize ?? false;
     if (!authorize) {
       return;
     }

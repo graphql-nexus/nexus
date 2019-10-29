@@ -4,6 +4,13 @@ import { SchemaConfig, DynamicFieldDefs } from "./builder";
 import { NexusInterfaceTypeConfig } from "./definitions/interfaceType";
 import { RootTypings } from "./definitions/_types";
 import { NexusInputObjectTypeConfig } from "./definitions/inputObjectType";
+import { GraphQLNamedType } from "graphql";
+
+export type NexusGraphQLNamedType = GraphQLNamedType & {
+  extensions?: {
+    nexus?: NexusTypeExtension<any>;
+  };
+};
 
 export type NexusTypeExtensions =
   | NexusObjectTypeExtension
@@ -19,7 +26,7 @@ type PossibleTypes =
 
 type ExtensionConfigFor<T extends PossibleTypes> = any;
 
-export class NexusExtension<T extends PossibleTypes> {
+export class NexusTypeExtension<T extends PossibleTypes> {
   constructor(readonly type: T, readonly config: ExtensionConfigFor<T>) {}
 }
 
@@ -76,8 +83,8 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
   }
 }
 
-export interface NexusSchemaExtensionConfig {
-  config: Omit<SchemaConfig, "types">;
+export interface NexusSchemaExtensionConfig
+  extends Omit<SchemaConfig, "types"> {
   dynamicFields: DynamicFieldDefs;
   rootTypings: RootTypings;
 }
@@ -87,12 +94,5 @@ export interface NexusSchemaExtensionConfig {
  * of metadata from the builder so we can use it when we
  */
 export class NexusSchemaExtension {
-  readonly config: Omit<SchemaConfig, "types">;
-  readonly dynamicFields: DynamicFieldDefs;
-  readonly rootTypings: RootTypings;
-  constructor(obj: NexusSchemaExtensionConfig) {
-    this.config = obj.config;
-    this.dynamicFields = obj.dynamicFields;
-    this.rootTypings = obj.rootTypings;
-  }
+  constructor(readonly config: NexusSchemaExtensionConfig) {}
 }

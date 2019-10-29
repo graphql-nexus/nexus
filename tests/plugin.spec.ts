@@ -1,5 +1,5 @@
-import { forEach, isCollection } from "iterall";
-import { isPromiseLike } from "../src/core";
+import { isPromiseLike, makeSchema, objectType } from "../src/core";
+import { GraphQLObjectType } from "graphql";
 
 describe("plugin", () => {
   it.skip("is applied to the resolver for every field in the schema", () => {});

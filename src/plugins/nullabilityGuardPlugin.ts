@@ -1,63 +1,61 @@
-import { isCollection, forEach } from "iterall";
-import { plugin } from "../plugin";
 import {
-  isWrappingType,
-  isNonNullType,
+  isEnumType,
   isListType,
+  isNonNullType,
+  isObjectType,
+  isScalarType,
+  GraphQLOutputType,
   GraphQLResolveInfo,
+  isWrappingType,
+  isUnionType,
+  isInterfaceType,
+  GraphQLNullableType,
 } from "graphql";
-import { GraphQLNamedOutputType } from "../definitions/_types";
-import {
-  isPromiseLike,
-  printedGenTyping,
-  printedGenTypingImport,
-} from "../utils";
-import { GetGen, GenericFieldResolver } from "../typegenTypeHelpers";
+import { forEach } from "iterall";
+import { plugin, CreateFieldResolverInfo } from "../plugin";
+import { GetGen, GetGen2 } from "../typegenTypeHelpers";
+import { printedGenTyping, isPromiseLike } from "../utils";
+import { core } from "..";
+import { GraphQLPossibleOutputs } from "../definitions/_types";
+import { NexusGraphQLNamedType } from "../extensions";
 
-interface OnGuardedInfo {
-  root: any;
-  args: any;
+export interface NullabilityPluginFallbackFn {
   ctx: GetGen<"context">;
   info: GraphQLResolveInfo;
+  type: GraphQLPossibleOutputs;
 }
 
+export interface NullabilityPluginOnGuardedConfig {
+  fallback: any;
+  ctx: GetGen<"context">;
+  info: GraphQLResolveInfo;
+  type: GraphQLNullableType;
+}
+
+export type NullFallbackValues = Partial<
+  {
+    [K in core.AllOutputTypes]: (
+      obj: NullabilityPluginFallbackFn
+    ) => GetGen2<"rootTypes", K>;
+  }
+>;
+
 export type NullabilityGuardConfig = {
+  /**
+   * Whether we should guard against non-null values. Defaults to "true" if NODE_ENV === "production",
+   * false otherwise.
+   */
   shouldGuard?: boolean;
-  onGuarded?: (obj: OnGuardedInfo) => void;
-  fallbackValue?: (type: GraphQLNamedOutputType) => any;
+  /**
+   * When a nullish value is "guarded", meaning it is coerced into an acceptable non-null
+   * value, this function will be called if supplied.
+   */
+  onGuarded?: (obj: NullabilityPluginOnGuardedConfig) => void;
+  /**
+   * A mapping of typename to the value that should be used in the case of a null value.
+   */
+  fallbackValues?: NullFallbackValues;
 };
-
-const schemaDefTypes = printedGenTyping({
-  name: "nullGuardFallback",
-  optional: true,
-  type:
-    "<TypeName extends string>(typeName: TypeName, args: any, ctx: NexusGenTypes['context'], info: GraphQLResolveInfo) => core.GetGen2<'rootTypes', TypeName>",
-  description: `
-    When there's a null value for any, we can recover by supplying this value instead.
-    This can be added at the schema, to define global guards.
-  `,
-});
-
-const objectTypeDefTypes = printedGenTyping({
-  name: "nullGuardFallback",
-  optional: true,
-  type:
-    "(args: any, ctx: NexusGenTypes['context'], info: GraphQLResolveInfo) => core.GetGen2<'rootTypes', TypeName>",
-  description: `
-    When there's a null value for this type, we should recover by supplying this value instead.
-    This can be added to any object type
-  `,
-  imports: [
-    printedGenTypingImport({
-      module: "graphql",
-      bindings: ["GraphQLResolveInfo"],
-    }),
-    printedGenTypingImport({
-      module: "nexus",
-      bindings: ["core"],
-    }),
-  ],
-});
 
 const fieldDefTypes = printedGenTyping({
   name: "skipNullGuard",
@@ -70,132 +68,167 @@ const fieldDefTypes = printedGenTyping({
   `,
 });
 
-interface TypeGuardMeta extends Required<NullabilityGuardConfig> {
-  outerIsList: boolean;
-  outerNonNull: boolean;
-  hasListNonNull: boolean;
-  listNonNull: boolean[];
-}
-
-type NullGuardFn = GenericFieldResolver<(val: unknown) => unknown>;
-
 export const nullabilityGuard = (pluginConfig: NullabilityGuardConfig) => {
+  const {
+    shouldGuard = process.env.NODE_ENV === "production",
+    fallbackValues = {},
+    onGuarded = (obj: NullabilityPluginOnGuardedConfig) => {
+      console.warn(
+        `Nullability guard called for ${obj.info.parentType.name}.${obj.info.fieldName}`
+      );
+    },
+  } = pluginConfig;
+  const finalPluginConfig: Required<NullabilityGuardConfig> = {
+    shouldGuard,
+    onGuarded,
+    fallbackValues,
+  };
   return plugin({
     name: "NullabilityGuard",
     description:
       "If we have a nullable field, we want to guard against this being an issue in production.",
-    objectTypeDefTypes,
     fieldDefTypes,
-    schemaDefTypes,
-    onCreateFieldResolver(config) {
-      const { config: fieldConfig } = config.fieldExtension;
-      if ((fieldConfig as any).skipNullGuard) {
+    onCreateFieldResolver(
+      config: CreateFieldResolverInfo<{ skipNullGuard: boolean }>
+    ) {
+      if (config.fieldConfig.extensions?.nexus?.config.skipNullGuard) {
         return;
       }
-      let finalConfig = {
-        onGuarded: pluginConfig.onGuarded || (() => {}),
-      } as TypeGuardMeta;
-      let type = config.fieldConfig.type;
-      if (isNonNullType(type)) {
-        finalConfig.outerNonNull = true;
-        type = type.ofType;
+      const { type } = config.fieldConfig;
+      const { outerNonNull, hasListNonNull } = nonNullInfo(type);
+      if (outerNonNull || hasListNonNull) {
+        return (root, args, ctx, info, next) => {
+          return plugin.completeValue(
+            next(root, args, ctx, info),
+            nonNullGuard(
+              ctx,
+              info,
+              isNonNullType(type) ? type.ofType : type,
+              config,
+              finalPluginConfig,
+              outerNonNull
+            )
+          );
+        };
       }
-      if (isListType(type)) {
-        finalConfig.outerIsList = true;
-        type = type.ofType;
-      }
-      while (isWrappingType(type)) {
-        if (isListType(type)) {
-          type = type.ofType;
+    },
+    onAfterBuild(schema) {
+      Object.keys(schema.getTypeMap()).forEach((typeName) => {
+        const type = schema.getType(typeName) as NexusGraphQLNamedType;
+        if (isScalarType(type)) {
+          if (fallbackValues[type.name as keyof typeof fallbackValues]) {
+            return;
+          }
+          console.error(
+            `No nullability guard was provided for Scalar ${type.name}. ` +
+              `Provide one in the nullabilityGuard config to remove this warning.`
+          );
         }
-        if (isNonNullType(type)) {
-          finalConfig.hasListNonNull = true;
-          finalConfig.listNonNull.push(true);
-          type = type.ofType;
-        } else {
-          finalConfig.listNonNull.push(false);
-        }
+      });
+      if (pluginConfig.fallbackValues) {
+        Object.keys(pluginConfig.fallbackValues).forEach((name) => {
+          const type = schema.getType(name) as NexusGraphQLNamedType;
+          if (!type) {
+            return console.error(
+              `Unknown type ${name} provided in nullabilityGuard fallbackValues config.`
+            );
+          }
+        });
       }
-      if (!finalConfig.outerNonNull && !finalConfig.hasListNonNull) {
-        return;
-      }
-      const nonNullGuard = finalConfig.outerIsList
-        ? nonNullListGuard(finalConfig)
-        : nonNullValueGuard(finalConfig);
-      return (root, args, ctx, info, next) => {
-        return plugin.completeValue(
-          next(root, args, ctx, info),
-          nonNullGuard(root, args, ctx, info)
-        );
-      };
     },
   });
 };
 
-const nonNullListGuard = (finalConfig: TypeGuardMeta): NullGuardFn => (
-  root,
-  args,
-  ctx,
-  info
-) => (val) => {
-  if (val == null) {
-    if (finalConfig.outerNonNull) {
-      finalConfig.onGuarded({ root, args, ctx, info });
-      return [];
-    }
-    return null;
-  }
-  let resultArr: any[] = [];
-  let hasPromise = false;
-  if (isCollection(val)) {
-    forEach(val as any, (item: any) => {
-      if (isPromiseLike(item)) {
-        hasPromise = true;
-      } else if (item == null) {
-        finalConfig.onGuarded({ root, args, ctx, info });
+const isNullish = (val: any): boolean =>
+  val === null || val === undefined || val !== val;
+
+const nonNullGuard = (
+  ctx: GetGen<"context">,
+  info: GraphQLResolveInfo,
+  type: GraphQLOutputType,
+  config: CreateFieldResolverInfo,
+  pluginConfig: Required<NullabilityGuardConfig>,
+  outerNonNull: boolean
+) => {
+  const { onGuarded, fallbackValues, shouldGuard } = pluginConfig;
+  const guardResult = (fallback: any) => {
+    onGuarded({ ctx, info, type, fallback });
+    return shouldGuard ? fallback : null;
+  };
+  return (val: any) => {
+    // If it's a list type, return [] if the value is null,
+    // otherwise recurse into resolving the individual type.
+    if (isListType(type)) {
+      if (isNullish(val) && outerNonNull) {
+        return guardResult([]);
       }
-      resultArr.push(val);
-    });
-  }
-  return hasPromise ? Promise.all(resultArr) : resultArr;
+      let hasPromise = false;
+      const listMembers: any[] = [];
+      const listCompleter = nonNullGuard(
+        ctx,
+        info,
+        isNonNullType(type.ofType) ? type.ofType.ofType : type.ofType,
+        config,
+        pluginConfig,
+        isNonNullType(type.ofType)
+      );
+      forEach(val as any, (item) => {
+        if (!hasPromise && isPromiseLike(item)) {
+          hasPromise = true;
+        }
+        listMembers.push(plugin.completeValue(item, listCompleter));
+      });
+      return hasPromise ? Promise.all(listMembers) : listMembers;
+    }
+    if (!isNullish(val) || outerNonNull === false) {
+      return val;
+    }
+    const typeName = type.name as keyof typeof fallbackValues;
+    const fallbackFn = fallbackValues[typeName];
+    const fallbackValue =
+      typeof fallbackFn === "function" ? fallbackFn({ type, info, ctx }) : null;
+
+    if (!isNullish(fallbackValue)) {
+      return guardResult(fallbackValue);
+    }
+    // If it's an object, just return an empty object and let the scalar fallbacks take care of the rest
+    if (isObjectType(type)) {
+      return guardResult({});
+    }
+    // If it's an enum, return the first member
+    if (isEnumType(type)) {
+      return guardResult(type.getValues()[0].value);
+    }
+    // If It's a union or interface, return the first type
+    if (isUnionType(type) || isInterfaceType(type)) {
+      const possibleTypes = info.schema.getPossibleTypes(type);
+      return guardResult({ __typename: possibleTypes[0].name });
+    }
+    // Otherwise, fail?
+    return val;
+  };
 };
 
-const nonNullValueGuard = (finalConfig: TypeGuardMeta): NullGuardFn => (
-  root,
-  args,
-  ctx,
-  info
-) => (val) => {
-  if (val != null) {
-    return val;
+interface NonNullInfo {
+  outerNonNull: boolean;
+  hasListNonNull: boolean;
+}
+
+const nonNullInfo = (type: GraphQLOutputType): NonNullInfo => {
+  let outerNonNull = false;
+  let hasListNonNull = false;
+  if (isNonNullType(type)) {
+    outerNonNull = true;
+    type = type.ofType;
   }
-  finalConfig.onGuarded({ root, args, ctx, info });
-  const type = info.schema.getType(info.parentType.name);
-  if (
-    type &&
-    type.extensions &&
-    type.extensions.nexus &&
-    typeof type.extensions.nexus.config.nullGuardFallback === "function"
-  ) {
-    const fallback = type.extensions.nexus.config.nullGuardFallback(
-      args,
-      ctx,
-      info
-    );
-    return (fallback || {})[info.fieldName];
+  while (isWrappingType(type)) {
+    type = type.ofType;
+    if (isNonNullType(type)) {
+      hasListNonNull = true;
+    }
   }
-  if (
-    info.schema.extensions &&
-    info.schema.extensions.nexus &&
-    typeof info.schema.extensions.nexus.config.nullGuardFallback === "function"
-  ) {
-    const fallback = info.schema.extensions.nullGuardFallback(
-      info.parentType.name,
-      args,
-      ctx,
-      info
-    );
-    return (fallback || {})[info.fieldName];
-  }
-  return type;
+  return {
+    outerNonNull,
+    hasListNonNull,
+  };
 };

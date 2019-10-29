@@ -19,7 +19,6 @@ import {
   isWrappingType,
   isListType,
   isNonNullType,
-  GraphQLFieldConfig,
 } from "graphql";
 import path from "path";
 import { UNKNOWN_TYPE_SCALAR, BuilderConfig } from "./builder";
@@ -138,6 +137,17 @@ export function mapObj<T, R>(
   mapper: (val: T, key: string, index: number) => R
 ) {
   return Object.keys(obj).map((key, index) => mapper(obj[key], key, index));
+}
+
+export function mapValues<T, R>(
+  obj: Record<string, T>,
+  mapper: (val: T, key: string, index: number) => R
+) {
+  const result: Record<string, any> = {};
+  Object.keys(obj).forEach(
+    (key, index) => (result[key] = mapper(obj[key], key, index))
+  );
+  return result;
 }
 
 export function eachObj<T>(
@@ -385,14 +395,6 @@ export function unwrapType(
   return { type: finalType, isNonNull, list };
 }
 
-// export function hasExt<T extends GraphQLNamedType>(t: T): NexusExtension<T> {}
-
-export function getExt<
-  T extends GraphQLNamedType | GraphQLSchema | GraphQLFieldConfig<any, any>
->(type: T, fallback: any = {}) {
-  return type.extensions ? type.extensions.nexus || fallback : fallback;
-}
-
 export function assertNoMissingTypes(
   schema: GraphQLSchema,
   missingTypes: Record<string, MissingType>
@@ -477,11 +479,7 @@ export function validateOnInstallHookResult(
   pluginName: string,
   hookResult: ReturnType<Exclude<PluginConfig["onInstall"], undefined>>
 ): void {
-  if (
-    hookResult === null ||
-    typeof hookResult !== "object" ||
-    !Array.isArray(hookResult.types)
-  ) {
+  if (!Array.isArray(hookResult?.types)) {
     throw new Error(
       `Plugin "${pluginName}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
     );

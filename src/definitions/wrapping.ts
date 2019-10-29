@@ -130,15 +130,13 @@ export function isNexusDynamicInputMethod<T extends string>(
     isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicInput
   );
 }
-export function isNexusPrintedGenTyping<T extends string>(
-  obj: any
-): obj is PrintedGenTyping {
+export function isNexusPrintedGenTyping(obj: any): obj is PrintedGenTyping {
   return (
     isNexusTypeDef(obj) &&
     obj[NexusWrappedSymbol] === NexusTypes.PrintedGenTyping
   );
 }
-export function isNexusPrintedGenTypingImport<T extends string>(
+export function isNexusPrintedGenTypingImport(
   obj: any
 ): obj is PrintedGenTypingImport {
   return (

@@ -9,6 +9,7 @@
   "scripts": {
     "test": "jest",
     "test:ci": "jest --coverage --maxWorkers 2",
+    "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
     "build": "tsc",
     "dev": "tsc -w",
     "dev:test": "jest --watch",
@@ -53,12 +54,12 @@
     "jest": "^24.9.0",
     "jest-watch-typeahead": "^0.3.1",
     "lint-staged": "^7.3.0",
-    "prettier": "^1.16.0",
+    "prettier": "prettier/prettier#5522f0d",
     "ts-jest": "^24.1.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.6.4"
+    "typescript": "3.7.1-rc"
   },
   "peerDependencies": {
     "graphql": "^14.5.0"

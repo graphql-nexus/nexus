@@ -1,5 +1,17 @@
+import graphql, { GraphQLObjectType, GraphQLNonNull, GraphQLID } from "graphql";
 import "./_nullabilityGuard.typegen";
 import { plugins as nexusPlugins, objectType, queryField } from "../../src";
+
+export const SomeObjectType = new GraphQLObjectType({
+  name: "SomeObjectType",
+  description:
+    "Showing that the defaults works for all resolvers, not just Nexus ones",
+  fields: () => ({
+    id: {
+      type: GraphQLNonNull(GraphQLID),
+    },
+  }),
+});
 
 export const userType = objectType({
   name: "User",
@@ -13,10 +25,12 @@ export const userType = objectType({
       },
     });
   },
-  nullGuardFallback(args, ctx, info) {
-    return { id: "N/A" };
-  },
   rootTyping: "{ id: string }",
+});
+
+export const objType = queryField("objType", {
+  type: "SomeObjectType" as any,
+  resolve: () => ({} as any),
 });
 
 export const userField = queryField("getUser", {
@@ -33,10 +47,31 @@ export const guardedField = queryField("getUserWithGuard", {
   }),
 });
 
+// @ts-ignore
+export const guardedIntDefault = queryField("intList", {
+  type: "Int",
+  list: true,
+  resolve: () => [1, 2, null],
+});
+
+// @ts-ignore
+export const guardedUserList = queryField("userList", {
+  type: "User",
+  list: true,
+  resolve: () => [null, null, null],
+});
+
+export const onGuardedMock = jest.fn();
+
 export const plugins = [
   nexusPlugins.nullabilityGuard({
-    onGuarded() {
-      console.log(arguments);
+    onGuarded: onGuardedMock,
+    fallbackValues: {
+      ID: ({ info }) => `${info.parentType.name}:N/A`,
+      Int: () => -1,
+      String: () => "",
+      Boolean: () => false,
     },
+    shouldGuard: true,
   }),
 ];

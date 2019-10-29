@@ -3,7 +3,11 @@ import {
   PluginBuilderLens,
   NexusAcceptedTypeDef,
 } from "./builder";
-import { GraphQLResolveInfo, GraphQLFieldResolver } from "graphql";
+import {
+  GraphQLSchema,
+  GraphQLResolveInfo,
+  GraphQLFieldResolver,
+} from "graphql";
 import {
   withNexusSymbol,
   NexusTypes,
@@ -11,17 +15,14 @@ import {
   NexusGraphQLFieldConfig,
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
+  Maybe,
 } from "./definitions/_types";
 import { isPromiseLike, PrintedGenTyping, venn } from "./utils";
-import {
-  NexusFieldExtension,
-  NexusSchemaExtension,
-  NexusTypeExtensions,
-} from "./extensions";
+import { NexusSchemaExtension } from "./extensions";
 
 export { PluginBuilderLens };
 
-export type CreateFieldResolverInfo = {
+export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   /**
    * The internal Nexus "builder" object
    */
@@ -30,33 +31,27 @@ export type CreateFieldResolverInfo = {
    * Info about the GraphQL Field we're decorating.
    * Always guaranteed to exist, even for non-Nexus GraphQL types
    */
-  fieldConfig: Omit<NexusGraphQLFieldConfig, "resolve">;
+  fieldConfig: Omit<NexusGraphQLFieldConfig, "resolve" | "extensions"> & {
+    extensions?: Maybe<{ nexus?: { config: FieldExt } }>;
+  };
   /**
    * The config provided to the Nexus type containing the field.
    * Will not exist if this is a non-Nexus GraphQL type.
    */
-  parentTypeConfig:
-    | NexusGraphQLObjectTypeConfig
-    | NexusGraphQLInterfaceTypeConfig;
+  parentTypeConfig: (
+    | Omit<NexusGraphQLObjectTypeConfig, "fields" | "extensions">
+    | Omit<NexusGraphQLInterfaceTypeConfig, "fields" | "extensions">
+  ) & {
+    extensions?: Maybe<{ nexus?: { config: TypeExt } }>;
+  };
   /**
    * The root-level SchemaConfig passed
    */
   schemaConfig: Omit<SchemaConfig, "types">;
   /**
    * Nexus specific metadata provided to the schema.
-   * Shorthand for `schemaConfig.extensions.nexus`
    */
   schemaExtension: NexusSchemaExtension;
-  /**
-   * Nexus specific metadata provided to the parent type
-   * Shorthand for `typeConfig.extensions.nexus`
-   */
-  typeExtension: NexusTypeExtensions;
-  /**
-   * Nexus specific metadata provided to the field
-   * Shorthand for `fieldConfig.extensions.nexus`
-   */
-  fieldExtension: NexusFieldExtension;
 };
 
 export type StringLike = PrintedGenTyping | string;
@@ -102,6 +97,10 @@ export interface PluginConfig {
    * any types before we go through the resolution step.
    */
   onBeforeBuild?: (builder: PluginBuilderLens) => void;
+  /**
+   * After the schema is built, provided the Schema to do any final config validation.
+   */
+  onAfterBuild?: (schema: GraphQLSchema) => void;
   /**
    * If a type is not defined in the schema, our plugins can register an `onMissingType` handler,
    * which will intercept the missing type name and give us an opportunity to respond with a valid
@@ -223,6 +222,7 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     "schemaDefTypes",
     "onInstall",
     "onBeforeBuild",
+    "onAfterBuild",
     "onMissingType",
     "onCreateFieldResolver",
     "onCreateFieldSubscribe",
