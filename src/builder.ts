@@ -629,12 +629,9 @@ export class SchemaBuilder {
     >
   ) {
     const { fields, ...rest } = config;
-    const fieldConfig = typeof fields === "function" ? fields() : fields;
-    return mapValues(fieldConfig, (val, key) => {
+    const fieldsConfig = typeof fields === "function" ? fields() : fields;
+    return mapValues(fieldsConfig, (val, key) => {
       const { resolve, type, ...fieldConfig } = val;
-      if (config.name === "Post" && key === "geo") {
-        debugger;
-      }
       const finalType = this.replaceNamedType(type);
       return {
         ...fieldConfig,
