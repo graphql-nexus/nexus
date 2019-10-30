@@ -4,6 +4,7 @@ import { SchemaBuilder } from "./builder";
 import { OutputDefinitionBlock } from "./definitions/definitionBlocks";
 
 export type OutputPropertyFactoryConfig<T> = {
+  stage: "walk" | "build";
   builder: SchemaBuilder;
   typeDef: OutputDefinitionBlock<any>;
   /**

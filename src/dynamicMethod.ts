@@ -6,6 +6,7 @@ import { withNexusSymbol, NexusTypes } from "./definitions/_types";
 import { SchemaBuilder } from "./builder";
 
 export type OutputFactoryConfig<T> = {
+  stage: "walk" | "build";
   args: any[];
   builder: SchemaBuilder;
   typeDef: OutputDefinitionBlock<any>;
