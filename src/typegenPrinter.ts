@@ -29,7 +29,6 @@ import {
   groupTypes,
   mapObj,
   relativePathTo,
-  printedGenTypingImport,
 } from "./utils";
 import { NexusGraphQLSchema } from "./definitions/_types";
 import {
