@@ -1,5 +1,7 @@
+import path from "path";
 import { objectType, makeSchema, queryField, authorizePlugin } from "../../src";
 import { graphql, GraphQLError } from "graphql";
+import { generateSchema } from "../../src/core";
 
 describe("authorizePlugin", () => {
   const consoleErrorSpy = jest
@@ -239,5 +241,21 @@ describe("authorizePlugin", () => {
     expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
     expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
     expect(consoleWarnSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("printing the authorize schema", async () => {
+    const result = await generateSchema.withArtifacts(
+      {
+        types: [
+          queryField("ok", {
+            type: "Boolean",
+            resolve: () => true,
+          }),
+        ],
+        plugins: [authorizePlugin()],
+      },
+      path.join(__dirname, "test.gen.ts")
+    );
+    expect(result.tsTypes).toMatchSnapshot("Full Type Output");
   });
 });

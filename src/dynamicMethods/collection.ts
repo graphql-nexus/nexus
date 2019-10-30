@@ -16,6 +16,7 @@ export const CollectionFieldMethod = dynamicOutputMethod({
       description?: string
     }): void;`,
   factory({ typeDef: t, args: [fieldName, config] }) {
+    /* istanbul ignore next */
     if (!config.type) {
       throw new Error(
         `Missing required property "type" from collectionField ${fieldName}`
@@ -23,6 +24,7 @@ export const CollectionFieldMethod = dynamicOutputMethod({
     }
     const typeName =
       typeof config.type === "string" ? config.type : config.type.name;
+    /* istanbul ignore next */
     if (config.list) {
       throw new Error(
         `Collection field ${fieldName}.${typeName} cannot be used as a list.`

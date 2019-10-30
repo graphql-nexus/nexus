@@ -428,7 +428,7 @@ export class SchemaBuilder {
   protected _schemaExtension?: NexusSchemaExtension;
 
   get schemaExtension() {
-    /* istanbul ignore if */
+    /* istanbul ignore next */
     if (!this._schemaExtension) {
       throw new Error("Cannot reference schemaExtension before it is created");
     }
@@ -994,6 +994,7 @@ export class SchemaBuilder {
     members: UnionMembers | undefined
   ) {
     const unionMembers: GraphQLObjectType[] = [];
+    /* istanbul ignore next */
     if (!members) {
       throw new Error(
         `Missing Union members for ${unionName}.` +
@@ -1003,6 +1004,7 @@ export class SchemaBuilder {
     members.forEach((member) => {
       unionMembers.push(this.getObjectType(member));
     });
+    /* istanbul ignore next */
     if (!unionMembers.length) {
       throw new Error(
         `GraphQL Nexus: Union ${unionName} must have at least one member type`
@@ -1301,7 +1303,7 @@ export class SchemaBuilder {
           `or t.resolveType(() => null) if you don't want or need to implement.`
       )
     );
-    return () => null;
+    return (obj: any) => obj?.__typename || null;
   }
 
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
@@ -1545,16 +1547,19 @@ export function makeSchemaInternal(config: SchemaConfig) {
   } = buildTypesInternal(config.types, config);
   const { Query, Mutation, Subscription } = typeMap;
 
+  /* istanbul ignore next */
   if (!isObjectType(Query)) {
     throw new Error(
       `Expected Query to be a objectType, saw ${Query.constructor.name}`
     );
   }
+  /* istanbul ignore next */
   if (Mutation && !isObjectType(Mutation)) {
     throw new Error(
       `Expected Mutation to be a objectType, saw ${Mutation.constructor.name}`
     );
   }
+  /* istanbul ignore next */
   if (Subscription && !isObjectType(Subscription)) {
     throw new Error(
       `Expected Subscription to be a objectType, saw ${Subscription.constructor.name}`
@@ -1613,9 +1618,31 @@ export async function generateSchema(
 }
 
 /**
+ * Mainly useful for testing, generates the schema and returns the artifacts
+ * that would have been otherwise written to the filesystem.
+ */
+generateSchema.withArtifacts = async (
+  config: SchemaConfig,
+  typeFilePath: string | false
+): Promise<{
+  schema: NexusGraphQLSchema;
+  schemaTypes: string;
+  tsTypes: string;
+}> => {
+  const typegenConfig = resolveTypegenConfig(config);
+  const { schema, missingTypes } = makeSchemaInternal(config);
+  assertNoMissingTypes(schema, missingTypes);
+  const { schemaTypes, tsTypes } = await new TypegenMetadata(
+    typegenConfig
+  ).generateArtifactContents(schema, typeFilePath);
+  return { schema, schemaTypes, tsTypes };
+};
+
+/**
  * Assertion utility with nexus-aware feedback for users.
  */
 function invariantGuard(val: any) {
+  /* istanbul ignore next */
   if (Boolean(val) === false) {
     throw new Error(
       "Nexus Error: This should never happen, " +

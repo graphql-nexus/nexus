@@ -29,9 +29,13 @@ import {
   groupTypes,
   mapObj,
   relativePathTo,
+  printedGenTypingImport,
 } from "./utils";
 import { NexusGraphQLSchema } from "./definitions/_types";
-import { isNexusPrintedGenTyping } from "./definitions/wrapping";
+import {
+  isNexusPrintedGenTyping,
+  isNexusPrintedGenTypingImport,
+} from "./definitions/wrapping";
 import { StringLike } from "./plugin";
 
 const SpecifiedScalars = {
@@ -779,6 +783,10 @@ export class TypegenPrinter {
     }
     if (isNexusPrintedGenTyping(strLike)) {
       strLike.imports.forEach((i) => {
+        if (!isNexusPrintedGenTypingImport(i)) {
+          console.warn(`Expected printedGenTypingImport, saw ${i}`);
+          return;
+        }
         this.printImports[i.config.module] =
           this.printImports[i.config.module] || {};
         if (i.config.default) {

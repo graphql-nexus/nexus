@@ -31,20 +31,29 @@ export class TypegenMetadata {
    */
   async generateArtifacts(schema: NexusGraphQLSchema) {
     const sortedSchema = this.sortSchema(schema);
-    if (this.config.outputs.schema) {
-      await this.writeFile(
-        "schema",
-        this.generateSchemaFile(sortedSchema),
-        this.config.outputs.schema
-      );
-    }
-    if (this.config.outputs.typegen) {
-      const value = await this.generateTypesFile(
+    if (this.config.outputs.schema || this.config.outputs.typegen) {
+      const { schemaTypes, tsTypes } = await this.generateArtifactContents(
         sortedSchema,
         this.config.outputs.typegen
       );
-      await this.writeFile("types", value, this.config.outputs.typegen);
+      if (this.config.outputs.schema) {
+        await this.writeFile("schema", schemaTypes, this.config.outputs.schema);
+      }
+      if (this.config.outputs.typegen) {
+        await this.writeFile("types", tsTypes, this.config.outputs.typegen);
+      }
     }
+  }
+
+  async generateArtifactContents(
+    schema: NexusGraphQLSchema,
+    typeFilePath: string | false
+  ) {
+    const [schemaTypes, tsTypes] = await Promise.all([
+      this.generateSchemaFile(schema),
+      typeFilePath ? this.generateTypesFile(schema, typeFilePath) : "",
+    ]);
+    return { schemaTypes, tsTypes };
   }
 
   sortSchema(schema: NexusGraphQLSchema) {

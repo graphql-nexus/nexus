@@ -19,6 +19,7 @@ export const RelayConnectionFieldMethod = dynamicOutputMethod({
     }): void
   `,
   factory({ typeDef: t, args: [fieldName, config] }) {
+    /* istanbul ignore next */
     if (!config.type) {
       throw new Error(
         `Missing required property "type" from relayConnection field ${fieldName}`
@@ -35,6 +36,7 @@ export const RelayConnectionFieldMethod = dynamicOutputMethod({
           p.boolean("hasPreviousPage");
         },
       });
+    /* istanbul ignore next */
     if (config.list) {
       throw new Error(
         `Collection field ${fieldName}.${typeName} cannot be used as a list.`
