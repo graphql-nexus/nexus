@@ -83,6 +83,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/prisma/nexus.git"
+    "url": "git://github.com/prisma-labs/nexus.git"
   }
 }
