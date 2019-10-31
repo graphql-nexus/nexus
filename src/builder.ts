@@ -311,6 +311,9 @@ export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef;
 export type PluginBuilderLens = {
   hasType: SchemaBuilder["hasType"];
   addType: SchemaBuilder["addType"];
+  setConfigOption: SchemaBuilder["setConfigOption"];
+  hasConfigOption: SchemaBuilder["hasConfigOption"];
+  getConfigOption: SchemaBuilder["getConfigOption"];
 };
 
 /**
