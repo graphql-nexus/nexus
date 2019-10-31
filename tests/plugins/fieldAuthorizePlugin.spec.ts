@@ -1,9 +1,14 @@
 import path from "path";
-import { objectType, makeSchema, queryField, authorizePlugin } from "../../src";
-import { graphql, GraphQLError } from "graphql";
+import {
+  objectType,
+  makeSchema,
+  queryField,
+  fieldAuthorizePlugin,
+} from "../../src";
+import { graphql } from "graphql";
 import { generateSchema } from "../../src/core";
 
-describe("authorizePlugin", () => {
+describe("fieldAuthorizePlugin", () => {
   const consoleErrorSpy = jest
     .spyOn(console, "error")
     .mockImplementation(() => {});
@@ -76,7 +81,7 @@ describe("authorizePlugin", () => {
   const testSchema = makeSchema({
     types: schemaTypes,
     plugins: [
-      authorizePlugin({
+      fieldAuthorizePlugin({
         formatError({ error, root, args, ctx, info }) {
           console.error(`Guarded error ${error.message}`);
           return new Error("Authorization Error");
@@ -171,7 +176,7 @@ describe("authorizePlugin", () => {
   test("default format error does not call console.error", async () => {
     const schema = makeSchema({
       types: schemaTypes,
-      plugins: [authorizePlugin()],
+      plugins: [fieldAuthorizePlugin()],
     });
     const { data, errors = [] } = await testField("userFalse", false, schema);
     expect(data).toBeNull();
@@ -185,7 +190,7 @@ describe("authorizePlugin", () => {
       types: schemaTypes,
       plugins: [
         // @ts-ignore
-        authorizePlugin({
+        fieldAuthorizePlugin({
           // @ts-ignore
           formatError() {},
         }),
@@ -210,7 +215,7 @@ describe("authorizePlugin", () => {
           resolve: () => ({ id: 1 }),
         }),
       ],
-      plugins: [authorizePlugin({})],
+      plugins: [fieldAuthorizePlugin({})],
     });
     const { data, errors = [] } = await testField(
       "incorrectFieldConfig",
@@ -252,7 +257,7 @@ describe("authorizePlugin", () => {
             resolve: () => true,
           }),
         ],
-        plugins: [authorizePlugin()],
+        plugins: [fieldAuthorizePlugin()],
       },
       path.join(__dirname, "test.gen.ts")
     );

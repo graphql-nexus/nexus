@@ -215,18 +215,22 @@ export const createPlugin = plugin;
  */
 function validatePluginConfig(pluginConfig: PluginConfig): void {
   const validRequiredProps = ["name"];
+  const optionalPropFns: Array<keyof PluginConfig> = [
+    "onInstall",
+    "onCreateFieldResolver",
+    "onCreateFieldSubscribe",
+    "onBeforeBuild",
+    "onMissingType",
+    "onAfterBuild",
+  ];
   const validOptionalProps = [
     "description",
     "fieldDefTypes",
     "objectTypeDefTypes",
     "schemaDefTypes",
-    "onInstall",
-    "onBeforeBuild",
-    "onAfterBuild",
-    "onMissingType",
-    "onCreateFieldResolver",
-    "onCreateFieldSubscribe",
+    ...optionalPropFns,
   ];
+
   const validProps = [...validRequiredProps, ...validOptionalProps];
   const givenProps = Object.keys(pluginConfig);
 
@@ -258,19 +262,23 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
 
   const [, , invalidGivenProps] = venn(validProps, givenProps);
   if (invalidGivenProps.size > 0) {
-    throw new Error(
-      `Plugin "${
-        pluginConfig.name
-      }" is giving unexpected properties: ${printProps(invalidGivenProps)}`
+    console.error(
+      new Error(
+        `Plugin "${
+          pluginConfig.name
+        }" is giving unexpected properties: ${printProps(invalidGivenProps)}`
+      )
     );
   }
 
-  if (pluginConfig.onInstall) {
-    const onInstallType = typeof pluginConfig.onInstall;
-    if (onInstallType !== "function") {
-      throw new Error(
-        `Plugin "${pluginConfig.name}" is giving an invalid value for onInstall hook: expected "function" type, got ${onInstallType} type`
+  optionalPropFns.forEach((fnName) => {
+    const fnType = typeof pluginConfig[fnName];
+    if (fnType !== "function" && fnType !== "undefined") {
+      console.error(
+        new Error(
+          `Plugin "${pluginConfig.name}" is giving an invalid value for ${fnName} hook: expected "function" type, got ${fnType} type`
+        )
       );
     }
-  }
+  });
 }

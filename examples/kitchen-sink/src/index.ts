@@ -1,7 +1,12 @@
 import { ApolloServer } from "apollo-server";
-import { makeSchema, nullabilityGuardPlugin, authorizePlugin } from "nexus";
+import {
+  makeSchema,
+  nullabilityGuardPlugin,
+  fieldAuthorizePlugin,
+} from "nexus";
 import path from "path";
 import * as types from "./kitchen-sink-definitions";
+import { logMutationTimePlugin } from "./example-plugins";
 
 const schema = makeSchema({
   types,
@@ -10,7 +15,8 @@ const schema = makeSchema({
     typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
   },
   plugins: [
-    authorizePlugin(),
+    logMutationTimePlugin,
+    fieldAuthorizePlugin(),
     nullabilityGuardPlugin({
       shouldGuard: true,
       fallbackValues: {

@@ -3,22 +3,17 @@
  * Do not make changes to this file directly
  */
 
-import * as swapi from "./types/backingTypes"
-
-
-
-
+import * as swapi from "./types/backingTypes";
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface NexusGenInputs {
-}
+export interface NexusGenInputs {}
 
 export interface NexusGenEnums {
-  Episode: 5 | 6 | 4
-  MoreEpisodes: 5 | 6 | 4 | "OTHER"
+  Episode: 5 | 6 | 4;
+  MoreEpisodes: 5 | 6 | 4 | "OTHER";
 }
 
 export interface NexusGenRootTypes {
@@ -34,69 +29,79 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  Episode: NexusGenEnums['Episode'];
-  MoreEpisodes: NexusGenEnums['MoreEpisodes'];
+  Episode: NexusGenEnums["Episode"];
+  MoreEpisodes: NexusGenEnums["MoreEpisodes"];
 }
 
 export interface NexusGenFieldTypes {
-  Droid: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+  Droid: {
+    // field return type
+    appearsIn: NexusGenEnums["Episode"][]; // [Episode!]!
+    friends: NexusGenRootTypes["Character"][]; // [Character!]!
     id: string; // String!
     name: string; // String!
     primaryFunction: string; // String!
-  }
-  Human: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+  };
+  Human: {
+    // field return type
+    appearsIn: NexusGenEnums["Episode"][]; // [Episode!]!
+    friends: NexusGenRootTypes["Character"][]; // [Character!]!
     homePlanet: string | null; // String
     id: string; // String!
     name: string; // String!
-  }
-  Query: { // field return type
-    droid: NexusGenRootTypes['Droid']; // Droid!
-    hero: NexusGenRootTypes['Character']; // Character!
-    human: NexusGenRootTypes['Human']; // Human!
-  }
-  Character: { // field return type
-    appearsIn: NexusGenEnums['Episode'][]; // [Episode!]!
-    friends: NexusGenRootTypes['Character'][]; // [Character!]!
+  };
+  Query: {
+    // field return type
+    droid: NexusGenRootTypes["Droid"]; // Droid!
+    hero: NexusGenRootTypes["Character"]; // Character!
+    human: NexusGenRootTypes["Human"]; // Human!
+  };
+  Character: {
+    // field return type
+    appearsIn: NexusGenEnums["Episode"][]; // [Episode!]!
+    friends: NexusGenRootTypes["Character"][]; // [Character!]!
     id: string; // String!
     name: string; // String!
-  }
+  };
 }
 
 export interface NexusGenArgTypes {
   Droid: {
-    appearsIn: { // args
+    appearsIn: {
+      // args
       id: string; // ID!
-    }
-  }
+    };
+  };
   Human: {
-    appearsIn: { // args
+    appearsIn: {
+      // args
       id: string; // ID!
-    }
-  }
+    };
+  };
   Query: {
-    droid: { // args
+    droid: {
+      // args
       id: string; // String!
-    }
-    hero: { // args
-      episode?: NexusGenEnums['Episode'] | null; // Episode
-    }
-    human: { // args
+    };
+    hero: {
+      // args
+      episode?: NexusGenEnums["Episode"] | null; // Episode
+    };
+    human: {
+      // args
       id: string; // String!
-    }
-  }
+    };
+  };
   Character: {
-    appearsIn: { // args
+    appearsIn: {
+      // args
       id: string; // ID!
-    }
-  }
+    };
+  };
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  Character: "Droid" | "Human"
+  Character: "Droid" | "Human";
 }
 
 export interface NexusGenInheritedFields {}
@@ -127,19 +132,35 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
-  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  allInputTypes:
+    | NexusGenTypes["inputNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["scalarNames"];
+  allOutputTypes:
+    | NexusGenTypes["objectNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["unionNames"]
+    | NexusGenTypes["interfaceNames"]
+    | NexusGenTypes["scalarNames"];
+  allNamedTypes:
+    | NexusGenTypes["allInputTypes"]
+    | NexusGenTypes["allOutputTypes"];
+  abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
 
-
 declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {
+    /**
+     * The nullability guard can be helpful, but is also a pottentially expensive operation for lists.
+     * We need to iterate the entire list to check for null items to guard against. Set this to true
+     * to skip the null guard on a specific field if you know there's no potential for unsafe types.
+     */
+    skipNullGuard?: boolean;
   }
-  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
-  }
-  interface NexusGenPluginSchemaConfig {
-  }
+  interface NexusGenPluginSchemaConfig {}
 }

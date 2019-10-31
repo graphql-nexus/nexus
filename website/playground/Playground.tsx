@@ -86,7 +86,7 @@ export const Playground: React.SFC<PlaygroundProps> = (props) => {
     schema: GraphQLSchema;
     metadata: core.TypegenMetadata;
   } | null>(null);
-  const debouncedSchema = useDebounce<{
+  const [debouncedSchema] = useDebounce<{
     schema: GraphQLSchema;
     metadata: core.TypegenMetadata;
   } | null>(activeSchema, 100);

@@ -20,8 +20,10 @@
       "api-makeSchema",
       "api-extendType",
       "api-mutationField",
-      "api-queryField"
+      "api-queryField",
+      "api-plugins"
     ],
-    "Ecosystem": ["ecosystem-plugins"]
+    "Included Plugins": ["plugin-nullabilityGuard", "plugin-fieldAuthorize"],
+    "Ecosystem Plugins": ["nexus-prisma"]
   }
 }

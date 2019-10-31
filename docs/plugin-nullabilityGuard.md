@@ -1,8 +1,19 @@
-### Nullability Guard Plugin
+---
+id: plugin-nullabilityGuard
+title: Nullability Guard Plugin
+sidebar_label: Nullability Guard
+---
 
-This plugin helps us guard against non-null values crashing our queries in production.
+This plugin helps us guard against non-null values crashing our queries in production. It does this by defining that every scalar value have a "fallback" value defined, so if we see a nullish value on an otherwise non-null field, we will fallback to this instead of crashing the query.
 
-#### Use:
+<blockquote class="warn">
+<b>Note:</b>
+
+The `nullabilityGuardPlugin` by default only guards when `process.env.NODE_ENV === 'production'`. This is intended so you see/catch these errors in development and do not use it except as a last resort. If you want to change this, set the `shouldGuard` config option.
+
+</blockquote>
+
+### Example Use:
 
 ```ts
 import { nullabilityGuardPlugin } from "nexus";
@@ -29,35 +40,24 @@ const guardPlugin = nullabilityGuardPlugin({
 });
 ```
 
-#### Object type config:
-
-```ts
-const User = objectType({
-  name: "User",
-  definition(t) {
-    t.int("id");
-    t.list.field("posts", {});
-  },
-  nullGuardFallback: {
-    id: "1",
-    name: "Unknown",
-    posts: [],
-  },
-});
-```
-
 ### Null Guard Algorithm
 
 - If a field is nullable:
+
   - If the field is non-list, do not guard
   - If the field is a list, and none of the list members are nullable, do not guard
-- If the field is non-nullable:
+
+- If the field is non-nullable and the value is null:
+
   - If the field is a list:
     - If the value is nullish, return an empty list `[]`
     - If the list is non-empty, iterate and complete with a valid non-null fallback
+  - If the value is a Union/Interface
+
+    - Return with an object with the `__typename` of the first type which implements this contract
+
   - If the field is an object:
     - If the value is nullish
-      - If there is a fallback defined on the object for that value, return with that
-      - If there is a
+      - If there is a fallback defined on the object for that type, return with that
       - Else return with an empty object
     - Return the value and push forward to the next resolvers

@@ -148,7 +148,7 @@ import {
   NexusObjectTypeExtension,
   NexusInputObjectTypeExtension,
 } from "./extensions";
-import { authorizePlugin } from "./plugins/authorizePlugin";
+import { fieldAuthorizePlugin } from "./plugins/fieldAuthorizePlugin";
 
 type NexusShapedOutput = {
   name: string;
@@ -441,50 +441,41 @@ export class SchemaBuilder {
       output: true,
       ...config.nonNullDefaults,
     };
-    this.plugins = config.plugins || [authorizePlugin()];
+    this.plugins = config.plugins || [fieldAuthorizePlugin()];
     this.builderLens = Object.freeze({
-      hasType: this.hasType.bind(this),
-      addType: this.addType.bind(this),
+      hasType: this.hasType,
+      addType: this.addType,
+      setConfigOption: this.setConfigOption,
+      hasConfigOption: this.hasConfigOption,
+      getConfigOption: this.getConfigOption,
     });
   }
 
-  hasType(typeName: string): boolean {
+  setConfigOption = <K extends keyof BuilderConfig>(
+    key: K,
+    value: BuilderConfig[K]
+  ) => {
+    this.config = {
+      ...this.config,
+      [key]: value,
+    };
+  };
+
+  hasConfigOption = (key: keyof BuilderConfig): boolean => {
+    return this.config.hasOwnProperty(key);
+  };
+
+  getConfigOption = <K extends keyof BuilderConfig>(
+    key: K
+  ): BuilderConfig[K] => {
+    return this.config[key];
+  };
+
+  hasType = (typeName: string): boolean => {
     return Boolean(
       this.pendingTypeMap[typeName] || this.finalTypeMap[typeName]
     );
-  }
-
-  addTypes(types: any) {
-    if (!types) {
-      return;
-    }
-    if (isSchema(types)) {
-      this.addTypes(types.getTypeMap());
-    }
-    if (isNexusPlugin(types)) {
-      if (!this.config.plugins?.includes(types)) {
-        throw new Error(
-          `Nexus plugin ${types.config.name} was seen in the "types" config, but should instead be provided to the "plugins" array.`
-        );
-      }
-      return;
-    }
-    if (
-      isNexusNamedTypeDef(types) ||
-      isNexusExtendTypeDef(types) ||
-      isNexusExtendInputTypeDef(types) ||
-      isNamedType(types) ||
-      isNexusDynamicInputMethod(types) ||
-      isNexusDynamicOutputMethod(types) ||
-      isNexusDynamicOutputProperty(types)
-    ) {
-      this.addType(types);
-    } else if (Array.isArray(types)) {
-      types.forEach((typeDef) => this.addTypes(typeDef));
-    } else if (isObject(types)) {
-      Object.keys(types).forEach((key) => this.addTypes(types[key]));
-    }
-  }
+  };
 
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls
@@ -493,7 +484,7 @@ export class SchemaBuilder {
    * those in too, so you can define types anonymously, without
    * exporting them.
    */
-  addType(typeDef: TypeDef | DynamicBlockDef) {
+  addType = (typeDef: TypeDef | DynamicBlockDef) => {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef;
       return;
@@ -598,6 +589,38 @@ export class SchemaBuilder {
     }
     if (isNexusInterfaceTypeDef(typeDef)) {
       this.typesToWalk.push({ type: "interface", value: typeDef.value });
+    }
+  };
+
+  addTypes(types: any) {
+    if (!types) {
+      return;
+    }
+    if (isSchema(types)) {
+      this.addTypes(types.getTypeMap());
+    }
+    if (isNexusPlugin(types)) {
+      if (!this.config.plugins?.includes(types)) {
+        throw new Error(
+          `Nexus plugin ${types.config.name} was seen in the "types" config, but should instead be provided to the "plugins" array.`
+        );
+      }
+      return;
+    }
+    if (
+      isNexusNamedTypeDef(types) ||
+      isNexusExtendTypeDef(types) ||
+      isNexusExtendInputTypeDef(types) ||
+      isNamedType(types) ||
+      isNexusDynamicInputMethod(types) ||
+      isNexusDynamicOutputMethod(types) ||
+      isNexusDynamicOutputProperty(types)
+    ) {
+      this.addType(types);
+    } else if (Array.isArray(types)) {
+      types.forEach((typeDef) => this.addTypes(typeDef));
+    } else if (isObject(types)) {
+      Object.keys(types).forEach((key) => this.addTypes(types[key]));
     }
   }
 

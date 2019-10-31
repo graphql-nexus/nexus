@@ -8,9 +8,9 @@ import {
 import { GraphQLResolveInfo } from "graphql";
 import { printedGenTyping, printedGenTypingImport } from "../utils";
 
-const authorizeResolverImport = printedGenTypingImport({
-  module: "nexus/dist/plugins/authorizePlugin",
-  bindings: ["AuthorizeResolver"],
+const FieldauthorizeResolverImport = printedGenTypingImport({
+  module: "nexus/dist/plugins/fieldAuthorizePlugin",
+  bindings: ["FieldAuthorizeResolver"],
 });
 
 const fieldDefTypes = printedGenTyping({
@@ -24,11 +24,11 @@ const fieldDefTypes = printedGenTyping({
     Returning or throwing an error will also prevent the 
     resolver from executing.
   `,
-  type: "AuthorizeResolver<TypeName, FieldName>",
-  imports: [authorizeResolverImport],
+  type: "FieldAuthorizeResolver<TypeName, FieldName>",
+  imports: [FieldauthorizeResolverImport],
 });
 
-export type AuthorizeResolver<
+export type FieldAuthorizeResolver<
   TypeName extends string,
   FieldName extends string
 > = (
@@ -38,7 +38,7 @@ export type AuthorizeResolver<
   info: GraphQLResolveInfo
 ) => MaybePromise<boolean | Error>;
 
-export interface AuthorizePluginErrorConfig {
+export interface FieldAuthorizePluginErrorConfig {
   error: Error;
   root: any;
   args: any;
@@ -46,19 +46,21 @@ export interface AuthorizePluginErrorConfig {
   info: GraphQLResolveInfo;
 }
 
-export interface AuthorizePluginConfig {
-  formatError?: (authConfig: AuthorizePluginErrorConfig) => Error;
+export interface FieldAuthorizePluginConfig {
+  formatError?: (authConfig: FieldAuthorizePluginErrorConfig) => Error;
 }
 
 export const defaultFormatError = ({
   error,
-}: AuthorizePluginErrorConfig): Error => {
+}: FieldAuthorizePluginErrorConfig): Error => {
   const err: Error & { originalError?: Error } = new Error("Not authorized");
   err.originalError = error;
   return err;
 };
 
-export const authorizePlugin = (authConfig: AuthorizePluginConfig = {}) => {
+export const fieldAuthorizePlugin = (
+  authConfig: FieldAuthorizePluginConfig = {}
+) => {
   const { formatError = defaultFormatError } = authConfig;
   const ensureError = (
     root: any,
@@ -106,7 +108,7 @@ export const authorizePlugin = (authConfig: AuthorizePluginConfig = {}) => {
       ) {
         if (!hasWarned) {
           console.warn(
-            'The GraphQL Nexus "authorize" feature has been moved to a plugin, add plugins: [authorizePlugin()] to your makeSchema config to remove this warning.'
+            'The GraphQL Nexus "authorize" feature has been moved to a plugin, add [fieldAuthorizePlugin()] to your makeSchema plugin config to remove this warning.'
           );
           hasWarned = true;
         }

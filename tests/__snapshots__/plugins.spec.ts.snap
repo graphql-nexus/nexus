@@ -42,10 +42,6 @@ exports[`runtime config validation checks name is string 1`] = `"Plugin \\"1\\" 
 
 exports[`runtime config validation checks name present 1`] = `"Plugin \\"undefined\\" is missing required properties: name"`;
 
-exports[`runtime config validation checks onInstall is a function if defined 1`] = `"Plugin \\"x\\" is giving an invalid value for onInstall hook: expected \\"function\\" type, got string type"`;
-
-exports[`runtime config validation checks onInstall is a function if defined 2`] = `"Plugin \\"x\\" is giving an invalid value for onInstall hook: expected \\"function\\" type, got object type"`;
-
 exports[`runtime onInstall hook handler does not validate types array members yet 1`] = `"Cannot read property 'name' of null"`;
 
 exports[`runtime onInstall hook handler validates return value against shallow schema 1`] = `

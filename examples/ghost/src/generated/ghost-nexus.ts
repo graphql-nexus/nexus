@@ -5,7 +5,7 @@
 
 import * as ctx from "../data-sources/Context";
 import * as db from "./ghost-db-types";
-import { AuthorizeResolver } from "nexus/dist/plugins/authorizePlugin";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { core } from "nexus";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -172,7 +172,7 @@ declare global {
      * Returning or throwing an error will also prevent the
      * resolver from executing.
      */
-    authorize?: AuthorizeResolver<TypeName, FieldName>;
+    authorize?: FieldAuthorizeResolver<TypeName, FieldName>;
   }
   interface NexusGenPluginSchemaConfig {}
 }

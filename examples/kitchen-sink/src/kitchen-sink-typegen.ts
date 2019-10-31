@@ -4,7 +4,7 @@
  */
 
 import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions";
-import { AuthorizeResolver } from "nexus/dist/plugins/authorizePlugin";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { core } from "nexus";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -315,7 +315,7 @@ declare global {
      * Returning or throwing an error will also prevent the
      * resolver from executing.
      */
-    authorize?: AuthorizeResolver<TypeName, FieldName>;
+    authorize?: FieldAuthorizeResolver<TypeName, FieldName>;
     /**
      * The nullability guard can be helpful, but is also a pottentially expensive operation for lists.
      * We need to iterate the entire list to check for null items to guard against. Set this to true

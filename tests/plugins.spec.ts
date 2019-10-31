@@ -23,6 +23,12 @@ const queryField = extendType({
 });
 
 describe("runtime config validation", () => {
+  const spy = jest.spyOn(console, "error").mockImplementation();
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   const whenGiven = (config: any) => () => createPlugin(config);
 
   it("checks name present", () => {
@@ -38,13 +44,11 @@ describe("runtime config validation", () => {
   });
 
   it("checks onInstall is a function if defined", () => {
-    expect(
-      whenGiven({ name: "x", onInstall: "foo" })
-    ).toThrowErrorMatchingSnapshot();
-
-    expect(
-      whenGiven({ name: "x", onInstall: {} })
-    ).toThrowErrorMatchingSnapshot();
+    whenGiven({ name: "x", onInstall: "foo" })();
+    expect(spy).toBeCalledTimes(1);
+    jest.resetAllMocks();
+    whenGiven({ name: "x", onInstall: {} })();
+    expect(spy).toBeCalledTimes(1);
   });
 });
 
