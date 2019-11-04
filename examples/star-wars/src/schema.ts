@@ -1,5 +1,4 @@
 import * as path from "path";
-import path from "path";
 import * as allTypes from "./graphql";
 import { makeSchema, nullabilityGuardPlugin } from "nexus";
 
