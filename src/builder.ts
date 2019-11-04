@@ -252,6 +252,13 @@ export type SchemaConfig = BuilderConfig & {
    * valid types, ignoring invalid ones.
    */
   types: any;
+  /**
+   * Whether we should process.exit after the artifacts are generated.
+   * Useful if you wish to explicitly generate the test artifacts at a certain stage in
+   * a startup or build process.
+   * @default false
+   */
+  shouldExitAfterGenerateArtifacts?: boolean;
 } & NexusGenPluginSchemaConfig;
 
 export interface TypegenInfo {
@@ -1621,9 +1628,27 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
   if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    new TypegenMetadata(typegenConfig).generateArtifacts(schema).catch((e) => {
-      console.error(e);
-    });
+    const typegenPromise = new TypegenMetadata(typegenConfig).generateArtifacts(
+      schema
+    );
+    if (config.shouldExitAfterGenerateArtifacts) {
+      typegenPromise
+        .then(() => {
+          console.log(`Generated Artifacts:
+          TypeScript Types  ==> ${typegenConfig.outputs.typegen ||
+            "(not enabled)"}
+          GraphQL Schema    ==> ${typegenConfig.outputs.schema ||
+            "(not enabled)"}`);
+        })
+        .catch((e) => {
+          console.error(e);
+          process.exit(1);
+        });
+    } else {
+      typegenPromise.catch((e) => {
+        console.error(e);
+      });
+    }
   }
   assertNoMissingTypes(schema, missingTypes);
   return schema;

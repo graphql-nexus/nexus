@@ -2,13 +2,19 @@
   "name": "@graphql-nexus/example-fullstack-tutorial-server",
   "version": "0.0.0",
   "description": "",
+  "license": "ISC",
+  "author": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
-    "start": "ts-node-dev --no-notify --transpileOnly --respawn src/index.ts"
+    "start": "ts-node-dev --no-notify --transpileOnly --respawn src/index.ts",
+    "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/__utils"
+    ]
+  },
   "dependencies": {
     "apollo-datasource": "^0.2.0",
     "apollo-datasource-rest": "^0.2.0",
@@ -30,14 +36,8 @@
     "jest": "^24.3.1",
     "nock": "^10.0.2",
     "node-fetch": "^2.2.1",
-    "prettier": "^1.15.2",
+    "prettier": "prettier/prettier#refs/pull/6736/head",
     "ts-node-dev": "^1.0.0-pre.30",
     "typescript": "^3.6.4"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/__utils"
-    ]
   }
 }

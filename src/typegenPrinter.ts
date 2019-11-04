@@ -751,11 +751,6 @@ export class TypegenPrinter {
           padLeft(this.printType(plugin.config.fieldDefTypes), "    ")
         );
       }
-      if (plugin.config.schemaDefTypes) {
-        pluginSchemaExt.push(
-          padLeft(this.printType(plugin.config.schemaDefTypes), "    ")
-        );
-      }
       if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(
           padLeft(this.printType(plugin.config.objectTypeDefTypes), "    ")

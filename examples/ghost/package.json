@@ -1,8 +1,8 @@
 {
   "name": "@graphql-nexus/ghost-example-api",
   "scripts": {
-    "start": "yarn dump-tables && ts-node-dev --ignore-watch src/generated --no-notify --transpileOnly --respawn ./src",
-    "dump-tables": "node -r ts-node/register/transpile-only scripts/dumpTables.ts"
+    "dump-tables": "node -r ts-node/register/transpile-only scripts/dumpTables.ts",
+    "start": "yarn dump-tables && ts-node-dev --ignore-watch src/generated --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
     "apollo-server-express": "^2.3.3",
@@ -22,7 +22,7 @@
     "@types/graphql-iso-date": "^3.3.3",
     "@types/lodash": "^4.14.120",
     "fs-extra": "^7.0.1",
-    "prettier": "^1.15.2",
+    "prettier": "prettier/prettier#refs/pull/6736/head",
     "schemats": "^3.0.3",
     "ts-node": "^8.0.2",
     "ts-node-dev": "^1.0.0-pre.30",

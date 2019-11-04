@@ -453,10 +453,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.15.tgz#e8f7729b631be1b02ae130ff0b61f3e018000640"
   integrity sha512-CBR5avlLcu0YCILJiDIXeU2pTw7UK/NIxfC63m7d7CVamho1qDEzXKkOtEauQRPMy6MI8mLozth+JJkas7HY6g==
 
-"@types/prettier@^1.15.2":
-  version "1.18.1"
-  resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-1.18.1.tgz#a71897c3860efe1ed4d36162bc6efa79e6e0b237"
-  integrity sha512-68j7wTrTZUInkpYd6PGJOeKkEtDDkQDIyrX/ynY0gV20gOjSq0xcGpvsUrmdhUn+s4eJgOImNtnNmh5rXkq3Vg==
+"@types/prettier@^1.18.3":
+  version "1.18.3"
+  resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-1.18.3.tgz#64ff53329ce16139f17c3db9d3e0487199972cd8"
+  integrity sha512-48rnerQdcZ26odp+HOvDGX8IcUkYOCuMc2BodWYTe956MqkHlOGAG4oFQ83cjZ0a4GAgj7mb4GUClxYd2Hlodg==
 
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
@@ -1238,6 +1238,11 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
   integrity sha1-hMbhWbgZBP3KWaDvRM2HDTElD5o=
+
+detect-indent@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-5.0.0.tgz#3871cc0a6a002e8c3e5b3cf7f336264675f06b9d"
+  integrity sha1-OHHMCmoALow+Wzz38zYmRnXwa50=
 
 detect-libc@^1.0.2:
   version "1.0.3"
@@ -3756,9 +3761,9 @@ prelude-ls@~1.1.2:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
 
-prettier@prettier/prettier#5522f0d:
+prettier@prettier/prettier#refs/pull/6736/head:
   version "1.18.2"
-  resolved "https://codeload.github.com/prettier/prettier/tar.gz/5522f0d78fc22c2824b30583d00123e6329a7060"
+  resolved "https://codeload.github.com/prettier/prettier/tar.gz/ec22a7ab5937828eb25c50c76598451ccd61c523"
   dependencies:
     "@angular/compiler" "8.2.7"
     "@babel/code-frame" "7.5.5"
@@ -4278,6 +4283,19 @@ snapdragon@^0.8.1:
     source-map "^0.5.6"
     source-map-resolve "^0.5.0"
     use "^3.1.0"
+
+sort-object-keys@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/sort-object-keys/-/sort-object-keys-1.1.2.tgz#d3a6c48dc2ac97e6bc94367696e03f6d09d37952"
+  integrity sha1-06bEjcKsl+a8lDZ2luA/bQnTeVI=
+
+sort-package-json@^1.22.1:
+  version "1.22.1"
+  resolved "https://registry.yarnpkg.com/sort-package-json/-/sort-package-json-1.22.1.tgz#384ce7a098cd13be4109800d5ce2f0cf7826052e"
+  integrity sha512-uVINQraFQvnlzNHFnQOT4MYy0qonIEzKwhrI2yrTiQjNo5QF4h3ffrnCk7a95QAwoK/RdkO/w8W9tJIcaOWC7g==
+  dependencies:
+    detect-indent "^5.0.0"
+    sort-object-keys "^1.1.2"
 
 source-map-resolve@^0.5.0:
   version "0.5.2"

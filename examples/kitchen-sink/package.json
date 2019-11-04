@@ -2,8 +2,8 @@
   "name": "@graphql-nexus/example-kitchen-sink",
   "version": "0.0.0",
   "scripts": {
-    "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src",
-    "debug": "ts-node-dev --inspect-brk --no-notify --transpileOnly --respawn ./src"
+    "debug": "ts-node-dev --inspect-brk --no-notify --transpileOnly --respawn ./src",
+    "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
     "apollo-server": "^2.2.0",
@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "jest": "^23.6.0",
-    "prettier": "^1.15.2",
+    "prettier": "prettier/prettier#refs/pull/6736/head",
     "ts-jest": "^23.10.4",
     "typescript": "^3.6.4"
   }

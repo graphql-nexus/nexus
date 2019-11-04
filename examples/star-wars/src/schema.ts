@@ -1,4 +1,5 @@
 import * as path from "path";
+import path from "path";
 import * as allTypes from "./graphql";
 import { makeSchema, nullabilityGuardPlugin } from "nexus";
 
@@ -37,4 +38,5 @@ export const schema = makeSchema({
     ],
     contextType: "swapi.ContextType",
   },
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });

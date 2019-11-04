@@ -28,6 +28,7 @@ const schema = makeSchema({
       },
     }),
   ],
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });
 
 const server = new ApolloServer({

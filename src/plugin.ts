@@ -74,10 +74,6 @@ export interface PluginConfig {
    */
   objectTypeDefTypes?: StringLike | StringLike[];
   /**
-   * Any type definitions we want to add to the schema
-   */
-  schemaDefTypes?: StringLike | StringLike[];
-  /**
    * Executed once, just before the types are walked. Useful for defining custom extensions
    * to the "definition" builders that are needed while traversing the type definitions, as
    * are defined by `dynamicOutput{Method,Property}` / `dynamicInput{Method,Property}`
@@ -227,7 +223,6 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     "description",
     "fieldDefTypes",
     "objectTypeDefTypes",
-    "schemaDefTypes",
     ...optionalPropFns,
   ];
 

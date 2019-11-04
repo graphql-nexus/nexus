@@ -10,6 +10,7 @@ const schema = makeSchema({
     schema: path.join(__dirname, "../githunt-api-schema.graphql"),
     typegen: path.join(__dirname, "./githunt-typegen.ts"),
   },
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });
 
 const server = new ApolloServer({
