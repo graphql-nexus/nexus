@@ -409,6 +409,7 @@ describe("nullabilityGuardPlugin", () => {
   });
 
   it("will return null for nullable list values", async () => {
+    const onGuardedMock = jest.fn();
     const { errors = [], data } = await graphql(
       makeSchema({
         types: [
@@ -419,7 +420,11 @@ describe("nullabilityGuardPlugin", () => {
             resolve: async () => null,
           }),
         ],
-        plugins: [nullPlugin()],
+        plugins: [
+          nullPlugin({
+            onGuarded: onGuardedMock,
+          }),
+        ],
       }),
       `
         {
@@ -429,5 +434,6 @@ describe("nullabilityGuardPlugin", () => {
     );
     expect(errors).toHaveLength(0);
     expect(data.nullableList).toEqual(null);
+    expect(onGuardedMock).toHaveBeenCalledTimes(0);
   });
 });

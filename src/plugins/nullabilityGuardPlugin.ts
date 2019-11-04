@@ -161,7 +161,7 @@ const nonNullGuard = (
     // otherwise recurse into resolving the individual type.
     if (isListType(type)) {
       if (isNullish(val)) {
-        return guardResult(outerNonNull ? [] : null);
+        return outerNonNull ? guardResult([]) : null;
       }
       let hasPromise = false;
       const listMembers: any[] = [];
