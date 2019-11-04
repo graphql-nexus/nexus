@@ -407,4 +407,27 @@ describe("nullabilityGuardPlugin", () => {
       "Cannot return null for non-nullable field Query.shouldFail."
     );
   });
+
+  it("will return null for nullable list values", async () => {
+    const { errors = [], data } = await graphql(
+      makeSchema({
+        types: [
+          queryField("nullableList", {
+            type: "String",
+            list: true,
+            nullable: true,
+            resolve: async () => null,
+          }),
+        ],
+        plugins: [nullPlugin()],
+      }),
+      `
+        {
+          nullableList
+        }
+      `
+    );
+    expect(errors).toHaveLength(0);
+    expect(data.nullableList).toEqual(null);
+  });
 });
