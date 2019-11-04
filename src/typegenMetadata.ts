@@ -110,6 +110,7 @@ export class TypegenMetadata {
       try {
         await removeFile(filePath);
       } catch (e) {
+        /* istanbul ignore next */
         if (e.code !== "ENOENT" && e.code !== "ENOTDIR") {
           throw e;
         }

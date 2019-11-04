@@ -13,6 +13,7 @@ export function typegenFormatPrettier(
     type: "types" | "schema"
   ) {
     let prettier: typeof import("prettier");
+    /* istanbul ignore next */
     try {
       prettier = require("prettier") as typeof import("prettier");
     } catch {
@@ -24,6 +25,7 @@ export function typegenFormatPrettier(
       return content;
     }
     if (typeof prettierConfig === "string") {
+      /* istanbul ignore if */
       if (!path.isAbsolute(prettierConfig)) {
         console.error(
           new Error(

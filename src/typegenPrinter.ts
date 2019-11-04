@@ -777,6 +777,7 @@ export class TypegenPrinter {
     }
     if (isNexusPrintedGenTyping(strLike)) {
       strLike.imports.forEach((i) => {
+        /* istanbul ignore if */
         if (!isNexusPrintedGenTypingImport(i)) {
           console.warn(`Expected printedGenTypingImport, saw ${i}`);
           return;

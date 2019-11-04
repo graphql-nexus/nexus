@@ -8,27 +8,15 @@ import { GraphQLNamedType } from "graphql";
 
 export type NexusGraphQLNamedType = GraphQLNamedType & {
   extensions?: {
-    nexus?: NexusTypeExtension<any>;
+    nexus?: {
+      config: any;
+    };
   };
 };
 
 export type NexusTypeExtensions =
   | NexusObjectTypeExtension
   | NexusInterfaceTypeExtension;
-
-type PossibleTypes =
-  | "ObjectType"
-  | "UnionType"
-  | "ScalarType"
-  | "IntefaceType"
-  | "InputObjectType"
-  | "Schema";
-
-type ExtensionConfigFor<T extends PossibleTypes> = any;
-
-export class NexusTypeExtension<T extends PossibleTypes> {
-  constructor(readonly type: T, readonly config: ExtensionConfigFor<T>) {}
-}
 
 /**
  * Container object living on `fieldDefinition.extensions.nexus`

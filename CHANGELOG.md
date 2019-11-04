@@ -54,10 +54,10 @@
 
 #### beta.12
 
-- feat(config): <strike>env var for should-generate-artifacts (#244)</strike>
+- feat(config): <strike>env var for should-generate-artifacts (#244)
 
   You can now set the `shouldGenerateArtifacts` config option by env var
-  `NEXUS_SHOULD_GENERATE_ARTIFACTS=true|false`.
+  `NEXUS_SHOULD_GENERATE_ARTIFACTS=true|false`.</strike> (removed, see 0.12 release notes)
 
 - fix(typegen): delete prev file before writing next (#252)
 
@@ -65,7 +65,7 @@
   up its changed version. This change should reduce/remove the need for this
   workaround.
 
-* feat: <strike>by default typegen as an @types package (#230)</strike> see 0.12.0-rc notes
+* feat: <strike>by default typegen as an @types package (#230)
 
   BREAKING CHANGE
 
@@ -76,7 +76,7 @@
 
   This is a breaking change because typegen is enabled even when config
   `outputs` have not been configured (before, they were required). The
-  heuristics of `shouldGenerateArtifacts` remain unchanged.
+  heuristics of `shouldGenerateArtifacts` remain unchanged.</strike> (removed, see 0.12 release notes)
 
 ### 0.11.7
 

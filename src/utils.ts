@@ -434,13 +434,6 @@ export function venn<T>(
       rights.delete(l);
     }
   });
-  rights.forEach((r) => {
-    if (lefts.has(r)) {
-      boths.add(r);
-      lefts.delete(r);
-      rights.delete(r);
-    }
-  });
 
   return [lefts, boths, rights];
 }
