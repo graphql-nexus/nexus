@@ -9,7 +9,7 @@ import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
 const { makeSchema, TypegenPrinter, TypegenMetadata } = core;
 
-describe("typegen", () => {
+describe("typegenPrinter", () => {
   let typegen: core.TypegenPrinter;
   let metadata: core.TypegenMetadata;
   beforeEach(async () => {

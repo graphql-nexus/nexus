@@ -8,9 +8,9 @@
 
 - feat: Adds "Plugins" API, [see the docs]() for more info on what all these can help accomplish
 
-- feat(plugin): Add `nullabilityGuard` plugin. See [the docs]() for more info
+- feat(plugin): Add `nullabilityGuardPlugin`. See [the docs](docs/plugin-nullabilityGuard.md) for more info
 
-- feat(plugin): Add `authorize` plugin. See [the docs]() for more info
+- feat(plugin): Add `fieldAuthorizePlugin`. See [the docs](docs/plugin-fieldAuthorize.md) for more info
 
   This is the same behavior as before, but implemented more flexibly as a plugin. This will be
   automatically added if no plugins are specified, otherwise it will need to be imported & added
