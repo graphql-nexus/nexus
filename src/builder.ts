@@ -1645,6 +1645,7 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
             "(not enabled)"}
           GraphQL Schema    ==> ${typegenConfig.outputs.schema ||
             "(not enabled)"}`);
+          process.exit(0);
         })
         .catch((e) => {
           console.error(e);

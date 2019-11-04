@@ -24,6 +24,6 @@ A **field type** is the valid return value used to a field on an object type. In
 
 ## Configuring our types
 
-The [Ghost Example](https://github.com/prisma/nexus/blob/develop/examples/ghost/src/ghost-schema.ts) is the best to look at for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
+The [Ghost Example](https://github.com/prisma-labs/nexus/blob/develop/examples/ghost/src/ghost-schema.ts) is the best to look at for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
 
 The [makeSchema](api-makeSchema.md) takes several options which helps us find the types we need to import into our generated schema, and customize where these generated types are output. Read more about the API [here](api-makeSchema.md).

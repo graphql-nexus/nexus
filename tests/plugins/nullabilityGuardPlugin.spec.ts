@@ -123,6 +123,7 @@ const types = [
 const defaultSchema = makeSchema({
   types,
   plugins: [nullPlugin()],
+  outputs: false,
 });
 
 describe("nullabilityGuardPlugin", () => {
@@ -234,6 +235,7 @@ describe("nullabilityGuardPlugin", () => {
   it("should guard union types", async () => {
     const { errors = [], data } = await graphql(
       makeSchema({
+        outputs: false,
         types: [
           types,
           unionType({
@@ -297,6 +299,7 @@ describe("nullabilityGuardPlugin", () => {
       .spyOn(console, "warn")
       .mockImplementationOnce(() => {});
     const schema = makeSchema({
+      outputs: false,
       types,
       plugins: [nullPlugin({ onGuarded: undefined })],
     });

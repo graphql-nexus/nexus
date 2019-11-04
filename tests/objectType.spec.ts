@@ -61,6 +61,8 @@ describe("objectType", () => {
   it("warns when specifying .list and list: true", () => {
     const spy = jest.spyOn(console, "warn").mockImplementation();
     makeSchema({
+      outputs: false,
+
       types: [
         objectType({
           name: "throwingList",
@@ -72,7 +74,6 @@ describe("objectType", () => {
           },
         }),
       ],
-      outputs: false,
       shouldGenerateArtifacts: false,
     });
     expect(spy.mock.calls[0]).toMatchSnapshot();
@@ -83,6 +84,7 @@ describe("objectType", () => {
   it("throws when modifyType is used", () => {
     expect(() => {
       makeSchema({
+        outputs: false,
         types: [
           objectType({
             name: "testing",

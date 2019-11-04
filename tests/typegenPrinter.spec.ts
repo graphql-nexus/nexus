@@ -14,7 +14,13 @@ describe("typegenPrinter", () => {
   let metadata: core.TypegenMetadata;
   beforeEach(async () => {
     const schema = makeSchema({
+      outputs: {
+        typegen: path.join(__dirname, "typegen/types.gen.ts"),
+        schema: path.join(__dirname, "typegen/schema.gen.graphql"),
+      },
+      shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
+      prettierConfig: path.join(__dirname, "../.prettierrc"),
     }) as core.NexusGraphQLSchema;
     metadata = new TypegenMetadata({
       outputs: {

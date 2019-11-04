@@ -10,7 +10,8 @@ import {
 import { TypegenInfo, BuilderConfig } from "./builder";
 import { NexusGraphQLSchema } from "./definitions/_types";
 
-export interface TypegenMetadataConfig extends Omit<BuilderConfig, "outputs"> {
+export interface TypegenMetadataConfig
+  extends Omit<BuilderConfig, "outputs" | "shouldGenerateArtifacts"> {
   outputs: {
     schema: false | string;
     typegen: false | string;
@@ -109,7 +110,7 @@ export class TypegenMetadata {
       try {
         await removeFile(filePath);
       } catch (e) {
-        if (e.code !== "ENOENT") {
+        if (e.code !== "ENOENT" && e.code !== "ENOTDIR") {
           throw e;
         }
       }

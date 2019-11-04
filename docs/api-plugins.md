@@ -78,11 +78,27 @@ plugin({
 ### onCreateFieldResolver(config)
 
 Every ObjectType, whether they are defined via Nexus' `objectType` api, or elsewhere is given a resolver.
-The [defaultResolver](shouldExitAfterGenerateArtifacts)
+The [defaultFieldResolver](https://github.com/graphql/graphql-js/blob/82a0c336de05b4ab0d24d5557b56135c828fe888/src/execution/execute.js#L1179-L1197) is provided if none is specified by the field definition.
+
+When the resolver is created for a type, this can optionally return a "middleware" which wraps the resolve behavior of the field. Here's an example of writing a "LogMutationTimePlugin", which logs how long it takes a mutation to complete:
 
 ```ts
-plugin({
-  name: "onCreateFieldResolverExample",
+const LogMutationTimePlugin = plugin({
+  name: "LogMutationTimePlugin",
+  onCreateFieldResolver(config) {
+    if (config.parentTypeConfig.name !== "Mutation") {
+      return;
+    }
+    return async (root, args, ctx, info, next) => {
+      const startTimeMs = new Date().valueOf();
+      const value = await next(root, args, ctx, info);
+      const endTimeMs = new Date().valueOf();
+      console.log(
+        `Mutation ${info.operation.name} took ${endTimeMs - startTimeMs} ms`
+      );
+      return value;
+    };
+  },
 });
 ```
 

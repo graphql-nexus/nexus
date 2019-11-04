@@ -1,12 +1,22 @@
 # Changelog
 
+### 0.12.0 final (unreleased)
+
+- refactor: Remove NEXUS_SHOULD_GENERATE_ARTIFACTS env var
+- feat: Add `shouldExitAfterGenerateArtifacts`
+- Warn on missing `outputs` in `makeSchema` config
+
+### 0.12.0-rc.2, rc.3
+
+- fix: bug in nullability check plugin
+
 ### 0.12.0-rc
 
 - feat(deps): Bumps the default minimum version of graphql-js to 14.5.0
 
   Nexus uses the new [`extensions` property](https://github.com/graphql/graphql-js/pull/2097) on types to store metadata provided to Nexus types, in order to make them usable by plugins.
 
-- feat: Adds "Plugins" API, [see the docs]() for more info on what all these can help accomplish
+- feat: Adds "Plugins" API, [see the docs](docs/api-plugins.md) for more info on what all these can help accomplish
 
 - feat(plugin): Add `nullabilityGuardPlugin`. See [the docs](docs/plugin-nullabilityGuard.md) for more info
 
@@ -44,7 +54,7 @@
 
 #### beta.12
 
-- feat(config): env var for should-generate-artifacts (#244)
+- feat(config): <strike>env var for should-generate-artifacts (#244)</strike>
 
   You can now set the `shouldGenerateArtifacts` config option by env var
   `NEXUS_SHOULD_GENERATE_ARTIFACTS=true|false`.
@@ -55,7 +65,7 @@
   up its changed version. This change should reduce/remove the need for this
   workaround.
 
-* feat: by default typegen as an @types package (#230)
+* feat: <strike>by default typegen as an @types package (#230)</strike> see 0.12.0-rc notes
 
   BREAKING CHANGE
 

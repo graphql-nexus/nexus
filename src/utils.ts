@@ -311,63 +311,35 @@ export function printedGenTyping(config: PrintedGenTypingConfig) {
 export function resolveTypegenConfig(
   config: BuilderConfig
 ): TypegenMetadataConfig {
-  const { outputs, ...rest } = config;
+  const {
+    outputs,
+    shouldGenerateArtifacts = Boolean(
+      !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+    ),
+    ...rest
+  } = config;
 
+  let typegenPath: string | false = false;
+  let schemaPath: string | false = false;
   if (outputs && typeof outputs === "object") {
     if (typeof outputs.schema === "string") {
-      assertAbsolutePath(outputs.schema, "outputs.schema");
+      schemaPath = assertAbsolutePath(outputs.schema, "outputs.schema");
     }
     if (typeof outputs.typegen === "string") {
-      assertAbsolutePath(outputs.typegen, "outputs.typegen");
+      typegenPath = assertAbsolutePath(outputs.typegen, "outputs.typegen");
     }
-  }
-
-  const shouldGenerateArtifacts =
-    typeof config.shouldGenerateArtifacts === "boolean"
-      ? config.shouldGenerateArtifacts
-      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "true"
-      ? true
-      : process.env.NEXUS_SHOULD_GENERATE_ARTIFACTS === "false"
-      ? false
-      : Boolean(
-          !process.env.NODE_ENV || process.env.NODE_ENV === "development"
-        );
-
-  const defaultSchemaPath = path.join(process.cwd(), "schema.graphql");
-  const defaultTypegenPath = path.join(
-    __dirname,
-    "../../@types/nexus-typegen/index.d.ts"
-  );
-  let finalSchemaPath: false | string = false;
-  let finalTypegenPath: false | string = false;
-
-  if (shouldGenerateArtifacts === false || outputs === false) {
-    finalTypegenPath = false;
-    finalSchemaPath = false;
-  } else if (outputs === undefined || outputs === true) {
-    finalTypegenPath = defaultTypegenPath;
-    finalSchemaPath = outputs === true ? defaultSchemaPath : false;
-  } else if (typeof outputs === "object") {
-    if (outputs.typegen === undefined || outputs.typegen === true) {
-      finalTypegenPath = defaultTypegenPath;
-    } else if (typeof outputs.typegen === "string") {
-      finalTypegenPath = outputs.typegen;
-    }
-    if (outputs.schema === undefined) {
-      finalSchemaPath = false;
-    } else if (outputs.schema === true) {
-      finalSchemaPath = defaultSchemaPath;
-    } else if (typeof outputs.schema === "string") {
-      finalSchemaPath = outputs.schema;
-    }
+  } else if (outputs !== false) {
+    console.warn(
+      `You should specify a configuration value for outputs in Nexus' makeSchema. ` +
+        `Provide one to remove this warning.`
+    );
   }
 
   return {
     ...rest,
-    shouldGenerateArtifacts,
     outputs: {
-      typegen: finalTypegenPath,
-      schema: finalSchemaPath,
+      typegen: shouldGenerateArtifacts ? typegenPath : false,
+      schema: shouldGenerateArtifacts ? schemaPath : false,
     },
   };
 }

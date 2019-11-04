@@ -79,6 +79,7 @@ describe("fieldAuthorizePlugin", () => {
     }),
   ];
   const testSchema = makeSchema({
+    outputs: false,
     types: schemaTypes,
     plugins: [
       fieldAuthorizePlugin({
@@ -175,6 +176,7 @@ describe("fieldAuthorizePlugin", () => {
 
   test("default format error does not call console.error", async () => {
     const schema = makeSchema({
+      outputs: false,
       types: schemaTypes,
       plugins: [fieldAuthorizePlugin()],
     });
@@ -187,6 +189,7 @@ describe("fieldAuthorizePlugin", () => {
 
   test("always throws an error, even when formatError is wrong", async () => {
     const schema = makeSchema({
+      outputs: false,
       types: schemaTypes,
       plugins: [
         // @ts-ignore
@@ -206,6 +209,7 @@ describe("fieldAuthorizePlugin", () => {
 
   test("warns when a field has a non-function authorize prop", async () => {
     const schema = makeSchema({
+      outputs: false,
       types: [
         schemaTypes,
         queryField("incorrectFieldConfig", {
@@ -230,6 +234,7 @@ describe("fieldAuthorizePlugin", () => {
 
   test("warns and adds the authorize plugin when a schema has an authorize prop but no plugins", async () => {
     const schema = makeSchema({
+      outputs: false,
       types: [
         schemaTypes,
         queryField("shouldWarn", {

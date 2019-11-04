@@ -96,7 +96,7 @@ makeSchema({
 });
 ```
 
-The [Ghost Example](https://github.com/prisma/nexus/blob/develop/examples/ghost/src/ghost-schema.ts) is the best place to look for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
+The [Ghost Example](https://github.com/prisma-labs/nexus/blob/develop/examples/ghost/src/ghost-schema.ts) is the best place to look for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
 
 ## shouldExitAfterGenerateArtifacts
 

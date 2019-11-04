@@ -27,6 +27,7 @@ describe("plugin", () => {
     const beforeCalls: string[] = [];
     const afterCalls: string[] = [];
     const schema = makeSchema({
+      outputs: false,
       types: [buildSchema(EXAMPLE_SDL)],
       plugins: [
         plugin({
@@ -83,6 +84,7 @@ describe("plugin", () => {
     expect.assertions(1);
     try {
       makeSchema({
+        outputs: false,
         types: [buildSchema(EXAMPLE_SDL), nullGuardPlugin],
       });
     } catch (e) {
@@ -94,6 +96,7 @@ describe("plugin", () => {
 
   it("does not throw if the plugin is seen in the types as well as the plugins array", () => {
     makeSchema({
+      outputs: false,
       types: [buildSchema(EXAMPLE_SDL), nullGuardPlugin],
       plugins: [nullGuardPlugin],
     });
@@ -101,6 +104,7 @@ describe("plugin", () => {
 
   it("has an onMissingType, which will be called in order when we encounter a missing type", () => {
     const schema = makeSchema({
+      outputs: false,
       types: [
         objectType({
           name: "User",
@@ -178,6 +182,7 @@ describe("plugin", () => {
       });
     };
     const schema = makeSchema({
+      outputs: false,
       types: [
         queryField("testCompose", {
           type: "Int",
@@ -228,6 +233,7 @@ describe("plugin", () => {
       });
     };
     const schema = makeSchema({
+      outputs: false,
       types: [
         queryField("testCompose", {
           type: "Int",

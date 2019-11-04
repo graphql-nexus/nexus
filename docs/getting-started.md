@@ -178,4 +178,4 @@ Specifying a defaultResolver for a type can have unintended consequences, and ma
 
 ## Testing Nexus
 
-Nexus encourages separating your domain logic from the actual resolvers via context, so you should be able to test and reuse your application logic independent of GraphQL. See the use of the [data-sources](https://github.com/prisma/nexus/tree/develop/examples/ghost/src/data-sources) in the ghost example for a start on how you might structure your data layer.
+Nexus encourages separating your domain logic from the actual resolvers via context, so you should be able to test and reuse your application logic independent of GraphQL. See the use of the [data-sources](https://github.com/prisma-labs/nexus/tree/develop/examples/ghost/src/data-sources) in the ghost example for a start on how you might structure your data layer.

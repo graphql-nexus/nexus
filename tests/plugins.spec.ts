@@ -55,6 +55,7 @@ describe("runtime config validation", () => {
 describe("runtime onInstall hook handler", () => {
   const whenGiven = (onInstall: any) => () =>
     makeSchema({
+      outputs: false,
       types: [],
       plugins: [createPlugin({ name: "x", onInstall })],
     });
@@ -77,6 +78,7 @@ describe("runtime onInstall hook handler", () => {
 describe("a plugin may", () => {
   const whenGiven = (pluginConfig: PluginConfig) => () =>
     makeSchema({
+      outputs: false,
       types: [],
       plugins: [createPlugin(pluginConfig)],
     });
@@ -100,6 +102,7 @@ describe("onInstall plugins", () => {
 
     return printSchema(
       makeSchema({
+        outputs: false,
         types: appTypes || [],
         plugins: [createPlugin({ name: "x", ...xPluginConfig })],
       })
