@@ -25,5 +25,5 @@ export const schema = makeSchema({
       Date: "Date",
     },
   },
-  prettierConfig: {},
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });

@@ -3,23 +3,18 @@
  * Do not make changes to this file directly
  */
 
-import * as t from "./types/index"
-import ts from "typescript"
-
-
-
-
+import * as t from "./types/index";
+import ts from "typescript";
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface NexusGenInputs {
-}
+export interface NexusGenInputs {}
 
 export interface NexusGenEnums {
-  NodeFlags: ts.NodeFlags
-  SyntaxKind: ts.SyntaxKind
+  NodeFlags: ts.NodeFlags;
+  SyntaxKind: ts.SyntaxKind;
 }
 
 export interface NexusGenRootTypes {
@@ -86,23 +81,32 @@ export interface NexusGenRootTypes {
   TypeLiteral: ts.TypeLiteralNode;
   TypeParameterDeclaration: ts.TypeParameterDeclaration;
   TypeReference: ts.TypeReferenceNode;
-  UNKNOWN_NODE: { // root type
+  UNKNOWN_NODE: {
+    // root type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    name?: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    parent: NexusGenRootTypes['Node']; // Node!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    name?: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
-    typeName?: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
+    typeName?: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
   UnionType: ts.UnionTypeNode;
-  UnnamedNode: { // root type
+  UnnamedNode: {
+    // root type
     text?: string | null; // String
-  }
+  };
   VariableDeclaration: ts.VariableDeclaration;
   HasJSDoc: ts.HasJSDoc;
   JSDocTag: ts.JSDocTag;
-  MaybeOptional: NexusGenRootTypes['ConstructorDeclaration'] | NexusGenRootTypes['FunctionDeclaration'] | NexusGenRootTypes['GetAccessorDeclaration'] | NexusGenRootTypes['MethodDeclaration'] | NexusGenRootTypes['PropertyDeclaration'] | NexusGenRootTypes['PropertySignature'] | NexusGenRootTypes['SetAccessorDeclaration'];
+  MaybeOptional:
+    | NexusGenRootTypes["ConstructorDeclaration"]
+    | NexusGenRootTypes["FunctionDeclaration"]
+    | NexusGenRootTypes["GetAccessorDeclaration"]
+    | NexusGenRootTypes["MethodDeclaration"]
+    | NexusGenRootTypes["PropertyDeclaration"]
+    | NexusGenRootTypes["PropertySignature"]
+    | NexusGenRootTypes["SetAccessorDeclaration"];
   Node: ts.Node;
   String: string;
   Int: number;
@@ -113,1463 +117,1812 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  NodeFlags: NexusGenEnums['NodeFlags'];
-  SyntaxKind: NexusGenEnums['SyntaxKind'];
+  NodeFlags: NexusGenEnums["NodeFlags"];
+  SyntaxKind: NexusGenEnums["SyntaxKind"];
 }
 
 export interface NexusGenFieldTypes {
-  ArrayTypeNode: { // field return type
-    elementType: NexusGenRootTypes['Node']; // Node!
+  ArrayTypeNode: {
+    // field return type
+    elementType: NexusGenRootTypes["Node"]; // Node!
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  BindingPattern: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  BindingPattern: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  CallSignatureDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  CallSignatureDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ClassDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ClassDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    members: NexusGenRootTypes['Node'][]; // [Node!]!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    members: NexusGenRootTypes["Node"][]; // [Node!]!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ComputedPropertyName: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ComputedPropertyName: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ConditionalTypeNode: { // field return type
-    checkType: NexusGenRootTypes['Node']; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ConditionalTypeNode: {
+    // field return type
+    checkType: NexusGenRootTypes["Node"]; // Node!
     end: number; // Int!
-    extendsType: NexusGenRootTypes['Node']; // Node!
-    falseType: NexusGenRootTypes['Node']; // Node!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    extendsType: NexusGenRootTypes["Node"]; // Node!
+    falseType: NexusGenRootTypes["Node"]; // Node!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    trueType: NexusGenRootTypes['Node']; // Node!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ConstructSignatureDeclaration: { // field return type
+    trueType: NexusGenRootTypes["Node"]; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ConstructSignatureDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ConstructorDeclaration: { // field return type
-    asteriskToken: NexusGenRootTypes['Token'] | null; // Token
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ConstructorDeclaration: {
+    // field return type
+    asteriskToken: NexusGenRootTypes["Token"] | null; // Token
     end: number; // Int!
-    exclamationToken: NexusGenRootTypes['Token'] | null; // Token
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    exclamationToken: NexusGenRootTypes["Token"] | null; // Token
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parameters: NexusGenRootTypes['ParameterDeclaration'][]; // [ParameterDeclaration!]!
-    parent: NexusGenRootTypes['Node']; // Node!
+    parameters: NexusGenRootTypes["ParameterDeclaration"][]; // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
-  }
-  ConstructorTypeNode: { // field return type
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameters: NexusGenRootTypes["TypeParameterDeclaration"][] | null; // [TypeParameterDeclaration!]
+  };
+  ConstructorTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    rawText: string; // String!
-    type: NexusGenRootTypes['Node']; // Node!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  EnumDeclaration: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    members: NexusGenRootTypes['Node'][]; // [Node!]!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ExportAssignment: { // field return type
+    type: NexusGenRootTypes["Node"]; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  EnumDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    members: NexusGenRootTypes["Node"][]; // [Node!]!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ExportDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ExportAssignment: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  FunctionDeclaration: { // field return type
-    asteriskToken: NexusGenRootTypes['Token'] | null; // Token
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ExportDeclaration: {
+    // field return type
     end: number; // Int!
-    exclamationToken: NexusGenRootTypes['Token'] | null; // Token
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parameters: NexusGenRootTypes['ParameterDeclaration'][]; // [ParameterDeclaration!]!
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
-    rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
-  }
-  FunctionTypeNode: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    type: NexusGenRootTypes['Node']; // Node!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  GetAccessorDeclaration: { // field return type
-    asteriskToken: NexusGenRootTypes['Token'] | null; // Token
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  FunctionDeclaration: {
+    // field return type
+    asteriskToken: NexusGenRootTypes["Token"] | null; // Token
     end: number; // Int!
-    exclamationToken: NexusGenRootTypes['Token'] | null; // Token
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    exclamationToken: NexusGenRootTypes["Token"] | null; // Token
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parameters: NexusGenRootTypes['ParameterDeclaration'][]; // [ParameterDeclaration!]!
-    parent: NexusGenRootTypes['Node']; // Node!
+    parameters: NexusGenRootTypes["ParameterDeclaration"][]; // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
-  }
-  Identifier: { // field return type
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameters: NexusGenRootTypes["TypeParameterDeclaration"][] | null; // [TypeParameterDeclaration!]
+  };
+  FunctionTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
+    pos: number; // Int!
+    rawText: string; // String!
+    type: NexusGenRootTypes["Node"]; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  GetAccessorDeclaration: {
+    // field return type
+    asteriskToken: NexusGenRootTypes["Token"] | null; // Token
+    end: number; // Int!
+    exclamationToken: NexusGenRootTypes["Token"] | null; // Token
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    nameText: string | null; // String
+    parameters: NexusGenRootTypes["ParameterDeclaration"][]; // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes["Node"]; // Node!
+    pos: number; // Int!
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
+    rawText: string; // String!
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameters: NexusGenRootTypes["TypeParameterDeclaration"][] | null; // [TypeParameterDeclaration!]
+  };
+  Identifier: {
+    // field return type
+    end: number; // Int!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    nameText: string | null; // String
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
     text: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ImportDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ImportDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ImportEqualsDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ImportEqualsDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ImportTypeNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ImportTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  IndexSignatureDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  IndexSignatureDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  IndexedAccessTypeNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  IndexedAccessTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  InferTypeNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  InferTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameter: NexusGenRootTypes['Node']; // Node!
-  }
-  InterfaceDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameter: NexusGenRootTypes["Node"]; // Node!
+  };
+  InterfaceDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  IntersectionTypeNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  IntersectionTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    types: NexusGenRootTypes['Node'][]; // [Node!]!
-  }
-  JSDoc: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    types: NexusGenRootTypes["Node"][]; // [Node!]!
+  };
+  JSDoc: {
+    // field return type
     comment: string | null; // String
-    tags: NexusGenRootTypes['JSDocTag'][] | null; // [JSDocTag!]
-  }
-  JSDocAugmentsTag: { // field return type
-    comment: string | null; // String
-    tagName: string | null; // String
-  }
-  JSDocClassTag: { // field return type
-    comment: string | null; // String
-    tagName: string | null; // String
-  }
-  JSDocEnumTag: { // field return type
-    comment: string | null; // String
-    tagName: string | null; // String
-  }
-  JSDocNamespaceDeclaration: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  JSDocReturnTag: { // field return type
+    tags: NexusGenRootTypes["JSDocTag"][] | null; // [JSDocTag!]
+  };
+  JSDocAugmentsTag: {
+    // field return type
     comment: string | null; // String
     tagName: string | null; // String
-  }
-  JSDocTemplateTag: { // field return type
+  };
+  JSDocClassTag: {
+    // field return type
     comment: string | null; // String
     tagName: string | null; // String
-  }
-  JSDocThisTag: { // field return type
+  };
+  JSDocEnumTag: {
+    // field return type
     comment: string | null; // String
     tagName: string | null; // String
-  }
-  JSDocTypeTag: { // field return type
+  };
+  JSDocNamespaceDeclaration: {
+    // field return type
+    end: number; // Int!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    nameText: string | null; // String
+    parent: NexusGenRootTypes["Node"]; // Node!
+    pos: number; // Int!
+    rawText: string; // String!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  JSDocReturnTag: {
+    // field return type
     comment: string | null; // String
     tagName: string | null; // String
-  }
-  JSDocUnknownTag: { // field return type
+  };
+  JSDocTemplateTag: {
+    // field return type
     comment: string | null; // String
     tagName: string | null; // String
-  }
-  KeywordTypeNode: { // field return type
+  };
+  JSDocThisTag: {
+    // field return type
+    comment: string | null; // String
+    tagName: string | null; // String
+  };
+  JSDocTypeTag: {
+    // field return type
+    comment: string | null; // String
+    tagName: string | null; // String
+  };
+  JSDocUnknownTag: {
+    // field return type
+    comment: string | null; // String
+    tagName: string | null; // String
+  };
+  KeywordTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  LiteralType: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  LiteralType: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  MappedTypeNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  MappedTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  MethodDeclaration: { // field return type
-    asteriskToken: NexusGenRootTypes['Token'] | null; // Token
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  MethodDeclaration: {
+    // field return type
+    asteriskToken: NexusGenRootTypes["Token"] | null; // Token
     end: number; // Int!
-    exclamationToken: NexusGenRootTypes['Token'] | null; // Token
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    exclamationToken: NexusGenRootTypes["Token"] | null; // Token
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parameters: NexusGenRootTypes['ParameterDeclaration'][]; // [ParameterDeclaration!]!
-    parent: NexusGenRootTypes['Node']; // Node!
+    parameters: NexusGenRootTypes["ParameterDeclaration"][]; // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
-  }
-  MissingDeclaration: { // field return type
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameters: NexusGenRootTypes["TypeParameterDeclaration"][] | null; // [TypeParameterDeclaration!]
+  };
+  MissingDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ModuleDeclaration: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  NamespaceDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ModuleDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  NamespaceExportDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  NamespaceDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  NumericLiteral: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  NamespaceExportDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  OptionalTypeNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  NumericLiteral: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    type: NexusGenRootTypes['Node']; // Node!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ParameterDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  OptionalTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ParenthesizedType: { // field return type
+    type: NexusGenRootTypes["Node"]; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ParameterDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    type: NexusGenRootTypes['Node']; // Node!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  PropertyDeclaration: { // field return type
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ParenthesizedType: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
-    rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  PropertyLikeDeclaration: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  PropertySignature: { // field return type
+    type: NexusGenRootTypes["Node"]; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  PropertyDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  QualifiedName: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  PropertyLikeDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
-    pos: number; // Int!
-    rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  Query: { // field return type
-    parseFile: NexusGenRootTypes['SourceFile']; // SourceFile!
-  }
-  RestTypeNode: { // field return type
-    end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-    kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    type: NexusGenRootTypes['Node']; // Node!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  SetAccessorDeclaration: { // field return type
-    asteriskToken: NexusGenRootTypes['Token'] | null; // Token
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  PropertySignature: {
+    // field return type
     end: number; // Int!
-    exclamationToken: NexusGenRootTypes['Token'] | null; // Token
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parameters: NexusGenRootTypes['ParameterDeclaration'][]; // [ParameterDeclaration!]!
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
-  }
-  SourceFile: { // field return type
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  QualifiedName: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    statements: NexusGenRootTypes['Node'][]; // [Node!]!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  StringLiteral: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  Query: {
+    // field return type
+    parseFile: NexusGenRootTypes["SourceFile"]; // SourceFile!
+  };
+  RestTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  StringLiteralLike: { // field return type
+    type: NexusGenRootTypes["Node"]; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  SetAccessorDeclaration: {
+    // field return type
+    asteriskToken: NexusGenRootTypes["Token"] | null; // Token
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    exclamationToken: NexusGenRootTypes["Token"] | null; // Token
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parameters: NexusGenRootTypes["ParameterDeclaration"][]; // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes["Node"]; // Node!
+    pos: number; // Int!
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
+    rawText: string; // String!
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameters: NexusGenRootTypes["TypeParameterDeclaration"][] | null; // [TypeParameterDeclaration!]
+  };
+  SourceFile: {
+    // field return type
+    end: number; // Int!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    nameText: string | null; // String
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  ThisTypeNode: { // field return type
+    statements: NexusGenRootTypes["Node"][]; // [Node!]!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  StringLiteral: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  Token: { // field return type
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
-  }
-  TupleTypeNode: { // field return type
-    elementTypes: NexusGenRootTypes['Node'][]; // [Node!]!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  StringLiteralLike: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  TypeAliasDeclaration: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  ThisTypeNode: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    type: NexusGenRootTypes['Node'] | null; // Node
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null; // [TypeParameterDeclaration!]
-  }
-  TypeLiteral: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  Token: {
+    // field return type
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+  };
+  TupleTypeNode: {
+    // field return type
+    elementTypes: NexusGenRootTypes["Node"][]; // [Node!]!
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  TypeParameterDeclaration: { // field return type
-    constraint: NexusGenRootTypes['Node']; // Node!
-    default: NexusGenRootTypes['Node']; // Node!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  TypeAliasDeclaration: {
+    // field return type
     end: number; // Int!
-    expression: NexusGenRootTypes['Node']; // Node!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  TypeReference: { // field return type
+    type: NexusGenRootTypes["Node"] | null; // Node
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    typeParameters: NexusGenRootTypes["TypeParameterDeclaration"][] | null; // [TypeParameterDeclaration!]
+  };
+  TypeLiteral: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
+    pos: number; // Int!
+    rawText: string; // String!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  TypeParameterDeclaration: {
+    // field return type
+    constraint: NexusGenRootTypes["Node"]; // Node!
+    default: NexusGenRootTypes["Node"]; // Node!
+    end: number; // Int!
+    expression: NexusGenRootTypes["Node"]; // Node!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    nameText: string | null; // String
+    parent: NexusGenRootTypes["Node"]; // Node!
+    pos: number; // Int!
+    rawText: string; // String!
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  TypeReference: {
+    // field return type
+    end: number; // Int!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
+    kindCode: number; // Int!
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    nameText: string | null; // String
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
     text: string | null; // String
-    typeArguments: NexusGenRootTypes['Node'][] | null; // [Node!]
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  UNKNOWN_NODE: { // field return type
+    typeArguments: NexusGenRootTypes["Node"][] | null; // [Node!]
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  UNKNOWN_NODE: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  UnionType: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  UnionType: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-    types: NexusGenRootTypes['Node'][]; // [Node!]!
-  }
-  UnnamedNode: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+    types: NexusGenRootTypes["Node"][]; // [Node!]!
+  };
+  UnnamedNode: {
+    // field return type
     text: string | null; // String
-  }
-  VariableDeclaration: { // field return type
+  };
+  VariableDeclaration: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
-  HasJSDoc: { // field return type
-    jsDoc: NexusGenRootTypes['JSDoc'][] | null; // [JSDoc!]
-  }
-  JSDocTag: { // field return type
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
+  HasJSDoc: {
+    // field return type
+    jsDoc: NexusGenRootTypes["JSDoc"][] | null; // [JSDoc!]
+  };
+  JSDocTag: {
+    // field return type
     comment: string | null; // String
     tagName: string | null; // String
-  }
-  MaybeOptional: { // field return type
-    questionToken: NexusGenRootTypes['Token'] | null; // Token
-  }
-  Node: { // field return type
+  };
+  MaybeOptional: {
+    // field return type
+    questionToken: NexusGenRootTypes["Token"] | null; // Token
+  };
+  Node: {
+    // field return type
     end: number; // Int!
-    flags: NexusGenEnums['NodeFlags']; // NodeFlags!
-    kind: NexusGenEnums['SyntaxKind']; // SyntaxKind!
+    flags: NexusGenEnums["NodeFlags"]; // NodeFlags!
+    kind: NexusGenEnums["SyntaxKind"]; // SyntaxKind!
     kindCode: number; // Int!
-    modifiers: NexusGenRootTypes['Token'][] | null; // [Token!]
-    name: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
+    modifiers: NexusGenRootTypes["Token"][] | null; // [Token!]
+    name: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
     nameText: string | null; // String
-    parent: NexusGenRootTypes['Node']; // Node!
+    parent: NexusGenRootTypes["Node"]; // Node!
     pos: number; // Int!
     rawText: string; // String!
-    typeName: NexusGenRootTypes['DeclarationName'] | null; // DeclarationName
-  }
+    typeName: NexusGenRootTypes["DeclarationName"] | null; // DeclarationName
+  };
 }
 
 export interface NexusGenArgTypes {
   ArrayTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   BindingPattern: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   CallSignatureDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ClassDeclaration: {
-    members: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    members: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ComputedPropertyName: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ConditionalTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ConstructSignatureDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ConstructorDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ConstructorTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   EnumDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ExportAssignment: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ExportDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   FunctionDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   FunctionTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   GetAccessorDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   Identifier: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ImportDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ImportEqualsDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ImportTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   IndexSignatureDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   IndexedAccessTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   InferTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   InterfaceDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   IntersectionTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   JSDocNamespaceDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   KeywordTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   LiteralType: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   MappedTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   MethodDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   MissingDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ModuleDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   NamespaceDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   NamespaceExportDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   NumericLiteral: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   OptionalTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ParameterDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ParenthesizedType: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   PropertyDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   PropertyLikeDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   PropertySignature: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   QualifiedName: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   Query: {
-    parseFile: { // args
+    parseFile: {
+      // args
       file: string; // String!
-    }
-  }
+    };
+  };
   RestTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   SetAccessorDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   SourceFile: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    statements: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    statements: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   StringLiteral: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   StringLiteralLike: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   ThisTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   TupleTypeNode: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   TypeAliasDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   TypeLiteral: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   TypeParameterDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   TypeReference: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   UNKNOWN_NODE: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   UnionType: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   VariableDeclaration: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
   Node: {
-    modifiers: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-    rawText: { // args
-      only?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-      skip?: NexusGenEnums['SyntaxKind'][] | null; // [SyntaxKind!]
-    }
-  }
+    modifiers: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+    rawText: {
+      // args
+      only?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+      skip?: NexusGenEnums["SyntaxKind"][] | null; // [SyntaxKind!]
+    };
+  };
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  DeclarationName: "BindingPattern" | "ComputedPropertyName" | "Identifier" | "NumericLiteral" | "QualifiedName" | "StringLiteralLike" | "UnnamedNode"
-  HasJSDoc: "ClassDeclaration" | "ConstructorDeclaration" | "ParameterDeclaration" | "EnumDeclaration" | "FunctionDeclaration" | "GetAccessorDeclaration" | "IndexSignatureDeclaration" | "InterfaceDeclaration" | "MethodDeclaration" | "ModuleDeclaration" | "NamespaceDeclaration" | "PropertyDeclaration" | "PropertySignature" | "SetAccessorDeclaration" | "TypeAliasDeclaration"
-  JSDocTag: "JSDocAugmentsTag" | "JSDocClassTag" | "JSDocEnumTag" | "JSDocReturnTag" | "JSDocTemplateTag" | "JSDocThisTag" | "JSDocTypeTag" | "JSDocUnknownTag"
-  MaybeOptional: "ConstructorDeclaration" | "FunctionDeclaration" | "GetAccessorDeclaration" | "MethodDeclaration" | "PropertyDeclaration" | "PropertySignature" | "SetAccessorDeclaration"
-  Node: "SourceFile" | "BindingPattern" | "ComputedPropertyName" | "Identifier" | "NumericLiteral" | "QualifiedName" | "StringLiteralLike" | "ArrayTypeNode" | "CallSignatureDeclaration" | "ClassDeclaration" | "ConditionalTypeNode" | "ConstructorDeclaration" | "ParameterDeclaration" | "TypeParameterDeclaration" | "ConstructorTypeNode" | "ConstructSignatureDeclaration" | "EnumDeclaration" | "ExportAssignment" | "ExportDeclaration" | "FunctionDeclaration" | "FunctionTypeNode" | "GetAccessorDeclaration" | "ImportDeclaration" | "ImportEqualsDeclaration" | "ImportTypeNode" | "IndexedAccessTypeNode" | "IndexSignatureDeclaration" | "InferTypeNode" | "InterfaceDeclaration" | "IntersectionTypeNode" | "JSDocNamespaceDeclaration" | "KeywordTypeNode" | "LiteralType" | "MappedTypeNode" | "MethodDeclaration" | "MissingDeclaration" | "ModuleDeclaration" | "NamespaceDeclaration" | "NamespaceExportDeclaration" | "OptionalTypeNode" | "ParenthesizedType" | "PropertyDeclaration" | "PropertyLikeDeclaration" | "PropertySignature" | "RestTypeNode" | "SetAccessorDeclaration" | "StringLiteral" | "ThisTypeNode" | "TupleTypeNode" | "TypeAliasDeclaration" | "TypeLiteral" | "TypeReference" | "UnionType" | "UNKNOWN_NODE" | "VariableDeclaration"
+  DeclarationName:
+    | "BindingPattern"
+    | "ComputedPropertyName"
+    | "Identifier"
+    | "NumericLiteral"
+    | "QualifiedName"
+    | "StringLiteralLike"
+    | "UnnamedNode";
+  HasJSDoc:
+    | "ClassDeclaration"
+    | "ConstructorDeclaration"
+    | "ParameterDeclaration"
+    | "EnumDeclaration"
+    | "FunctionDeclaration"
+    | "GetAccessorDeclaration"
+    | "IndexSignatureDeclaration"
+    | "InterfaceDeclaration"
+    | "MethodDeclaration"
+    | "ModuleDeclaration"
+    | "NamespaceDeclaration"
+    | "PropertyDeclaration"
+    | "PropertySignature"
+    | "SetAccessorDeclaration"
+    | "TypeAliasDeclaration";
+  JSDocTag:
+    | "JSDocAugmentsTag"
+    | "JSDocClassTag"
+    | "JSDocEnumTag"
+    | "JSDocReturnTag"
+    | "JSDocTemplateTag"
+    | "JSDocThisTag"
+    | "JSDocTypeTag"
+    | "JSDocUnknownTag";
+  MaybeOptional:
+    | "ConstructorDeclaration"
+    | "FunctionDeclaration"
+    | "GetAccessorDeclaration"
+    | "MethodDeclaration"
+    | "PropertyDeclaration"
+    | "PropertySignature"
+    | "SetAccessorDeclaration";
+  Node:
+    | "SourceFile"
+    | "BindingPattern"
+    | "ComputedPropertyName"
+    | "Identifier"
+    | "NumericLiteral"
+    | "QualifiedName"
+    | "StringLiteralLike"
+    | "ArrayTypeNode"
+    | "CallSignatureDeclaration"
+    | "ClassDeclaration"
+    | "ConditionalTypeNode"
+    | "ConstructorDeclaration"
+    | "ParameterDeclaration"
+    | "TypeParameterDeclaration"
+    | "ConstructorTypeNode"
+    | "ConstructSignatureDeclaration"
+    | "EnumDeclaration"
+    | "ExportAssignment"
+    | "ExportDeclaration"
+    | "FunctionDeclaration"
+    | "FunctionTypeNode"
+    | "GetAccessorDeclaration"
+    | "ImportDeclaration"
+    | "ImportEqualsDeclaration"
+    | "ImportTypeNode"
+    | "IndexedAccessTypeNode"
+    | "IndexSignatureDeclaration"
+    | "InferTypeNode"
+    | "InterfaceDeclaration"
+    | "IntersectionTypeNode"
+    | "JSDocNamespaceDeclaration"
+    | "KeywordTypeNode"
+    | "LiteralType"
+    | "MappedTypeNode"
+    | "MethodDeclaration"
+    | "MissingDeclaration"
+    | "ModuleDeclaration"
+    | "NamespaceDeclaration"
+    | "NamespaceExportDeclaration"
+    | "OptionalTypeNode"
+    | "ParenthesizedType"
+    | "PropertyDeclaration"
+    | "PropertyLikeDeclaration"
+    | "PropertySignature"
+    | "RestTypeNode"
+    | "SetAccessorDeclaration"
+    | "StringLiteral"
+    | "ThisTypeNode"
+    | "TupleTypeNode"
+    | "TypeAliasDeclaration"
+    | "TypeLiteral"
+    | "TypeReference"
+    | "UnionType"
+    | "UNKNOWN_NODE"
+    | "VariableDeclaration";
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ArrayTypeNode" | "BindingPattern" | "CallSignatureDeclaration" | "ClassDeclaration" | "ComputedPropertyName" | "ConditionalTypeNode" | "ConstructSignatureDeclaration" | "ConstructorDeclaration" | "ConstructorTypeNode" | "EnumDeclaration" | "ExportAssignment" | "ExportDeclaration" | "FunctionDeclaration" | "FunctionTypeNode" | "GetAccessorDeclaration" | "Identifier" | "ImportDeclaration" | "ImportEqualsDeclaration" | "ImportTypeNode" | "IndexSignatureDeclaration" | "IndexedAccessTypeNode" | "InferTypeNode" | "InterfaceDeclaration" | "IntersectionTypeNode" | "JSDoc" | "JSDocAugmentsTag" | "JSDocClassTag" | "JSDocEnumTag" | "JSDocNamespaceDeclaration" | "JSDocReturnTag" | "JSDocTemplateTag" | "JSDocThisTag" | "JSDocTypeTag" | "JSDocUnknownTag" | "KeywordTypeNode" | "LiteralType" | "MappedTypeNode" | "MethodDeclaration" | "MissingDeclaration" | "ModuleDeclaration" | "NamespaceDeclaration" | "NamespaceExportDeclaration" | "NumericLiteral" | "OptionalTypeNode" | "ParameterDeclaration" | "ParenthesizedType" | "PropertyDeclaration" | "PropertyLikeDeclaration" | "PropertySignature" | "QualifiedName" | "Query" | "RestTypeNode" | "SetAccessorDeclaration" | "SourceFile" | "StringLiteral" | "StringLiteralLike" | "ThisTypeNode" | "Token" | "TupleTypeNode" | "TypeAliasDeclaration" | "TypeLiteral" | "TypeParameterDeclaration" | "TypeReference" | "UNKNOWN_NODE" | "UnionType" | "UnnamedNode" | "VariableDeclaration";
+export type NexusGenObjectNames =
+  | "ArrayTypeNode"
+  | "BindingPattern"
+  | "CallSignatureDeclaration"
+  | "ClassDeclaration"
+  | "ComputedPropertyName"
+  | "ConditionalTypeNode"
+  | "ConstructSignatureDeclaration"
+  | "ConstructorDeclaration"
+  | "ConstructorTypeNode"
+  | "EnumDeclaration"
+  | "ExportAssignment"
+  | "ExportDeclaration"
+  | "FunctionDeclaration"
+  | "FunctionTypeNode"
+  | "GetAccessorDeclaration"
+  | "Identifier"
+  | "ImportDeclaration"
+  | "ImportEqualsDeclaration"
+  | "ImportTypeNode"
+  | "IndexSignatureDeclaration"
+  | "IndexedAccessTypeNode"
+  | "InferTypeNode"
+  | "InterfaceDeclaration"
+  | "IntersectionTypeNode"
+  | "JSDoc"
+  | "JSDocAugmentsTag"
+  | "JSDocClassTag"
+  | "JSDocEnumTag"
+  | "JSDocNamespaceDeclaration"
+  | "JSDocReturnTag"
+  | "JSDocTemplateTag"
+  | "JSDocThisTag"
+  | "JSDocTypeTag"
+  | "JSDocUnknownTag"
+  | "KeywordTypeNode"
+  | "LiteralType"
+  | "MappedTypeNode"
+  | "MethodDeclaration"
+  | "MissingDeclaration"
+  | "ModuleDeclaration"
+  | "NamespaceDeclaration"
+  | "NamespaceExportDeclaration"
+  | "NumericLiteral"
+  | "OptionalTypeNode"
+  | "ParameterDeclaration"
+  | "ParenthesizedType"
+  | "PropertyDeclaration"
+  | "PropertyLikeDeclaration"
+  | "PropertySignature"
+  | "QualifiedName"
+  | "Query"
+  | "RestTypeNode"
+  | "SetAccessorDeclaration"
+  | "SourceFile"
+  | "StringLiteral"
+  | "StringLiteralLike"
+  | "ThisTypeNode"
+  | "Token"
+  | "TupleTypeNode"
+  | "TypeAliasDeclaration"
+  | "TypeLiteral"
+  | "TypeParameterDeclaration"
+  | "TypeReference"
+  | "UNKNOWN_NODE"
+  | "UnionType"
+  | "UnnamedNode"
+  | "VariableDeclaration";
 
 export type NexusGenInputNames = never;
 
 export type NexusGenEnumNames = "NodeFlags" | "SyntaxKind";
 
-export type NexusGenInterfaceNames = "HasJSDoc" | "JSDocTag" | "MaybeOptional" | "Node";
+export type NexusGenInterfaceNames =
+  | "HasJSDoc"
+  | "JSDocTag"
+  | "MaybeOptional"
+  | "Node";
 
 export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String";
 
@@ -1589,9 +1942,19 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
-  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  allInputTypes:
+    | NexusGenTypes["inputNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["scalarNames"];
+  allOutputTypes:
+    | NexusGenTypes["objectNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["unionNames"]
+    | NexusGenTypes["interfaceNames"]
+    | NexusGenTypes["scalarNames"];
+  allNamedTypes:
+    | NexusGenTypes["allInputTypes"]
+    | NexusGenTypes["allOutputTypes"];
+  abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }

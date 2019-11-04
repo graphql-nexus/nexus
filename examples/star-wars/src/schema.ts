@@ -27,4 +27,5 @@ export const schema = makeSchema({
     ],
     contextType: "swapi.ContextType",
   },
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });
