@@ -9,6 +9,7 @@ const schema = makeSchema({
     schema: path.join(__dirname, "../kitchen-sink-schema.graphql"),
     typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
   },
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });
 
 const server = new ApolloServer({

@@ -32,6 +32,7 @@ const schema = makeSchema({
     ],
     contextType: "t.Context",
   },
+  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
 });
 
 const store = createStore();

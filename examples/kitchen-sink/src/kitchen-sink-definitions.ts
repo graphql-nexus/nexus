@@ -182,7 +182,7 @@ export const Query = objectType({
       resolve: () => "ok",
     });
     t.list.date("dateAsList", () => []);
-    t.collection("collectionField", {
+    t.collectionField("collectionField", {
       type: Bar,
       args: {
         a: intArg(),
