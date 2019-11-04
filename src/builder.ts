@@ -826,7 +826,7 @@ export class SchemaBuilder {
       addField: (fieldDef) => fields.push(fieldDef),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addDynamicOutputMembers: (block, isList) =>
-        this.addDynamicOutputMembers(block, isList),
+        this.addDynamicOutputMembers(block, isList, "build"),
       warn: consoleWarn,
     });
     config.definition(definitionBlock);
@@ -875,7 +875,7 @@ export class SchemaBuilder {
       addField: (field) => fields.push(field),
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) =>
-        this.addDynamicOutputMembers(block, isList),
+        this.addDynamicOutputMembers(block, isList, "build"),
       warn: consoleWarn,
     });
     config.definition(definitionBlock);
@@ -1369,7 +1369,11 @@ export class SchemaBuilder {
     });
   }
 
-  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean) {
+  addDynamicOutputMembers(
+    block: OutputDefinitionBlock<any>,
+    isList: boolean,
+    stage: "walk" | "build"
+  ) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === "string") {
         return this.addDynamicScalar(methodName, val, block);
@@ -1382,6 +1386,7 @@ export class SchemaBuilder {
           typeDef: block,
           builder: this,
           typeName: block.typeName,
+          stage,
         });
       };
     });
@@ -1392,6 +1397,7 @@ export class SchemaBuilder {
             typeDef: block,
             builder: this,
             typeName: block.typeName,
+            stage,
           });
         },
         enumerable: true,
@@ -1428,7 +1434,7 @@ export class SchemaBuilder {
       addInterfaces: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
-        this.addDynamicOutputMembers(block, isList),
+        this.addDynamicOutputMembers(block, isList, "walk"),
       warn: () => {},
     });
     obj.definition(definitionBlock);
@@ -1441,7 +1447,7 @@ export class SchemaBuilder {
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
-        this.addDynamicOutputMembers(block, isList),
+        this.addDynamicOutputMembers(block, isList, "walk"),
       warn: () => {},
     });
     obj.definition(definitionBlock);
