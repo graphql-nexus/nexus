@@ -2,14 +2,15 @@
 import { GraphQLEnumType, GraphQLObjectType, printType } from "graphql";
 import {
   idArg,
-  buildTypes,
   enumType,
   extendType,
   objectType,
   inputObjectType,
   extendInputType,
+  makeSchema,
 } from "../src";
 import { UserObject, PostObject } from "./_helpers";
+import { TypeMap } from "graphql/type/schema";
 
 enum NativeColors {
   RED = "RED",
@@ -23,19 +24,28 @@ enum NativeNumbers {
   THREE = 3,
 }
 
+const buildTypes = <T extends TypeMap = any>(types: any) => {
+  return makeSchema({
+    types,
+    outputs: false,
+  }).getTypeMap() as T;
+};
+
 describe("enumType", () => {
   it("builds an enum", () => {
     const PrimaryColors = enumType({
       name: "PrimaryColors",
       members: ["RED", "YELLOW", "BLUE"],
     });
-    const types = buildTypes<{ PrimaryColors: GraphQLEnumType }>([
+    const typeMap = buildTypes<{ PrimaryColors: GraphQLEnumType }>([
       PrimaryColors,
     ]);
-    expect(types.typeMap.PrimaryColors).toBeInstanceOf(GraphQLEnumType);
-    expect(types.typeMap.PrimaryColors.getValues().map((v) => v.value)).toEqual(
-      ["RED", "YELLOW", "BLUE"]
-    );
+    expect(typeMap.PrimaryColors).toBeInstanceOf(GraphQLEnumType);
+    expect(typeMap.PrimaryColors.getValues().map((v) => v.value)).toEqual([
+      "RED",
+      "YELLOW",
+      "BLUE",
+    ]);
   });
 
   it("builds an enum from a TypeScript enum with string values", () => {
@@ -43,10 +53,10 @@ describe("enumType", () => {
       name: "Colors",
       members: NativeColors,
     });
-    const types = buildTypes<{ Colors: GraphQLEnumType }>([Colors]);
+    const typeMap = buildTypes<{ Colors: GraphQLEnumType }>([Colors]);
 
-    expect(types.typeMap.Colors).toBeInstanceOf(GraphQLEnumType);
-    expect(types.typeMap.Colors.getValues()).toEqual(
+    expect(typeMap.Colors).toBeInstanceOf(GraphQLEnumType);
+    expect(typeMap.Colors.getValues()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           name: "RED",
@@ -69,10 +79,10 @@ describe("enumType", () => {
       name: "Numbers",
       members: NativeNumbers,
     });
-    const types = buildTypes<{ Numbers: GraphQLEnumType }>([Numbers]);
+    const typeMap = buildTypes<{ Numbers: GraphQLEnumType }>([Numbers]);
 
-    expect(types.typeMap.Numbers).toBeInstanceOf(GraphQLEnumType);
-    expect(types.typeMap.Numbers.getValues()).toEqual(
+    expect(typeMap.Numbers).toBeInstanceOf(GraphQLEnumType);
+    expect(typeMap.Numbers.getValues()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           name: "ONE",
@@ -93,14 +103,14 @@ describe("enumType", () => {
   it("can map internal values", () => {
     const Internal = enumType({
       name: "Internal",
-      members: [{ name: "A", value: "--A--" }, { name: "B", value: "--B--" }],
+      members: [
+        { name: "A", value: "--A--" },
+        { name: "B", value: "--B--" },
+      ],
     });
-    const types = buildTypes<{ Internal: GraphQLEnumType }>([Internal]);
-    expect(types.typeMap.Internal.getValues().map((v) => v.name)).toEqual([
-      "A",
-      "B",
-    ]);
-    expect(types.typeMap.Internal.getValues().map((v) => v.value)).toEqual([
+    const typeMap = buildTypes<{ Internal: GraphQLEnumType }>([Internal]);
+    expect(typeMap.Internal.getValues().map((v) => v.name)).toEqual(["A", "B"]);
+    expect(typeMap.Internal.getValues().map((v) => v.value)).toEqual([
       "--A--",
       "--B--",
     ]);
@@ -114,17 +124,14 @@ describe("enumType", () => {
         b: 2,
       },
     });
-    const types = buildTypes<{
+    const typeMap = buildTypes<{
       MappedObj: GraphQLEnumType;
     }>([MappedObj]);
-    expect(types.typeMap.MappedObj.getValues().map((v) => v.name)).toEqual([
+    expect(typeMap.MappedObj.getValues().map((v) => v.name)).toEqual([
       "a",
       "b",
     ]);
-    expect(types.typeMap.MappedObj.getValues().map((v) => v.value)).toEqual([
-      1,
-      2,
-    ]);
+    expect(typeMap.MappedObj.getValues().map((v) => v.value)).toEqual([1, 2]);
   });
 
   it("throws if the enum has no members", () => {
@@ -133,8 +140,8 @@ describe("enumType", () => {
         name: "NoMembers",
         members: [],
       });
-      const types = buildTypes<{ NoMembers: GraphQLEnumType }>([NoMembers]);
-      expect(types.typeMap.NoMembers.getValues()).toHaveLength(0);
+      const typeMap = buildTypes<{ NoMembers: GraphQLEnumType }>([NoMembers]);
+      expect(typeMap.NoMembers.getValues()).toHaveLength(0);
     }).toThrow("must have at least one member");
   });
 });
@@ -152,8 +159,8 @@ describe("objectType", () => {
         t.string("nestedList", { list: [false, true] });
       },
     });
-    const type = buildTypes<{ Account: GraphQLObjectType }>([Account]);
-    const fields = type.typeMap.Account.getFields();
+    const typeMap = buildTypes<{ Account: GraphQLObjectType }>([Account]);
+    const fields = typeMap.Account.getFields();
     expect(Object.keys(fields).sort()).toEqual([
       "email",
       "id",
@@ -187,7 +194,7 @@ describe("extendType", () => {
           GetPost,
           PostObject,
           UserObject,
-        ]).typeMap.Query.getFields()
+        ]).Query.getFields()
       )
     ).toMatchSnapshot();
   });
@@ -209,7 +216,7 @@ describe("inputObjectType", () => {
         },
       }),
     ]);
-    expect(printType(buildTypesMap.typeMap.AddToBasketInput)).toMatchSnapshot();
+    expect(printType(buildTypesMap.AddToBasketInput)).toMatchSnapshot();
   });
 });
 
@@ -229,6 +236,6 @@ describe("extendInputType", () => {
         },
       }),
     ]);
-    expect(printType(buildTypesMap.typeMap.InputTest)).toMatchSnapshot();
+    expect(printType(buildTypesMap.InputTest)).toMatchSnapshot();
   });
 });

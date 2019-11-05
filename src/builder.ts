@@ -781,6 +781,7 @@ export class SchemaBuilder {
     this.beforeBuildTypes();
     this.buildNexusTypes();
     return {
+      finalConfig: this.config,
       typeMap: this.finalTypeMap,
       schemaExtension: this.schemaExtension!,
       missingTypes: this.missingTypes,
@@ -1541,6 +1542,7 @@ export type DynamicFieldDefs = {
 export interface BuildTypes<
   TypeMapDefs extends Record<string, GraphQLNamedType>
 > {
+  finalConfig: BuilderConfig;
   typeMap: TypeMapDefs;
   missingTypes: Record<string, MissingType>;
   schemaExtension: NexusSchemaExtension;
@@ -1548,42 +1550,19 @@ export interface BuildTypes<
 }
 
 /**
- * Builds the types, normalizing the "types" passed into the schema for a
- * better developer experience. This is primarily useful for testing
- * type generation
- */
-export function buildTypes<
-  TypeMapDefs extends Record<string, GraphQLNamedType> = any
->(
-  types: any,
-  config: BuilderConfig = { outputs: false }
-): BuildTypes<TypeMapDefs> {
-  const internalConfig = resolveTypegenConfig(config);
-  return buildTypesInternal<TypeMapDefs>(types, internalConfig);
-}
-
-/**
- * Internal build types woring with config rather than options.
- */
-export function buildTypesInternal<
-  TypeMapDefs extends Record<string, GraphQLNamedType> = any
->(types: any, config: BuilderConfig): BuildTypes<TypeMapDefs> {
-  const builder = new SchemaBuilder(config);
-  builder.addTypes(types);
-  return builder.getFinalTypeMap();
-}
-
-/**
  * Builds the schema, we may return more than just the schema
  * from this one day.
  */
 export function makeSchemaInternal(config: SchemaConfig) {
+  const builder = new SchemaBuilder(config);
+  builder.addTypes(config.types);
   const {
+    finalConfig,
     typeMap,
     missingTypes,
     schemaExtension,
     onAfterBuildFns,
-  } = buildTypesInternal(config.types, config);
+  } = builder.getFinalTypeMap();
   const { Query, Mutation, Subscription } = typeMap;
 
   /* istanbul ignore next */
@@ -1617,7 +1596,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
 
   onAfterBuildFns.forEach((fn) => fn(schema));
 
-  return { schema, missingTypes };
+  return { schema, missingTypes, finalConfig };
 }
 
 /**
@@ -1628,8 +1607,8 @@ export function makeSchemaInternal(config: SchemaConfig) {
  * root query type.
  */
 export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
-  const typegenConfig = resolveTypegenConfig(config);
-  const { schema, missingTypes } = makeSchemaInternal(config);
+  const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
+  const typegenConfig = resolveTypegenConfig(finalConfig);
 
   if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
     // Generating in the next tick allows us to use the schema
@@ -1668,8 +1647,8 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
 export async function generateSchema(
   config: SchemaConfig
 ): Promise<NexusGraphQLSchema> {
-  const typegenConfig = resolveTypegenConfig(config);
-  const { schema, missingTypes } = makeSchemaInternal(config);
+  const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
+  const typegenConfig = resolveTypegenConfig(finalConfig);
   assertNoMissingTypes(schema, missingTypes);
   await new TypegenMetadata(typegenConfig).generateArtifacts(schema);
   return schema;
@@ -1687,8 +1666,8 @@ generateSchema.withArtifacts = async (
   schemaTypes: string;
   tsTypes: string;
 }> => {
-  const typegenConfig = resolveTypegenConfig(config);
-  const { schema, missingTypes } = makeSchemaInternal(config);
+  const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
+  const typegenConfig = resolveTypegenConfig(finalConfig);
   assertNoMissingTypes(schema, missingTypes);
   const { schemaTypes, tsTypes } = await new TypegenMetadata(
     typegenConfig
