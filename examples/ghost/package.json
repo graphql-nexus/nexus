@@ -11,7 +11,7 @@
     "ghost": "^2.13.1",
     "graphql": "^14.0.2",
     "graphql-iso-date": "^3.6.1",
-    "knex": "^0.19.5",
+    "knex": "^0.20.1",
     "lodash": "^4.17.11",
     "mysql": "^2.16.0",
     "nexus": "0.12.0-beta.9"
