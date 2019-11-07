@@ -1,25 +1,48 @@
 /// <reference path="../_setup.ts" />
 import { join } from "path";
-import { generateSchema } from "../../src/builder";
-import ts from "typescript";
-import { typegenFormatPrettier } from "../../src/core";
+import { core } from "../../src";
+import * as ts from "typescript";
+const { generateSchema, typegenFormatPrettier } = core;
 
-export const testSchema = (name: string) => {
-  it(`can compile ${name} app with its typegen`, async () => {
-    const appFilePath = join(__dirname, `./_${name}.ts`);
-    const typegenFilePath = join(__dirname, `_${name}.typegen.ts`);
-    await generateSchema({
-      types: require(`./_${name}`),
+const NO_OP = () => {};
+
+export const testSchema = (
+  name: string,
+  additionalTests: (
+    getSchema: () => core.NexusGraphQLSchema,
+    getImported: () => any
+  ) => void = NO_OP
+) => {
+  let schema: core.NexusGraphQLSchema;
+  const typegenFilePath = join(__dirname, `_${name}.typegen.ts`);
+  const imported = require(`./_${name}`);
+  const { plugins, ...rest } = imported;
+
+  beforeAll(async () => {
+    schema = await generateSchema({
+      types: rest,
       outputs: {
         typegen: typegenFilePath,
         schema: false,
       },
-      async formatTypegen(content, type) {
-        const result = await typegenFormatPrettier({})(content, type);
-        return result.replace('"nexus"', '"../.."');
+      shouldGenerateArtifacts: true,
+      plugins: plugins || [],
+      async formatTypegen(source, type) {
+        const content = await typegenFormatPrettier({
+          trailingComma: "es5",
+          arrowParens: "always",
+        })(source, type);
+        return content.replace('"nexus"', '"../.."');
       },
     });
+  });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it(`can compile ${name} app with its typegen`, async () => {
+    const appFilePath = join(__dirname, `./_${name}.ts`);
     expect([appFilePath]).toTypeCheck({
       sourceMap: false,
       downlevelIteration: true,
@@ -31,4 +54,9 @@ export const testSchema = (name: string) => {
       noErrorTruncation: false,
     });
   });
+
+  additionalTests(
+    () => schema,
+    () => imported
+  );
 };

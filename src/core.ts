@@ -2,7 +2,7 @@
 // For anyone who wants to use the internals
 export * from "./builder";
 export * from "./sdlConverter";
-export * from "./typegen";
+export * from "./typegenPrinter";
 export * from "./typegenAutoConfig";
 export * from "./typegenFormatPrettier";
 export * from "./typegenMetadata";
@@ -25,3 +25,5 @@ export * from "./definitions/scalarType";
 export * from "./definitions/unionType";
 export * from "./definitions/wrapping";
 export * from "./dynamicMethod";
+export * from "./plugin";
+export * from "./plugins";

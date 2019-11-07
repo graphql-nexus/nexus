@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as allTypes from "./graphql";
-import { makeSchema } from "nexus";
+import { makeSchema, nullabilityGuardPlugin } from "nexus";
 
 /**
  * Finally, we construct our schema (whose starting query type is the query
@@ -15,6 +15,16 @@ export const schema = makeSchema({
       "./star-wars-typegen.ts"
     ),
   },
+  plugins: [
+    nullabilityGuardPlugin({
+      shouldGuard: true,
+      fallbackValues: {
+        String: () => "",
+        ID: () => "MISSING_ID",
+        Boolean: () => true,
+      },
+    }),
+  ],
   typegenAutoConfig: {
     sources: [
       {

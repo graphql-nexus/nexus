@@ -2,13 +2,19 @@
   "name": "@graphql-nexus/example-fullstack-tutorial-server",
   "version": "0.0.0",
   "description": "",
+  "license": "ISC",
+  "author": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
-    "start": "ts-node-dev --no-notify --transpileOnly --respawn src/index.ts"
+    "start": "ts-node-dev --no-notify --transpileOnly --respawn src/index.ts",
+    "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/__utils"
+    ]
+  },
   "dependencies": {
     "apollo-datasource": "^0.2.0",
     "apollo-datasource-rest": "^0.2.0",
@@ -16,9 +22,9 @@
     "apollo-server-testing": "2.2.0-alpha.2",
     "dedent": "^0.7.0",
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
-    "graphql": "^14.0.2",
+    "graphql": "^14.5.8",
     "isemail": "^3.2.0",
-    "nexus": "0.11.2",
+    "nexus": "0.12.0-rc",
     "sequelize": "^5.21.2",
     "sqlite3": "^4.1.0"
   },
@@ -30,14 +36,8 @@
     "jest": "^24.3.1",
     "nock": "^10.0.2",
     "node-fetch": "^2.2.1",
-    "prettier": "^1.15.2",
+    "prettier": "prettier/prettier#refs/pull/6736/head",
     "ts-node-dev": "^1.0.0-pre.30",
-    "typescript": "^3.4.5"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/__utils"
-    ]
+    "typescript": "^3.6.4"
   }
 }

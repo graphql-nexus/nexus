@@ -3,8 +3,9 @@
  * Do not make changes to this file directly
  */
 
-import { core } from "nexus";
 import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions";
+import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
+import { core } from "nexus";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(
@@ -23,8 +24,8 @@ declare global {
         type:
           | NexusGenObjectNames
           | NexusGenInterfaceNames
-          | core.NexusObjectTypeDef<string>
-          | core.NexusInterfaceTypeDef<string>;
+          | core.NexusObjectTypeDef<any>
+          | core.NexusInterfaceTypeDef<any>;
         nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">;
         totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">;
         args?: core.ArgsRecord;
@@ -38,11 +39,11 @@ declare global {
         type:
           | NexusGenObjectNames
           | NexusGenInterfaceNames
-          | core.NexusObjectTypeDef<string>
-          | core.NexusInterfaceTypeDef<string>;
+          | core.NexusObjectTypeDef<any>
+          | core.NexusInterfaceTypeDef<any>;
         edges: core.SubFieldResolver<TypeName, FieldName, "edges">;
         pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">;
-        args?: Record<string, core.NexusArgDef<string>>;
+        args?: Record<string, core.NexusArgDef<any>>;
         nullable?: boolean;
         description?: string;
       }
@@ -154,6 +155,7 @@ export interface NexusGenFieldTypes {
     getNumberOrNull: number | null; // Int
     inlineArgs: string; // String!
     inputAsArgExample: string; // String!
+    protectedField: number; // Int!
   };
   SomeItem: {
     // field return type
@@ -297,4 +299,29 @@ export interface NexusGenTypes {
     | NexusGenTypes["allOutputTypes"];
   abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+declare global {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {
+    /**
+     * Authorization for an individual field. Returning "true"
+     * or "Promise<true>" means the field can be accessed.
+     * Returning "false" or "Promise<false>" will respond
+     * with a "Not Authorized" error for the field.
+     * Returning or throwing an error will also prevent the
+     * resolver from executing.
+     */
+    authorize?: FieldAuthorizeResolver<TypeName, FieldName>;
+    /**
+     * The nullability guard can be helpful, but is also a pottentially expensive operation for lists.
+     * We need to iterate the entire list to check for null items to guard against. Set this to true
+     * to skip the null guard on a specific field if you know there's no potential for unsafe types.
+     */
+    skipNullGuard?: boolean;
+  }
+  interface NexusGenPluginSchemaConfig {}
 }

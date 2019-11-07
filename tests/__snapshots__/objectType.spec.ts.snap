@@ -14,6 +14,13 @@ Object {
 
 exports[`objectType throws when chaining .list twice 1`] = `"Cannot chain list.list, in the definition block. Use \`list: []\` config value"`;
 
+exports[`objectType throws when modifyType is used 1`] = `
+"
+      The Nexus objectType.modify API has been removed. If you were using this API, please open an issue on 
+      GitHub to discuss your use case so we can discuss a suitable replacement.
+    "
+`;
+
 exports[`objectType warns when specifying .list and list: true 1`] = `
 Array [
   "It looks like you chained .list and set list for someField. You should only do one or the other",

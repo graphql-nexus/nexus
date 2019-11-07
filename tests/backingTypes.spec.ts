@@ -1,8 +1,8 @@
-import path from "path";
-import { core, makeSchema, queryType, enumType } from "../src";
+import * as path from "path";
+import { core, makeSchema, queryType, enumType } from "..";
 import { A, B } from "./_types";
 
-const { Typegen, TypegenMetadata } = core;
+const { TypegenPrinter, TypegenMetadata } = core;
 
 export enum TestEnum {
   A = "a",
@@ -67,11 +67,10 @@ describe("backingTypes", () => {
   it("can match backing types to regular enums", async () => {
     const schema = getSchemaWithNormalEnums();
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
-      schema,
-      { ...typegenInfo, typegenFile: "" },
-      (schema as any).extensions.nexus
-    );
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
@@ -79,11 +78,10 @@ describe("backingTypes", () => {
   it("can match backing types for const enums", async () => {
     const schema = getSchemaWithConstEnums();
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
-      schema,
-      { ...typegenInfo, typegenFile: "" },
-      (schema as any).extensions.nexus
-    );
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
@@ -108,11 +106,10 @@ describe("rootTypings", () => {
       outputs: false,
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new Typegen(
-      schema,
-      { ...typegenInfo, typegenFile: "" },
-      (schema as any).extensions.nexus
-    );
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
     expect(typegen.print()).toMatchSnapshot();
   });
 });

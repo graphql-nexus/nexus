@@ -2,7 +2,7 @@ import {
   OutputDefinitionBlock,
   OutputDefinitionBuilder,
 } from "./definitionBlocks";
-import { GetGen2, GetGen, FieldResolver } from "../typegenTypeHelpers";
+import { GetGen, FieldResolver } from "../typegenTypeHelpers";
 import {
   NonNullConfig,
   NexusTypes,
@@ -13,9 +13,7 @@ import {
 import { assertValidName } from "graphql";
 import { NexusInterfaceTypeDef } from "./interfaceType";
 
-export type Implemented =
-  | GetGen<"interfaceNames">
-  | NexusInterfaceTypeDef<string>;
+export type Implemented = GetGen<"interfaceNames"> | NexusInterfaceTypeDef<any>;
 
 export interface FieldModification<
   TypeName extends string,
@@ -41,9 +39,6 @@ export interface FieldModificationDef<
 export interface ObjectDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void;
-  addFieldModifications<FieldName extends string>(
-    changes: FieldModificationDef<TypeName, FieldName>
-  ): void;
 }
 
 export class ObjectDefinitionBlock<
@@ -61,14 +56,15 @@ export class ObjectDefinitionBlock<
   /**
    * Modifies a field added via an interface
    */
-  modify<
-    FieldName extends Extract<keyof GetGen2<"fieldTypes", TypeName>, string>
-  >(field: FieldName, modifications: FieldModification<TypeName, FieldName>) {
-    this.typeBuilder.addFieldModifications({ ...modifications, field });
+  modify(field: any, modifications: any) {
+    throw new Error(`
+      The Nexus objectType.modify API has been removed. If you were using this API, please open an issue on 
+      GitHub to discuss your use case so we can discuss a suitable replacement.
+    `);
   }
 }
 
-export interface NexusObjectTypeConfig<TypeName extends string> {
+export type NexusObjectTypeConfig<TypeName extends string> = {
   name: TypeName;
   definition(t: ObjectDefinitionBlock<TypeName>): void;
   /**
@@ -90,7 +86,7 @@ export interface NexusObjectTypeConfig<TypeName extends string> {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef;
-}
+} & NexusGenPluginTypeConfig<TypeName>;
 
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(

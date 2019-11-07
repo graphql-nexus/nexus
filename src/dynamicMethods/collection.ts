@@ -8,7 +8,7 @@ const basicCollectionMap = new Map<string, NexusObjectTypeDef<string>>();
 export const CollectionFieldMethod = dynamicOutputMethod({
   name: "collectionField",
   typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
-      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">,
       totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">,
       args?: core.ArgsRecord,
@@ -16,6 +16,7 @@ export const CollectionFieldMethod = dynamicOutputMethod({
       description?: string
     }): void;`,
   factory({ typeDef: t, args: [fieldName, config] }) {
+    /* istanbul ignore next */
     if (!config.type) {
       throw new Error(
         `Missing required property "type" from collectionField ${fieldName}`
@@ -23,6 +24,7 @@ export const CollectionFieldMethod = dynamicOutputMethod({
     }
     const typeName =
       typeof config.type === "string" ? config.type : config.type.name;
+    /* istanbul ignore next */
     if (config.list) {
       throw new Error(
         `Collection field ${fieldName}.${typeName} cannot be used as a list.`

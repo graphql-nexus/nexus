@@ -1,6 +1,47 @@
 # Changelog
 
-### 0.12.0 (next)
+### 0.12.0 final (unreleased)
+
+- refactor: Remove NEXUS_SHOULD_GENERATE_ARTIFACTS env var
+- feat: Add `shouldExitAfterGenerateArtifacts`
+- Warn on missing `outputs` in `makeSchema` config
+
+### 0.12.0-rc.2, rc.3
+
+- fix: bug in nullability check plugin
+
+### 0.12.0-rc
+
+- feat(deps): Bumps the default minimum version of graphql-js to 14.5.0
+
+  Nexus uses the new [`extensions` property](https://github.com/graphql/graphql-js/pull/2097) on types to store metadata provided to Nexus types, in order to make them usable by plugins.
+
+- feat: Adds "Plugins" API, [see the docs](docs/api-plugins.md) for more info on what all these can help accomplish
+
+- feat(plugin): Add `nullabilityGuardPlugin`. See [the docs](docs/plugin-nullabilityGuard.md) for more info
+
+- feat(plugin): Add `fieldAuthorizePlugin`. See [the docs](docs/plugin-fieldAuthorize.md) for more info
+
+  This is the same behavior as before, but implemented more flexibly as a plugin. This will be
+  automatically added if no plugins are specified, otherwise it will need to be imported & added
+  to `makeSchema`.
+
+- feat(schema): Adds `shouldExitAfterGenerateArtifacts` option to `makeSchema`
+
+  The `shouldExitAfterGenerateArtifacts` makes it possible to exit after the types are generated,
+  useful if you do not check a schema artifact into source control, but wish to generate before the code runs.
+
+- refactor: Removes `nexusWrappedType`
+
+  This was an internal implementation detail which should not affect end users
+
+- refactor: Removes `t.modifyType` API
+
+  This may not have ever worked, it was only intended to modify fields on an `objectType` which were
+  originally implemented by an interface. Please open an issue if this is a breaking change for you, so we
+  can understand the use-case and design a better API.
+
+- test: Improved code coverage, adds base threshold to new PRs
 
 #### beta.14
 
@@ -13,10 +54,10 @@
 
 #### beta.12
 
-- feat(config): env var for should-generate-artifacts (#244)
+- feat(config): <strike>env var for should-generate-artifacts (#244)
 
   You can now set the `shouldGenerateArtifacts` config option by env var
-  `NEXUS_SHOULD_GENERATE_ARTIFACTS=true|false`.
+  `NEXUS_SHOULD_GENERATE_ARTIFACTS=true|false`.</strike> (removed, see 0.12 release notes)
 
 - fix(typegen): delete prev file before writing next (#252)
 
@@ -24,7 +65,7 @@
   up its changed version. This change should reduce/remove the need for this
   workaround.
 
-* feat: by default typegen as an @types package (#230)
+* feat: <strike>by default typegen as an @types package (#230)
 
   BREAKING CHANGE
 
@@ -35,7 +76,7 @@
 
   This is a breaking change because typegen is enabled even when config
   `outputs` have not been configured (before, they were required). The
-  heuristics of `shouldGenerateArtifacts` remain unchanged.
+  heuristics of `shouldGenerateArtifacts` remain unchanged.</strike> (removed, see 0.12 release notes)
 
 ### 0.11.7
 

@@ -1,9 +1,27 @@
 version: 2.1
 
-jobs:
-  nexus:
+executors:
+  node-10:
     docker:
       - image: circleci/node:10
+
+commands:
+  test_example_project:
+    description: "Tests the compilation of a specified example"
+    parameters:
+      dir:
+        type: string
+    steps:
+      - checkout
+      - run: yarn --frozen-lockfile
+      - run: yarn link
+      - run: yarn --cwd=examples/<< parameters.dir >> --frozen-lockfile
+      - run: yarn --cwd=examples/<< parameters.dir >> link nexus
+      - run: yarn --cwd=examples/<< parameters.dir >> tsc
+
+jobs:
+  nexus:
+    executor: node-10
     steps:
       - checkout
       - run: yarn --frozen-lockfile
@@ -15,62 +33,35 @@ jobs:
           path: coverage
 
   example_apollo-fullstack:
-    docker:
-      - image: circleci/node:10
+    executor: node-10
     steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn --cwd=examples/apollo-fullstack --frozen-lockfile
-      - run: yarn --cwd=examples/apollo-fullstack tsc
+      - test_example_project:
+          dir: "apollo-fullstack"
 
   example_ghost:
-    docker:
-      - image: circleci/node:10
+    executor: node-10
     steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn --cwd=examples/ghost --frozen-lockfile
-      - run: yarn --cwd=examples/ghost tsc
+      - test_example_project:
+          dir: "ghost"
 
   example_githunt-api:
     docker:
       - image: circleci/node:8
     steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn link
-      - run: yarn --cwd=examples/githunt-api --frozen-lockfile
-      - run: yarn --cwd=examples/githunt-api link nexus
-      - run: yarn --cwd=examples/githunt-api tsc
+      - test_example_project:
+          dir: "githunt-api"
 
   example_kitchen-sink:
-    docker:
-      - image: circleci/node:10
+    executor: node-10
     steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn --cwd=examples/kitchen-sink --frozen-lockfile
-      - run: yarn --cwd=examples/kitchen-sink tsc
-
-  example_nexus-prisma:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn --cwd=examples/nexus-prisma --frozen-lockfile
-      - run: yarn --cwd=examples/nexus-prisma tsc
+      - test_example_project:
+          dir: "kitchen-sink"
 
   example_star-wars:
-    docker:
-      - image: circleci/node:10
+    executor: node-10
     steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn link
-      - run: yarn --cwd=examples/star-wars --frozen-lockfile
-      - run: yarn --cwd=examples/star-wars link nexus
-      - run: yarn --cwd=examples/star-wars tsc
+      - test_example_project:
+          dir: "star-wars"
       - run:
           command: |
             rm examples/star-wars/src/star-wars-typegen.ts
@@ -79,15 +70,10 @@ jobs:
             git diff --exit-code
 
   example_ts-ast-reader:
-    docker:
-      - image: circleci/node:10
+    executor: node-10
     steps:
-      - checkout
-      - run: yarn --frozen-lockfile
-      - run: yarn link
-      - run: yarn --cwd=examples/ts-ast-reader --frozen-lockfile
-      - run: yarn --cwd=examples/ts-ast-reader link nexus
-      - run: yarn --cwd=examples/ts-ast-reader tsc
+      - test_example_project:
+          dir: "ts-ast-reader"
 
 workflows:
   nexus:
@@ -97,6 +83,5 @@ workflows:
       - example_ghost
       - example_githunt-api
       - example_kitchen-sink
-      - example_nexus-prisma
       - example_star-wars
       - example_ts-ast-reader

@@ -1,21 +1,27 @@
 import {
   buildSchema,
-  lexicographicSortSchema,
   GraphQLField,
   GraphQLObjectType,
   GraphQLInterfaceType,
 } from "graphql";
-import path from "path";
+import * as path from "path";
 import { core } from "../src";
 import { EXAMPLE_SDL } from "./_sdl";
+const { makeSchema, TypegenPrinter, TypegenMetadata } = core;
 
-const { Typegen, TypegenMetadata } = core;
-
-describe("typegen", () => {
-  let typegen: core.Typegen;
+describe("typegenPrinter", () => {
+  let typegen: core.TypegenPrinter;
   let metadata: core.TypegenMetadata;
   beforeEach(async () => {
-    const schema = lexicographicSortSchema(buildSchema(EXAMPLE_SDL));
+    const schema = makeSchema({
+      outputs: {
+        typegen: path.join(__dirname, "typegen/types.gen.ts"),
+        schema: path.join(__dirname, "typegen/schema.gen.graphql"),
+      },
+      shouldGenerateArtifacts: true,
+      types: [buildSchema(EXAMPLE_SDL)],
+      prettierConfig: path.join(__dirname, "../.prettierrc"),
+    }) as core.NexusGraphQLSchema;
     metadata = new TypegenMetadata({
       outputs: {
         typegen: path.join(__dirname, "test-gen.ts"),
@@ -35,21 +41,10 @@ describe("typegen", () => {
       },
     });
     const typegenInfo = await metadata.getTypegenInfo(schema);
-    typegen = new Typegen(
-      schema,
-      {
-        ...typegenInfo,
-        typegenFile: "",
-      },
-      {
-        rootTypings: {},
-        dynamicFields: {
-          dynamicInputFields: {},
-          dynamicOutputFields: {},
-          dynamicOutputProperties: {},
-        },
-      }
-    );
+    typegen = new TypegenPrinter(metadata.sortSchema(schema), {
+      ...typegenInfo,
+      typegenFile: "",
+    });
     jest
       .spyOn(typegen, "hasResolver")
       .mockImplementation(

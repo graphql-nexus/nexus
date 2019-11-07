@@ -1,3 +1,5 @@
 import { testSchema } from "./_helpers";
 
-testSchema("app");
+testSchema("app", (getSchema) => {
+  const schema = getSchema();
+});

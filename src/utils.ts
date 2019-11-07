@@ -15,13 +15,17 @@ import {
   isEnumType,
   specifiedScalarTypes,
   GraphQLNamedType,
+  GraphQLType,
+  isWrappingType,
+  isListType,
+  isNonNullType,
 } from "graphql";
 import path from "path";
-import { UNKNOWN_TYPE_SCALAR } from "./builder";
-
-export function log(msg: string) {
-  console.log(`GraphQL Nexus: ${msg}`);
-}
+import { BuilderConfig } from "./builder";
+import { TypegenMetadataConfig } from "./typegenMetadata";
+import { MissingType, withNexusSymbol, NexusTypes } from "./definitions/_types";
+import { PluginConfig } from "./plugin";
+import { decorateType } from "./definitions/decorateType";
 
 export const isInterfaceField = (
   type: GraphQLObjectType,
@@ -136,6 +140,17 @@ export function mapObj<T, R>(
   return Object.keys(obj).map((key, index) => mapper(obj[key], key, index));
 }
 
+export function mapValues<T, R>(
+  obj: Record<string, T>,
+  mapper: (val: T, key: string, index: number) => R
+) {
+  const result: Record<string, any> = {};
+  Object.keys(obj).forEach(
+    (key, index) => (result[key] = mapper(obj[key], key, index))
+  );
+  return result;
+}
+
 export function eachObj<T>(
   obj: Record<string, T>,
   iter: (val: T, key: string, index: number) => void
@@ -217,8 +232,7 @@ export function firstDefined<T>(...args: Array<T | undefined>): T {
   throw new Error("At least one of the values should be defined");
 }
 
-// eslint-disable-next-line no-redeclare
-export function isPromise(value: any): value is PromiseLike<any> {
+export function isPromiseLike(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === "function");
 }
 
@@ -237,6 +251,166 @@ export function relativePathTo(
   return path.join(relative, filename);
 }
 
+export interface PrintedGenTypingImportConfig {
+  module: string;
+  default?: string;
+  bindings?: Array<string | [string, string]>; // import { X } or import { X as Y }
+}
+
+export class PrintedGenTypingImport {
+  constructor(readonly config: PrintedGenTypingImportConfig) {}
+}
+withNexusSymbol(PrintedGenTypingImport, NexusTypes.PrintedGenTypingImport);
+
+export function printedGenTypingImport(config: PrintedGenTypingImportConfig) {
+  return new PrintedGenTypingImport(config);
+}
+
+export interface PrintedGenTypingConfig {
+  name: string;
+  optional: boolean;
+  type: string;
+  description?: string;
+  imports?: PrintedGenTypingImport[];
+}
+
+export class PrintedGenTyping {
+  constructor(protected config: PrintedGenTypingConfig) {}
+
+  get imports() {
+    return this.config.imports || [];
+  }
+
+  toString() {
+    let str = ``;
+    if (this.config.description) {
+      const descriptionLines = this.config.description
+        .split("\n")
+        .map((s) => s.trim())
+        .filter((s) => s)
+        .map((s) => ` * ${s}`)
+        .join("\n");
+      str = `/**\n${descriptionLines}\n */\n`;
+    }
+    const field = `${this.config.name}${this.config.optional ? "?" : ""}`;
+    str += `${field}: ${this.config.type}`;
+    return str;
+  }
+}
+withNexusSymbol(PrintedGenTyping, NexusTypes.PrintedGenTyping);
+
+export function printedGenTyping(config: PrintedGenTypingConfig) {
+  return new PrintedGenTyping(config);
+}
+
+/**
+ * Normalizes the builder config into the config we need for typegen
+ *
+ * @param config {BuilderConfig}
+ */
+export function resolveTypegenConfig(
+  config: BuilderConfig
+): TypegenMetadataConfig {
+  const {
+    outputs,
+    shouldGenerateArtifacts = Boolean(
+      !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+    ),
+    ...rest
+  } = config;
+
+  let typegenPath: string | false = false;
+  let schemaPath: string | false = false;
+  if (outputs && typeof outputs === "object") {
+    if (typeof outputs.schema === "string") {
+      schemaPath = assertAbsolutePath(outputs.schema, "outputs.schema");
+    }
+    if (typeof outputs.typegen === "string") {
+      typegenPath = assertAbsolutePath(outputs.typegen, "outputs.typegen");
+    }
+  } else if (outputs !== false) {
+    console.warn(
+      `You should specify a configuration value for outputs in Nexus' makeSchema. ` +
+        `Provide one to remove this warning.`
+    );
+  }
+
+  return {
+    ...rest,
+    outputs: {
+      typegen: shouldGenerateArtifacts ? typegenPath : false,
+      schema: shouldGenerateArtifacts ? schemaPath : false,
+    },
+  };
+}
+
+export function unwrapType(
+  type: GraphQLType
+): { type: GraphQLNamedType; isNonNull: boolean; list: boolean[] } {
+  let finalType = type;
+  let isNonNull = false;
+  const list = [];
+  while (isWrappingType(finalType)) {
+    while (isListType(finalType)) {
+      finalType = finalType.ofType;
+      if (isNonNullType(finalType)) {
+        finalType = finalType.ofType;
+        list.unshift(true);
+      } else {
+        list.unshift(false);
+      }
+    }
+    if (isNonNullType(finalType)) {
+      isNonNull = true;
+      finalType = finalType.ofType;
+    }
+  }
+  return { type: finalType, isNonNull, list };
+}
+
+export function assertNoMissingTypes(
+  schema: GraphQLSchema,
+  missingTypes: Record<string, MissingType>
+) {
+  const missingTypesNames = Object.keys(missingTypes);
+  const schemaTypeMap = schema.getTypeMap();
+  const schemaTypeNames = Object.keys(schemaTypeMap).filter(
+    (typeName) => !isUnknownType(schemaTypeMap[typeName])
+  );
+
+  if (missingTypesNames.length > 0) {
+    const errors = missingTypesNames
+      .map((typeName) => {
+        const { fromObject } = missingTypes[typeName];
+
+        if (fromObject) {
+          return `- Looks like you forgot to import ${typeName} in the root "types" passed to Nexus makeSchema`;
+        }
+
+        const suggestions = suggestionList(typeName, schemaTypeNames);
+
+        let suggestionsString = "";
+
+        if (suggestions.length > 0) {
+          suggestionsString = ` or mean ${suggestions.join(", ")}`;
+        }
+
+        return `- Missing type ${typeName}, did you forget to import a type to the root query${suggestionsString}?`;
+      })
+      .join("\n");
+
+    throw new Error("\n" + errors);
+  }
+}
+
+export function consoleWarn(msg: string) {
+  console.warn(msg);
+}
+
+export function log(msg: string) {
+  console.log(`GraphQL Nexus: ${msg}`);
+}
+
 /**
  * Calculate the venn diagram between two iterables based on reference equality
  * checks. The returned tripple contains items thusly:
@@ -253,20 +427,51 @@ export function venn<T>(
   const boths: Set<T> = new Set();
   const rights: Set<T> = new Set(ys);
 
-  for (const l of lefts) {
+  lefts.forEach((l) => {
     if (rights.has(l)) {
       boths.add(l);
       lefts.delete(l);
       rights.delete(l);
     }
-  }
-  for (const r of rights) {
-    if (lefts.has(r)) {
-      boths.add(r);
-      lefts.delete(r);
-      rights.delete(r);
-    }
-  }
+  });
 
   return [lefts, boths, rights];
 }
+
+/**
+ * Validate that the data returned from a plugin from the `onInstall` hook is valid.
+ */
+export function validateOnInstallHookResult(
+  pluginName: string,
+  hookResult: ReturnType<Exclude<PluginConfig["onInstall"], undefined>>
+): void {
+  if (!Array.isArray(hookResult?.types)) {
+    throw new Error(
+      `Plugin "${pluginName}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
+    );
+  }
+  // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
+}
+
+export const UNKNOWN_TYPE_SCALAR = decorateType(
+  new GraphQLScalarType({
+    name: "NEXUS__UNKNOWN__TYPE",
+    description: `
+    This scalar should never make it into production. It is used as a placeholder for situations
+    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    the TypeScript definitions will not be updated.
+  `,
+    parseValue(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    parseLiteral(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+    serialize(value) {
+      throw new Error("Error: NEXUS__UNKNOWN__TYPE is not a valid scalar.");
+    },
+  }),
+  {
+    rootTyping: "never",
+  }
+);

@@ -9,17 +9,17 @@ let pageInfo: NexusObjectTypeDef<string>;
 
 export const RelayConnectionFieldMethod = dynamicOutputMethod({
   name: "relayConnectionField",
-  typeDefinition: `
-    <FieldName extends string>(fieldName: FieldName, opts: {
-      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<string> | core.NexusInterfaceTypeDef<string>,
+  typeDefinition: `<FieldName extends string>(fieldName: FieldName, opts: {
+      type: NexusGenObjectNames | NexusGenInterfaceNames | core.NexusObjectTypeDef<any> | core.NexusInterfaceTypeDef<any>,
       edges: core.SubFieldResolver<TypeName, FieldName, "edges">,
       pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">,
-      args?: Record<string, core.NexusArgDef<string>>,
+      args?: Record<string, core.NexusArgDef<any>>,
       nullable?: boolean,
       description?: string
     }): void
   `,
   factory({ typeDef: t, args: [fieldName, config] }) {
+    /* istanbul ignore next */
     if (!config.type) {
       throw new Error(
         `Missing required property "type" from relayConnection field ${fieldName}`
@@ -36,6 +36,7 @@ export const RelayConnectionFieldMethod = dynamicOutputMethod({
           p.boolean("hasPreviousPage");
         },
       });
+    /* istanbul ignore next */
     if (config.list) {
       throw new Error(
         `Collection field ${fieldName}.${typeName} cannot be used as a list.`

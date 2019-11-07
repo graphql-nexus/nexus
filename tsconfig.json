@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
+    "target": "es2016",
     "downlevelIteration": true,
-    "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["es2015"],
+    "lib": ["es2016"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "noUnusedLocals": true,
     "declaration": true,
+    // "declarationMap": true,
     "importHelpers": true,
     "resolveJsonModule": true,
     "sourceMap": true

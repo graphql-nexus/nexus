@@ -6,13 +6,13 @@
   "dependencies": {
     "apollo-server": "2.2.0-alpha.2",
     "githunt-api": "peggyrayzis/GitHunt-API",
-    "graphql": "^14.0.2",
-    "nexus": "0.12.0-beta.9"
+    "graphql": "^14.5.8",
+    "nexus": "0.12.0-rc"
   },
   "devDependencies": {
     "nodemon": "^1.18.6",
-    "prettier": "^1.15.2",
-    "typescript": "^3.4.5",
-    "sqlite3": "^4.1.0"
+    "prettier": "prettier/prettier#refs/pull/6736/head",
+    "sqlite3": "^4.1.0",
+    "typescript": "3.7.1-rc"
   }
 }

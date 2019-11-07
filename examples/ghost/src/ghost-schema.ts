@@ -1,4 +1,4 @@
-import { makeSchema } from "nexus";
+import { makeSchema, fieldAuthorizePlugin } from "nexus";
 import path from "path";
 import * as allTypes from "./schema";
 
@@ -8,6 +8,7 @@ export const schema = makeSchema({
     schema: path.join(__dirname, "ghost-schema.graphql"),
     typegen: path.join(__dirname, "generated", "ghost-nexus.ts"),
   },
+  plugins: [fieldAuthorizePlugin()],
   typegenAutoConfig: {
     contextType: "ctx.Context",
     sources: [

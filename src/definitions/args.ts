@@ -1,5 +1,5 @@
 import { GetGen2, AllInputTypes } from "../typegenTypeHelpers";
-import { AllNexusInputTypeDefs, NexusWrappedType } from "./wrapping";
+import { AllNexusInputTypeDefs } from "./wrapping";
 import { NexusTypes, withNexusSymbol } from "./_types";
 
 export type ArgsRecord = Record<
@@ -40,8 +40,7 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
 
 export type NexusArgConfigType<T extends AllInputTypes> =
   | T
-  | AllNexusInputTypeDefs<T>
-  | NexusWrappedType<AllNexusInputTypeDefs<T>>;
+  | AllNexusInputTypeDefs<T>;
 
 export interface NexusAsArgConfig<T extends AllInputTypes>
   extends CommonArgConfig {

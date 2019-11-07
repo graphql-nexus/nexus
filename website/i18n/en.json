@@ -41,6 +41,10 @@
         "title": "objectType",
         "sidebar_label": "objectType"
       },
+      "api-plugins": {
+        "title": "Nexus Plugins",
+        "sidebar_label": "Plugins"
+      },
       "api-queryField": {
         "title": "queryField",
         "sidebar_label": "queryField"
@@ -57,9 +61,12 @@
         "title": "Best Practices",
         "sidebar_label": "Best Practices"
       },
-      "ecosystem-plugins": {
-        "title": "Plugins",
-        "sidebar_label": "Plugins"
+      "builder-construction": {
+        "title": "builder-construction"
+      },
+      "nexus-prisma": {
+        "title": "Nexus Prisma",
+        "sidebar_label": "nexus-prisma"
       },
       "future-features": {
         "title": "Potential Features",
@@ -72,6 +79,14 @@
       "library-authors": {
         "title": "Library Authors",
         "sidebar_label": "Library Authors"
+      },
+      "plugin-fieldAuthorize": {
+        "title": "Field Authorize Plugin",
+        "sidebar_label": "Field Authorize"
+      },
+      "plugin-nullabilityGuard": {
+        "title": "Nullability Guard Plugin",
+        "sidebar_label": "Nullability Guard"
       },
       "type-generation": {
         "title": "Type Generation Details",
@@ -92,7 +107,8 @@
     "categories": {
       "Documentation": "Documentation",
       "API": "API",
-      "Ecosystem": "Ecosystem"
+      "Included Plugins": "Included Plugins",
+      "Ecosystem Plugins": "Ecosystem Plugins"
     }
   },
   "pages-strings": {

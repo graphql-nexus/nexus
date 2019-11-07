@@ -151,6 +151,7 @@ export const Query = objectType({
       args: {
         testAsArg: InputType.asArg({ required: true }),
       },
+      skipNullGuard: true, // just checking that this isn't a type error
       resolve: () => "ok",
     });
     t.string("inputAsArgExample", {
@@ -212,6 +213,10 @@ export const MoreQueryFields = extendType({
       resolve(root) {
         return { id: "SomeID" };
       },
+    });
+    t.int("protectedField", {
+      authorize: () => false,
+      resolve: () => 1,
     });
   },
 });

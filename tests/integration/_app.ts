@@ -68,6 +68,7 @@ export const User = objectType({
     t.string("firstName");
     t.string("lastName");
   },
+  rootTyping: `{ firstName: string, lastName: string }`,
 });
 
 export const Query = extendType({

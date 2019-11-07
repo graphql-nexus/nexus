@@ -1,0 +1,95 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`plugin composes the onCreateFieldResolve fns 1`] = `
+Array [
+  "Before:a",
+  "Before:b",
+  "Before:c",
+  "calls:resolver",
+  "After:c 1",
+  "After:b 2",
+  "After:a 3",
+]
+`;
+
+exports[`plugin has a plugin.completeValue fn which is used to efficiently complete a value which is possibly a promise 1`] = `
+Array [
+  "Before:a",
+  "Before:b",
+  "Before:c",
+  "calls:resolver",
+  "After:c 1",
+  "After:b 2",
+  "After:a 3",
+]
+`;
+
+exports[`plugin has an onMissingType, which will be called in order when we encounter a missing type 1`] = `
+"type ConnectionInfo {
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type Query {
+  users: UserConnection!
+}
+
+type User {
+  id: ID!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  connectionInfo: ConnectionInfo!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+"
+`;
+
+exports[`plugin is applied to the resolver for every field in the schema 1`] = `
+Array [
+  "onInstall",
+  "onBeforeBuild",
+  "onAfterBuild",
+]
+`;
+
+exports[`plugin is applied to the resolver for every field in the schema 2`] = `
+Array [
+  "Query:user",
+  "Query:posts",
+  "User:id",
+  "User:name",
+  "User:email",
+  "User:phone",
+]
+`;
+
+exports[`plugin is applied to the resolver for every field in the schema 3`] = `
+Array [
+  "Query:user [object Object]",
+  "Query:posts ",
+  "User:id UNKNOWN_ID",
+  "User:name ",
+  "User:email ",
+  "User:phone undefined",
+]
+`;
+
+exports[`plugin is applied to the resolver for every field in the schema 4`] = `
+Object {
+  "data": Object {
+    "posts": Array [],
+    "user": Object {
+      "email": "",
+      "id": "UNKNOWN_ID",
+      "name": "",
+      "phone": null,
+    },
+  },
+}
+`;

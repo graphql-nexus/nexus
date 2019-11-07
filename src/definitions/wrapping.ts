@@ -1,5 +1,4 @@
 import { GraphQLNamedType } from "graphql";
-import { SchemaBuilder } from "../builder";
 import { NexusEnumTypeDef } from "./enumType";
 import { NexusExtendTypeDef } from "./extendType";
 import { NexusInputObjectTypeDef } from "./inputObjectType";
@@ -7,7 +6,7 @@ import { NexusInterfaceTypeDef } from "./interfaceType";
 import { NexusObjectTypeDef } from "./objectType";
 import { NexusScalarTypeDef } from "./scalarType";
 import { NexusUnionTypeDef } from "./unionType";
-import { NexusTypes, NexusWrappedSymbol, withNexusSymbol } from "./_types";
+import { NexusTypes, NexusWrappedSymbol } from "./_types";
 import { NexusExtendInputTypeDef } from "./extendInputType";
 import {
   DynamicOutputMethodDef,
@@ -16,18 +15,20 @@ import {
 import { NexusArgDef } from "./args";
 import { DynamicOutputPropertyDef } from "../dynamicProperty";
 import { AllInputTypes } from "../typegenTypeHelpers";
+import { PrintedGenTyping, PrintedGenTypingImport } from "../utils";
+import { NexusPlugin } from "../plugin";
 
-export type AllNexusInputTypeDefs<T extends string = string> =
+export type AllNexusInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>;
 
 export type AllNexusOutputTypeDefs =
-  | NexusObjectTypeDef<string>
-  | NexusInterfaceTypeDef<string>
-  | NexusUnionTypeDef<string>
-  | NexusEnumTypeDef<string>
-  | NexusScalarTypeDef<string>;
+  | NexusObjectTypeDef<any>
+  | NexusInterfaceTypeDef<any>
+  | NexusUnionTypeDef<any>
+  | NexusEnumTypeDef<any>
+  | NexusScalarTypeDef<any>;
 
 export type AllNexusNamedTypeDefs =
   | AllNexusInputTypeDefs
@@ -38,35 +39,6 @@ export type AllTypeDefs =
   | AllNexusOutputTypeDefs
   | GraphQLNamedType;
 
-export type WrappedTypeFn<T extends AllNexusNamedTypeDefs> = (
-  builder: SchemaBuilder
-) => T;
-
-/**
- * Container object for a "wrapped function"
- */
-export class NexusWrappedType<T extends AllNexusNamedTypeDefs> {
-  constructor(readonly name: string, protected wrappedFn: WrappedTypeFn<T>) {}
-  get fn(): WrappedTypeFn<T> {
-    return this.wrappedFn;
-  }
-}
-
-withNexusSymbol(NexusWrappedType, NexusTypes.WrappedType);
-
-/**
- * Useful primarily for plugins, where you want to delay the execution
- * of a block until other metadata exists from the root.
- *
- * @param fn
- */
-export function nexusWrappedType<T extends AllNexusNamedTypeDefs>(
-  name: string,
-  fn: WrappedTypeFn<T>
-) {
-  return new NexusWrappedType(name, fn);
-}
-
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
   NexusTypes.Object,
@@ -76,19 +48,26 @@ const NamedTypeDefs = new Set([
   NexusTypes.InputObject,
 ]);
 
-export function isNexusTypeDef(
+export const isNexusTypeDef = (
+  obj: any
+): obj is { [NexusWrappedSymbol]: NexusTypes } => {
+  console.warn(`isNexusTypeDef is deprecated, use isNexusStruct`);
+  return isNexusStruct(obj);
+};
+
+export function isNexusStruct(
   obj: any
 ): obj is { [NexusWrappedSymbol]: NexusTypes } {
   return obj && Boolean(obj[NexusWrappedSymbol]);
 }
 export function isNexusNamedTypeDef(obj: any): obj is AllNexusNamedTypeDefs {
-  return isNexusTypeDef(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol]);
+  return isNexusStruct(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol]);
 }
 export function isNexusExtendInputTypeDef(
   obj: any
 ): obj is NexusExtendInputTypeDef<string> {
   return (
-    isNexusTypeDef(obj) &&
+    isNexusStruct(obj) &&
     obj[NexusWrappedSymbol] === NexusTypes.ExtendInputObject
   );
 }
@@ -96,58 +75,49 @@ export function isNexusExtendTypeDef(
   obj: any
 ): obj is NexusExtendTypeDef<string> {
   return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.ExtendObject
-  );
-}
-export function isNexusWrappedType(
-  obj: any
-): obj is NexusWrappedType<AllNexusNamedTypeDefs> {
-  return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.WrappedType
+    isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.ExtendObject
   );
 }
 
 export function isNexusEnumTypeDef(obj: any): obj is NexusEnumTypeDef<string> {
-  return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Enum;
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Enum;
 }
 export function isNexusInputObjectTypeDef(
   obj: any
 ): obj is NexusInputObjectTypeDef<string> {
   return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.InputObject
+    isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.InputObject
   );
 }
 export function isNexusObjectTypeDef(
   obj: any
 ): obj is NexusObjectTypeDef<string> {
-  return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Object;
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Object;
 }
 export function isNexusScalarTypeDef(
   obj: any
 ): obj is NexusScalarTypeDef<string> {
-  return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Scalar;
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Scalar;
 }
 export function isNexusUnionTypeDef(
   obj: any
 ): obj is NexusUnionTypeDef<string> {
-  return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Union;
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Union;
 }
 export function isNexusInterfaceTypeDef(
   obj: any
 ): obj is NexusInterfaceTypeDef<string> {
-  return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Interface
-  );
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Interface;
 }
 export function isNexusArgDef(obj: any): obj is NexusArgDef<AllInputTypes> {
-  return isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.Arg;
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Arg;
 }
 
 export function isNexusDynamicOutputProperty<T extends string>(
   obj: any
 ): obj is DynamicOutputPropertyDef<T> {
   return (
-    isNexusTypeDef(obj) &&
+    isNexusStruct(obj) &&
     obj[NexusWrappedSymbol] === NexusTypes.DynamicOutputProperty
   );
 }
@@ -155,7 +125,7 @@ export function isNexusDynamicOutputMethod<T extends string>(
   obj: any
 ): obj is DynamicOutputMethodDef<T> {
   return (
-    isNexusTypeDef(obj) &&
+    isNexusStruct(obj) &&
     obj[NexusWrappedSymbol] === NexusTypes.DynamicOutputMethod
   );
 }
@@ -163,6 +133,24 @@ export function isNexusDynamicInputMethod<T extends string>(
   obj: any
 ): obj is DynamicInputMethodDef<T> {
   return (
-    isNexusTypeDef(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicInput
+    isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicInput
   );
+}
+export function isNexusPrintedGenTyping(obj: any): obj is PrintedGenTyping {
+  return (
+    isNexusStruct(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.PrintedGenTyping
+  );
+}
+export function isNexusPrintedGenTypingImport(
+  obj: any
+): obj is PrintedGenTypingImport {
+  return (
+    isNexusStruct(obj) &&
+    obj[NexusWrappedSymbol] === NexusTypes.PrintedGenTypingImport
+  );
+}
+
+export function isNexusPlugin(obj: any): obj is NexusPlugin {
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Plugin;
 }

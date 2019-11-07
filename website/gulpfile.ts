@@ -93,7 +93,10 @@ gulp.task("run-examples", async () => {
   }
 });
 
-gulp.task("check-examples", gulp.series("link-examples", async () => {}));
+gulp.task(
+  "check-examples",
+  gulp.series("link-examples", async () => {})
+);
 
 gulp.task("link-website", async () => {
   await linkNexus();

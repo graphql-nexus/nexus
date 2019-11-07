@@ -4,5 +4,6 @@
     "noUnusedLocals": false, // FIXME
     "noEmit": true,
     "rootDir": "."
-  }
+  },
+  "include": ["**/*.ts"]
 }

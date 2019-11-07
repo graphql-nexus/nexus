@@ -3,7 +3,7 @@
   <h1 align="center">Nexus</h1>
 </p>
 
-[![CircleCI](https://img.shields.io/circleci/build/github/prisma-labs/nexus)](https://circleci.com/gh/prisma/nexus)
+[![CircleCI](https://img.shields.io/circleci/build/github/prisma-labs/nexus)](https://circleci.com/gh/prisma-labs/nexus)
 [![npm version](https://badge.fury.io/js/nexus.svg)](https://badge.fury.io/js/nexus)
 [![Slack](https://slack.prisma.io/badge.svg)](https://slack.prisma.io/)
 
@@ -58,7 +58,7 @@ All examples of GraphQL Nexus can be found in the [`/examples`](./examples) dire
 - [star-wars](./examples/star-wars)
 - [kitchen-sink](./examples/kitchen-sink)
 
-If you're interested in examples using the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin, check out the official [`prisma-examples`](https://github.com/prisma/prisma-examples/) repo:
+If you're interested in examples using the [`nexus-prisma`](https://github.com/prisma-labs/nexus-prisma) plugin, check out the official [`prisma-examples`](https://github.com/prisma/prisma-examples/) repo:
 
 - [GraphQL blogging app](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql)
 - [GraphQL blogging app with authentication & authorization](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-auth)
@@ -73,10 +73,10 @@ If you're interested in examples using the [`nexus-prisma`](https://github.com/p
 - Interoperable with vanilla `graphql-js` types, and it's _just_ a [`GraphQLSchema`](https://graphql.org/graphql-js/type/#graphqlschema) so it fits in just fine with existing community solutions of `apollo-server`, `graphql-middleware`, etc.
 - Inline function resolvers for when you need to do simple field aliasing
 - Auto-generated graphql SDL schema, great for when seeing how any code changes affected the schema
-- Lots of good [examples](https://github.com/prisma/nexus/tree/develop/examples) to get you started and thorough [API documentation](https://nexus.js.org/docs/api-core-concepts)
+- Lots of good [examples](https://github.com/prisma-labs/nexus/tree/develop/examples) to get you started and thorough [API documentation](https://nexus.js.org/docs/api-core-concepts)
 - Full type-safety for free
 - Internal structure allows library authors to build more advanced abstractions
-- Independent from Prisma, but integrates nicely using the [`nexus-prisma`](https://github.com/prisma/nexus-prisma) plugin
+- Independent from Prisma, but integrates nicely using the [`nexus-prisma`](https://github.com/prisma-labs/nexus-prisma) plugin
 - Allows code re-use by creating higher level "functions" which wrap common fields
 
 ## Documentation

@@ -5,6 +5,12 @@ declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {}
   interface NexusGenCustomOutputMethods<TypeName extends string> {}
   interface NexusGenCustomOutputProperties<TypeName extends string> {}
+  interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
 }
 
 export type AllInputTypes = GetGen<"allInputTypes", string>;
@@ -112,16 +118,6 @@ export type SubFieldResolver<
 ) =>
   | MaybePromise<ResultValue<TypeName, FieldName>[SubFieldName]>
   | MaybePromiseDeep<ResultValue<TypeName, FieldName>[SubFieldName]>;
-
-export type AuthorizeResolver<
-  TypeName extends string,
-  FieldName extends string
-> = (
-  root: RootValue<TypeName>,
-  args: ArgsValue<TypeName, FieldName>,
-  context: GetGen<"context">,
-  info: GraphQLResolveInfo
-) => MaybePromise<boolean | Error>;
 
 export type AbstractResolveReturn<
   TypeName extends string

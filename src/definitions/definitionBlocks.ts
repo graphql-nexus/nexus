@@ -4,16 +4,11 @@ import {
   GetGen,
   HasGen3,
   NeedsResolver,
-  AuthorizeResolver,
   GetGen3,
   AllInputTypes,
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
-import {
-  AllNexusOutputTypeDefs,
-  NexusWrappedType,
-  AllNexusInputTypeDefs,
-} from "./wrapping";
+import { AllNexusOutputTypeDefs, AllNexusInputTypeDefs } from "./wrapping";
 import { BaseScalars } from "./_types";
 import { GraphQLFieldResolver } from "graphql";
 
@@ -44,24 +39,15 @@ export interface CommonFieldConfig {
   list?: true | boolean[];
 }
 
-export interface CommonOutputFieldConfig<
+export type CommonOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
-> extends CommonFieldConfig {
+> = CommonFieldConfig & {
   /**
    * Arguments for the field
    */
   args?: ArgsRecord;
-  /**
-   * Authorization for an individual field. Returning "true"
-   * or "Promise<true>" means the field can be accessed.
-   * Returning "false" or "Promise<false>" will respond
-   * with a "Not Authorized" error for the field. Returning
-   * or throwing an error will also prevent the resolver from
-   * executing.
-   */
-  authorize?: AuthorizeResolver<TypeName, FieldName>;
-}
+} & NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 export interface OutputScalarConfig<
   TypeName extends string,
@@ -77,10 +63,7 @@ export interface NexusOutputFieldConfig<
   TypeName extends string,
   FieldName extends string
 > extends OutputScalarConfig<TypeName, FieldName> {
-  type:
-    | GetGen<"allOutputTypes", string>
-    | AllNexusOutputTypeDefs
-    | NexusWrappedType<AllNexusOutputTypeDefs>;
+  type: GetGen<"allOutputTypes", string> | AllNexusOutputTypeDefs;
 }
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {

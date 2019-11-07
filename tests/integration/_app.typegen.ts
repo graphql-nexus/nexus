@@ -42,11 +42,7 @@ export interface NexusGenRootTypes {
     title: string; // String!
   };
   Query: {};
-  User: {
-    // root type
-    firstName: string; // String!
-    lastName: string; // String!
-  };
+  User: { firstName: string; lastName: string };
   String: string;
   Int: number;
   Float: number;
@@ -146,4 +142,13 @@ export interface NexusGenTypes {
     | NexusGenTypes["allOutputTypes"];
   abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+}
+
+declare global {
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
+  interface NexusGenPluginSchemaConfig {}
 }

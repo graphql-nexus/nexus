@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _, { Dictionary } from "lodash";
 import { DBTables } from "../generated/ghost-db-tables";
 import { Context } from "../data-sources/Context";
 import { QueryBuilder } from "knex";
@@ -18,7 +18,7 @@ export function byColumnLoader<
     .select(`${table}.*`)
     .whereIn(`${table}.${key}`, keys)
     .then((rows: DBTables[Tbl][]) => {
-      const keyed: Record<KeyType, DBTables[Tbl]> = _.keyBy(rows, key);
+      const keyed: Dictionary<DBTables[Tbl]> = _.keyBy(rows, key);
       return keys.map((k) => {
         return keyed[k] || new Error(`Missing row for ${table}:${key} ${k}`);
       });

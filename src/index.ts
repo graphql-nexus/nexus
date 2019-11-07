@@ -1,11 +1,6 @@
 // All of the Public API definitions
-export {
-  createPlugin,
-  PluginConfig,
-  PluginBuilderLens,
-  PluginOnInstallHandler,
-} from "./plugins";
-export { buildTypes, makeSchema } from "./builder";
+export { createPlugin, PluginConfig, PluginBuilderLens } from "./plugin";
+export { makeSchema } from "./builder";
 export {
   arg,
   booleanArg,
@@ -26,7 +21,6 @@ export { subscriptionField } from "./definitions/subscriptionField";
 export { scalarType, asNexusMethod } from "./definitions/scalarType";
 export { decorateType } from "./definitions/decorateType";
 export { unionType } from "./definitions/unionType";
-export { nexusWrappedType } from "./definitions/wrapping";
 export { convertSDL } from "./sdlConverter";
 export { groupTypes } from "./utils";
 export {
@@ -38,6 +32,8 @@ export {
 export { dynamicInputMethod, dynamicOutputMethod } from "./dynamicMethod";
 export { dynamicOutputProperty } from "./dynamicProperty";
 export { core, blocks, ext };
+export { plugin } from "./plugin";
+export * from "./plugins";
 import * as core from "./core";
 import * as blocks from "./blocks";
-import * as ext from "./extensions";
+import * as ext from "./dynamicMethods";
