@@ -2,6 +2,8 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.4
+
 - refactor: Remove NEXUS_SHOULD_GENERATE_ARTIFACTS env var
 - feat: Add `shouldExitAfterGenerateArtifacts`
 - Warn on missing `outputs` in `makeSchema` config
