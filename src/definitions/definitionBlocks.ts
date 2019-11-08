@@ -347,5 +347,5 @@ export class InputDefinitionBlock<TypeName extends string> {
 
 export interface AbstractOutputDefinitionBuilder<TypeName extends string>
   extends OutputDefinitionBuilder {
-  setResolveType(fn: AbstractTypeResolver<TypeName>): void;
+  setResolveType(fn: AbstractTypeResolver<TypeName> | null): void;
 }

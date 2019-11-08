@@ -4,7 +4,7 @@ import { assertValidName } from "graphql";
 import { NexusObjectTypeDef } from "./objectType";
 
 export interface UnionDefinitionBuilder<TypeName extends string> {
-  setResolveType(fn: AbstractTypeResolver<TypeName>): void;
+  setResolveType(fn: AbstractTypeResolver<TypeName> | null): void;
   addUnionMembers(members: UnionMembers): void;
 }
 
@@ -24,8 +24,8 @@ export class UnionDefinitionBlock<TypeName extends string> {
   /**
    * Sets the "resolveType" method for the current union
    */
-  resolveType(fn: AbstractTypeResolver<TypeName>) {
-    this.typeBuilder.setResolveType(fn);
+  resolveType(fn?: AbstractTypeResolver<TypeName>) {
+    this.typeBuilder.setResolveType(fn || null);
   }
 }
 

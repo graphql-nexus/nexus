@@ -50,8 +50,8 @@ export class InterfaceDefinitionBlock<
   /**
    * Sets the "resolveType" method for the current type.
    */
-  resolveType(fn: AbstractTypeResolver<TypeName>) {
-    this.typeBuilder.setResolveType(fn);
+  resolveType(fn?: AbstractTypeResolver<TypeName>) {
+    this.typeBuilder.setResolveType(fn || null);
   }
 }
 

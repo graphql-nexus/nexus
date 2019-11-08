@@ -38,6 +38,8 @@ import {
   GraphQLType,
   isWrappingType,
   isUnionType,
+  GraphQLTypeResolver,
+  defaultTypeResolver,
 } from "graphql";
 import {
   NexusArgConfig,
@@ -869,7 +871,11 @@ export class SchemaBuilder {
 
   buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config;
-    let resolveType: AbstractTypeResolver<string> | undefined;
+    let resolveType:
+      | null
+      | AbstractTypeResolver<any>
+      | GraphQLTypeResolver<any, any>
+      | undefined;
     const fields: NexusOutputFieldDef[] = [];
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
@@ -885,6 +891,9 @@ export class SchemaBuilder {
       toExtend.forEach((e) => {
         e.definition(definitionBlock);
       });
+    }
+    if (resolveType === null) {
+      resolveType = defaultTypeResolver;
     }
     if (!resolveType) {
       resolveType = this.missingResolveType(config.name, "union");
@@ -954,13 +963,20 @@ export class SchemaBuilder {
 
   buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined;
-    let resolveType: AbstractTypeResolver<string> | undefined;
+    let resolveType:
+      | null
+      | AbstractTypeResolver<string>
+      | GraphQLTypeResolver<any, any>
+      | undefined;
     config.definition(
       new UnionDefinitionBlock({
         setResolveType: (fn) => (resolveType = fn),
         addUnionMembers: (unionMembers) => (members = unionMembers),
       })
     );
+    if (resolveType === null) {
+      resolveType = defaultTypeResolver;
+    }
     if (!resolveType) {
       resolveType = this.missingResolveType(config.name, "union");
     }
@@ -1334,10 +1350,10 @@ export class SchemaBuilder {
       new Error(
         `Missing resolveType for the ${name} ${location}. ` +
           `Be sure to add one in the definition block for the type, ` +
-          `or t.resolveType(() => null) if you don't want or need to implement.`
+          `or t.resolveType() if you want to use GraphQL's defaultTypeResolver and hide this warning.`
       )
     );
-    return (obj: any) => obj?.__typename || null;
+    return defaultTypeResolver;
   }
 
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
