@@ -28,7 +28,7 @@ export class NexusFieldExtension<
   readonly config: Omit<NexusOutputFieldConfig<TypeName, FieldName>, "resolve">;
   /**
    * Whether the user has provided a custom "resolve" function,
-   * or whether we're using the defaultResolver
+   * or whether we're using GraphQL's defaultResolver
    */
   readonly hasDefinedResolver: boolean;
   constructor(config: NexusOutputFieldConfig<TypeName, FieldName>) {

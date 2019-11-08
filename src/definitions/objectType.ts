@@ -79,10 +79,6 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    */
   description?: string | null;
   /**
-   * Specifies a default field resolver for all members of this type.
-   */
-  defaultResolver?: FieldResolver<TypeName, any>;
-  /**
    * Root type information for this type
    */
   rootTyping?: RootTypingDef;
