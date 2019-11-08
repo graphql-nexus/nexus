@@ -70,7 +70,7 @@ export const UnusedInterface = interfaceType({
   name: "UnusedInterface",
   definition(t) {
     t.boolean("ok");
-    t.resolveType(() => null);
+    t.resolveType();
   },
   rootTyping: { name: "UnusedInterfaceTypeDef", path: __filename },
 });

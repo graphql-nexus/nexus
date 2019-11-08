@@ -49,7 +49,7 @@ const types = [
     definition(t) {
       t.id("id");
       t.string("login");
-      t.resolveType((o) => o.__typename || null);
+      t.resolveType();
     },
   }),
   objectType({

@@ -51,7 +51,7 @@ const content = dedent`
     definition(t) {
       t.date('createdAt', () => new Date());
       t.date('updatedAt', () => new Date());
-      t.resolveType(() => null)
+      t.resolveType();
     }
   });
 
@@ -65,7 +65,7 @@ const content = dedent`
           return ${"`${info.parentType.name}:${root.id}`"}
         }
       });
-      t.resolveType(() => null)
+      t.resolveType();
     }
   })
 

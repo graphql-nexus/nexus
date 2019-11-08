@@ -189,7 +189,7 @@ export const Node = interfaceType({
   description: \\"This is a description of a Node\\",
   definition(t) {
     t.id(\\"id\\")
-    t.resolveType(() => null)
+    t.resolveType()
   }
 });
 
@@ -332,7 +332,7 @@ const Node = interfaceType({
   description: \\"This is a description of a Node\\",
   definition(t) {
     t.id(\\"id\\")
-    t.resolveType(() => null)
+    t.resolveType()
   }
 });
 

@@ -285,7 +285,7 @@ export class SDLConverter {
       this.maybeDescription(type),
       `  definition(t) {`,
       this.printObjectFields(type),
-      `    t.resolveType(() => null)`,
+      `    t.resolveType()`,
       `  }`,
       `});`,
     ]);

@@ -10,7 +10,7 @@ describe("interfaceType", () => {
           name: "Node",
           definition(t) {
             t.id("id");
-            t.resolveType(() => null);
+            t.resolveType();
           },
         }),
         objectType({

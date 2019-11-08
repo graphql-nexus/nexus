@@ -13,6 +13,6 @@ Object {
 
 exports[`interfaceType logs error when resolveType is not provided for an interface 1`] = `
 Array [
-  [Error: Missing resolveType for the Node union. Be sure to add one in the definition block for the type, or t.resolveType(() => null) if you don't want or need to implement.],
+  [Error: Missing resolveType for the Node union. Be sure to add one in the definition block for the type, or t.resolveType() if you want to use GraphQL's defaultTypeResolver and hide this warning.],
 ]
 `;

@@ -2,6 +2,8 @@
 
 ### 0.12.0 final (unreleased)
 
+- Partial fix for #188, allow `t.resolveType()` to use default `graphql-js` defaultTypeResolver for abstract types.
+
 ### 0.12.0-rc.4
 
 - refactor: Remove NEXUS_SHOULD_GENERATE_ARTIFACTS env var
