@@ -22,7 +22,7 @@
     "@types/graphql-iso-date": "^3.3.3",
     "@types/lodash": "^4.14.120",
     "fs-extra": "^7.0.1",
-    "prettier": "prettier/prettier#refs/pull/6736/head",
+    "prettier": "^1.19.1",
     "schemats": "^3.0.3",
     "ts-node": "^8.0.2",
     "ts-node-dev": "^1.0.0-pre.30",

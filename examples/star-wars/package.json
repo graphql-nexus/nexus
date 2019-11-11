@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "jest": "^23.6.0",
-    "prettier": "prettier/prettier#refs/pull/6736/head",
+    "prettier": "^1.19.1",
     "ts-jest": "^23.10.4",
     "typescript": "^3.6.4"
   }

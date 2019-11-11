@@ -79,7 +79,7 @@
     "jest": "^24.9.0",
     "jest-watch-typeahead": "^0.3.1",
     "lint-staged": "^7.3.0",
-    "prettier": "prettier/prettier#refs/pull/6736/head",
+    "prettier": "^1.19.1",
     "sort-package-json": "^1.22.1",
     "ts-jest": "^24.1.0",
     "ts-node": "^7.0.1",

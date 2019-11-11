@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "nodemon": "^1.18.6",
-    "prettier": "prettier/prettier#refs/pull/6736/head",
+    "prettier": "^1.19.1",
     "sqlite3": "^4.1.0",
     "typescript": "3.7.1-rc"
   }
