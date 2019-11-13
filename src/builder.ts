@@ -1363,7 +1363,7 @@ export class SchemaBuilder {
         return val.value.factory({
           args: config,
           typeDef: block,
-          builder: this,
+          builder: this.builderLens,
           typeName: block.typeName,
         });
       };
@@ -1385,7 +1385,7 @@ export class SchemaBuilder {
         return val.value.factory({
           args: config,
           typeDef: block,
-          builder: this,
+          builder: this.builderLens,
           typeName: block.typeName,
           stage,
         });
@@ -1396,7 +1396,7 @@ export class SchemaBuilder {
         get() {
           return val.value.factory({
             typeDef: block,
-            builder: this,
+            builder: this.builderLens,
             typeName: block.typeName,
             stage,
           });
