@@ -9,9 +9,15 @@ interface Bar {
   ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
-type BarCollection {
-  nodes: [Bar!]!
-  totalCount: Int!
+type BarConnection {
+  edges: BarEdge!
+  pageInfo: PageInfo!
+}
+
+type BarEdge {
+  cursor: String!
+  node: Bar!
+  totalCount: Int
 }
 
 interface Baz {
@@ -51,10 +57,20 @@ input NestedType {
   veryNested: String
 }
 
+"""
+PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+"""
+type PageInfo {
+  endCursor: String!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+}
+
 type Query {
   asArgExample(testAsArg: InputType!): String!
   bar: TestObj!
-  collectionField(a: Int): BarCollection!
+  connectionField(a: Int!): BarConnection!
   dateAsList: [Date!]!
   extended: SomeItem!
   getNumberOrNull(a: Int!): Int

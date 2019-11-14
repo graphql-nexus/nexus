@@ -3,6 +3,7 @@ import {
   makeSchema,
   nullabilityGuardPlugin,
   fieldAuthorizePlugin,
+  connectionPlugin,
 } from "nexus";
 import path from "path";
 import * as types from "./kitchen-sink-definitions";
@@ -15,6 +16,9 @@ const schema = makeSchema({
     typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
   },
   plugins: [
+    connectionPlugin({
+      nullable: true,
+    }),
     logMutationTimePlugin,
     fieldAuthorizePlugin(),
     nullabilityGuardPlugin({

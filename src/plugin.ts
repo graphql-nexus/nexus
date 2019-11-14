@@ -17,7 +17,12 @@ import {
   NexusGraphQLInterfaceTypeConfig,
   Maybe,
 } from "./definitions/_types";
-import { isPromiseLike, PrintedGenTyping, venn } from "./utils";
+import {
+  isPromiseLike,
+  PrintedGenTyping,
+  venn,
+  PrintedGenTypingImport,
+} from "./utils";
 import { NexusSchemaExtension } from "./extensions";
 
 export { PluginBuilderLens };
@@ -54,7 +59,7 @@ export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   schemaExtension: NexusSchemaExtension;
 };
 
-export type StringLike = PrintedGenTyping | string;
+export type StringLike = PrintedGenTypingImport | PrintedGenTyping | string;
 
 export interface PluginConfig {
   /**

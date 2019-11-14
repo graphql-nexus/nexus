@@ -46,8 +46,12 @@ export async function linkExamples() {
       .map(async (exampleDir) => {
         const dir = path.join(rootPath, `examples/${exampleDir}`);
         console.log(`Linking ${exampleDir}`);
-        await linkDir(dir, rootPath);
-        console.log(`Finished linking ${exampleDir}`);
+        try {
+          await linkDir(dir, rootPath);
+          console.log(`Finished linking ${exampleDir}`);
+        } catch (e) {
+          console.error(`Failed linking ${exampleDir}: ${e.message}`);
+        }
       })
       .concat(linkWebsite())
   );

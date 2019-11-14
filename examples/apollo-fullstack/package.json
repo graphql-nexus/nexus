@@ -36,7 +36,7 @@
     "jest": "^24.3.1",
     "nock": "^10.0.2",
     "node-fetch": "^2.2.1",
-    "prettier": "prettier/prettier#refs/pull/6736/head",
+    "prettier": "^1.19.1",
     "ts-node-dev": "^1.0.0-pre.30",
     "typescript": "^3.6.4"
   }

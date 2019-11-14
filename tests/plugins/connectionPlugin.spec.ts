@@ -19,7 +19,9 @@ describe("connectionPlugin", () => {
             // @ts-ignore
             t.connectionField("users", {
               type: "User",
-              edges: () => {},
+              edges: () => {
+                return [];
+              },
               pageInfo: () => {},
             });
           },
@@ -30,8 +32,6 @@ describe("connectionPlugin", () => {
           extendConnection: {
             totalCount: {
               type: "Int",
-              resolve: (config) => config,
-              typing: ``,
             },
           },
         }),

@@ -10,10 +10,7 @@ import {
   idArg,
   mutationField,
   mutationType,
-  ext,
 } from "nexus";
-
-export { ext };
 
 export const testArgs1 = {
   foo: idArg(),
@@ -183,17 +180,15 @@ export const Query = objectType({
       resolve: () => "ok",
     });
     t.list.date("dateAsList", () => []);
-    t.collectionField("collectionField", {
+    t.connectionField("connectionField", {
       type: Bar,
       args: {
-        a: intArg(),
+        a: intArg({ nullable: false }),
       },
-      nodes() {
+      edges(root, args) {
         return [];
       },
-      totalCount(root, args, ctx, info) {
-        return args.a || 0;
-      },
+      pageInfo: () => ({}),
     });
   },
 });

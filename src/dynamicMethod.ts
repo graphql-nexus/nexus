@@ -80,9 +80,9 @@ withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutputMethod);
 /**
  * Defines a new property on the object definition block
  * for an output type, taking arbitrary input to define
- * additional types.
+ * additional types. See the connectionPlugin:
  *
- * t.collection('posts', {
+ * t.connectionField('posts', {
  *   nullable: true,
  *   totalCount(root, args, ctx, info) {
  *     return ctx.user.getTotalPostCount(root.id, args)

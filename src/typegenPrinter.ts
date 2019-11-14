@@ -29,6 +29,7 @@ import {
   groupTypes,
   mapObj,
   relativePathTo,
+  PrintedGenTypingImport,
 } from "./utils";
 import { NexusGraphQLSchema } from "./definitions/_types";
 import {
@@ -777,29 +778,37 @@ export class TypegenPrinter {
     }
     if (isNexusPrintedGenTyping(strLike)) {
       strLike.imports.forEach((i) => {
-        /* istanbul ignore if */
-        if (!isNexusPrintedGenTypingImport(i)) {
-          console.warn(`Expected printedGenTypingImport, saw ${i}`);
-          return;
-        }
-        this.printImports[i.config.module] =
-          this.printImports[i.config.module] || {};
-        if (i.config.default) {
-          this.printImports[i.config.module].default = i.config.default;
-        }
-        if (i.config.bindings) {
-          i.config.bindings.forEach((binding) => {
-            if (typeof binding === "string") {
-              this.printImports[i.config.module][binding] = true;
-            } else {
-              this.printImports[i.config.module][binding[0]] = binding[1];
-            }
-          });
-        }
+        this.addImport(i);
       });
       return strLike.toString();
     }
+    if (isNexusPrintedGenTypingImport(strLike)) {
+      this.addImport(strLike);
+      return "";
+    }
     return strLike;
+  }
+
+  addImport(i: PrintedGenTypingImport) {
+    /* istanbul ignore if */
+    if (!isNexusPrintedGenTypingImport(i)) {
+      console.warn(`Expected printedGenTypingImport, saw ${i}`);
+      return;
+    }
+    this.printImports[i.config.module] =
+      this.printImports[i.config.module] || {};
+    if (i.config.default) {
+      this.printImports[i.config.module].default = i.config.default;
+    }
+    if (i.config.bindings) {
+      i.config.bindings.forEach((binding) => {
+        if (typeof binding === "string") {
+          this.printImports[i.config.module][binding] = true;
+        } else {
+          this.printImports[i.config.module][binding[0]] = binding[1];
+        }
+      });
+    }
   }
 }
 

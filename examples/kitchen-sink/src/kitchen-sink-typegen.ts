@@ -4,8 +4,13 @@
  */
 
 import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions";
+import { core, ConnectionFieldConfig } from "nexus";
+import {
+  ConnectionNodesResolver,
+  EdgeFieldResolver,
+  PageInfoFieldResolver,
+} from "nexus/dist/plugins/connectionPlugin";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { core } from "nexus";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(
@@ -18,41 +23,20 @@ declare global {
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
-    collectionField<FieldName extends string>(
-      fieldName: FieldName,
-      opts: {
-        type:
-          | NexusGenObjectNames
-          | NexusGenInterfaceNames
-          | core.NexusObjectTypeDef<any>
-          | core.NexusInterfaceTypeDef<any>;
-        nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">;
-        totalCount: core.SubFieldResolver<TypeName, FieldName, "totalCount">;
-        args?: core.ArgsRecord;
-        nullable?: boolean;
-        description?: string;
-      }
-    ): void;
-    relayConnectionField<FieldName extends string>(
-      fieldName: FieldName,
-      opts: {
-        type:
-          | NexusGenObjectNames
-          | NexusGenInterfaceNames
-          | core.NexusObjectTypeDef<any>
-          | core.NexusInterfaceTypeDef<any>;
-        edges: core.SubFieldResolver<TypeName, FieldName, "edges">;
-        pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">;
-        args?: Record<string, core.NexusArgDef<any>>;
-        nullable?: boolean;
-        description?: string;
-      }
-    ): void;
-
     date<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "Date";
+    connectionField<FieldName extends string>(
+      fieldName: FieldName,
+      config: ConnectionFieldConfig & {
+        edges: ConnectionNodesResolver<TypeName, FieldName>;
+        pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">;
+        edgeFields: {
+          totalCount: EdgeFieldResolver<TypeName, FieldName, "totalCount">;
+        };
+      }
+    ): void;
   }
 }
 
@@ -87,10 +71,16 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
-  BarCollection: {
+  BarConnection: {
     // root type
-    nodes: NexusGenRootTypes["Bar"][]; // [Bar!]!
-    totalCount: number; // Int!
+    edges: NexusGenRootTypes["BarEdge"]; // BarEdge!
+    pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
+  };
+  BarEdge: {
+    // root type
+    cursor: string; // String!
+    node: NexusGenRootTypes["Bar"]; // Bar!
+    totalCount?: number | null; // Int
   };
   Foo: {
     // root type
@@ -98,6 +88,13 @@ export interface NexusGenRootTypes {
     ok: boolean; // Boolean!
   };
   Mutation: {};
+  PageInfo: {
+    // root type
+    endCursor: string; // String!
+    hasNextPage: boolean; // Boolean!
+    hasPreviousPage: boolean; // Boolean!
+    startCursor: string; // String!
+  };
   Query: {};
   SomeItem: {
     // root type
@@ -129,10 +126,16 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 }
 
 export interface NexusGenFieldTypes {
-  BarCollection: {
+  BarConnection: {
     // field return type
-    nodes: NexusGenRootTypes["Bar"][]; // [Bar!]!
-    totalCount: number; // Int!
+    edges: NexusGenRootTypes["BarEdge"]; // BarEdge!
+    pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
+  };
+  BarEdge: {
+    // field return type
+    cursor: string; // String!
+    node: NexusGenRootTypes["Bar"]; // Bar!
+    totalCount: number | null; // Int
   };
   Foo: {
     // field return type
@@ -145,11 +148,18 @@ export interface NexusGenFieldTypes {
     ok: boolean; // Boolean!
     someMutationField: NexusGenRootTypes["Foo"]; // Foo!
   };
+  PageInfo: {
+    // field return type
+    endCursor: string; // String!
+    hasNextPage: boolean; // Boolean!
+    hasPreviousPage: boolean; // Boolean!
+    startCursor: string; // String!
+  };
   Query: {
     // field return type
     asArgExample: string; // String!
     bar: NexusGenRootTypes["TestObj"]; // TestObj!
-    collectionField: NexusGenRootTypes["BarCollection"]; // BarCollection!
+    connectionField: NexusGenRootTypes["BarConnection"]; // BarConnection!
     dateAsList: any[]; // [Date!]!
     extended: NexusGenRootTypes["SomeItem"]; // SomeItem!
     getNumberOrNull: number | null; // Int
@@ -202,9 +212,9 @@ export interface NexusGenArgTypes {
       // args
       testAsArg: NexusGenInputs["InputType"]; // InputType!
     };
-    collectionField: {
+    connectionField: {
       // args
-      a?: number | null; // Int
+      a: number; // Int!
     };
     getNumberOrNull: {
       // args
@@ -243,9 +253,11 @@ export interface NexusGenAbstractResolveReturnTypes {
 export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames =
-  | "BarCollection"
+  | "BarConnection"
+  | "BarEdge"
   | "Foo"
   | "Mutation"
+  | "PageInfo"
   | "Query"
   | "SomeItem"
   | "TestObj";
