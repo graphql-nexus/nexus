@@ -2,6 +2,10 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.5
+
+- feat: Add `customPrintSchemaFn` to makeSchema config
+
 ### 0.12.0-rc.4
 
 - refactor: Remove NEXUS_SHOULD_GENERATE_ARTIFACTS env var
