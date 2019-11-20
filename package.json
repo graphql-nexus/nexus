@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.12.0-rc.4",
+  "version": "0.12.0-rc.5",
   "description": "Scalable, strongly typed GraphQL schema development",
   "keywords": [
     "graphql",
