@@ -1,7 +1,8 @@
 import path from "path";
 import os from "os";
 import { queryField } from "../src/definitions/queryField";
-import { makeSchema } from "../src/builder";
+import { makeSchema, makeSchemaInternal, generateSchema } from "../src/builder";
+import { printSchema } from "graphql";
 
 describe("makeSchema", () => {
   describe("shouldExitAfterGenerateArtifacts", () => {
@@ -59,6 +60,25 @@ describe("makeSchema", () => {
         shouldGenerateArtifacts: true,
         shouldExitAfterGenerateArtifacts: true,
       });
+    });
+
+    it("accepts a customPrintSchemaFn", async () => {
+      const { schemaTypes } = await generateSchema.withArtifacts(
+        {
+          types: [
+            queryField("ok", {
+              description: "Example boolean field",
+              type: "Boolean",
+            }),
+          ],
+          outputs: {},
+          customPrintSchemaFn: (schema) => {
+            return printSchema(schema, { commentDescriptions: true });
+          },
+        },
+        false
+      );
+      expect(schemaTypes).toMatchSnapshot();
     });
   });
 });

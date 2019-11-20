@@ -137,6 +137,19 @@ Read more on this in the [getting-started](getting-started.md) guide.
 
 Escape hatches for more advanced cases which need further control over. You typically won't need these.
 
+### customPrintSchemaFn
+
+Optional, allows you to override the `printSchema` when outputting the generated `.graphql` file:
+
+```ts
+makeSchema({
+  // ...
+  customPrintSchemaFn: (schema) => {
+    return printSchema(schema, { commentDescriptions: true });
+  },
+});
+```
+
 #### Footnotes: Annotated config option for typegenAutoConfig:
 
 ```ts

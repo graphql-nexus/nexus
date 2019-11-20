@@ -38,6 +38,7 @@ import {
   GraphQLType,
   isWrappingType,
   isUnionType,
+  printSchema,
 } from "graphql";
 import {
   NexusArgConfig,
@@ -243,6 +244,11 @@ export interface BuilderConfig {
    * executed first to last: before -> resolve -> after
    */
   plugins?: NexusPlugin[];
+  /**
+   * Provide if you wish to customize the behavior of the schema printing.
+   * Otherwise, uses `printSchema` from graphql-js
+   */
+  customPrintSchemaFn?: typeof printSchema;
 }
 
 export type SchemaConfig = BuilderConfig & {
