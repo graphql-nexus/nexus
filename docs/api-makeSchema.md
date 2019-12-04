@@ -30,13 +30,13 @@ export const schema = makeSchema({
 The `plugins` property is an array for adding "Plugins", or ways of extending/changing the runtime behavior of Nexus and GraphQL. Unlike the `types` property, this must be an array, and the order of the plugins matters because this influences the order of any resolver "middleware" the plugin may optionally provide.
 
 ```ts
-import { makeSchema, nullabilityGuard, authorizeField } from "nexus";
+import { makeSchema, nullabilityGuard, fieldAuthorizePlugin } from "nexus";
 import * as types from "./allNexusTypes";
 
 export const schema = makeSchema({
   types,
   plugins: [
-    authorizeField({
+    fieldAuthorizePlugin({
       /* ... */
     }),
     nullabilityGuard({
