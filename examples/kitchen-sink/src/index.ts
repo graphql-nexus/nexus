@@ -1,3 +1,4 @@
+/// <reference path="./kitchen-sink-typegen.ts" />
 import { ApolloServer } from "apollo-server";
 import {
   makeSchema,
