@@ -351,11 +351,13 @@ function getCurrentSchema(code: string): SchemaOrError {
         },
       },
     };
-    const { builder, schema } = core.makeSchemaInternal(config);
+    const { schema, finalConfig } = core.makeSchemaInternal(config);
     const sortedSchema = lexicographicSortSchema(schema);
     return {
       schema: sortedSchema,
-      metadata: new core.TypegenMetadata(builder, config),
+      metadata: new core.TypegenMetadata(
+        core.resolveTypegenConfig(finalConfig)
+      ),
       error: null,
     };
   } catch (error) {
