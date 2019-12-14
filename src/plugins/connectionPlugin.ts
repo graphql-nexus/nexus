@@ -2,9 +2,14 @@ import { plugin } from "../plugin";
 import { dynamicOutputMethod } from "../dynamicMethod";
 import { intArg, ArgsRecord, stringArg } from "../definitions/args";
 import { ObjectDefinitionBlock, objectType } from "../definitions/objectType";
-import { printedGenTypingImport, eachObj, mapObj, isObject } from "../utils";
 import {
-  FieldResolver,
+  printedGenTypingImport,
+  eachObj,
+  mapObj,
+  isObject,
+  isPromiseLike,
+} from "../utils";
+import {
   GetGen,
   RootValue,
   ArgsValue,
@@ -14,6 +19,7 @@ import {
 import { FieldOutConfig } from "../definitions/definitionBlocks";
 import { AllNexusOutputTypeDefs } from "../definitions/wrapping";
 import { GraphQLResolveInfo } from "graphql";
+import { forEach } from "iterall";
 
 export interface ConnectionPluginConfig {
   /**
@@ -24,39 +30,38 @@ export interface ConnectionPluginConfig {
    */
   nexusFieldName?: string;
   /**
-   * Whether we want the inputs to follow the spec, or if we
-   * want something different across the board
-   * for instance - { input: { pageSize: intArg(), page: intArg() } }
+   * Any args we want to include by default, in addition to the ones in the spec.
+   *
+   * @default null
    */
   args?: ArgsRecord;
   /**
-   * Whether we want the "edges" field on the connection / need to
-   * implement this in the contract.
-   *
-   * @default true
+   * Pass this value if you have logic you would like to use to validate the arguments.
+   * Defaults to requiring that either a `first` or `last` is provided.
    */
-  edges?: boolean;
+  validateArgs?: (args: ArgsRecord) => boolean;
   /**
-   * Whether we want a "nodes" field on the connection / need to
-   * implement this in the contract.
+   * Whether we also want to expose the "nodes" directly on the connection for convenience.
    *
    * @default false
    */
-  nodes?: boolean;
+  includeNodesField?: boolean;
   /**
-   * Whether we want "pageInfo" field on the connection / need to
-   * implement this in the contract.
+   * Default approach we use to transform a node into an unencoded cursor.
    *
-   * @default true
+   * Default is `cursor:${index}`
+   *
+   * @default "field"
    */
-  pageInfo?: boolean;
+  cursorFromNode?: (node: any, args: PaginationArgs, index: number) => string;
   /**
-   * Setting to true means that Nexus will automatically add the cursor
-   * property for each node in the list.
-   *
-   * @default true
+   * Conversion from a cursor string into an opaque token. Defaults to base64Encode(string)
    */
-  autoCursor?: boolean;
+  encodeCursor?: (value: string) => string;
+  /**
+   * Conversion from an opaque token into a cursor string. Defaults to base64Decode(string)
+   */
+  decodeCursor?: (cursor: string) => string;
   /**
    * Extend *all* edges to include additional fields, beyond cursor and node
    */
@@ -73,16 +78,50 @@ export interface ConnectionPluginConfig {
   extendPageInfo?: Record<string, Omit<FieldOutConfig<any, any>, "resolve">>;
 }
 
-export interface ConnectionFieldConfig {
+export interface ConnectionFieldConfig<
+  TypeName extends string = any,
+  FieldName extends string = any
+> {
   type: GetGen<"allOutputTypes", string> | AllNexusOutputTypeDefs;
   /**
    * Args we want to use for this field.
    */
   args?: ArgsRecord;
   /**
-   * Takes the args, and returns the args we should use in place for this field
+   * All of the nodes needed to fulfill the connection slice based on the pagination.
    */
-  extendArgs?: (args: ArgsRecord) => ArgsRecord;
+  nodes: (
+    root: RootValue<TypeName>,
+    args: ArgsValue<TypeName, FieldName>,
+    ctx: GetGen<"context">,
+    info: GraphQLResolveInfo
+  ) => Iterable<ResultValue<TypeName, FieldName>["edges"]["node"]>;
+  /**
+   * Approach we use to transform a node into a cursor.
+   *
+   * @default "nodeField"
+   */
+  cursorFromNode?: (
+    node: ResultValue<TypeName, FieldName>["edges"]["node"],
+    allNodes: Array<ResultValue<TypeName, FieldName>["edges"]["node"]>,
+    args: ArgsValue<TypeName, FieldName>
+  ) => string;
+  /**
+   * Whether the field allows for backward pagination
+   */
+  disableForwardPagination?: boolean;
+  /**
+   * Whether the field allows for backward pagination
+   */
+  disableBackwardPagination?: boolean;
+  /**
+   * Custom check for whether there is a next page for the pagination.
+   */
+  hasNextPage?: () => boolean;
+  /**
+   * Custom check for whether there is a previous page for the pagination.
+   */
+  hasPreviousPage?: () => boolean;
   /**
    * Dynamically adds additional fields to the current "connection" as it is define
    */
@@ -98,19 +137,40 @@ export interface ConnectionFieldConfig {
 }
 
 const FieldInfoArgs = {
-  first: intArg(),
-  after: stringArg(),
-  last: intArg(),
-  before: stringArg(),
+  first: intArg({
+    nullable: true,
+    description: "Returns the first n elements from the list.",
+  }),
+  after: stringArg({
+    nullable: true,
+    description:
+      "Returns the elements in the list that come after the specified cursor",
+  }),
+  last: intArg({
+    nullable: true,
+    description: "Returns the last n elements from the list.",
+  }),
+  before: stringArg({
+    nullable: true,
+    description:
+      "Returns the elements in the list that come before the specified cursor",
+  }),
 };
 
+function base64Encode(str: string) {
+  return Buffer.from(str, "utf8").toString("base64");
+}
+
+function base64Decode(str: string) {
+  return Buffer.from(str, "base64").toString("utf8");
+}
+
 const defaultConfig: ConnectionPluginConfig = {
-  args: FieldInfoArgs,
-  edges: true,
-  nodes: false,
-  pageInfo: true,
-  autoCursor: true,
   nexusFieldName: "connectionField",
+  args: FieldInfoArgs,
+  includeNodesField: false,
+  encodeCursor: base64Encode,
+  decodeCursor: base64Decode,
 };
 
 export type ConnectionNodesResolver<
@@ -123,27 +183,8 @@ export type ConnectionNodesResolver<
   info: GraphQLResolveInfo
 ) => MaybePromise<Array<ResultValue<TypeName, FieldName>["edges"]["node"]>>;
 
-export type EdgeFieldResolver<
-  TypeName extends string,
-  FieldName extends string,
-  EdgeField extends string
-> = (
-  root: RootValue<TypeName>,
-  args: ArgsValue<TypeName, FieldName>,
-  context: GetGen<"context">,
-  info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<TypeName, FieldName>["edges"][EdgeField]>;
-
-export type PageInfoFieldResolver<
-  TypeName extends string,
-  FieldName extends string,
-  EdgeField extends string
-> = (
-  root: RootValue<TypeName>,
-  args: ArgsValue<TypeName, FieldName>,
-  context: GetGen<"context">,
-  info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<TypeName, FieldName>["pageInfo"][EdgeField]>;
+// Used to break the `forEach` loop while while iterating a pagination connection.
+const BREAK = {};
 
 export const connectionPlugin = (
   config: "spec" | ConnectionPluginConfig = "spec"
@@ -167,46 +208,23 @@ export const connectionPlugin = (
       }),
     ],
     // Defines the field added to the definition block:
-    // t.connectionField('fieldName', {
+    // t.connectionField('users', {
     //   type: User
     // })
     onInstall(b) {
       let dynamicConfig = [];
 
       const {
-        args = FieldInfoArgs,
-        edges,
+        args = {},
         extendConnection,
         extendEdge,
         extendPageInfo,
-        nodes,
-        autoCursor,
+        includeNodesField,
+        encodeCursor = base64Encode,
+        decodeCursor = base64Decode,
+        cursorFromNode = defaultCursorFromNode,
         nexusFieldName = "connectionField",
-        pageInfo,
       } = finalConfig;
-
-      // If we want the "edges" field, add the type definition for it. If the "autoCursor"
-      // is true, meaning our library creates cursors automatically, then we want the return
-      // type to be an array, otherwise it's the edges field typing.
-      if (edges) {
-        dynamicConfig.push(
-          autoCursor
-            ? `edges: ConnectionNodesResolver<TypeName, FieldName>`
-            : `edges: core.SubFieldResolver<TypeName, FieldName, "edges">`
-        );
-      }
-
-      if (pageInfo) {
-        dynamicConfig.push(
-          `pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">`
-        );
-      }
-
-      if (nodes) {
-        dynamicConfig.push(
-          `nodes: core.SubFieldResolver<TypeName, FieldName, "nodes">`
-        );
-      }
 
       // If we want to add fields to every connection, we require the resolver be defined on the
       // field definition.
@@ -244,7 +262,7 @@ export const connectionPlugin = (
           name: nexusFieldName,
           typeDefinition: `<FieldName extends string>(
             fieldName: FieldName, 
-            config: ConnectionFieldConfig & ${printedDynamicConfig}
+            config: ConnectionFieldConfig<TypeName, FieldName> & ${printedDynamicConfig}
           ): void`,
           factory({ typeName, typeDef: t, args: [fieldName, config] }) {
             const fieldConfig = config as ConnectionFieldConfig;
@@ -279,27 +297,30 @@ export const connectionPlugin = (
                 objectType({
                   name: connectionName,
                   definition(t2) {
-                    if (nodes) {
+                    t2.field("edges", {
+                      type: edgeName,
+                      description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
+                    });
+
+                    t2.field("pageInfo", {
+                      type: pageInfoName,
+                      nullable: false,
+                      description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
+                    });
+
+                    if (includeNodesField) {
                       t2.list.field("nodes", {
                         type: targetType,
+                        description: `Flattened list of ${targetTypeName} type`,
                       });
                     }
-                    if (edges) {
-                      t2.field("edges", {
-                        type: edgeName,
-                      });
-                    }
-                    if (pageInfo) {
-                      t2.field("pageInfo", {
-                        type: pageInfoName,
-                        nullable: false,
-                      });
-                    }
+
                     if (extendConnection) {
                       eachObj(extendConnection, (val, key) => {
                         t2.field(key, val);
                       });
                     }
+
                     if (config.extendConnection instanceof Function) {
                       config.extendConnection(t2);
                     }
@@ -314,8 +335,19 @@ export const connectionPlugin = (
                 objectType({
                   name: edgeName,
                   definition(t2) {
-                    t2.string("cursor");
-                    t2.field("node", { type: targetType });
+                    t2.string("cursor", {
+                      nullable: false,
+                      description:
+                        "https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor",
+                      resolve(o) {
+                        return encodeCursor(o.cursor);
+                      },
+                    });
+                    t2.field("node", {
+                      type: targetType,
+                      description:
+                        "https://facebook.github.io/relay/graphql/connections.htm#sec-Node",
+                    });
                     if (extendEdge) {
                       eachObj(extendEdge, (val, key) => {
                         t2.field(key, val);
@@ -337,70 +369,184 @@ export const connectionPlugin = (
                   description:
                     "PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo",
                   definition(t2) {
-                    t2.boolean("hasNextPage", { nullable: false });
-                    t2.boolean("hasPreviousPage", { nullable: false });
-                    t2.string("startCursor", { nullable: false });
-                    t2.string("endCursor", { nullable: false });
+                    t2.boolean("hasNextPage", {
+                      nullable: false,
+                      description: `hasNextPage is used to indicate whether more edges exist following the set defined by the clients arguments. If the client is paginating with first/after, then the server must return true if further edges exist, otherwise false. If the client is paginating with last/before, then the client may return true if edges further from before exist, if it can do so efficiently, otherwise may return false.`,
+                    });
+                    t2.boolean("hasPreviousPage", {
+                      nullable: false,
+                      description: `hasPreviousPage is used to indicate whether more edges exist prior to the set defined by the clients arguments. If the client is paginating with last/before, then the server must return true if prior edges exist, otherwise false. If the client is paginating with first/after, then the client may return true if edges prior to after exist, if it can do so efficiently, otherwise may return false.`,
+                    });
+                    t2.string("startCursor", {
+                      nullable: false,
+                      description: `The cursor corresponding to the first nodes in edges.`,
+                      resolve: (o) => encodeCursor(o.startCursor),
+                    });
+                    t2.string("endCursor", {
+                      nullable: false,
+                      description: `The cursor corresponding to the last nodes in edges.`,
+                      resolve: (o) => encodeCursor(o.endCursor),
+                    });
+
                     if (extendPageInfo) {
                       eachObj(extendPageInfo, (val, key) => {
                         t2.field(key, val);
                       });
                     }
-                    if (config.extendPageInfo instanceof Function) {
-                      config.extendPageInfo(t2);
+                    if (fieldConfig.extendPageInfo instanceof Function) {
+                      fieldConfig.extendPageInfo(t2);
                     }
                   },
                 })
               );
             }
 
-            const fieldArgs = fieldConfig.extendArgs
-              ? fieldConfig.extendArgs(args)
-              : config.args || finalConfig.args;
+            const fieldArgs = {
+              ...args,
+              ...FieldInfoArgs,
+              ...(fieldConfig.args || {}),
+            };
 
             // Add the field to the type.
             t.field(fieldName, {
               ...config,
               args: fieldArgs,
               type: connectionName,
-              resolve(root, args, ctx, info) {
-                const resolveObj: Record<string, FieldResolver<any, any>> = {};
+              resolve(root, args: PaginationArgs, ctx, info) {
+                const formattedArgs = { ...args };
+                if (args.after) {
+                  formattedArgs.after = decodeCursor(args.after);
+                }
+                if (args.before) {
+                  formattedArgs.before = decodeCursor(args.before);
+                }
 
-                if (edges) {
-                  if (autoCursor) {
-                    resolveObj.edges = (a, b, c, info) => {
-                      return plugin.completeValue(
-                        config.edges(root, args, ctx, info),
-                        (edgeItems) => {
-                          return edgeItems;
-                        }
-                      );
-                    };
-                  } else {
-                    resolveObj.edges = (a, b, c, info) =>
-                      config.edges(root, args, ctx, info);
+                // TODO: Validate Arguments
+
+                // Local variable to cache the execution of fetching the nodes,
+                // which is needed for all fields.
+                let nodes: Promise<Iterable<any>>;
+                let edges: Promise<Array<{ cursor: string; node: any }>>;
+
+                function resolveNodes() {
+                  if (nodes !== undefined) {
+                    return nodes;
                   }
+                  nodes = Promise.resolve(
+                    fieldConfig.nodes(root, formattedArgs, ctx, info) || null
+                  );
+                  return nodes;
                 }
 
-                if (nodes) {
-                  resolveObj.nodes = (a, b, c, info) =>
-                    config.nodes(root, args, ctx, info);
+                function resolveEdges() {
+                  if (edges !== undefined) {
+                    return edges;
+                  }
+
+                  type ResolvedEdge = {
+                    cursor: string;
+                    node: any;
+                  };
+
+                  edges = resolveNodes().then((nodes) => {
+                    const resolvedEdges: MaybePromise<ResolvedEdge>[] = [];
+                    let hasPromise = false;
+
+                    function iterateNodesCallback(maybeNode: any, i: number) {
+                      if (isPromiseLike(maybeNode)) {
+                        hasPromise = true;
+                        resolvedEdges.push(
+                          maybeNode.then((node) => ({
+                            cursor: cursorFromNode(node, formattedArgs, i),
+                            node,
+                          }))
+                        );
+                      }
+                    }
+
+                    try {
+                      forEach(nodes, iterateNodesCallback);
+                    } catch (e) {
+                      if (e !== BREAK) {
+                        throw e;
+                      }
+                    }
+
+                    if (hasPromise) {
+                      return Promise.all(resolvedEdges);
+                    }
+
+                    return resolvedEdges as ResolvedEdge[];
+                  });
+
+                  return edges;
                 }
 
-                if (pageInfo) {
-                  resolveObj.pageInfo = (a, b, c, info) =>
-                    config.pageInfo(root, args, ctx, info);
+                async function resolvePageInfo() {
+                  const edges = await resolveEdges();
                 }
+
+                return {
+                  get nodes() {
+                    return resolveNodes();
+                  },
+                  get edges() {
+                    return resolveEdges();
+                  },
+                  get pageInfo() {
+                    return resolvePageInfo();
+                  },
+                };
               },
             });
           },
         })
       );
+
       // TODO: Deprecate this syntax
       return { types: [] };
     },
   });
 };
+
+type PaginationArgs =
+  | {
+      first: number;
+      after?: string;
+      last?: never;
+      before?: never;
+    }
+  | {
+      last: number;
+      before?: string;
+      first?: number;
+      after?: string;
+    };
+
+function defaultHasPreviousPage() {
+  //
+  return;
+}
+
+function defaultHasNextPage() {
+  //
+  return;
+}
+
+const CURSOR_PREFIX = "cursor:";
+
+// Assumes we're only paginating in one direction.
+function defaultCursorFromNode(node: any, args: PaginationArgs, index: number) {
+  if (args.first) {
+    if (args.after) {
+    }
+  }
+  if (args.last) {
+    if (args.before) {
+    }
+  }
+  return CURSOR_PREFIX + index;
+}
 
 const isConnectionExtended = (config: ConnectionFieldConfig) => {
   if (
@@ -441,24 +587,10 @@ const assertCorrectConfig = (
   finalConfig: ConnectionPluginConfig,
   config: any
 ) => {
-  if (finalConfig.edges && typeof config.edges !== "function") {
-    console.error(
-      new Error(
-        `Nexus Connection Plugin: Missing edges resolver property for ${typeName}.${fieldName}`
-      )
-    );
-  }
-  if (finalConfig.nodes && typeof config.nodes !== "function") {
+  if (typeof config.nodes !== "function") {
     console.error(
       new Error(
         `Nexus Connection Plugin: Missing nodes resolver property for ${typeName}.${fieldName}`
-      )
-    );
-  }
-  if (finalConfig.pageInfo && typeof config.pageInfo !== "function") {
-    console.error(
-      new Error(
-        `Nexus Connection Plugin: Missing pageInfo resolver property for ${typeName}.${fieldName}`
       )
     );
   }

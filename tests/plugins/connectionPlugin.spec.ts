@@ -19,10 +19,9 @@ describe("connectionPlugin", () => {
             // @ts-ignore
             t.connectionField("users", {
               type: "User",
-              edges: () => {
+              nodes() {
                 return [];
               },
-              pageInfo: () => {},
             });
           },
         }),
