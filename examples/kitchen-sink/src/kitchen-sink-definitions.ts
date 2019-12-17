@@ -182,13 +182,9 @@ export const Query = objectType({
     t.list.date("dateAsList", () => []);
     t.connectionField("connectionField", {
       type: Bar,
-      args: {
-        a: intArg({ nullable: false }),
-      },
-      edges(root, args) {
+      nodes(root, args) {
         return [];
       },
-      pageInfo: () => ({}),
     });
   },
 });
