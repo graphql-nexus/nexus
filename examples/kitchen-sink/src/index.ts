@@ -9,6 +9,10 @@ import path from "path";
 import * as types from "./kitchen-sink-definitions";
 import { logMutationTimePlugin } from "./example-plugins";
 
+const DEBUGGING_CURSOR = false;
+
+let fn = DEBUGGING_CURSOR ? (i: string) => i : undefined;
+
 const schema = makeSchema({
   types,
   outputs: {
@@ -17,7 +21,8 @@ const schema = makeSchema({
   },
   plugins: [
     connectionPlugin({
-      nullable: true,
+      encodeCursor: fn,
+      decodeCursor: fn,
     }),
     logMutationTimePlugin,
     fieldAuthorizePlugin(),

@@ -19,7 +19,8 @@ export const User = objectType({
   definition(t) {
     t.connectionField("friends", {
       type: User,
-      // A list of nodes which will be turned into edges with cursors
+      // A list of nodes which will be turned into edges with cursors.
+      // If only `nodes` is provided, we will infer the pagination.
       nodes(root, args, ctx, info) {
         return ctx.user.getFriends(args);
       },

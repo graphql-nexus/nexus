@@ -1,3 +1,5 @@
 export * from "./nullabilityGuardPlugin";
 export * from "./fieldAuthorizePlugin";
-export * from "./connectionPlugin";
+import * as connectionPluginCore from "./connectionPlugin";
+export { connectionPluginCore };
+export { connectionPlugin } from "./connectionPlugin";

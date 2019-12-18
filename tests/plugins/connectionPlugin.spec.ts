@@ -1,15 +1,16 @@
+import _ from "lodash";
 import { connectionPlugin, makeSchema, objectType } from "../../src";
 
 const User = objectType({
   name: "User",
   definition(t) {
-    t.id("name");
+    t.id("id");
     t.string("name");
   },
 });
 
 describe("connectionPlugin", () => {
-  it("should adhere to the Relay spec by default", () => {
+  it("should adhere to the Relay spec", () => {
     makeSchema({
       types: [
         User,
@@ -19,8 +20,11 @@ describe("connectionPlugin", () => {
             // @ts-ignore
             t.connectionField("users", {
               type: "User",
-              nodes() {
-                return [];
+              nodes(root, args, ctx, info) {
+                return [
+                  { id: "User:1", name: "Test 1" },
+                  { id: "User:2", name: "Test 2" },
+                ];
               },
             });
           },

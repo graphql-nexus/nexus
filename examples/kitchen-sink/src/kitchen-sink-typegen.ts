@@ -4,12 +4,7 @@
  */
 
 import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions";
-import { core, ConnectionFieldConfig } from "nexus";
-import {
-  ConnectionNodesResolver,
-  EdgeFieldResolver,
-  PageInfoFieldResolver,
-} from "nexus/dist/plugins/connectionPlugin";
+import { core, connectionPluginCore } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -29,13 +24,10 @@ declare global {
     ): void; // "Date";
     connectionField<FieldName extends string>(
       fieldName: FieldName,
-      config: ConnectionFieldConfig & {
-        edges: ConnectionNodesResolver<TypeName, FieldName>;
-        pageInfo: core.SubFieldResolver<TypeName, FieldName, "pageInfo">;
-        edgeFields: {
-          totalCount: EdgeFieldResolver<TypeName, FieldName, "totalCount">;
-        };
-      }
+      config: connectionPluginCore.ConnectionFieldConfig<
+        TypeName,
+        FieldName
+      > & {}
     ): void;
   }
 }
@@ -71,16 +63,15 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
-  BarConnection: {
+  BooleanConnection: {
     // root type
-    edges: NexusGenRootTypes["BarEdge"]; // BarEdge!
+    edges?: Array<NexusGenRootTypes["BooleanEdge"] | null> | null; // [BooleanEdge]
     pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
   };
-  BarEdge: {
+  BooleanEdge: {
     // root type
     cursor: string; // String!
-    node: NexusGenRootTypes["Bar"]; // Bar!
-    totalCount?: number | null; // Int
+    node: boolean; // Boolean!
   };
   Foo: {
     // root type
@@ -90,10 +81,10 @@ export interface NexusGenRootTypes {
   Mutation: {};
   PageInfo: {
     // root type
-    endCursor: string; // String!
+    endCursor?: string | null; // String
     hasNextPage: boolean; // Boolean!
     hasPreviousPage: boolean; // Boolean!
-    startCursor: string; // String!
+    startCursor?: string | null; // String
   };
   Query: {};
   SomeItem: {
@@ -105,6 +96,21 @@ export interface NexusGenRootTypes {
     a?: NexusGenRootTypes["Bar"] | null; // Bar
     item: string; // String!
     ok: boolean; // Boolean!
+  };
+  User: {
+    // root type
+    id: string; // ID!
+    name: string; // String!
+  };
+  UserConnection: {
+    // root type
+    edges?: Array<NexusGenRootTypes["UserEdge"] | null> | null; // [UserEdge]
+    pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
+  };
+  UserEdge: {
+    // root type
+    cursor: string; // String!
+    node: NexusGenRootTypes["User"]; // User!
   };
   Bar: NexusGenRootTypes["TestObj"] | NexusGenRootTypes["Foo"];
   Baz: NexusGenRootTypes["TestObj"];
@@ -126,16 +132,15 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 }
 
 export interface NexusGenFieldTypes {
-  BarConnection: {
+  BooleanConnection: {
     // field return type
-    edges: NexusGenRootTypes["BarEdge"]; // BarEdge!
+    edges: Array<NexusGenRootTypes["BooleanEdge"] | null> | null; // [BooleanEdge]
     pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
   };
-  BarEdge: {
+  BooleanEdge: {
     // field return type
     cursor: string; // String!
-    node: NexusGenRootTypes["Bar"]; // Bar!
-    totalCount: number | null; // Int
+    node: boolean; // Boolean!
   };
   Foo: {
     // field return type
@@ -150,22 +155,27 @@ export interface NexusGenFieldTypes {
   };
   PageInfo: {
     // field return type
-    endCursor: string; // String!
+    endCursor: string | null; // String
     hasNextPage: boolean; // Boolean!
     hasPreviousPage: boolean; // Boolean!
-    startCursor: string; // String!
+    startCursor: string | null; // String
   };
   Query: {
     // field return type
     asArgExample: string; // String!
     bar: NexusGenRootTypes["TestObj"]; // TestObj!
-    connectionField: NexusGenRootTypes["BarConnection"]; // BarConnection!
     dateAsList: any[]; // [Date!]!
+    edges: NexusGenRootTypes["BooleanConnection"]; // BooleanConnection!
     extended: NexusGenRootTypes["SomeItem"]; // SomeItem!
     getNumberOrNull: number | null; // Int
     inlineArgs: string; // String!
     inputAsArgExample: string; // String!
     protectedField: number; // Int!
+    userConnectionAdditionalArgs: NexusGenRootTypes["UserConnection"]; // UserConnection!
+    userConnectionBackwardOnly: NexusGenRootTypes["UserConnection"]; // UserConnection!
+    userConnectionForwardOnly: NexusGenRootTypes["UserConnection"]; // UserConnection!
+    usersConnectionNodes: NexusGenRootTypes["UserConnection"]; // UserConnection!
+    usersConnectionResolve: NexusGenRootTypes["UserConnection"]; // UserConnection!
   };
   SomeItem: {
     // field return type
@@ -177,6 +187,21 @@ export interface NexusGenFieldTypes {
     argsTest: boolean; // Boolean!
     item: string; // String!
     ok: boolean; // Boolean!
+  };
+  User: {
+    // field return type
+    id: string; // ID!
+    name: string; // String!
+  };
+  UserConnection: {
+    // field return type
+    edges: Array<NexusGenRootTypes["UserEdge"] | null> | null; // [UserEdge]
+    pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
+  };
+  UserEdge: {
+    // field return type
+    cursor: string; // String!
+    node: NexusGenRootTypes["User"]; // User!
   };
   Bar: {
     // field return type
@@ -212,9 +237,12 @@ export interface NexusGenArgTypes {
       // args
       testAsArg: NexusGenInputs["InputType"]; // InputType!
     };
-    connectionField: {
+    edges: {
       // args
-      a: number; // Int!
+      after?: string | null; // String
+      before?: string | null; // String
+      first?: number | null; // Int
+      last?: number | null; // Int
     };
     getNumberOrNull: {
       // args
@@ -228,6 +256,38 @@ export interface NexusGenArgTypes {
       // args
       testInput?: NexusGenInputs["InputType"] | null; // InputType
       testScalar?: string | null; // String
+    };
+    userConnectionAdditionalArgs: {
+      // args
+      after?: string | null; // String
+      before?: string | null; // String
+      first?: number | null; // Int
+      isEven?: boolean | null; // Boolean
+      last?: number | null; // Int
+    };
+    userConnectionBackwardOnly: {
+      // args
+      before?: string | null; // String
+      last?: number | null; // Int
+    };
+    userConnectionForwardOnly: {
+      // args
+      after?: string | null; // String
+      first?: number | null; // Int
+    };
+    usersConnectionNodes: {
+      // args
+      after?: string | null; // String
+      before?: string | null; // String
+      first?: number | null; // Int
+      last?: number | null; // Int
+    };
+    usersConnectionResolve: {
+      // args
+      after?: string | null; // String
+      before?: string | null; // String
+      first?: number | null; // Int
+      last?: number | null; // Int
     };
   };
   TestObj: {
@@ -253,14 +313,17 @@ export interface NexusGenAbstractResolveReturnTypes {
 export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames =
-  | "BarConnection"
-  | "BarEdge"
+  | "BooleanConnection"
+  | "BooleanEdge"
   | "Foo"
   | "Mutation"
   | "PageInfo"
   | "Query"
   | "SomeItem"
-  | "TestObj";
+  | "TestObj"
+  | "User"
+  | "UserConnection"
+  | "UserEdge";
 
 export type NexusGenInputNames =
   | "InputType"
