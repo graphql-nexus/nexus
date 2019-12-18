@@ -23,8 +23,7 @@ import { GraphQLResolveInfo, GraphQLFieldResolver } from "graphql";
 
 export interface ConnectionPluginConfig {
   /**
-   * What the connection field is defined as on the object
-   * definition block.
+   * The method name in the objectType definition block
    *
    * @default 'connectionField'
    */
@@ -201,12 +200,12 @@ export type ConnectionFieldConfig<
        *
        * https://github.com/graphql/graphql-relay-js
        */
-      resolve(
+      resolve: (
         root: RootValue<TypeName>,
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<"context">,
         info: GraphQLResolveInfo
-      ):
+      ) =>
         | MaybePromise<ResultValue<TypeName, FieldName>>
         | MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
 
@@ -585,27 +584,27 @@ export function makeResolveFn(
 
     // Local variable to cache the execution of fetching the nodes,
     // which is needed for all fields.
-    let nodes: Promise<Array<any>>;
-    let edges: Promise<Array<EdgeLike | null> | null>;
+    let cachedNodes: Promise<Array<any>>;
+    let cachedEdges: Promise<Array<EdgeLike | null> | null>;
 
-    const resolveNodes = function resolveNodes() {
-      if (nodes !== undefined) {
-        return nodes;
+    const resolveNodes = () => {
+      if (cachedNodes !== undefined) {
+        return cachedNodes;
       }
-      nodes = Promise.resolve(
+      cachedNodes = Promise.resolve(
         nodesResolve(root, formattedArgs, ctx, info) || null
       );
-      return nodes.then((allNodes) =>
+      return cachedNodes.then((allNodes) =>
         allNodes ? Array.from(allNodes) : allNodes
       );
     };
 
-    const resolveEdges = function resolveEdges() {
-      if (edges !== undefined) {
-        return edges;
+    const resolveEdges = () => {
+      if (cachedEdges !== undefined) {
+        return cachedEdges;
       }
 
-      edges = resolveNodes().then((nodes) => {
+      cachedEdges = resolveNodes().then((nodes) => {
         if (!nodes) {
           return null;
         }
@@ -651,10 +650,10 @@ export function makeResolveFn(
         return resolvedEdgeList as EdgeLike[];
       });
 
-      return edges;
+      return cachedEdges;
     };
 
-    const resolvePageInfo = async function resolvePageInfo() {
+    const resolvePageInfo = async () => {
       const [nodes, edges] = await Promise.all([
         resolveNodes(),
         resolveEdges(),
@@ -806,7 +805,7 @@ function defaultCursorFromNode(
       cursorIndex = offset - args.last + index;
     }
   }
-  return CURSOR_PREFIX + cursorIndex;
+  return `${CURSOR_PREFIX}${cursorIndex}`;
 }
 
 const isConnectionExtended = (config: ConnectionFieldConfig) => {

@@ -4,104 +4,57 @@ title: Connection Plugin
 sidebar_label: Connections
 ---
 
-Default Usage:
+The connection plugin provides a new method on the object definition builder, which allows us to
+create paginated associations between types, using the [Relay Connection Specification](https://facebook.github.io/relay/graphql/connections.htm#sec-Node).
+
+To install, add the connectionPlugin to the `makeSchema.plugins` array, along with any other plugins
+you'd like to include:
 
 ```ts
-makeSchema({
+import { makeSchema, connectionPlugin } from "nexus";
+
+const schema = makeSchema({
   // ... types, etc,
   plugins: [connectionPlugin()],
 });
 ```
 
+By default, the plugin will make a `t.connectionField` method available on the object definition builder:
+
 ```ts
 export const User = objectType({
   name: "User",
   definition(t) {
-    t.connectionField("friends", {
-      type: User,
-      // A list of nodes which will be turned into edges with cursors.
-      // If only `nodes` is provided, we will infer the pagination.
-      nodes(root, args, ctx, info) {
-        return ctx.user.getFriends(args);
-      },
-    });
+    t.connectionField(...);
   },
 });
 ```
 
+Though you can also configure this, or create multiple connection types with varying defaults, available
+under different connections.
+
 Custom Usage:
 
 ```ts
+import { makeSchema, connectionPlugin } from "nexus";
+
+const schema = makeSchema({
+  // ... types, etc,
+  plugins: [
+    connectionPlugin({
+      nexusFieldName: "analyticsConnection",
+      extendConnection: {},
+    }),
+    connectionPlugin({}),
+  ],
+});
 ```
 
-Plugin Configuration Options:
+If you want to include a `nodes` field, which includes the nodes of the connection flattened into an array similar to how
+GitHub does in their [GraphQL API](https://developer.github.com/v4/), set
 
 ```ts
-type ConnectionPlugin =
-  | "spec"
-  | {
-      /**
-       * @default 'connectionField'
-       */
-      name?: string;
-      /**
-       * Field description
-       */
-      description?: string;
-      /**
-       * Deprecation reason
-       */
-      deprecated?: string;
-      /**
-       * Whether we want the inputs to follow the spec, or if we
-       * want something different across the board
-       * for instance - { input: { pageSize: intArg(), page: intArg() } }
-       */
-      inputs?: "spec" | Args;
-      /**
-       * How we want the connection name to be named.
-       * Provide this option to override.
-       *
-       * @default
-       *
-       * type Organization {
-       *   members(...): UserConnection
-       * }
-       *
-       * unless either the `inputs`, `extendEdge`, or `extendConnection`
-       * are provided on the field definition - in which case:
-       *
-       * type Organization {
-       *   members(...): OrganizationMembersUserConnection
-       * }
-       */
-      name?: (fieldConfig) => string;
-      /**
-       * The edge type we want to return
-       */
-      edgeType?: (fieldConfig) => string;
-      /**
-       * Whether we want the "edges" field on the connection / need to
-       * implement this in the contract.
-       *
-       * @default true
-       */
-      edges?: boolean;
-      /**
-       * Whether we want "pageInfo" field on the connection / need to
-       * implement this in the contract.
-       *
-       * @default true
-       */
-      pageInfo?: boolean;
-      /**
-       * Extend *all* edges to include additional fields, beyond cursor.
-       */
-      extendEdge?: Record<string, { type: resolve }>;
-      /**
-       * Any additional fields we want to make available to the connection type,
-       * beyond what is in the spec / configured above.
-       */
-      extendConnection?: Record<string, { type: resolve }>;
-    };
+connectionPlugin({
+  includeNodesField: true,
+});
 ```
