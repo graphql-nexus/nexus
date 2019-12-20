@@ -334,7 +334,7 @@ export class InputDefinitionBlock<TypeName extends string> {
     if (this.isList) {
       if (config.list) {
         this.typeBuilder.warn(
-          `It looks like you chained .list and set list for ${config.name}` +
+          `It looks like you chained .list and set list for ${config.name}. ` +
             "You should only do one or the other"
         );
       } else {
