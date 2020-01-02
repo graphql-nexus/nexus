@@ -29,6 +29,9 @@ export interface ConnectionPluginConfig {
    */
   nexusFieldName?: string;
   /**
+   *
+   */
+  /**
    * Whether to expose the "nodes" directly on the connection for convenience.
    *
    * @default false
@@ -74,6 +77,14 @@ export interface ConnectionPluginConfig {
     allNodes: any[]
   ) => string;
   /**
+   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
+   * when customizing the behavior of `cursorFromNode`
+   */
+  pageInfoFromNodes?: (
+    allNodes: any[],
+    args: PaginationArgs
+  ) => { hasNextPage: boolean; hasPreviousPage: boolean };
+  /**
    * Conversion from a cursor string into an opaque token. Defaults to base64Encode(string)
    */
   encodeCursor?: (value: string) => string;
@@ -95,13 +106,6 @@ export interface ConnectionPluginConfig {
    * beyond hasNextPage, hasPreviousPage, startCursor, endCursor
    */
   extendPageInfo?: Record<string, Omit<FieldOutConfig<any, any>, "resolve">>;
-  /**
-   * If set to true, we will assume that a next/previous page exists
-   * if the nodes length >= number requested for the first / last
-   *
-   * @default true
-   */
-  approximateNextPage?: boolean;
 }
 
 // Extract the node value from the connection for a given field.
@@ -140,6 +144,14 @@ export type ConnectionFieldConfig<
     allNodes: NodeValue<TypeName, FieldName>[]
   ) => string;
   /**
+   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
+   * when customizing the behavior of `cursorFromNode`
+   */
+  pageInfoFromNodes?: (
+    nodes: NodeValue<TypeName, FieldName>[],
+    args: ArgsValue<TypeName, FieldName>
+  ) => { hasNextPage: boolean; hasPreviousPage: boolean };
+  /**
    * Whether the field allows for backward pagination
    */
   disableForwardPagination?: boolean;
@@ -147,6 +159,13 @@ export type ConnectionFieldConfig<
    * Whether the field allows for backward pagination
    */
   disableBackwardPagination?: boolean;
+  /**
+   * Custom logic to validate the arguments.
+   *
+   * Defaults to requiring that either a `first` or `last` is provided, and
+   * that after / before must be paired with `first` or `last`, respectively.
+   */
+  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
   /**
    * Dynamically adds additional fields to the current "connection" as it is define
    */
@@ -159,13 +178,6 @@ export type ConnectionFieldConfig<
    * Dynamically adds additional fields to the connection "pageInfo" as it is defined
    */
   extendPageInfo?: (def: ObjectDefinitionBlock<any>) => void;
-  /**
-   * If set to true, we will assume that a next/previous page exists
-   * if the nodes length >= number requested for the first / last
-   *
-   * @default true
-   */
-  approximateNextPage?: boolean;
 } & (
   | {
       /**
@@ -300,6 +312,15 @@ export const connectionPlugin = (
     //   type: User
     // })
     onInstall(b) {
+      const plugins = b.getConfigOption("plugins");
+
+      // If we know there are multiple connection fields, we need to rename the "Base Name" for the
+      // Connection / Edge
+      const hasMultipleConnectionFields =
+        (plugins
+          ?.map((p) => p.config.name)
+          .filter((name) => name === "ConnectionPlugin").length ?? 0) > 1;
+
       let dynamicConfig = [];
 
       const {
@@ -308,7 +329,6 @@ export const connectionPlugin = (
         extendEdge: pluginExtendEdge,
         extendPageInfo: pluginExtendPageInfo,
         includeNodesField = false,
-        validateArgs = defaultValidateArgs,
         nexusFieldName = "connectionField",
       } = pluginConfig;
 
@@ -350,35 +370,32 @@ export const connectionPlugin = (
             fieldName: FieldName, 
             config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> & ${printedDynamicConfig}
           ): void`,
-          factory({ typeName, typeDef: t, args: factoryArgs }) {
+          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
               ConnectionFieldConfig
             ];
             const targetType = fieldConfig.type;
-            const targetTypeName =
-              typeof targetType === "string"
-                ? targetType
-                : (targetType.name as string);
 
-            // If we have changed the config specific to this field, on either the connection,
-            // edge, or page info, then we need a custom type for the connection & edge.
-            const connectionName = isConnectionExtended(fieldConfig)
-              ? `${typeName}${upperFirst(fieldName)}${targetTypeName}Connection`
-              : `${targetTypeName}Connection`;
+            const {
+              targetTypeName,
+              connectionName,
+              edgeName,
+              pageInfoName,
+            } = getTypeNames(
+              fieldName,
+              parentTypeName,
+              fieldConfig,
+              pluginConfig,
+              hasMultipleConnectionFields
+            );
 
-            // If we have modified the "edge" at all, then we need
-            const edgeName = isEdgeExtended(fieldConfig)
-              ? `${typeName}${upperFirst(fieldName)}${targetTypeName}Edge`
-              : `${targetTypeName}Edge`;
-
-            // If we have modified the "edge" at all, then we need a specific type
-            // for this Connection, rather than the generic one.
-            const pageInfoName = isPageInfoExtended(fieldConfig)
-              ? `${typeName}${upperFirst(fieldName)}${targetTypeName}PageInfo`
-              : `PageInfo`;
-
-            assertCorrectConfig(typeName, fieldName, pluginConfig, fieldConfig);
+            assertCorrectConfig(
+              parentTypeName,
+              fieldName,
+              pluginConfig,
+              fieldConfig
+            );
 
             // Add the "Connection" type to the schema if it doesn't exist already
             if (!b.hasType(connectionName)) {
@@ -490,7 +507,11 @@ export const connectionPlugin = (
                 })
               );
             }
-            const { disableBackwardPagination, disableForwardPagination } = {
+            const {
+              disableBackwardPagination,
+              disableForwardPagination,
+              validateArgs = defaultValidateArgs,
+            } = {
               ...pluginConfig,
               ...fieldConfig,
             };
@@ -562,7 +583,7 @@ export function makeResolveFn(
       decodeCursor = base64Decode,
       encodeCursor = base64Encode,
     } = pluginConfig;
-    const { approximateNextPage = true } = mergedConfig;
+    const { pageInfoFromNodes = defaultPageInfoFromNodes } = mergedConfig;
     if (!nodesResolve) {
       console.error(
         `Missing resolve or nodes field for Connection ${info.parentType.name}.${info.fieldName}`
@@ -585,9 +606,13 @@ export function makeResolveFn(
     // Local variable to cache the execution of fetching the nodes,
     // which is needed for all fields.
     let cachedNodes: Promise<Array<any>>;
-    let cachedEdges: Promise<Array<EdgeLike | null> | null>;
+    let cachedEdges: Promise<{
+      edges: Array<EdgeLike | null>;
+      nodes: any[];
+    }>;
 
-    const resolveNodes = () => {
+    // Get all the nodes, before any pagination sliciing
+    const resolveAllNodes = () => {
       if (cachedNodes !== undefined) {
         return cachedNodes;
       }
@@ -599,29 +624,31 @@ export function makeResolveFn(
       );
     };
 
-    const resolveEdges = () => {
+    const resolveEdgesAndNodes = () => {
       if (cachedEdges !== undefined) {
         return cachedEdges;
       }
 
-      cachedEdges = resolveNodes().then((nodes) => {
-        if (!nodes) {
-          return null;
+      cachedEdges = resolveAllNodes().then((allNodes) => {
+        if (!allNodes) {
+          return { edges: [], nodes: [] };
         }
 
         const resolvedEdgeList: MaybePromise<EdgeLike>[] = [];
+        const resolvedNodeList: any[] = [];
         let hasPromise = false;
 
-        iterateNodes(nodes, args, (maybeNode, i) => {
+        iterateNodes(allNodes, args, (maybeNode, i) => {
           if (isPromiseLike(maybeNode)) {
             hasPromise = true;
+            resolvedNodeList.push(maybeNode);
             resolvedEdgeList.push(
               maybeNode.then((node) => {
                 const rawCursor = cursorFromNode(
                   maybeNode,
                   formattedArgs,
                   i,
-                  nodes
+                  allNodes
                 );
                 return {
                   cursor: encodeCursor(rawCursor),
@@ -634,37 +661,42 @@ export function makeResolveFn(
               maybeNode,
               formattedArgs,
               i,
-              nodes
+              allNodes
             );
+            resolvedNodeList.push(maybeNode);
             resolvedEdgeList.push({
-              cursor: encodeCursor(rawCursor),
               node: maybeNode,
+              cursor: encodeCursor(rawCursor),
             });
           }
         });
 
         if (hasPromise) {
-          return Promise.all(resolvedEdgeList);
+          return Promise.all([
+            Promise.all(resolvedEdgeList),
+            Promise.all(resolvedNodeList),
+          ]).then(([edges, nodes]) => ({ edges, nodes }));
         }
 
-        return resolvedEdgeList as EdgeLike[];
+        return { nodes: resolvedNodeList, edges: resolvedEdgeList };
       });
 
       return cachedEdges;
     };
 
     const resolvePageInfo = async () => {
-      const [nodes, edges] = await Promise.all([
-        resolveNodes(),
-        resolveEdges(),
+      const [allNodes, { edges }] = await Promise.all([
+        resolveAllNodes(),
+        resolveEdgesAndNodes(),
       ]);
+      let basePageInfo = allNodes
+        ? pageInfoFromNodes(allNodes, args)
+        : {
+            hasNextPage: false,
+            hasPreviousPage: false,
+          };
       return {
-        hasNextPage: edges
-          ? defaultHasNextPage(args, edges, nodes, approximateNextPage)
-          : false,
-        hasPreviousPage: edges
-          ? defaultHasPreviousPage(args, edges, nodes, approximateNextPage)
-          : false,
+        ...basePageInfo,
         startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
         endCursor: edges?.[edges.length - 1]?.cursor ?? null,
       };
@@ -672,10 +704,10 @@ export function makeResolveFn(
 
     return {
       get nodes() {
-        return resolveNodes();
+        return resolveEdgesAndNodes().then((o) => o.nodes);
       },
       get edges() {
-        return resolveEdges();
+        return resolveEdgesAndNodes().then((o) => o.edges);
       },
       get pageInfo() {
         return resolvePageInfo();
@@ -722,20 +754,18 @@ type PaginationArgs =
       after?: string;
     };
 
-function defaultHasNextPage(
-  args: PaginationArgs,
-  edges: Array<EdgeLike | null>,
-  nodes: any[] | null,
-  approximateNextPage: boolean
-) {
+function defaultPageInfoFromNodes(nodes: any[], args: PaginationArgs) {
+  return {
+    hasNextPage: defaultHasNextPage(nodes, args),
+    hasPreviousPage: defaultHasPreviousPage(nodes, args),
+  };
+}
+
+function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
   if (args.first) {
-    if (approximateNextPage) {
-      return edges.length >= args.first;
-    } else {
-      return nodes ? nodes.length > args.first : false;
-    }
+    return nodes.length >= args.first;
   }
   // If we're paginating backward, and there are as many results as we asked for, then we'll assume
   // that we have a previous page
@@ -752,12 +782,7 @@ function defaultHasNextPage(
 /**
  * A sensible default for determining "previous page".
  */
-function defaultHasPreviousPage(
-  args: PaginationArgs,
-  edges: Array<EdgeLike | null>,
-  nodes: any[] | null,
-  approximateNextPage: boolean
-) {
+function defaultHasPreviousPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
   if (args.first) {
@@ -769,10 +794,7 @@ function defaultHasPreviousPage(
   // If we're paginating backward, and there are as many results as we asked for, then we'll assume
   // that we have a previous page
   if (args.last) {
-    if (approximateNextPage) {
-      return edges.length >= args.last;
-    }
-    return nodes ? nodes.length > args.last : false;
+    return nodes.length >= args.last;
   }
   // Otherwise, if neither first or last are provided, return false
   return false;
@@ -808,26 +830,122 @@ function defaultCursorFromNode(
   return `${CURSOR_PREFIX}${cursorIndex}`;
 }
 
-const isConnectionExtended = (config: ConnectionFieldConfig) => {
+const getTypeNames = (
+  fieldName: string,
+  parentTypeName: string,
+  fieldConfig: ConnectionFieldConfig,
+  pluginConfig: ConnectionPluginConfig,
+  hasMultipleConnectionFields: boolean
+) => {
+  const targetTypeName =
+    typeof fieldConfig.type === "string"
+      ? fieldConfig.type
+      : (fieldConfig.type.name as string);
+
+  // If we have changed the config specific to this field, on either the connection,
+  // edge, or page info, then we need a custom type for the connection & edge.
+  const connectionName = isConnectionFieldExtended(fieldConfig)
+    ? `${parentTypeName}${upperFirst(fieldName)}${targetTypeName}Connection`
+    : isConnectionGloballyExtended(pluginConfig)
+    ? `${targetTypeName}${extendedPrefix(
+        pluginConfig,
+        hasMultipleConnectionFields
+      )}Connection`
+    : `${targetTypeName}${maybePrefix("Connection", pluginConfig)}`;
+
+  // If we have modified the "edge" at all, then we need
+  const edgeName = isEdgeFieldExtended(fieldConfig)
+    ? `${parentTypeName}${upperFirst(fieldName)}${targetTypeName}Edge`
+    : isEdgeGloballyExtended(pluginConfig)
+    ? `${targetTypeName}${extendedPrefix(
+        pluginConfig,
+        hasMultipleConnectionFields
+      )}Edge`
+    : `${targetTypeName}${maybePrefix("Edge", pluginConfig)}`;
+
+  // If we have modified the "edge" at all, then we need a specific type
+  // for this Connection, rather than the generic one.
+  const pageInfoName = isPageInfoFieldExtended(fieldConfig)
+    ? `${parentTypeName}${upperFirst(fieldName)}${targetTypeName}PageInfo`
+    : isConnectionGloballyExtended(pluginConfig)
+    ? `${targetTypeName}${extendedPrefix(
+        pluginConfig,
+        hasMultipleConnectionFields
+      )}PageInfo`
+    : maybePrefix("PageInfo", pluginConfig);
+
+  return {
+    targetTypeName,
+    edgeName,
+    pageInfoName,
+    connectionName,
+  };
+};
+
+const maybePrefix = (
+  toPrefix: string,
+  pluginConfig: ConnectionPluginConfig
+) => {
+  //
+};
+
+const extendedPrefix = (
+  pluginConfig: ConnectionPluginConfig,
+  hasMultipleConnectionFields: boolean
+) => {
+  if (pluginConfig.prefix) {
+  }
+  // If we don't have multiple connections, we don't need to worry about prefixing uniquely
+  if (!hasMultipleConnectionFields) {
+    return "";
+  }
+};
+
+const isConnectionGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
   if (
-    config.extendConnection ||
-    isEdgeExtended(config) ||
-    isPageInfoExtended(config)
+    pluginConfig.extendConnection ||
+    isEdgeGloballyExtended(pluginConfig) ||
+    isPageInfoGloballyExtended(pluginConfig)
   ) {
     return true;
   }
   return false;
 };
 
-const isEdgeExtended = (config: ConnectionFieldConfig) => {
-  if (config.extendEdge) {
+const isEdgeGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
+  if (pluginConfig.extendEdge) {
     return true;
   }
   return false;
 };
 
-const isPageInfoExtended = (config: ConnectionFieldConfig) => {
-  if (config.extendPageInfo) {
+const isPageInfoGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
+  if (pluginConfig.extendPageInfo) {
+    return true;
+  }
+  return false;
+};
+
+const isConnectionFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
+  if (
+    fieldConfig.extendConnection ||
+    isEdgeFieldExtended(fieldConfig) ||
+    isPageInfoFieldExtended(fieldConfig)
+  ) {
+    return true;
+  }
+  return false;
+};
+
+const isEdgeFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
+  if (fieldConfig.extendEdge) {
+    return true;
+  }
+  return false;
+};
+
+const isPageInfoFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
+  if (fieldConfig.extendPageInfo) {
     return true;
   }
   return false;

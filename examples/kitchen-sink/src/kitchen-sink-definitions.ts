@@ -11,6 +11,7 @@ import {
   mutationField,
   mutationType,
   booleanArg,
+  queryField,
 } from "nexus";
 import _ from "lodash";
 import { connectionFromArray } from "graphql-relay";
@@ -270,32 +271,34 @@ export const Query = objectType({
         };
       },
     });
-
-    t.connectionField("userConnectionAdditionalArgs", {
-      type: User,
-      additionalArgs: {
-        isEven: booleanArg({
-          description: "If true, filters the users with an odd pk",
-        }),
-      },
-      resolve(root, args) {
-        let userData = USERS_DATA;
-        if (args.isEven) {
-          userData = USERS_DATA.filter((u) => u.pk % 2 === 0);
-        }
-        const { edges, pageInfo } = connectionFromArray(userData, args);
-        // The typings are wrong in this package for hasNextPage & hasPreviousPage
-        return {
-          edges,
-          pageInfo: {
-            ...pageInfo,
-            hasNextPage: Boolean(pageInfo.hasNextPage),
-            hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
-          },
-        };
-      },
-    });
   },
+});
+
+export const userConnectionAdditionalArgs = queryField((t) => {
+  t.connectionField("userConnectionAdditionalArgs", {
+    type: User,
+    additionalArgs: {
+      isEven: booleanArg({
+        description: "If true, filters the users with an odd pk",
+      }),
+    },
+    resolve(root, args) {
+      let userData = USERS_DATA;
+      if (args.isEven) {
+        userData = USERS_DATA.filter((u) => u.pk % 2 === 0);
+      }
+      const { edges, pageInfo } = connectionFromArray(userData, args);
+      // The typings are wrong in this package for hasNextPage & hasPreviousPage
+      return {
+        edges,
+        pageInfo: {
+          ...pageInfo,
+          hasNextPage: Boolean(pageInfo.hasNextPage),
+          hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
+        },
+      };
+    },
+  });
 });
 
 export const User = objectType({
