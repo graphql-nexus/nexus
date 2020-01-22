@@ -1439,9 +1439,9 @@ export class SchemaBuilder {
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
       addInterfaces: (i) => {
-        i.forEach((i) => {
-          if (typeof i !== "string") {
-            this.addType(i);
+        i.forEach((j) => {
+          if (typeof j !== "string") {
+            this.addType(j);
           }
         });
       },
