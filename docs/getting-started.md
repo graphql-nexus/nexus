@@ -165,17 +165,8 @@ Read more about how the automatic [type generation](type-generation.md) works.
 Although your <code>.graphql</code> file is generated, we recommend you check the file into source control. This gives you visibility into how changes in type construction affect the schema consumed by the end-user.
 </blockquote>
 
-## Type-Level defaultResolver
-
-GraphQL Nexus allows you to define an override to the `defaultResolver` on a per-type basis, for advanced use-cases
-
-<blockquote class="warn">
-<b>Warning:</b>
-
-Specifying a defaultResolver for a type can have unintended consequences, and makes it harder to statically type. It is only recommended for advanced use-cases.
-
-</blockquote>
-
 ## Testing Nexus
 
 Nexus encourages separating your domain logic from the actual resolvers via context, so you should be able to test and reuse your application logic independent of GraphQL. See the use of the [data-sources](https://github.com/prisma-labs/nexus/tree/develop/examples/ghost/src/data-sources) in the ghost example for a start on how you might structure your data layer.
+
+More info about testing patterns for GraphQL will be coming soon.
