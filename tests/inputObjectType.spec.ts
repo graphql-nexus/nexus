@@ -17,6 +17,14 @@ describe("inputObject", () => {
             t.boolean("boolInput");
             t.float("floatInput");
             t.int("intInput");
+            t.field("inlineField", {
+              type: inputObjectType({
+                name: "InlineFiedExample",
+                definition(t) {
+                  t.boolean("ok");
+                },
+              }),
+            });
           },
         }),
         objectType({
