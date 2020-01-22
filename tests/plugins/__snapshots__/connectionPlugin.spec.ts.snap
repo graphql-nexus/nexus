@@ -432,11 +432,35 @@ exports[`connectionPlugin global plugin configuration allows disabling backward 
 }"
 `;
 
+exports[`connectionPlugin global plugin configuration allows disabling backward pagination w/ strictArgs: false to make \`first\` nullable 1`] = `
+"type Query {
+  users(
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+  ): UserConnection
+}"
+`;
+
 exports[`connectionPlugin global plugin configuration allows disabling forward pagination 1`] = `
 "type Query {
   users(
     \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
     last: Int!
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+  ): UserConnection
+}"
+`;
+
+exports[`connectionPlugin global plugin configuration allows disabling forward pagination w/ strictArgs:false to make \`last\` nullable 1`] = `
+"type Query {
+  users(
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
 
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
