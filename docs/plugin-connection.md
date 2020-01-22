@@ -32,9 +32,11 @@ export const User = objectType({
 });
 ```
 
+You can change the name of this field by specifying the `nexusFieldName` in the plugin config.
+
 ## Usage:
 
-There are two main ways to use the connection field, by providing a `nodes` property or providing a `resolve` property:
+There are two main ways to use the connection field, with a `nodes` property, or a `resolve` property:
 
 ### With `nodes`:
 
@@ -51,22 +53,28 @@ t.connectionField("users", {
 });
 ```
 
-There are properties on the plugin to help configure this including, `cursorFromNode`, which allows you to customize how the cursor is created, or `pageInfoFromNodes` to customize how `hasNextPage` or `hasPreviousPage` are set.
+One limitation of the `nodes` property, is that you cannot paginate backward without a `cursor`, or without defining a `cursorFromNode` property on either the field or plugin config. This is because we can't know how long the connection list may be to begin paginating backward.
 
 ### With `resolve`:
 
-If you have custom logic you'd like to provide in resolving the connection, we allow you to instead specify a `resolve` field, which will make not assumptions about how the `edges`, `cursor`, or `pageInfo` are defined. For instance, you can use this with the helpers provided via [graphql-relay-js](https://github.com/graphql/graphql-relay-js).
+If you have custom logic you'd like to provide in resolving the connection, we allow you to instead specify a `resolve` field, which will make not assumptions about how the `edges`, `cursor`, or `pageInfo` are defined.
+
+You can use this with helpers provided via [graphql-relay-js](https://github.com/graphql/graphql-relay-js).
 
 ```ts
+import { connectionFromArray } from "graphql-relay";
+
 export const usersQueryField = queryField((t) => {
   t.connectionField("users", {
     type: User,
-    resolve(root, args, ctx, info) {
-      return;
+    async resolve(root, args, ctx, info) {
+      return connectionFromArray(await ctx.resolveUserNodes(), args);
     },
   });
 });
 ```
+
+There are properties on the plugin to help configure this including, `cursorFromNode`, which allows you to customize how the cursor is created, or `pageInfoFromNodes` to customize how `hasNextPage` or `hasPreviousPage` are set.
 
 ## Pagination Arguments
 
@@ -84,8 +92,7 @@ to the field configuration directly.
 
 ## Multiple Connection Types:
 
-Though you can also configure this, or create multiple connection types with varying defaults, available
-under different connections.
+You can create multiple field connection types with varying defaults, available under different connections builder methods. A `typePrefix` property should be supplied to configure the name
 
 Custom Usage:
 
@@ -96,15 +103,19 @@ const schema = makeSchema({
   // ... types, etc,
   plugins: [
     connectionPlugin({
+      typePrefix: "Analytics",
       nexusFieldName: "analyticsConnection",
       extendConnection: {
         totalCount: { type: "Int" },
+        avgDuration: { type: "Int" },
       },
     }),
     connectionPlugin({}),
   ],
 });
 ```
+
+### Including a `nodes` field:
 
 If you want to include a `nodes` field, which includes the nodes of the connection flattened into an array similar to how GitHub does in their [GraphQL API](https://developer.github.com/v4/), set `includeNodesField` to `true`
 

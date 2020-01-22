@@ -135,9 +135,9 @@ export interface PluginConfig {
  * Helper for allowing plugins to fulfill the return of the `next` resolver,
  * without paying the cost of the Promise if not required.
  */
-export function completeValue<T>(
+export function completeValue<T, R = T>(
   valOrPromise: PromiseLike<T> | T,
-  onSuccess: (completedVal: T) => T,
+  onSuccess: (completedVal: T) => R,
   onError?: (errVal: any) => T
 ) {
   if (isPromiseLike(valOrPromise)) {

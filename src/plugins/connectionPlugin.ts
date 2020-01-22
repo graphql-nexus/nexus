@@ -71,16 +71,19 @@ export interface ConnectionPluginConfig {
   cursorFromNode?: (
     node: any,
     args: PaginationArgs,
-    index: number,
-    allNodes: any[]
-  ) => string;
+    ctx: GetGen<"context">,
+    info: GraphQLResolveInfo,
+    forCursor: { index: number; nodes: any[] }
+  ) => string | Promise<string>;
   /**
    * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
    * when customizing the behavior of `cursorFromNode`
    */
   pageInfoFromNodes?: (
     allNodes: any[],
-    args: PaginationArgs
+    args: PaginationArgs,
+    ctx: GetGen<"context">,
+    info: GraphQLResolveInfo
   ) => { hasNextPage: boolean; hasPreviousPage: boolean };
   /**
    * Conversion from a cursor string into an opaque token. Defaults to base64Encode(string)
@@ -102,7 +105,7 @@ export interface ConnectionPluginConfig {
   /**
    * Prefix for the Connection / Edge type
    */
-  prefix?: string;
+  typePrefix?: string;
 }
 
 // Extract the node value from the connection for a given field.
@@ -135,18 +138,21 @@ export type ConnectionFieldConfig<
    * @default "nodeField"
    */
   cursorFromNode?: (
-    node: NodeValue<TypeName, FieldName>,
-    args: ArgsValue<TypeName, FieldName>,
-    index: number,
-    allNodes: NodeValue<TypeName, FieldName>[]
-  ) => string;
+    node: any,
+    args: PaginationArgs,
+    ctx: GetGen<"context">,
+    info: GraphQLResolveInfo,
+    forCursor: { index: number; nodes: any[] }
+  ) => string | Promise<string>;
   /**
    * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
    * when customizing the behavior of `cursorFromNode`
    */
   pageInfoFromNodes?: (
     nodes: NodeValue<TypeName, FieldName>[],
-    args: ArgsValue<TypeName, FieldName>
+    args: ArgsValue<TypeName, FieldName>,
+    ctx: GetGen<"context">,
+    info: GraphQLResolveInfo
   ) => { hasNextPage: boolean; hasPreviousPage: boolean };
   /**
    * Whether the field allows for backward pagination
@@ -165,13 +171,13 @@ export type ConnectionFieldConfig<
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
   /**
    * Dynamically adds additional fields to the current "connection" when it is defined.
-   * This will cause the resulting type to be prefix'ed with the name of the field it is branched off of,
+   * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
   extendConnection?: (def: ObjectDefinitionBlock<any>) => void;
   /**
    * Dynamically adds additional fields to the connection "edge" when it is defined.
-   * This will cause the resulting type to be prefix'ed with the name of the field it is branched off of,
+   * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
   extendEdge?: (def: ObjectDefinitionBlock<any>) => void;
@@ -288,7 +294,7 @@ export type PageInfoFieldResolver<
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<TypeName, FieldName>["pageInfo"][EdgeField]>;
 
-type EdgeLike = { cursor: string; node: any };
+type EdgeLike = { cursor: string | PromiseLike<string>; node: any };
 
 export const connectionPlugin = (
   connectionPluginConfig?: ConnectionPluginConfig
@@ -309,15 +315,6 @@ export const connectionPlugin = (
     //   type: User
     // })
     onInstall(b) {
-      const plugins = b.getConfigOption("plugins");
-
-      // If we know there are multiple connection fields, we need to rename the "Base Name" for the
-      // Connection / Edge
-      const hasMultipleConnectionFields =
-        (plugins
-          ?.map((p) => p.config.name)
-          .filter((name) => name === "ConnectionPlugin").length ?? 0) > 1;
-
       let dynamicConfig = [];
 
       const {
@@ -373,8 +370,7 @@ export const connectionPlugin = (
               fieldName,
               parentTypeName,
               fieldConfig,
-              pluginConfig,
-              hasMultipleConnectionFields
+              pluginConfig
             );
 
             if (stage === "build") {
@@ -574,19 +570,16 @@ export function makeResolveFn(
 ): GraphQLFieldResolver<any, any, any> {
   const mergedConfig = { ...pluginConfig, ...fieldConfig };
   return (root, args: PaginationArgs, ctx, info) => {
-    const {
-      cursorFromNode = defaultCursorFromNode,
-      nodes: nodesResolve,
-    } = fieldConfig;
+    const { nodes: nodesResolve } = fieldConfig;
     const {
       decodeCursor = base64Decode,
       encodeCursor = base64Encode,
     } = pluginConfig;
-    const { pageInfoFromNodes = defaultPageInfoFromNodes } = mergedConfig;
+    const {
+      pageInfoFromNodes = defaultPageInfoFromNodes,
+      cursorFromNode = defaultCursorFromNode,
+    } = mergedConfig;
     if (!nodesResolve) {
-      console.error(
-        `Missing resolve or nodes field for Connection ${info.parentType.name}.${info.fieldName}`
-      );
       return null;
     }
 
@@ -600,6 +593,12 @@ export function makeResolveFn(
     }
     if (args.after) {
       formattedArgs.after = decodeCursor(args.after).replace(CURSOR_PREFIX, "");
+    }
+
+    if (args.last && !args.before && cursorFromNode === defaultCursorFromNode) {
+      throw new Error(
+        `Cannot paginate backward without a "before" cursor by default.`
+      );
     }
 
     // Local variable to cache the execution of fetching the nodes,
@@ -647,29 +646,31 @@ export function makeResolveFn(
             resolvedNodeList.push(maybeNode);
             resolvedEdgeList.push(
               maybeNode.then((node) => {
-                const rawCursor = cursorFromNode(
-                  maybeNode,
-                  formattedArgs,
-                  i,
-                  allNodes
+                return completeValue<string, any>(
+                  cursorFromNode(maybeNode, formattedArgs, ctx, info, {
+                    index: i,
+                    nodes: allNodes,
+                  }),
+                  (rawCursor) => {
+                    return {
+                      cursor: encodeCursor(rawCursor),
+                      node,
+                    };
+                  }
                 );
-                return {
-                  cursor: encodeCursor(rawCursor),
-                  node,
-                };
               })
             );
           } else {
-            const rawCursor = cursorFromNode(
-              maybeNode,
-              formattedArgs,
-              i,
-              allNodes
-            );
             resolvedNodeList.push(maybeNode);
             resolvedEdgeList.push({
               node: maybeNode,
-              cursor: encodeCursor(rawCursor),
+              cursor: completeValue(
+                cursorFromNode(maybeNode, formattedArgs, ctx, info, {
+                  index: i,
+                  nodes: allNodes,
+                }),
+                (rawCursor) => encodeCursor(rawCursor)
+              ),
             });
           }
         });
@@ -693,7 +694,7 @@ export function makeResolveFn(
         resolveEdgesAndNodes(),
       ]);
       let basePageInfo = allNodes
-        ? pageInfoFromNodes(allNodes, args)
+        ? pageInfoFromNodes(allNodes, args, ctx, info)
         : {
             hasNextPage: false,
             hasPreviousPage: false,
@@ -776,8 +777,8 @@ function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
     }
     return false;
   }
-  // Otherwise, if neither first or last are provided, return false
-  return false;
+  /* istanbul ignore next */
+  throw new Error("Unreachable");
 }
 
 /**
@@ -797,8 +798,8 @@ function defaultHasPreviousPage(nodes: any[], args: PaginationArgs) {
   if (args.last) {
     return nodes.length >= args.last;
   }
-  // Otherwise, if neither first or last are provided, return false
-  return false;
+  /* istanbul ignore next */
+  throw new Error("Unreachable");
 }
 
 const CURSOR_PREFIX = "cursor:";
@@ -807,8 +808,9 @@ const CURSOR_PREFIX = "cursor:";
 function defaultCursorFromNode(
   node: any,
   args: PaginationArgs,
-  index: number,
-  allNodes: any[]
+  ctx: any,
+  info: GraphQLResolveInfo,
+  { index }: { index: number; nodes: any[] }
 ) {
   let cursorIndex = index;
   // If we're paginating forward, assume we're incrementing from the offset provided via "after",
@@ -826,6 +828,9 @@ function defaultCursorFromNode(
     if (args.before) {
       const offset = parseInt(args.before, 10);
       cursorIndex = offset - args.last + index;
+    } else {
+      /* istanbul ignore next */
+      throw new Error("Unreachable");
     }
   }
   return `${CURSOR_PREFIX}${cursorIndex}`;
@@ -835,8 +840,7 @@ const getTypeNames = (
   fieldName: string,
   parentTypeName: string,
   fieldConfig: ConnectionFieldConfig,
-  pluginConfig: ConnectionPluginConfig,
-  hasMultipleConnectionFields: boolean
+  pluginConfig: ConnectionPluginConfig
 ) => {
   const targetTypeName =
     typeof fieldConfig.type === "string"
@@ -848,90 +852,24 @@ const getTypeNames = (
   let connectionName: string;
   if (isConnectionFieldExtended(fieldConfig)) {
     connectionName = `${parentTypeName}${upperFirst(fieldName)}_Connection`;
-  } else if (isConnectionGloballyExtended(pluginConfig)) {
-    connectionName = `${targetTypeName}${extendedPrefix(
-      pluginConfig,
-      hasMultipleConnectionFields
-    )}Connection`;
   } else {
-    connectionName = `${targetTypeName}${maybePrefix(
-      "Connection",
-      pluginConfig,
-      fieldConfig
-    )}`;
+    connectionName = `${pluginConfig.typePrefix ||
+      ""}${targetTypeName}Connection`;
   }
 
   // If we have modified the "edge" at all, then we need
   let edgeName;
   if (isEdgeFieldExtended(fieldConfig)) {
     edgeName = `${parentTypeName}${upperFirst(fieldName)}_Edge`;
-  } else if (isEdgeGloballyExtended(pluginConfig)) {
-    edgeName = `${targetTypeName}${extendedPrefix(
-      pluginConfig,
-      hasMultipleConnectionFields
-    )}Edge`;
   } else {
-    edgeName = `${targetTypeName}${maybePrefix(
-      "Edge",
-      pluginConfig,
-      fieldConfig
-    )}`;
+    edgeName = `${pluginConfig.typePrefix || ""}${targetTypeName}Edge`;
   }
 
   return {
-    targetTypeName,
     edgeName,
+    targetTypeName,
     connectionName,
   };
-};
-
-const maybePrefix = (
-  toPrefix: "Edge" | "Connection",
-  pluginConfig: ConnectionPluginConfig,
-  fieldConfig: ConnectionFieldConfig
-) => {
-  if (
-    toPrefix === "Edge" &&
-    typeof pluginConfig.extendConnection === "function"
-  ) {
-    return pluginConfig.nexusFieldName;
-  }
-  if (
-    toPrefix === "Connection" &&
-    typeof pluginConfig.extendConnection === "function"
-  ) {
-    return pluginConfig.nexusFieldName;
-  }
-  return toPrefix;
-};
-
-/**
- * If we have an explicit prefix set, then we prefix
- */
-const extendedPrefix = (
-  pluginConfig: ConnectionPluginConfig,
-  hasMultipleConnectionFields: boolean
-) => {
-  if (pluginConfig.prefix) {
-  }
-  // If we don't have multiple connections, we don't need to worry about prefixing uniquely
-  if (!hasMultipleConnectionFields) {
-    return "";
-  }
-};
-
-const isConnectionGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
-  if (pluginConfig.extendConnection || isEdgeGloballyExtended(pluginConfig)) {
-    return true;
-  }
-  return false;
-};
-
-const isEdgeGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
-  if (pluginConfig.extendEdge) {
-    return true;
-  }
-  return false;
 };
 
 const isConnectionFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
@@ -1020,3 +958,9 @@ function defaultValidateArgs(
     );
   }
 }
+
+// Provided for use if you create a custom implementation and want to call the original.
+connectionPlugin.defaultCursorFromNode = defaultCursorFromNode;
+connectionPlugin.defaultValidateArgs = defaultValidateArgs;
+connectionPlugin.defaultHasPreviousPage = defaultHasPreviousPage;
+connectionPlugin.defaultHasNextPage = defaultHasNextPage;

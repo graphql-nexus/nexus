@@ -4,6 +4,8 @@ import {
   parse,
   GraphQLFieldResolver,
   GraphQLError,
+  ExecutionArgs,
+  printSchema,
 } from "graphql";
 import { connectionFromArray } from "graphql-relay";
 import { connectionPlugin, makeSchema, objectType, arg } from "../../src";
@@ -52,6 +54,12 @@ const UsersFieldFirstAfter = parse(
   `query UsersFieldFirstAfter($first: Int!, $after: String!) { users(first: $first, after: $after) { ${UsersFieldBody} } }`
 );
 
+const executeOk = async (args: ExecutionArgs) => {
+  const result = await execute(args);
+  expect(result.errors).toBeUndefined();
+  return result;
+};
+
 const customResolveFn: GraphQLFieldResolver<any, any> = (
   root: any,
   args: any
@@ -72,7 +80,7 @@ const testConnectionSchema = (
         definition(t) {
           // @ts-ignore
           t.connectionField("users", {
-            type: "User",
+            type: User,
             nodes(root: any, args: any, ctx: any, info: any) {
               return userNodes;
             },
@@ -101,6 +109,19 @@ describe("connectionPlugin", () => {
       expect(printType(schema.getType("PageInfo")!)).toMatchSnapshot();
     });
 
+    it("resolves string value", () => {
+      const schema = testConnectionSchema(
+        {},
+        {
+          // @ts-ignore
+          type: "User",
+        }
+      );
+      expect(schema.getType("UserConnection")).not.toBeUndefined();
+      expect(schema.getType("UserEdge")).not.toBeUndefined();
+      expect(schema.getType("PageInfo")).not.toBeUndefined();
+    });
+
     it("should provide forward pagination defaults", async () => {
       const schema = testConnectionSchema({});
       const nodes = await execute({
@@ -118,21 +139,113 @@ describe("connectionPlugin", () => {
       ).toEqual("cursor:0");
     });
 
-    it("should provide backward pagination defaults", async () => {
-      const schema = testConnectionSchema({});
+    it("should continue forward pagination from the after index", async () => {
+      const schema = testConnectionSchema(
+        {},
+        {
+          nodes(root: any, args: any) {
+            expect(args).toEqual({ first: 1, after: "0" });
+            return userNodes;
+          },
+        }
+      );
+      const nodes = await executeOk({
+        schema,
+        document: UsersFieldFirstAfter,
+        variableValues: { first: 1, after: "Y3Vyc29yOjA=" },
+      });
+      expect(
+        Buffer.from(nodes.data?.users.edges[0].cursor, "base64").toString(
+          "utf8"
+        )
+      ).toEqual("cursor:1");
+    });
+
+    it("can paginate backward from a before cursor", async () => {
+      const schema = testConnectionSchema({
+        encodeCursor: (str) => str,
+        decodeCursor: (str) => str,
+      });
+      const first = await executeOk({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 9 },
+      });
+      expect(first.data?.users.pageInfo).toEqual({
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: "cursor:0",
+        endCursor: "cursor:8",
+      });
+      const lastNodes = await executeOk({
+        schema,
+        document: UsersFieldLastBefore,
+        variableValues: {
+          last: 3,
+          before: first.data?.users.pageInfo.endCursor,
+        },
+      });
+      expect(lastNodes.data?.users.pageInfo).toEqual({
+        startCursor: "cursor:5",
+        endCursor: "cursor:7",
+        hasNextPage: true,
+        hasPreviousPage: true,
+      });
+    });
+
+    it("can paginate backward without a before with a custom cursorFromNodes", async () => {
+      const getTotalCount = async () => Promise.resolve(100);
+      const schema = testConnectionSchema({
+        encodeCursor: (str) => str,
+        decodeCursor: (str) => str,
+        cursorFromNode: async (node, args, ctx, info, { index, nodes }) => {
+          if (args.last && !args.before) {
+            const totalCount = await getTotalCount();
+            return `cursor:${totalCount - args.last + index + 1}`;
+          }
+          return connectionPlugin.defaultCursorFromNode(node, args, ctx, info, {
+            index,
+            nodes,
+          });
+        },
+      });
+      const lastNodes = await executeOk({
+        schema,
+        document: UsersFieldLast,
+        variableValues: {
+          last: 3,
+        },
+      });
+      expect(lastNodes.data?.users.pageInfo).toEqual({
+        startCursor: "cursor:98",
+        endCursor: "cursor:100",
+        hasNextPage: false,
+        hasPreviousPage: true,
+      });
+    });
+
+    it("cannot paginate backward without a before cursor or a custom cursorFromNodes", async () => {
+      const schema = testConnectionSchema({
+        encodeCursor: (str) => str,
+        decodeCursor: (str) => str,
+      });
       const lastNodes = await execute({
         schema,
         document: UsersFieldLast,
-        variableValues: { last: 1 },
+        variableValues: {
+          last: 3,
+        },
       });
-      expect(lastNodes.data?.users.edges).toEqual([
-        { cursor: "Y3Vyc29yOjA=", node: { id: "User:10" } },
+      expect(lastNodes.errors).toEqual([
+        new GraphQLError(
+          `Cannot paginate backward without a "before" cursor by default.`
+        ),
       ]);
     });
 
     it("should resolve pageInfo with basics", async () => {
       const schema = testConnectionSchema({});
-      const lastNodes = await execute({
+      const lastNodes = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 10 },
@@ -149,16 +262,33 @@ describe("connectionPlugin", () => {
       const schema = testConnectionSchema({
         includeNodesField: true,
       });
-      const lastNodes = await execute({
+      const lastNodes = await executeOk({
         schema,
-        document: UsersFieldLast,
+        document: UsersFieldFirst,
+        variableValues: { first: 10 },
       });
       expect(lastNodes.data?.users.nodes).toEqual(
         lastNodes.data?.users.edges.map((e: any) => e.node)
       );
     });
 
-    it("should be possible to define a custom resolve, rather than just the nodes needed", async () => {
+    it("can define custom resolve", async () => {
+      const schema = testConnectionSchema(
+        {},
+        {
+          nodes: undefined,
+          resolve: customResolveFn,
+        }
+      );
+      const lastNodes = await execute({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 2 },
+      });
+      expect(lastNodes).toMatchSnapshot();
+    });
+
+    it("can define custom resolve, which will derive nodes if includeNodesField is true", async () => {
       const schema = testConnectionSchema(
         {
           includeNodesField: true,
@@ -169,6 +299,30 @@ describe("connectionPlugin", () => {
         }
       );
       const lastNodes = await execute({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 2 },
+      });
+      expect(lastNodes).toMatchSnapshot();
+    });
+
+    it("can define custom resolve, supplying nodes directly", async () => {
+      const schema = testConnectionSchema(
+        {
+          includeNodesField: true,
+        },
+        {
+          nodes: undefined,
+          resolve: (...args) => {
+            const result = customResolveFn(...args);
+            return {
+              ...result,
+              nodes: result.edges.map((e: any) => e.node),
+            };
+          },
+        }
+      );
+      const lastNodes = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 2 },
@@ -248,6 +402,30 @@ describe("connectionPlugin", () => {
       });
     });
 
+    it("returns null and logs an error if the nodes resolve is missing", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation();
+      const schema = testConnectionSchema(
+        {
+          includeNodesField: true,
+        },
+        {
+          nodes: undefined,
+        }
+      );
+      const lastNodes = await execute({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 2 },
+      });
+      expect(lastNodes.data?.users).toEqual(null);
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      expect(consoleError).toHaveBeenLastCalledWith(
+        new Error(
+          "Nexus Connection Plugin: Missing nodes or resolve property for Query.users"
+        )
+      );
+    });
+
     it("returns empty arrays, but warns if the nodes returns null", async () => {
       const consoleWarn = jest.spyOn(console, "warn").mockImplementation();
       const schema = testConnectionSchema(
@@ -279,6 +457,23 @@ describe("connectionPlugin", () => {
       expect(consoleWarn).toHaveBeenLastCalledWith(
         'You resolved null/undefined from nodes() at path ["users"], this is likely an error. Return an empty array to suppress this warning.'
       );
+    });
+
+    it("resolves any promises in nodes", async () => {
+      const schema = testConnectionSchema(
+        {},
+        {
+          nodes() {
+            return userNodes.map((node) => Promise.resolve(node));
+          },
+        }
+      );
+      const result = await execute({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 10 },
+      });
+      expect(result).toMatchSnapshot();
     });
   });
 
@@ -314,10 +509,23 @@ describe("connectionPlugin", () => {
       expect(printType(schema.getType("UserConnection")!)).toMatchSnapshot();
     });
 
-    it("errors if the extendConnection resolver is not specified", () => {
+    it("logs error if the extendConnection resolver is not specified", () => {
       const spy = jest.spyOn(console, "error").mockImplementation();
       testConnectionSchema({
         extendConnection: {
+          totalCount: {
+            type: "Int",
+          },
+        },
+      });
+      expect(spy.mock.calls[0]).toMatchSnapshot();
+      expect(spy).toBeCalledTimes(1);
+    });
+
+    it("logs error if the extendEdge resolver is not specified", () => {
+      const spy = jest.spyOn(console, "error").mockImplementation();
+      testConnectionSchema({
+        extendEdge: {
           totalCount: {
             type: "Int",
           },
@@ -445,6 +653,49 @@ describe("connectionPlugin", () => {
         }
       );
       expect(printType(schema.getQueryType()!)).toMatchSnapshot();
+    });
+
+    it("can define a schema with multiple plugins, and separate them by typePrefix", () => {
+      const schema = makeSchema({
+        outputs: false,
+        types: [
+          objectType({
+            name: "Query",
+            definition(t) {
+              // @ts-ignore
+              t.connectionField("users", {
+                type: User,
+                nodes(root: any, args: any, ctx: any, info: any) {
+                  return userNodes;
+                },
+              });
+              // @ts-ignore
+              t.analyticsConnectionField("userStats", {
+                type: User,
+                nodes() {
+                  return userNodes;
+                },
+              });
+            },
+          }),
+        ],
+        plugins: [
+          connectionPlugin({}),
+          connectionPlugin({
+            typePrefix: "Analytics",
+            nexusFieldName: "analyticsConnectionField",
+            extendConnection: {
+              totalCount: { type: "Int" },
+              averageCount: { type: "Int" },
+            },
+          }),
+        ],
+        nonNullDefaults: {
+          input: false,
+          output: false,
+        },
+      });
+      expect(printSchema(schema)).toMatchSnapshot();
     });
   });
 });

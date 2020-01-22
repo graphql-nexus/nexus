@@ -478,10 +478,10 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
 );
 
 export function pathToArray(
-  path: GraphQLResolveInfo["path"]
+  infoPath: GraphQLResolveInfo["path"]
 ): Array<string | number> {
   const flattened = [];
-  let curr: GraphQLResolveInfo["path"] | undefined = path;
+  let curr: GraphQLResolveInfo["path"] | undefined = infoPath;
   while (curr) {
     flattened.push(curr.key);
     curr = curr.prev;
