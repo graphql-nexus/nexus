@@ -1,4 +1,4 @@
-import { interfaceType, objectType, makeSchema } from "../..";
+import { interfaceType, objectType, makeSchema } from "../../src";
 import { GraphQLSchema } from "graphql";
 
 describe("GH #361, interfaceType & implements", () => {
@@ -20,7 +20,10 @@ describe("GH #361, interfaceType & implements", () => {
       },
     });
 
-    const schema = makeSchema({ types: [User] });
+    const schema = makeSchema({
+      types: [User],
+      outputs: false,
+    });
 
     expect(schema).toBeInstanceOf(GraphQLSchema);
   });

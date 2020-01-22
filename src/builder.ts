@@ -1080,6 +1080,7 @@ export class SchemaBuilder {
     typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
   ): GraphQLFieldConfig<any, any> {
     if (!fieldConfig.type) {
+      /* istanbul ignore next */
       throw new Error(
         `Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`
       );
@@ -1248,6 +1249,7 @@ export class SchemaBuilder {
   ): GraphQLInterfaceType {
     const type = this.getOrBuildType(name);
     if (!isInterfaceType(type)) {
+      /* istanbul ignore next */
       throw new Error(
         `Expected ${name} to be an interfaceType, saw ${type.constructor.name}`
       );
@@ -1260,6 +1262,7 @@ export class SchemaBuilder {
   ): GraphQLPossibleInputs {
     const type = this.getOrBuildType(name);
     if (!isInputObjectType(type) && !isLeafType(type)) {
+      /* istanbul ignore next */
       throw new Error(
         `Expected ${name} to be a possible input type, saw ${type.constructor.name}`
       );
@@ -1272,6 +1275,7 @@ export class SchemaBuilder {
   ): GraphQLPossibleOutputs {
     const type = this.getOrBuildType(name);
     if (!isOutputType(type)) {
+      /* istanbul ignore next */
       throw new Error(
         `Expected ${name} to be a valid output type, saw ${type.constructor.name}`
       );
@@ -1287,6 +1291,7 @@ export class SchemaBuilder {
     }
     const type = this.getOrBuildType(name);
     if (!isObjectType(type)) {
+      /* istanbul ignore next */
       throw new Error(
         `Expected ${name} to be a objectType, saw ${type.constructor.name}`
       );
@@ -1309,6 +1314,7 @@ export class SchemaBuilder {
       return this.finalTypeMap[name];
     }
     if (this.buildingTypes.has(name)) {
+      /* istanbul ignore next */
       throw new Error(
         `GraphQL Nexus: Circular dependency detected, while building types ${Array.from(
           this.buildingTypes
@@ -1349,7 +1355,7 @@ export class SchemaBuilder {
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
     const definitionBlock = new InputDefinitionBlock({
       typeName: obj.name,
-      addField: (f) => this.maybeTraverseInputType(f),
+      addField: (f) => this.maybeTraverseInputFieldType(f),
       addDynamicInputFields: (block, isList) =>
         this.addDynamicInputFields(block, isList),
       warn: () => {},
@@ -1439,13 +1445,13 @@ export class SchemaBuilder {
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
       addInterfaces: (i) => {
-        i.forEach((j) => {
-          if (typeof j !== "string") {
-            this.addType(j);
+        i.forEach((i) => {
+          if (typeof i !== "string") {
+            this.addType(i);
           }
         });
       },
-      addField: (f) => this.maybeTraverseOutputType(f),
+      addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList, "walk"),
       warn: () => {},
@@ -1458,7 +1464,7 @@ export class SchemaBuilder {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
       setResolveType: () => {},
-      addField: (f) => this.maybeTraverseOutputType(f),
+      addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList, "walk"),
       warn: () => {},
@@ -1467,7 +1473,7 @@ export class SchemaBuilder {
     return obj;
   }
 
-  protected maybeTraverseOutputType(type: NexusOutputFieldDef) {
+  protected maybeTraverseOutputFieldType(type: NexusOutputFieldDef) {
     const { args, type: fieldType } = type;
     if (typeof fieldType !== "string") {
       this.addType(fieldType);
@@ -1482,7 +1488,7 @@ export class SchemaBuilder {
     }
   }
 
-  protected maybeTraverseInputType(type: NexusInputFieldDef) {
+  protected maybeTraverseInputFieldType(type: NexusInputFieldDef) {
     const { type: fieldType } = type;
     if (typeof fieldType !== "string") {
       this.addType(fieldType);
