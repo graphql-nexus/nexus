@@ -1438,7 +1438,13 @@ export class SchemaBuilder {
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
-      addInterfaces: () => {},
+      addInterfaces: (i) => {
+        i.forEach((i) => {
+          if (typeof i !== "string") {
+            this.addType(i);
+          }
+        });
+      },
       addField: (f) => this.maybeTraverseOutputType(f),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList, "walk"),
