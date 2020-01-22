@@ -131,7 +131,7 @@ type Query {
     """
     Returns the first n elements from the list.
     """
-    first: Int
+    first: Int!
   ): BooleanConnection!
   dateAsList: [Date!]!
   extended: SomeItem!
@@ -145,7 +145,7 @@ type Query {
     """
     Returns the first n elements from the list.
     """
-    first: Int
+    first: Int!
   ): DateConnection!
   inlineArgs(someArg: SomeArg): String!
   inputAsArgExample(testInput: InputType, testScalar: String): String!
@@ -159,7 +159,7 @@ type Query {
     """
     Returns the first n elements from the list.
     """
-    first: Int
+    first: Int!
 
     """
     If true, filters the users with an odd pk
@@ -175,7 +175,7 @@ type Query {
     """
     Returns the last n elements from the list.
     """
-    last: Int
+    last: Int!
   ): UserConnection!
   userConnectionForwardOnly(
     """
@@ -186,7 +186,7 @@ type Query {
     """
     Returns the first n elements from the list.
     """
-    first: Int
+    first: Int!
   ): UserConnection!
   usersConnectionNodes(
     """

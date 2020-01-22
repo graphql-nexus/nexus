@@ -424,7 +424,7 @@ exports[`connectionPlugin global plugin configuration allows disabling backward 
 "type Query {
   users(
     \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
+    first: Int!
 
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
@@ -436,7 +436,7 @@ exports[`connectionPlugin global plugin configuration allows disabling forward p
 "type Query {
   users(
     \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
+    last: Int!
 
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String

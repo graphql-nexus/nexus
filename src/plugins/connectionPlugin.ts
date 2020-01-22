@@ -62,6 +62,12 @@ export interface ConnectionPluginConfig {
    */
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
   /**
+   * If disableForwardPagination or disableBackwardPagination are set to true,
+   * we require the `first` or `last` field as needed. Defaults to true,
+   * setting this to false will disable this behavior and make the field nullable.
+   */
+  strictArgs?: boolean;
+  /**
    * Default approach we use to transform a node into an unencoded cursor.
    *
    * Default is `cursor:${index}`
@@ -170,6 +176,12 @@ export type ConnectionFieldConfig<
    */
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
   /**
+   * If disableForwardPagination or disableBackwardPagination are set to true,
+   * we require the `first` or `last` field as needed. Defaults to true,
+   * setting this to false will disable this behavior and make the field nullable.
+   */
+  strictArgs?: boolean;
+  /**
    * Dynamically adds additional fields to the current "connection" when it is defined.
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
@@ -242,6 +254,14 @@ const ForwardPaginateArgs = {
   }),
 };
 
+const ForwardOnlyStrictArgs = {
+  ...ForwardPaginateArgs,
+  first: intArg({
+    nullable: false,
+    description: "Returns the first n elements from the list.",
+  }),
+};
+
 const BackwardPaginateArgs = {
   last: intArg({
     nullable: true,
@@ -251,6 +271,14 @@ const BackwardPaginateArgs = {
     nullable: true,
     description:
       "Returns the elements in the list that come before the specified cursor",
+  }),
+};
+
+const BackwardOnlyStrictArgs = {
+  ...BackwardPaginateArgs,
+  last: intArg({
+    nullable: false,
+    description: "Returns the last n elements from the list.",
   }),
 };
 
@@ -486,17 +514,26 @@ export const connectionPlugin = (
               disableBackwardPagination,
               disableForwardPagination,
               validateArgs = defaultValidateArgs,
+              strictArgs = true,
             } = {
               ...pluginConfig,
               ...fieldConfig,
             };
 
             let specArgs = {};
-            if (disableForwardPagination !== true) {
-              specArgs = { ...ForwardPaginateArgs };
-            }
-            if (disableBackwardPagination !== true) {
-              specArgs = { ...specArgs, ...BackwardPaginateArgs };
+            if (
+              disableForwardPagination !== true &&
+              disableBackwardPagination !== true
+            ) {
+              specArgs = { ...ForwardPaginateArgs, ...BackwardPaginateArgs };
+            } else if (disableForwardPagination !== true) {
+              specArgs = strictArgs
+                ? { ...ForwardOnlyStrictArgs }
+                : { ...ForwardPaginateArgs };
+            } else if (disableBackwardPagination !== true) {
+              specArgs = strictArgs
+                ? { ...BackwardOnlyStrictArgs }
+                : { ...BackwardPaginateArgs };
             }
 
             // If we have additional args,
@@ -583,6 +620,7 @@ function nonConnectionFieldProps(fieldConfig: ConnectionFieldConfig) {
     resolve,
     type,
     validateArgs,
+    strictArgs,
     ...rest
   } = fieldConfig;
   return rest;
