@@ -9,7 +9,7 @@ export interface UnionDefinitionBuilder<TypeName extends string> {
 }
 
 export type UnionMembers = Array<
-  GetGen<"objectNames"> | NexusObjectTypeDef<string>
+  GetGen<"objectNames"> | NexusObjectTypeDef<any>
 >;
 
 export class UnionDefinitionBlock<TypeName extends string> {
