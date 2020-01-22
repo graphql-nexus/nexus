@@ -139,7 +139,7 @@ describe("dynamicOutputMethod", () => {
             // @ts-ignore
             t.relayConnectionField("cats", {
               type: "Cat",
-              nodes(root, args, ctx, info) {
+              nodes(root: any, args: any, ctx: any, info: any) {
                 return CatListFixture;
               },
               pageInfo: () => ({

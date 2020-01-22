@@ -1,4 +1,4 @@
-import { plugin } from "../plugin";
+import { plugin, completeValue } from "../plugin";
 import { dynamicOutputMethod } from "../dynamicMethod";
 import { intArg, ArgsRecord, stringArg } from "../definitions/args";
 import { ObjectDefinitionBlock, objectType } from "../definitions/objectType";
@@ -8,6 +8,7 @@ import {
   mapObj,
   isObject,
   isPromiseLike,
+  pathToArray,
 } from "../utils";
 import {
   GetGen,
@@ -28,9 +29,6 @@ export interface ConnectionPluginConfig {
    * @default 'connectionField'
    */
   nexusFieldName?: string;
-  /**
-   *
-   */
   /**
    * Whether to expose the "nodes" directly on the connection for convenience.
    *
@@ -102,10 +100,9 @@ export interface ConnectionPluginConfig {
    */
   extendConnection?: Record<string, Omit<FieldOutConfig<any, any>, "resolve">>;
   /**
-   * Any additional fields to make available to the all pageInfo fields,
-   * beyond hasNextPage, hasPreviousPage, startCursor, endCursor
+   * Prefix for the Connection / Edge type
    */
-  extendPageInfo?: Record<string, Omit<FieldOutConfig<any, any>, "resolve">>;
+  prefix?: string;
 }
 
 // Extract the node value from the connection for a given field.
@@ -167,17 +164,17 @@ export type ConnectionFieldConfig<
    */
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
   /**
-   * Dynamically adds additional fields to the current "connection" as it is define
+   * Dynamically adds additional fields to the current "connection" when it is defined.
+   * This will cause the resulting type to be prefix'ed with the name of the field it is branched off of,
+   * so as not to conflict with any non-extended connections.
    */
   extendConnection?: (def: ObjectDefinitionBlock<any>) => void;
   /**
-   * Dynamically adds additional fields to the connection "edge" as it is defined
+   * Dynamically adds additional fields to the connection "edge" when it is defined.
+   * This will cause the resulting type to be prefix'ed with the name of the field it is branched off of,
+   * so as not to conflict with any non-extended connections.
    */
   extendEdge?: (def: ObjectDefinitionBlock<any>) => void;
-  /**
-   * Dynamically adds additional fields to the connection "pageInfo" as it is defined
-   */
-  extendPageInfo?: (def: ObjectDefinitionBlock<any>) => void;
 } & (
   | {
       /**
@@ -327,7 +324,6 @@ export const connectionPlugin = (
         additionalArgs = {},
         extendConnection: pluginExtendConnection,
         extendEdge: pluginExtendEdge,
-        extendPageInfo: pluginExtendPageInfo,
         includeNodesField = false,
         nexusFieldName = "connectionField",
       } = pluginConfig;
@@ -351,15 +347,6 @@ export const connectionPlugin = (
         dynamicConfig.push(`edgeFields: { ${edgeFields.join(", ")} }`);
       }
 
-      if (pluginExtendPageInfo) {
-        const pageInfoFields = mapObj(
-          pluginExtendPageInfo,
-          (val, key) =>
-            `${key}: connectionPluginCore.PageInfoFieldResolver<TypeName, FieldName, "${key}">`
-        );
-        dynamicConfig.push(`pageInfoFields: { ${pageInfoFields.join(", ")} }`);
-      }
-
       const printedDynamicConfig = `{ ${dynamicConfig.join(", ")} }`;
 
       // Add the t.connectionField (or something else if we've changed the name)
@@ -370,19 +357,19 @@ export const connectionPlugin = (
             fieldName: FieldName, 
             config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> & ${printedDynamicConfig}
           ): void`,
-          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs }) {
+          factory({
+            typeName: parentTypeName,
+            typeDef: t,
+            args: factoryArgs,
+            stage,
+          }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
               ConnectionFieldConfig
             ];
             const targetType = fieldConfig.type;
 
-            const {
-              targetTypeName,
-              connectionName,
-              edgeName,
-              pageInfoName,
-            } = getTypeNames(
+            const { targetTypeName, connectionName, edgeName } = getTypeNames(
               fieldName,
               parentTypeName,
               fieldConfig,
@@ -390,45 +377,43 @@ export const connectionPlugin = (
               hasMultipleConnectionFields
             );
 
-            assertCorrectConfig(
-              parentTypeName,
-              fieldName,
-              pluginConfig,
-              fieldConfig
-            );
+            if (stage === "build") {
+              assertCorrectConfig(
+                parentTypeName,
+                fieldName,
+                pluginConfig,
+                fieldConfig
+              );
+            }
 
             // Add the "Connection" type to the schema if it doesn't exist already
             if (!b.hasType(connectionName)) {
               b.addType(
                 objectType({
-                  name: connectionName,
+                  name: connectionName as any,
                   definition(t2) {
                     t2.field("edges", {
-                      type: edgeName,
+                      type: edgeName as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
                       nullable: true,
                       list: [false],
                     });
-
                     t2.field("pageInfo", {
-                      type: pageInfoName,
+                      type: "PageInfo" as any,
                       nullable: false,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
                     });
-
                     if (includeNodesField) {
                       t2.list.field("nodes", {
                         type: targetType,
                         description: `Flattened list of ${targetTypeName} type`,
                       });
                     }
-
                     if (pluginExtendConnection) {
                       eachObj(pluginExtendConnection, (val, key) => {
                         t2.field(key, val);
                       });
                     }
-
                     if (fieldConfig.extendConnection instanceof Function) {
                       fieldConfig.extendConnection(t2);
                     }
@@ -470,22 +455,21 @@ export const connectionPlugin = (
             }
 
             // Add the "PageInfo" type to the schema if it doesn't exist already
-            if (!b.hasType(pageInfoName)) {
+            if (!b.hasType("PageInfo")) {
               b.addType(
                 objectType({
-                  name: pageInfoName,
+                  name: "PageInfo",
                   description:
                     "PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo",
                   definition(t2) {
                     t2.boolean("hasNextPage", {
                       nullable: false,
-                      description: `hasNextPage is used to indicate whether more edges exist following the set defined by the clients arguments.`,
+                      description: `Used to indicate whether more edges exist following the set defined by the clients arguments.`,
                     });
                     t2.boolean("hasPreviousPage", {
                       nullable: false,
-                      description: `hasPreviousPage is used to indicate whether more edges exist prior to the set defined by the clients arguments.`,
+                      description: `Used to indicate whether more edges exist prior to the set defined by the clients arguments.`,
                     });
-
                     t2.string("startCursor", {
                       nullable: true,
                       description: `The cursor corresponding to the first nodes in edges. Null if the connection is empty.`,
@@ -494,15 +478,6 @@ export const connectionPlugin = (
                       nullable: true,
                       description: `The cursor corresponding to the last nodes in edges. Null if the connection is empty.`,
                     });
-
-                    if (pluginExtendPageInfo) {
-                      eachObj(pluginExtendPageInfo, (val, key) => {
-                        t2.field(key, val);
-                      });
-                    }
-                    if (fieldConfig.extendPageInfo instanceof Function) {
-                      fieldConfig.extendPageInfo(t2);
-                    }
                   },
                 })
               );
@@ -531,11 +506,13 @@ export const connectionPlugin = (
               if (additionalArgs && fieldConfig.inheritAdditionalArgs) {
                 fieldAdditionalArgs = {
                   ...additionalArgs,
+                  ...fieldConfig.additionalArgs,
+                };
+              } else {
+                fieldAdditionalArgs = {
+                  ...fieldConfig.additionalArgs,
                 };
               }
-              fieldAdditionalArgs = {
-                ...fieldConfig.additionalArgs,
-              };
             } else if (additionalArgs) {
               fieldAdditionalArgs = { ...additionalArgs };
             }
@@ -545,15 +522,37 @@ export const connectionPlugin = (
               ...specArgs,
             };
 
-            const resolveFn = fieldConfig.resolve
-              ? fieldConfig.resolve
-              : makeResolveFn(pluginConfig, fieldConfig);
+            let resolveFn: GraphQLFieldResolver<any, any>;
+            if (fieldConfig.resolve) {
+              if (includeNodesField) {
+                resolveFn = (root, args, ctx, info) => {
+                  return completeValue(
+                    fieldConfig.resolve(root, args, ctx, info),
+                    (val) => {
+                      if (val && val.nodes === undefined) {
+                        return {
+                          ...val,
+                          nodes: completeValue(val.edges, (edges) =>
+                            edges.map((edge: any) => edge.node)
+                          ),
+                        };
+                      }
+                      return val;
+                    }
+                  );
+                };
+              } else {
+                resolveFn = fieldConfig.resolve;
+              }
+            } else {
+              resolveFn = makeResolveFn(pluginConfig, fieldConfig);
+            }
 
             // Add the field to the type.
             t.field(fieldName, {
               ...fieldConfig,
               args: fieldArgs,
-              type: connectionName,
+              type: connectionName as any,
               resolve(root, args: PaginationArgs, ctx, info) {
                 validateArgs(args, info);
                 return resolveFn(root, args, ctx, info);
@@ -631,6 +630,10 @@ export function makeResolveFn(
 
       cachedEdges = resolveAllNodes().then((allNodes) => {
         if (!allNodes) {
+          const arrPath = JSON.stringify(pathToArray(info.path));
+          console.warn(
+            `You resolved null/undefined from nodes() at path ${arrPath}, this is likely an error. Return an empty array to suppress this warning.`
+          );
           return { edges: [], nodes: [] };
         }
 
@@ -724,17 +727,15 @@ function iterateNodes(
   // If we want the first N of an array of nodes, it's pretty straightforward.
   if (args.first) {
     for (let i = 0; i < args.first; i++) {
-      const nextNode = nodes[i];
-      if (nextNode !== undefined) {
-        cb(nextNode, i);
+      if (i <= nodes.length) {
+        cb(nodes[i], i);
       }
     }
   } else if (args.last) {
     for (let i = 0; i < args.last; i++) {
       const idx = nodes.length - args.last + i;
-      const nextNode = nodes[idx];
-      if (nextNode !== undefined) {
-        cb(nextNode, i);
+      if (idx >= 0) {
+        cb(nodes[idx], i);
       }
     }
   }
@@ -844,51 +845,69 @@ const getTypeNames = (
 
   // If we have changed the config specific to this field, on either the connection,
   // edge, or page info, then we need a custom type for the connection & edge.
-  const connectionName = isConnectionFieldExtended(fieldConfig)
-    ? `${parentTypeName}${upperFirst(fieldName)}${targetTypeName}Connection`
-    : isConnectionGloballyExtended(pluginConfig)
-    ? `${targetTypeName}${extendedPrefix(
-        pluginConfig,
-        hasMultipleConnectionFields
-      )}Connection`
-    : `${targetTypeName}${maybePrefix("Connection", pluginConfig)}`;
+  let connectionName: string;
+  if (isConnectionFieldExtended(fieldConfig)) {
+    connectionName = `${parentTypeName}${upperFirst(fieldName)}_Connection`;
+  } else if (isConnectionGloballyExtended(pluginConfig)) {
+    connectionName = `${targetTypeName}${extendedPrefix(
+      pluginConfig,
+      hasMultipleConnectionFields
+    )}Connection`;
+  } else {
+    connectionName = `${targetTypeName}${maybePrefix(
+      "Connection",
+      pluginConfig,
+      fieldConfig
+    )}`;
+  }
 
   // If we have modified the "edge" at all, then we need
-  const edgeName = isEdgeFieldExtended(fieldConfig)
-    ? `${parentTypeName}${upperFirst(fieldName)}${targetTypeName}Edge`
-    : isEdgeGloballyExtended(pluginConfig)
-    ? `${targetTypeName}${extendedPrefix(
-        pluginConfig,
-        hasMultipleConnectionFields
-      )}Edge`
-    : `${targetTypeName}${maybePrefix("Edge", pluginConfig)}`;
-
-  // If we have modified the "edge" at all, then we need a specific type
-  // for this Connection, rather than the generic one.
-  const pageInfoName = isPageInfoFieldExtended(fieldConfig)
-    ? `${parentTypeName}${upperFirst(fieldName)}${targetTypeName}PageInfo`
-    : isConnectionGloballyExtended(pluginConfig)
-    ? `${targetTypeName}${extendedPrefix(
-        pluginConfig,
-        hasMultipleConnectionFields
-      )}PageInfo`
-    : maybePrefix("PageInfo", pluginConfig);
+  let edgeName;
+  if (isEdgeFieldExtended(fieldConfig)) {
+    edgeName = `${parentTypeName}${upperFirst(fieldName)}_Edge`;
+  } else if (isEdgeGloballyExtended(pluginConfig)) {
+    edgeName = `${targetTypeName}${extendedPrefix(
+      pluginConfig,
+      hasMultipleConnectionFields
+    )}Edge`;
+  } else {
+    edgeName = `${targetTypeName}${maybePrefix(
+      "Edge",
+      pluginConfig,
+      fieldConfig
+    )}`;
+  }
 
   return {
     targetTypeName,
     edgeName,
-    pageInfoName,
     connectionName,
   };
 };
 
 const maybePrefix = (
-  toPrefix: string,
-  pluginConfig: ConnectionPluginConfig
+  toPrefix: "Edge" | "Connection",
+  pluginConfig: ConnectionPluginConfig,
+  fieldConfig: ConnectionFieldConfig
 ) => {
-  //
+  if (
+    toPrefix === "Edge" &&
+    typeof pluginConfig.extendConnection === "function"
+  ) {
+    return pluginConfig.nexusFieldName;
+  }
+  if (
+    toPrefix === "Connection" &&
+    typeof pluginConfig.extendConnection === "function"
+  ) {
+    return pluginConfig.nexusFieldName;
+  }
+  return toPrefix;
 };
 
+/**
+ * If we have an explicit prefix set, then we prefix
+ */
 const extendedPrefix = (
   pluginConfig: ConnectionPluginConfig,
   hasMultipleConnectionFields: boolean
@@ -902,11 +921,7 @@ const extendedPrefix = (
 };
 
 const isConnectionGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
-  if (
-    pluginConfig.extendConnection ||
-    isEdgeGloballyExtended(pluginConfig) ||
-    isPageInfoGloballyExtended(pluginConfig)
-  ) {
+  if (pluginConfig.extendConnection || isEdgeGloballyExtended(pluginConfig)) {
     return true;
   }
   return false;
@@ -919,19 +934,8 @@ const isEdgeGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
   return false;
 };
 
-const isPageInfoGloballyExtended = (pluginConfig: ConnectionPluginConfig) => {
-  if (pluginConfig.extendPageInfo) {
-    return true;
-  }
-  return false;
-};
-
 const isConnectionFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
-  if (
-    fieldConfig.extendConnection ||
-    isEdgeFieldExtended(fieldConfig) ||
-    isPageInfoFieldExtended(fieldConfig)
-  ) {
+  if (fieldConfig.extendConnection || isEdgeFieldExtended(fieldConfig)) {
     return true;
   }
   return false;
@@ -939,13 +943,6 @@ const isConnectionFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
 
 const isEdgeFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
   if (fieldConfig.extendEdge) {
-    return true;
-  }
-  return false;
-};
-
-const isPageInfoFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
-  if (fieldConfig.extendPageInfo) {
     return true;
   }
   return false;
@@ -996,18 +993,6 @@ const assertCorrectConfig = (
       );
     }
   });
-  eachObj(pluginConfig.extendPageInfo || {}, (val, key) => {
-    if (
-      !isObject(fieldConfig.pageInfoFields) ||
-      typeof fieldConfig.pageInfoFields[key] !== "function"
-    ) {
-      console.error(
-        new Error(
-          `Nexus Connection Plugin: Missing pageInfoFields.${key} resolver property for ${typeName}.${fieldName}`
-        )
-      );
-    }
-  });
 };
 
 function defaultValidateArgs(
@@ -1016,38 +1001,22 @@ function defaultValidateArgs(
 ) {
   if (!args.first && !args.last) {
     throw new Error(
-      `The ${getPath(info)} connection requires a "first" or "last" argument`
+      `The ${info.parentType}.${info.fieldName} connection field requires a "first" or "last" argument`
     );
   }
   if (args.first && args.last) {
     throw new Error(
-      `The ${getPath(
-        info
-      )} connection requires a "first" or "last" argument, not both`
+      `The ${info.parentType}.${info.fieldName} connection field requires a "first" or "last" argument, not both`
     );
   }
   if (args.first && args.before) {
     throw new Error(
-      `The ${getPath(
-        info
-      )} connection does not allow a "before" argument with "first"`
+      `The ${info.parentType}.${info.fieldName} connection field does not allow a "before" argument with "first"`
     );
   }
   if (args.last && args.after) {
     throw new Error(
-      `The ${getPath(
-        info
-      )} connection does not allow a "last" argument with "after"`
+      `The ${info.parentType}.${info.fieldName} connection field does not allow a "last" argument with "after"`
     );
   }
-}
-
-function getPath(info: GraphQLResolveInfo) {
-  let fullPath = info.path.key;
-  let prev = info.path.prev;
-  while (prev) {
-    fullPath = `${prev.key}.${fullPath}`;
-    prev = prev.prev;
-  }
-  return fullPath;
 }
