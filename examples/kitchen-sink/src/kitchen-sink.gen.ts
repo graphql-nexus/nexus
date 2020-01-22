@@ -258,9 +258,7 @@ export interface NexusGenArgTypes {
     booleanConnection: {
       // args
       after?: string | null; // String
-      before?: string | null; // String
       first?: number | null; // Int
-      last?: number | null; // Int
     };
     getNumberOrNull: {
       // args
@@ -269,9 +267,7 @@ export interface NexusGenArgTypes {
     guardedConnection: {
       // args
       after?: string | null; // String
-      before?: string | null; // String
       first?: number | null; // Int
-      last?: number | null; // Int
     };
     inlineArgs: {
       // args
@@ -285,10 +281,8 @@ export interface NexusGenArgTypes {
     userConnectionAdditionalArgs: {
       // args
       after?: string | null; // String
-      before?: string | null; // String
       first?: number | null; // Int
       isEven?: boolean | null; // Boolean
-      last?: number | null; // Int
     };
     userConnectionBackwardOnly: {
       // args

@@ -138,11 +138,11 @@ export type ConnectionFieldConfig<
    * @default "nodeField"
    */
   cursorFromNode?: (
-    node: any,
-    args: PaginationArgs,
+    node: NodeValue<TypeName, FieldName>,
+    args: ArgsValue<TypeName, FieldName>,
     ctx: GetGen<"context">,
     info: GraphQLResolveInfo,
-    forCursor: { index: number; nodes: any[] }
+    forCursor: { index: number; nodes: NodeValue<TypeName, FieldName>[] }
   ) => string | Promise<string>;
   /**
    * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
@@ -766,19 +766,12 @@ function iterateNodes(
   }
 }
 
-type PaginationArgs =
-  | {
-      first: number;
-      after?: string;
-      last?: never;
-      before?: never;
-    }
-  | {
-      last: number;
-      before?: string;
-      first?: number;
-      after?: string;
-    };
+export type PaginationArgs = {
+  first?: number | null;
+  after?: string | null;
+  last?: number | null;
+  before?: string | null;
+};
 
 function defaultPageInfoFromNodes(nodes: any[], args: PaginationArgs) {
   return {

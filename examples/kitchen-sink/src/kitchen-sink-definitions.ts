@@ -12,6 +12,7 @@ import {
   mutationType,
   booleanArg,
   queryField,
+  connectionPlugin,
 } from "nexus";
 import _ from "lodash";
 import { connectionFromArray } from "graphql-relay";
@@ -196,6 +197,7 @@ export const Query = objectType({
 
     t.connectionField("booleanConnection", {
       type: "Boolean",
+      disableBackwardPagination: true,
       nodes() {
         return [true];
       },
@@ -203,6 +205,7 @@ export const Query = objectType({
 
     t.connectionField("guardedConnection", {
       type: "Date",
+      disableBackwardPagination: true,
       authorize() {
         return false;
       },
@@ -213,6 +216,16 @@ export const Query = objectType({
 
     t.connectionField("usersConnectionNodes", {
       type: User,
+      cursorFromNode(node, args, ctx, info, { index, nodes }) {
+        if (args.last && !args.before) {
+          const totalCount = USERS_DATA.length;
+          return `cursor:${totalCount - args.last! + index + 1}`;
+        }
+        return connectionPlugin.defaultCursorFromNode(node, args, ctx, info, {
+          index,
+          nodes,
+        });
+      },
       nodes(root, args) {
         if (args.after) {
           return USERS_DATA.slice(Number(args.after) + 1);
@@ -287,6 +300,7 @@ export const Query = objectType({
 export const userConnectionAdditionalArgs = queryField((t) => {
   t.connectionField("userConnectionAdditionalArgs", {
     type: User,
+    disableBackwardPagination: true,
     additionalArgs: {
       isEven: booleanArg({
         description: "If true, filters the users with an odd pk",
