@@ -492,6 +492,22 @@ describe("connectionPlugin", () => {
       expect(printType(schema.getQueryType()!)).toMatchSnapshot();
     });
 
+    it("allows disabling forward pagination w/ strictArgs:false to make `last` nullable", () => {
+      const schema = testConnectionSchema({
+        disableForwardPagination: true,
+        strictArgs: false,
+      });
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
+    });
+
+    it("allows disabling backward pagination w/ strictArgs: false to make `first` nullable", () => {
+      const schema = testConnectionSchema({
+        disableBackwardPagination: true,
+        strictArgs: false,
+      });
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
+    });
+
     it("can configure additional fields for the connection globally", () => {
       const schema = testConnectionSchema(
         {
