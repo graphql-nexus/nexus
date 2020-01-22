@@ -194,10 +194,20 @@ export const Query = objectType({
     });
     t.list.date("dateAsList", () => []);
 
-    t.connectionField("edges", {
+    t.connectionField("booleanConnection", {
       type: "Boolean",
       nodes() {
         return [true];
+      },
+    });
+
+    t.connectionField("guardedConnection", {
+      type: "Date",
+      authorize() {
+        return false;
+      },
+      nodes() {
+        return [new Date()];
       },
     });
 

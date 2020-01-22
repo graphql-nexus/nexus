@@ -1,4 +1,4 @@
-/// <reference path="./kitchen-sink-typegen.ts" />
+/// <reference path="./kitchen-sink.gen.ts" />
 import { ApolloServer } from "apollo-server";
 import {
   makeSchema,
@@ -18,7 +18,7 @@ const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, "../kitchen-sink-schema.graphql"),
-    typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
+    typegen: path.join(__dirname, "./kitchen-sink.gen.ts"),
   },
   plugins: [
     connectionPlugin({

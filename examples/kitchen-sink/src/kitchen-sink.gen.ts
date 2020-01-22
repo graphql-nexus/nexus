@@ -24,10 +24,7 @@ declare global {
     ): void; // "Date";
     connectionField<FieldName extends string>(
       fieldName: FieldName,
-      config: connectionPluginCore.ConnectionFieldConfig<
-        TypeName,
-        FieldName
-      > & {}
+      config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName>
     ): void;
   }
 }
@@ -72,6 +69,16 @@ export interface NexusGenRootTypes {
     // root type
     cursor: string; // String!
     node: boolean; // Boolean!
+  };
+  DateConnection: {
+    // root type
+    edges?: Array<NexusGenRootTypes["DateEdge"] | null> | null; // [DateEdge]
+    pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
+  };
+  DateEdge: {
+    // root type
+    cursor: string; // String!
+    node: any; // Date!
   };
   Foo: {
     // root type
@@ -142,6 +149,16 @@ export interface NexusGenFieldTypes {
     cursor: string; // String!
     node: boolean; // Boolean!
   };
+  DateConnection: {
+    // field return type
+    edges: Array<NexusGenRootTypes["DateEdge"] | null> | null; // [DateEdge]
+    pageInfo: NexusGenRootTypes["PageInfo"]; // PageInfo!
+  };
+  DateEdge: {
+    // field return type
+    cursor: string; // String!
+    node: any; // Date!
+  };
   Foo: {
     // field return type
     argsTest: boolean; // Boolean!
@@ -164,10 +181,11 @@ export interface NexusGenFieldTypes {
     // field return type
     asArgExample: string; // String!
     bar: NexusGenRootTypes["TestObj"]; // TestObj!
+    booleanConnection: NexusGenRootTypes["BooleanConnection"]; // BooleanConnection!
     dateAsList: any[]; // [Date!]!
-    edges: NexusGenRootTypes["BooleanConnection"]; // BooleanConnection!
     extended: NexusGenRootTypes["SomeItem"]; // SomeItem!
     getNumberOrNull: number | null; // Int
+    guardedConnection: NexusGenRootTypes["DateConnection"]; // DateConnection!
     inlineArgs: string; // String!
     inputAsArgExample: string; // String!
     protectedField: number; // Int!
@@ -237,7 +255,7 @@ export interface NexusGenArgTypes {
       // args
       testAsArg: NexusGenInputs["InputType"]; // InputType!
     };
-    edges: {
+    booleanConnection: {
       // args
       after?: string | null; // String
       before?: string | null; // String
@@ -247,6 +265,13 @@ export interface NexusGenArgTypes {
     getNumberOrNull: {
       // args
       a: number; // Int!
+    };
+    guardedConnection: {
+      // args
+      after?: string | null; // String
+      before?: string | null; // String
+      first?: number | null; // Int
+      last?: number | null; // Int
     };
     inlineArgs: {
       // args
@@ -315,6 +340,8 @@ export interface NexusGenInheritedFields {}
 export type NexusGenObjectNames =
   | "BooleanConnection"
   | "BooleanEdge"
+  | "DateConnection"
+  | "DateEdge"
   | "Foo"
   | "Mutation"
   | "PageInfo"

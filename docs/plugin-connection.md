@@ -74,6 +74,21 @@ export const usersQueryField = queryField((t) => {
 });
 ```
 
+### Top level connection field:
+
+The `queryField` or `mutationField` helpers may accept a function rather than a field name, which will be shorthand for the query builder:
+
+```ts
+export const usersField = queryField((t) => {
+  t.connectionField("users", {
+    type: Users,
+    nodes(root, args, ctx, info) {
+      return ctx.users.forConnection(root, args);
+    },
+  });
+});
+```
+
 There are properties on the plugin to help configure this including, `cursorFromNode`, which allows you to customize how the cursor is created, or `pageInfoFromNodes` to customize how `hasNextPage` or `hasPreviousPage` are set.
 
 ## Pagination Arguments

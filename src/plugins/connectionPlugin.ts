@@ -227,7 +227,8 @@ export type ConnectionFieldConfig<
       // resolve XOR nodes
       nodes?: never;
     }
-);
+) &
+  NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 const ForwardPaginateArgs = {
   first: intArg({
@@ -344,7 +345,10 @@ export const connectionPlugin = (
         dynamicConfig.push(`edgeFields: { ${edgeFields.join(", ")} }`);
       }
 
-      const printedDynamicConfig = `{ ${dynamicConfig.join(", ")} }`;
+      let printedDynamicConfig = "";
+      if (dynamicConfig.length > 0) {
+        printedDynamicConfig = ` & { ${dynamicConfig.join(", ")} }`;
+      }
 
       // Add the t.connectionField (or something else if we've changed the name)
       b.addType(
@@ -352,7 +356,7 @@ export const connectionPlugin = (
           name: nexusFieldName,
           typeDefinition: `<FieldName extends string>(
             fieldName: FieldName, 
-            config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> & ${printedDynamicConfig}
+            config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> ${printedDynamicConfig}
           ): void`,
           factory({
             typeName: parentTypeName,
@@ -546,7 +550,7 @@ export const connectionPlugin = (
 
             // Add the field to the type.
             t.field(fieldName, {
-              ...fieldConfig,
+              ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
               type: connectionName as any,
               resolve(root, args: PaginationArgs, ctx, info) {
@@ -563,6 +567,26 @@ export const connectionPlugin = (
     },
   });
 };
+
+// Extract all of the non-connection related field config we may want to apply for plugin purposes
+function nonConnectionFieldProps(fieldConfig: ConnectionFieldConfig) {
+  const {
+    additionalArgs,
+    cursorFromNode,
+    disableBackwardPagination,
+    disableForwardPagination,
+    extendConnection,
+    extendEdge,
+    inheritAdditionalArgs,
+    nodes,
+    pageInfoFromNodes,
+    resolve,
+    type,
+    validateArgs,
+    ...rest
+  } = fieldConfig;
+  return rest;
+}
 
 export function makeResolveFn(
   pluginConfig: ConnectionPluginConfig,

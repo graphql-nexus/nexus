@@ -1,16 +1,31 @@
 import { GraphQLResolveInfo } from "graphql";
 
 declare global {
-  interface NexusGen {}
-  interface NexusGenCustomInputMethods<TypeName extends string> {}
-  interface NexusGenCustomOutputMethods<TypeName extends string> {}
-  interface NexusGenCustomOutputProperties<TypeName extends string> {}
-  interface NexusGenPluginSchemaConfig {}
-  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  // The `$` types are so we don't have an empty interface, which is equivalent to a generic object type
+  interface NexusGen {
+    $NexusGen?: never;
+  }
+  interface NexusGenCustomInputMethods<TypeName extends string> {
+    $NexusGenCustomInputMethods?: never;
+  }
+  interface NexusGenCustomOutputMethods<TypeName extends string> {
+    $NexusGenCustomOutputMethods?: never;
+  }
+  interface NexusGenCustomOutputProperties<TypeName extends string> {
+    $NexusGenCustomOutputProperties?: never;
+  }
+  interface NexusGenPluginSchemaConfig {
+    $NexusGenPluginSchemaConfig?: never;
+  }
+  interface NexusGenPluginTypeConfig<TypeName extends string> {
+    $NexusGenPluginTypeConfig?: never;
+  }
   interface NexusGenPluginFieldConfig<
     TypeName extends string,
     FieldName extends string
-  > {}
+  > {
+    $NexusGenPluginFieldConfig?: never;
+  }
 }
 
 export type AllInputTypes = GetGen<"allInputTypes", string>;

@@ -43,6 +43,30 @@ type BooleanEdge {
 
 scalar Date
 
+type DateConnection {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  """
+  edges: [DateEdge]
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  """
+  pageInfo: PageInfo!
+}
+
+type DateEdge {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  """
+  cursor: String!
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  """
+  node: Date!
+}
+
 type Foo implements Bar {
   argsTest(a: InputType = { answer: 2, key: "one" }): Boolean!
   name: String!
@@ -80,12 +104,12 @@ type PageInfo {
   endCursor: String
 
   """
-  hasNextPage is used to indicate whether more edges exist following the set defined by the clients arguments.
+  Used to indicate whether more edges exist following the set defined by the clients arguments.
   """
   hasNextPage: Boolean!
 
   """
-  hasPreviousPage is used to indicate whether more edges exist prior to the set defined by the clients arguments.
+  Used to indicate whether more edges exist prior to the set defined by the clients arguments.
   """
   hasPreviousPage: Boolean!
 
@@ -98,8 +122,7 @@ type PageInfo {
 type Query {
   asArgExample(testAsArg: InputType!): String!
   bar: TestObj!
-  dateAsList: [Date!]!
-  edges(
+  booleanConnection(
     """
     Returns the elements in the list that come after the specified cursor
     """
@@ -120,8 +143,30 @@ type Query {
     """
     last: Int
   ): BooleanConnection!
+  dateAsList: [Date!]!
   extended: SomeItem!
   getNumberOrNull(a: Int!): Int
+  guardedConnection(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor
+    """
+    before: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last n elements from the list.
+    """
+    last: Int
+  ): DateConnection!
   inlineArgs(someArg: SomeArg): String!
   inputAsArgExample(testInput: InputType, testScalar: String): String!
   protectedField: Int!
