@@ -475,6 +475,25 @@ describe("connectionPlugin", () => {
       });
       expect(result).toMatchSnapshot();
     });
+
+    it("returns list as length of nodes if result is smaller than requested", async () => {
+      const schema = testConnectionSchema(
+        {
+          includeNodesField: true,
+        },
+        {
+          nodes() {
+            return userNodes;
+          },
+        }
+      );
+      const result = await executeOk({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 1000 },
+      });
+      expect(result.data?.users.nodes.length).toEqual(10);
+    });
   });
 
   describe("global plugin configuration", () => {
