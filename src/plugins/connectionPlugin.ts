@@ -119,7 +119,10 @@ export type NodeValue<
   TypeName extends string = any,
   FieldName extends string = any
 > = Exclude<
-  Exclude<ResultValue<TypeName, FieldName>["edges"], null | undefined>[number],
+  Exclude<
+    Exclude<ResultValue<TypeName, FieldName>, null | undefined>["edges"],
+    null | undefined
+  >[number],
   null | undefined
 >["node"];
 
@@ -214,7 +217,7 @@ export type ConnectionFieldConfig<
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<"context">,
         info: GraphQLResolveInfo
-      ) => Array<NodeValue<TypeName, FieldName>>;
+      ) => MaybePromise<Array<NodeValue<TypeName, FieldName>>>;
 
       // resolve XOR nodes
       resolve?: never;
