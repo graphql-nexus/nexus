@@ -23,7 +23,11 @@
       "api-queryField",
       "api-plugins"
     ],
-    "Included Plugins": ["plugin-nullabilityGuard", "plugin-fieldAuthorize"],
+    "Included Plugins": [
+      "plugin-connection",
+      "plugin-fieldAuthorize",
+      "plugin-nullabilityGuard"
+    ],
     "Ecosystem Plugins": ["nexus-prisma"]
   }
 }

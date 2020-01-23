@@ -13,8 +13,9 @@ Nexus ships with a plugin API which allows you to define your own abstractions w
 
 We also ship with several plugins out of the box, and will have more in the near future:
 
-- [Nullability Guard Plugin](plugin-nullabilityGuard.md)
+- [Connection Plugin](plugin-connection.md)
 - [Field Authorize Plugin](plugin-fieldAuthorize.md)
+- [Nullability Guard Plugin](plugin-nullabilityGuard.md)
 
 ### Defining a sample plugin:
 

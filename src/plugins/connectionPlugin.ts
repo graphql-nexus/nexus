@@ -169,18 +169,18 @@ export type ConnectionFieldConfig<
    */
   disableBackwardPagination?: boolean;
   /**
+   * If disableForwardPagination or disableBackwardPagination are set to true,
+   * we require the `first` or `last` field as needed. Defaults to true,
+   * setting this to false will disable this behavior and make the field nullable.
+   */
+  strictArgs?: boolean;
+  /**
    * Custom logic to validate the arguments.
    *
    * Defaults to requiring that either a `first` or `last` is provided, and
    * that after / before must be paired with `first` or `last`, respectively.
    */
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void;
-  /**
-   * If disableForwardPagination or disableBackwardPagination are set to true,
-   * we require the `first` or `last` field as needed. Defaults to true,
-   * setting this to false will disable this behavior and make the field nullable.
-   */
-  strictArgs?: boolean;
   /**
    * Dynamically adds additional fields to the current "connection" when it is defined.
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,

@@ -34,28 +34,11 @@ export const User = objectType({
 
 You can change the name of this field by specifying the `nexusFieldName` in the plugin config.
 
-## Usage:
+## Usage
 
 There are two main ways to use the connection field, with a `nodes` property, or a `resolve` property:
 
-### With `nodes`:
-
-When providing a `nodes` property, we make some assumptions about the structure of the connection. We only
-require you return a list of rows to resolve based on the connection, and then we will automatically infer the `hasNextPage`, `hasPreviousPage`, and `cursor` values for you.
-
-```ts
-t.connectionField("users", {
-  type: User,
-  nodes(root, args, ctx, info) {
-    // [{ id: 1,  ... }, ..., { id: 10, ... }]
-    return ctx.resolveUsersConnection(root, args, ctx, info);
-  },
-});
-```
-
-One limitation of the `nodes` property, is that you cannot paginate backward without a `cursor`, or without defining a `cursorFromNode` property on either the field or plugin config. This is because we can't know how long the connection list may be to begin paginating backward.
-
-### With `resolve`:
+### With `resolve`
 
 If you have custom logic you'd like to provide in resolving the connection, we allow you to instead specify a `resolve` field, which will make not assumptions about how the `edges`, `cursor`, or `pageInfo` are defined.
 
@@ -74,59 +57,39 @@ export const usersQueryField = queryField((t) => {
 });
 ```
 
-### Top level connection field:
+### With `nodes`
 
-The `queryField` or `mutationField` helpers may accept a function rather than a field name, which will be shorthand for the query builder:
+When providing a `nodes` property, we make some assumptions about the structure of the connection. We only
+require you return a list of rows to resolve based on the connection, and then we will automatically infer the `hasNextPage`, `hasPreviousPage`, and `cursor` values for you.
 
 ```ts
-export const usersField = queryField((t) => {
-  t.connectionField("users", {
-    type: Users,
-    nodes(root, args, ctx, info) {
-      return ctx.users.forConnection(root, args);
-    },
-  });
+t.connectionField("users", {
+  type: User,
+  nodes(root, args, ctx, info) {
+    // [{ id: 1,  ... }, ..., { id: 10, ... }]
+    return ctx.users.resolveForConnection(root, args, ctx, info);
+  },
 });
 ```
 
-There are properties on the plugin to help configure this including, `cursorFromNode`, which allows you to customize how the cursor is created, or `pageInfoFromNodes` to customize how `hasNextPage` or `hasPreviousPage` are set.
-
-## Pagination Arguments
-
-### Configuring: `disableBackwardPagination` / `disableForwardPagination`
-
-By default we assume that the cursor can paginate in both directions. This is not always something every
-API needs or supports, so to turn them off, you can set `disableForwardPagination`, or `disableBackwardPagination` to
-true on either the `paginationConfig`, or on the `fieldConfig`.
-
-### Validation
-
-The connection field validates that a `first` or a `last` must be provided, and not both. If you wish to
-provide your own validation, supply a `validateArgs` property to either the `connectionPlugin` config, or
-to the field configuration directly.
-
-## Multiple Connection Types:
-
-You can create multiple field connection types with varying defaults, available under different connections builder methods. A `typePrefix` property should be supplied to configure the name
-
-Custom Usage:
+One limitation of the `nodes` property, is that you cannot paginate backward without a `cursor`, or without defining a `cursorFromNode` property on either the field or plugin config. This is because we can't know how long the connection list may be to begin paginating backward.
 
 ```ts
-import { makeSchema, connectionPlugin } from "nexus";
-
-const schema = makeSchema({
-  // ... types, etc,
-  plugins: [
-    connectionPlugin({
-      typePrefix: "Analytics",
-      nexusFieldName: "analyticsConnection",
-      extendConnection: {
-        totalCount: { type: "Int" },
-        avgDuration: { type: "Int" },
-      },
-    }),
-    connectionPlugin({}),
-  ],
+t.connectionField("usersConnectionNodes", {
+  type: User,
+  cursorFromNode(node, args, ctx, info, { index, nodes }) {
+    if (args.last && !args.before) {
+      const totalCount = USERS_DATA.length;
+      return `cursor:${totalCount - args.last! + index + 1}`;
+    }
+    return connectionPlugin.defaultCursorFromNode(node, args, ctx, info, {
+      index,
+      nodes,
+    });
+  },
+  nodes() {
+    // ...
+  },
 });
 ```
 
@@ -152,4 +115,137 @@ query IncludeNodesFieldExample {
     }
   }
 }
+```
+
+### Top level connection field
+
+The `queryField` or `mutationField` helpers may accept a function rather than a field name, which will be shorthand for the query builder:
+
+```ts
+export const usersField = queryField((t) => {
+  t.connectionField("users", {
+    type: Users,
+    nodes(root, args, ctx, info) {
+      return ctx.users.forConnection(root, args);
+    },
+  });
+});
+```
+
+There are properties on the plugin to help configure this including, `cursorFromNode`, which allows you to customize how the cursor is created, or `pageInfoFromNodes` to customize how `hasNextPage` or `hasPreviousPage` are set.
+
+## Pagination Arguments
+
+### Modifying arguments
+
+You may specify `additionalArgs` on either the plugin or the field config, to add additional arguments to the connection:
+
+```ts
+t.connectionField("userConnectionAdditionalArgs", {
+  type: User,
+  disableBackwardPagination: true,
+  additionalArgs: {
+    isEven: booleanArg({
+      description: "If true, filters the users with an odd pk",
+    }),
+  },
+  resolve() {
+    // ...
+  },
+});
+```
+
+If you have specified args on the field, they will overwrite any custom args defined on the plugin config, unless `inheritAdditionalArgs` is set to true.
+
+### Disabling forward/backward pagination
+
+By default we assume that the cursor can paginate in both directions. This is not always something every
+API needs or supports, so to turn them off, you can set `disableForwardPagination`, or `disableBackwardPagination` to
+true on either the `paginationConfig`, or on the `fieldConfig`.
+
+When we disable the forward or backward pagination args, by default we set the remaining `first` or `last` to required.
+If you do not want this to happen, specify `strictArgs: false` in the plugin or field config.
+
+### Argument validation
+
+By default, the connection field validates that a `first` or a `last` must be provided, and not both. If you wish to provide your own validation, supply a `validateArgs` property to either the `connectionPlugin` config, or to the field configuration directly.
+
+```ts
+connectionPlugin({
+  validateArgs(args, info) {
+    // ... custom validate logic
+  },
+});
+
+// or
+
+t.connectionField("users", {
+  // ...
+  validateArgs: (args, info) => {
+    // custom validate logic
+  },
+});
+```
+
+## Extending Connection / Edge types
+
+There are two ways to extend the connection type, one is by providing `extendConnection` on the `connectionPlugin` configuration, the other is to add an `extendConnection` or `extendEdge` definition block on the field config.
+
+### Globally
+
+```ts
+connectionPlugin({
+  extendConnection: {
+    totalCount: { type: "Int" },
+  },
+});
+
+t.connectionField("users", {
+  type: User,
+  nodes: () => {
+    // ...
+  },
+  totalCount() {
+    return ctx.users.totalCount(args);
+  },
+});
+```
+
+### One-off / per-field
+
+```ts
+t.connectionField("users", {
+  extendConnection(t) {
+    t.int("totalCount", {
+      resolve: (source, args, ctx) => ctx.users.totalCount(args),
+    });
+  },
+});
+```
+
+The field-level customization approach will result in a custom connection type specific to that type/field, e.g. `QueryUsers_Connection`, since the modification is specific to the individual field.
+
+## Multiple Connection Types
+
+You can create multiple field connection types with varying defaults, available under different connections builder methods. A `typePrefix` property should be supplied to configure the name
+
+Custom Usage:
+
+```ts
+import { makeSchema, connectionPlugin } from "nexus";
+
+const schema = makeSchema({
+  // ... types, etc,
+  plugins: [
+    connectionPlugin({
+      typePrefix: "Analytics",
+      nexusFieldName: "analyticsConnection",
+      extendConnection: {
+        totalCount: { type: "Int" },
+        avgDuration: { type: "Int" },
+      },
+    }),
+    connectionPlugin({}),
+  ],
+});
 ```
