@@ -793,7 +793,7 @@ function iterateNodes(
   // If we want the first N of an array of nodes, it's pretty straightforward.
   if (args.first) {
     for (let i = 0; i < args.first; i++) {
-      if (i <= nodes.length) {
+      if (i < nodes.length) {
         cb(nodes[i], i);
       }
     }
