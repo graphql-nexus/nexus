@@ -2,9 +2,17 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.9
+
+- fix: iteration if # nodes requested > connection length
+
+### 0.12.0-rc.8
+
+- fix: typings for `connectionPlugin` node field (#364)
+
 ### 0.12.0-rc.7
 
-- feat: Added `connectionPlugin`
+- feat: Added `connectionPlugin` (#324)
 
 ### 0.12.0-rc.6
 
