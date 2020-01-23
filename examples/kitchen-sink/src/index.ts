@@ -1,21 +1,30 @@
-/// <reference path="./kitchen-sink-typegen.ts" />
+/// <reference path="./kitchen-sink.gen.ts" />
 import { ApolloServer } from "apollo-server";
 import {
   makeSchema,
   nullabilityGuardPlugin,
   fieldAuthorizePlugin,
+  connectionPlugin,
 } from "nexus";
 import path from "path";
 import * as types from "./kitchen-sink-definitions";
 import { logMutationTimePlugin } from "./example-plugins";
 
+const DEBUGGING_CURSOR = false;
+
+let fn = DEBUGGING_CURSOR ? (i: string) => i : undefined;
+
 const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, "../kitchen-sink-schema.graphql"),
-    typegen: path.join(__dirname, "./kitchen-sink-typegen.ts"),
+    typegen: path.join(__dirname, "./kitchen-sink.gen.ts"),
   },
   plugins: [
+    connectionPlugin({
+      encodeCursor: fn,
+      decodeCursor: fn,
+    }),
     logMutationTimePlugin,
     fieldAuthorizePlugin(),
     nullabilityGuardPlugin({

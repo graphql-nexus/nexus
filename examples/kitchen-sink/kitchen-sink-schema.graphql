@@ -9,11 +9,6 @@ interface Bar {
   ok: Boolean! @deprecated(reason: "Not ok?")
 }
 
-type BarCollection {
-  nodes: [Bar!]!
-  totalCount: Int!
-}
-
 interface Baz {
   """
   'A' description
@@ -22,7 +17,55 @@ interface Baz {
   ok: Boolean!
 }
 
+type BooleanConnection {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  """
+  edges: [BooleanEdge]
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  """
+  pageInfo: PageInfo!
+}
+
+type BooleanEdge {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  """
+  cursor: String!
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  """
+  node: Boolean!
+}
+
 scalar Date
+
+type DateConnection {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  """
+  edges: [DateEdge]
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  """
+  pageInfo: PageInfo!
+}
+
+type DateEdge {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  """
+  cursor: String!
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  """
+  node: Date!
+}
 
 type Foo implements Bar {
   argsTest(a: InputType = { answer: 2, key: "one" }): Boolean!
@@ -51,16 +94,142 @@ input NestedType {
   veryNested: String
 }
 
+"""
+PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+"""
+type PageInfo {
+  """
+  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
+  """
+  endCursor: String
+
+  """
+  Used to indicate whether more edges exist following the set defined by the clients arguments.
+  """
+  hasNextPage: Boolean!
+
+  """
+  Used to indicate whether more edges exist prior to the set defined by the clients arguments.
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  The cursor corresponding to the first nodes in edges. Null if the connection is empty.
+  """
+  startCursor: String
+}
+
 type Query {
   asArgExample(testAsArg: InputType!): String!
   bar: TestObj!
-  collectionField(a: Int): BarCollection!
+  booleanConnection(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int!
+  ): BooleanConnection!
   dateAsList: [Date!]!
   extended: SomeItem!
   getNumberOrNull(a: Int!): Int
+  guardedConnection(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int!
+  ): DateConnection!
   inlineArgs(someArg: SomeArg): String!
   inputAsArgExample(testInput: InputType, testScalar: String): String!
   protectedField: Int!
+  userConnectionAdditionalArgs(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int!
+
+    """
+    If true, filters the users with an odd pk
+    """
+    isEven: Boolean
+  ): UserConnection!
+  userConnectionBackwardOnly(
+    """
+    Returns the elements in the list that come before the specified cursor
+    """
+    before: String
+
+    """
+    Returns the last n elements from the list.
+    """
+    last: Int!
+  ): UserConnection!
+  userConnectionForwardOnly(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int!
+  ): UserConnection!
+  usersConnectionNodes(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor
+    """
+    before: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last n elements from the list.
+    """
+    last: Int
+  ): UserConnection!
+  usersConnectionResolve(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor
+    """
+    before: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last n elements from the list.
+    """
+    last: Int
+  ): UserConnection!
 }
 
 input SomeArg {
@@ -86,4 +255,33 @@ union TestUnion = Foo
 
 interface UnusedInterface {
   ok: Boolean!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type UserConnection {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  """
+  edges: [UserEdge]
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  """
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  """
+  cursor: String!
+
+  """
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  """
+  node: User!
 }

@@ -80,6 +80,10 @@
         "title": "Library Authors",
         "sidebar_label": "Library Authors"
       },
+      "plugin-connection": {
+        "title": "Connection Plugin",
+        "sidebar_label": "Connections"
+      },
       "plugin-fieldAuthorize": {
         "title": "Field Authorize Plugin",
         "sidebar_label": "Field Authorize"

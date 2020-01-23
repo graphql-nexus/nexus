@@ -17,7 +17,12 @@ import {
   NexusGraphQLInterfaceTypeConfig,
   Maybe,
 } from "./definitions/_types";
-import { isPromiseLike, PrintedGenTyping, venn } from "./utils";
+import {
+  isPromiseLike,
+  PrintedGenTyping,
+  venn,
+  PrintedGenTypingImport,
+} from "./utils";
 import { NexusSchemaExtension } from "./extensions";
 
 export { PluginBuilderLens };
@@ -54,7 +59,7 @@ export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   schemaExtension: NexusSchemaExtension;
 };
 
-export type StringLike = PrintedGenTyping | string;
+export type StringLike = PrintedGenTypingImport | PrintedGenTyping | string;
 
 export interface PluginConfig {
   /**
@@ -130,9 +135,9 @@ export interface PluginConfig {
  * Helper for allowing plugins to fulfill the return of the `next` resolver,
  * without paying the cost of the Promise if not required.
  */
-export function completeValue<T>(
+export function completeValue<T, R = T>(
   valOrPromise: PromiseLike<T> | T,
-  onSuccess: (completedVal: T) => T,
+  onSuccess: (completedVal: T) => R,
   onError?: (errVal: any) => T
 ) {
   if (isPromiseLike(valOrPromise)) {

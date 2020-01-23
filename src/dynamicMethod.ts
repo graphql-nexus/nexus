@@ -3,12 +3,12 @@ import {
   OutputDefinitionBlock,
 } from "./definitions/definitionBlocks";
 import { withNexusSymbol, NexusTypes } from "./definitions/_types";
-import { SchemaBuilder } from "./builder";
+import { PluginBuilderLens } from "./builder";
 
 export type OutputFactoryConfig<T> = {
   stage: "walk" | "build";
   args: any[];
-  builder: SchemaBuilder;
+  builder: PluginBuilderLens;
   typeDef: OutputDefinitionBlock<any>;
   /**
    * The name of the type this field is being declared on
@@ -18,7 +18,7 @@ export type OutputFactoryConfig<T> = {
 
 export type InputFactoryConfig<T> = {
   args: any[];
-  builder: SchemaBuilder;
+  builder: PluginBuilderLens;
   typeDef: InputDefinitionBlock<any>;
   /**
    * The name of the type this field is being declared on
@@ -80,9 +80,9 @@ withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutputMethod);
 /**
  * Defines a new property on the object definition block
  * for an output type, taking arbitrary input to define
- * additional types.
+ * additional types. See the connectionPlugin:
  *
- * t.collection('posts', {
+ * t.connectionField('posts', {
  *   nullable: true,
  *   totalCount(root, args, ctx, info) {
  *     return ctx.user.getTotalPostCount(root.id, args)

@@ -2,6 +2,15 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.7
+
+- feat: Added `connectionPlugin`
+
+### 0.12.0-rc.6
+
+- fix: #329: Union members typing (#363)
+- fix: #361, error when using interfaceType & implements (#362)
+
 ### 0.12.0-rc.5
 
 - feat: Add `customPrintSchemaFn` to makeSchema config

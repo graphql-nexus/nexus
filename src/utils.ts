@@ -19,6 +19,7 @@ import {
   isWrappingType,
   isListType,
   isNonNullType,
+  GraphQLResolveInfo,
 } from "graphql";
 import path from "path";
 import { BuilderConfig } from "./builder";
@@ -475,3 +476,15 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
     rootTyping: "never",
   }
 );
+
+export function pathToArray(
+  infoPath: GraphQLResolveInfo["path"]
+): Array<string | number> {
+  const flattened = [];
+  let curr: GraphQLResolveInfo["path"] | undefined = infoPath;
+  while (curr) {
+    flattened.push(curr.key);
+    curr = curr.prev;
+  }
+  return flattened.reverse();
+}

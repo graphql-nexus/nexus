@@ -10,10 +10,18 @@ import {
   idArg,
   mutationField,
   mutationType,
-  ext,
+  booleanArg,
+  queryField,
+  connectionPlugin,
 } from "nexus";
+import _ from "lodash";
+import { connectionFromArray } from "graphql-relay";
 
-export { ext };
+const USERS_DATA = _.times(100, (i) => ({
+  pk: i,
+  id: `User: ${i}`,
+  name: `Users Connection ${i}`,
+}));
 
 export const testArgs1 = {
   foo: idArg(),
@@ -147,6 +155,7 @@ export const Query = objectType({
         return null;
       },
     });
+
     t.string("asArgExample", {
       args: {
         testAsArg: InputType.asArg({ required: true }),
@@ -154,6 +163,7 @@ export const Query = objectType({
       skipNullGuard: true, // just checking that this isn't a type error
       resolve: () => "ok",
     });
+
     t.string("inputAsArgExample", {
       args: {
         testScalar: "String",
@@ -161,6 +171,7 @@ export const Query = objectType({
       },
       resolve: () => "ok",
     });
+
     t.string("inlineArgs", {
       args: {
         someArg: arg({
@@ -183,18 +194,142 @@ export const Query = objectType({
       resolve: () => "ok",
     });
     t.list.date("dateAsList", () => []);
-    t.collectionField("collectionField", {
-      type: Bar,
-      args: {
-        a: intArg(),
-      },
+
+    t.connectionField("booleanConnection", {
+      type: "Boolean",
+      disableBackwardPagination: true,
       nodes() {
-        return [];
-      },
-      totalCount(root, args, ctx, info) {
-        return args.a || 0;
+        return [true];
       },
     });
+
+    t.connectionField("guardedConnection", {
+      type: "Date",
+      disableBackwardPagination: true,
+      authorize() {
+        return false;
+      },
+      nodes() {
+        return [new Date()];
+      },
+    });
+
+    t.connectionField("usersConnectionNodes", {
+      type: User,
+      cursorFromNode(node, args, ctx, info, { index, nodes }) {
+        if (args.last && !args.before) {
+          const totalCount = USERS_DATA.length;
+          return `cursor:${totalCount - args.last! + index + 1}`;
+        }
+        return connectionPlugin.defaultCursorFromNode(node, args, ctx, info, {
+          index,
+          nodes,
+        });
+      },
+      nodes(root, args) {
+        if (args.after) {
+          return USERS_DATA.slice(Number(args.after) + 1);
+        }
+        if (args.last) {
+          if (args.before) {
+            const beforeNum = Number(args.before);
+            return USERS_DATA.slice(
+              Math.max(beforeNum - args.last, 0),
+              beforeNum
+            );
+          } else {
+            return USERS_DATA.slice(-args.last - 1);
+          }
+        }
+        return USERS_DATA;
+      },
+    });
+
+    t.connectionField("usersConnectionResolve", {
+      type: User,
+      resolve(root, args) {
+        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args);
+        // The typings are wrong in this package for hasNextPage & hasPreviousPage
+        return {
+          edges,
+          pageInfo: {
+            ...pageInfo,
+            hasNextPage: Boolean(pageInfo.hasNextPage),
+            hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
+          },
+        };
+      },
+    });
+
+    t.connectionField("userConnectionForwardOnly", {
+      type: User,
+      disableBackwardPagination: true,
+      resolve(root, args) {
+        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args);
+        // The typings are wrong in this package for hasNextPage & hasPreviousPage
+        return {
+          edges,
+          pageInfo: {
+            ...pageInfo,
+            hasNextPage: Boolean(pageInfo.hasNextPage),
+            hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
+          },
+        };
+      },
+    });
+
+    t.connectionField("userConnectionBackwardOnly", {
+      type: User,
+      disableForwardPagination: true,
+      resolve(root, args) {
+        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args);
+        // The typings are wrong in this package for hasNextPage & hasPreviousPage
+        return {
+          edges,
+          pageInfo: {
+            ...pageInfo,
+            hasNextPage: Boolean(pageInfo.hasNextPage),
+            hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
+          },
+        };
+      },
+    });
+  },
+});
+
+export const userConnectionAdditionalArgs = queryField((t) => {
+  t.connectionField("userConnectionAdditionalArgs", {
+    type: User,
+    disableBackwardPagination: true,
+    additionalArgs: {
+      isEven: booleanArg({
+        description: "If true, filters the users with an odd pk",
+      }),
+    },
+    resolve(root, args) {
+      let userData = USERS_DATA;
+      if (args.isEven) {
+        userData = USERS_DATA.filter((u) => u.pk % 2 === 0);
+      }
+      const { edges, pageInfo } = connectionFromArray(userData, args);
+      // The typings are wrong in this package for hasNextPage & hasPreviousPage
+      return {
+        edges,
+        pageInfo: {
+          ...pageInfo,
+          hasNextPage: Boolean(pageInfo.hasNextPage),
+          hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
+        },
+      };
+    },
+  });
+});
+
+export const User = objectType({
+  name: "User",
+  definition(t) {
+    t.id("id");
+    t.string("name");
   },
 });
 

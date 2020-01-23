@@ -1,15 +1,27 @@
-import { FieldOutConfig } from "../core";
+import { FieldOutConfig, OutputDefinitionBlock } from "../core";
 import { extendType } from "./extendType";
+
+export type QueryFieldConfig<FieldName extends string> =
+  | FieldOutConfig<"Query", FieldName>
+  | (() => FieldOutConfig<"Query", FieldName>);
+
+export function queryField(
+  fieldFn: (t: OutputDefinitionBlock<"Query">) => void
+): void;
 
 export function queryField<FieldName extends string>(
   fieldName: FieldName,
-  config:
-    | FieldOutConfig<"Query", FieldName>
-    | (() => FieldOutConfig<"Query", FieldName>)
-) {
+  config: QueryFieldConfig<FieldName>
+): void;
+
+export function queryField(...args: any[]) {
   return extendType({
     type: "Query",
     definition(t) {
+      if (typeof args[0] === "function") {
+        return args[0](t);
+      }
+      const [fieldName, config] = args as [string, QueryFieldConfig<any>];
       const finalConfig = typeof config === "function" ? config() : config;
       t.field(fieldName, finalConfig);
     },
