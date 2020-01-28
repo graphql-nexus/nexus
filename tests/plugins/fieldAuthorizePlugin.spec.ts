@@ -229,7 +229,7 @@ describe("fieldAuthorizePlugin", () => {
     expect(errors).toEqual([]);
     expect(data?.incorrectFieldConfig).toEqual({ id: 1 });
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-    expect(consoleWarnSpy.mock.calls[0]).toMatchSnapshot();
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
   });
 
   test("warns and adds the authorize plugin when a schema has an authorize prop but no plugins", async () => {
