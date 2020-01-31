@@ -92,6 +92,10 @@
         "title": "Nullability Guard Plugin",
         "sidebar_label": "Nullability Guard"
       },
+      "plugin-queryComplexity": {
+        "title": "Query Complexity Plugin",
+        "sidebar_label": "Query Complexity"
+      },
       "type-generation": {
         "title": "Type Generation Details",
         "sidebar_label": "Type Generation Details"
