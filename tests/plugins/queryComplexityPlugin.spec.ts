@@ -29,7 +29,7 @@ describe("queryComplexityPlugin", () => {
     });
   };
 
-  test("complexity number should be set on field extension if defined", async () => {
+  test("complexity number should be set on field extension if defined", () => {
     const testSchema = createTestSchema([
       objectType({
         name: "User",
@@ -47,7 +47,7 @@ describe("queryComplexityPlugin", () => {
     expect(idField.extensions?.complexity).toBe(1);
   });
 
-  test("complexity estimator should be set on field extension if defined", async () => {
+  test("complexity estimator should be set on field extension if defined", () => {
     const estimator = () => 1;
     const testSchema = createTestSchema([
       objectType({
@@ -66,7 +66,7 @@ describe("queryComplexityPlugin", () => {
     expect(idField.extensions?.complexity).toBe(estimator);
   });
 
-  test("complexity number should work on query fields too", async () => {
+  test("complexity number should work on query fields too", () => {
     const testSchema = createTestSchema([
       queryField("ok", {
         type: "Boolean",
@@ -80,7 +80,7 @@ describe("queryComplexityPlugin", () => {
     expect(ok?.extensions?.complexity).toBe(1);
   });
 
-  test("complexity should not be set on field extension if not defined", async () => {
+  test("complexity should not be set on field extension if not defined", () => {
     const testSchema = createTestSchema([
       objectType({
         name: "User",
@@ -94,7 +94,7 @@ describe("queryComplexityPlugin", () => {
     expect(idField.extensions).not.toHaveProperty("complexity");
   });
 
-  test("throws error if complexity is of invalid type", async () => {
+  test("throws error if complexity is of invalid type", () => {
     const testSchema = createTestSchema([
       objectType({
         name: "User",
