@@ -325,6 +325,23 @@ export const userConnectionAdditionalArgs = queryField((t) => {
   });
 });
 
+export const ComplexObject = objectType({
+  name: "ComplexObject",
+  definition(t) {
+    t.id("id", { complexity: 5 });
+  },
+});
+
+export const complexQuery = queryField("complexQuery", {
+  type: "ComplexObject",
+  list: true,
+  args: {
+    count: intArg({ nullable: false }),
+  },
+  complexity: ({ args, childComplexity }) => args.count * childComplexity,
+  resolve: () => [{ id: "1" }],
+});
+
 export const User = objectType({
   name: "User",
   definition(t) {

@@ -5,6 +5,7 @@
 
 import { UnusedInterfaceTypeDef } from "./kitchen-sink-definitions";
 import { core, connectionPluginCore } from "nexus";
+import { QueryComplexity } from "nexus/dist/plugins/queryComplexityPlugin";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -69,6 +70,10 @@ export interface NexusGenRootTypes {
     // root type
     cursor: string; // String!
     node: boolean; // Boolean!
+  };
+  ComplexObject: {
+    // root type
+    id: string; // ID!
   };
   DateConnection: {
     // root type
@@ -149,6 +154,10 @@ export interface NexusGenFieldTypes {
     cursor: string; // String!
     node: boolean; // Boolean!
   };
+  ComplexObject: {
+    // field return type
+    id: string; // ID!
+  };
   DateConnection: {
     // field return type
     edges: Array<NexusGenRootTypes["DateEdge"] | null> | null; // [DateEdge]
@@ -182,6 +191,7 @@ export interface NexusGenFieldTypes {
     asArgExample: string; // String!
     bar: NexusGenRootTypes["TestObj"]; // TestObj!
     booleanConnection: NexusGenRootTypes["BooleanConnection"]; // BooleanConnection!
+    complexQuery: NexusGenRootTypes["ComplexObject"][]; // [ComplexObject!]!
     dateAsList: any[]; // [Date!]!
     extended: NexusGenRootTypes["SomeItem"]; // SomeItem!
     getNumberOrNull: number | null; // Int
@@ -260,6 +270,10 @@ export interface NexusGenArgTypes {
       after?: string | null; // String
       first: number; // Int!
     };
+    complexQuery: {
+      // args
+      count: number; // Int!
+    };
     getNumberOrNull: {
       // args
       a: number; // Int!
@@ -334,6 +348,7 @@ export interface NexusGenInheritedFields {}
 export type NexusGenObjectNames =
   | "BooleanConnection"
   | "BooleanEdge"
+  | "ComplexObject"
   | "DateConnection"
   | "DateEdge"
   | "Foo"
@@ -403,6 +418,12 @@ declare global {
     TypeName extends string,
     FieldName extends string
   > {
+    /**
+     * The complexity for an individual field. Return a number
+     * or a function that returns a number to specify the
+     * complexity for this field.
+     */
+    complexity?: QueryComplexity<TypeName, FieldName>;
     /**
      * Authorization for an individual field. Returning "true"
      * or "Promise<true>" means the field can be accessed.
