@@ -143,6 +143,42 @@ declare global {
 }"
 `;
 
+exports[`fieldAuthorizePlugin subscribe field-level authorize fails returning a Promise for an error 1`] = `
+Array [
+  "Guarded error Not authorized",
+]
+`;
+
+exports[`fieldAuthorizePlugin subscribe field-level authorize fails returning a Promise for false 1`] = `
+Array [
+  "Guarded error Not authorized",
+]
+`;
+
+exports[`fieldAuthorizePlugin subscribe field-level authorize fails returning an error 1`] = `
+Array [
+  "Guarded error You shall not pass.",
+]
+`;
+
+exports[`fieldAuthorizePlugin subscribe field-level authorize fails returning false 1`] = `
+Array [
+  "Guarded error Not authorized",
+]
+`;
+
+exports[`fieldAuthorizePlugin subscribe field-level authorize fails throwing an error 1`] = `
+Array [
+  "Guarded error You shall not pass.",
+]
+`;
+
+exports[`fieldAuthorizePlugin subscribe field-level authorize fails with any other value 1`] = `
+Array [
+  "Guarded error Nexus authorize for Subscription.userSubscribeInvalidValue Expected a boolean or Error, saw 1",
+]
+`;
+
 exports[`fieldAuthorizePlugin warns and adds the authorize plugin when a schema has an authorize prop but no plugins 1`] = `
 Array [
   "The GraphQL Nexus \\"authorize\\" feature has been moved to a plugin, add [fieldAuthorizePlugin()] to your makeSchema plugin config to remove this warning.",

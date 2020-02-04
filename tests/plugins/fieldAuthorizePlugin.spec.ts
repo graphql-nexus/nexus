@@ -6,7 +6,7 @@ import {
   fieldAuthorizePlugin,
 } from "../../src";
 import { graphql } from "graphql";
-import { generateSchema } from "../../src/core";
+import { generateSchema, subscriptionField } from "../../src/core";
 
 describe("fieldAuthorizePlugin", () => {
   const consoleErrorSpy = jest
@@ -60,7 +60,7 @@ describe("fieldAuthorizePlugin", () => {
     queryField("userReturnPromiseError", {
       type: "User",
       // @ts-ignore
-      authorize: (root, args, ctx) => new Error("You shall not pass."),
+      authorize: async (root, args, ctx) => new Error("You shall not pass."),
       resolve: () => ({ id: 1 }),
     }),
     queryField("userThrowError", {
@@ -77,7 +77,66 @@ describe("fieldAuthorizePlugin", () => {
       authorize: (root, args, ctx) => 1,
       resolve: () => ({ id: 1 }),
     }),
+    subscriptionField("userSubscribeTrue", {
+      type: "User",
+      //@ts-ignore
+      authorize: (root, args, ctx) => ctx.user.id === 1,
+      subscribe: () => true,
+      resolve: () => ({ id: 1 }),
+    }),
+    subscriptionField("userSubscribeTruePromise", {
+      type: "User",
+      //@ts-ignore
+      authorize: async (root, args, ctx) => ctx.user.id === 1,
+      subscribe: () => true,
+      resolve: () => ({ id: 1 }),
+    }),
+    subscriptionField("userSubscribeFalse", {
+      type: "User",
+      // @ts-ignore
+      authorize: (root, args, ctx) => ctx.user.id === 2,
+      subscribe: () => true,
+      resolve: () => ({ id: 2 }),
+    }),
+    subscriptionField("userSubscribeFalsePromise", {
+      type: "User",
+      // @ts-ignore
+      authorize: async (root, args, ctx) => ctx.user.id === 2,
+      subscribe: () => true,
+      resolve: () => ({ id: 2 }),
+    }),
+    subscriptionField("userSubscribeReturnError", {
+      type: "User",
+      // @ts-ignore
+      authorize: (root, args, ctx) => new Error("You shall not pass."),
+      subscribe: () => true,
+      resolve: () => ({ id: 1 }),
+    }),
+    subscriptionField("userSubscribeReturnPromiseError", {
+      type: "User",
+      // @ts-ignore
+      authorize: async (root, args, ctx) => new Error("You shall not pass."),
+      subscribe: () => true,
+      resolve: () => ({ id: 1 }),
+    }),
+    subscriptionField("userSubscribeThrowError", {
+      type: "User",
+      // @ts-ignore
+      authorize: (root, args, ctx) => {
+        throw new Error("You shall not pass.");
+      },
+      subscribe: () => true,
+      resolve: () => ({ id: 1 }),
+    }),
+    subscriptionField("userSubscribeInvalidValue", {
+      type: "User",
+      // @ts-ignore
+      authorize: (root, args, ctx) => 1,
+      subscribe: () => true,
+      resolve: () => ({ id: 1 }),
+    }),
   ];
+
   const testSchema = makeSchema({
     outputs: false,
     types: schemaTypes,
@@ -167,6 +226,101 @@ describe("fieldAuthorizePlugin", () => {
 
   test("field-level authorize fails with any other value", async () => {
     const { data, errors = [] } = await testField("userInvalidValue");
+    expect(data).toBeNull();
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Authorization Error");
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  const testSubscription = (field: string) => {
+    return graphql(
+      testSchema,
+      `
+        subscription {
+          ${field} {
+            id
+          }
+        }
+      `,
+      {},
+      mockCtx
+    );
+  };
+
+  test("subscribe field-level authorize passes returning true", async () => {
+    const { data, errors = [] } = await testSubscription("userSubscribeTrue");
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    expect(errors).toEqual([]);
+    expect(data?.userSubscribeTrue).toEqual({ id: 1 });
+  });
+
+  test("subscribe field-level authorize passes returning a Promise for true", async () => {
+    const { data, errors = [] } = await testSubscription(
+      "userSubscribeTruePromise"
+    );
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    expect(errors).toEqual([]);
+    expect(data?.userSubscribeTruePromise).toEqual({ id: 1 });
+  });
+
+  test("subscribe field-level authorize fails returning false", async () => {
+    const { data, errors = [] } = await testSubscription("userSubscribeFalse");
+    expect(data).toBeNull();
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Authorization Error");
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("subscribe field-level authorize fails returning a Promise for false", async () => {
+    const { data, errors = [] } = await testSubscription(
+      "userSubscribeFalsePromise"
+    );
+    expect(data).toBeNull();
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Authorization Error");
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("subscribe field-level authorize fails returning an error", async () => {
+    const { data, errors = [] } = await testSubscription(
+      "userSubscribeReturnError"
+    );
+    expect(data).toBeNull();
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Authorization Error");
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("subscribe field-level authorize fails returning a Promise for an error", async () => {
+    const { data, errors = [] } = await testSubscription(
+      "userSubscribeFalsePromise"
+    );
+    expect(data).toBeNull();
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Authorization Error");
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("subscribe field-level authorize fails throwing an error", async () => {
+    const { data, errors = [] } = await testSubscription(
+      "userSubscribeThrowError"
+    );
+    expect(data).toBeNull();
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Authorization Error");
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy.mock.calls[0]).toMatchSnapshot();
+  });
+
+  test("subscribe field-level authorize fails with any other value", async () => {
+    const { data, errors = [] } = await testSubscription(
+      "userSubscribeInvalidValue"
+    );
     expect(data).toBeNull();
     expect(errors.length).toEqual(1);
     expect(errors[0].message).toEqual("Authorization Error");

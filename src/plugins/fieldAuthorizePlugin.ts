@@ -84,7 +84,7 @@ export const fieldAuthorizePlugin = (
     config: CreateFieldResolverInfo<any, any>
   ): MiddlewareFn | undefined => {
     const authorize = config.fieldConfig.extensions?.nexus?.config.authorize;
-    // If the field doesn't have an authorize field, don't worry about wrapping the resolver
+    // If the field doesn't have an authorize field, don't worry about wrapping subscribe/resolver
     if (authorize == null) {
       return;
     }
@@ -112,7 +112,7 @@ export const fieldAuthorizePlugin = (
         hasWarned = true;
       }
     }
-    // The authorize wrapping resolver.
+    // The authorize wrapping subscribe/resolver.
     return function(root, args, ctx, info, next) {
       let toComplete;
       try {
