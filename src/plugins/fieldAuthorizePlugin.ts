@@ -94,6 +94,8 @@ export const fieldAuthorizePlugin = (
         console.error(
           new Error(
             `The authorize property provided to ${
+              config.fieldConfig.name
+            } with type ${
               config.fieldConfig.type
             } should be a function, saw ${typeof authorize}`
           )

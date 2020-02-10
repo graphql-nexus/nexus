@@ -147,7 +147,7 @@ type WithExt<T extends { extensions?: any }, Ext> = Omit<T, "extensions"> & {
 export type NexusGraphQLFieldConfig = WithExt<
   GraphQLFieldConfig<any, any>,
   NexusFieldExtension
->;
+> & { name: string };
 
 export type NexusGraphQLObjectTypeConfig = WithExt<
   GraphQLObjectTypeConfig<any, any>,

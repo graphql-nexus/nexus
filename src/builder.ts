@@ -659,6 +659,7 @@ export class SchemaBuilder {
             fieldConfig: {
               ...fieldConfig,
               type: finalType,
+              name: key,
             },
             schemaConfig: this.config,
             parentTypeConfig: rest,
@@ -1090,6 +1091,7 @@ export class SchemaBuilder {
       NexusGraphQLFieldConfig,
       "resolve" | "subscribe"
     > = {
+      name: fieldConfig.name,
       type: this.decorateType(
         this.getOutputType(fieldConfig.type),
         fieldConfig.list,

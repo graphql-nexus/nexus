@@ -149,4 +149,8 @@ Array [
 ]
 `;
 
-exports[`fieldAuthorizePlugin warns when a field has a non-function authorize prop 1`] = `undefined`;
+exports[`fieldAuthorizePlugin warns when a field has a non-function authorize prop 1`] = `
+Array [
+  [Error: The authorize property provided to incorrectFieldConfig with type User! should be a function, saw number],
+]
+`;
