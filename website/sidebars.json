@@ -26,7 +26,8 @@
     "Included Plugins": [
       "plugin-connection",
       "plugin-fieldAuthorize",
-      "plugin-nullabilityGuard"
+      "plugin-nullabilityGuard",
+      "plugin-queryComplexity"
     ],
     "Ecosystem Plugins": ["nexus-prisma"]
   }

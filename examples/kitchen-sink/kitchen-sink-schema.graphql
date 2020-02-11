@@ -41,6 +41,10 @@ type BooleanEdge {
   node: Boolean!
 }
 
+type ComplexObject {
+  id: ID!
+}
+
 scalar Date
 
 type DateConnection {
@@ -133,6 +137,7 @@ type Query {
     """
     first: Int!
   ): BooleanConnection!
+  complexQuery(count: Int!): [ComplexObject!]!
   dateAsList: [Date!]!
   extended: SomeItem!
   getNumberOrNull(a: Int!): Int

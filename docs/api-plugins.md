@@ -16,6 +16,7 @@ We also ship with several plugins out of the box, and will have more in the near
 - [Connection Plugin](plugin-connection.md)
 - [Field Authorize Plugin](plugin-fieldAuthorize.md)
 - [Nullability Guard Plugin](plugin-nullabilityGuard.md)
+- [Query Complexity Plugin](plugin-queryComplexity.md)
 
 ### Defining a sample plugin:
 
