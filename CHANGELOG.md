@@ -2,6 +2,11 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.10
+
+- feat: add `queryComplexityPlugin` (#369)
+- feat: expose `name` on `fieldConfig` (#368)
+
 ### 0.12.0-rc.9
 
 - fix: iteration if # nodes requested > connection length
