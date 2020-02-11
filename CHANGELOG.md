@@ -2,6 +2,10 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.11
+
+- fix: TypeScript error from missing `graphql-query-complexity` import (#376)
+
 ### 0.12.0-rc.10
 
 - feat: add `queryComplexityPlugin` (#369)
