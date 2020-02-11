@@ -7,6 +7,7 @@ import { linkExamples, linkWebsite, linkNexus } from "./scripts/link-examples";
 import { unlinkExamples } from "./scripts/unlink-examples";
 import { allExamples } from "./scripts/constants";
 import { upgradeDeps } from "./scripts/upgrade-deps";
+import { publishAtNexusSchema } from "./scripts/publish-nexus-schema";
 
 const serviceRegistry = new Map<string, ChildProcess>();
 
@@ -112,4 +113,9 @@ gulp.task("unlink-examples", async () => {
 gulp.task("upgrade-deps", async () => {
   await upgradeDeps();
   console.log("All dependencies upgraded");
+});
+
+gulp.task("publish-nexus-schema", async () => {
+  await publishAtNexusSchema();
+  console.log("Published to @nexus/schema");
 });
