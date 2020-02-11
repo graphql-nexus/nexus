@@ -2,20 +2,20 @@
   "name": "@graphql-nexus/website",
   "license": "MIT",
   "scripts": {
-    "start": "gulp start",
     "build": "yarn && webpack && docusaurus-build",
     "build-webpack": "webpack",
     "publish-gh-pages": "docusaurus-publish",
-    "write-translations": "docusaurus-write-translations",
-    "version": "docusaurus-version",
     "rename-version": "docusaurus-rename-version",
-    "webpack": "webpack -w"
+    "start": "gulp start",
+    "version": "docusaurus-version",
+    "webpack": "webpack -w",
+    "write-translations": "docusaurus-write-translations"
   },
   "dependencies": {
     "dedent": "^0.7.0",
     "graphql": "^14.5.8",
     "monaco-editor": "^0.18.1",
-    "nexus": "0.12.0-rc",
+    "nexus": "0.12.0-rc.11",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2"
   },

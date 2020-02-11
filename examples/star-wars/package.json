@@ -7,7 +7,7 @@
   "dependencies": {
     "apollo-server": "^2.2.0",
     "graphql": "^14.5.8",
-    "nexus": "0.12.0-rc",
+    "nexus": "0.12.0-rc.11",
     "ts-node-dev": "^1.0.0-pre.30"
   },
   "devDependencies": {

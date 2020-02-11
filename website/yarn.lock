@@ -5907,10 +5907,10 @@ next-tick@^1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-nexus@0.12.0-rc:
-  version "0.12.0-rc"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-rc.tgz#8fe41a6d90ceee3378a9e38e74c47427f6295039"
-  integrity sha512-Ytycgt/5t5eqYUDUvRzS0UBgulv94ckxy2yEu5FMpNBN8kDNuPxMP6heUA+zWKrFnqykobqqvOW8FoJfalVKtA==
+nexus@0.12.0-rc.11:
+  version "0.12.0-rc.11"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-rc.11.tgz#7d9da9dd2ab537c7908e25442be2a0ecbe2a5ca6"
+  integrity sha512-zfeTKQQIJBE7wXYpIrkszzO9owNIDf8GxalyKih/dSxiFG7O225RX7PI+XKfAulL4oxdPhrf3WB3ypBhLOf9EQ==
   dependencies:
     iterall "^1.2.2"
     tslib "^1.9.3"

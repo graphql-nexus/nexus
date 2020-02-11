@@ -14,7 +14,7 @@
     "knex": "^0.19.5",
     "lodash": "^4.17.11",
     "mysql": "^2.16.0",
-    "nexus": "0.12.0-rc"
+    "nexus": "0.12.0-rc.11"
   },
   "devDependencies": {
     "@types/express": "^4.16.1",
