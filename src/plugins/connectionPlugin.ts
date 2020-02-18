@@ -1,26 +1,26 @@
-import { plugin, completeValue } from "../plugin";
-import { dynamicOutputMethod } from "../dynamicMethod";
-import { intArg, ArgsRecord, stringArg } from "../definitions/args";
+import { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
+import { ArgsRecord, intArg, stringArg } from "../definitions/args";
+import { FieldOutConfig } from "../definitions/definitionBlocks";
 import { ObjectDefinitionBlock, objectType } from "../definitions/objectType";
+import { AllNexusOutputTypeDefs } from "../definitions/wrapping";
+import { dynamicOutputMethod } from "../dynamicMethod";
+import { completeValue, plugin } from "../plugin";
 import {
-  printedGenTypingImport,
+  ArgsValue,
+  GetGen,
+  MaybePromise,
+  MaybePromiseDeep,
+  ResultValue,
+  RootValue,
+} from "../typegenTypeHelpers";
+import {
   eachObj,
-  mapObj,
   isObject,
   isPromiseLike,
+  mapObj,
   pathToArray,
+  printedGenTypingImport,
 } from "../utils";
-import {
-  GetGen,
-  RootValue,
-  ArgsValue,
-  MaybePromise,
-  ResultValue,
-  MaybePromiseDeep,
-} from "../typegenTypeHelpers";
-import { FieldOutConfig } from "../definitions/definitionBlocks";
-import { AllNexusOutputTypeDefs } from "../definitions/wrapping";
-import { GraphQLResolveInfo, GraphQLFieldResolver } from "graphql";
 
 export interface ConnectionPluginConfig {
   /**
@@ -334,11 +334,23 @@ export const connectionPlugin = (
   const pluginConfig: ConnectionPluginConfig = { ...connectionPluginConfig };
 
   // Define the plugin with the appropriate configuration.
+
+  let packageName;
+  try {
+    packageName = require("../../package.json").name;
+  } catch (e) {
+    console.error(
+      'Failed to get name from package manifest for typegen. Falling back to hardcoded "nexus". Error was:\n\n'
+    );
+    console.error(e);
+    packageName = "nexus";
+  }
+
   return plugin({
     name: "ConnectionPlugin",
     fieldDefTypes: [
       printedGenTypingImport({
-        module: "nexus",
+        module: packageName,
         bindings: ["core", "connectionPluginCore"],
       }),
     ],
