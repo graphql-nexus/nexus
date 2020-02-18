@@ -1,7 +1,9 @@
 import {
   GraphQLArgument,
+  GraphQLEnumType,
   GraphQLField,
   GraphQLInputField,
+  GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -18,25 +20,24 @@ import {
   isScalarType,
   isSpecifiedScalarType,
   isUnionType,
-  GraphQLInputObjectType,
-  GraphQLEnumType,
 } from "graphql";
 import path from "path";
 import { TypegenInfo } from "./builder";
+import {
+  isNexusPrintedGenTyping,
+  isNexusPrintedGenTypingImport,
+} from "./definitions/wrapping";
+import { NexusGraphQLSchema } from "./definitions/_types";
+import { StringLike } from "./plugin";
+import { getPackageNameForImport } from "./typegenTypeHelpers";
 import {
   eachObj,
   GroupedTypes,
   groupTypes,
   mapObj,
-  relativePathTo,
   PrintedGenTypingImport,
+  relativePathTo,
 } from "./utils";
-import { NexusGraphQLSchema } from "./definitions/_types";
-import {
-  isNexusPrintedGenTyping,
-  isNexusPrintedGenTypingImport,
-} from "./definitions/wrapping";
-import { StringLike } from "./plugin";
 
 const SpecifiedScalars = {
   ID: "string",
@@ -153,13 +154,15 @@ export class TypegenPrinter {
     const importMap: Record<string, Set<string>> = {};
     const outputPath = this.typegenInfo.typegenFile;
     // For backward compat.
-    if (!this.printImports.nexus) {
+
+    const packName = getPackageNameForImport();
+    if (!this.printImports[packName]) {
       if (
         [dynamicInputFields, dynamicOutputFields].some(
           (o) => Object.keys(o).length > 0
         )
       ) {
-        this.printImports.nexus = { core: true };
+        this.printImports[packName] = { core: true };
       }
     }
     eachObj(rootTypings, (val, key) => {

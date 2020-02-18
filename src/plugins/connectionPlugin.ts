@@ -8,6 +8,7 @@ import { completeValue, plugin } from "../plugin";
 import {
   ArgsValue,
   GetGen,
+  getPackageNameForImport,
   MaybePromise,
   MaybePromiseDeep,
   ResultValue,
@@ -335,22 +336,11 @@ export const connectionPlugin = (
 
   // Define the plugin with the appropriate configuration.
 
-  let packageName;
-  try {
-    packageName = require("../../package.json").name;
-  } catch (e) {
-    console.error(
-      'Failed to get name from package manifest for typegen. Falling back to hardcoded "nexus". Error was:\n\n'
-    );
-    console.error(e);
-    packageName = "nexus";
-  }
-
   return plugin({
     name: "ConnectionPlugin",
     fieldDefTypes: [
       printedGenTypingImport({
-        module: packageName,
+        module: getPackageNameForImport(),
         bindings: ["core", "connectionPluginCore"],
       }),
     ],

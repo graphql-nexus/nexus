@@ -1,5 +1,17 @@
 import { GraphQLResolveInfo } from "graphql";
 
+export function getPackageNameForImport(): string {
+  try {
+    return require("../../package.json").name;
+  } catch (e) {
+    console.error(
+      'Failed to get name from package manifest for typegen. Falling back to hardcoded "nexus". Error was:\n\n'
+    );
+    console.error(e);
+    return "nexus";
+  }
+}
+
 declare global {
   interface NexusGen {}
   interface NexusGenCustomInputMethods<TypeName extends string> {}
