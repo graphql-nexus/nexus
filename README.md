@@ -1,7 +1,4 @@
-<p align="center">
-  <a href="https://nexus.js.org"><img src="https://i.imgur.com/Y5BgDGl.png" width="150" /><a>
-  <h1 align="center">Nexus</h1>
-</p>
+# Nexus Schema
 
 [![CircleCI](https://img.shields.io/circleci/build/github/prisma-labs/nexus)](https://circleci.com/gh/prisma-labs/nexus)
 [![npm version](https://badge.fury.io/js/nexus.svg)](https://badge.fury.io/js/nexus)
@@ -9,7 +6,9 @@
 
 Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript
 
-> GraphQL Nexus can be used independently from [Prisma](https://www.prisma.io). To learn how it can best be combined with Prisma, check out the [`nexus-prisma`](https://github.com/prisma-labs/nexus-prisma) plugin.
+> **Note**
+>
+> The `nexus` package is becoming the Nexus framework. Learn more about the transition in [#373](https://github.com/prisma-labs/nexus/issues/373). Learn how to migrate your app to the framework in the [migration guide](/getting-started/migrate-from-nexus-schema). Don't worry, you will be able to continue using this schema component standalone.
 
 ## Overview
 
@@ -23,7 +22,7 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 **"Hello World" GraphQL server with `graphql-yoga`**
 
 ```ts
-import { queryType, stringArg, makeSchema } from "nexus";
+import { queryType, stringArg, makeSchema } from "@nexus/schema";
 import { GraphQLServer } from "graphql-yoga";
 
 const Query = queryType({
@@ -50,19 +49,13 @@ const server = new GraphQLServer({
 server.start(() => `Server is running on http://localhost:4000`);
 ```
 
-All examples of GraphQL Nexus can be found in the [`/examples`](./examples) directory:
+All examples of Nexus Schema can be found in the [`/examples`](./examples) directory:
 
 - [githunt-api](./examples/githunt-api)
 - [ts-ast-reader](./examples/ts-ast-reader)
 - [apollo-fullstack](./examples/apollo-fullstack)
 - [star-wars](./examples/star-wars)
 - [kitchen-sink](./examples/kitchen-sink)
-
-If you're interested in examples using the [`nexus-prisma`](https://github.com/prisma-labs/nexus-prisma) plugin, check out the official [`prisma-examples`](https://github.com/prisma/prisma-examples/) repo:
-
-- [GraphQL blogging app](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql)
-- [GraphQL blogging app with authentication & authorization](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-auth)
-- [GraphQL CRUD example](https://github.com/prisma/prisma-examples/tree/master/typescript/graphql-crud)
 
 ## Features
 
@@ -81,20 +74,20 @@ If you're interested in examples using the [`nexus-prisma`](https://github.com/p
 
 ## Documentation
 
-You can find the docs for GraphQL Nexus [here](https://nexus.js.org).
+You can find the docs for Nexus Schema [here](https://nexus.js.org).
 
 ## Install
 
-GraphQL Nexus can be installed via the `nexus` package. It also requires `graphql` as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/):
+Nexus Schema can be installed via the `@nexus/schema` package. It also requires `graphql` as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/):
 
 ```
-npm install --save nexus graphql
+npm install --save @nexus/schema graphql
 ```
 
 or
 
 ```
-yarn add nexus graphql
+yarn add @nexus/schema graphql
 ```
 
 ## Migrate from SDL
