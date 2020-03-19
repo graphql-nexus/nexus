@@ -1,8 +1,7 @@
 # Nexus Schema
 
-[![CircleCI](https://img.shields.io/circleci/build/github/prisma-labs/nexus)](https://circleci.com/gh/prisma-labs/nexus)
-[![npm version](https://badge.fury.io/js/nexus.svg)](https://badge.fury.io/js/nexus)
-[![Slack](https://slack.prisma.io/badge.svg)](https://slack.prisma.io/)
+[![CircleCI](https://img.shields.io/circleci/build/github/graphql-nexus/schema)](https://circleci.com/gh/graphql-nexus/schema)
+[![npm version](https://badge.fury.io/js/%40nexus%2Fschema.svg)](https://badge.fury.io/js/%40nexus%2Fschema)
 
 Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript
 
