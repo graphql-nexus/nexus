@@ -23,7 +23,8 @@
     "dist",
     "LICENSE.md",
     "README.md",
-    "yarn.lock"
+    "yarn.lock",
+    "scripts/framework-transition-notice.js"
   ],
   "main": "dist",
   "types": "dist/index.d.ts",
@@ -36,6 +37,7 @@
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && cd website && yarn gulp run-examples",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
+    "postinstall": "node scripts/framework-transition-notice.js",
     "link-examples": "cd website && yarn && yarn gulp link-examples",
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn lint && yarn build",
