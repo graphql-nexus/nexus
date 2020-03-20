@@ -170,7 +170,9 @@ export class TypegenPrinter {
         const importPath = (path.isAbsolute(val.path)
           ? relativePathTo(val.path, outputPath)
           : val.path
-        ).replace(/(\.d)?\.ts/, "");
+        )
+        .replace(/(\.d)?\.ts/, "")
+        .replace(/\\/, "/");
         importMap[importPath] = importMap[importPath] || new Set();
         importMap[importPath].add(
           val.alias ? `${val.name} as ${val.alias}` : val.name
