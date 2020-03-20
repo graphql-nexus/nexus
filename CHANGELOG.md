@@ -2,6 +2,19 @@
 
 ### 0.12.0 final (unreleased)
 
+### 0.12.0-rc.14
+
+- improve: add post-install framework notice (#398)
+
+### 0.12.0-rc.13
+
+- improve: add post-install framework notice (#398)
+- fix: typegen always use manifest for package import (#382)
+
+### 0.12.0-rc.12
+
+- feat: respect manifest name in typegen imports (#380)
+
 ### 0.12.0-rc.11
 
 - fix: TypeScript error from missing `graphql-query-complexity` import (#376)
