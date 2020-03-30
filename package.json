@@ -1,5 +1,5 @@
 {
-  "name": "nexus",
+  "name": "@nexus/schema",
   "version": "0.12.0",
   "description": "Scalable, strongly typed GraphQL schema development",
   "keywords": [
@@ -8,10 +8,10 @@
     "types",
     "typescript"
   ],
-  "homepage": "https://nexus.js.org",
+  "homepage": "https://nexusjs.org/#/components/schema/about",
   "repository": {
     "type": "git",
-    "url": "git://github.com/prisma-labs/nexus.git"
+    "url": "git://github.com/graphql-nexus/schema.git"
   },
   "license": "MIT",
   "author": {
