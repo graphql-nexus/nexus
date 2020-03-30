@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.13.1
+
+- fix: remove transition postinstall message
+
 ### 0.13.0
 
 The first release of Nexus schema under the package name `@nexus/schema`
