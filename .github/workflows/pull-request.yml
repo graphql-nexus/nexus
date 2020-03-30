@@ -7,8 +7,7 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x]
-        # todo widnows-latest
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -26,16 +25,22 @@ jobs:
         example:
           - apollo-fullstack
           - ghost
-          - githunt-api
+          # - githunt-api requires node 8
           - kitchen-sink
-          - star-wars
+          # - star-wars requires special commands
+          # rm examples/star-wars/src/star-wars-typegen.ts
+          # rm examples/star-wars/star-wars-schema.graphql
+          # node examples/star-wars/dist/schema.js
+          # git diff --exit-code
           - ts-ast-reader
-    runs-on: macos-latest
+        node-version: [10.x]
+        os: [macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Link
@@ -43,6 +48,6 @@ jobs:
       - name: Example Install
         run: yarn --cwd=examples/${{ matrix.example }} --frozen-lockfile
       - name: Example Use Link
-        run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
+        run: yarn --cwd=examples/${{ matrix.example }} link nexus
       - name: Example Typecheck
         run: yarn --cwd=examples/${{ matrix.example }} tsc
