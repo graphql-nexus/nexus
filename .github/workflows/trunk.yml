@@ -28,14 +28,14 @@ jobs:
         example:
           - apollo-fullstack
           - ghost
-          # - githunt-api requires node 8
           - kitchen-sink
+          - ts-ast-reader
+          # - githunt-api requires node 8
           # - star-wars requires special commands
           # rm examples/star-wars/src/star-wars-typegen.ts
           # rm examples/star-wars/star-wars-schema.graphql
           # node examples/star-wars/dist/schema.js
           # git diff --exit-code
-          - ts-ast-reader
         node-version: [10.x]
         os: [macos-latest]
     runs-on: ${{ matrix.os }}
