@@ -5,10 +5,10 @@ export function getPackageNameForImport(): string {
     return require("../package.json").name;
   } catch (e) {
     console.error(
-      'Failed to get name from package manifest for typegen. Falling back to hardcoded "nexus". Error was:\n\n'
+      'Failed to get name from package manifest for typegen. Falling back to hardcoded "@nexus/schema". Error was:\n\n'
     );
     console.error(e);
-    return "nexus";
+    return "@nexus/schema";
   }
 }
 
