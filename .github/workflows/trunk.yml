@@ -1,0 +1,55 @@
+name: trunk
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Test
+        run: yarn -s test
+
+  test-examples:
+    strategy:
+      matrix:
+        example:
+          - apollo-fullstack
+          - ghost
+          # - githunt-api requires node 8
+          - kitchen-sink
+          # - star-wars requires special commands
+          # rm examples/star-wars/src/star-wars-typegen.ts
+          # rm examples/star-wars/star-wars-schema.graphql
+          # node examples/star-wars/dist/schema.js
+          # git diff --exit-code
+          - ts-ast-reader
+        node-version: [10.x]
+        os: [macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Link
+        run: yarn link
+      - name: Example Install
+        run: yarn --cwd=examples/${{ matrix.example }} --frozen-lockfile
+      - name: Example Use Link
+        run: yarn --cwd=examples/${{ matrix.example }} link nexus
+      - name: Example Typecheck
+        run: yarn --cwd=examples/${{ matrix.example }} tsc
