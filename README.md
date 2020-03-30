@@ -7,11 +7,11 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 
 ## Install
 
-Nexus Schema can be installed via the `@nexus/schema` package. It also requires `graphql` as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/):
-
 ```
 npm install @nexus/schema graphql
 ```
+
+Note you must also add `graphql`. Nexus Schema pins to it as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/).
 
 ## Overview
 
