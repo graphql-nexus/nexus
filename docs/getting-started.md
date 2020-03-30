@@ -56,7 +56,7 @@ import {
   intArg,
   arg,
   makeSchema,
-} from "nexus";
+} from "@nexus/schema";
 
 const Node = interfaceType({
   name: "Node",

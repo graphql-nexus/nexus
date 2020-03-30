@@ -12,7 +12,7 @@ const siteConfig = {
   },
 
   // Used for publishing and more
-  projectName: "nexus",
+  projectName: "@nexus/schema",
   organizationName: "graphql-nexus",
 
   // For no header links in the top nav bar -> headerLinks: [],
