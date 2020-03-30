@@ -1,6 +1,10 @@
 # Changelog
 
-### 0.12.0 final (unreleased)
+### 0.12.0
+
+The last release of Nexus schema under the package name `nexus`
+
+See previous release notes for details on what's new in `0.12.0`
 
 ### 0.12.0-rc.14
 
