@@ -1,28 +1,28 @@
 import {
   buildSchema,
-  GraphQLObjectType,
-  GraphQLEnumType,
-  GraphQLInterfaceType,
-  GraphQLInputObjectType,
-  GraphQLScalarType,
-  GraphQLUnionType,
-  GraphQLSchema,
-  GraphQLNamedType,
-  isSpecifiedScalarType,
-  GraphQLField,
-  GraphQLOutputType,
-  GraphQLWrappingType,
-  isScalarType,
-  isObjectType,
-  GraphQLInputField,
   GraphQLArgument,
+  GraphQLEnumType,
+  GraphQLField,
+  GraphQLInputField,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  GraphQLObjectType,
+  GraphQLOutputType,
+  GraphQLScalarType,
+  GraphQLSchema,
+  GraphQLUnionType,
+  GraphQLWrappingType,
+  isObjectType,
+  isScalarType,
+  isSpecifiedScalarType,
 } from "graphql";
 import {
-  groupTypes,
+  eachObj,
   GroupedTypes,
+  groupTypes,
   isInterfaceField,
   objValues,
-  eachObj,
   unwrapType,
 } from "./utils";
 
@@ -78,11 +78,11 @@ export class SDLConverter {
     if (this.commonjs) {
       return `const { ${Array.from(this.usedImports).join(
         ", "
-      )} } = require('nexus');`;
+      )} } = require('@nexus/schema');`;
     }
     return `import { ${Array.from(this.usedImports).join(
       ", "
-    )} } from 'nexus';`;
+    )} } from '@nexus/schema';`;
   }
 
   printObjectTypes() {
