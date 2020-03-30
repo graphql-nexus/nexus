@@ -766,10 +766,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nexus/schema@^0.12.0-rc.13":
-  version "0.12.0-rc.13"
-  resolved "https://registry.yarnpkg.com/@nexus/schema/-/schema-0.12.0-rc.13.tgz#afdc7433030b5d7fffcd2509a771581d6c143cf5"
-  integrity sha512-q4A5Jfe26wayPHE2qgXF5wJIu2soeUR2koyVCzihR6Zxe6THwONKkntHmznUNy4ofIGTRFsF4d0I7kmjceMhVw==
+"@nexus/schema@0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@nexus/schema/-/schema-0.13.0.tgz#324210e8c7215b6c3869a25a4648201db3c70093"
+  integrity sha512-PeN5nG7CVToHe/Jh8xKFtWt5GmEt1XCef7k2FTI4PxkL70ndWASe4QmCd+GZ+DoUcio27OI+ugXzAg/uSJqL0Q==
   dependencies:
     iterall "^1.2.2"
     tslib "^1.9.3"

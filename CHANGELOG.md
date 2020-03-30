@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.13.0
+
+The first release of Nexus schema under the package name `@nexus/schema`
+
 ### 0.12.0
 
 The last release of Nexus schema under the package name `nexus`
