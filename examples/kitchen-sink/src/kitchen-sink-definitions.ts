@@ -13,7 +13,7 @@ import {
   booleanArg,
   queryField,
   connectionPlugin,
-} from "nexus";
+} from "@nexus/schema";
 import _ from "lodash";
 import { connectionFromArray } from "graphql-relay";
 

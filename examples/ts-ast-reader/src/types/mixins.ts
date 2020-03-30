@@ -1,4 +1,4 @@
-import { core } from "nexus";
+import { core } from "@nexus/schema";
 
 export function withTypeArguments(t: core.OutputDefinitionBlock<any>) {
   t.list.field("typeArguments", { type: "Node", nullable: true });

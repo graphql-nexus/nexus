@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as allTypes from "./graphql";
-import { makeSchema, nullabilityGuardPlugin } from "nexus";
+import { makeSchema, nullabilityGuardPlugin } from "@nexus/schema";
 
 /**
  * Finally, we construct our schema (whose starting query type is the query

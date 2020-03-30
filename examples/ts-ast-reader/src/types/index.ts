@@ -1,4 +1,4 @@
-import { objectType, stringArg } from "nexus";
+import { objectType, stringArg } from "@nexus/schema";
 import ts from "typescript";
 import fs from "fs-extra";
 

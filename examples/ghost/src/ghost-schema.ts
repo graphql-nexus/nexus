@@ -1,4 +1,4 @@
-import { makeSchema, fieldAuthorizePlugin } from "nexus";
+import { makeSchema, fieldAuthorizePlugin } from "@nexus/schema";
 import path from "path";
 import * as allTypes from "./schema";
 

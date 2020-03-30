@@ -1,4 +1,4 @@
-import { queryType, idArg } from "nexus";
+import { queryType, idArg } from "@nexus/schema";
 import { Post } from "./Post";
 import { User } from "./User";
 

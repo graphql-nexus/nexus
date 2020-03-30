@@ -395,6 +395,14 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
+"@nexus/schema@^0.12.0-rc.13":
+  version "0.12.0-rc.13"
+  resolved "https://registry.yarnpkg.com/@nexus/schema/-/schema-0.12.0-rc.13.tgz#afdc7433030b5d7fffcd2509a771581d6c143cf5"
+  integrity sha512-q4A5Jfe26wayPHE2qgXF5wJIu2soeUR2koyVCzihR6Zxe6THwONKkntHmznUNy4ofIGTRFsF4d0I7kmjceMhVw==
+  dependencies:
+    iterall "^1.2.2"
+    tslib "^1.9.3"
+
 "@oclif/color@^0.0.0":
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/@oclif/color/-/color-0.0.0.tgz#54939bbd16d1387511bf1a48ccda1a417248e6a9"
@@ -4611,14 +4619,6 @@ netrc-parser@^3.1.4:
   dependencies:
     debug "^3.1.0"
     execa "^0.10.0"
-
-nexus@0.12.0-rc.14:
-  version "0.12.0-rc.14"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-rc.14.tgz#f5b24ac6d1e26798b3432f512f526fe084461d55"
-  integrity sha512-cXJh+ZS0xq2ra+EidpUrKxRd1oc1Wipv3n8HlIUJF8nbN3ojzmyDylJ4VxjizhGjH+Wu0AGsCUuNukUNGkPr3Q==
-  dependencies:
-    iterall "^1.2.2"
-    tslib "^1.9.3"
 
 nice-try@^1.0.4:
   version "1.0.5"

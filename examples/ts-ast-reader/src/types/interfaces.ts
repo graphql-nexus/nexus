@@ -1,4 +1,4 @@
-import { interfaceType, arg } from "nexus";
+import { interfaceType, arg } from "@nexus/schema";
 import { SyntaxKind, JSDoc } from "typescript";
 import { allKnownNodes, syntaxKindFilter } from "./utils";
 

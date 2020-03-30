@@ -5,10 +5,10 @@
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
+    "@nexus/schema": "^0.12.0-rc.13",
     "apollo-server": "^2.2.5",
     "fs-extra": "^7.0.1",
     "graphql": "^14.5.8",
-    "nexus": "0.12.0-rc.11",
     "ts-node-dev": "1.0.0-pre.31",
     "typescript": "^3.6.4"
   },

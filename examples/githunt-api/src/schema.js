@@ -1,5 +1,11 @@
 // @ts-check
-const { enumType, objectType, arg, intArg, stringArg } = require("nexus");
+const {
+  enumType,
+  objectType,
+  arg,
+  intArg,
+  stringArg,
+} = require("@nexus/schema");
 
 exports.FeedType = enumType({
   name: "FeedType",
@@ -121,7 +127,7 @@ exports.Mutation = objectType({
 
 /**
  * Example of using functions to mixin fields across types
- * @type {(t: import('nexus').core.ObjectDefinitionBlock<any>) => void}
+ * @type {(t: import('@nexus/schema').core.ObjectDefinitionBlock<any>) => void}
  */
 const commonFields = (t) => {
   t.int("id", { description: "The SQL ID of this entry" });
