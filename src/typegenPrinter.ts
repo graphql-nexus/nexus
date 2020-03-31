@@ -172,7 +172,7 @@ export class TypegenPrinter {
           : val.path
         )
         .replace(/(\.d)?\.ts/, "")
-        .replace(/\\/, "/");
+        .replace(/\\+/g, "/");
         importMap[importPath] = importMap[importPath] || new Set();
         importMap[importPath].add(
           val.alias ? `${val.name} as ${val.alias}` : val.name
