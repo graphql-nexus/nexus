@@ -132,7 +132,7 @@ import {
 import { fieldAuthorizePlugin } from "./plugins/fieldAuthorizePlugin";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
-import { builderToTypegenMetaConfig, TypegenMetadata } from "./typegenMetadata";
+import { resolveTypegenConfig, TypegenMetadata } from "./typegenMetadata";
 import {
   AbstractTypeResolver,
   AllInputTypes,
@@ -1639,7 +1639,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
  */
 export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
-  const typegenConfig = builderToTypegenMetaConfig(finalConfig);
+  const typegenConfig = resolveTypegenConfig(finalConfig);
   if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
@@ -1681,7 +1681,7 @@ export async function generateSchema(
   config: SchemaConfig
 ): Promise<NexusGraphQLSchema> {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
-  const typegenMetaConfig = builderToTypegenMetaConfig(finalConfig);
+  const typegenMetaConfig = resolveTypegenConfig(finalConfig);
   assertNoMissingTypes(schema, missingTypes);
   await new TypegenMetadata(typegenMetaConfig).generateArtifacts(schema);
   return schema;
@@ -1700,7 +1700,7 @@ generateSchema.withArtifacts = async (
   tsTypes: string;
 }> => {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
-  const typegenMetaConfig = builderToTypegenMetaConfig(finalConfig);
+  const typegenMetaConfig = resolveTypegenConfig(finalConfig);
   assertNoMissingTypes(schema, missingTypes);
   const { schemaTypes, tsTypes } = await new TypegenMetadata(
     typegenMetaConfig

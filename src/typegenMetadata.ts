@@ -16,7 +16,7 @@ import { assertAbsolutePath, getOwnPackage } from "./utils";
  *
  * @param config {BuilderConfig}
  */
-export function builderToTypegenMetaConfig(
+export function resolveTypegenConfig(
   config: BuilderConfig
 ): TypegenMetadataConfig {
   const {
