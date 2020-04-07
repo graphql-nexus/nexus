@@ -1647,7 +1647,6 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
     const typegenPromise = new TypegenMetadata(typegenConfig).generateArtifacts(
       schema
     );
-
     if (config.shouldExitAfterGenerateArtifacts) {
       typegenPromise
         .then(() => {
@@ -1668,9 +1667,7 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
       });
     }
   }
-
   assertNoMissingTypes(schema, missingTypes);
-
   return schema;
 }
 
@@ -1682,9 +1679,9 @@ export async function generateSchema(
   config: SchemaConfig
 ): Promise<NexusGraphQLSchema> {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
-  const typegenMetaConfig = resolveTypegenConfig(finalConfig);
+  const typegenConfig = resolveTypegenConfig(finalConfig);
   assertNoMissingTypes(schema, missingTypes);
-  await new TypegenMetadata(typegenMetaConfig).generateArtifacts(schema);
+  await new TypegenMetadata(typegenConfig).generateArtifacts(schema);
   return schema;
 }
 
@@ -1701,10 +1698,10 @@ generateSchema.withArtifacts = async (
   tsTypes: string;
 }> => {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config);
-  const typegenMetaConfig = resolveTypegenConfig(finalConfig);
+  const typegenConfig = resolveTypegenConfig(finalConfig);
   assertNoMissingTypes(schema, missingTypes);
   const { schemaTypes, tsTypes } = await new TypegenMetadata(
-    typegenMetaConfig
+    typegenConfig
   ).generateArtifactContents(schema, typeFilePath);
   return { schema, schemaTypes, tsTypes };
 };
