@@ -1,22 +1,22 @@
 import {
+  GraphQLNullableType,
+  GraphQLOutputType,
+  GraphQLResolveInfo,
   isEnumType,
+  isInterfaceType,
   isListType,
   isNonNullType,
   isObjectType,
   isScalarType,
-  GraphQLOutputType,
-  GraphQLResolveInfo,
-  isWrappingType,
   isUnionType,
-  isInterfaceType,
-  GraphQLNullableType,
+  isWrappingType,
 } from "graphql";
 import { forEach } from "iterall";
-import { plugin, CreateFieldResolverInfo } from "../plugin";
-import { GetGen, GetGen2, AllOutputTypes } from "../typegenTypeHelpers";
-import { printedGenTyping, isPromiseLike } from "../utils";
 import { GraphQLPossibleOutputs } from "../definitions/_types";
 import { NexusGraphQLNamedType } from "../extensions";
+import { CreateFieldResolverInfo, plugin } from "../plugin";
+import { AllOutputTypes, GetGen, GetGen2 } from "../typegenTypeHelpers";
+import { isPromiseLike, printedGenTyping } from "../utils";
 
 export interface NullabilityPluginFallbackFn {
   ctx: GetGen<"context">;

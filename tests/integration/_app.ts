@@ -1,16 +1,16 @@
-import "./_app.typegen";
 import {
-  objectType,
-  idArg,
-  queryType,
-  mutationType,
-  stringArg,
-  inputObjectType,
-  extendType,
-  dynamicOutputMethod,
   dynamicInputMethod,
+  dynamicOutputMethod,
   dynamicOutputProperty,
+  extendType,
+  idArg,
+  inputObjectType,
+  mutationType,
+  objectType,
+  queryType,
+  stringArg,
 } from "../../src";
+import "./_app.typegen";
 
 export const query = queryType({
   definition(t) {

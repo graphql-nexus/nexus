@@ -1,14 +1,14 @@
 import { graphql } from "graphql";
 import {
-  makeSchema,
-  queryField,
+  arg,
   booleanArg,
   floatArg,
   idArg,
-  stringArg,
   intArg,
+  makeSchema,
   objectType,
-  arg,
+  queryField,
+  stringArg,
 } from "../src/core";
 
 describe("interfaceType", () => {

@@ -1,11 +1,11 @@
+import { graphql } from "graphql";
 import path from "path";
 import {
-  objectType,
-  makeSchema,
-  queryField,
   fieldAuthorizePlugin,
+  makeSchema,
+  objectType,
+  queryField,
 } from "../../src";
-import { graphql } from "graphql";
 import { generateSchema } from "../../src/core";
 
 describe("fieldAuthorizePlugin", () => {

@@ -1,7 +1,11 @@
 import {
+  assertValidName,
+  defaultFieldResolver,
+  getNamedType,
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
+  GraphQLField,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
@@ -22,6 +26,7 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLString,
+  GraphQLType,
   GraphQLUnionType,
   isInputObjectType,
   isInterfaceType,
@@ -30,21 +35,16 @@ import {
   isObjectType,
   isOutputType,
   isScalarType,
-  assertValidName,
-  getNamedType,
-  GraphQLField,
-  defaultFieldResolver,
   isSchema,
-  GraphQLType,
-  isWrappingType,
   isUnionType,
+  isWrappingType,
   printSchema,
 } from "graphql";
 import {
+  arg,
+  ArgsRecord,
   NexusArgConfig,
   NexusArgDef,
-  ArgsRecord,
-  arg,
 } from "./definitions/args";
 import {
   InputDefinitionBlock,
@@ -53,6 +53,10 @@ import {
   OutputDefinitionBlock,
 } from "./definitions/definitionBlocks";
 import { EnumTypeConfig } from "./definitions/enumType";
+import {
+  NexusExtendInputTypeConfig,
+  NexusExtendInputTypeDef,
+} from "./definitions/extendInputType";
 import {
   NexusExtendTypeConfig,
   NexusExtendTypeDef,
@@ -70,8 +74,8 @@ import {
   ObjectDefinitionBlock,
 } from "./definitions/objectType";
 import {
-  NexusScalarTypeConfig,
   NexusScalarExtensions,
+  NexusScalarTypeConfig,
 } from "./definitions/scalarType";
 import {
   NexusUnionTypeConfig,
@@ -81,75 +85,71 @@ import {
 import {
   AllNexusInputTypeDefs,
   AllNexusNamedTypeDefs,
+  AllNexusOutputTypeDefs,
+  isNexusArgDef,
+  isNexusDynamicInputMethod,
+  isNexusDynamicOutputMethod,
+  isNexusDynamicOutputProperty,
   isNexusEnumTypeDef,
+  isNexusExtendInputTypeDef,
   isNexusExtendTypeDef,
   isNexusInputObjectTypeDef,
   isNexusInterfaceTypeDef,
   isNexusNamedTypeDef,
   isNexusObjectTypeDef,
+  isNexusPlugin,
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
-  isNexusExtendInputTypeDef,
-  AllNexusOutputTypeDefs,
-  isNexusDynamicInputMethod,
-  isNexusDynamicOutputMethod,
-  isNexusArgDef,
-  isNexusDynamicOutputProperty,
-  isNexusPlugin,
 } from "./definitions/wrapping";
 import {
   GraphQLPossibleInputs,
   GraphQLPossibleOutputs,
-  NonNullConfig,
-  RootTypings,
   MissingType,
   NexusGraphQLFieldConfig,
+  NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLSchema,
-  NexusGraphQLInputObjectTypeConfig,
+  NonNullConfig,
+  RootTypings,
 } from "./definitions/_types";
+import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
+import { DynamicOutputPropertyDef } from "./dynamicProperty";
+import {
+  NexusFieldExtension,
+  NexusInputObjectTypeExtension,
+  NexusInterfaceTypeExtension,
+  NexusObjectTypeExtension,
+  NexusSchemaExtension,
+} from "./extensions";
+import {
+  composeMiddlewareFns,
+  CreateFieldResolverInfo,
+  MiddlewareFn,
+  NexusPlugin,
+  PluginConfig,
+} from "./plugin";
+import { fieldAuthorizePlugin } from "./plugins/fieldAuthorizePlugin";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
 import { TypegenMetadata } from "./typegenMetadata";
 import {
   AbstractTypeResolver,
-  GetGen,
   AllInputTypes,
+  GetGen,
 } from "./typegenTypeHelpers";
 import {
-  firstDefined,
-  objValues,
-  isObject,
-  eachObj,
-  resolveTypegenConfig,
   assertNoMissingTypes,
   consoleWarn,
-  validateOnInstallHookResult,
+  eachObj,
+  firstDefined,
+  isObject,
   mapValues,
+  objValues,
+  resolveTypegenConfig,
   UNKNOWN_TYPE_SCALAR,
+  validateOnInstallHookResult,
 } from "./utils";
-import {
-  NexusExtendInputTypeDef,
-  NexusExtendInputTypeConfig,
-} from "./definitions/extendInputType";
-import { DynamicInputMethodDef, DynamicOutputMethodDef } from "./dynamicMethod";
-import { DynamicOutputPropertyDef } from "./dynamicProperty";
-import {
-  NexusPlugin,
-  composeMiddlewareFns,
-  PluginConfig,
-  CreateFieldResolverInfo,
-  MiddlewareFn,
-} from "./plugin";
-import {
-  NexusFieldExtension,
-  NexusInterfaceTypeExtension,
-  NexusSchemaExtension,
-  NexusObjectTypeExtension,
-  NexusInputObjectTypeExtension,
-} from "./extensions";
-import { fieldAuthorizePlugin } from "./plugins/fieldAuthorizePlugin";
 
 type NexusShapedOutput = {
   name: string;

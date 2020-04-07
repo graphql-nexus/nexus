@@ -1,32 +1,32 @@
 import {
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLSchema,
-  GraphQLInputObjectType,
-  GraphQLUnionType,
   GraphQLEnumType,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  GraphQLObjectType,
+  GraphQLResolveInfo,
   GraphQLScalarType,
-  isObjectType,
+  GraphQLSchema,
+  GraphQLType,
+  GraphQLUnionType,
+  isEnumType,
   isInputObjectType,
+  isInterfaceType,
+  isListType,
+  isNonNullType,
+  isObjectType,
   isScalarType,
   isSpecifiedScalarType,
   isUnionType,
-  isInterfaceType,
-  isEnumType,
-  specifiedScalarTypes,
-  GraphQLNamedType,
-  GraphQLType,
   isWrappingType,
-  isListType,
-  isNonNullType,
-  GraphQLResolveInfo,
+  specifiedScalarTypes,
 } from "graphql";
 import path from "path";
 import { BuilderConfig } from "./builder";
-import { TypegenMetadataConfig } from "./typegenMetadata";
-import { MissingType, withNexusSymbol, NexusTypes } from "./definitions/_types";
-import { PluginConfig } from "./plugin";
 import { decorateType } from "./definitions/decorateType";
+import { MissingType, NexusTypes, withNexusSymbol } from "./definitions/_types";
+import { PluginConfig } from "./plugin";
+import { TypegenMetadataConfig } from "./typegenMetadata";
 
 export const isInterfaceField = (
   type: GraphQLObjectType,

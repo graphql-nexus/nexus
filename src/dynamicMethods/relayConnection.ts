@@ -1,7 +1,7 @@
-import { dynamicOutputMethod } from "../dynamicMethod";
-import { objectType, NexusObjectTypeDef } from "../definitions/objectType";
 import { GraphQLFieldResolver } from "graphql";
 import { intArg, stringArg } from "../definitions/args";
+import { NexusObjectTypeDef, objectType } from "../definitions/objectType";
+import { dynamicOutputMethod } from "../dynamicMethod";
 
 const relayConnectionMap = new Map<string, NexusObjectTypeDef<string>>();
 

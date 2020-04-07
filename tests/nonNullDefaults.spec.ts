@@ -1,5 +1,5 @@
-import { makeSchema, queryType, intArg, core } from "../src";
 import { printSchema } from "graphql";
+import { core, intArg, makeSchema, queryType } from "../src";
 
 describe("nonNullDefaults", () => {
   test("true/true on schema", () => {

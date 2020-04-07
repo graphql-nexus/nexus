@@ -1,5 +1,5 @@
-import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { assertValidName } from "graphql";
+import { NexusTypes, RootTypingDef, withNexusSymbol } from "./_types";
 
 type TypeScriptEnumLike = {
   [key: number]: string;
