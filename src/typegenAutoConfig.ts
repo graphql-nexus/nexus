@@ -2,7 +2,7 @@ import { GraphQLNamedType, GraphQLSchema, isOutputType } from "graphql";
 import path from "path";
 import { TypegenInfo } from "./builder";
 import { TYPEGEN_HEADER } from "./lang";
-import { log, objValues, relativePathTo } from "./utils";
+import { getOwnPackage, log, objValues, relativePathTo } from "./utils";
 
 /**
  * Any common types / constants that would otherwise be circular-imported
@@ -327,6 +327,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
       backingTypeMap,
       imports,
       contextType,
+      nexusSchemaImportId: getOwnPackage().name,
     };
 
     return typegenInfo;

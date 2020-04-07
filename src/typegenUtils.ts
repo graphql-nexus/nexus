@@ -1,6 +1,6 @@
 import { BuilderConfig } from "./builder";
 import { TypegenMetadataConfig } from "./typegenMetadata";
-import { assertAbsolutePath } from "./utils";
+import { assertAbsolutePath, getOwnPackage } from "./utils";
 
 /**
  * Normalizes the builder config into the config we need for typegen
@@ -36,6 +36,7 @@ export function resolveTypegenConfig(
 
   return {
     ...rest,
+    nexusSchemaImportId: getOwnPackage().name,
     outputs: {
       typegen: shouldGenerateArtifacts ? typegenPath : false,
       schema: shouldGenerateArtifacts ? schemaPath : false,
