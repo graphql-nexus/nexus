@@ -29,9 +29,9 @@ import {
 } from "./definitions/wrapping";
 import { NexusGraphQLSchema } from "./definitions/_types";
 import { StringLike } from "./plugin";
-import { getPackageNameForImport } from "./typegenTypeHelpers";
 import {
   eachObj,
+  getOwnPackage,
   GroupedTypes,
   groupTypes,
   mapObj,
@@ -155,7 +155,7 @@ export class TypegenPrinter {
     const outputPath = this.typegenInfo.typegenFile;
     // For backward compat.
 
-    const packName = getPackageNameForImport();
+    const packName = getOwnPackage().name;
     if (!this.printImports[packName]) {
       if (
         [dynamicInputFields, dynamicOutputFields].some(
