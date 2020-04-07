@@ -15,7 +15,6 @@ import {
 } from "../typegenTypeHelpers";
 import {
   eachObj,
-  getOwnPackage,
   isObject,
   isPromiseLike,
   mapObj,
@@ -335,13 +334,6 @@ export const connectionPlugin = (
   const pluginConfig: ConnectionPluginConfig = { ...connectionPluginConfig };
 
   // Define the plugin with the appropriate configuration.
-
-  console.log(
-    printedGenTypingImport({
-      module: getOwnPackage().name,
-      bindings: ["core", "connectionPluginCore"],
-    })
-  );
 
   return plugin({
     name: "ConnectionPlugin",
