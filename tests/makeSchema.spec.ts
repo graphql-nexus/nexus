@@ -1,8 +1,8 @@
-import path from "path";
-import os from "os";
-import { queryField } from "../src/definitions/queryField";
-import { makeSchema, makeSchemaInternal, generateSchema } from "../src/builder";
 import { printSchema } from "graphql";
+import os from "os";
+import path from "path";
+import { generateSchema, makeSchema } from "../src/builder";
+import { queryField } from "../src/definitions/queryField";
 
 describe("makeSchema", () => {
   describe("shouldExitAfterGenerateArtifacts", () => {

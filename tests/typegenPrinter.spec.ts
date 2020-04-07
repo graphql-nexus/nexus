@@ -1,8 +1,8 @@
 import {
   buildSchema,
   GraphQLField,
-  GraphQLObjectType,
   GraphQLInterfaceType,
+  GraphQLObjectType,
 } from "graphql";
 import * as path from "path";
 import { core } from "../src";

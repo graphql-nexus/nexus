@@ -1,17 +1,17 @@
-import path from "path";
+import { graphql } from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
+import path from "path";
 import {
+  decorateType,
+  dynamicInputMethod,
+  ext,
+  inputObjectType,
   makeSchema,
   objectType,
   queryType,
-  inputObjectType,
-  dynamicInputMethod,
-  decorateType,
-  ext,
 } from "../src";
-import { graphql } from "graphql";
-import { CatListFixture } from "./_fixtures";
 import { dynamicOutputProperty } from "../src/dynamicProperty";
+import { CatListFixture } from "./_fixtures";
 
 let spy: jest.SpyInstance;
 beforeEach(() => {

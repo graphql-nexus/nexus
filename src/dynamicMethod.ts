@@ -1,9 +1,9 @@
+import { PluginBuilderLens } from "./builder";
 import {
   InputDefinitionBlock,
   OutputDefinitionBlock,
 } from "./definitions/definitionBlocks";
-import { withNexusSymbol, NexusTypes } from "./definitions/_types";
-import { PluginBuilderLens } from "./builder";
+import { NexusTypes, withNexusSymbol } from "./definitions/_types";
 
 export type OutputFactoryConfig<T> = {
   stage: "walk" | "build";

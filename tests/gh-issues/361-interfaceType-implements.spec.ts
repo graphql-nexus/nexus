@@ -1,5 +1,5 @@
-import { interfaceType, objectType, makeSchema } from "../../src";
 import { GraphQLSchema } from "graphql";
+import { interfaceType, makeSchema, objectType } from "../../src";
 
 describe("GH #361, interfaceType & implements", () => {
   test("should pass", () => {

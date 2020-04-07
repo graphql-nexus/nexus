@@ -1,24 +1,24 @@
 import {
-  GraphQLLeafType,
   GraphQLCompositeType,
-  GraphQLInputObjectType,
-  GraphQLScalarType,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
   GraphQLEnumType,
   GraphQLFieldConfig,
-  GraphQLObjectTypeConfig,
-  GraphQLInterfaceTypeConfig,
-  GraphQLSchema,
+  GraphQLInputObjectType,
   GraphQLInputObjectTypeConfig,
+  GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
+  GraphQLLeafType,
+  GraphQLObjectType,
+  GraphQLObjectTypeConfig,
+  GraphQLScalarType,
+  GraphQLSchema,
+  GraphQLUnionType,
 } from "graphql";
 import {
   NexusFieldExtension,
-  NexusObjectTypeExtension,
-  NexusInterfaceTypeExtension,
-  NexusSchemaExtension,
   NexusInputObjectTypeExtension,
+  NexusInterfaceTypeExtension,
+  NexusObjectTypeExtension,
+  NexusSchemaExtension,
 } from "../extensions";
 
 export type Maybe<T> = T | null;
