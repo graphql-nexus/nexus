@@ -488,3 +488,7 @@ export function pathToArray(
   }
   return flattened.reverse();
 }
+
+export function getOwnPackage(): { name: string } {
+  return require("../package.json");
+}
