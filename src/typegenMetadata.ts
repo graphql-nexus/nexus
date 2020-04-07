@@ -12,7 +12,7 @@ import { TypegenPrinter } from "./typegenPrinter";
 
 export interface TypegenMetadataConfig
   extends Omit<BuilderConfig, "outputs" | "shouldGenerateArtifacts"> {
-  nexusSchemaImportId: string;
+  nexusSchemaImportId?: string;
   outputs: {
     schema: false | string;
     typegen: false | string;
