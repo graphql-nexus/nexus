@@ -138,6 +138,7 @@ import {
   AllInputTypes,
   GetGen,
 } from "./typegenTypeHelpers";
+import { resolveTypegenConfig } from "./typegenUtils";
 import {
   assertNoMissingTypes,
   consoleWarn,
@@ -146,7 +147,6 @@ import {
   isObject,
   mapValues,
   objValues,
-  resolveTypegenConfig,
   UNKNOWN_TYPE_SCALAR,
   validateOnInstallHookResult,
 } from "./utils";
