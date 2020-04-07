@@ -267,7 +267,6 @@ export type SchemaConfig = BuilderConfig & {
 } & NexusGenPluginSchemaConfig;
 
 export interface TypegenInfo {
-  nexusSchemaImportId: string;
   /**
    * Headers attached to the generate type output
    */
@@ -285,6 +284,18 @@ export interface TypegenInfo {
    * The type of the context for the resolvers
    */
   contextType?: string;
+  /**
+   * The path to the @nexus/schema package.
+   *
+   * @default '@nexus/schema'
+   *
+   * @remarks
+   *
+   * This setting is particularly useful when @nexus/schema is being wrapped by
+   * another library/framework such that @nexus/schema is not expected to be a
+   * direct dependency at the application level.
+   */
+  nexusSchemaImportId?: string;
 }
 
 export type TypeToWalk =

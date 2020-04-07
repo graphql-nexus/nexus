@@ -55,10 +55,6 @@ export function builderToTypegenMetaConfig(
 
 export interface TypegenMetadataConfig
   extends Omit<BuilderConfig, "outputs" | "shouldGenerateArtifacts"> {
-  /**
-   * The typegen file needs types from the @nexus/schema package. Use this to
-   * set where the import should look.
-   */
   nexusSchemaImportId: string;
   outputs: {
     schema: false | string;

@@ -31,6 +31,7 @@ import { NexusGraphQLSchema } from "./definitions/_types";
 import { StringLike } from "./plugin";
 import {
   eachObj,
+  getOwnPackage,
   GroupedTypes,
   groupTypes,
   mapObj,
@@ -156,14 +157,16 @@ export class TypegenPrinter {
     const imports: string[] = [];
     const importMap: Record<string, Set<string>> = {};
     const outputPath = this.typegenInfo.typegenFile;
+    const nexusSchemaImportId =
+      this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name;
 
-    if (!this.printImports[this.typegenInfo.nexusSchemaImportId]) {
+    if (!this.printImports[nexusSchemaImportId]) {
       if (
         [dynamicInputFields, dynamicOutputFields].some(
           (o) => Object.keys(o).length > 0
         )
       ) {
-        this.printImports[this.typegenInfo.nexusSchemaImportId] = {
+        this.printImports[nexusSchemaImportId] = {
           core: true,
         };
       }
