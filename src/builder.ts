@@ -132,12 +132,13 @@ import {
 import { fieldAuthorizePlugin } from "./plugins/fieldAuthorizePlugin";
 import { TypegenAutoConfigOptions } from "./typegenAutoConfig";
 import { TypegenFormatFn } from "./typegenFormatPrettier";
-import { resolveTypegenConfig, TypegenMetadata } from "./typegenMetadata";
+import { TypegenMetadata } from "./typegenMetadata";
 import {
   AbstractTypeResolver,
   AllInputTypes,
   GetGen,
 } from "./typegenTypeHelpers";
+import { resolveTypegenConfig } from "./typegenUtils";
 import {
   assertNoMissingTypes,
   consoleWarn,

@@ -26,4 +26,5 @@ export * from "./typegenFormatPrettier";
 export * from "./typegenMetadata";
 export * from "./typegenPrinter";
 export * from "./typegenTypeHelpers";
+export * from "./typegenUtils";
 export * from "./utils";
