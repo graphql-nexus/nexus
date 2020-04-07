@@ -8,7 +8,6 @@ import { completeValue, plugin } from "../plugin";
 import {
   ArgsValue,
   GetGen,
-  getPackageNameForImport,
   MaybePromise,
   MaybePromiseDeep,
   ResultValue,
@@ -16,6 +15,7 @@ import {
 } from "../typegenTypeHelpers";
 import {
   eachObj,
+  getOwnPackage,
   isObject,
   isPromiseLike,
   mapObj,
@@ -336,11 +336,19 @@ export const connectionPlugin = (
 
   // Define the plugin with the appropriate configuration.
 
+  console.log(
+    printedGenTypingImport({
+      module: getOwnPackage().name,
+      bindings: ["core", "connectionPluginCore"],
+    })
+  );
+
   return plugin({
     name: "ConnectionPlugin",
     fieldDefTypes: [
       printedGenTypingImport({
-        module: getPackageNameForImport(),
+        // module: getOwnPackage().name,
+        module: require.resolve("../../"),
         bindings: ["core", "connectionPluginCore"],
       }),
     ],

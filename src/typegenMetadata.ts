@@ -1,17 +1,65 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from "graphql";
 import path from "path";
-import { TypegenPrinter } from "./typegenPrinter";
+import { BuilderConfig, TypegenInfo } from "./builder";
+import { NexusGraphQLSchema } from "./definitions/_types";
 import { SDL_HEADER, TYPEGEN_HEADER } from "./lang";
 import { typegenAutoConfig } from "./typegenAutoConfig";
 import {
-  typegenFormatPrettier,
   TypegenFormatFn,
+  typegenFormatPrettier,
 } from "./typegenFormatPrettier";
-import { TypegenInfo, BuilderConfig } from "./builder";
-import { NexusGraphQLSchema } from "./definitions/_types";
+import { TypegenPrinter } from "./typegenPrinter";
+import { assertAbsolutePath, getOwnPackage } from "./utils";
+
+/**
+ * Normalizes the builder config into the config we need for typegen
+ *
+ * @param config {BuilderConfig}
+ */
+export function builderToTypegenMetaConfig(
+  config: BuilderConfig
+): TypegenMetadataConfig {
+  const {
+    outputs,
+    shouldGenerateArtifacts = Boolean(
+      !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+    ),
+    ...rest
+  } = config;
+
+  let typegenPath: string | false = false;
+  let schemaPath: string | false = false;
+  if (outputs && typeof outputs === "object") {
+    if (typeof outputs.schema === "string") {
+      schemaPath = assertAbsolutePath(outputs.schema, "outputs.schema");
+    }
+    if (typeof outputs.typegen === "string") {
+      typegenPath = assertAbsolutePath(outputs.typegen, "outputs.typegen");
+    }
+  } else if (outputs !== false) {
+    console.warn(
+      `You should specify a configuration value for outputs in Nexus' makeSchema. ` +
+        `Provide one to remove this warning.`
+    );
+  }
+
+  return {
+    ...rest,
+    nexusSchemaImportId: getOwnPackage().name,
+    outputs: {
+      typegen: shouldGenerateArtifacts ? typegenPath : false,
+      schema: shouldGenerateArtifacts ? schemaPath : false,
+    },
+  };
+}
 
 export interface TypegenMetadataConfig
   extends Omit<BuilderConfig, "outputs" | "shouldGenerateArtifacts"> {
+  /**
+   * The typegen file needs types from the @nexus/schema package. Use this to
+   * set where the import should look.
+   */
+  nexusSchemaImportId: string;
   outputs: {
     schema: false | string;
     typegen: false | string;
@@ -27,7 +75,7 @@ export class TypegenMetadata {
   constructor(protected config: TypegenMetadataConfig) {}
 
   /**
-   * Generates the artifacts of the buid based on what we
+   * Generates the artifacts of the build based on what we
    * know about the schema and how it was defined.
    */
   async generateArtifacts(schema: NexusGraphQLSchema) {
@@ -69,7 +117,7 @@ export class TypegenMetadata {
     if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
       return Promise.reject(
         new Error(
-          `Expected an absolute path to output the GraphQL Nexus ${type}, saw ${filePath}`
+          `Expected an absolute path to output the Nexus ${type}, saw ${filePath}`
         )
       );
     }
@@ -163,6 +211,7 @@ export class TypegenMetadata {
     }
 
     return {
+      nexusSchemaImportId: this.config.nexusSchemaImportId,
       headers: [TYPEGEN_HEADER],
       imports: [],
       contextType: "any",
