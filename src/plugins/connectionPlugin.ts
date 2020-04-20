@@ -8,7 +8,6 @@ import { completeValue, plugin } from "../plugin";
 import {
   ArgsValue,
   GetGen,
-  getPackageNameForImport,
   MaybePromise,
   MaybePromiseDeep,
   ResultValue,
@@ -16,6 +15,7 @@ import {
 } from "../typegenTypeHelpers";
 import {
   eachObj,
+  getOwnPackage,
   isObject,
   isPromiseLike,
   mapObj,
@@ -113,6 +113,18 @@ export interface ConnectionPluginConfig {
    * Prefix for the Connection / Edge type
    */
   typePrefix?: string;
+  /**
+   * The path to the @nexus/schema package. Needed for typegen.
+   *
+   * @default '@nexus/schema'
+   *
+   * @remarks
+   *
+   * This setting is particularly useful when @nexus/schema is being wrapped by
+   * another library/framework such that @nexus/schema is not expected to be a
+   * direct dependency at the application level.
+   */
+  nexusSchemaImportId?: string;
 }
 
 // Extract the node value from the connection for a given field.
@@ -340,7 +352,8 @@ export const connectionPlugin = (
     name: "ConnectionPlugin",
     fieldDefTypes: [
       printedGenTypingImport({
-        module: getPackageNameForImport(),
+        module:
+          connectionPluginConfig?.nexusSchemaImportId ?? getOwnPackage().name,
         bindings: ["core", "connectionPluginCore"],
       }),
     ],

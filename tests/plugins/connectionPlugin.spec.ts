@@ -1,17 +1,17 @@
 import {
-  printType,
   execute,
-  parse,
-  GraphQLFieldResolver,
-  GraphQLError,
   ExecutionArgs,
+  GraphQLError,
+  GraphQLFieldResolver,
+  parse,
   printSchema,
+  printType,
 } from "graphql";
 import { connectionFromArray } from "graphql-relay";
-import { connectionPlugin, makeSchema, objectType, arg } from "../../src";
+import { arg, connectionPlugin, makeSchema, objectType } from "../../src";
 import {
-  ConnectionPluginConfig,
   ConnectionFieldConfig,
+  ConnectionPluginConfig,
 } from "../../src/plugins/connectionPlugin";
 
 const userNodes: { id: string; name: string }[] = [];

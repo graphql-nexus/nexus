@@ -1,16 +1,16 @@
+import { GraphQLFieldResolver } from "graphql";
 import {
   AbstractTypeResolver,
+  AllInputTypes,
   FieldResolver,
   GetGen,
+  GetGen3,
   HasGen3,
   NeedsResolver,
-  GetGen3,
-  AllInputTypes,
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
-import { AllNexusOutputTypeDefs, AllNexusInputTypeDefs } from "./wrapping";
+import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from "./wrapping";
 import { BaseScalars } from "./_types";
-import { GraphQLFieldResolver } from "graphql";
 
 export interface CommonFieldConfig {
   /**

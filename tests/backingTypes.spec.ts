@@ -1,5 +1,5 @@
 import * as path from "path";
-import { core, makeSchema, queryType, enumType } from "..";
+import { core, enumType, makeSchema, queryType } from "..";
 import { A, B } from "./_types";
 
 const { TypegenPrinter, TypegenMetadata } = core;

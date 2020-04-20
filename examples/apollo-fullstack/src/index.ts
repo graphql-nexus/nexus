@@ -1,7 +1,7 @@
 // @ts-check
 import { ApolloServer } from "apollo-server";
 import path from "path";
-import { makeSchema } from "nexus";
+import { makeSchema } from "@nexus/schema";
 import isEmail from "isemail";
 import * as types from "./schema";
 import { Request } from "express";

@@ -17,7 +17,7 @@ export const UserConnectionTypes = connectionType("User");
 Where `connectionType` is really just a wrapper creating two `objectTypes`:
 
 ```ts
-import { core, objectType } from "nexus";
+import { core, objectType } from "@nexus/schema";
 
 export function connectionType(name: core.AllOutputTypes) {
   const Connection = objectType({

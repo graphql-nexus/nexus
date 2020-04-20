@@ -1,30 +1,30 @@
+import {
+  arg,
+  booleanArg,
+  core,
+  enumType,
+  floatArg,
+  idArg,
+  inputObjectType,
+  intArg,
+  interfaceType,
+  objectType,
+  scalarType,
+  stringArg,
+  unionType,
+} from "@nexus/schema";
+import { graphql, GraphQLSchema, lexicographicSortSchema } from "graphql";
+import debounce from "lodash.debounce";
+import * as monaco from "monaco-editor";
 import React, {
-  useState,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
-  useCallback,
+  useState,
 } from "react";
-import {
-  objectType,
-  interfaceType,
-  inputObjectType,
-  unionType,
-  enumType,
-  scalarType,
-  arg,
-  intArg,
-  stringArg,
-  floatArg,
-  idArg,
-  booleanArg,
-  core,
-} from "nexus";
-import { GraphQLSchema, graphql, lexicographicSortSchema } from "graphql";
-import * as monaco from "monaco-editor";
 import { useDebounce } from "use-debounce";
 import "./monaco-config";
-import debounce from "lodash.debounce";
 // import * as urlHash from "./urlHash";
 
 interface GraphiQLProps {

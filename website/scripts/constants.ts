@@ -4,5 +4,6 @@ export const allExamples = [
   "kitchen-sink",
   "githunt-api",
   "apollo-fullstack",
+  "zeit-typescript",
   "ghost",
 ];

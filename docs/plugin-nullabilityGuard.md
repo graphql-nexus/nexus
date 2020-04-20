@@ -16,7 +16,7 @@ The `nullabilityGuardPlugin` by default only guards when `process.env.NODE_ENV =
 ### Example Use:
 
 ```ts
-import { nullabilityGuardPlugin } from "nexus";
+import { nullabilityGuardPlugin } from "@nexus/schema";
 
 const guardPlugin = nullabilityGuardPlugin({
   onNullGuarded(ctx, info) {

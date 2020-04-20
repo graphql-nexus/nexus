@@ -1,12 +1,12 @@
+import { printSchema } from "graphql";
 import {
   createPlugin,
   makeSchema,
+  objectType,
   PluginConfig,
   queryType,
-  objectType,
 } from "../src";
-import { printSchema } from "graphql";
-import { NexusAcceptedTypeDef, inputObjectType, extendType } from "../src/core";
+import { extendType, inputObjectType, NexusAcceptedTypeDef } from "../src/core";
 
 const fooObject = objectType({
   name: "foo",

@@ -1,4 +1,4 @@
-import { objectType, arg } from "nexus";
+import { objectType, arg } from "@nexus/schema";
 import { nodeType, functionLikeDeclaration, hasTypeParameters } from "./mixins";
 import { filteredNodesList } from "./utils";
 

@@ -1,4 +1,4 @@
-import { enumType } from "nexus";
+import { enumType } from "@nexus/schema";
 
 const OriginalEpisodes = [
   { name: "NEWHOPE", value: 4, description: "Released in 1977." },

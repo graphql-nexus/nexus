@@ -12,7 +12,7 @@ async function linkDir(dir: string, root: string) {
   await execAsync("yarn", {
     cwd: dir,
   });
-  await execAsync("yarn link nexus", {
+  await execAsync("yarn link @nexus/schema", {
     cwd: dir,
   });
   await execAsync("rm -rf graphql", {

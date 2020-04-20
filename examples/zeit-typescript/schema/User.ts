@@ -1,4 +1,4 @@
-import { extendType, objectType } from "nexus"
+import { extendType, objectType } from "@nexus/schema"
 
 export const Query = extendType({
   type: "Query",

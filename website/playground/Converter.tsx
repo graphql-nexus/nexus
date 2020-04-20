@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import * as monaco from "monaco-editor";
-import ReactDOM from "react-dom";
-import debounce from "lodash.debounce";
-import { convertSDL } from "nexus";
+import { convertSDL } from "@nexus/schema";
 import json5 from "json5";
+import debounce from "lodash.debounce";
+import * as monaco from "monaco-editor";
+import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 import { EXAMPLE_SDL } from "../../tests/_sdl";
-import "./monaco-graphql";
 import { fetchSchema } from "./fetchSchema";
+import "./monaco-graphql";
 
 const COMMON_CONFIG: monaco.editor.IEditorConstructionOptions = {
   minimap: {
@@ -86,7 +86,7 @@ export function Converter() {
           height: 50,
           marginTop: 50,
           fontSize: "medium",
-          textAlign: "center"
+          textAlign: "center",
         }}
         onChange={(e) => debounceInputChange(e.target.value)}
       />
@@ -96,7 +96,7 @@ export function Converter() {
             style={{
               flexBasis: "50%",
               height: "100%",
-              flexDirection: "column"
+              flexDirection: "column",
             }}
           >
             <div ref={sdlDiv} style={{ height: "100%" }} />
@@ -105,7 +105,7 @@ export function Converter() {
             style={{
               flexBasis: "50%",
               height: "100%",
-              flexDirection: "column"
+              flexDirection: "column",
             }}
           >
             <div ref={outputDiv} style={{ height: "100%" }} />

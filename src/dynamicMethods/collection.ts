@@ -1,7 +1,7 @@
-import { dynamicOutputMethod } from "../dynamicMethod";
-import { NexusObjectTypeDef, objectType } from "../definitions/objectType";
 import { GraphQLFieldResolver } from "graphql";
 import { intArg } from "../definitions/args";
+import { NexusObjectTypeDef, objectType } from "../definitions/objectType";
+import { dynamicOutputMethod } from "../dynamicMethod";
 
 const basicCollectionMap = new Map<string, NexusObjectTypeDef<string>>();
 

@@ -1,7 +1,7 @@
 /// <reference path="../_setup.ts" />
 import { join } from "path";
-import { core } from "../../src";
 import * as ts from "typescript";
+import { core } from "../../src";
 const { generateSchema, typegenFormatPrettier } = core;
 
 const NO_OP = () => {};
@@ -32,7 +32,7 @@ export const testSchema = (
           trailingComma: "es5",
           arrowParens: "always",
         })(source, type);
-        return content.replace('"nexus"', '"../.."');
+        return content.replace('"@nexus/schema"', '"../.."');
       },
     });
   });

@@ -1,9 +1,9 @@
 import { graphql } from "graphql";
 import {
+  inputObjectType,
   makeSchema,
   objectType,
   queryField,
-  inputObjectType,
 } from "../src/core";
 
 describe("inputObject", () => {

@@ -1,13 +1,13 @@
-import { extendType } from "./extendType";
-import { CommonOutputFieldConfig } from "./definitionBlocks";
 import { GraphQLResolveInfo } from "graphql";
 import {
-  ResultValue,
-  MaybePromiseDeep,
   ArgsValue,
   GetGen,
   MaybePromise,
+  MaybePromiseDeep,
+  ResultValue,
 } from "../typegenTypeHelpers";
+import { CommonOutputFieldConfig } from "./definitionBlocks";
+import { extendType } from "./extendType";
 import { AllNexusOutputTypeDefs } from "./wrapping";
 import { AsyncIterator } from "./_types";
 

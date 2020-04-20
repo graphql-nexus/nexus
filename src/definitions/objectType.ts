@@ -1,17 +1,17 @@
+import { assertValidName } from "graphql";
+import { FieldResolver, GetGen } from "../typegenTypeHelpers";
 import {
   OutputDefinitionBlock,
   OutputDefinitionBuilder,
 } from "./definitionBlocks";
-import { GetGen, FieldResolver } from "../typegenTypeHelpers";
+import { NexusInterfaceTypeDef } from "./interfaceType";
 import {
-  NonNullConfig,
   NexusTypes,
-  withNexusSymbol,
+  NonNullConfig,
   Omit,
   RootTypingDef,
+  withNexusSymbol,
 } from "./_types";
-import { assertValidName } from "graphql";
-import { NexusInterfaceTypeDef } from "./interfaceType";
 
 export type Implemented = GetGen<"interfaceNames"> | NexusInterfaceTypeDef<any>;
 
