@@ -1,11 +1,22 @@
 import { assertValidName } from "graphql";
 import { AllOutputTypesPossible } from "../typegenTypeHelpers";
 import { OutputDefinitionBlock } from "./definitionBlocks";
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { NexusTypes, withNexusSymbol, NonNullConfig } from "./_types";
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName;
   definition(t: OutputDefinitionBlock<TypeName>): void;
+  /**
+   * Configures the nullability for the type, check the
+   * documentation's "Getting Started" section to learn
+   * more about GraphQL Nexus's assumptions and configuration
+   * on nullability.
+   */
+  nonNullDefaults?: NonNullConfig;
+  /**
+   * The description to annotate the GraphQL SDL
+   */
+  description?: string | null;
 }
 
 export class NexusExtendTypeDef<TypeName extends string> {

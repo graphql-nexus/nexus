@@ -40,6 +40,7 @@ import {
   isWrappingType,
   printSchema,
 } from "graphql";
+import { EOL } from "os";
 import {
   arg,
   ArgsRecord,
@@ -51,6 +52,7 @@ import {
   NexusInputFieldDef,
   NexusOutputFieldDef,
   OutputDefinitionBlock,
+  AbstractOutputDefinitionBuilder,
 } from "./definitions/definitionBlocks";
 import { EnumTypeConfig } from "./definitions/enumType";
 import {
@@ -72,6 +74,7 @@ import {
   NexusObjectTypeConfig,
   NexusObjectTypeDef,
   ObjectDefinitionBlock,
+  ObjectDefinitionBuilder,
 } from "./definitions/objectType";
 import {
   NexusScalarExtensions,
@@ -840,22 +843,49 @@ export class SchemaBuilder {
 
   buildObjectType(config: NexusObjectTypeConfig<any>) {
     const fields: NexusOutputFieldDef[] = [];
+    const descriptions: string[] = [];
     const interfaces: Implemented[] = [];
-    const definitionBlock = new ObjectDefinitionBlock({
+
+    if (config.description) {
+      descriptions.push(config.description);
+    }
+
+    let objectDefinitionBuilder: ObjectDefinitionBuilder<any> = {
       typeName: config.name,
-      addField: (fieldDef) => fields.push(fieldDef),
+      addField: (fieldDef) =>
+        fields.push({ ...fieldDef, typeConfig: { ...config } }),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList, "build"),
       warn: consoleWarn,
-    });
+    };
+
+    const definitionBlock = new ObjectDefinitionBlock(objectDefinitionBuilder);
     config.definition(definitionBlock);
+
     const extensions = this.typeExtendMap[config.name];
     if (extensions) {
       extensions.forEach((extension) => {
-        extension.definition(definitionBlock);
+        if (extension.description) {
+          descriptions.push(extension.description);
+        }
+
+        objectDefinitionBuilder.addField = (fieldDef) => {
+          fields.push({
+            ...fieldDef,
+            typeConfig: {
+              nonNullDefaults:
+                extension.nonNullDefaults ?? config.nonNullDefaults,
+            },
+          });
+        };
+
+        extension.definition(
+          new ObjectDefinitionBlock(objectDefinitionBuilder)
+        );
       });
     }
+
     this.typeExtendMap[config.name] = null;
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping;
@@ -863,7 +893,7 @@ export class SchemaBuilder {
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
       interfaces: () => interfaces.map((i) => this.getInterface(i)),
-      description: config.description,
+      description: descriptions.join(EOL),
       fields: () => {
         const allInterfaces = interfaces.map((i) => this.getInterface(i));
         const interfaceConfigs = allInterfaces.map((i) => i.toConfig());
@@ -890,19 +920,50 @@ export class SchemaBuilder {
     const { name, description } = config;
     let resolveType: AbstractTypeResolver<string> | undefined;
     const fields: NexusOutputFieldDef[] = [];
-    const definitionBlock = new InterfaceDefinitionBlock({
+    const descriptions: string[] = [];
+
+    if (config.description) {
+      descriptions.push(config.description);
+    }
+
+    let interfaceDefinitionBuilder: AbstractOutputDefinitionBuilder<any> = {
       typeName: config.name,
-      addField: (field) => fields.push(field),
+      addField: (field) =>
+        fields.push({
+          ...field,
+          typeConfig: { nonNullDefaults: config.nonNullDefaults },
+        }),
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) =>
         this.addDynamicOutputMembers(block, isList, "build"),
       warn: consoleWarn,
-    });
+    };
+    const definitionBlock = new InterfaceDefinitionBlock(
+      interfaceDefinitionBuilder
+    );
+
     config.definition(definitionBlock);
-    const toExtend = this.typeExtendMap[config.name];
-    if (toExtend) {
-      toExtend.forEach((e) => {
-        e.definition(definitionBlock);
+
+    const extensions = this.typeExtendMap[config.name];
+    if (extensions) {
+      extensions.forEach((extension) => {
+        if (extension.description) {
+          descriptions.push(extension.description);
+        }
+
+        interfaceDefinitionBuilder.addField = (field) => {
+          fields.push({
+            ...field,
+            typeConfig: {
+              nonNullDefaults:
+                extension.nonNullDefaults ?? config.nonNullDefaults,
+            },
+          });
+        };
+
+        extension.definition(
+          new InterfaceDefinitionBlock(interfaceDefinitionBuilder)
+        );
       });
     }
     if (!resolveType) {
@@ -915,7 +976,11 @@ export class SchemaBuilder {
       name,
       resolveType,
       description,
-      fields: () => this.buildOutputFields(fields, interfaceTypeConfig, {}),
+      fields: () => {
+        const toto = this.buildOutputFields(fields, interfaceTypeConfig, {});
+        console.log({ toto });
+        return toto;
+      },
       extensions: {
         nexus: new NexusInterfaceTypeExtension(config),
       },
@@ -1107,7 +1172,7 @@ export class SchemaBuilder {
       type: this.decorateType(
         this.getOutputType(fieldConfig.type),
         fieldConfig.list,
-        this.outputNonNull(typeConfig, fieldConfig)
+        this.outputNonNull(fieldConfig)
       ),
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
       description: fieldConfig.description,
@@ -1210,12 +1275,9 @@ export class SchemaBuilder {
     );
   }
 
-  protected outputNonNull(
-    typeDef: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig,
-    field: NexusOutputFieldDef
-  ): boolean {
+  protected outputNonNull(field: NexusOutputFieldDef): boolean {
     const { nullable } = field;
-    const { nonNullDefaults = {} } = typeDef.extensions?.nexus?.config ?? {};
+    const { nonNullDefaults = {} } = field.typeConfig ?? {};
     if (typeof nullable !== "undefined") {
       return !nullable;
     }

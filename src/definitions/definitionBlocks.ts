@@ -10,7 +10,7 @@ import {
 } from "../typegenTypeHelpers";
 import { ArgsRecord } from "./args";
 import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from "./wrapping";
-import { BaseScalars } from "./_types";
+import { BaseScalars, NonNullConfig } from "./_types";
 
 export interface CommonFieldConfig {
   /**
@@ -69,6 +69,9 @@ export interface NexusOutputFieldConfig<
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string;
   subscribe?: GraphQLFieldResolver<any, any>;
+  typeConfig?: {
+    nonNullDefaults?: NonNullConfig;
+  };
 };
 
 /**
