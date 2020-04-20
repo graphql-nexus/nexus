@@ -4,6 +4,7 @@ import {
   OutputDefinitionBlock,
   OutputDefinitionBuilder,
 } from "./definitionBlocks";
+import { extendType } from "./extendType";
 import { NexusInterfaceTypeDef } from "./interfaceType";
 import {
   NexusTypes,
@@ -105,13 +106,13 @@ export function objectType<TypeName extends string>(
 }
 
 export function queryType(
-  config: Omit<NexusObjectTypeConfig<"Query">, "name">
+  config: Omit<NexusObjectTypeConfig<"Query">, "name" | "rootTyping">
 ) {
-  return objectType({ ...config, name: "Query" });
+  return extendType({ ...config, type: "Query" });
 }
 
 export function mutationType(
-  config: Omit<NexusObjectTypeConfig<"Mutation">, "name">
+  config: Omit<NexusObjectTypeConfig<"Mutation">, "name" | "rootTyping">
 ) {
-  return objectType({ ...config, name: "Mutation" });
+  return extendType({ ...config, type: "Mutation" });
 }
