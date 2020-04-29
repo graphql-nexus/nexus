@@ -72,7 +72,7 @@ More examples can be found in the [`/examples`](./examples) directory:
 
 ## Documentation
 
-You can find the docs for Nexus Schema [here](nexusjs.org/#/components/schema/about).
+You can find the docs for Nexus Schema [here](https://www.nexusjs.org/#/components/schema/about).
 
 ## Migrate from SDL
 
