@@ -1,5 +1,5 @@
 import { FieldOutConfig, OutputDefinitionBlock } from "../core";
-import { extendType } from "./extendType";
+import { extendType, NexusExtendTypeDef } from "./extendType";
 
 export type MutationFieldConfig<FieldName extends string> =
   | FieldOutConfig<"Mutation", FieldName>
@@ -7,12 +7,12 @@ export type MutationFieldConfig<FieldName extends string> =
 
 export function mutationField(
   fieldFn: (t: OutputDefinitionBlock<"Mutation">) => void
-): void;
+): NexusExtendTypeDef<"Mutation">;
 
 export function mutationField<FieldName extends string>(
   fieldName: FieldName,
   config: MutationFieldConfig<FieldName>
-): void;
+): NexusExtendTypeDef<"Mutation">;
 
 export function mutationField(...args: any[]) {
   return extendType({
