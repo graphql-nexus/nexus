@@ -29,4 +29,4 @@ const Episode = enumType({
 });
 ```
 
-Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options of `enumType`, or feel free to open a PR on the docs to help document!
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/schema/tree/develop/examples) for a full illustration of the various options of `enumType`, or feel free to open a PR on the docs to help document!
