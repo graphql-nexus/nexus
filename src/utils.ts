@@ -366,7 +366,7 @@ export function consoleWarn(msg: string) {
 }
 
 export function log(msg: string) {
-  console.log(`GraphQL Nexus: ${msg}`);
+  console.log(`Nexus Schema: ${msg}`);
 }
 
 /**

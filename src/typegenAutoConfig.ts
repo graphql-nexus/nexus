@@ -179,7 +179,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
           path.extname(pathOrModule) !== ".ts"
         ) {
           return console.warn(
-            `GraphQL Nexus Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
+            `Nexus Schema Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
           );
         }
         let resolvedPath: string;
@@ -213,7 +213,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
-            `GraphQL Nexus Typegen: Cannot have multiple type sources ${importsMap[alias]} and ${pathOrModule} with the same alias ${alias}, skipping`
+            `Nexus Schema Typegen: Cannot have multiple type sources ${importsMap[alias]} and ${pathOrModule} with the same alias ${alias}, skipping`
           );
         }
         allImportsMap[alias] = importPath;
