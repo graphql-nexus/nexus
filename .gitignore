@@ -1,5 +1,6 @@
 node_modules
 dist/*
+dist-esm/*
 website/build
 examples/*/dist
 website/static/playground-dist

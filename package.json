@@ -21,17 +21,19 @@
   "files": [
     "src",
     "dist",
+    "dist-esm",
     "LICENSE.md",
     "README.md",
     "yarn.lock"
   ],
   "main": "dist",
+  "module": "dist-esm",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
+    "build": "yarn -s clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "clean": "rm -rf dist*",
     "deploy-site": "cd website && yarn && yarn gulp link-website && yarn build",
-    "dev": "tsc -w",
+    "dev": "tsc -p tsconfig.cjs.json -w",
     "dev:examples": "yarn -s link-examples && tsc -w",
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && cd website && yarn gulp run-examples",
