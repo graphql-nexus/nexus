@@ -21,6 +21,7 @@
   "files": [
     "src",
     "dist",
+    "dist-esm",
     "LICENSE.md",
     "README.md",
     "yarn.lock"
