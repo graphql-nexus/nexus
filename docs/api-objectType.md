@@ -45,4 +45,4 @@ const StatusEnum = enumType({
 
 `queryType` / `mutationType` are shorthand for the root types.
 
-Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/develop/examples) for a full illustration of the various options of `objectType`, or feel free to open a PR on the docs to help document!
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/schema/tree/develop/examples) for a full illustration of the various options of `objectType`, or feel free to open a PR on the docs to help document!

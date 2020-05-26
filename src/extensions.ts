@@ -1,10 +1,10 @@
-import { NexusOutputFieldConfig } from "./definitions/definitionBlocks";
-import { NexusObjectTypeConfig } from "./definitions/objectType";
-import { SchemaConfig, DynamicFieldDefs } from "./builder";
-import { NexusInterfaceTypeConfig } from "./definitions/interfaceType";
-import { RootTypings } from "./definitions/_types";
-import { NexusInputObjectTypeConfig } from "./definitions/inputObjectType";
 import { GraphQLNamedType } from "graphql";
+import { DynamicFieldDefs, SchemaConfig } from "./builder";
+import { NexusOutputFieldConfig } from "./definitions/definitionBlocks";
+import { NexusInputObjectTypeConfig } from "./definitions/inputObjectType";
+import { NexusInterfaceTypeConfig } from "./definitions/interfaceType";
+import { NexusObjectTypeConfig } from "./definitions/objectType";
+import { RootTypings } from "./definitions/_types";
 
 export type NexusGraphQLNamedType = GraphQLNamedType & {
   extensions?: {

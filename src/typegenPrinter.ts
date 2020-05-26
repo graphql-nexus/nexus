@@ -29,9 +29,9 @@ import {
 } from "./definitions/wrapping";
 import { NexusGraphQLSchema } from "./definitions/_types";
 import { StringLike } from "./plugin";
-import { getPackageNameForImport } from "./typegenTypeHelpers";
 import {
   eachObj,
+  getOwnPackage,
   GroupedTypes,
   groupTypes,
   mapObj,
@@ -55,6 +55,10 @@ type RootTypeMapping = Record<
   string | Record<string, [string, string]>
 >;
 
+interface TypegenInfoWithFile extends TypegenInfo {
+  typegenFile: string;
+}
+
 /**
  * We track and output a few main things:
  *
@@ -72,11 +76,11 @@ type RootTypeMapping = Record<
  */
 export class TypegenPrinter {
   groupedTypes: GroupedTypes;
-  printImports: Record<string, Record<string, any>>;
+  printImports: Record<string, Record<string, boolean | string>>;
 
   constructor(
     protected schema: NexusGraphQLSchema,
-    protected typegenInfo: TypegenInfo & { typegenFile: string }
+    protected typegenInfo: TypegenInfoWithFile
   ) {
     this.groupedTypes = groupTypes(schema);
     this.printImports = {};
@@ -153,26 +157,29 @@ export class TypegenPrinter {
     const imports: string[] = [];
     const importMap: Record<string, Set<string>> = {};
     const outputPath = this.typegenInfo.typegenFile;
-    // For backward compat.
+    const nexusSchemaImportId =
+      this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name;
 
-    const packName = getPackageNameForImport();
-    if (!this.printImports[packName]) {
+    if (!this.printImports[nexusSchemaImportId]) {
       if (
         [dynamicInputFields, dynamicOutputFields].some(
           (o) => Object.keys(o).length > 0
         )
       ) {
-        this.printImports[packName] = { core: true };
+        this.printImports[nexusSchemaImportId] = {
+          core: true,
+        };
       }
     }
+
     eachObj(rootTypings, (val, key) => {
       if (typeof val !== "string") {
         const importPath = (path.isAbsolute(val.path)
           ? relativePathTo(val.path, outputPath)
           : val.path
         )
-        .replace(/(\.d)?\.ts/, "")
-        .replace(/\\+/g, "/");
+          .replace(/(\.d)?\.ts/, "")
+          .replace(/\\+/g, "/");
         importMap[importPath] = importMap[importPath] || new Set();
         importMap[importPath].add(
           val.alias ? `${val.name} as ${val.alias}` : val.name

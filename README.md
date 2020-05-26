@@ -5,7 +5,7 @@
 
 Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript.
 
-This is a component of the [Neuxs Framework](https://nexusjs.org) but can be used as well standalone.
+This is a component of the [Nexus Framework](https://nexusjs.org) but can be used as well standalone.
 
 ## Installation
 
@@ -72,7 +72,7 @@ More examples can be found in the [`/examples`](./examples) directory:
 
 ## Documentation
 
-You can find the docs for Nexus Schema [here](nexusjs.org/#/components/schema/about).
+You can find the docs for Nexus Schema [here](http://nexusjs.org/#/components/schema/about).
 
 ## Migrate from SDL
 

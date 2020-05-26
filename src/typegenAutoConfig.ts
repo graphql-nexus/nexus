@@ -1,8 +1,8 @@
-import { GraphQLSchema, isOutputType, GraphQLNamedType } from "graphql";
+import { GraphQLNamedType, GraphQLSchema, isOutputType } from "graphql";
 import path from "path";
-import { TYPEGEN_HEADER } from "./lang";
-import { log, objValues, relativePathTo } from "./utils";
 import { TypegenInfo } from "./builder";
+import { TYPEGEN_HEADER } from "./lang";
+import { getOwnPackage, log, objValues, relativePathTo } from "./utils";
 
 /**
  * Any common types / constants that would otherwise be circular-imported
@@ -179,7 +179,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
           path.extname(pathOrModule) !== ".ts"
         ) {
           return console.warn(
-            `GraphQL Nexus Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
+            `Nexus Schema Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
           );
         }
         let resolvedPath: string;
@@ -213,7 +213,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
-            `GraphQL Nexus Typegen: Cannot have multiple type sources ${importsMap[alias]} and ${pathOrModule} with the same alias ${alias}, skipping`
+            `Nexus Schema Typegen: Cannot have multiple type sources ${importsMap[alias]} and ${pathOrModule} with the same alias ${alias}, skipping`
           );
         }
         allImportsMap[alias] = importPath;
@@ -327,6 +327,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
       backingTypeMap,
       imports,
       contextType,
+      nexusSchemaImportId: getOwnPackage().name,
     };
 
     return typegenInfo;

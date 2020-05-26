@@ -1,7 +1,7 @@
-import { GetGen, AbstractTypeResolver } from "../typegenTypeHelpers";
-import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { assertValidName } from "graphql";
+import { AbstractTypeResolver, GetGen } from "../typegenTypeHelpers";
 import { NexusObjectTypeDef } from "./objectType";
+import { NexusTypes, RootTypingDef, withNexusSymbol } from "./_types";
 
 export interface UnionDefinitionBuilder<TypeName extends string> {
   setResolveType(fn: AbstractTypeResolver<TypeName>): void;

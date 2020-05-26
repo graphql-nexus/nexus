@@ -1,5 +1,15 @@
 import { GraphQLNamedType } from "graphql";
+import {
+  DynamicInputMethodDef,
+  DynamicOutputMethodDef,
+} from "../dynamicMethod";
+import { DynamicOutputPropertyDef } from "../dynamicProperty";
+import { NexusPlugin } from "../plugin";
+import { AllInputTypes } from "../typegenTypeHelpers";
+import { PrintedGenTyping, PrintedGenTypingImport } from "../utils";
+import { NexusArgDef } from "./args";
 import { NexusEnumTypeDef } from "./enumType";
+import { NexusExtendInputTypeDef } from "./extendInputType";
 import { NexusExtendTypeDef } from "./extendType";
 import { NexusInputObjectTypeDef } from "./inputObjectType";
 import { NexusInterfaceTypeDef } from "./interfaceType";
@@ -7,16 +17,6 @@ import { NexusObjectTypeDef } from "./objectType";
 import { NexusScalarTypeDef } from "./scalarType";
 import { NexusUnionTypeDef } from "./unionType";
 import { NexusTypes, NexusWrappedSymbol } from "./_types";
-import { NexusExtendInputTypeDef } from "./extendInputType";
-import {
-  DynamicOutputMethodDef,
-  DynamicInputMethodDef,
-} from "../dynamicMethod";
-import { NexusArgDef } from "./args";
-import { DynamicOutputPropertyDef } from "../dynamicProperty";
-import { AllInputTypes } from "../typegenTypeHelpers";
-import { PrintedGenTyping, PrintedGenTypingImport } from "../utils";
-import { NexusPlugin } from "../plugin";
 
 export type AllNexusInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>

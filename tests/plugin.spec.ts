@@ -1,13 +1,13 @@
+import { buildSchema, graphql, GraphQLSchema, printSchema } from "graphql";
 import {
   makeSchema,
+  MiddlewareFn,
   objectType,
   plugin,
   queryField,
-  MiddlewareFn,
 } from "../src/core";
-import { buildSchema, GraphQLSchema, graphql, printSchema } from "graphql";
-import { EXAMPLE_SDL } from "./_sdl";
 import { nullabilityGuardPlugin } from "../src/plugins";
+import { EXAMPLE_SDL } from "./_sdl";
 
 const nullGuardPlugin = nullabilityGuardPlugin({
   shouldGuard: true,

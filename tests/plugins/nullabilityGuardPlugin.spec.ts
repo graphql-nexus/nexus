@@ -1,15 +1,14 @@
-import { GraphQLObjectType, GraphQLNonNull, GraphQLID, graphql } from "graphql";
+import { graphql, GraphQLID, GraphQLNonNull, GraphQLObjectType } from "graphql";
 import {
-  objectType,
-  queryField,
-  nullabilityGuardPlugin,
+  enumType,
+  interfaceType,
   makeSchema,
   NullabilityGuardConfig,
+  nullabilityGuardPlugin,
+  objectType,
+  queryField,
   unionType,
-  interfaceType,
-  enumType,
 } from "../../src";
-import { NexusGraphQLSchema } from "../../src/core";
 
 const NODE_ENV = process.env.NODE_ENV;
 

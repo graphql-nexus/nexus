@@ -1,10 +1,10 @@
 import {
-  GraphQLScalarTypeConfig,
   assertValidName,
   GraphQLScalarType,
+  GraphQLScalarTypeConfig,
 } from "graphql";
-import { NexusTypes, withNexusSymbol, RootTypingDef } from "./_types";
 import { decorateType } from "./decorateType";
+import { NexusTypes, RootTypingDef, withNexusSymbol } from "./_types";
 
 export interface ScalarBase
   extends Pick<

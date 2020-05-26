@@ -21,7 +21,7 @@ const siteConfig = {
     { page: "playground", label: "Playground" },
     { page: "converter", label: "SDL Converter" },
     {
-      href: "https://github.com/graphql-nexus/nexus/tree/develop/examples",
+      href: "https://github.com/graphql-nexus/schema/tree/develop/examples",
       label: "Examples",
     },
     {

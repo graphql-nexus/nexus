@@ -1,5 +1,5 @@
 import { FieldOutConfig, OutputDefinitionBlock } from "../core";
-import { extendType } from "./extendType";
+import { extendType, NexusExtendTypeDef } from "./extendType";
 
 export type QueryFieldConfig<FieldName extends string> =
   | FieldOutConfig<"Query", FieldName>
@@ -7,12 +7,12 @@ export type QueryFieldConfig<FieldName extends string> =
 
 export function queryField(
   fieldFn: (t: OutputDefinitionBlock<"Query">) => void
-): void;
+): NexusExtendTypeDef<"Query">;
 
 export function queryField<FieldName extends string>(
   fieldName: FieldName,
   config: QueryFieldConfig<FieldName>
-): void;
+): NexusExtendTypeDef<"Query">;
 
 export function queryField(...args: any[]) {
   return extendType({
