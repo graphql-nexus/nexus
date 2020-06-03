@@ -5,8 +5,8 @@ All of these example can be run at once:
 With Yarn:
 
 ```
-git clone https://github.com/graphql-nexus/nexus.git
-cd nexus
+git clone https://github.com/graphql-nexus/schema.git
+cd schema
 yarn
 yarn examples
 ```
@@ -14,8 +14,8 @@ yarn examples
 or NPM:
 
 ```
-git clone https://github.com/graphql-nexus/nexus.git
-cd nexus
+git clone https://github.com/graphql-nexus/schema.git
+cd schema
 npm i
 npm run examples
 ```
