@@ -16,7 +16,7 @@
     ]
   },
   "dependencies": {
-    "@nexus/schema": "^0.13.1",
+    "@nexus/schema": "0.14.0",
     "apollo-datasource": "^0.2.0",
     "apollo-datasource-rest": "^0.2.0",
     "apollo-server": "2.2.0-alpha.2",
