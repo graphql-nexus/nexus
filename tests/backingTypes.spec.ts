@@ -75,41 +75,41 @@ describe("backingTypes", () => {
     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
 
-  it("can match backing types for const enums", async () => {
-    const schema = getSchemaWithConstEnums();
-    const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new TypegenPrinter(schema, {
-      ...typegenInfo,
-      typegenFile: "",
-    });
+  // it("can match backing types for const enums", async () => {
+  //   const schema = getSchemaWithConstEnums();
+  //   const typegenInfo = await metadata.getTypegenInfo(schema);
+  //   const typegen = new TypegenPrinter(schema, {
+  //     ...typegenInfo,
+  //     typegenFile: "",
+  //   });
 
-    expect(typegen.printEnumTypeMap()).toMatchSnapshot();
-  });
+  //   expect(typegen.printEnumTypeMap()).toMatchSnapshot();
+  // });
 });
 
-describe("rootTypings", () => {
-  it("can import enum via rootTyping", async () => {
-    const metadata = new TypegenMetadata({
-      outputs: { typegen: false, schema: false },
-    });
-    const schema = makeSchema({
-      types: [
-        enumType({
-          name: "TestEnumType",
-          members: TestEnum,
-          rootTyping: {
-            path: __filename,
-            name: "TestEnum",
-          },
-        }),
-      ],
-      outputs: false,
-    });
-    const typegenInfo = await metadata.getTypegenInfo(schema);
-    const typegen = new TypegenPrinter(schema, {
-      ...typegenInfo,
-      typegenFile: "",
-    });
-    expect(typegen.print()).toMatchSnapshot();
-  });
-});
+// describe("rootTypings", () => {
+//   it("can import enum via rootTyping", async () => {
+//     const metadata = new TypegenMetadata({
+//       outputs: { typegen: false, schema: false },
+//     });
+//     const schema = makeSchema({
+//       types: [
+//         enumType({
+//           name: "TestEnumType",
+//           members: TestEnum,
+//           rootTyping: {
+//             path: __filename,
+//             name: "TestEnum",
+//           },
+//         }),
+//       ],
+//       outputs: false,
+//     });
+//     const typegenInfo = await metadata.getTypegenInfo(schema);
+//     const typegen = new TypegenPrinter(schema, {
+//       ...typegenInfo,
+//       typegenFile: "",
+//     });
+//     expect(typegen.print()).toMatchSnapshot();
+//   });
+// });
