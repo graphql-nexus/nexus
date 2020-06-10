@@ -75,16 +75,16 @@ describe("backingTypes", () => {
     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
 
-  // it("can match backing types for const enums", async () => {
-  //   const schema = getSchemaWithConstEnums();
-  //   const typegenInfo = await metadata.getTypegenInfo(schema);
-  //   const typegen = new TypegenPrinter(schema, {
-  //     ...typegenInfo,
-  //     typegenFile: "",
-  //   });
+  it("can match backing types for const enums", async () => {
+    const schema = getSchemaWithConstEnums();
+    const typegenInfo = await metadata.getTypegenInfo(schema);
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
 
-  //   expect(typegen.printEnumTypeMap()).toMatchSnapshot();
-  // });
+    expect(typegen.printEnumTypeMap()).toMatchSnapshot();
+  });
 });
 
 // describe("rootTypings", () => {
