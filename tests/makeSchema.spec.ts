@@ -5,7 +5,7 @@ import { generateSchema, makeSchema } from "../src/builder";
 import { queryField } from "../src/definitions/queryField";
 
 describe("makeSchema", () => {
-  describe("shouldExitAfterGenerateArtifacts", () => {
+  describe.skip("shouldExitAfterGenerateArtifacts", () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
