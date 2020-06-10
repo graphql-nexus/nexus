@@ -64,47 +64,47 @@ describe("typegenPrinter", () => {
     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
   });
 
-  it("builds the input object type defs", () => {
-    expect(typegen.printInputTypeMap()).toMatchSnapshot();
-  });
+  // it("builds the input object type defs", () => {
+  //   expect(typegen.printInputTypeMap()).toMatchSnapshot();
+  // });
 
-  it("should build an argument type map", () => {
-    expect(typegen.printArgTypeMap()).toMatchSnapshot();
-  });
+  // it("should build an argument type map", () => {
+  //   expect(typegen.printArgTypeMap()).toMatchSnapshot();
+  // });
 
-  it("should print a root type map", () => {
-    expect(typegen.printRootTypeMap()).toMatchSnapshot();
-  });
+  // it("should print a root type map", () => {
+  //   expect(typegen.printRootTypeMap()).toMatchSnapshot();
+  // });
 
-  it("should not print roots for fields with resolvers", () => {
-    // If we don't have a dedicated "root type", then we need to infer
-    // what the return type should be based on the shape of the object
-    // If the field has a resolver, we assume it's derived, otherwise
-    // you'll need to supply a backing root type with more information.
-    jest
-      .spyOn(typegen, "hasResolver")
-      .mockImplementation(
-        (
-          field: GraphQLField<any, any>,
-          type: GraphQLObjectType | GraphQLInterfaceType
-        ) => {
-          if (type.name === "Query" || type.name === "Mutation") {
-            return true;
-          }
-          if (type.name === "User" && field.name === "posts") {
-            return true;
-          }
-          return false;
-        }
-      );
-    expect(typegen.printRootTypeMap()).toMatchSnapshot();
-  });
+  // it("should not print roots for fields with resolvers", () => {
+  //   // If we don't have a dedicated "root type", then we need to infer
+  //   // what the return type should be based on the shape of the object
+  //   // If the field has a resolver, we assume it's derived, otherwise
+  //   // you'll need to supply a backing root type with more information.
+  //   jest
+  //     .spyOn(typegen, "hasResolver")
+  //     .mockImplementation(
+  //       (
+  //         field: GraphQLField<any, any>,
+  //         type: GraphQLObjectType | GraphQLInterfaceType
+  //       ) => {
+  //         if (type.name === "Query" || type.name === "Mutation") {
+  //           return true;
+  //         }
+  //         if (type.name === "User" && field.name === "posts") {
+  //           return true;
+  //         }
+  //         return false;
+  //       }
+  //     );
+  //   expect(typegen.printRootTypeMap()).toMatchSnapshot();
+  // });
 
-  it("should print a return type map", () => {
-    expect(typegen.printReturnTypeMap()).toMatchSnapshot();
-  });
+  // it("should print a return type map", () => {
+  //   expect(typegen.printReturnTypeMap()).toMatchSnapshot();
+  // });
 
-  it("should print the full output", () => {
-    expect(typegen.print()).toMatchSnapshot();
-  });
+  // it("should print the full output", () => {
+  //   expect(typegen.print()).toMatchSnapshot();
+  // });
 });
