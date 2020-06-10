@@ -1,3 +1,4 @@
+import path from "path";
 import { core, enumType, makeSchema, queryType } from "..";
 import { A, B } from "./_types";
 
@@ -42,49 +43,49 @@ function getSchemaWithConstEnums() {
   });
 }
 
-// describe("backingTypes", () => {
-//   let metadata: core.TypegenMetadata;
+describe("backingTypes", () => {
+  let metadata: core.TypegenMetadata;
 
-//   beforeEach(async () => {
-//     metadata = new TypegenMetadata({
-//       outputs: {
-//         typegen: path.join(__dirname, "test-gen.ts"),
-//         schema: path.join(__dirname, "test-gen.graphql"),
-//       },
-//       typegenAutoConfig: {
-//         sources: [
-//           {
-//             alias: "t",
-//             source: path.join(__dirname, "_types.ts"),
-//           },
-//         ],
-//         contextType: "t.TestContext",
-//       },
-//     });
-//   });
+  beforeEach(async () => {
+    metadata = new TypegenMetadata({
+      outputs: {
+        typegen: path.join(__dirname, "test-gen.ts"),
+        schema: path.join(__dirname, "test-gen.graphql"),
+      },
+      typegenAutoConfig: {
+        sources: [
+          {
+            alias: "t",
+            source: path.join(__dirname, "_types.ts"),
+          },
+        ],
+        contextType: "t.TestContext",
+      },
+    });
+  });
 
-//   it("can match backing types to regular enums", async () => {
-//     const schema = getSchemaWithNormalEnums();
-//     const typegenInfo = await metadata.getTypegenInfo(schema);
-//     const typegen = new TypegenPrinter(schema, {
-//       ...typegenInfo,
-//       typegenFile: "",
-//     });
+  it("can match backing types to regular enums", async () => {
+    const schema = getSchemaWithNormalEnums();
+    const typegenInfo = await metadata.getTypegenInfo(schema);
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
 
-//     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
-//   });
+    expect(typegen.printEnumTypeMap()).toMatchSnapshot();
+  });
 
-//   it("can match backing types for const enums", async () => {
-//     const schema = getSchemaWithConstEnums();
-//     const typegenInfo = await metadata.getTypegenInfo(schema);
-//     const typegen = new TypegenPrinter(schema, {
-//       ...typegenInfo,
-//       typegenFile: "",
-//     });
+  it("can match backing types for const enums", async () => {
+    const schema = getSchemaWithConstEnums();
+    const typegenInfo = await metadata.getTypegenInfo(schema);
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: "",
+    });
 
-//     expect(typegen.printEnumTypeMap()).toMatchSnapshot();
-//   });
-// });
+    expect(typegen.printEnumTypeMap()).toMatchSnapshot();
+  });
+});
 
 describe("rootTypings", () => {
   it("can import enum via rootTyping", async () => {
