@@ -1,6 +1,6 @@
 {
   "name": "@nexus/schema",
-  "version": "0.14.0-next.2",
+  "version": "0.0.0-dripip",
   "description": "Scalable, strongly typed GraphQL schema development",
   "keywords": [
     "graphql",
@@ -42,8 +42,9 @@
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn lint && yarn build",
     "postpublish": "yarn upgrade-deps || echo 'Oops...'",
-    "release:preview": "yarn publish --tag next",
-    "release:stable": "yarn publish",
+    "release:pr": "dripip pr",
+    "release:preview": "dripip preview",
+    "release:stable": "dripip stable",
     "test": "jest",
     "test:ci": "jest --coverage --maxWorkers 2",
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
@@ -79,6 +80,7 @@
     "@types/prettier": "^1.18.3",
     "@typescript-eslint/eslint-plugin": "2.7.0",
     "codecov": "^3.6.1",
+    "dripip": "^0.9.0",
     "eslint": "^6.6.0",
     "graphql": "^14.5.8",
     "graphql-iso-date": "^3.6.1",
