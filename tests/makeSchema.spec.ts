@@ -39,14 +39,13 @@ describe("makeSchema", () => {
       const errSpy = jest
         .spyOn(console, "error")
         .mockImplementationOnce(() => {});
-      jest.spyOn(process, "exit").mockImplementationOnce((code) => {
-        // on windows, code is string instead of number, don't know why.
-        expect(Number(code)).toEqual(1);
-        expect(errSpy.mock.calls[0][0].message).toEqual(
-          `ENOTDIR: not a directory, open '/dev/null/schema.graphql'`
-        );
-        return done() as never;
-      });
+      const exit = process.exit;
+      process.exit = (code) => {
+        process.exit = exit;
+        expect(code).toEqual(1);
+        done();
+        return null as never;
+      };
       makeSchema({
         types: [
           queryField("someField", {
@@ -55,8 +54,8 @@ describe("makeSchema", () => {
           }),
         ],
         outputs: {
-          typegen: `/dev/null/file.ts`,
-          schema: `/dev/null/schema.graphql`,
+          typegen: path.normalize(`/dev/null/file.ts`),
+          schema: path.normalize(`/dev/null/schema.graphql`),
         },
         shouldGenerateArtifacts: true,
         shouldExitAfterGenerateArtifacts: true,
