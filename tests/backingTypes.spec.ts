@@ -1,4 +1,4 @@
-import path from "path";
+import * as path from "path";
 import { core, enumType, makeSchema, queryType } from "..";
 import { A, B } from "./_types";
 
