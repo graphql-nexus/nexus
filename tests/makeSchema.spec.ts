@@ -5,7 +5,7 @@ import { generateSchema, makeSchema } from "../src/builder";
 import { queryField } from "../src/definitions/queryField";
 
 describe("makeSchema", () => {
-  describe.skip("shouldExitAfterGenerateArtifacts", () => {
+  describe("shouldExitAfterGenerateArtifacts", () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
@@ -40,7 +40,8 @@ describe("makeSchema", () => {
         .spyOn(console, "error")
         .mockImplementationOnce(() => {});
       jest.spyOn(process, "exit").mockImplementationOnce((code) => {
-        expect(code).toEqual(1);
+        // on windows, code is string instead of number, don't know why.
+        expect(Number(code)).toEqual(1);
         expect(errSpy.mock.calls[0][0].message).toEqual(
           `ENOTDIR: not a directory, open '/dev/null/schema.graphql'`
         );
