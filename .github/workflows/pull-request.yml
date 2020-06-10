@@ -17,4 +17,4 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Test
-        run: yarn -s test --bail backingTypes
+        run: yarn -s test
