@@ -40,6 +40,8 @@ describe("typegenPrinter", () => {
         contextType: "t.TestContext",
       },
     });
+    // give time for artifact generation to complete
+    await new Promise((res) => setTimeout(res, 2000));
     const typegenInfo = await metadata.getTypegenInfo(schema);
     typegen = new TypegenPrinter(metadata.sortSchema(schema), {
       ...typegenInfo,

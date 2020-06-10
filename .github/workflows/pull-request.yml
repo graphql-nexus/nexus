@@ -7,8 +7,7 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x]
-        # todo windows-latest
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +18,6 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Test
         run: yarn -s test
-
   test-examples:
     strategy:
       matrix:
