@@ -7,7 +7,7 @@ sidebar_label: queryField
 Often times you want to split up query fields into different domains of your application, and like [`mutationField`](api-mutationField.md) are another one of the most common use-cases for `extendType`. `queryField` exists as a shorthand for this common case:
 
 ```ts
-import { stringArg } from "nexus";
+import { stringArg } from "@nexus/schema";
 
 export const usersQueryField = queryField("user", {
   type: SomeType,

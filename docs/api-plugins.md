@@ -21,7 +21,7 @@ We also ship with several plugins out of the box, and will have more in the near
 ### Defining a sample plugin:
 
 ```ts
-import { plugin } from "nexus";
+import { plugin } from "@nexus/schema";
 
 export const myErrorGuardPlugin = plugin({
   name: "MyErrorGuardPlugin",

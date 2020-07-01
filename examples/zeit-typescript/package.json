@@ -1,25 +1,25 @@
 {
   "name": "zeit-typescript",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
+  "main": "index.js",
   "scripts": {
     "dev": "now dev",
     "generate:nexus": "ts-node --transpile-only schema",
     "now-build": "yarn -s generate:nexus"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all"
+  },
+  "dependencies": {
+    "@nexus/schema": "0.14.0",
+    "graphql": "^14.5.8"
   },
   "devDependencies": {
     "@now/node": "^1.0.1",
     "@types/node": "^12.11.1",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.4"
-  },
-  "dependencies": {
-    "graphql": "^14.5.8",
-    "nexus": "^0.12.0-beta.14"
-  },
-  "prettier": {
-    "semi": false,
-    "trailingComma": "all"
   }
 }

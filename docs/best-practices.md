@@ -8,7 +8,7 @@ A few tips when using Nexus to build out a schema:
 
 ## Configure your development server to auto-restart
 
-The development experience works best when you are using a tool like [Nodemon](https://github.com/remy/nodemon) to restart your application as the schema changes. The GraphQL schema artifact will automatically regenerate when the server restarts in development mode. Check the [/examples](https://github.com/prisma-labs/nexus/tree/develop/examples) to see how they are setup to auto-restart.
+The development experience works best when you are using a tool like [Nodemon](https://github.com/remy/nodemon) to restart your application as the schema changes. The GraphQL schema artifact will automatically regenerate when the server restarts in development mode. Check the [/examples](https://github.com/graphql-nexus/schema/tree/develop/examples) to see how they are setup to auto-restart.
 
 ## VSCode: Configuring a keyboard shortcut for "Go to Type Definition"
 

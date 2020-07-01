@@ -12,10 +12,10 @@
     "write-translations": "docusaurus-write-translations"
   },
   "dependencies": {
+    "@nexus/schema": "0.14.0",
     "dedent": "^0.7.0",
     "graphql": "^14.5.8",
     "monaco-editor": "^0.18.1",
-    "nexus": "0.12.0-rc.11",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2"
   },

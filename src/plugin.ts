@@ -1,29 +1,29 @@
 import {
-  SchemaConfig,
-  PluginBuilderLens,
-  NexusAcceptedTypeDef,
-} from "./builder";
-import {
-  GraphQLSchema,
-  GraphQLResolveInfo,
   GraphQLFieldResolver,
+  GraphQLResolveInfo,
+  GraphQLSchema,
 } from "graphql";
 import {
-  withNexusSymbol,
+  NexusAcceptedTypeDef,
+  PluginBuilderLens,
+  SchemaConfig,
+} from "./builder";
+import {
+  Maybe,
+  NexusGraphQLFieldConfig,
+  NexusGraphQLInterfaceTypeConfig,
+  NexusGraphQLObjectTypeConfig,
   NexusTypes,
   Omit,
-  NexusGraphQLFieldConfig,
-  NexusGraphQLObjectTypeConfig,
-  NexusGraphQLInterfaceTypeConfig,
-  Maybe,
+  withNexusSymbol,
 } from "./definitions/_types";
+import { NexusSchemaExtension } from "./extensions";
 import {
   isPromiseLike,
   PrintedGenTyping,
-  venn,
   PrintedGenTypingImport,
+  venn,
 } from "./utils";
-import { NexusSchemaExtension } from "./extensions";
 
 export { PluginBuilderLens };
 

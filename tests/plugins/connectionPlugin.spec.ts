@@ -1,17 +1,17 @@
 import {
-  printType,
   execute,
-  parse,
-  GraphQLFieldResolver,
-  GraphQLError,
   ExecutionArgs,
+  GraphQLError,
+  GraphQLFieldResolver,
+  parse,
   printSchema,
+  printType,
 } from "graphql";
 import { connectionFromArray } from "graphql-relay";
-import { connectionPlugin, makeSchema, objectType, arg } from "../../src";
+import { arg, connectionPlugin, makeSchema, objectType } from "../../src";
 import {
-  ConnectionPluginConfig,
   ConnectionFieldConfig,
+  ConnectionPluginConfig,
 } from "../../src/plugins/connectionPlugin";
 
 const userNodes: { id: string; name: string }[] = [];
@@ -344,6 +344,50 @@ describe("connectionPlugin", () => {
             'The Query.users connection field requires a "first" or "last" argument'
           ),
         ],
+      });
+    });
+
+    it("default arg validation: allows first to be zero", async () => {
+      const schema = testConnectionSchema({});
+      const result = await execute({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 0 },
+      });
+      expect(result).toEqual({
+        data: {
+          users: {
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: null,
+            },
+          },
+        },
+      });
+    });
+
+    it("default arg validation: allows last to be zero", async () => {
+      const schema = testConnectionSchema({});
+      const result = await execute({
+        schema,
+        document: UsersFieldLast,
+        variableValues: { last: 0 },
+      });
+      expect(result).toEqual({
+        data: {
+          users: {
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+              hasPreviousPage: true,
+              startCursor: null,
+            },
+          },
+        },
       });
     });
 

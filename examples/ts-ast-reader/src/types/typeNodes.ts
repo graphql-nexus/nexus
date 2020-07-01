@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { objectType } from "@nexus/schema";
 import { nodeType } from "./mixins";
 
 export const KeywordTypeNode = objectType({

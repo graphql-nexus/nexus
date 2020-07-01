@@ -9,7 +9,7 @@ A single GraphQL query can potentially generate a huge workload for a server, li
 To install, add the `queryComplexityPlugin` to the `makeSchema.plugins` array, along with any other plugins you'd like to include:
 
 ```ts
-import { makeSchema, queryComplexityPlugin } from "nexus";
+import { makeSchema, queryComplexityPlugin } from "@nexus/schema";
 
 const schema = makeSchema({
   // ... types, etc,

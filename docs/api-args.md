@@ -11,7 +11,7 @@ sidebar_label: "args: arg / *Arg"
 Defines an argument that can be used in any object or interface type. Args can be reused in multiple locations, and it can be convenient to create your own wrappers around arguments.
 
 ```ts
-import { intArg, core } from "nexus";
+import { intArg, core } from "@nexus/schema";
 
 function requiredInt(opts: core.ScalarArgConfig<number>) {
   return intArg({ ...opts, required: true });

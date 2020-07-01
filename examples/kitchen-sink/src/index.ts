@@ -6,7 +6,7 @@ import {
   fieldAuthorizePlugin,
   connectionPlugin,
   queryComplexityPlugin,
-} from "nexus";
+} from "@nexus/schema";
 import path from "path";
 import * as types from "./kitchen-sink-definitions";
 import { logMutationTimePlugin } from "./example-plugins";

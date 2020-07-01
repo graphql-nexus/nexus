@@ -1,10 +1,10 @@
+import { Kind } from "graphql";
 import {
-  objectType,
-  makeSchemaInternal,
   makeSchema,
+  makeSchemaInternal,
+  objectType,
   UNKNOWN_TYPE_SCALAR,
 } from "../src/core";
-import { Kind } from "graphql";
 
 describe("unknownType", () => {
   const Query = objectType({

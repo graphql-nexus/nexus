@@ -1,16 +1,16 @@
 /// <reference types="jest" />
 import { GraphQLEnumType, GraphQLObjectType, printType } from "graphql";
-import {
-  idArg,
-  enumType,
-  extendType,
-  objectType,
-  inputObjectType,
-  extendInputType,
-  makeSchema,
-} from "../src";
-import { UserObject, PostObject } from "./_helpers";
 import { TypeMap } from "graphql/type/schema";
+import {
+  enumType,
+  extendInputType,
+  extendType,
+  idArg,
+  inputObjectType,
+  makeSchema,
+  objectType,
+} from "../src";
+import { PostObject, UserObject } from "./_helpers";
 
 enum NativeColors {
   RED = "RED",

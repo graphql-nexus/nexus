@@ -1,6 +1,6 @@
 {
-  "name": "nexus",
-  "version": "0.12.0-rc.13",
+  "name": "@nexus/schema",
+  "version": "0.0.0-dripip",
   "description": "Scalable, strongly typed GraphQL schema development",
   "keywords": [
     "graphql",
@@ -8,10 +8,10 @@
     "types",
     "typescript"
   ],
-  "homepage": "https://nexus.js.org",
+  "homepage": "https://nexusjs.org/#/components/schema/about",
   "repository": {
     "type": "git",
-    "url": "git://github.com/prisma-labs/nexus.git"
+    "url": "git://github.com/graphql-nexus/schema.git"
   },
   "license": "MIT",
   "author": {
@@ -21,17 +21,19 @@
   "files": [
     "src",
     "dist",
+    "dist-esm",
     "LICENSE.md",
     "README.md",
     "yarn.lock"
   ],
   "main": "dist",
+  "module": "dist-esm",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
+    "build": "yarn -s clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "clean": "rm -rf dist*",
     "deploy-site": "cd website && yarn && yarn gulp link-website && yarn build",
-    "dev": "tsc -w",
+    "dev": "tsc -p tsconfig.cjs.json -w",
     "dev:examples": "yarn -s link-examples && tsc -w",
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && cd website && yarn gulp run-examples",
@@ -40,6 +42,9 @@
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn lint && yarn build",
     "postpublish": "yarn upgrade-deps || echo 'Oops...'",
+    "release:pr": "dripip pr",
+    "release:preview": "dripip preview",
+    "release:stable": "dripip stable",
     "test": "jest",
     "test:ci": "jest --coverage --maxWorkers 2",
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
@@ -70,22 +75,23 @@
   "devDependencies": {
     "@types/graphql-iso-date": "^3.3.3",
     "@types/graphql-relay": "^0.4.11",
-    "@types/jest": "^23.3.7",
+    "@types/jest": "^25.2.3",
     "@types/node": "^10.12.2",
     "@types/prettier": "^1.18.3",
     "@typescript-eslint/eslint-plugin": "2.7.0",
     "codecov": "^3.6.1",
+    "dripip": "^0.9.0",
     "eslint": "^6.6.0",
     "graphql": "^14.5.8",
     "graphql-iso-date": "^3.6.1",
     "graphql-relay": "^0.6.0",
     "husky": "^1.1.2",
-    "jest": "^24.9.0",
-    "jest-watch-typeahead": "^0.3.1",
+    "jest": "^26.0.1",
+    "jest-watch-typeahead": "^0.6.0",
     "lint-staged": "^7.3.0",
     "prettier": "^1.19.1",
     "sort-package-json": "^1.22.1",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^26.0.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",

@@ -1,15 +1,15 @@
+import { assertValidName } from "graphql";
+import { AbstractTypeResolver } from "../typegenTypeHelpers";
 import {
-  OutputDefinitionBlock,
   AbstractOutputDefinitionBuilder,
+  OutputDefinitionBlock,
 } from "./definitionBlocks";
 import {
   NexusTypes,
   NonNullConfig,
-  withNexusSymbol,
   RootTypingDef,
+  withNexusSymbol,
 } from "./_types";
-import { assertValidName } from "graphql";
-import { AbstractTypeResolver } from "../typegenTypeHelpers";
 
 export type NexusInterfaceTypeConfig<TypeName extends string> = {
   name: TypeName;

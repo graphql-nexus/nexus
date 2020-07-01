@@ -1,6 +1,31 @@
 # Changelog
 
-### 0.12.0 final (unreleased)
+### 0.13.1
+
+- fix: remove transition postinstall message
+
+### 0.13.0
+
+The first release of Nexus schema under the package name `@nexus/schema`
+
+### 0.12.0
+
+The last release of Nexus schema under the package name `nexus`
+
+See previous release notes for details on what's new in `0.12.0`
+
+### 0.12.0-rc.14
+
+- improve: add post-install framework notice (#398)
+
+### 0.12.0-rc.13
+
+- improve: add post-install framework notice (#398)
+- fix: typegen always use manifest for package import (#382)
+
+### 0.12.0-rc.12
+
+- feat: respect manifest name in typegen imports (#380)
 
 ### 0.12.0-rc.11
 

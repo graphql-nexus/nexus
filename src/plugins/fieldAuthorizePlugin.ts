@@ -1,15 +1,15 @@
+import { GraphQLResolveInfo } from "graphql";
 import { plugin } from "../plugin";
 import {
-  RootValue,
   ArgsValue,
   GetGen,
   MaybePromise,
+  RootValue,
 } from "../typegenTypeHelpers";
-import { GraphQLResolveInfo } from "graphql";
 import { printedGenTyping, printedGenTypingImport } from "../utils";
 
 const FieldauthorizeResolverImport = printedGenTypingImport({
-  module: "nexus/dist/plugins/fieldAuthorizePlugin",
+  module: "@nexus/schema/dist/plugins/fieldAuthorizePlugin",
   bindings: ["FieldAuthorizeResolver"],
 });
 

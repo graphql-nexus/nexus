@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { objectType } from "@nexus/schema";
 import dedent from "dedent";
 
 export const Launch = objectType({

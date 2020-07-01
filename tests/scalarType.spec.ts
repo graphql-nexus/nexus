@@ -1,12 +1,12 @@
+import { graphql } from "graphql";
+import { GraphQLDate, GraphQLDateTime } from "graphql-iso-date";
 import {
+  asNexusMethod,
+  inputObjectType,
   makeSchema,
   objectType,
   queryField,
-  asNexusMethod,
-  inputObjectType,
 } from "../src/core";
-import { graphql } from "graphql";
-import { GraphQLDateTime, GraphQLDate } from "graphql-iso-date";
 
 describe("scalarType", () => {
   it("asNexusMethod: should wrap a scalar and make it available on the builder", async () => {

@@ -1,11 +1,11 @@
+import { GraphQLObjectType } from "graphql";
 import path from "path";
 import {
-  objectType,
   makeSchema,
-  queryField,
+  objectType,
   queryComplexityPlugin,
+  queryField,
 } from "../../src";
-import { GraphQLObjectType } from "graphql";
 import { generateSchema } from "../../src/core";
 
 describe("queryComplexityPlugin", () => {

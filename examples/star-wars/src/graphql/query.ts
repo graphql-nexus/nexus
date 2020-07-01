@@ -1,4 +1,4 @@
-import { objectType, arg, stringArg } from "nexus";
+import { objectType, arg, stringArg } from "@nexus/schema";
 import { getHero, getHuman, getDroid } from "../data";
 
 const characterArgs = {

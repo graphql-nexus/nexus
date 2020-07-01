@@ -1,8 +1,8 @@
-import path from "path";
-import os from "os";
-import { queryField } from "../src/definitions/queryField";
-import { makeSchema, makeSchemaInternal, generateSchema } from "../src/builder";
 import { printSchema } from "graphql";
+import os from "os";
+import path from "path";
+import { generateSchema, makeSchema } from "../src/builder";
+import { queryField } from "../src/definitions/queryField";
 
 describe("makeSchema", () => {
   describe("shouldExitAfterGenerateArtifacts", () => {
@@ -35,32 +35,36 @@ describe("makeSchema", () => {
       });
     });
 
-    it("exits with 1 code and logs error after failure", (done) => {
-      const errSpy = jest
-        .spyOn(console, "error")
-        .mockImplementationOnce(() => {});
-      jest.spyOn(process, "exit").mockImplementationOnce((code) => {
-        expect(code).toEqual(1);
-        expect(errSpy.mock.calls[0][0].message).toEqual(
-          `ENOTDIR: not a directory, open '/dev/null/schema.graphql'`
-        );
-        return done() as never;
+    // using jest.spyOn on process.exit doesn't not work on Windows
+    if (process.platform !== "win32") {
+      it("exits with 1 code and logs error after failure", (done) => {
+        const errSpy = jest
+          .spyOn(console, "error")
+          .mockImplementationOnce(() => {});
+        jest.spyOn(process, "exit").mockImplementationOnce((code) => {
+          expect(code).toEqual(1);
+          expect(errSpy.mock.calls[0][0].message).toEqual(
+            `ENOTDIR: not a directory, open '/dev/null/schema.graphql'`
+          );
+          expect(errSpy.mock.calls.length).toEqual(1);
+          return done() as never;
+        });
+        makeSchema({
+          types: [
+            queryField("someField", {
+              type: "String",
+              resolve: () => "Test",
+            }),
+          ],
+          outputs: {
+            typegen: path.normalize(`/dev/null/file.ts`),
+            schema: path.normalize(`/dev/null/schema.graphql`),
+          },
+          shouldGenerateArtifacts: true,
+          shouldExitAfterGenerateArtifacts: true,
+        });
       });
-      makeSchema({
-        types: [
-          queryField("someField", {
-            type: "String",
-            resolve: () => "Test",
-          }),
-        ],
-        outputs: {
-          typegen: `/dev/null/file.ts`,
-          schema: `/dev/null/schema.graphql`,
-        },
-        shouldGenerateArtifacts: true,
-        shouldExitAfterGenerateArtifacts: true,
-      });
-    });
+    }
 
     it("accepts a customPrintSchemaFn", async () => {
       const { schemaTypes } = await generateSchema.withArtifacts(

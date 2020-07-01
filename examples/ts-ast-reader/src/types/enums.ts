@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { enumType } from "nexus";
+import { enumType } from "@nexus/schema";
 import { convertTsEnum } from "./utils";
 
 export const SyntaxKind = enumType({

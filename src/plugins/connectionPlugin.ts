@@ -8,7 +8,6 @@ import { completeValue, plugin } from "../plugin";
 import {
   ArgsValue,
   GetGen,
-  getPackageNameForImport,
   MaybePromise,
   MaybePromiseDeep,
   ResultValue,
@@ -16,6 +15,7 @@ import {
 } from "../typegenTypeHelpers";
 import {
   eachObj,
+  getOwnPackage,
   isObject,
   isPromiseLike,
   mapObj,
@@ -113,6 +113,18 @@ export interface ConnectionPluginConfig {
    * Prefix for the Connection / Edge type
    */
   typePrefix?: string;
+  /**
+   * The path to the @nexus/schema package. Needed for typegen.
+   *
+   * @default '@nexus/schema'
+   *
+   * @remarks
+   *
+   * This setting is particularly useful when @nexus/schema is being wrapped by
+   * another library/framework such that @nexus/schema is not expected to be a
+   * direct dependency at the application level.
+   */
+  nexusSchemaImportId?: string;
 }
 
 // Extract the node value from the connection for a given field.
@@ -340,7 +352,8 @@ export const connectionPlugin = (
     name: "ConnectionPlugin",
     fieldDefTypes: [
       printedGenTypingImport({
-        module: getPackageNameForImport(),
+        module:
+          connectionPluginConfig?.nexusSchemaImportId ?? getOwnPackage().name,
         bindings: ["core", "connectionPluginCore"],
       }),
     ],
@@ -826,12 +839,12 @@ function defaultPageInfoFromNodes(nodes: any[], args: PaginationArgs) {
 function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
-  if (args.first) {
+  if (typeof args.first === "number") {
     return nodes.length > args.first;
   }
   // If we're paginating backward, and there are as many results as we asked for, then we'll assume
   // that we have a previous page
-  if (args.last) {
+  if (typeof args.last === "number") {
     if (args.before && args.before !== "0") {
       return true;
     }
@@ -847,7 +860,7 @@ function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
 function defaultHasPreviousPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
-  if (args.first) {
+  if (typeof args.first === "number") {
     if (args.after && args.after !== "0") {
       return true;
     }
@@ -855,7 +868,7 @@ function defaultHasPreviousPage(nodes: any[], args: PaginationArgs) {
   }
   // If we're paginating backward, and there are as many results as we asked for, then we'll assume
   // that we have a previous page
-  if (args.last) {
+  if (typeof args.last === "number") {
     return nodes.length >= args.last;
   }
   /* istanbul ignore next */
@@ -875,7 +888,7 @@ function defaultCursorFromNode(
   let cursorIndex = index;
   // If we're paginating forward, assume we're incrementing from the offset provided via "after",
   // e.g. [0...20] (first: 5, after: "cursor:5") -> [cursor:6, cursor:7, cursor:8, cursor:9, cursor: 10]
-  if (args.first) {
+  if (typeof args.first === "number") {
     if (args.after) {
       const offset = parseInt(args.after, 10);
       cursorIndex = offset + index + 1;
@@ -884,7 +897,7 @@ function defaultCursorFromNode(
 
   // If we're paginating backward, assume we're working backward from the assumed length
   // e.g. [0...20] (last: 5, before: "cursor:20") -> [cursor:15, cursor:16, cursor:17, cursor:18, cursor:19]
-  if (args.last) {
+  if (typeof args.last === "number") {
     if (args.before) {
       const offset = parseInt(args.before, 10);
       cursorIndex = offset - args.last + index;
@@ -997,7 +1010,7 @@ function defaultValidateArgs(
   args: Record<string, any> = {},
   info: GraphQLResolveInfo
 ) {
-  if (!args.first && !args.last) {
+  if (!(args.first || args.first === 0) && !(args.last || args.last === 0)) {
     throw new Error(
       `The ${info.parentType}.${info.fieldName} connection field requires a "first" or "last" argument`
     );

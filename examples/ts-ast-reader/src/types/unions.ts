@@ -1,4 +1,4 @@
-import { unionType } from "nexus";
+import { unionType } from "@nexus/schema";
 import ts from "typescript";
 import { NexusGenAbstractResolveReturnTypes } from "../ts-ast-reader-typegen";
 

@@ -1,7 +1,7 @@
-import { NexusTypes, withNexusSymbol } from "./_types";
-import { OutputDefinitionBlock } from "./definitionBlocks";
 import { assertValidName } from "graphql";
 import { AllOutputTypesPossible } from "../typegenTypeHelpers";
+import { OutputDefinitionBlock } from "./definitionBlocks";
+import { NexusTypes, withNexusSymbol } from "./_types";
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName;

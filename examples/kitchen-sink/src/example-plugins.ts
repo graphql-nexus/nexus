@@ -1,4 +1,4 @@
-import { plugin } from "nexus";
+import { plugin } from "@nexus/schema";
 
 export const logMutationTimePlugin = plugin({
   name: "LogMutationTime",

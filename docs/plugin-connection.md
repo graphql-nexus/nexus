@@ -10,7 +10,7 @@ To install, add the `connectionPlugin` to the `makeSchema.plugins` array, along 
 you'd like to include:
 
 ```ts
-import { makeSchema, connectionPlugin } from "nexus";
+import { makeSchema, connectionPlugin } from "@nexus/schema";
 
 const schema = makeSchema({
   // ... types, etc,
@@ -232,7 +232,7 @@ You can create multiple field connection types with varying defaults, available 
 Custom Usage:
 
 ```ts
-import { makeSchema, connectionPlugin } from "nexus";
+import { makeSchema, connectionPlugin } from "@nexus/schema";
 
 const schema = makeSchema({
   // ... types, etc,

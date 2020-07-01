@@ -16,6 +16,7 @@
     ]
   },
   "dependencies": {
+    "@nexus/schema": "0.14.0",
     "apollo-datasource": "^0.2.0",
     "apollo-datasource-rest": "^0.2.0",
     "apollo-server": "2.2.0-alpha.2",
@@ -24,7 +25,6 @@
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
     "graphql": "^14.5.8",
     "isemail": "^3.2.0",
-    "nexus": "0.12.0-rc.11",
     "sequelize": "^5.21.2",
     "sqlite3": "^4.1.0"
   },
