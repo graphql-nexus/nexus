@@ -252,7 +252,7 @@ describe("connectionPlugin", () => {
       });
       expect(lastNodes.data?.users.pageInfo).toEqual({
         endCursor: "Y3Vyc29yOjk=",
-        hasNextPage: true,
+        hasNextPage: false,
         hasPreviousPage: false,
         startCursor: "Y3Vyc29yOjA=",
       });

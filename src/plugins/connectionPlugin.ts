@@ -840,7 +840,7 @@ function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
   if (typeof args.first === "number") {
-    return nodes.length >= args.first;
+    return nodes.length > args.first;
   }
   // If we're paginating backward, and there are as many results as we asked for, then we'll assume
   // that we have a previous page
