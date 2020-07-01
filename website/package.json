@@ -12,7 +12,7 @@
     "write-translations": "docusaurus-write-translations"
   },
   "dependencies": {
-    "@nexus/schema": "^0.13.1",
+    "@nexus/schema": "0.14.0",
     "dedent": "^0.7.0",
     "graphql": "^14.5.8",
     "monaco-editor": "^0.18.1",
