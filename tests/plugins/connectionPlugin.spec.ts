@@ -347,6 +347,50 @@ describe("connectionPlugin", () => {
       });
     });
 
+    it("default arg validation: allows first to be zero", async () => {
+      const schema = testConnectionSchema({});
+      const result = await execute({
+        schema,
+        document: UsersFieldFirst,
+        variableValues: { first: 0 },
+      });
+      expect(result).toEqual({
+        data: {
+          users: {
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: null,
+            },
+          },
+        },
+      });
+    });
+
+    it("default arg validation: allows last to be zero", async () => {
+      const schema = testConnectionSchema({});
+      const result = await execute({
+        schema,
+        document: UsersFieldLast,
+        variableValues: { last: 0 },
+      });
+      expect(result).toEqual({
+        data: {
+          users: {
+            edges: [],
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+              hasPreviousPage: true,
+              startCursor: null,
+            },
+          },
+        },
+      });
+    });
+
     it("default arg validation: throws if both first & last are provided", async () => {
       const schema = testConnectionSchema({});
       const result = await execute({
