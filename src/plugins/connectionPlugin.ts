@@ -762,7 +762,11 @@ export function makeResolveFn(
           ]).then(([edges, nodes]) => ({ edges, nodes }));
         }
 
-        return { nodes: resolvedNodeList, edges: resolvedEdgeList };
+        return {
+          nodes: resolvedNodeList,
+          // todo find typesafe way of doing this
+          edges: resolvedEdgeList as EdgeLike[],
+        };
       });
 
       return cachedEdges;
