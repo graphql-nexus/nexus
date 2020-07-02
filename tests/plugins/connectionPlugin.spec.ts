@@ -6,26 +6,23 @@ import {
   parse,
   printSchema,
   printType,
-} from "graphql";
-import { connectionFromArray } from "graphql-relay";
-import { arg, connectionPlugin, makeSchema, objectType } from "../../src";
-import {
-  ConnectionFieldConfig,
-  ConnectionPluginConfig,
-} from "../../src/plugins/connectionPlugin";
+} from 'graphql'
+import { connectionFromArray } from 'graphql-relay'
+import { arg, connectionPlugin, makeSchema, objectType } from '../../src'
+import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
-const userNodes: { id: string; name: string }[] = [];
+const userNodes: { id: string; name: string }[] = []
 for (let i = 0; i < 10; i++) {
-  userNodes.push({ id: `User:${i + 1}`, name: `Test ${i + 1}` });
+  userNodes.push({ id: `User:${i + 1}`, name: `Test ${i + 1}` })
 }
 
 const User = objectType({
-  name: "User",
+  name: 'User',
   definition(t) {
-    t.id("id");
-    t.string("name");
+    t.id('id')
+    t.string('name')
   },
-});
+})
 
 const UsersFieldBody = `
   nodes { id }
@@ -39,53 +36,48 @@ const UsersFieldBody = `
     startCursor
     endCursor
   }
-`;
+`
 
-const UsersFieldLast = parse(
-  `query UsersFieldLast($last: Int!) { users(last: $last) { ${UsersFieldBody} } }`
-);
+const UsersFieldLast = parse(`query UsersFieldLast($last: Int!) { users(last: $last) { ${UsersFieldBody} } }`)
 const UsersFieldLastBefore = parse(
   `query UsersFieldLastBefore($last: Int!, $before: String!) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
-);
+)
 const UsersFieldFirst = parse(
   `query UsersFieldFirst($first: Int!) { users(first: $first) { ${UsersFieldBody} } }`
-);
+)
 const UsersFieldFirstAfter = parse(
   `query UsersFieldFirstAfter($first: Int!, $after: String!) { users(first: $first, after: $after) { ${UsersFieldBody} } }`
-);
+)
 
 const executeOk = async (args: ExecutionArgs) => {
-  const result = await execute(args);
-  expect(result.errors).toBeUndefined();
-  return result;
-};
+  const result = await execute(args)
+  expect(result.errors).toBeUndefined()
+  return result
+}
 
-const customResolveFn: GraphQLFieldResolver<any, any> = (
-  root: any,
-  args: any
-) => {
-  return connectionFromArray(userNodes, args);
-};
+const customResolveFn: GraphQLFieldResolver<any, any> = (root: any, args: any) => {
+  return connectionFromArray(userNodes, args)
+}
 
 const testConnectionSchema = (
   pluginConfig: ConnectionPluginConfig,
-  connectionFieldProps: Omit<ConnectionFieldConfig<any, any>, "type"> = {}
+  connectionFieldProps: Omit<ConnectionFieldConfig<any, any>, 'type'> = {}
 ) =>
   makeSchema({
     outputs: false,
     types: [
       User,
       objectType({
-        name: "Query",
+        name: 'Query',
         definition(t) {
           // @ts-ignore
-          t.connectionField("users", {
+          t.connectionField('users', {
             type: User,
             nodes(root: any, args: any, ctx: any, info: any) {
-              return userNodes;
+              return userNodes
             },
             ...connectionFieldProps,
-          });
+          })
         },
       }),
     ],
@@ -94,89 +86,79 @@ const testConnectionSchema = (
       input: false,
       output: false,
     },
-  });
+  })
 
-describe("connectionPlugin", () => {
+describe('connectionPlugin', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-  });
+    jest.resetAllMocks()
+  })
 
-  describe("basic behavior", () => {
-    it("should adhere to the Relay spec", () => {
-      const schema = testConnectionSchema({});
-      expect(printType(schema.getType("UserConnection")!)).toMatchSnapshot();
-      expect(printType(schema.getType("UserEdge")!)).toMatchSnapshot();
-      expect(printType(schema.getType("PageInfo")!)).toMatchSnapshot();
-    });
+  describe('basic behavior', () => {
+    it('should adhere to the Relay spec', () => {
+      const schema = testConnectionSchema({})
+      expect(printType(schema.getType('UserConnection')!)).toMatchSnapshot()
+      expect(printType(schema.getType('UserEdge')!)).toMatchSnapshot()
+      expect(printType(schema.getType('PageInfo')!)).toMatchSnapshot()
+    })
 
-    it("resolves string value", () => {
+    it('resolves string value', () => {
       const schema = testConnectionSchema(
         {},
         {
           // @ts-ignore
-          type: "User",
+          type: 'User',
         }
-      );
-      expect(schema.getType("UserConnection")).not.toBeUndefined();
-      expect(schema.getType("UserEdge")).not.toBeUndefined();
-      expect(schema.getType("PageInfo")).not.toBeUndefined();
-    });
+      )
+      expect(schema.getType('UserConnection')).not.toBeUndefined()
+      expect(schema.getType('UserEdge')).not.toBeUndefined()
+      expect(schema.getType('PageInfo')).not.toBeUndefined()
+    })
 
-    it("should provide forward pagination defaults", async () => {
-      const schema = testConnectionSchema({});
+    it('should provide forward pagination defaults', async () => {
+      const schema = testConnectionSchema({})
       const nodes = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 1 },
-      });
-      expect(nodes.data?.users.edges).toEqual([
-        { cursor: "Y3Vyc29yOjA=", node: { id: "User:1" } },
-      ]);
-      expect(
-        Buffer.from(nodes.data?.users.edges[0].cursor, "base64").toString(
-          "utf8"
-        )
-      ).toEqual("cursor:0");
-    });
+      })
+      expect(nodes.data?.users.edges).toEqual([{ cursor: 'Y3Vyc29yOjA=', node: { id: 'User:1' } }])
+      expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
+    })
 
-    it("should continue forward pagination from the after index", async () => {
+    it('should continue forward pagination from the after index', async () => {
       const schema = testConnectionSchema(
         {},
         {
           nodes(root: any, args: any) {
-            expect(args).toEqual({ first: 1, after: "0" });
-            return userNodes;
+            expect(args).toEqual({ first: 1, after: '0' })
+            return userNodes
           },
         }
-      );
+      )
       const nodes = await executeOk({
         schema,
         document: UsersFieldFirstAfter,
-        variableValues: { first: 1, after: "Y3Vyc29yOjA=" },
-      });
-      expect(
-        Buffer.from(nodes.data?.users.edges[0].cursor, "base64").toString(
-          "utf8"
-        )
-      ).toEqual("cursor:1");
-    });
+        variableValues: { first: 1, after: 'Y3Vyc29yOjA=' },
+      })
+      expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:1')
+    })
 
-    it("can paginate backward from a before cursor", async () => {
+    it('can paginate backward from a before cursor', async () => {
       const schema = testConnectionSchema({
         encodeCursor: (str) => str,
         decodeCursor: (str) => str,
-      });
+      })
       const first = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 9 },
-      });
+      })
       expect(first.data?.users.pageInfo).toEqual({
         hasNextPage: true,
         hasPreviousPage: false,
-        startCursor: "cursor:0",
-        endCursor: "cursor:8",
-      });
+        startCursor: 'cursor:0',
+        endCursor: 'cursor:8',
+      })
       const lastNodes = await executeOk({
         schema,
         document: UsersFieldLastBefore,
@@ -184,111 +166,107 @@ describe("connectionPlugin", () => {
           last: 3,
           before: first.data?.users.pageInfo.endCursor,
         },
-      });
+      })
       expect(lastNodes.data?.users.pageInfo).toEqual({
-        startCursor: "cursor:5",
-        endCursor: "cursor:7",
+        startCursor: 'cursor:5',
+        endCursor: 'cursor:7',
         hasNextPage: true,
         hasPreviousPage: true,
-      });
-    });
+      })
+    })
 
-    it("can paginate backward without a before with a custom cursorFromNodes", async () => {
-      const getTotalCount = async () => Promise.resolve(100);
+    it('can paginate backward without a before with a custom cursorFromNodes', async () => {
+      const getTotalCount = async () => Promise.resolve(100)
       const schema = testConnectionSchema({
         encodeCursor: (str) => str,
         decodeCursor: (str) => str,
         cursorFromNode: async (node, args, ctx, info, { index, nodes }) => {
           if (args.last && !args.before) {
-            const totalCount = await getTotalCount();
-            return `cursor:${totalCount - args.last + index + 1}`;
+            const totalCount = await getTotalCount()
+            return `cursor:${totalCount - args.last + index + 1}`
           }
           return connectionPlugin.defaultCursorFromNode(node, args, ctx, info, {
             index,
             nodes,
-          });
+          })
         },
-      });
+      })
       const lastNodes = await executeOk({
         schema,
         document: UsersFieldLast,
         variableValues: {
           last: 3,
         },
-      });
+      })
       expect(lastNodes.data?.users.pageInfo).toEqual({
-        startCursor: "cursor:98",
-        endCursor: "cursor:100",
+        startCursor: 'cursor:98',
+        endCursor: 'cursor:100',
         hasNextPage: false,
         hasPreviousPage: true,
-      });
-    });
+      })
+    })
 
-    it("cannot paginate backward without a before cursor or a custom cursorFromNodes", async () => {
+    it('cannot paginate backward without a before cursor or a custom cursorFromNodes', async () => {
       const schema = testConnectionSchema({
         encodeCursor: (str) => str,
         decodeCursor: (str) => str,
-      });
+      })
       const lastNodes = await execute({
         schema,
         document: UsersFieldLast,
         variableValues: {
           last: 3,
         },
-      });
+      })
       expect(lastNodes.errors).toEqual([
-        new GraphQLError(
-          `Cannot paginate backward without a "before" cursor by default.`
-        ),
-      ]);
-    });
+        new GraphQLError(`Cannot paginate backward without a "before" cursor by default.`),
+      ])
+    })
 
-    it("should resolve pageInfo with basics", async () => {
-      const schema = testConnectionSchema({});
+    it('should resolve pageInfo with basics', async () => {
+      const schema = testConnectionSchema({})
       const lastNodes = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 10 },
-      });
+      })
       expect(lastNodes.data?.users.pageInfo).toEqual({
-        endCursor: "Y3Vyc29yOjk=",
+        endCursor: 'Y3Vyc29yOjk=',
         hasNextPage: false,
         hasPreviousPage: false,
-        startCursor: "Y3Vyc29yOjA=",
-      });
-    });
+        startCursor: 'Y3Vyc29yOjA=',
+      })
+    })
 
-    it("should resolve nodes & edges at the same time", async () => {
+    it('should resolve nodes & edges at the same time', async () => {
       const schema = testConnectionSchema({
         includeNodesField: true,
-      });
+      })
       const lastNodes = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 10 },
-      });
-      expect(lastNodes.data?.users.nodes).toEqual(
-        lastNodes.data?.users.edges.map((e: any) => e.node)
-      );
-    });
+      })
+      expect(lastNodes.data?.users.nodes).toEqual(lastNodes.data?.users.edges.map((e: any) => e.node))
+    })
 
-    it("can define custom resolve", async () => {
+    it('can define custom resolve', async () => {
       const schema = testConnectionSchema(
         {},
         {
           nodes: undefined,
           resolve: customResolveFn,
         }
-      );
+      )
       const lastNodes = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 2 },
-      });
-      expect(lastNodes).toMatchSnapshot();
-    });
+      })
+      expect(lastNodes).toMatchSnapshot()
+    })
 
-    it("can define custom resolve, which will derive nodes if includeNodesField is true", async () => {
+    it('can define custom resolve, which will derive nodes if includeNodesField is true', async () => {
       const schema = testConnectionSchema(
         {
           includeNodesField: true,
@@ -297,16 +275,16 @@ describe("connectionPlugin", () => {
           nodes: undefined,
           resolve: customResolveFn,
         }
-      );
+      )
       const lastNodes = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 2 },
-      });
-      expect(lastNodes).toMatchSnapshot();
-    });
+      })
+      expect(lastNodes).toMatchSnapshot()
+    })
 
-    it("can define custom resolve, supplying nodes directly", async () => {
+    it('can define custom resolve, supplying nodes directly', async () => {
       const schema = testConnectionSchema(
         {
           includeNodesField: true,
@@ -314,46 +292,42 @@ describe("connectionPlugin", () => {
         {
           nodes: undefined,
           resolve: (...args) => {
-            const result = customResolveFn(...args);
+            const result = customResolveFn(...args)
             return {
               ...result,
               nodes: result.edges.map((e: any) => e.node),
-            };
+            }
           },
         }
-      );
+      )
       const lastNodes = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 2 },
-      });
-      expect(lastNodes).toMatchSnapshot();
-    });
+      })
+      expect(lastNodes).toMatchSnapshot()
+    })
 
-    it("default arg validation: throws if no connection are provided", async () => {
-      const schema = testConnectionSchema({});
+    it('default arg validation: throws if no connection are provided', async () => {
+      const schema = testConnectionSchema({})
       const result = await execute({
         schema,
         document: parse(`{ users { edges { cursor } } }`),
         variableValues: {},
-      });
+      })
       expect(result).toEqual({
         data: { users: null },
-        errors: [
-          new GraphQLError(
-            'The Query.users connection field requires a "first" or "last" argument'
-          ),
-        ],
-      });
-    });
+        errors: [new GraphQLError('The Query.users connection field requires a "first" or "last" argument')],
+      })
+    })
 
-    it("default arg validation: allows first to be zero", async () => {
-      const schema = testConnectionSchema({});
+    it('default arg validation: allows first to be zero', async () => {
+      const schema = testConnectionSchema({})
       const result = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 0 },
-      });
+      })
       expect(result).toEqual({
         data: {
           users: {
@@ -366,16 +340,16 @@ describe("connectionPlugin", () => {
             },
           },
         },
-      });
-    });
+      })
+    })
 
-    it("default arg validation: allows last to be zero", async () => {
-      const schema = testConnectionSchema({});
+    it('default arg validation: allows last to be zero', async () => {
+      const schema = testConnectionSchema({})
       const result = await execute({
         schema,
         document: UsersFieldLast,
         variableValues: { last: 0 },
-      });
+      })
       expect(result).toEqual({
         data: {
           users: {
@@ -388,16 +362,16 @@ describe("connectionPlugin", () => {
             },
           },
         },
-      });
-    });
+      })
+    })
 
-    it("default arg validation: throws if both first & last are provided", async () => {
-      const schema = testConnectionSchema({});
+    it('default arg validation: throws if both first & last are provided', async () => {
+      const schema = testConnectionSchema({})
       const result = await execute({
         schema,
         document: parse(`{ users(first: 2, last: 1) { edges { cursor } } }`),
         variableValues: {},
-      });
+      })
       expect(result).toEqual({
         data: { users: null },
         errors: [
@@ -405,18 +379,16 @@ describe("connectionPlugin", () => {
             'The Query.users connection field requires a "first" or "last" argument, not both'
           ),
         ],
-      });
-    });
+      })
+    })
 
-    it("default arg validation: throws if first & before are mixed", async () => {
-      const schema = testConnectionSchema({});
+    it('default arg validation: throws if first & before are mixed', async () => {
+      const schema = testConnectionSchema({})
       const result = await execute({
         schema,
-        document: parse(
-          `{ users(first: 1, before: "FAKE") { edges { cursor } } }`
-        ),
+        document: parse(`{ users(first: 1, before: "FAKE") { edges { cursor } } }`),
         variableValues: {},
-      });
+      })
       expect(result).toEqual({
         data: { users: null },
         errors: [
@@ -424,30 +396,26 @@ describe("connectionPlugin", () => {
             'The Query.users connection field does not allow a "before" argument with "first"'
           ),
         ],
-      });
-    });
+      })
+    })
 
-    it("default arg validation: throws if last & after are mixed", async () => {
-      const schema = testConnectionSchema({});
+    it('default arg validation: throws if last & after are mixed', async () => {
+      const schema = testConnectionSchema({})
       const result = await execute({
         schema,
-        document: parse(
-          `{ users(last: 2, after: "FAKE") { edges { cursor } } }`
-        ),
+        document: parse(`{ users(last: 2, after: "FAKE") { edges { cursor } } }`),
         variableValues: {},
-      });
+      })
       expect(result).toEqual({
         data: { users: null },
         errors: [
-          new GraphQLError(
-            'The Query.users connection field does not allow a "last" argument with "after"'
-          ),
+          new GraphQLError('The Query.users connection field does not allow a "last" argument with "after"'),
         ],
-      });
-    });
+      })
+    })
 
-    it("returns null and logs an error if the nodes resolve is missing", async () => {
-      const consoleError = jest.spyOn(console, "error").mockImplementation();
+    it('returns null and logs an error if the nodes resolve is missing', async () => {
+      const consoleError = jest.spyOn(console, 'error').mockImplementation()
       const schema = testConnectionSchema(
         {
           includeNodesField: true,
@@ -455,38 +423,36 @@ describe("connectionPlugin", () => {
         {
           nodes: undefined,
         }
-      );
+      )
       const lastNodes = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 2 },
-      });
-      expect(lastNodes.data?.users).toEqual(null);
-      expect(consoleError).toHaveBeenCalledTimes(1);
+      })
+      expect(lastNodes.data?.users).toEqual(null)
+      expect(consoleError).toHaveBeenCalledTimes(1)
       expect(consoleError).toHaveBeenLastCalledWith(
-        new Error(
-          "Nexus Connection Plugin: Missing nodes or resolve property for Query.users"
-        )
-      );
-    });
+        new Error('Nexus Connection Plugin: Missing nodes or resolve property for Query.users')
+      )
+    })
 
-    it("returns empty arrays, but warns if the nodes returns null", async () => {
-      const consoleWarn = jest.spyOn(console, "warn").mockImplementation();
+    it('returns empty arrays, but warns if the nodes returns null', async () => {
+      const consoleWarn = jest.spyOn(console, 'warn').mockImplementation()
       const schema = testConnectionSchema(
         {
           includeNodesField: true,
         },
         {
           nodes() {
-            return null as any;
+            return null as any
           },
         }
-      );
+      )
       const lastNodes = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 2 },
-      });
+      })
       expect(lastNodes.data?.users).toEqual({
         edges: [],
         nodes: [],
@@ -496,87 +462,87 @@ describe("connectionPlugin", () => {
           startCursor: null,
           endCursor: null,
         },
-      });
-      expect(consoleWarn).toHaveBeenCalledTimes(1);
+      })
+      expect(consoleWarn).toHaveBeenCalledTimes(1)
       expect(consoleWarn).toHaveBeenLastCalledWith(
         'You resolved null/undefined from nodes() at path ["users"], this is likely an error. Return an empty array to suppress this warning.'
-      );
-    });
+      )
+    })
 
-    it("resolves any promises in nodes", async () => {
+    it('resolves any promises in nodes', async () => {
       const schema = testConnectionSchema(
         {},
         {
           nodes() {
-            return userNodes.map((node) => Promise.resolve(node));
+            return userNodes.map((node) => Promise.resolve(node))
           },
         }
-      );
+      )
       const result = await execute({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 10 },
-      });
-      expect(result).toMatchSnapshot();
-    });
+      })
+      expect(result).toMatchSnapshot()
+    })
 
-    it("returns list as length of nodes if result is smaller than requested", async () => {
+    it('returns list as length of nodes if result is smaller than requested', async () => {
       const schema = testConnectionSchema(
         {
           includeNodesField: true,
         },
         {
           nodes() {
-            return userNodes;
+            return userNodes
           },
         }
-      );
+      )
       const result = await executeOk({
         schema,
         document: UsersFieldFirst,
         variableValues: { first: 1000 },
-      });
-      expect(result.data?.users.nodes.length).toEqual(10);
-    });
-  });
+      })
+      expect(result.data?.users.nodes.length).toEqual(10)
+    })
+  })
 
-  describe("global plugin configuration", () => {
-    it("allows disabling forward pagination", () => {
+  describe('global plugin configuration', () => {
+    it('allows disabling forward pagination', () => {
       const schema = testConnectionSchema({
         disableForwardPagination: true,
-      });
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
+      })
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
 
-    it("allows disabling backward pagination", () => {
+    it('allows disabling backward pagination', () => {
       const schema = testConnectionSchema({
         disableBackwardPagination: true,
-      });
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
+      })
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
 
-    it("allows disabling forward pagination w/ strictArgs:false to make `last` nullable", () => {
+    it('allows disabling forward pagination w/ strictArgs:false to make `last` nullable', () => {
       const schema = testConnectionSchema({
         disableForwardPagination: true,
         strictArgs: false,
-      });
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
+      })
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
 
-    it("allows disabling backward pagination w/ strictArgs: false to make `first` nullable", () => {
+    it('allows disabling backward pagination w/ strictArgs: false to make `first` nullable', () => {
       const schema = testConnectionSchema({
         disableBackwardPagination: true,
         strictArgs: false,
-      });
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
+      })
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
 
-    it("can configure additional fields for the connection globally", () => {
+    it('can configure additional fields for the connection globally', () => {
       const schema = testConnectionSchema(
         {
           extendConnection: {
             totalCount: {
-              type: "Int",
+              type: 'Int',
             },
           },
         },
@@ -584,140 +550,136 @@ describe("connectionPlugin", () => {
           // @ts-ignore
           totalCount: () => 1,
         }
-      );
-      expect(printType(schema.getType("UserConnection")!)).toMatchSnapshot();
-    });
+      )
+      expect(printType(schema.getType('UserConnection')!)).toMatchSnapshot()
+    })
 
-    it("logs error if the extendConnection resolver is not specified", () => {
-      const spy = jest.spyOn(console, "error").mockImplementation();
+    it('logs error if the extendConnection resolver is not specified', () => {
+      const spy = jest.spyOn(console, 'error').mockImplementation()
       testConnectionSchema({
         extendConnection: {
           totalCount: {
-            type: "Int",
+            type: 'Int',
           },
         },
-      });
-      expect(spy.mock.calls[0]).toMatchSnapshot();
-      expect(spy).toBeCalledTimes(1);
-    });
+      })
+      expect(spy.mock.calls[0]).toMatchSnapshot()
+      expect(spy).toBeCalledTimes(1)
+    })
 
-    it("logs error if the extendEdge resolver is not specified", () => {
-      const spy = jest.spyOn(console, "error").mockImplementation();
+    it('logs error if the extendEdge resolver is not specified', () => {
+      const spy = jest.spyOn(console, 'error').mockImplementation()
       testConnectionSchema({
         extendEdge: {
           totalCount: {
-            type: "Int",
+            type: 'Int',
           },
         },
-      });
-      expect(spy.mock.calls[0]).toMatchSnapshot();
-      expect(spy).toBeCalledTimes(1);
-    });
+      })
+      expect(spy.mock.calls[0]).toMatchSnapshot()
+      expect(spy).toBeCalledTimes(1)
+    })
 
-    it("can configure additional fields for the edge globally", () => {
+    it('can configure additional fields for the edge globally', () => {
       const schema = testConnectionSchema(
         {
           extendEdge: {
             createdAt: {
-              type: "String",
+              type: 'String',
             },
           },
         },
         {
           // @ts-ignore
           edgeFields: {
-            createdAt: () => "FakeDate",
+            createdAt: () => 'FakeDate',
           },
         }
-      );
-      expect(printType(schema.getType("UserEdge")!)).toMatchSnapshot();
-    });
+      )
+      expect(printType(schema.getType('UserEdge')!)).toMatchSnapshot()
+    })
 
     it('can include a "nodes" field, with an array of nodes', () => {
       const schema = testConnectionSchema({
         includeNodesField: true,
-      });
-      expect(schema.getType("UserConnection")!).toMatchSnapshot();
-    });
+      })
+      expect(schema.getType('UserConnection')!).toMatchSnapshot()
+    })
 
-    it("can define additional args for all connections", () => {
+    it('can define additional args for all connections', () => {
       const schema = testConnectionSchema({
         additionalArgs: {
           order: arg({
-            type: "String",
+            type: 'String',
             required: true,
-            description: "This should be included",
+            description: 'This should be included',
           }),
         },
-      });
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
-  });
+      })
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
+  })
 
-  describe("field level configuration", () => {
-    it("can configure the connection per-instance", () => {
+  describe('field level configuration', () => {
+    it('can configure the connection per-instance', () => {
       const schema = testConnectionSchema(
         {},
         {
           extendConnection(t) {
-            t.int("totalCount", () => 1);
+            t.int('totalCount', () => 1)
           },
         }
-      );
-      expect(
-        printType(schema.getType("QueryUsers_Connection")!)
-      ).toMatchSnapshot();
-      expect(schema.getType("QueryUsers_Edge")).toBeUndefined();
-    });
+      )
+      expect(printType(schema.getType('QueryUsers_Connection')!)).toMatchSnapshot()
+      expect(schema.getType('QueryUsers_Edge')).toBeUndefined()
+    })
 
-    it("can configure the edge per-instance", () => {
+    it('can configure the edge per-instance', () => {
       const schema = testConnectionSchema(
         {},
         {
           extendEdge(t) {
-            t.string("role", () => "admin");
+            t.string('role', () => 'admin')
           },
         }
-      );
-      expect(
-        printType(schema.getType("QueryUsers_Connection")!)
-      ).toMatchSnapshot();
-      expect(printType(schema.getType("QueryUsers_Edge")!)).toMatchSnapshot();
-    });
+      )
+      expect(printType(schema.getType('QueryUsers_Connection')!)).toMatchSnapshot()
+      expect(printType(schema.getType('QueryUsers_Edge')!)).toMatchSnapshot()
+    })
 
-    it("can modify the behavior of cursorFromNode ", () => {});
+    it('can modify the behavior of cursorFromNode ', () => {})
 
-    it("can define additional args for the connection", () => {
+    it('can define additional args for the connection', () => {
       const schema = testConnectionSchema(
         {
           additionalArgs: {
             order: arg({
-              type: "String",
+              type: 'String',
               required: true,
-              description: "This should be ignored",
+              description: 'This should be ignored',
             }),
           },
         },
         {
           additionalArgs: {
             filter: arg({
-              type: "String",
-              description: "This should be included",
+              type: 'String',
+              description: 'This should be included',
             }),
           },
         }
-      );
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
+      )
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
 
-    it("can inherit the additional args from the main config", () => {
+    it('can inherit the additional args from the main config', () => {
       const schema = testConnectionSchema(
         {
           additionalArgs: {
             order: arg({
-              type: "String",
+              type: 'String',
               required: true,
-              description: "This should be included",
+              description: 'This should be included',
             }),
           },
         },
@@ -725,47 +687,47 @@ describe("connectionPlugin", () => {
           inheritAdditionalArgs: true,
           additionalArgs: {
             filter: arg({
-              type: "String",
-              description: "This should also be included",
+              type: 'String',
+              description: 'This should also be included',
             }),
           },
         }
-      );
-      expect(printType(schema.getQueryType()!)).toMatchSnapshot();
-    });
+      )
+      expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+    })
 
-    it("can define a schema with multiple plugins, and separate them by typePrefix", () => {
+    it('can define a schema with multiple plugins, and separate them by typePrefix', () => {
       const schema = makeSchema({
         outputs: false,
         types: [
           objectType({
-            name: "Query",
+            name: 'Query',
             definition(t) {
               // @ts-ignore
-              t.connectionField("users", {
+              t.connectionField('users', {
                 type: User,
                 nodes(root: any, args: any, ctx: any, info: any) {
-                  return userNodes;
+                  return userNodes
                 },
-              });
+              })
               // @ts-ignore
-              t.analyticsConnectionField("userStats", {
+              t.analyticsConnectionField('userStats', {
                 type: User,
                 nodes() {
-                  return userNodes;
+                  return userNodes
                 },
-              });
+              })
             },
           }),
         ],
         plugins: [
           connectionPlugin({}),
           connectionPlugin({
-            typePrefix: "Analytics",
-            nexusFieldName: "analyticsConnectionField",
+            typePrefix: 'Analytics',
+            nexusFieldName: 'analyticsConnectionField',
             extendConnection: {
-              totalCount: { type: "Int" },
-              averageCount: { type: "Int" },
+              totalCount: { type: 'Int' },
+              averageCount: { type: 'Int' },
             },
           }),
         ],
@@ -773,8 +735,8 @@ describe("connectionPlugin", () => {
           input: false,
           output: false,
         },
-      });
-      expect(printSchema(schema)).toMatchSnapshot();
-    });
-  });
-});
+      })
+      expect(printSchema(schema)).toMatchSnapshot()
+    })
+  })
+})

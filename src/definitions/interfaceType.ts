@@ -1,18 +1,10 @@
-import { assertValidName } from "graphql";
-import { AbstractTypeResolver } from "../typegenTypeHelpers";
-import {
-  AbstractOutputDefinitionBuilder,
-  OutputDefinitionBlock,
-} from "./definitionBlocks";
-import {
-  NexusTypes,
-  NonNullConfig,
-  RootTypingDef,
-  withNexusSymbol,
-} from "./_types";
+import { assertValidName } from 'graphql'
+import { AbstractTypeResolver } from '../typegenTypeHelpers'
+import { AbstractOutputDefinitionBuilder, OutputDefinitionBlock } from './definitionBlocks'
+import { NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
 
 export type NexusInterfaceTypeConfig<TypeName extends string> = {
-  name: TypeName;
+  name: TypeName
 
   // Really wanted to keep this here, but alas, it looks like there's some
   // issues around inferring the generic.
@@ -21,60 +13,51 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
   //
   // resolveType: AbstractTypeResolver<TypeName>;
 
-  definition(t: InterfaceDefinitionBlock<TypeName>): void;
+  definition(t: InterfaceDefinitionBlock<TypeName>): void
   /**
    * Configures the nullability for the type, check the
    * documentation's "Getting Started" section to learn
    * more about GraphQL Nexus's assumptions and configuration
    * on nullability.
    */
-  nonNullDefaults?: NonNullConfig;
+  nonNullDefaults?: NonNullConfig
   /**
    * The description to annotate the GraphQL SDL
    */
-  description?: string | null;
+  description?: string | null
   /**
    * Root type information for this type
    */
-  rootTyping?: RootTypingDef;
-};
+  rootTyping?: RootTypingDef
+}
 
-export class InterfaceDefinitionBlock<
-  TypeName extends string
-> extends OutputDefinitionBlock<TypeName> {
-  constructor(
-    protected typeBuilder: AbstractOutputDefinitionBuilder<TypeName>
-  ) {
-    super(typeBuilder);
+export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
+  constructor(protected typeBuilder: AbstractOutputDefinitionBuilder<TypeName>) {
+    super(typeBuilder)
   }
   /**
    * Sets the "resolveType" method for the current type.
    */
   resolveType(fn: AbstractTypeResolver<TypeName>) {
-    this.typeBuilder.setResolveType(fn);
+    this.typeBuilder.setResolveType(fn)
   }
 }
 
 export class NexusInterfaceTypeDef<TypeName extends string> {
-  constructor(
-    readonly name: TypeName,
-    protected config: NexusInterfaceTypeConfig<TypeName>
-  ) {
-    assertValidName(name);
+  constructor(readonly name: TypeName, protected config: NexusInterfaceTypeConfig<TypeName>) {
+    assertValidName(name)
   }
   get value() {
-    return this.config;
+    return this.config
   }
 }
 
-withNexusSymbol(NexusInterfaceTypeDef, NexusTypes.Interface);
+withNexusSymbol(NexusInterfaceTypeDef, NexusTypes.Interface)
 
 /**
  * Defines a GraphQLInterfaceType
  * @param config
  */
-export function interfaceType<TypeName extends string>(
-  config: NexusInterfaceTypeConfig<TypeName>
-) {
-  return new NexusInterfaceTypeDef<TypeName>(config.name, config);
+export function interfaceType<TypeName extends string>(config: NexusInterfaceTypeConfig<TypeName>) {
+  return new NexusInterfaceTypeDef<TypeName>(config.name, config)
 }

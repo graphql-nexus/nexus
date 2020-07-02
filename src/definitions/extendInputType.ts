@@ -1,11 +1,11 @@
-import { assertValidName } from "graphql";
-import { GetGen } from "../typegenTypeHelpers";
-import { InputDefinitionBlock } from "./definitionBlocks";
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { assertValidName } from 'graphql'
+import { GetGen } from '../typegenTypeHelpers'
+import { InputDefinitionBlock } from './definitionBlocks'
+import { NexusTypes, withNexusSymbol } from './_types'
 
 export interface NexusExtendInputTypeConfig<TypeName extends string> {
-  type: TypeName;
-  definition(t: InputDefinitionBlock<TypeName>): void;
+  type: TypeName
+  definition(t: InputDefinitionBlock<TypeName>): void
 }
 
 export class NexusExtendInputTypeDef<TypeName extends string> {
@@ -13,14 +13,14 @@ export class NexusExtendInputTypeDef<TypeName extends string> {
     readonly name: TypeName,
     protected config: NexusExtendInputTypeConfig<string> & { name: string }
   ) {
-    assertValidName(name);
+    assertValidName(name)
   }
   get value() {
-    return this.config;
+    return this.config
   }
 }
 
-withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject);
+withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject)
 
 /**
  * Adds new fields to an existing inputObjectType in the schema. Useful when
@@ -28,11 +28,11 @@ withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject);
  *
  * @see http://graphql-nexus.com/api/extendType
  */
-export function extendInputType<TypeName extends GetGen<"inputNames", string>>(
+export function extendInputType<TypeName extends GetGen<'inputNames', string>>(
   config: NexusExtendInputTypeConfig<TypeName>
 ) {
   return new NexusExtendInputTypeDef(config.type, {
     ...config,
     name: config.type,
-  });
+  })
 }

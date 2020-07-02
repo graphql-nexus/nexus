@@ -1,4 +1,4 @@
-import { graphql } from "graphql";
+import { graphql } from 'graphql'
 import {
   arg,
   booleanArg,
@@ -9,15 +9,15 @@ import {
   objectType,
   queryField,
   stringArg,
-} from "../src/core";
+} from '../src/core'
 
-describe("interfaceType", () => {
-  let schema: ReturnType<typeof makeSchema>;
+describe('interfaceType', () => {
+  let schema: ReturnType<typeof makeSchema>
   beforeAll(() => {
     schema = makeSchema({
       types: [
-        queryField("user", {
-          type: "User",
+        queryField('user', {
+          type: 'User',
           args: {
             int: intArg(),
             bool: booleanArg(),
@@ -25,21 +25,21 @@ describe("interfaceType", () => {
             id: idArg(),
             str: stringArg(),
           },
-          resolve: () => ({ id: `User:1`, name: "Test User" }),
+          resolve: () => ({ id: `User:1`, name: 'Test User' }),
         }),
         objectType({
-          name: "User",
+          name: 'User',
           definition(t) {
-            t.id("id");
-            t.string("name");
+            t.id('id')
+            t.string('name')
           },
         }),
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
-    });
-  });
-  it("can be implemented by object types", async () => {
+    })
+  })
+  it('can be implemented by object types', async () => {
     expect(
       await graphql(
         schema,
@@ -52,10 +52,10 @@ describe("interfaceType", () => {
           }
         `
       )
-    ).toMatchSnapshot();
-  });
-  it("throws if the arg is not provided to the type", async () => {
+    ).toMatchSnapshot()
+  })
+  it('throws if the arg is not provided to the type', async () => {
     // @ts-ignore
-    expect(() => arg({ type: null })).toThrowErrorMatchingSnapshot();
-  });
-});
+    expect(() => arg({ type: null })).toThrowErrorMatchingSnapshot()
+  })
+})

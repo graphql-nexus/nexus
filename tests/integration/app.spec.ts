@@ -1,5 +1,5 @@
-import { testSchema } from "./_helpers";
+import { testSchema } from './_helpers'
 
-testSchema("app", (getSchema) => {
-  const schema = getSchema();
-});
+testSchema('app', (getSchema) => {
+  const schema = getSchema()
+})

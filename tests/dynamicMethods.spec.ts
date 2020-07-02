@@ -1,6 +1,6 @@
-import { graphql } from "graphql";
-import { GraphQLDateTime } from "graphql-iso-date";
-import path from "path";
+import { graphql } from 'graphql'
+import { GraphQLDateTime } from 'graphql-iso-date'
+import path from 'path'
 import {
   decorateType,
   dynamicInputMethod,
@@ -9,47 +9,46 @@ import {
   makeSchema,
   objectType,
   queryType,
-} from "../src";
-import { dynamicOutputProperty } from "../src/dynamicProperty";
-import { CatListFixture } from "./_fixtures";
+} from '../src'
+import { dynamicOutputProperty } from '../src/dynamicProperty'
+import { CatListFixture } from './_fixtures'
 
-let spy: jest.SpyInstance;
+let spy: jest.SpyInstance
 beforeEach(() => {
-  jest.clearAllMocks();
-});
+  jest.clearAllMocks()
+})
 
-describe("dynamicOutputMethod", () => {
+describe('dynamicOutputMethod', () => {
   const Cat = objectType({
-    name: "Cat",
+    name: 'Cat',
     definition(t) {
-      t.id("id");
-      t.string("name");
+      t.id('id')
+      t.string('name')
     },
-  });
+  })
 
-  test("RelayConnectionFieldMethod example", async () => {
+  test('RelayConnectionFieldMethod example', async () => {
     const Query = queryType({
       definition(t) {
         // @ts-ignore
-        t.relayConnectionField("cats", {
+        t.relayConnectionField('cats', {
           type: Cat,
           pageInfo: () => ({
             hasNextPage: false,
             hasPreviousPage: false,
           }),
-          edges: () =>
-            CatListFixture.map((c) => ({ cursor: `Cursor: ${c.id}`, node: c })),
-        });
+          edges: () => CatListFixture.map((c) => ({ cursor: `Cursor: ${c.id}`, node: c })),
+        })
       },
-    });
+    })
     const schema = makeSchema({
       types: [Query, ext.RelayConnectionFieldMethod],
       outputs: {
-        typegen: path.join(__dirname, "test-output.ts"),
-        schema: path.join(__dirname, "schema.graphql"),
+        typegen: path.join(__dirname, 'test-output.ts'),
+        schema: path.join(__dirname, 'schema.graphql'),
       },
       shouldGenerateArtifacts: false,
-    });
+    })
     expect(
       await graphql(
         schema,
@@ -70,29 +69,29 @@ describe("dynamicOutputMethod", () => {
           }
         `
       )
-    ).toMatchSnapshot();
-  });
+    ).toMatchSnapshot()
+  })
 
-  test("CollectionFieldMethod example", async () => {
+  test('CollectionFieldMethod example', async () => {
     const dynamicOutputMethod = queryType({
       definition(t) {
         // @ts-ignore
-        t.collectionField("cats", {
+        t.collectionField('cats', {
           type: Cat,
           totalCount: () => CatListFixture.length,
           nodes: () => CatListFixture,
-        });
+        })
       },
-    });
+    })
 
     const schema = makeSchema({
       types: [dynamicOutputMethod, ext.CollectionFieldMethod],
       outputs: {
-        typegen: path.join(__dirname, "test-output"),
-        schema: path.join(__dirname, "schema.graphql"),
+        typegen: path.join(__dirname, 'test-output'),
+        schema: path.join(__dirname, 'schema.graphql'),
       },
       shouldGenerateArtifacts: false,
-    });
+    })
 
     expect(
       await graphql(
@@ -109,38 +108,38 @@ describe("dynamicOutputMethod", () => {
           }
         `
       )
-    ).toMatchSnapshot();
-  });
+    ).toMatchSnapshot()
+  })
 
-  test("CollectionFieldMethod example with string type ref", () => {
+  test('CollectionFieldMethod example with string type ref', () => {
     makeSchema({
       types: [
         queryType({
           definition(t) {
             // @ts-ignore
-            t.collectionField("cats", {
-              type: "Cat",
+            t.collectionField('cats', {
+              type: 'Cat',
               totalCount: () => CatListFixture.length,
               nodes: () => CatListFixture,
-            });
+            })
           },
         }),
         ext.CollectionFieldMethod,
       ],
       outputs: false,
-    });
-  });
+    })
+  })
 
-  test("RelayConnectionFieldMethod example with string type ref", async () => {
+  test('RelayConnectionFieldMethod example with string type ref', async () => {
     makeSchema({
       types: [
         queryType({
           definition(t) {
             // @ts-ignore
-            t.relayConnectionField("cats", {
-              type: "Cat",
+            t.relayConnectionField('cats', {
+              type: 'Cat',
               nodes(root: any, args: any, ctx: any, info: any) {
-                return CatListFixture;
+                return CatListFixture
               },
               pageInfo: () => ({
                 hasNextPage: false,
@@ -151,80 +150,80 @@ describe("dynamicOutputMethod", () => {
                   cursor: `Cursor: ${c.id}`,
                   node: c,
                 })),
-            });
+            })
           },
         }),
         ext.RelayConnectionFieldMethod,
       ],
       outputs: false,
-    });
-  });
-});
+    })
+  })
+})
 
-describe("dynamicInputMethod", () => {
-  it("should provide a method on the input definition", async () => {
+describe('dynamicInputMethod', () => {
+  it('should provide a method on the input definition', async () => {
     makeSchema({
       types: [
         decorateType(GraphQLDateTime, {
-          rootTyping: "Date",
+          rootTyping: 'Date',
         }),
         inputObjectType({
-          name: "SomeInput",
+          name: 'SomeInput',
           definition(t) {
-            t.id("id");
+            t.id('id')
             // @ts-ignore
-            t.timestamps();
+            t.timestamps()
           },
         }),
         dynamicInputMethod({
-          name: "timestamps",
+          name: 'timestamps',
           factory({ typeDef }) {
-            typeDef.field("createdAt", { type: "DateTime" });
-            typeDef.field("updatedAt", { type: "DateTime" });
+            typeDef.field('createdAt', { type: 'DateTime' })
+            typeDef.field('updatedAt', { type: 'DateTime' })
           },
         }),
       ],
       outputs: {
-        typegen: path.join(__dirname, "test-output.ts"),
-        schema: path.join(__dirname, "schema.graphql"),
+        typegen: path.join(__dirname, 'test-output.ts'),
+        schema: path.join(__dirname, 'schema.graphql'),
       },
       shouldGenerateArtifacts: false,
-    });
-  });
-});
+    })
+  })
+})
 
-describe("dynamicOutputProperty", () => {
-  it("should provide a way for adding a chainable api on the output definition", async () => {
+describe('dynamicOutputProperty', () => {
+  it('should provide a way for adding a chainable api on the output definition', async () => {
     makeSchema({
       types: [
         decorateType(GraphQLDateTime, {
-          rootTyping: "Date",
+          rootTyping: 'Date',
         }),
         objectType({
-          name: "DynamicPropObject",
+          name: 'DynamicPropObject',
           definition(t) {
-            t.id("id");
+            t.id('id')
             // @ts-ignore
-            t.model.timestamps();
+            t.model.timestamps()
           },
         }),
         dynamicOutputProperty({
-          name: "model",
+          name: 'model',
           factory({ typeDef }) {
             return {
               timestamps() {
-                typeDef.field("createdAt", { type: "DateTime" });
-                typeDef.field("updatedAt", { type: "DateTime" });
+                typeDef.field('createdAt', { type: 'DateTime' })
+                typeDef.field('updatedAt', { type: 'DateTime' })
               },
-            };
+            }
           },
         }),
       ],
       outputs: {
-        typegen: path.join(__dirname, "test-output.ts"),
-        schema: path.join(__dirname, "schema.graphql"),
+        typegen: path.join(__dirname, 'test-output.ts'),
+        schema: path.join(__dirname, 'schema.graphql'),
       },
       shouldGenerateArtifacts: false,
-    });
-  });
-});
+    })
+  })
+})

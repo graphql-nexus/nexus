@@ -1,20 +1,20 @@
 export type TestContext = {
-  user: User | null;
-};
+  user: User | null
+}
 
 export interface User {
-  firstName: string;
-  lastName: string;
-  email: string;
-  fullName(): string;
+  firstName: string
+  lastName: string
+  email: string
+  fullName(): string
 }
 
 export enum A {
-  ONE = "ONE",
-  TWO = "TWO",
+  ONE = 'ONE',
+  TWO = 'TWO',
 }
 
 export const enum B {
-  NINE = "9",
-  TEN = "10",
+  NINE = '9',
+  TEN = '10',
 }

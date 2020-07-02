@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as allTypes from "./graphql";
-import { makeSchema, nullabilityGuardPlugin } from "@nexus/schema";
+import { makeSchema, nullabilityGuardPlugin } from '@nexus/schema'
+import * as path from 'path'
+import * as allTypes from './graphql'
 
 /**
  * Finally, we construct our schema (whose starting query type is the query
@@ -9,18 +9,15 @@ import { makeSchema, nullabilityGuardPlugin } from "@nexus/schema";
 export const schema = makeSchema({
   types: allTypes,
   outputs: {
-    schema: path.join(__dirname, "../star-wars-schema.graphql"),
-    typegen: path.join(
-      __dirname.replace(/\/dist$/, "/src"),
-      "./star-wars-typegen.ts"
-    ),
+    schema: path.join(__dirname, '../star-wars-schema.graphql'),
+    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), './star-wars-typegen.ts'),
   },
   plugins: [
     nullabilityGuardPlugin({
       shouldGuard: true,
       fallbackValues: {
-        String: () => "",
-        ID: () => "MISSING_ID",
+        String: () => '',
+        ID: () => 'MISSING_ID',
         Boolean: () => true,
       },
     }),
@@ -28,14 +25,11 @@ export const schema = makeSchema({
   typegenAutoConfig: {
     sources: [
       {
-        source: path.join(
-          __dirname.replace(/\/dist$/, "/src"),
-          "./types/backingTypes.ts"
-        ),
-        alias: "swapi",
+        source: path.join(__dirname.replace(/\/dist$/, '/src'), './types/backingTypes.ts'),
+        alias: 'swapi',
       },
     ],
-    contextType: "swapi.ContextType",
+    contextType: 'swapi.ContextType',
   },
-  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
-});
+  prettierConfig: require.resolve('../../../package.json'),
+})

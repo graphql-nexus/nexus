@@ -1,21 +1,21 @@
-import { AllInputTypes, GetGen2 } from "../typegenTypeHelpers";
-import { AllNexusInputTypeDefs } from "./wrapping";
-import { NexusTypes, withNexusSymbol } from "./_types";
+import { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
+import { AllNexusInputTypeDefs } from './wrapping'
+import { NexusTypes, withNexusSymbol } from './_types'
 
 export type ArgsRecord = Record<
   string,
   NexusArgDef<AllInputTypes> | AllInputTypes | AllNexusInputTypeDefs<string>
->;
+>
 
 export interface CommonArgConfig {
   /**
    * Whether the field is required, `required: true` = `nullable: false`
    */
-  required?: boolean;
+  required?: boolean
   /**
    * Whether the field is nullable, `nullable: true` = `required: false`
    */
-  nullable?: boolean;
+  nullable?: boolean
   /**
    * Whether the argument is a list or not.
    *
@@ -24,51 +24,44 @@ export interface CommonArgConfig {
    * array = nested list, where true/false decides
    * whether the list member can be nullable
    */
-  list?: null | true | boolean[];
+  list?: null | true | boolean[]
   /**
    * The description to annotate the GraphQL SDL
    */
-  description?: string | null;
+  description?: string | null
 }
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
   /**
    * Configure the default for the object
    */
-  default?: T;
+  default?: T
 }
 
-export type NexusArgConfigType<T extends AllInputTypes> =
-  | T
-  | AllNexusInputTypeDefs<T>;
+export type NexusArgConfigType<T extends AllInputTypes> = T | AllNexusInputTypeDefs<T>
 
-export interface NexusAsArgConfig<T extends AllInputTypes>
-  extends CommonArgConfig {
+export interface NexusAsArgConfig<T extends AllInputTypes> extends CommonArgConfig {
   /**
    * Configure the default for the object
    */
-  default?: GetGen2<"allTypes", T>; // TODO: Make this type-safe somehow
+  default?: GetGen2<'allTypes', T> // TODO: Make this type-safe somehow
 }
 
-export interface NexusArgConfig<T extends AllInputTypes>
-  extends NexusAsArgConfig<T> {
+export interface NexusArgConfig<T extends AllInputTypes> extends NexusAsArgConfig<T> {
   /**
    * The type of the argument, either the string name of the type,
    * or the concrete Nexus type definition
    */
-  type: NexusArgConfigType<T>;
+  type: NexusArgConfigType<T>
 }
 
 export class NexusArgDef<TypeName extends AllInputTypes> {
-  constructor(
-    readonly name: string,
-    protected config: NexusArgConfig<TypeName>
-  ) {}
+  constructor(readonly name: string, protected config: NexusArgConfig<TypeName>) {}
   get value() {
-    return this.config;
+    return this.config
   }
 }
-withNexusSymbol(NexusArgDef, NexusTypes.Arg);
+withNexusSymbol(NexusArgDef, NexusTypes.Arg)
 
 /**
  * Defines an argument that can be used in any object or interface type
@@ -79,31 +72,27 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg);
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg<T extends AllInputTypes>(
-  options: { type: NexusArgConfigType<T> } & NexusArgConfig<T>
-) {
+export function arg<T extends AllInputTypes>(options: { type: NexusArgConfigType<T> } & NexusArgConfig<T>) {
   if (!options.type) {
-    throw new Error('You must provide a "type" for the arg()');
+    throw new Error('You must provide a "type" for the arg()')
   }
   return new NexusArgDef(
-    typeof options.type === "string"
-      ? options.type
-      : (options.type as any).name,
+    typeof options.type === 'string' ? options.type : (options.type as any).name,
     options
-  );
+  )
 }
 export function stringArg(options?: ScalarArgConfig<string>) {
-  return arg({ type: "String", ...options });
+  return arg({ type: 'String', ...options })
 }
 export function intArg(options?: ScalarArgConfig<number>) {
-  return arg({ type: "Int", ...options });
+  return arg({ type: 'Int', ...options })
 }
 export function floatArg(options?: ScalarArgConfig<number>) {
-  return arg({ type: "Float", ...options });
+  return arg({ type: 'Float', ...options })
 }
 export function idArg(options?: ScalarArgConfig<string>) {
-  return arg({ type: "ID", ...options });
+  return arg({ type: 'ID', ...options })
 }
 export function booleanArg(options?: ScalarArgConfig<boolean>) {
-  return arg({ type: "Boolean", ...options });
+  return arg({ type: 'Boolean', ...options })
 }
