@@ -1,44 +1,44 @@
-import { makeSchema, subscriptionField } from "../src/core";
+import { makeSchema, subscriptionField } from '../src/core'
 
-describe("subscriptionField", () => {
+describe('subscriptionField', () => {
   // TODO: Actually validate real subscription usage
 
-  it("defines a field on the mutation type as shorthand", () => {
+  it('defines a field on the mutation type as shorthand', () => {
     makeSchema({
       types: [
-        subscriptionField("someField", {
-          type: "String",
+        subscriptionField('someField', {
+          type: 'String',
           async subscribe() {
-            let val = 0;
+            let val = 0
             return {
               next() {
-                return `Num:${val++}`;
+                return `Num:${val++}`
               },
-            };
+            }
           },
-          resolve: () => "Hello World",
+          resolve: () => 'Hello World',
         }),
       ],
       outputs: false,
-    });
-  });
-  it("can be defined as a thunk", () => {
+    })
+  })
+  it('can be defined as a thunk', () => {
     makeSchema({
       types: [
-        subscriptionField("someField", () => ({
-          type: "String",
+        subscriptionField('someField', () => ({
+          type: 'String',
           async subscribe() {
-            let val = 0;
+            let val = 0
             return {
               next() {
-                return `Num:${val++}`;
+                return `Num:${val++}`
               },
-            };
+            }
           },
-          resolve: () => "Hello World",
+          resolve: () => 'Hello World',
         })),
       ],
       outputs: false,
-    });
-  });
-});
+    })
+  })
+})

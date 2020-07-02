@@ -70,4 +70,4 @@ type Mutation {
   createPost(input: CreatePostInput!): Post!
   registerClick(uuid: UUID): Query!
 }
-`;
+`

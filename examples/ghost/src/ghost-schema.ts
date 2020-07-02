@@ -1,30 +1,30 @@
-import { makeSchema, fieldAuthorizePlugin } from "@nexus/schema";
-import path from "path";
-import * as allTypes from "./schema";
+import { fieldAuthorizePlugin, makeSchema } from '@nexus/schema'
+import path from 'path'
+import * as allTypes from './schema'
 
 export const schema = makeSchema({
   types: allTypes,
   outputs: {
-    schema: path.join(__dirname, "ghost-schema.graphql"),
-    typegen: path.join(__dirname, "generated", "ghost-nexus.ts"),
+    schema: path.join(__dirname, 'ghost-schema.graphql'),
+    typegen: path.join(__dirname, 'generated', 'ghost-nexus.ts'),
   },
   plugins: [fieldAuthorizePlugin()],
   typegenAutoConfig: {
-    contextType: "ctx.Context",
+    contextType: 'ctx.Context',
     sources: [
       {
-        alias: "ctx",
-        source: path.join(__dirname, "data-sources", "Context.ts"),
+        alias: 'ctx',
+        source: path.join(__dirname, 'data-sources', 'Context.ts'),
       },
       {
-        alias: "db",
-        source: path.join(__dirname, "generated", "ghost-db-types.ts"),
+        alias: 'db',
+        source: path.join(__dirname, 'generated', 'ghost-db-types.ts'),
         typeMatch: (type) => new RegExp(`(?:interface)\\s+(${type.name}s)\\W`),
       },
     ],
     backingTypeMap: {
-      Date: "Date",
+      Date: 'Date',
     },
   },
-  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
-});
+  prettierConfig: require.resolve('../../../package.json'),
+})

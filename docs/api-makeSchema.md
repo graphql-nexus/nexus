@@ -17,12 +17,12 @@ The `types` property is required, and should contain all of the possible Nexus/G
 - `[typeA, typeB, typeC, typeD]`
 
 ```ts
-import { makeSchema } from "@nexus/schema";
-import * as types from "./allNexusTypes";
+import { makeSchema } from '@nexus/schema'
+import * as types from './allNexusTypes'
 
 export const schema = makeSchema({
   types,
-});
+})
 ```
 
 ## plugins
@@ -30,12 +30,8 @@ export const schema = makeSchema({
 The `plugins` property is an array for adding "Plugins", or ways of extending/changing the runtime behavior of Nexus and GraphQL. Unlike the `types` property, this must be an array, and the order of the plugins matters because this influences the order of any resolver "middleware" the plugin may optionally provide.
 
 ```ts
-import {
-  makeSchema,
-  nullabilityGuard,
-  fieldAuthorizePlugin,
-} from "@nexus/schema";
-import * as types from "./allNexusTypes";
+import { makeSchema, nullabilityGuard, fieldAuthorizePlugin } from '@nexus/schema'
+import * as types from './allNexusTypes'
 
 export const schema = makeSchema({
   types,
@@ -47,7 +43,7 @@ export const schema = makeSchema({
       /* ... */
     }),
   ],
-});
+})
 ```
 
 ## shouldGenerateArtifacts, outputs, typegenAutoConfig
@@ -63,41 +59,38 @@ type definition file. An example of the `sources` is provided below:
 ```ts
 makeSchema({
   types,
-  shouldGenerateArtifacts: process.env.NODE_ENV === "development",
+  shouldGenerateArtifacts: process.env.NODE_ENV === 'development',
   outputs: {
     // I tend to use `.gen` to denote "auto-generated" files, but this is not a requirement.
-    schema: path.join(__dirname, "generated/schema.gen.graphql"),
-    typegen: path.join(__dirname, "generated/nexusTypes.gen.ts"),
+    schema: path.join(__dirname, 'generated/schema.gen.graphql'),
+    typegen: path.join(__dirname, 'generated/nexusTypes.gen.ts'),
   },
   typegenAutoConfig: {
-    headers: [
-      'import { ConnectionFieldOpts } from "@packages/api-graphql/src/extensions/connectionType"',
-    ],
+    headers: ['import { ConnectionFieldOpts } from "@packages/api-graphql/src/extensions/connectionType"'],
     sources: [
       // Automatically finds any interface/type/class named similarly to the and infers it
       // the "source" type of that resolver.
       {
-        source: "@packages/types/src/db.ts",
-        alias: "dbt",
-        typeMatch: (name) =>
-          new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, "g"),
+        source: '@packages/types/src/db.ts',
+        alias: 'dbt',
+        typeMatch: (name) => new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, 'g'),
       },
       // We also need to import this source in order to provide it as the `contextType` below.
       {
-        source: "@packages/data-context/src/DataContext.ts",
-        alias: "ctx",
+        source: '@packages/data-context/src/DataContext.ts',
+        alias: 'ctx',
       },
     ],
     // Typing from the source
-    contextType: "ctx.DataContext",
+    contextType: 'ctx.DataContext',
     backingTypeMap: {
-      Date: "Date",
-      DateTime: "Date",
-      UUID: "string",
+      Date: 'Date',
+      DateTime: 'Date',
+      UUID: 'string',
     },
     debug: false,
   },
-});
+})
 ```
 
 The [Ghost Example](https://github.com/prisma-labs/nexus/blob/develop/examples/ghost/src/ghost-schema.ts) is the best place to look for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
@@ -109,8 +102,8 @@ If you are not checking in your artifacts and wish to run them, this will allow 
 ```ts
 makeSchema({
   // ... options like above
-  shouldExitAfterGenerateArtifacts: process.argv.includes("--nexus-exit"),
-});
+  shouldExitAfterGenerateArtifacts: process.argv.includes('--nexus-exit'),
+})
 ```
 
 ```sh
@@ -124,8 +117,8 @@ Either an absolute path to a `.prettierrc` file, or an object with a valid "pret
 ```ts
 makeSchema({
   // ... options like above
-  prettierConfig: path.join(__dirname, "../../../.prettierrc"),
-});
+  prettierConfig: require.resolve('../../../package.json'),
+})
 ```
 
 ## nonNullDefaults
@@ -149,9 +142,9 @@ Optional, allows you to override the `printSchema` when outputting the generated
 makeSchema({
   // ...
   customPrintSchemaFn: (schema) => {
-    return printSchema(schema, { commentDescriptions: true });
+    return printSchema(schema, { commentDescriptions: true })
   },
-});
+})
 ```
 
 #### Footnotes: Annotated config option for typegenAutoConfig:
@@ -161,7 +154,7 @@ export interface TypegenAutoConfigOptions {
   /**
    * Any headers to prefix on the generated type file
    */
-  headers?: string[];
+  headers?: string[]
   /**
    * Array of files to match for a type
    *
@@ -170,12 +163,12 @@ export interface TypegenAutoConfigOptions {
    *     { source: path.join(__dirname, '../backingTypes'), alias: 'b' },
    *   ]
    */
-  sources: TypegenConfigSourceModule[];
+  sources: TypegenConfigSourceModule[]
   /**
    * Typing for the context, referencing a type defined in the aliased module
    * provided in sources e.g. 'alias.Context'
    */
-  contextType?: string;
+  contextType?: string
   /**
    * Types that should not be matched for a backing type,
    *
@@ -183,18 +176,18 @@ export interface TypegenAutoConfigOptions {
    *
    *   skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
    */
-  skipTypes?: (string | RegExp)[];
+  skipTypes?: (string | RegExp)[]
   /**
    * If debug is set to true, this will log out info about all types
    * found, skipped, etc. for the type generation files.
    */
-  debug?: boolean;
+  debug?: boolean
   /**
    * If provided this will be used for the backing types rather than the auto-resolve
    * mechanism above. Useful as an override for one-off cases, or for scalar
    * backing types.
    */
-  backingTypeMap?: Record<string, string>;
+  backingTypeMap?: Record<string, string>
 }
 
 export interface TypegenConfigSourceModule {
@@ -204,13 +197,13 @@ export interface TypegenConfigSourceModule {
    * so if this lives in node_modules, you can just provide the module name
    * otherwise you should provide the absolute path to the file.
    */
-  source: string;
+  source: string
   /**
    * When we import the module, we use 'import * as ____' to prevent
    * conflicts. This alias should be a name that doesn't conflict with any other
    * types, usually a short lowercase name.
    */
-  alias: string;
+  alias: string
   /**
    * Provides a custom approach to matching for the type
    *
@@ -221,20 +214,17 @@ export interface TypegenConfigSourceModule {
    *   ]
    *
    */
-  typeMatch?: (
-    type: GraphQLNamedType,
-    defaultRegex: RegExp
-  ) => RegExp | RegExp[];
+  typeMatch?: (type: GraphQLNamedType, defaultRegex: RegExp) => RegExp | RegExp[]
   /**
    * A list of typesNames or regular expressions matching type names
    * that should be resolved by this import. Provide an empty array if you
    * wish to use the file for context and ensure no other types are matched.
    */
-  onlyTypes?: (string | RegExp)[];
+  onlyTypes?: (string | RegExp)[]
   /**
    * By default the import is configured 'import * as alias from', setting glob to false
    * will change this to 'import alias from'
    */
-  glob?: false;
+  glob?: false
 }
 ```

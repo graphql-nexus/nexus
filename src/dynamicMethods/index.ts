@@ -1,2 +1,2 @@
-export * from "./collection";
-export * from "./relayConnection";
+export * from './collection'
+export * from './relayConnection'

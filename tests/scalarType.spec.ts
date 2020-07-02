@@ -1,35 +1,29 @@
-import { graphql } from "graphql";
-import { GraphQLDate, GraphQLDateTime } from "graphql-iso-date";
-import {
-  asNexusMethod,
-  inputObjectType,
-  makeSchema,
-  objectType,
-  queryField,
-} from "../src/core";
+import { graphql } from 'graphql'
+import { GraphQLDate, GraphQLDateTime } from 'graphql-iso-date'
+import { asNexusMethod, inputObjectType, makeSchema, objectType, queryField } from '../src/core'
 
-describe("scalarType", () => {
-  it("asNexusMethod: should wrap a scalar and make it available on the builder", async () => {
+describe('scalarType', () => {
+  it('asNexusMethod: should wrap a scalar and make it available on the builder', async () => {
     const schema = makeSchema({
       types: [
-        asNexusMethod(GraphQLDateTime, "dateTime"),
-        asNexusMethod(GraphQLDate, "date"),
+        asNexusMethod(GraphQLDateTime, 'dateTime'),
+        asNexusMethod(GraphQLDate, 'date'),
         objectType({
-          name: "User",
+          name: 'User',
           definition(t) {
-            t.id("id");
+            t.id('id')
             // @ts-ignore
-            t.dateTime("dateTimeField");
+            t.dateTime('dateTimeField')
           },
         }),
-        queryField("user", {
-          type: "User",
+        queryField('user', {
+          type: 'User',
           args: {
             input: inputObjectType({
-              name: "SomeInput",
+              name: 'SomeInput',
               definition(t) {
                 // @ts-ignore
-                t.date("date", { required: true });
+                t.date('date', { required: true })
               },
             }).asArg({ required: true }),
           },
@@ -41,7 +35,7 @@ describe("scalarType", () => {
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
-    });
+    })
     expect(
       await graphql(
         schema,
@@ -54,6 +48,6 @@ describe("scalarType", () => {
           }
         `
       )
-    ).toMatchSnapshot();
-  });
-});
+    ).toMatchSnapshot()
+  })
+})

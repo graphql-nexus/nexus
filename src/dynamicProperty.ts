@@ -1,36 +1,32 @@
-import { SchemaBuilder } from "./builder";
-import { OutputDefinitionBlock } from "./definitions/definitionBlocks";
-import { NexusTypes, withNexusSymbol } from "./definitions/_types";
-import { BaseExtensionConfig } from "./dynamicMethod";
+import { SchemaBuilder } from './builder'
+import { OutputDefinitionBlock } from './definitions/definitionBlocks'
+import { NexusTypes, withNexusSymbol } from './definitions/_types'
+import { BaseExtensionConfig } from './dynamicMethod'
 
 export type OutputPropertyFactoryConfig<T> = {
-  stage: "walk" | "build";
-  builder: SchemaBuilder;
-  typeDef: OutputDefinitionBlock<any>;
+  stage: 'walk' | 'build'
+  builder: SchemaBuilder
+  typeDef: OutputDefinitionBlock<any>
   /**
    * The name of the type this field is being declared on
    */
-  typeName: string;
-};
+  typeName: string
+}
 
-export interface DynamicOutputPropertyConfig<T extends string>
-  extends BaseExtensionConfig<T> {
+export interface DynamicOutputPropertyConfig<T extends string> extends BaseExtensionConfig<T> {
   /**
    * Invoked when the property is accessed (as a getter)
    */
-  factory(config: OutputPropertyFactoryConfig<T>): any;
+  factory(config: OutputPropertyFactoryConfig<T>): any
 }
 
 export class DynamicOutputPropertyDef<Name extends string> {
-  constructor(
-    readonly name: Name,
-    protected config: DynamicOutputPropertyConfig<Name>
-  ) {}
+  constructor(readonly name: Name, protected config: DynamicOutputPropertyConfig<Name>) {}
   get value() {
-    return this.config;
+    return this.config
   }
 }
-withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicOutputProperty);
+withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicOutputProperty)
 
 /**
  * Defines a new property on the object definition block
@@ -39,8 +35,6 @@ withNexusSymbol(DynamicOutputPropertyDef, NexusTypes.DynamicOutputProperty);
  *
  * t.model.posts()
  */
-export function dynamicOutputProperty<T extends string>(
-  config: DynamicOutputPropertyConfig<T>
-) {
-  return new DynamicOutputPropertyDef(config.name, config);
+export function dynamicOutputProperty<T extends string>(config: DynamicOutputPropertyConfig<T>) {
+  return new DynamicOutputPropertyDef(config.name, config)
 }

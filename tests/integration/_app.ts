@@ -9,90 +9,90 @@ import {
   objectType,
   queryType,
   stringArg,
-} from "../../src";
-import "./_app.typegen";
+} from '../../src'
+import './_app.typegen'
 
 export const query = queryType({
   definition(t) {
-    t.string("foo", () => "bar");
+    t.string('foo', () => 'bar')
   },
-});
+})
 
 const mockData = {
-  posts: [{ title: "", body: "" }],
-  user: { firstName: "", lastName: "" },
-};
+  posts: [{ title: '', body: '' }],
+  user: { firstName: '', lastName: '' },
+}
 
 export const dom = dynamicOutputMethod({
-  name: "title",
-  typeDefinition: "(options: { escape: boolean }): void",
+  name: 'title',
+  typeDefinition: '(options: { escape: boolean }): void',
   factory: ({ typeDef: t }) => {
-    t.string("title");
+    t.string('title')
   },
-});
+})
 
 export const dim = dynamicInputMethod({
-  name: "title",
+  name: 'title',
   factory: ({ typeDef: t }) => {
-    t.string("title", { nullable: true });
+    t.string('title', { nullable: true })
   },
-});
+})
 
 export const dop = dynamicOutputProperty({
-  name: "body",
+  name: 'body',
   factory: ({ typeDef: t }) => {
-    t.string("body");
+    t.string('body')
   },
-});
+})
 
 export const PostSearchInput = inputObjectType({
-  name: "PostSearchInput",
+  name: 'PostSearchInput',
   definition(t) {
-    t.title();
-    t.string("body", { nullable: true });
+    t.title()
+    t.string('body', { nullable: true })
   },
-});
+})
 
 export const Post = objectType({
-  name: "Post",
+  name: 'Post',
   definition(t) {
-    t.title({ escape: true });
+    t.title({ escape: true })
     // tslint:disable-next-line: no-unused-expression
-    t.body;
+    t.body
   },
-});
+})
 
 export const User = objectType({
-  name: "User",
+  name: 'User',
   definition(t) {
-    t.string("firstName");
-    t.string("lastName");
+    t.string('firstName')
+    t.string('lastName')
   },
   rootTyping: `{ firstName: string, lastName: string }`,
-});
+})
 
 export const Query = extendType({
-  type: "Query",
+  type: 'Query',
   definition(t) {
-    t.list.field("searchPosts", {
-      type: "Post",
+    t.list.field('searchPosts', {
+      type: 'Post',
       args: { input: PostSearchInput },
       resolve: () => mockData.posts,
-    });
-    t.field("user", {
-      type: "User",
+    })
+    t.field('user', {
+      type: 'User',
       args: { id: idArg() },
       resolve: () => mockData.user,
-    });
+    })
   },
-});
+})
 
 export const Mutation = mutationType({
   definition(t) {
-    t.field("createUser", {
-      type: "User",
+    t.field('createUser', {
+      type: 'User',
       args: { firstName: stringArg(), lastName: stringArg() },
-      resolve: (_root) => ({ firstName: "", lastName: "" }),
-    });
+      resolve: (_root) => ({ firstName: '', lastName: '' }),
+    })
   },
-});
+})

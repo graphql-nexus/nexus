@@ -1,44 +1,39 @@
-import { graphql } from "graphql";
-import {
-  inputObjectType,
-  makeSchema,
-  objectType,
-  queryField,
-} from "../src/core";
+import { graphql } from 'graphql'
+import { inputObjectType, makeSchema, objectType, queryField } from '../src/core'
 
-describe("inputObject", () => {
-  it("builds creates an inputObject type", async () => {
+describe('inputObject', () => {
+  it('builds creates an inputObject type', async () => {
     const schema = makeSchema({
       types: [
         inputObjectType({
-          name: "InputObj",
+          name: 'InputObj',
           definition(t) {
-            t.id("idInput");
-            t.boolean("boolInput");
-            t.float("floatInput");
-            t.int("intInput");
-            t.field("inlineField", {
+            t.id('idInput')
+            t.boolean('boolInput')
+            t.float('floatInput')
+            t.int('intInput')
+            t.field('inlineField', {
               type: inputObjectType({
-                name: "InlineFiedExample",
+                name: 'InlineFiedExample',
                 definition(t) {
-                  t.boolean("ok");
+                  t.boolean('ok')
                 },
               }),
-            });
+            })
           },
         }),
         objectType({
-          name: "User",
+          name: 'User',
           definition(t) {
-            t.id("id", {
+            t.id('id', {
               args: {
-                input: "InputObj",
+                input: 'InputObj',
               },
-            });
+            })
           },
         }),
-        queryField("user", {
-          type: "User",
+        queryField('user', {
+          type: 'User',
           resolve: () => ({
             id: `User:1`,
           }),
@@ -46,7 +41,7 @@ describe("inputObject", () => {
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
-    });
+    })
     expect(
       await graphql(
         schema,
@@ -58,71 +53,71 @@ describe("inputObject", () => {
           }
         `
       )
-    ).toMatchSnapshot();
-  });
+    ).toMatchSnapshot()
+  })
 
-  it("throws when chaining .list twice", () => {
+  it('throws when chaining .list twice', () => {
     expect(() => {
       makeSchema({
         types: [
           inputObjectType({
-            name: "throwingListInput",
+            name: 'throwingListInput',
             definition(t) {
-              t.list.list.id("id");
+              t.list.list.id('id')
             },
           }),
         ],
         outputs: false,
         shouldGenerateArtifacts: false,
-      });
-    }).toThrowErrorMatchingSnapshot();
-  });
+      })
+    }).toThrowErrorMatchingSnapshot()
+  })
 
-  it("warns when specifying .list and list: true", () => {
-    const spy = jest.spyOn(console, "warn").mockImplementation();
+  it('warns when specifying .list and list: true', () => {
+    const spy = jest.spyOn(console, 'warn').mockImplementation()
     makeSchema({
       types: [
         inputObjectType({
-          name: "throwingList",
+          name: 'throwingList',
           definition(t) {
-            t.list.field("someField", {
+            t.list.field('someField', {
               list: true,
-              type: "Boolean",
-            });
+              type: 'Boolean',
+            })
           },
         }),
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
-    });
-    expect(spy.mock.calls[0]).toMatchSnapshot();
-    expect(spy).toBeCalledTimes(1);
-    spy.mockRestore();
-  });
+    })
+    expect(spy.mock.calls[0]).toMatchSnapshot()
+    expect(spy).toBeCalledTimes(1)
+    spy.mockRestore()
+  })
 
-  it("has asArg for using one-off inputObjects inline", async () => {
+  it('has asArg for using one-off inputObjects inline', async () => {
     const schema = makeSchema({
       types: [
         objectType({
-          name: "User",
+          name: 'User',
           definition(t) {
-            t.id("id", {
+            t.id('id', {
               args: {
                 input: inputObjectType({
-                  name: "InputObj",
+                  name: 'InputObj',
                   definition(t) {
-                    t.id("idInput");
-                    t.boolean("boolInput");
-                    t.float("floatInput");
-                    t.int("intInput");
+                    t.id('idInput')
+                    t.boolean('boolInput')
+                    t.float('floatInput')
+                    t.int('intInput')
                   },
                 }).asArg({ default: { idInput: 1 } }),
               },
-            });
+            })
           },
         }),
-        queryField("user", {
-          type: "User",
+        queryField('user', {
+          type: 'User',
           resolve: () => ({
             id: `User:1`,
           }),
@@ -130,7 +125,7 @@ describe("inputObject", () => {
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
-    });
+    })
     expect(
       await graphql(
         schema,
@@ -142,6 +137,6 @@ describe("inputObject", () => {
           }
         `
       )
-    ).toMatchSnapshot();
-  });
-});
+    ).toMatchSnapshot()
+  })
+})
