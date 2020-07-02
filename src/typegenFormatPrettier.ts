@@ -7,6 +7,7 @@ export type TypegenFormatFn = (
 ) => string | Promise<string>;
 
 // todo use Prettier.Options type instead of just `object`
+// but will this force us to make prettier a dep then since that type would be user-visible?
 export function typegenFormatPrettier(
   prettierConfig: string | object
 ): TypegenFormatFn {
@@ -41,7 +42,7 @@ export function typegenFormatPrettier(
       }
       prettierConfigResolved = (await prettier.resolveConfig("ignore_this", {
         config: prettierConfig,
-      }))!; // config file explicitly passed
+      }))!; // non-null assert b/c config file is explicitly passed
     } else {
       prettierConfigResolved = prettierConfig;
     }

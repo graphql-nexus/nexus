@@ -62,7 +62,7 @@ export function suggestionList(
     }
   }
 
-  return Object.keys(optionsByDistance).sort(function(a, b) {
+  return Object.keys(optionsByDistance).sort(function (a, b) {
     return optionsByDistance[a] - optionsByDistance[b];
   });
 }

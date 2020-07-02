@@ -1651,10 +1651,12 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
       typegenPromise
         .then(() => {
           console.log(`Generated Artifacts:
-          TypeScript Types  ==> ${typegenConfig.outputs.typegen ||
-            "(not enabled)"}
-          GraphQL Schema    ==> ${typegenConfig.outputs.schema ||
-            "(not enabled)"}`);
+          TypeScript Types  ==> ${
+            typegenConfig.outputs.typegen || "(not enabled)"
+          }
+          GraphQL Schema    ==> ${
+            typegenConfig.outputs.schema || "(not enabled)"
+          }`);
           process.exit(0);
         })
         .catch((e) => {

@@ -930,8 +930,9 @@ const getTypeNames = (
   if (isConnectionFieldExtended(fieldConfig)) {
     connectionName = `${parentTypeName}${upperFirst(fieldName)}_Connection`;
   } else {
-    connectionName = `${pluginConfig.typePrefix ||
-      ""}${targetTypeName}Connection`;
+    connectionName = `${
+      pluginConfig.typePrefix || ""
+    }${targetTypeName}Connection`;
   }
 
   // If we have modified the "edge" at all, then we need
@@ -964,10 +965,7 @@ const isEdgeFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
 };
 
 const upperFirst = (fieldName: string) => {
-  return fieldName
-    .slice(0, 1)
-    .toUpperCase()
-    .concat(fieldName.slice(1));
+  return fieldName.slice(0, 1).toUpperCase().concat(fieldName.slice(1));
 };
 
 // Add some sanity checking beyond the normal type checks.
