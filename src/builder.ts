@@ -225,8 +225,16 @@ export interface BuilderConfig {
     outputPath: string
   ) => TypegenInfo | PromiseLike<TypegenInfo>;
   /**
-   * Either an absolute path to a .prettierrc file, or an object
-   * with relevant Prettier rules to be used on the generated output
+   * Adjust the Prettier options used while running prettier over
+   * the generated output.
+   *
+   * Can be an absolute path to a Prettier config file like
+   * .prettierrc or package.json with "prettier" field, or an object
+   * of Prettier options.
+   *
+   * If provided, you must have prettier available as an importable dep
+   * in your project.
+   *
    */
   prettierConfig?: string | object;
   /**
@@ -1651,10 +1659,12 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
       typegenPromise
         .then(() => {
           console.log(`Generated Artifacts:
-          TypeScript Types  ==> ${typegenConfig.outputs.typegen ||
-            "(not enabled)"}
-          GraphQL Schema    ==> ${typegenConfig.outputs.schema ||
-            "(not enabled)"}`);
+          TypeScript Types  ==> ${
+            typegenConfig.outputs.typegen || "(not enabled)"
+          }
+          GraphQL Schema    ==> ${
+            typegenConfig.outputs.schema || "(not enabled)"
+          }`);
           process.exit(0);
         })
         .catch((e) => {

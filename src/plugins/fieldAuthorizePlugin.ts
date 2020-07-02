@@ -116,7 +116,7 @@ export const fieldAuthorizePlugin = (
         }
       }
       // The authorize wrapping resolver.
-      return function(root, args, ctx, info, next) {
+      return function (root, args, ctx, info, next) {
         let toComplete;
         try {
           toComplete = authorize(root, args, ctx, info);

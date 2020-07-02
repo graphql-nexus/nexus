@@ -228,8 +228,9 @@ export class TypegenPrinter {
               val
             )};`;
           }
-          return `    ${key}${val.value.typeDefinition ||
-            `(...args: any): void`}`;
+          return `    ${key}${
+            val.value.typeDefinition || `(...args: any): void`
+          }`;
         })
       )
       .concat([`  }`, `}`])
@@ -255,8 +256,9 @@ export class TypegenPrinter {
               val
             )};`;
           }
-          return `    ${key}${val.value.typeDefinition ||
-            `(...args: any): void`}`;
+          return `    ${key}${
+            val.value.typeDefinition || `(...args: any): void`
+          }`;
         })
       )
       .concat([`  }`, `}`])

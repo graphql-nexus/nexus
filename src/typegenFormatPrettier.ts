@@ -1,10 +1,13 @@
 import path from "path";
+import type * as Prettier from "prettier";
 
 export type TypegenFormatFn = (
   content: string,
   type: "types" | "schema"
 ) => string | Promise<string>;
 
+// todo use Prettier.Options type instead of just `object`
+// but will this force us to make prettier a dep then since that type would be user-visible?
 export function typegenFormatPrettier(
   prettierConfig: string | object
 ): TypegenFormatFn {
@@ -24,6 +27,9 @@ export function typegenFormatPrettier(
       );
       return content;
     }
+
+    let prettierConfigResolved: Prettier.Options;
+
     if (typeof prettierConfig === "string") {
       /* istanbul ignore if */
       if (!path.isAbsolute(prettierConfig)) {
@@ -34,13 +40,15 @@ export function typegenFormatPrettier(
         );
         return content;
       }
-      const fs = require("fs") as typeof import("fs");
-      const util = require("util") as typeof import("util");
-      const readFile = util.promisify(fs.readFile);
-      prettierConfig = JSON.parse(await readFile(prettierConfig, "utf8"));
+      prettierConfigResolved = (await prettier.resolveConfig("ignore_this", {
+        config: prettierConfig,
+      }))!; // non-null assert b/c config file is explicitly passed
+    } else {
+      prettierConfigResolved = prettierConfig;
     }
+
     return prettier.format(content, {
-      ...(prettierConfig as object),
+      ...prettierConfigResolved,
       parser: type === "types" ? "typescript" : "graphql",
     });
   };
