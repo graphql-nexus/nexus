@@ -148,7 +148,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.getUserWithGuard).toEqual({ id: "User:N/A" });
+    expect(data!.getUserWithGuard).toEqual({ id: "User:N/A" });
     expect(onGuardedMock).toBeCalledTimes(1);
   });
 
@@ -162,7 +162,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.intList).toEqual([1, 2, -1]);
+    expect(data!.intList).toEqual([1, 2, -1]);
     expect(onGuardedMock).toBeCalledTimes(1);
   });
 
@@ -178,7 +178,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.userList).toEqual([
+    expect(data!.userList).toEqual([
       { id: "User:N/A" },
       { id: "User:N/A" },
       { id: "User:N/A" },
@@ -199,7 +199,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.objType).toEqual({ id: "SomeObjectType:N/A" });
+    expect(data!.objType).toEqual({ id: "SomeObjectType:N/A" });
     expect(onGuardedMock).toBeCalledTimes(1);
   });
 
@@ -222,7 +222,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.interfaceType).toEqual({
+    expect(data!.interfaceType).toEqual({
       __typename: "User",
       id: "User:N/A",
       login: "",
@@ -267,7 +267,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.unionType).toEqual({
+    expect(data!.unionType).toEqual({
       __typename: "User",
       id: "User:N/A",
       login: "",
@@ -289,7 +289,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.enumType).toEqual("A");
+    expect(data!.enumType).toEqual("A");
     expect(onGuardedMock).toBeCalledTimes(1);
   });
 
@@ -313,7 +313,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toEqual([]);
-    expect(data.getUserWithGuard).toEqual({ id: "User:N/A" });
+    expect(data!.getUserWithGuard).toEqual({ id: "User:N/A" });
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(warnSpy).toHaveBeenCalledWith(
       "Nullability guard called for User.id"
@@ -356,7 +356,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors2).toEqual([]);
-    expect(data2.getUserWithGuard).toEqual({ id: "User:N/A" });
+    expect(data2!.getUserWithGuard).toEqual({ id: "User:N/A" });
   });
 
   it("logs an error if scalars are missing", () => {
@@ -435,7 +435,7 @@ describe("nullabilityGuardPlugin", () => {
       `
     );
     expect(errors).toHaveLength(0);
-    expect(data.nullableList).toEqual(null);
+    expect(data!.nullableList).toEqual(null);
     expect(onGuardedMock).toHaveBeenCalledTimes(0);
   });
 });
