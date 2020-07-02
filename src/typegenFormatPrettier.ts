@@ -48,7 +48,7 @@ export function typegenFormatPrettier(
     }
 
     return prettier.format(content, {
-      ...prettierConfigResolved, //(prettierConfig as object),
+      ...prettierConfigResolved,
       parser: type === "types" ? "typescript" : "graphql",
     });
   };
