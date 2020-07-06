@@ -136,8 +136,6 @@ type NexusShapedOutput = {
   name: string
   definition: (t: ObjectDefinitionBlock<string>) => void
 }
-// | NexusObjectTypeConfig<string>
-// | NexusSubscriptionTypeConfig
 
 type NexusShapedInput = {
   name: string
@@ -565,7 +563,6 @@ export class SchemaBuilder {
       this.typesToWalk.push({ type: 'object', value: typeDef.value })
     }
     if (isNexusSubscriptionTypeDef(typeDef)) {
-      // this.typesToWalk.push({ type: 'object', value: typeDef.value as any })
       this.typesToWalk.push({ type: 'subscription', value: typeDef.value })
     }
     if (isNexusInterfaceTypeDef(typeDef)) {
@@ -1238,6 +1235,8 @@ export class SchemaBuilder {
       if (isNexusObjectTypeDef(pendingType)) {
         return this.buildObjectType(pendingType.value)
       } else if (isNexusSubscriptionTypeDef(pendingType)) {
+        // we can build nexus subscrtipion type with object type implementation
+        // todo make type safe
         return this.buildObjectType(pendingType.value as any)
       } else if (isNexusInterfaceTypeDef(pendingType)) {
         return this.buildInterfaceType(pendingType.value)
