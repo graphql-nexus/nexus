@@ -465,7 +465,6 @@ export class SchemaBuilder {
    * exporting them.
    */
   addType = (typeDef: TypeDef | DynamicBlockDef) => {
-    // console.log('addType', typeDef)
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef
       return
@@ -703,9 +702,7 @@ export class SchemaBuilder {
     if (!this.pendingTypeMap.Query) {
       this.pendingTypeMap.Query = null as any
     }
-    // console.log('buildNexusTypes pendingTypeMap', this.pendingTypeMap)
     Object.keys(this.pendingTypeMap).forEach((key) => {
-      // console.log(key)
       if (this.typesToWalk.length > 0) {
         this.walkTypes()
       }
@@ -721,7 +718,6 @@ export class SchemaBuilder {
       this.buildingTypes.clear()
     })
     Object.keys(this.typeExtendMap).forEach((key) => {
-      // console.log('this.typeExtendMap', this.typeExtendMap)
       // If we haven't defined the type, assume it's an object type
       if (this.typeExtendMap[key] !== null) {
         this.buildObjectType({
@@ -812,7 +808,6 @@ export class SchemaBuilder {
         extension.definition(definitionBlock)
       })
     }
-    // console.log('buildObjectType config', config)
     this.typeExtendMap[config.name] = null
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
@@ -1357,7 +1352,6 @@ export class SchemaBuilder {
   }
 
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
-    // console.log('walkOutputType', obj)
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
       addInterfaces: (i) => {
