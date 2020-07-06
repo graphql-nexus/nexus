@@ -25,7 +25,7 @@ const siteConfig = {
       label: "Examples",
     },
     {
-      href: "https://github.com/graphql-nexus/nexus",
+      href: "https://github.com/graphql-nexus/schema",
       label: "GitHub",
     },
     { search: true },
