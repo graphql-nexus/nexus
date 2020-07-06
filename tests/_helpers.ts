@@ -1,3 +1,5 @@
+import * as GQL from 'graphql'
+import { ExecutionResultDataDefault } from 'graphql/execution/execute'
 import { inputObjectType, objectType } from '../src'
 
 /**
@@ -31,4 +33,42 @@ export const restoreEnvBeforeEach = () => {
   beforeEach(() => {
     process.env = { ...envBackup }
   })
+}
+
+/**
+ * Subscription helpers
+ */
+
+export function subscribe(
+  schema: GQL.GraphQLSchema,
+  document: string
+): Promise<AsyncIterableIterator<GQL.ExecutionResult<ExecutionResultDataDefault>>> {
+  const documentAST = GQL.parse(document)
+  return GQL.subscribe({ schema, document: documentAST }) as Promise<
+    AsyncIterableIterator<GQL.ExecutionResult<ExecutionResultDataDefault>>
+  >
+}
+
+export function take<T>(n: number) {
+  return async (asyncIterableIterator: AsyncIterableIterator<T>): Promise<T[]> => {
+    let i = 0
+    const vals = []
+    for await (const x of asyncIterableIterator) {
+      i++
+      vals.push(x)
+      if (i >= n) break
+    }
+    return vals
+  }
+}
+
+export async function* mockStream<T>(interval: number, seed: T, next: (previous: T) => T) {
+  let curr = seed
+  while (true) {
+    curr = next(curr)
+    yield curr
+    await new Promise((res) => {
+      setTimeout(res, interval)
+    })
+  }
 }

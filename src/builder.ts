@@ -63,6 +63,7 @@ import {
   ObjectDefinitionBlock,
 } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
+import { NexusSubscriptionTypeConfig } from './definitions/subscriptionType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
   AllNexusInputTypeDefs,
@@ -81,6 +82,7 @@ import {
   isNexusObjectTypeDef,
   isNexusPlugin,
   isNexusScalarTypeDef,
+  isNexusSubscriptionTypeDef,
   isNexusUnionTypeDef,
 } from './definitions/wrapping'
 import {
@@ -119,6 +121,7 @@ import { AbstractTypeResolver, AllInputTypes, GetGen } from './typegenTypeHelper
 import { resolveTypegenConfig } from './typegenUtils'
 import {
   assertNoMissingTypes,
+  casesHandled,
   consoleWarn,
   eachObj,
   firstDefined,
@@ -133,6 +136,8 @@ type NexusShapedOutput = {
   name: string
   definition: (t: ObjectDefinitionBlock<string>) => void
 }
+// | NexusObjectTypeConfig<string>
+// | NexusSubscriptionTypeConfig
 
 type NexusShapedInput = {
   name: string
@@ -286,6 +291,7 @@ export type TypeToWalk =
   | { type: 'named'; value: GraphQLNamedType }
   | { type: 'input'; value: NexusShapedInput }
   | { type: 'object'; value: NexusShapedOutput }
+  | { type: 'subscription'; value: NexusSubscriptionTypeConfig }
   | { type: 'interface'; value: NexusInterfaceTypeConfig<any> }
 
 export type DynamicInputFields = Record<string, DynamicInputMethodDef<string> | string>
@@ -459,6 +465,7 @@ export class SchemaBuilder {
    * exporting them.
    */
   addType = (typeDef: TypeDef | DynamicBlockDef) => {
+    // console.log('addType', typeDef)
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef
       return
@@ -558,6 +565,10 @@ export class SchemaBuilder {
     if (isNexusObjectTypeDef(typeDef)) {
       this.typesToWalk.push({ type: 'object', value: typeDef.value })
     }
+    if (isNexusSubscriptionTypeDef(typeDef)) {
+      // this.typesToWalk.push({ type: 'object', value: typeDef.value as any })
+      this.typesToWalk.push({ type: 'subscription', value: typeDef.value })
+    }
     if (isNexusInterfaceTypeDef(typeDef)) {
       this.typesToWalk.push({ type: 'interface', value: typeDef.value })
     }
@@ -640,6 +651,11 @@ export class SchemaBuilder {
         case 'object':
           this.walkOutputType(obj.value)
           break
+        case 'subscription':
+          this.walkOutputType(obj.value as any)
+          break
+        default:
+          casesHandled(obj)
       }
     }
   }
@@ -687,7 +703,9 @@ export class SchemaBuilder {
     if (!this.pendingTypeMap.Query) {
       this.pendingTypeMap.Query = null as any
     }
+    // console.log('buildNexusTypes pendingTypeMap', this.pendingTypeMap)
     Object.keys(this.pendingTypeMap).forEach((key) => {
+      // console.log(key)
       if (this.typesToWalk.length > 0) {
         this.walkTypes()
       }
@@ -703,6 +721,7 @@ export class SchemaBuilder {
       this.buildingTypes.clear()
     })
     Object.keys(this.typeExtendMap).forEach((key) => {
+      // console.log('this.typeExtendMap', this.typeExtendMap)
       // If we haven't defined the type, assume it's an object type
       if (this.typeExtendMap[key] !== null) {
         this.buildObjectType({
@@ -793,6 +812,7 @@ export class SchemaBuilder {
         extension.definition(definitionBlock)
       })
     }
+    // console.log('buildObjectType config', config)
     this.typeExtendMap[config.name] = null
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
@@ -1222,6 +1242,8 @@ export class SchemaBuilder {
       this.buildingTypes.add(pendingType.name)
       if (isNexusObjectTypeDef(pendingType)) {
         return this.buildObjectType(pendingType.value)
+      } else if (isNexusSubscriptionTypeDef(pendingType)) {
+        return this.buildObjectType(pendingType.value as any)
       } else if (isNexusInterfaceTypeDef(pendingType)) {
         return this.buildInterfaceType(pendingType.value)
       } else if (isNexusEnumTypeDef(pendingType)) {
@@ -1232,6 +1254,8 @@ export class SchemaBuilder {
         return this.buildInputObjectType(pendingType.value)
       } else if (isNexusUnionTypeDef(pendingType)) {
         return this.buildUnionType(pendingType.value)
+      } else {
+        console.warn('Unknown kind of type def to build. It will be ignored. The type def was: %j', name)
       }
     }
     return this.missingType(name, fromObject)
@@ -1333,6 +1357,7 @@ export class SchemaBuilder {
   }
 
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
+    // console.log('walkOutputType', obj)
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
       addInterfaces: (i) => {
