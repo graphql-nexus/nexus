@@ -74,9 +74,7 @@ export interface SubscribeFieldConfig<TypeName extends string, FieldName extends
 
 export interface SubscriptionDefinitionBuilder extends ObjectDefinitionBuilder<'Subscription'> {}
 
-export class SubscriptionDefinitionBlock<
-  TypeName extends string = 'Subscription'
-> extends ObjectDefinitionBlock<TypeName> {
+export class SubscriptionDefinitionBlock extends ObjectDefinitionBlock<'Subscription'> {
   constructor(protected typeBuilder: SubscriptionDefinitionBuilder, protected isList = false) {
     super(typeBuilder)
   }
@@ -88,27 +86,36 @@ export class SubscriptionDefinitionBlock<
     return new SubscriptionDefinitionBlock(this.typeBuilder, true)
   }
 
-  string<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+  string<FieldName extends string>(
+    fieldName: FieldName,
+    ...opts: ScalarSubSpread<'Subscription', FieldName>
+  ) {
     this.addScalarField(fieldName, 'String', opts)
   }
 
-  int<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+  int<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
     this.addScalarField(fieldName, 'Int', opts)
   }
 
-  boolean<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+  boolean<FieldName extends string>(
+    fieldName: FieldName,
+    ...opts: ScalarSubSpread<'Subscription', FieldName>
+  ) {
     this.addScalarField(fieldName, 'Boolean', opts)
   }
 
-  id<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+  id<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
     this.addScalarField(fieldName, 'ID', opts)
   }
 
-  float<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+  float<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
     this.addScalarField(fieldName, 'Float', opts)
   }
 
-  field<FieldName extends string>(name: FieldName, fieldConfig: SubscribeFieldConfig<TypeName, FieldName>) {
+  field<FieldName extends string>(
+    name: FieldName,
+    fieldConfig: SubscribeFieldConfig<'Subscription', FieldName>
+  ) {
     const field: any = { name, ...fieldConfig }
     this.typeBuilder.addField(this.decorateField(field))
   }
