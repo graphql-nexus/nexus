@@ -158,10 +158,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     // 2. NexusOutputFieldDef is contrained to be be a string
     // 3. so `name` is not compatible
     // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
-    const field: any = {
-      name,
-      ...fieldConfig,
-    }
+    const field: any = { name, ...fieldConfig }
     this.typeBuilder.addField(this.decorateField(field))
   }
 

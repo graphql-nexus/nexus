@@ -119,6 +119,7 @@ import { AbstractTypeResolver, AllInputTypes, GetGen } from './typegenTypeHelper
 import { resolveTypegenConfig } from './typegenUtils'
 import {
   assertNoMissingTypes,
+  casesHandled,
   consoleWarn,
   eachObj,
   firstDefined,
@@ -640,6 +641,8 @@ export class SchemaBuilder {
         case 'object':
           this.walkOutputType(obj.value)
           break
+        default:
+          casesHandled(obj)
       }
     }
   }
@@ -1232,6 +1235,8 @@ export class SchemaBuilder {
         return this.buildInputObjectType(pendingType.value)
       } else if (isNexusUnionTypeDef(pendingType)) {
         return this.buildUnionType(pendingType.value)
+      } else {
+        console.warn('Unknown kind of type def to build. It will be ignored. The type def was: %j', name)
       }
     }
     return this.missingType(name, fromObject)
