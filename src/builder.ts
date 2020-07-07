@@ -63,7 +63,6 @@ import {
   ObjectDefinitionBlock,
 } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
-import { NexusSubscriptionTypeConfig } from './definitions/subscriptionType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
   AllNexusInputTypeDefs,
@@ -82,7 +81,6 @@ import {
   isNexusObjectTypeDef,
   isNexusPlugin,
   isNexusScalarTypeDef,
-  isNexusSubscriptionTypeDef,
   isNexusUnionTypeDef,
 } from './definitions/wrapping'
 import {
@@ -289,7 +287,6 @@ export type TypeToWalk =
   | { type: 'named'; value: GraphQLNamedType }
   | { type: 'input'; value: NexusShapedInput }
   | { type: 'object'; value: NexusShapedOutput }
-  | { type: 'subscription'; value: NexusSubscriptionTypeConfig }
   | { type: 'interface'; value: NexusInterfaceTypeConfig<any> }
 
 export type DynamicInputFields = Record<string, DynamicInputMethodDef<string> | string>
@@ -562,9 +559,6 @@ export class SchemaBuilder {
     if (isNexusObjectTypeDef(typeDef)) {
       this.typesToWalk.push({ type: 'object', value: typeDef.value })
     }
-    if (isNexusSubscriptionTypeDef(typeDef)) {
-      this.typesToWalk.push({ type: 'subscription', value: typeDef.value })
-    }
     if (isNexusInterfaceTypeDef(typeDef)) {
       this.typesToWalk.push({ type: 'interface', value: typeDef.value })
     }
@@ -646,9 +640,6 @@ export class SchemaBuilder {
           break
         case 'object':
           this.walkOutputType(obj.value)
-          break
-        case 'subscription':
-          this.walkOutputType(obj.value as any)
           break
         default:
           casesHandled(obj)
@@ -1234,10 +1225,6 @@ export class SchemaBuilder {
       this.buildingTypes.add(pendingType.name)
       if (isNexusObjectTypeDef(pendingType)) {
         return this.buildObjectType(pendingType.value)
-      } else if (isNexusSubscriptionTypeDef(pendingType)) {
-        // we can build nexus subscrtipion type with object type implementation
-        // todo make type safe
-        return this.buildObjectType(pendingType.value as any)
       } else if (isNexusInterfaceTypeDef(pendingType)) {
         return this.buildInterfaceType(pendingType.value)
       } else if (isNexusEnumTypeDef(pendingType)) {

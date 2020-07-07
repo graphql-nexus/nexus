@@ -1,14 +1,24 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
-import { CommonOutputFieldConfig, OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
+import {
+  ArgsValue,
+  FieldResolver,
+  GetGen,
+  HasGen3,
+  MaybePromise,
+  MaybePromiseDeep,
+  NeedsResolver,
+  ResultValue,
+} from '../typegenTypeHelpers'
+import { CommonOutputFieldConfig } from './definitionBlocks'
+import { ObjectDefinitionBlock, ObjectDefinitionBuilder, objectType } from './objectType'
 import { AllNexusOutputTypeDefs } from './wrapping'
-import { NexusTypes, withNexusSymbol } from './_types'
 
-type SubscriptionTypeName = 'Subscription'
-
-export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string, T = any>
+export interface SubscriptionScalarConfig<TypeName extends string, FieldName extends string, T = any>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
-  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
+  /**
+   * Resolve method for the field
+   */
+  resolve?: FieldResolver<TypeName, FieldName>
 
   subscribe(
     root: object,
@@ -16,6 +26,31 @@ export interface SubscribeFieldConfig<TypeName extends string, FieldName extends
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
   ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>
+}
+
+export type ScalarSubSpread<TypeName extends string, FieldName extends string> = NeedsResolver<
+  TypeName,
+  FieldName
+> extends true
+  ? HasGen3<'argTypes', TypeName, FieldName> extends true
+    ? [ScalarSubConfig<TypeName, FieldName>]
+    : [ScalarSubConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
+  : HasGen3<'argTypes', TypeName, FieldName> extends true
+  ? [ScalarSubConfig<TypeName, FieldName>]
+  : [] | [FieldResolver<TypeName, FieldName>] | [ScalarSubConfig<TypeName, FieldName>]
+
+export type ScalarSubConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
+  TypeName,
+  FieldName
+> extends true
+  ? SubscriptionScalarConfig<TypeName, FieldName> & {
+      resolve: FieldResolver<TypeName, FieldName>
+    }
+  : SubscriptionScalarConfig<TypeName, FieldName>
+
+export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string, T = any>
+  extends CommonOutputFieldConfig<TypeName, FieldName> {
+  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
 
   /**
    * Resolve method for the field
@@ -28,50 +63,62 @@ export interface SubscribeFieldConfig<TypeName extends string, FieldName extends
   ):
     | MaybePromise<ResultValue<'Subscription', FieldName>>
     | MaybePromiseDeep<ResultValue<'Subscription', FieldName>>
+
+  subscribe(
+    root: object,
+    args: ArgsValue<TypeName, FieldName>,
+    ctx: GetGen<'context'>,
+    info: GraphQLResolveInfo
+  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>
 }
 
-export interface SubscriptionDefinitionBuilder extends OutputDefinitionBuilder {}
+export interface SubscriptionDefinitionBuilder extends ObjectDefinitionBuilder<'Subscription'> {}
 
-export class SubscriptionDefinitionBlock extends OutputDefinitionBlock<'Subscription'> {
-  constructor(protected typeBuilder: SubscriptionDefinitionBuilder) {
+export class SubscriptionDefinitionBlock<
+  TypeName extends string = 'Subscription'
+> extends ObjectDefinitionBlock<TypeName> {
+  constructor(protected typeBuilder: SubscriptionDefinitionBuilder, protected isList = false) {
     super(typeBuilder)
   }
 
-  field<FieldName extends string>(
-    name: FieldName,
-    fieldConfig: SubscribeFieldConfig<SubscriptionTypeName, FieldName>
-  ) {
-    // field<FieldName extends string>(name: FieldName, fieldConfig: FieldOutConfig<TypeName, FieldName>) {
-    // FIXME
-    // 1. FieldOutConfig<TypeName is constrained to any string subtype
-    // 2. NexusOutputFieldDef is contrained to be be a string
-    // 3. so `name` is not compatible
-    // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
-    const field: any = {
-      name,
-      ...fieldConfig,
+  get list() {
+    if (this.isList) {
+      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
     }
+    return new SubscriptionDefinitionBlock(this.typeBuilder, true)
+  }
+
+  string<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+    this.addScalarField(fieldName, 'String', opts)
+  }
+
+  int<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+    this.addScalarField(fieldName, 'Int', opts)
+  }
+
+  boolean<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+    this.addScalarField(fieldName, 'Boolean', opts)
+  }
+
+  id<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+    this.addScalarField(fieldName, 'ID', opts)
+  }
+
+  float<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<TypeName, FieldName>) {
+    this.addScalarField(fieldName, 'Float', opts)
+  }
+
+  field<FieldName extends string>(name: FieldName, fieldConfig: SubscribeFieldConfig<TypeName, FieldName>) {
+    const field: any = { name, ...fieldConfig }
     this.typeBuilder.addField(this.decorateField(field))
   }
 }
 
 export type NexusSubscriptionTypeConfig = {
-  name: SubscriptionTypeName
+  name: 'Subscription'
   definition(t: SubscriptionDefinitionBlock): void
 }
 
-export class NexusSubscriptionTypeDef {
-  constructor(protected config: NexusSubscriptionTypeConfig) {}
-
-  name = 'Subscription'
-
-  get value() {
-    return this.config
-  }
-}
-
-withNexusSymbol(NexusSubscriptionTypeDef, NexusTypes.Subscription)
-
 export function subscriptionType(config: Omit<NexusSubscriptionTypeConfig, 'name'>) {
-  return new NexusSubscriptionTypeDef({ ...config, name: 'Subscription' }) as any
+  return objectType({ name: 'Subscription', ...config })
 }

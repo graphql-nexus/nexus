@@ -12,7 +12,6 @@ import { NexusInputObjectTypeDef } from './inputObjectType'
 import { NexusInterfaceTypeDef } from './interfaceType'
 import { NexusObjectTypeDef } from './objectType'
 import { NexusScalarTypeDef } from './scalarType'
-import { NexusSubscriptionTypeDef } from './subscriptionType'
 import { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
 
@@ -22,7 +21,6 @@ export type AllNexusInputTypeDefs<T extends string = any> =
   | NexusScalarTypeDef<T>
 
 export type AllNexusOutputTypeDefs =
-  | NexusSubscriptionTypeDef
   | NexusObjectTypeDef<any>
   | NexusInterfaceTypeDef<any>
   | NexusUnionTypeDef<any>
@@ -35,7 +33,6 @@ export type AllTypeDefs = AllNexusInputTypeDefs | AllNexusOutputTypeDefs | Graph
 
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
-  NexusTypes.Subscription,
   NexusTypes.Object,
   NexusTypes.Scalar,
   NexusTypes.Union,
@@ -69,9 +66,6 @@ export function isNexusInputObjectTypeDef(obj: any): obj is NexusInputObjectType
 }
 export function isNexusObjectTypeDef(obj: any): obj is NexusObjectTypeDef<string> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Object
-}
-export function isNexusSubscriptionTypeDef(obj: any): obj is NexusSubscriptionTypeDef {
-  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Subscription
 }
 export function isNexusScalarTypeDef(obj: any): obj is NexusScalarTypeDef<string> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Scalar
