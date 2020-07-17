@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>GraphQL Nexus · GraphQL Nexus</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Robust, composable type definition for GraphQL in TypeScript/JavaScript."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="GraphQL Nexus · GraphQL Nexus"/><meta property="og:type" content="website"/><meta property="og:url" content="https://nexus.js.org/"/><meta property="og:description" content="Robust, composable type definition for GraphQL in TypeScript/JavaScript."/><meta property="og:image" content="https://nexus.js.org/img/nexus-dark.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://nexus.js.org/img/nexus-dark.png"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-39763513-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://use.fontawesome.com/releases/v5.7.1/js/all.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script><script type="text/javascript" src="/js/code-block-buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/nexus.png" alt="GraphQL Nexus"/><h2 class="headerTitleWithLogo">GraphQL Nexus</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive siteNavItemActive"><a href="/docs/getting-started" target="_self">Docs</a></li><li class=""><a href="/playground" target="_self">Playground</a></li><li class=""><a href="/converter" target="_self">SDL Converter</a></li><li class=""><a href="https://github.com/graphql-nexus/schema/tree/develop/examples" target="_self">Examples</a></li><li class=""><a href="https://github.com/graphql-nexus/schema" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Documentation</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/getting-started">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/docs/best-practices">Best Practices</a></li><li class="navListItem"><a class="navItem" href="/docs/type-generation">Type Generation Details</a></li><li class="navListItem"><a class="navItem" href="/docs/library-authors">Library Authors</a></li><li class="navListItem"><a class="navItem" href="/docs/why-graphql-nexus">Why Nexus?</a></li><li class="navListItem"><a class="navItem" href="/docs/future-features">Potential Future Features</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">API</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/api-core-concepts">API Core Concepts</a></li><li class="navListItem"><a class="navItem" href="/docs/api-objectType">objectType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-unionType">unionType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-scalarType">scalarType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-interfaceType">interfaceType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-inputObjectType">inputObjectType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-enumType">enumType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-args">args: arg / *Arg</a></li><li class="navListItem"><a class="navItem" href="/docs/api-makeSchema">makeSchema</a></li><li class="navListItem"><a class="navItem" href="/docs/api-extendType">extendType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-mutationField">mutationField</a></li><li class="navListItem"><a class="navItem" href="/docs/api-queryField">queryField</a></li><li class="navListItem"><a class="navItem" href="/docs/api-plugins">Plugins</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Included Plugins</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/plugin-connection">Connections</a></li><li class="navListItem"><a class="navItem" href="/docs/plugin-fieldAuthorize">Field Authorize</a></li><li class="navListItem"><a class="navItem" href="/docs/plugin-nullabilityGuard">Nullability Guard</a></li><li class="navListItem"><a class="navItem" href="/docs/plugin-queryComplexity">Query Complexity</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Ecosystem Plugins</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/nexus-prisma">nexus-prisma</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">GraphQL Nexus</h1></header><article><div><span><p>Robust, composable type definition for GraphQL in TypeScript/JavaScript.</p>
+<blockquote class="warn">
+<b>Note:</b>
+<p>The documentation is very new and may contain some gaps, please help us fill them in by opening issues or better yet, pull-requests when you think something could be explained better. The <a href="https://github.com/graphql-nexus/schema/tree/develop/examples">examples</a> are a great place to look to better understand how the library can be used.</p>
+</blockquote>
+<p>GraphQL Nexus aims to combine the simplicity and ease of development of SDL development approaches like <a href="https://www.apollographql.com/docs/graphql-tools/generate-schema.html">graphql-tools</a> with the long-term maintainability of programmatic construction, as seen in <a href="https://docs.graphene-python.org/en/latest/">graphene-python</a>, <a href="https://github.com/rmosolgo/graphql-ruby">graphql-ruby</a>, or <a href="https://github.com/graphql/graphql-js">graphql-js</a>.</p>
+<p>Nexus builds upon the primitives of <code>graphql-js</code>, and attempts to take the simplicity of the SDL schema-first approach and pair it with the power of having the full language runtime at your disposal.</p>
+<p>GraphQL Nexus was designed with TypeScript/JavaScript intellisense in mind, and combines TypeScript generics, conditional types, and type merging to provide full auto-generated type coverage out of the box.</p>
+<p>Check out the <a href="https://github.com/graphql-nexus/schema/tree/develop/examples">example projects</a> to get some ideas of what this looks like in practice, or try it out in the <a href="../playground">playground</a> to see what we mean!</p>
+<h2><a class="anchor" aria-hidden="true" id="installation"></a><a href="#installation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h2>
+<p>GraphQL Nexus can be installed with either <code>npm</code> or <code>yarn</code>.</p>
+<div class="tabs"><div class="nav-tabs"><div id="tab-group-1-tab-2" class="nav-link active" data-group="group_1" data-tab="tab-group-1-content-2">npm</div><div id="tab-group-1-tab-3" class="nav-link" data-group="group_1" data-tab="tab-group-1-content-3">yarn</div></div><div class="tab-content"><div id="tab-group-1-content-2" class="tab-pane active" data-group="group_1" tabindex="-1"><div><span><pre><code class="hljs css language-sh">npm install nexus<br />npm install graphql <span class="hljs-comment"># required as a peer dependency</span><br /></code></pre>
+</span></div></div><div id="tab-group-1-content-3" class="tab-pane" data-group="group_1" tabindex="-1"><div><span><pre><code class="hljs css language-sh">yarn add nexus<br />yarn add graphql <span class="hljs-comment"># required as a peer dependency</span><br /></code></pre>
+</span></div></div></div></div>
+<h2><a class="anchor" aria-hidden="true" id="building-an-example-schema"></a><a href="#building-an-example-schema" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Building an Example Schema</h2>
+<p>As documented in the <a href="/docs/api-core-concepts">API reference</a> GraphQL Nexus provides a consistent, scalable approach to defining GraphQL types in code.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> {
+  objectType,
+  interfaceType,
+  queryType,
+  stringArg,
+  enumType,
+  intArg,
+  arg,
+  makeSchema,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">"@nexus/schema"</span>;
+
+<span class="hljs-keyword">const</span> Node = interfaceType({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">"Node"</span>,
+  definition(t) {
+    t.id(<span class="hljs-string">"id"</span>, { <span class="hljs-attr">description</span>: <span class="hljs-string">"Unique identifier for the resource"</span> });
+    t.resolveType(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-literal">null</span>);
+  },
+});
+
+<span class="hljs-keyword">const</span> Account = objectType({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">"Account"</span>,
+  definition(t) {
+    t.implements(Node); <span class="hljs-comment">// or t.implements("Node")</span>
+    t.string(<span class="hljs-string">"username"</span>);
+    t.string(<span class="hljs-string">"email"</span>);
+  },
+});
+
+<span class="hljs-keyword">const</span> StatusEnum = enumType({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">"StatusEnum"</span>,
+  <span class="hljs-attr">members</span>: [<span class="hljs-string">"ACTIVE"</span>, <span class="hljs-string">"DISABLED"</span>],
+});
+
+<span class="hljs-keyword">const</span> Query = queryType({
+  definition(t) {
+    t.field(<span class="hljs-string">"account"</span>, {
+      <span class="hljs-attr">type</span>: Account, <span class="hljs-comment">// or "Account"</span>
+      args: {
+        <span class="hljs-attr">name</span>: stringArg(),
+        <span class="hljs-attr">status</span>: arg({ <span class="hljs-attr">type</span>: <span class="hljs-string">"StatusEnum"</span> }),
+      },
+    });
+    t.list.field(<span class="hljs-string">"accountsById"</span>, {
+      <span class="hljs-attr">type</span>: Account, <span class="hljs-comment">// or "Account"</span>
+      args: {
+        <span class="hljs-attr">ids</span>: intArg({ <span class="hljs-attr">list</span>: <span class="hljs-literal">true</span> }),
+      },
+    });
+  },
+});
+
+<span class="hljs-comment">// Recursively traverses the value passed to types looking for</span>
+<span class="hljs-comment">// any valid Nexus or graphql-js objects to add to the schema,</span>
+<span class="hljs-comment">// so you can be pretty flexible with how you import types here.</span>
+<span class="hljs-keyword">const</span> schema = makeSchema({
+  <span class="hljs-attr">types</span>: [Account, Node, Query, StatusEnum],
+  <span class="hljs-comment">// or types: { Account, Node, Query }</span>
+  <span class="hljs-comment">// or types: [Account, [Node], { Query }]</span>
+});
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="nullability-default-values"></a><a href="#nullability-default-values" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Nullability &amp; Default Values</h2>
+<p><em>tl;dr - GraphQL Nexus assumes output fields are non-null by default</em></p>
+<p>One benefit of GraphQL is the strict enforcement and guarantees of null values it provides in the type definitions. One opinion held by GraphQL is that fields should be considered nullable by default.</p>
+<p>The GraphQL documentation provides <a href="https://graphql.org/learn/best-practices/#nullability">this explanation</a>:</p>
+<blockquote>
+<p>... in a GraphQL type system, every field is nullable by default. This is because there are many things which can go awry in a networked service backed by databases and other services. A database could go down, an asynchronous action could fail, an exception could be thrown. Beyond simply system failures, authorization can often be granular, where individual fields within a request can have different authorization rules.</p>
+</blockquote>
+<p>GraphQL Nexus breaks slightly from this convention, and instead assumes by all fields are &quot;non-null&quot; unless otherwise specified with a <code>nullable</code> option set to <code>true</code>. It also assumes all input types (fields/args) are nullable unless <code>required</code> is set to true.</p>
+<p>The rationale being that for most applications, the case of returning <code>null</code> to mask errors and still properly handle this partial response is exceptional, and should be handled as such by manually defining these places where a schema could break in this regard.</p>
+<p>If you find yourself wanting this the other way around, there is a <code>nonNullDefaults</code> option for the <code>makeSchema</code> which will make all fields nullable unless <code>required: true</code> (an alias for <code>nullable: false</code>) is specified during field definition.</p>
+<p>This can also be configured on a per-type basis, using the <code>nonNullDefaults</code> option on the type definition object. This can be handy if you find yourself adding <code>{ nullable: true }</code> to many fields of an output object type, or <code>{required: true}</code> to many arguments.</p>
+<h2><a class="anchor" aria-hidden="true" id="resolving-inline-function"></a><a href="#resolving-inline-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Resolving: Inline Function</h2>
+<p>One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus makes this simple by allowing a function as the second parameter to any built-in scalar resolver function.</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> User = objectType({
+  name: <span class="hljs-string">"User"</span>,
+  definition(t) {
+    t.id(<span class="hljs-string">"id"</span>, <span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> o.user_id);
+    t.string(<span class="hljs-string">"name"</span>, <span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> o.user_name);
+    t.string(<span class="hljs-string">"description"</span>, <span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> o.user_description);
+  },
+});
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="auto-generated-artifacts"></a><a href="#auto-generated-artifacts" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Auto-Generated Artifacts</h2>
+<p>When you make a change to your GraphQL schema it is useful to see how exactly this changes the contract of the API, or the associated typings.</p>
+<p>GraphQL Nexus takes care of this for you, simply provide a path to where you want these files to be output and it will auto-generate them when the server starts. By default, this only occurs when <code>process.env.NODE_ENV !== &quot;production&quot;</code>.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> schema = makeSchema({
+  <span class="hljs-attr">types</span>: [
+    <span class="hljs-comment">/* All schema types provided here */</span>
+  ],
+  <span class="hljs-attr">outputs</span>: {
+    <span class="hljs-attr">schema</span>: path.join(__dirname, <span class="hljs-string">"../../my-schema.graphql"</span>),
+    <span class="hljs-attr">typegen</span>: path.join(__dirname, <span class="hljs-string">"../../my-generated-types.d.ts"</span>),
+  },
+});
+</code></pre>
+<p>Read more about how the automatic <a href="/docs/type-generation">type generation</a> works.</p>
+<blockquote class="good">
+Although your <code>.graphql</code> file is generated, we recommend you check the file into source control. This gives you visibility into how changes in type construction affect the schema consumed by the end-user.
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="testing-nexus"></a><a href="#testing-nexus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Testing Nexus</h2>
+<p>Nexus encourages separating your domain logic from the actual resolvers via context, so you should be able to test and reuse your application logic independent of GraphQL. See the use of the <a href="https://github.com/prisma-labs/schema/tree/develop/examples/ghost/src/data-sources">data-sources</a> in the ghost example for a start on how you might structure your data layer.</p>
+<p>More info about testing patterns for GraphQL will be coming soon.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-next button" href="/docs/best-practices"><span>Best Practices</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#installation">Installation</a></li><li><a href="#building-an-example-schema">Building an Example Schema</a></li><li><a href="#nullability-amp-default-values">Nullability &amp; Default Values</a></li><li><a href="#resolving-inline-function">Resolving: Inline Function</a></li><li><a href="#auto-generated-artifacts">Auto-Generated Artifacts</a></li><li><a href="#testing-nexus">Testing Nexus</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/nexus.png" alt="GraphQL Nexus" width="66"/></a><div><h5>Docs</h5><a href="/docs/getting-started">Getting Started</a><a href="/docs/api-core-concepts">API Reference</a><a href="/playground">Playground</a></div><div><h5>More</h5><a href="https://github.com/graphql-nexus/nexus">GitHub</a><a class="github-button" href="https://github.com/prisma-labs/nexus" data-icon="octicon-star" data-count-href="/graphql-nexus/nexus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Tim Griesser</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '80f72460aa3d84abf56948140313b079',
+                indexName: 'graphql-nexus',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

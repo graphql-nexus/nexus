@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <title>GraphQL Nexus Playground</title>
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="msapplication-starturl" content="/" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="icon" href="img/favicon.png" />
+    <meta
+      name="twitter:image"
+      content="https://nexus.js.org/img/nexus-dark.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.7.0-alpha.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.7.0-alpha.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.12.0/graphiql.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.12.0/graphiql.css"
+    />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="separate-css/playground.css" />
+  </head>
+  <body class="sideNavVisible separateOnPageNav">
+    <div class="fixedHeaderContainer">
+      <div class="headerWrapper wrapper">
+        <header>
+          <a href="index.html"
+            ><img class="logo" src="img/nexus.png" alt="GraphQL Nexus" />
+            <h2 class="headerTitleWithLogo">GraphQL Nexus</h2></a
+          >
+          <div class="navigationWrapper navigationSlider">
+            <nav class="slidingNav">
+              <ul class="nav-site nav-site-internal">
+                <li>
+                  <a href="docs/getting-started" target="_self">Docs</a>
+                </li>
+                <li class="siteNavGroupActive siteNavItemActive">
+                  <a href="playground" target="_self">Playground</a>
+                </li>
+                <li>
+                  <a href="converter" target="_self">SDL Converter</a>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/graphql-nexus/schema/tree/develop/examples"
+                    >Examples</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/graphql-nexus/nexus"
+                    target="_self"
+                    >GitHub</a
+                  >
+                </li>
+                <li class="navSearchWrapper reactNavSearchWrapper">
+                  <input
+                    type="text"
+                    id="search_input_react"
+                    placeholder="Search"
+                    title="Search"
+                  />
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </header>
+      </div>
+    </div>
+    <div id="root" class="playground-container"></div>
+    <script src="playground-dist/playground.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-39763513-4"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-39763513-4");
+    </script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"
+    ></script>
+    <script>
+      document.addEventListener("keyup", function(e) {
+        if (e.target !== document.body) {
+          return;
+        }
+        // keyCode for '/' (slash)
+        if (e.keyCode === 191) {
+          const search = document.getElementById("search_input_react");
+          search && search.focus();
+        }
+      });
+    </script>
+    <script>
+      var search = docsearch({
+        apiKey: "80f72460aa3d84abf56948140313b079",
+        indexName: "graphql-nexus",
+        inputSelector: "#search_input_react",
+        algoliaOptions: {},
+      });
+    </script>
+  </body>
+</html>

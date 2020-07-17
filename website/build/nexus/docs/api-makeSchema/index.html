@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>makeSchema · GraphQL Nexus</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Defines the GraphQL schema, by combining the GraphQL types defined by the GraphQL Nexus layer or any manually defined GraphQL named types (Scalars, ObjectTypes, Enums, etc)."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="makeSchema · GraphQL Nexus"/><meta property="og:type" content="website"/><meta property="og:url" content="https://nexus.js.org/"/><meta property="og:description" content="Defines the GraphQL schema, by combining the GraphQL types defined by the GraphQL Nexus layer or any manually defined GraphQL named types (Scalars, ObjectTypes, Enums, etc)."/><meta property="og:image" content="https://nexus.js.org/img/nexus-dark.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://nexus.js.org/img/nexus-dark.png"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-39763513-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://use.fontawesome.com/releases/v5.7.1/js/all.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script><script type="text/javascript" src="/js/code-block-buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/nexus.png" alt="GraphQL Nexus"/><h2 class="headerTitleWithLogo">GraphQL Nexus</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/getting-started" target="_self">Docs</a></li><li class=""><a href="/playground" target="_self">Playground</a></li><li class=""><a href="/converter" target="_self">SDL Converter</a></li><li class=""><a href="https://github.com/graphql-nexus/schema/tree/develop/examples" target="_self">Examples</a></li><li class=""><a href="https://github.com/graphql-nexus/schema" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>API</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/getting-started">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/docs/best-practices">Best Practices</a></li><li class="navListItem"><a class="navItem" href="/docs/type-generation">Type Generation Details</a></li><li class="navListItem"><a class="navItem" href="/docs/library-authors">Library Authors</a></li><li class="navListItem"><a class="navItem" href="/docs/why-graphql-nexus">Why Nexus?</a></li><li class="navListItem"><a class="navItem" href="/docs/future-features">Potential Future Features</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">API</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/api-core-concepts">API Core Concepts</a></li><li class="navListItem"><a class="navItem" href="/docs/api-objectType">objectType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-unionType">unionType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-scalarType">scalarType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-interfaceType">interfaceType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-inputObjectType">inputObjectType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-enumType">enumType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-args">args: arg / *Arg</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/api-makeSchema">makeSchema</a></li><li class="navListItem"><a class="navItem" href="/docs/api-extendType">extendType</a></li><li class="navListItem"><a class="navItem" href="/docs/api-mutationField">mutationField</a></li><li class="navListItem"><a class="navItem" href="/docs/api-queryField">queryField</a></li><li class="navListItem"><a class="navItem" href="/docs/api-plugins">Plugins</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Included Plugins</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/plugin-connection">Connections</a></li><li class="navListItem"><a class="navItem" href="/docs/plugin-fieldAuthorize">Field Authorize</a></li><li class="navListItem"><a class="navItem" href="/docs/plugin-nullabilityGuard">Nullability Guard</a></li><li class="navListItem"><a class="navItem" href="/docs/plugin-queryComplexity">Query Complexity</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Ecosystem Plugins</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/nexus-prisma">nexus-prisma</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">makeSchema</h1></header><article><div><span><p>Defines the GraphQL schema, by combining the GraphQL types defined by the GraphQL Nexus layer or any manually defined GraphQL named types (Scalars, ObjectTypes, Enums, etc).</p>
+<p>We require at least one type be named &quot;Query&quot;, which will be used as the root query type. The <code>makeSchema</code> takes several options which all should be specified by the user, detailed below:</p>
+<h2><a class="anchor" aria-hidden="true" id="types"></a><a href="#types" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>types</h2>
+<p>The <code>types</code> property is required, and should contain all of the possible Nexus/GraphQL types that make up a schema (at least the root-level ones), imported into one place. The type is opaque, it can be an array or object, we recursively walk through the object looking for types, so the following will all have the same result, and non-GraphQL objects will be ignored.</p>
+<ul>
+<li><code>{ typeA, typeB, typeC, typeD }</code></li>
+<li><code>[[typeA], [{ typeB: typeB }], typeC, { typeD }]</code></li>
+<li><code>[typeA, typeB, typeC, typeD]</code></li>
+</ul>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">import</span> { makeSchema } <span class="hljs-keyword">from</span> <span class="hljs-string">'@nexus/schema'</span>
+<span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> types <span class="hljs-keyword">from</span> <span class="hljs-string">'./allNexusTypes'</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> schema = makeSchema({
+  types,
+})
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="plugins"></a><a href="#plugins" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>plugins</h2>
+<p>The <code>plugins</code> property is an array for adding &quot;Plugins&quot;, or ways of extending/changing the runtime behavior of Nexus and GraphQL. Unlike the <code>types</code> property, this must be an array, and the order of the plugins matters because this influences the order of any resolver &quot;middleware&quot; the plugin may optionally provide.</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">import</span> { makeSchema, nullabilityGuard, fieldAuthorizePlugin } <span class="hljs-keyword">from</span> <span class="hljs-string">'@nexus/schema'</span>
+<span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> types <span class="hljs-keyword">from</span> <span class="hljs-string">'./allNexusTypes'</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> schema = makeSchema({
+  types,
+  plugins: [
+    fieldAuthorizePlugin({
+      <span class="hljs-comment">/* ... */</span>
+    }),
+    nullabilityGuard({
+      <span class="hljs-comment">/* ... */</span>
+    }),
+  ],
+})
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="shouldgenerateartifacts-outputs-typegenautoconfig"></a><a href="#shouldgenerateartifacts-outputs-typegenautoconfig" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>shouldGenerateArtifacts, outputs, typegenAutoConfig</h2>
+<p>The <code>shouldGenerateArtifacts</code> is a boolean value which determines whether artifact files (graphql and TypeScript) are emitted when the code for <code>makeSchema</code></p>
+<p><code>outputs</code> is an object which specifies the absolute path for where the emitted files are generated.
+If you do not wish to generate one of these types</p>
+<p><code>typegenAutoConfig</code> is an object which gives nexus more information about how to properly generate the
+type definition file. An example of the <code>sources</code> is provided below:</p>
+<pre><code class="hljs css language-ts">makeSchema({
+  types,
+  shouldGenerateArtifacts: process.env.NODE_ENV === <span class="hljs-string">'development'</span>,
+  outputs: {
+    <span class="hljs-comment">// I tend to use `.gen` to denote "auto-generated" files, but this is not a requirement.</span>
+    schema: path.join(__dirname, <span class="hljs-string">'generated/schema.gen.graphql'</span>),
+    typegen: path.join(__dirname, <span class="hljs-string">'generated/nexusTypes.gen.ts'</span>),
+  },
+  typegenAutoConfig: {
+    headers: [<span class="hljs-string">'import { ConnectionFieldOpts } from "@packages/api-graphql/src/extensions/connectionType"'</span>],
+    sources: [
+      <span class="hljs-comment">// Automatically finds any interface/type/class named similarly to the and infers it</span>
+      <span class="hljs-comment">// the "source" type of that resolver.</span>
+      {
+        source: <span class="hljs-string">'@packages/types/src/db.ts'</span>,
+        alias: <span class="hljs-string">'dbt'</span>,
+        typeMatch: <span class="hljs-function">(<span class="hljs-params">name</span>) =&gt;</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">`(?:interface|type|class)\\s+(<span class="hljs-subst">${name}</span>s?)\\W`</span>, <span class="hljs-string">'g'</span>),
+      },
+      <span class="hljs-comment">// We also need to import this source in order to provide it as the `contextType` below.</span>
+      {
+        source: <span class="hljs-string">'@packages/data-context/src/DataContext.ts'</span>,
+        alias: <span class="hljs-string">'ctx'</span>,
+      },
+    ],
+    <span class="hljs-comment">// Typing from the source</span>
+    contextType: <span class="hljs-string">'ctx.DataContext'</span>,
+    backingTypeMap: {
+      <span class="hljs-built_in">Date</span>: <span class="hljs-string">'Date'</span>,
+      DateTime: <span class="hljs-string">'Date'</span>,
+      UUID: <span class="hljs-string">'string'</span>,
+    },
+    debug: <span class="hljs-literal">false</span>,
+  },
+})
+</code></pre>
+<p>The <a href="https://github.com/prisma-labs/nexus/blob/develop/examples/ghost/src/ghost-schema.ts">Ghost Example</a> is the best place to look for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.</p>
+<h2><a class="anchor" aria-hidden="true" id="shouldexitaftergenerateartifacts"></a><a href="#shouldexitaftergenerateartifacts" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>shouldExitAfterGenerateArtifacts</h2>
+<p>If you are not checking in your artifacts and wish to run them, this will allow you to exit right after the artifacts have been generated. There is no default behavior for this, but you could do something like the following, to be able to run a script which will exit if <code>--nexus-exit</code> is provided:</p>
+<pre><code class="hljs css language-ts">makeSchema({
+  <span class="hljs-comment">// ... options like above</span>
+  shouldExitAfterGenerateArtifacts: process.argv.includes(<span class="hljs-string">'--nexus-exit'</span>),
+})
+</code></pre>
+<pre><code class="hljs css language-sh">ts-node -T ./path/to/my/schema.ts --nexus-exit
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="prettierconfig"></a><a href="#prettierconfig" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>prettierConfig</h2>
+<p>Either an absolute path to a <code>.prettierrc</code> file, or an object with a valid &quot;prettier&quot; config options.</p>
+<pre><code class="hljs css language-ts">makeSchema({
+  <span class="hljs-comment">// ... options like above</span>
+  prettierConfig: <span class="hljs-built_in">require</span>.resolve(<span class="hljs-string">'../../../package.json'</span>),
+})
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="nonnulldefaults"></a><a href="#nonnulldefaults" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>nonNullDefaults</h2>
+<p>Controls the nullability of the input / output types emitted by <code>nexus</code>. The current Nexus default is
+<code>{ output: true, input: false }</code>, though the <code>graphql-js</code> / spec default is <code>{ output: false, input: false }</code>.</p>
+<p>You should make a decision on this and supply the option yourself, it may be changed / required in the future.</p>
+<p>Read more on this in the <a href="/docs/getting-started">getting-started</a> guide.</p>
+<h3><a class="anchor" aria-hidden="true" id="typegenconfig-formattypegen"></a><a href="#typegenconfig-formattypegen" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>typegenConfig, formatTypegen</h3>
+<p>Escape hatches for more advanced cases which need further control over. You typically won't need these.</p>
+<h3><a class="anchor" aria-hidden="true" id="customprintschemafn"></a><a href="#customprintschemafn" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>customPrintSchemaFn</h3>
+<p>Optional, allows you to override the <code>printSchema</code> when outputting the generated <code>.graphql</code> file:</p>
+<pre><code class="hljs css language-ts">makeSchema({
+  <span class="hljs-comment">// ...</span>
+  customPrintSchemaFn: <span class="hljs-function">(<span class="hljs-params">schema</span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> printSchema(schema, { commentDescriptions: <span class="hljs-literal">true</span> })
+  },
+})
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="footnotes-annotated-config-option-for-typegenautoconfig"></a><a href="#footnotes-annotated-config-option-for-typegenautoconfig" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Footnotes: Annotated config option for typegenAutoConfig:</h4>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> TypegenAutoConfigOptions {
+  <span class="hljs-comment">/**
+   * Any headers to prefix on the generated type file
+   */</span>
+  headers?: <span class="hljs-built_in">string</span>[]
+  <span class="hljs-comment">/**
+   * Array of files to match for a type
+   *
+   *   sources: [
+   *     { source: 'typescript', alias: 'ts' },
+   *     { source: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   *   ]
+   */</span>
+  sources: TypegenConfigSourceModule[]
+  <span class="hljs-comment">/**
+   * Typing for the context, referencing a type defined in the aliased module
+   * provided in sources e.g. 'alias.Context'
+   */</span>
+  contextType?: <span class="hljs-built_in">string</span>
+  <span class="hljs-comment">/**
+   * Types that should not be matched for a backing type,
+   *
+   * By default this is set to ['Query', 'Mutation', 'Subscription']
+   *
+   *   skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
+   */</span>
+  skipTypes?: (<span class="hljs-built_in">string</span> | <span class="hljs-built_in">RegExp</span>)[]
+  <span class="hljs-comment">/**
+   * If debug is set to true, this will log out info about all types
+   * found, skipped, etc. for the type generation files.
+   */</span>
+  debug?: <span class="hljs-built_in">boolean</span>
+  <span class="hljs-comment">/**
+   * If provided this will be used for the backing types rather than the auto-resolve
+   * mechanism above. Useful as an override for one-off cases, or for scalar
+   * backing types.
+   */</span>
+  backingTypeMap?: Record&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>&gt;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> TypegenConfigSourceModule {
+  <span class="hljs-comment">/**
+   * The module for where to look for the types.
+   * This uses the node resolution algorithm via require.resolve,
+   * so if this lives in node_modules, you can just provide the module name
+   * otherwise you should provide the absolute path to the file.
+   */</span>
+  source: <span class="hljs-built_in">string</span>
+  <span class="hljs-comment">/**
+   * When we import the module, we use 'import * as ____' to prevent
+   * conflicts. This alias should be a name that doesn't conflict with any other
+   * types, usually a short lowercase name.
+   */</span>
+  alias: <span class="hljs-built_in">string</span>
+  <span class="hljs-comment">/**
+   * Provides a custom approach to matching for the type
+   *
+   * If not provided, the default implementation is:
+   *
+   *   (type) =&gt; [
+   *      new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g")
+   *   ]
+   *
+   */</span>
+  typeMatch?: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-keyword">type</span>: GraphQLNamedType, defaultRegex: <span class="hljs-built_in">RegExp</span></span>) =&gt;</span> <span class="hljs-built_in">RegExp</span> | <span class="hljs-built_in">RegExp</span>[]
+  <span class="hljs-comment">/**
+   * A list of typesNames or regular expressions matching type names
+   * that should be resolved by this import. Provide an empty array if you
+   * wish to use the file for context and ensure no other types are matched.
+   */</span>
+  onlyTypes?: (<span class="hljs-built_in">string</span> | <span class="hljs-built_in">RegExp</span>)[]
+  <span class="hljs-comment">/**
+   * By default the import is configured 'import * as alias from', setting glob to false
+   * will change this to 'import alias from'
+   */</span>
+  glob?: <span class="hljs-literal">false</span>
+}
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/api-args"><span class="arrow-prev">← </span><span>args: arg / *Arg</span></a><a class="docs-next button" href="/docs/api-extendType"><span class="function-name-prevnext">extendType</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#types">types</a></li><li><a href="#plugins">plugins</a></li><li><a href="#shouldgenerateartifacts-outputs-typegenautoconfig">shouldGenerateArtifacts, outputs, typegenAutoConfig</a></li><li><a href="#shouldexitaftergenerateartifacts">shouldExitAfterGenerateArtifacts</a></li><li><a href="#prettierconfig">prettierConfig</a></li><li><a href="#nonnulldefaults">nonNullDefaults</a><ul class="toc-headings"><li><a href="#typegenconfig-formattypegen">typegenConfig, formatTypegen</a></li><li><a href="#customprintschemafn">customPrintSchemaFn</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/nexus.png" alt="GraphQL Nexus" width="66"/></a><div><h5>Docs</h5><a href="/docs/getting-started">Getting Started</a><a href="/docs/api-core-concepts">API Reference</a><a href="/playground">Playground</a></div><div><h5>More</h5><a href="https://github.com/graphql-nexus/nexus">GitHub</a><a class="github-button" href="https://github.com/prisma-labs/nexus" data-icon="octicon-star" data-count-href="/graphql-nexus/nexus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Tim Griesser</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '80f72460aa3d84abf56948140313b079',
+                indexName: 'graphql-nexus',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>
