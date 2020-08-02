@@ -26,18 +26,21 @@ export interface NexusGenEnums {
   SomeEnum: 'A' | 'B'
 }
 
-export interface NexusGenRootTypes {
-  Mutation: {}
-  Post: {}
-  Query: {}
-  User: {}
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User']
+export interface NexusGenScalars {
   String: string
   Int: number
   Float: number
   Boolean: boolean
   ID: string
   UUID: any
+}
+
+export interface NexusGenRootTypes {
+  Mutation: {}
+  Post: {}
+  Query: {}
+  User: {}
+  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User']
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User']
 }
 
@@ -46,6 +49,12 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PostFilters: NexusGenInputs['PostFilters']
   OrderEnum: NexusGenEnums['OrderEnum']
   SomeEnum: NexusGenEnums['SomeEnum']
+  String: NexusGenScalars['String']
+  Int: NexusGenScalars['Int']
+  Float: NexusGenScalars['Float']
+  Boolean: NexusGenScalars['Boolean']
+  ID: NexusGenScalars['ID']
+  UUID: NexusGenScalars['UUID']
 }
 
 export interface NexusGenFieldTypes {
@@ -61,7 +70,7 @@ export interface NexusGenFieldTypes {
     geo: number[][] // [[Float!]!]!
     id: string // ID!
     messyGeo: Array<number[] | null> | null // [[Float!]]
-    uuid: any // UUID!
+    uuid: NexusGenScalars['UUID'] // UUID!
   }
   Query: {
     // field return type
@@ -92,7 +101,7 @@ export interface NexusGenArgTypes {
     }
     registerClick: {
       // args
-      uuid?: any | null // UUID
+      uuid?: NexusGenScalars['UUID'] | null // UUID
     }
     someList: {
       // args

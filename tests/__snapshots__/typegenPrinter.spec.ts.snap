@@ -28,7 +28,7 @@ exports[`typegenPrinter should build an argument type map 1`] = `
       input: NexusGenInputs['CreatePostInput']; // CreatePostInput!
     }
     registerClick: { // args
-      uuid?: string | null; // UUID
+      uuid?: NexusGenScalars['UUID'] | null; // UUID
     }
     someList: { // args
       items: Array<string | null>; // [String]!
@@ -58,7 +58,7 @@ exports[`typegenPrinter should not print roots for fields with resolvers 1`] = `
     geo: number[][]; // [[Float!]!]!
     id: string; // ID!
     messyGeo?: Array<number[] | null> | null; // [[Float!]]
-    uuid: string; // UUID!
+    uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: {};
   User: { // root type
@@ -69,12 +69,6 @@ exports[`typegenPrinter should not print roots for fields with resolvers 1`] = `
     phone?: string | null; // String
   }
   Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
-  String: string;
-  Int: number;
-  Float: number;
-  Boolean: boolean;
-  ID: string;
-  UUID: string;
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }"
 `;
@@ -91,7 +85,7 @@ exports[`typegenPrinter should print a return type map 1`] = `
     geo: number[][]; // [[Float!]!]!
     id: string; // ID!
     messyGeo: Array<number[] | null> | null; // [[Float!]]
-    uuid: string; // UUID!
+    uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: { // field return type
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
@@ -120,7 +114,7 @@ exports[`typegenPrinter should print a root type map 1`] = `
     geo: number[][]; // [[Float!]!]!
     id: string; // ID!
     messyGeo?: Array<number[] | null> | null; // [[Float!]]
-    uuid: string; // UUID!
+    uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: {};
   User: { // root type
@@ -132,12 +126,6 @@ exports[`typegenPrinter should print a root type map 1`] = `
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
   Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
-  String: string;
-  Int: number;
-  Float: number;
-  Boolean: boolean;
-  ID: string;
-  UUID: string;
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }"
 `;
@@ -175,6 +163,15 @@ export interface NexusGenEnums {
   SomeEnum: \\"A\\" | \\"B\\"
 }
 
+export interface NexusGenScalars {
+  String: string
+  Int: number
+  Float: number
+  Boolean: boolean
+  ID: string
+  UUID: string
+}
+
 export interface NexusGenRootTypes {
   Mutation: {};
   Post: { // root type
@@ -182,7 +179,7 @@ export interface NexusGenRootTypes {
     geo: number[][]; // [[Float!]!]!
     id: string; // ID!
     messyGeo?: Array<number[] | null> | null; // [[Float!]]
-    uuid: string; // UUID!
+    uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: {};
   User: { // root type
@@ -194,12 +191,6 @@ export interface NexusGenRootTypes {
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
   Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
-  String: string;
-  Int: number;
-  Float: number;
-  Boolean: boolean;
-  ID: string;
-  UUID: string;
   ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
 }
 
@@ -208,6 +199,12 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PostFilters: NexusGenInputs['PostFilters'];
   OrderEnum: NexusGenEnums['OrderEnum'];
   SomeEnum: NexusGenEnums['SomeEnum'];
+  String: NexusGenScalars['String'];
+  Int: NexusGenScalars['Int'];
+  Float: NexusGenScalars['Float'];
+  Boolean: NexusGenScalars['Boolean'];
+  ID: NexusGenScalars['ID'];
+  UUID: NexusGenScalars['UUID'];
 }
 
 export interface NexusGenFieldTypes {
@@ -221,7 +218,7 @@ export interface NexusGenFieldTypes {
     geo: number[][]; // [[Float!]!]!
     id: string; // ID!
     messyGeo: Array<number[] | null> | null; // [[Float!]]
-    uuid: string; // UUID!
+    uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: { // field return type
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
@@ -247,7 +244,7 @@ export interface NexusGenArgTypes {
       input: NexusGenInputs['CreatePostInput']; // CreatePostInput!
     }
     registerClick: { // args
-      uuid?: string | null; // UUID
+      uuid?: NexusGenScalars['UUID'] | null; // UUID
     }
     someList: { // args
       items: Array<string | null>; // [String]!
