@@ -41,6 +41,10 @@ export type MaybePromiseDeep<T> = Date extends T
   ? MaybePromise<T>
   : string extends T
   ? MaybePromise<T>
+  : T extends Array<infer X>
+  ? MaybePromise<Array<X>>
+  : T extends ReadonlyArray<infer Z>
+  ? MaybePromise<ReadonlyArray<Z>>
   : T extends object
   ? MaybePromise<
       | T
