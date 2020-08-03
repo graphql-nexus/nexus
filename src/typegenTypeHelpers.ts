@@ -35,21 +35,23 @@ export type MaybePromise<T> = PromiseLike<T> | T
  */
 export type MaybePromiseDeep<T> = Date extends T
   ? MaybePromise<T>
+  : null extends T
+  ? MaybePromise<T>
   : boolean extends T
   ? MaybePromise<T>
   : number extends T
   ? MaybePromise<T>
   : string extends T
   ? MaybePromise<T>
+  : T extends Array<infer U>
+  ? MaybePromise<Array<MaybePromiseDeep<U>>>
+  : T extends ReadonlyArray<infer Y>
+  ? MaybePromise<ReadonlyArray<MaybePromiseDeep<Y>>>
   : T extends object
   ? MaybePromise<
       | T
       | {
-          [P in keyof T]: T[P] extends Array<infer U>
-            ? MaybePromise<Array<MaybePromiseDeep<U>>>
-            : T[P] extends ReadonlyArray<infer Y>
-            ? MaybePromise<ReadonlyArray<MaybePromiseDeep<Y>>>
-            : MaybePromiseDeep<T[P]>
+          [P in keyof T]: MaybePromiseDeep<T[P]>
         }
     >
   : MaybePromise<T>

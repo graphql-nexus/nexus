@@ -8,19 +8,8 @@
     "rootDir": "src",
     "strict": true,
     "noUnusedLocals": true,
-    "declaration": true,
-    // "declarationMap": true,
     "importHelpers": true,
-    "resolveJsonModule": true,
-    "sourceMap": true
+    "resolveJsonModule": true
   },
-  "exclude": [
-    "./examples",
-    "./scripts",
-    "./dist",
-    "./tests",
-    "./website",
-    "./gulpfile.ts",
-    "./package.json"
-  ]
+  "exclude": ["./examples", "./scripts", "./dist", "./tests", "./website", "./gulpfile.ts", "./package.json"]
 }
