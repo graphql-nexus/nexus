@@ -5,8 +5,14 @@ import { MaybePromiseDeep } from './typegenTypeHelpers'
 // A case found by Sytten https://github.com/graphql-nexus/schema/issues/470
 // The presence of .then was leading to type errors
 
-type ones = 1[]
-type GraphQLResponse = ones | null
-const getOnes = () => Promise.resolve([] as ones)
+type Ones = 1[]
+type GraphQLResponse = Ones | null
+const getOnes = () => Promise.resolve([] as Ones)
 
 expectAssignable<MaybePromiseDeep<GraphQLResponse>>(getOnes().then((ones) => ones))
+
+expectAssignable<MaybePromiseDeep<{ a: 1[] }>>({ a: [1] })
+expectAssignable<MaybePromiseDeep<{ a: 1[] }>>(Promise.resolve({ a: [1] }))
+
+expectAssignable<MaybePromiseDeep<1[]>>([1])
+expectAssignable<MaybePromiseDeep<1[]>>(Promise.resolve([1]))
