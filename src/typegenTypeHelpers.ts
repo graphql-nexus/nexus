@@ -35,6 +35,8 @@ export type MaybePromise<T> = PromiseLike<T> | T
  */
 export type MaybePromiseDeep<T> = Date extends T
   ? MaybePromise<T>
+  : null extends T
+  ? MaybePromise<T>
   : boolean extends T
   ? MaybePromise<T>
   : number extends T

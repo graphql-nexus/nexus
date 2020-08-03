@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "dist",
+    "declaration": true,
+    // "declarationMap": true,
+    "sourceMap": true
+  },
+  "exclude": [
+    "./**/*.spec.types.ts",
+    "./examples",
+    "./scripts",
+    "./dist",
+    "./tests",
+    "./website",
+    "./gulpfile.ts",
+    "./package.json"
+  ]
+}
