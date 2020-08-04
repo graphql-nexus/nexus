@@ -64,16 +64,24 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
 }
 
+export interface NexusGenScalars {
+  String: string
+  Int: number
+  Float: number
+  Boolean: boolean
+  ID: string
+}
+
 export interface NexusGenRootTypes {
   Query: {};
-  String: string;
-  Int: number;
-  Float: number;
-  Boolean: boolean;
-  ID: string;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
+  String: NexusGenScalars['String'];
+  Int: NexusGenScalars['Int'];
+  Float: NexusGenScalars['Float'];
+  Boolean: NexusGenScalars['Boolean'];
+  ID: NexusGenScalars['ID'];
 }
 
 export interface NexusGenFieldTypes {

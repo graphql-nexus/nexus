@@ -52,8 +52,13 @@ export function scalarType<TypeName extends string>(options: NexusScalarTypeConf
   return new NexusScalarTypeDef(options.name, options)
 }
 
-export function asNexusMethod<T extends GraphQLScalarType>(scalar: T, methodName: string): T {
+export function asNexusMethod<T extends GraphQLScalarType>(
+  scalar: T,
+  methodName: string,
+  rootTyping?: RootTypingDef
+): T {
   return decorateType(scalar, {
     asNexusMethod: methodName,
+    rootTyping: rootTyping,
   })
 }

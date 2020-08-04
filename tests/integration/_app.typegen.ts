@@ -34,6 +34,14 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {}
 
+export interface NexusGenScalars {
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
+}
+
 export interface NexusGenRootTypes {
   Mutation: {};
   Post: {
@@ -43,15 +51,15 @@ export interface NexusGenRootTypes {
   };
   Query: {};
   User: { firstName: string; lastName: string };
-  String: string;
-  Int: number;
-  Float: number;
-  Boolean: boolean;
-  ID: string;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   PostSearchInput: NexusGenInputs["PostSearchInput"];
+  String: NexusGenScalars["String"];
+  Int: NexusGenScalars["Int"];
+  Float: NexusGenScalars["Float"];
+  Boolean: NexusGenScalars["Boolean"];
+  ID: NexusGenScalars["ID"];
 }
 
 export interface NexusGenFieldTypes {

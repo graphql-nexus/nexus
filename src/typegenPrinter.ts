@@ -81,6 +81,7 @@ export class TypegenPrinter {
     const body = [
       this.printInputTypeMap(),
       this.printEnumTypeMap(),
+      this.printScalarTypeMap(),
       this.printRootTypeMap(),
       this.printAllTypesMap(),
       this.printReturnTypeMap(),
@@ -340,6 +341,23 @@ export class TypegenPrinter {
     return inputObjMap
   }
 
+  buildScalarTypeMap() {
+    const scalarMap: TypeMapping = {}
+    this.groupedTypes.scalar.forEach((e) => {
+      if (isSpecifiedScalarType(e)) {
+        scalarMap[e.name] = SpecifiedScalars[e.name as SpecifiedScalarNames]
+        return
+      }
+      const backingType = this.resolveBackingType(e.name)
+      if (backingType) {
+        scalarMap[e.name] = backingType
+      } else {
+        scalarMap[e.name] = 'any'
+      }
+    })
+    return scalarMap
+  }
+
   printInputTypeMap() {
     return this.printTypeFieldInterface('NexusGenInputs', this.buildInputTypeMap(), 'input type')
   }
@@ -348,13 +366,16 @@ export class TypegenPrinter {
     return this.printTypeInterface('NexusGenEnums', this.buildEnumTypeMap())
   }
 
+  printScalarTypeMap() {
+    return this.printTypeInterface('NexusGenScalars', this.buildScalarTypeMap())
+  }
+
   buildRootTypeMap() {
     const rootTypeMap: RootTypeMapping = {}
-    const hasFields: (GraphQLInterfaceType | GraphQLObjectType | GraphQLScalarType | GraphQLUnionType)[] = []
+    const hasFields: (GraphQLInterfaceType | GraphQLObjectType | GraphQLUnionType)[] = []
     hasFields
       .concat(this.groupedTypes.object)
       .concat(this.groupedTypes.interface)
-      .concat(this.groupedTypes.scalar)
       .concat(this.groupedTypes.union)
       .forEach((type) => {
         const rootTyping = this.resolveBackingType(type.name)
@@ -362,13 +383,7 @@ export class TypegenPrinter {
           rootTypeMap[type.name] = rootTyping
           return
         }
-        if (isScalarType(type)) {
-          if (isSpecifiedScalarType(type)) {
-            rootTypeMap[type.name] = SpecifiedScalars[type.name as SpecifiedScalarNames]
-          } else {
-            rootTypeMap[type.name] = 'any'
-          }
-        } else if (isUnionType(type)) {
+        if (isUnionType(type)) {
           rootTypeMap[type.name] = type
             .getTypes()
             .map((t) => `NexusGenRootTypes['${t.name}']`)
@@ -411,15 +426,18 @@ export class TypegenPrinter {
 
   buildAllTypesMap() {
     const typeMap: TypeMapping = {}
-    const toCheck: (GraphQLInputObjectType | GraphQLEnumType)[] = []
+    const toCheck: (GraphQLInputObjectType | GraphQLEnumType | GraphQLScalarType)[] = []
     toCheck
       .concat(this.groupedTypes.input)
       .concat(this.groupedTypes.enum)
+      .concat(this.groupedTypes.scalar)
       .forEach((type) => {
         if (isInputObjectType(type)) {
           typeMap[type.name] = `NexusGenInputs['${type.name}']`
         } else if (isEnumType(type)) {
           typeMap[type.name] = `NexusGenEnums['${type.name}']`
+        } else if (isScalarType(type)) {
+          typeMap[type.name] = `NexusGenScalars['${type.name}']`
         }
       })
     return typeMap
@@ -642,12 +660,7 @@ export class TypegenPrinter {
     if (isSpecifiedScalarType(type)) {
       return SpecifiedScalars[type.name as SpecifiedScalarNames]
     }
-    const backingType = (this.typegenInfo.backingTypeMap as any)[type.name]
-    if (typeof backingType === 'string') {
-      return backingType
-    } else {
-      return 'any'
-    }
+    return `NexusGenScalars['${type.name}']`
   }
 
   printPlugins() {
