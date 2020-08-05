@@ -419,7 +419,7 @@ export class TypegenPrinter {
   resolveBackingType(typeName: string): string | undefined {
     const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
     if (rootTyping) {
-      return typeof rootTyping === 'string' ? rootTyping : rootTyping.name
+      return typeof rootTyping === 'string' ? rootTyping : (rootTyping.alias || rootTyping.name)
     }
     return (this.typegenInfo.backingTypeMap as any)[typeName]
   }
