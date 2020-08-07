@@ -1,5 +1,4 @@
 import * as GQL from 'graphql'
-import { ExecutionResultDataDefault } from 'graphql/execution/execute'
 import { inputObjectType, objectType } from '../src'
 
 /**
@@ -42,10 +41,10 @@ export const restoreEnvBeforeEach = () => {
 export function subscribe(
   schema: GQL.GraphQLSchema,
   document: string
-): Promise<AsyncIterableIterator<GQL.ExecutionResult<ExecutionResultDataDefault>>> {
+): Promise<AsyncIterableIterator<GQL.ExecutionResult>> {
   const documentAST = GQL.parse(document)
   return GQL.subscribe({ schema, document: documentAST }) as Promise<
-    AsyncIterableIterator<GQL.ExecutionResult<ExecutionResultDataDefault>>
+    AsyncIterableIterator<GQL.ExecutionResult>
   >
 }
 

@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { GraphQLDateTime } from 'graphql-iso-date'
+import { GraphQLDateTime } from 'graphql-scalars'
 import path from 'path'
 import {
   decorateType,

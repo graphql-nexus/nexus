@@ -272,21 +272,48 @@ exports[`connectionPlugin field level configuration can configure the edge per-i
 `;
 
 exports[`connectionPlugin field level configuration can define a schema with multiple plugins, and separate them by typePrefix 1`] = `
-"type AnalyticsUserConnection {
+"type Query {
+  users(
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+  ): UserConnection
+  userStats(
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+  ): AnalyticsUserConnection
+}
+
+type UserConnection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
   \\"\\"\\"
-  edges: [AnalyticsUserEdge]
+  edges: [UserEdge]
 
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
   \\"\\"\\"
   pageInfo: PageInfo!
-  totalCount: Int
-  averageCount: Int
 }
 
-type AnalyticsUserEdge {
+type UserEdge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
@@ -319,58 +346,31 @@ type PageInfo {
   endCursor: String
 }
 
-type Query {
-  users(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
-    after: String
-
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
-    before: String
-  ): UserConnection
-  userStats(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
-    after: String
-
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
-    before: String
-  ): AnalyticsUserConnection
-}
-
-type User {
-  id: ID
-  name: String
-}
-
-type UserConnection {
+type AnalyticsUserConnection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
   \\"\\"\\"
-  edges: [UserEdge]
+  edges: [AnalyticsUserEdge]
 
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
   \\"\\"\\"
   pageInfo: PageInfo!
+  totalCount: Int
+  averageCount: Int
 }
 
-type UserEdge {
+type AnalyticsUserEdge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
+}
+
+type User {
+  id: ID
+  name: String
 }
 "
 `;

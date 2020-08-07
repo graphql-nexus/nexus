@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { GraphQLDate, GraphQLDateTime } from 'graphql-iso-date'
+import { GraphQLDate, GraphQLDateTime } from 'graphql-scalars'
 import {
   asNexusMethod,
   inputObjectType,

@@ -2684,10 +2684,10 @@ graphql-extensions@0.4.3:
   dependencies:
     "@apollographql/apollo-tools" "^0.3.0"
 
-graphql-iso-date@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.6.1.tgz#bd2d0dc886e0f954cbbbc496bbf1d480b57ffa96"
-  integrity sha512-AwFGIuYMJQXOEAgRlJlFL4H1ncFM8n8XmoVDTNypNOZyQ8LFDG2ppMFlsS862BSTCDcSUfHp8PD3/uJhv7t59Q==
+graphql-scalars@^1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/graphql-scalars/-/graphql-scalars-1.2.6.tgz#a934ed63c91054db00cde41b9beeddb09b606729"
+  integrity sha512-k/88kZVXIuUKQuVLokokkKU2lnFEZ9aTn7O0fDweJpISd0pP5fQU1wzPN0jarH4Lnadr4092PfyIUtCcKzkeAw==
 
 graphql-subscriptions@^1.0.0:
   version "1.0.0"
@@ -2722,12 +2722,17 @@ graphql-upload@^8.0.2:
     http-errors "^1.7.1"
     object-path "^0.11.4"
 
-graphql@^14.5.3, graphql@^14.5.8:
+graphql@^14.5.3:
   version "14.5.8"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.5.8.tgz#504f3d3114cb9a0a3f359bbbcf38d9e5bf6a6b3c"
   integrity sha512-MMwmi0zlVLQKLdGiMfWkgQD7dY/TUKt4L+zgJ/aR0Howebod3aNgP5JkgvAULiR2HPVZaP2VEElqtdidHweLkg==
   dependencies:
     iterall "^1.2.2"
+
+graphql@^15.3.0:
+  version "15.3.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.3.0.tgz#3ad2b0caab0d110e3be4a5a9b2aa281e362b5278"
+  integrity sha512-GTCJtzJmkFLWRfFJuoo9RWWa/FfamUHgiFosxi/X1Ani4AVWbeyBenZTNX6dM+7WSbbFfTo/25eh0LLkwHMw2w==
 
 growly@^1.2.0:
   version "1.3.0"
@@ -4454,14 +4459,6 @@ netjet@1.3.0:
     lodash.unescape "^4.0.0"
     lru-cache "^4.0.0"
     posthtml "^0.9.0"
-
-nexus@0.12.0-rc.11:
-  version "0.12.0-rc.11"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-0.12.0-rc.11.tgz#7d9da9dd2ab537c7908e25442be2a0ecbe2a5ca6"
-  integrity sha512-zfeTKQQIJBE7wXYpIrkszzO9owNIDf8GxalyKih/dSxiFG7O225RX7PI+XKfAulL4oxdPhrf3WB3ypBhLOf9EQ==
-  dependencies:
-    iterall "^1.2.2"
-    tslib "^1.9.3"
 
 nice-try@^1.0.4:
   version "1.0.5"

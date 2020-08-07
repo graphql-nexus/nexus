@@ -25,17 +25,12 @@ Array [
 `;
 
 exports[`plugin has an onMissingType, which will be called in order when we encounter a missing type 1`] = `
-"type ConnectionInfo {
-  hasNextPage: Boolean!
-  hasPrevPage: Boolean!
+"type User {
+  id: ID!
 }
 
 type Query {
   users: UserConnection!
-}
-
-type User {
-  id: ID!
 }
 
 type UserConnection {
@@ -46,6 +41,11 @@ type UserConnection {
 type UserEdge {
   cursor: String!
   node: User!
+}
+
+type ConnectionInfo {
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
 }
 "
 `;
