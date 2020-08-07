@@ -51,7 +51,7 @@ If you have an existing GraphQL scalar and you'd like to expose it as a method o
 ```ts
 import { GraphQLDate } from "graphql-iso-date";
 
-export const GQLDate = asNexusMethod(GraphQLDate, "date");
+export const GQLDate = asNexusMethod(GraphQLDate, "date", "Date");
 ```
 
 ```ts
