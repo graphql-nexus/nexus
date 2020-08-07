@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`onInstall plugins does not have access to inline types 1`] = `
-"input Inline {
-  hidden: String
+"type Query {
+  bar(inline: Inline): String!
 }
 
-type Query {
-  bar(inline: Inline): String!
+input Inline {
+  hidden: String
 }
 "
 `;

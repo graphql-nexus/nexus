@@ -63,17 +63,17 @@ it('defines a field on the mutation type as shorthand', async () => {
   })
 
   expect(GQL.printSchema(schema)).toMatchInlineSnapshot(`
-    "type Query {
-      ok: Boolean!
-    }
-
-    type Subscription {
+    "type Subscription {
       someField: Int!
       someInt: Int!
       someString: String!
       someFloat: Float!
       someBoolean: Boolean!
       someID: ID!
+    }
+
+    type Query {
+      ok: Boolean!
     }
     "
   `)
