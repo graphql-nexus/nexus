@@ -21,12 +21,12 @@ const config = {
     //   { name: 'Community', link: 'https://www.prisma.io/community/' },
     //   { name: 'FAQ', link: 'https://www.prisma.io/docs/more/faq' },
     // ],
-    /*
     links: [
-      { name: 'Nexus Framework', link: '/' },
-      { name: 'Nexus Schema', link: '/components-standalone/schema' },
+      { name: 'Docs', link: '/' },
+      { name: 'Playground', link: '/' },
+      { name: 'SDL Converter', link: '/' },
+      { name: 'Examples', link: '/' },
     ],
-    */
     search: {
       indexName: process.env.GATSBY_ALGOLIA_INDEX_NAME,
       algoliaAppId: process.env.GATSBY_ALGOLIA_APP_ID,
