@@ -45,7 +45,7 @@ const config = {
       image: '/social/missing.png',
     },
     og: {
-      site_name: 'Nexus',
+      site_name: 'Nexus Schema', // TODO
       type: 'website',
       image: {
         alt: 'Nexus',
@@ -64,7 +64,7 @@ const config = {
   },
   footer: {
     logoLink: '/',
-    title: 'Nexus',
+    title: 'Nexus Schema',
     products: [
       {
         name: 'Prisma Client',
