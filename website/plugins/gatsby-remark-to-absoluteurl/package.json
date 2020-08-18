@@ -1,0 +1,12 @@
+{
+  "name": "gatsby-remark-to-absoluteurl",
+  "version": "1.0.0",
+  "description": "Relative to absolute url",
+  "main": "index.js",
+  "author": "Nilufar Bava <nilubava@gmail.com>",
+  "license": "ISC",
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin"
+  ]
+}

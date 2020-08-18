@@ -1,0 +1,712 @@
+---
+title: Overview
+---
+
+## Introduction
+
+Prisma is a next-generation developer-centric toolkit focused on making the data layer easy. This plugin gives you:
+
+###  Workflow integration
+
+Nexus `build` and `dev` workflows are enhanced to run your Prisma generators.
+
+### Runtime integration  
+
+Nexus schema component [GraphQL type builders](/guides/schema#graphql-type-builders) are augmented with `.model` and `.crud` methods. These make it easy for you to project your Prisma models and expose operations against them in your GraphQL API. Resolvers are dynamically created for you removing the need for traditional ORMs/query builders like TypeORM, Sequelize, or Knex. Out-of-box features include pagination, filtering, and ordering. And when you do need to drop down to custom resolvers a [`Prisma Client`](https://github.com/prisma/prisma-client-js) instance on `context` is ready to go.
+
+### Testtime integration
+
+Nexus testing component is augmented with an instance of the [`Prisma Client`](https://github.com/prisma/prisma-client-js), to help you easily seed your database for your tests.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Installation
+
+1. Install the plugin
+
+    ```bash-symbol
+    npm add nexus-plugin-prisma
+    ```
+
+    > Warning: All Prisma deps are bundled, so do _not_ install e.g. `@prisma/cli` or `@prisma/client`. If you are wondering _why_ you can read through [Nexus' philosophy on dependency management](/meta/architecture#dependency-philosophy). You can still find the the prisma CLI by running `npm run prisma` or `yarn prisma`. In an emergency you can still control version of prisma deps with Yarn [`"resolutions"`](https://classic.yarnpkg.com/en/docs/selective-version-resolutions).
+
+2. Enable the plugin
+
+    ```ts
+    import { use } from 'nexus'
+    import { prisma } from 'nexus-plugin-prisma'
+
+    use(prisma())
+    ```
+
+## Getting started
+
+There are two ways you can start with the Prisma plugin. Either from scratch, or using an existing database.
+
+### From scratch
+
+1. Create a `schema.prisma` file
+
+    ```prisma
+    //schema.prisma
+
+    generator prisma_client {
+      provider = "prisma-client-js"
+    }
+
+    model User {
+      id   Int @id @default(autoincrement())
+      name String
+    }
+    ```
+
+2. Add a datasource to your schema. We recommend you use Postgres but MySQL and SQLite are also supported.
+
+    To add your datasource, simply copy/paste one of the block below at the top of your `schema.prisma` file
+
+    > **Note**:  You can also pass the database credentials via a `.env` file. [Read more about it here](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file#using-environment-variables)
+
+    Using PostgreSQL:
+
+    ```prisma
+    //schema.prisma
+
+    datasource db {
+      provider = "postgres"
+      url = "postgresql://USER:PASSWORD@localhost:5432/DATABASE"
+    }
+    ```
+
+    Using MySQL:
+
+    ```prisma
+    //schema.prisma
+
+    datasource db {
+      provider = "mysql"
+      url = "mysql://USER:PASSWORD@localhost:3306/DATABASE"
+    }
+    ```
+
+    Using SQLite:
+
+    ```prisma
+    //schema.prisma
+
+    datasource db {
+      provider = "sqlite"
+      url = "file:./dev.db"
+    }
+    ```
+
+3. Create a migration file:
+
+    ```bash-symbol
+    npm run prisma migrate save --experimental
+    ```
+
+4. Migrate your database: 
+
+    ```bash-symbol
+    npm run prisma migrate up --experimental
+    ```
+
+You're ready to start working!
+
+### From an existing database
+
+When starting from an existing database, you should use [Prisma's introspection](https://www.prisma.io/docs/reference/tools-and-interfaces/introspection) feature.
+
+1. Create a `schema.prisma` file.
+
+  Create a `schema.prisma` file and add your database credentials in it so that Prisma can introspect your database schema.
+
+  > **Note**:  You can also pass the database credentials via a `.env` file. [Read more about it here](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file#using-environment-variables)
+
+    Using PostgreSQL:
+
+    ```prisma
+    //schema.prisma
+
+    datasource db {
+      provider = "postgres"
+      url = "postgresql://USER:PASSWORD@localhost:5432/DATABASE"
+    }
+    ```
+
+    Using MySQL:
+
+    ```prisma
+    //schema.prisma
+
+    datasource db {
+      provider = "mysql"
+      url = "mysql://USER:PASSWORD@localhost:3306/DATABASE"
+    }
+    ```
+
+    Using SQLite:
+
+    ```prisma
+    //schema.prisma
+
+    datasource db {
+      provider = "sqlite"
+      url = "file:./dev.db"
+    }
+    ```
+
+2. Introspect your database:
+
+  ```bash-symbol
+  npm run prisma introspect
+  ```
+
+3. Generate the Prisma Client. Add the following block at the top of your `schema.prisma` file:
+
+  ```
+  generator prisma_client {
+    provider = "prisma-client-js"
+  }
+  ```
+
+  The plugin will take care of generating the Prisma Client for you after that.
+
+You're ready to start working!
+
+## Example
+
+Given a [Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) (left), you will be able to project these Prisma models onto your API and expose operations against them (middle) resulting in the GraphQL Schema (right).
+
+> **Note**:  `t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+
+<div class="Row Collapsable">
+
+```prisma
+generator prisma_client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  birthDate DateTime
+}
+
+model Post {
+  id     String   @id @default(cuid())
+  author User[]
+}
+
+```
+
+```ts
+import { schema } from 'nexus'
+
+schema.queryType({
+  definition(t) {
+    t.crud.user()
+    t.crud.users({
+      ordering: true,
+    })
+    t.crud.post()
+    t.crud.posts({
+      filtering: true,
+    })
+  },
+})
+
+schema.mutationType({
+  definition(t) {
+    t.crud.createOneUser()
+    t.crud.createOnePost()
+    t.crud.deleteOneUser()
+    t.crud.deleteOnePost()
+  },
+})
+
+schema.objectType({
+  name: 'User',
+  definition(t) {
+    t.model.id()
+    t.model.email()
+    t.model.birthDate()
+    t.model.posts()
+  },
+})
+
+schema.objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.author()
+  },
+})
+```
+
+```graphql
+scalar DateTime
+
+input DateTimeFilter {
+  equals: DateTime
+  gt: DateTime
+  gte: DateTime
+  in: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  not: DateTime
+  notIn: [DateTime!]
+}
+
+type Mutation {
+  createOnePost(data: PostCreateInput!): Post!
+  createOneUser(data: UserCreateInput!): User!
+  deleteOnePost(where: PostWhereUniqueInput!): Post
+  deleteOneUser(where: UserWhereUniqueInput!): User
+}
+
+enum OrderByArg {
+  asc
+  desc
+}
+
+type Post {
+  author(after: String, before: String, first: Int, last: Int): [User!]!
+  id: ID!
+}
+
+input PostCreateInput {
+  author: UserCreateManyWithoutAuthorInput
+  id: ID
+}
+
+input PostCreateManyWithoutPostsInput {
+  connect: [PostWhereUniqueInput!]
+  create: [PostCreateWithoutAuthorInput!]
+}
+
+input PostCreateWithoutAuthorInput {
+  id: ID
+}
+
+input PostFilter {
+  every: PostWhereInput
+  none: PostWhereInput
+  some: PostWhereInput
+}
+
+input PostWhereInput {
+  AND: [PostWhereInput!]
+  author: UserFilter
+  id: StringFilter
+  NOT: [PostWhereInput!]
+  OR: [PostWhereInput!]
+}
+
+input PostWhereUniqueInput {
+  id: ID
+}
+
+type Query {
+  post(where: PostWhereUniqueInput!): Post
+  posts(after: String, before: String, first: Int, last: Int, where: PostWhereInput): [Post!]!
+  user(where: UserWhereUniqueInput!): User
+  users(after: String, before: String, first: Int, last: Int, orderBy: UserOrderByInput): [User!]!
+}
+
+input StringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: String
+  notIn: [String!]
+  startsWith: String
+}
+
+type User {
+  birthDate: DateTime!
+  email: String!
+  id: ID!
+  posts(after: String, before: String, first: Int, last: Int): [Post!]!
+}
+
+input UserCreateInput {
+  birthDate: DateTime!
+  email: String!
+  id: ID
+  posts: PostCreateManyWithoutPostsInput
+}
+
+input UserCreateManyWithoutAuthorInput {
+  connect: [UserWhereUniqueInput!]
+  create: [UserCreateWithoutPostsInput!]
+}
+
+input UserCreateWithoutPostsInput {
+  birthDate: DateTime!
+  email: String!
+  id: ID
+}
+
+input UserFilter {
+  every: UserWhereInput
+  none: UserWhereInput
+  some: UserWhereInput
+}
+
+input UserOrderByInput {
+  birthDate: OrderByArg
+  email: OrderByArg
+  id: OrderByArg
+}
+
+input UserWhereInput {
+  AND: [UserWhereInput!]
+  birthDate: DateTimeFilter
+  email: StringFilter
+  id: StringFilter
+  NOT: [UserWhereInput!]
+  OR: [UserWhereInput!]
+  posts: PostFilter
+}
+
+input UserWhereUniqueInput {
+  email: String
+  id: ID
+}
+```
+
+</div>
+
+## Plugin settings
+
+You can _optionally_ pass some settings to the plugin.
+
+### Type definition
+
+```ts
+export type PrismaClientOptions = {
+  /**
+   * Options to pass to the Prisma Client instantiated by the plugin.
+   * If you want to instantiate your own Prisma Client, use `instance` instead.
+   */
+  options: ClientOptions
+}
+
+export type PrismaClientInstance = {
+  /**
+   * Instance of your own Prisma Client. You can import it from 'nexus-plugin-prisma/client'.
+   * If you just want to pass some settings to the Prisma Client, use `options` instead.
+   */
+  instance: PrismaClient
+}
+
+export type Settings = {
+  /**
+   * Use this to pass some settings to the Prisma Client instantiated by the plugin or to pass your own Prisma Client
+   */
+  client?: PrismaClientOptions | PrismaClientInstance
+  /**
+   * Enable or disable migrations run by the plugin when editing your schema.prisma file
+   *
+   * @default true
+   */
+  migrations?: boolean
+  /**
+   * Features that require opting into. These are all disabled by default.
+   */
+  features?: {
+    /**
+     * Enable **experimental** CRUD capabilities.
+     * Add a `t.crud` method in your definition block to generate CRUD resolvers in your `Query` and `Mutation` GraphQL Object Type.
+     *
+     * @default false
+     */
+    crud?: boolean
+  }
+}
+```
+
+### Examples
+
+#### Configuring the Prisma Client
+
+```ts
+import { use } from 'nexus'
+import { prisma } from 'nexus-plugin-prisma'
+
+use(
+  prisma({
+    client: { options: { log: ['query'] } },
+  })
+)
+```
+
+#### Using a custom instance of the Prisma Client
+
+```ts
+import { use } from 'nexus'
+import { prisma } from 'nexus-plugin-prisma'
+import { PrismaClient } from 'nexus-plugin-prisma/client'
+
+use(
+  prisma({
+    client: { instance: new PrismaClient() },
+  })
+)
+```
+
+## Recipes
+
+### Projecting Prisma model fields
+
+Exposing one of your Prisma models in your GraphQL API
+
+```ts
+schema.objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.title()
+    t.model.content()
+  },
+})
+```
+
+### Simple computed GraphQL fields
+
+You can add computed fields to a GraphQL object using the standard GraphQL Nexus API.
+
+```ts
+schema.objectType({
+  name: "Post",
+  definition(t) {
+    t.model.id()
+    t.model.title()
+    t.model.content()
+    t.string("uppercaseTitle", {
+      resolve({ title }, args, ctx) {
+        return title.toUpperCase(),
+      }
+    })
+  },
+})
+```
+
+### Complex computed GraphQL fields
+
+If you need more complicated logic for your computed field (e.g. have access to some information from the database), you can use the `prisma` instance that's attached to the context and implement your resolver based on that.
+
+```ts
+schema.objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.content()
+    t.string('anotherComputedField', {
+      async resolve(_parent, _args, ctx) {
+        const databaseInfo = await ctx.prisma.someModel.someOperation(...)
+        const result = doSomething(databaseInfo)
+        return result
+      }
+    })
+  }
+})
+```
+
+### Project a Prisma field to a differently named GraphQL field
+
+```ts
+schema.objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.content({
+      alias: 'body',
+    })
+  },
+})
+```
+
+### Publish full-featured reads on a Prisma model
+
+`t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+
+```ts
+schema.queryType({
+  definition(t) {
+    t.crud.post()
+    t.crud.posts({
+      ordering: true,
+      filtering: true,
+    })
+  },
+})
+```
+
+### Publish writes on a Prisma model
+
+`t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+
+```ts
+schema.mutationType({
+  definition(t) {
+    t.crud.createPost()
+    t.crud.updatePost()
+    t.crud.updateManyPost()
+    t.crud.upsertPost()
+    t.crud.deletePost()
+    t.crud.deleteManyPost()
+  },
+})
+```
+
+### Publish customized reads on a Prisma model
+
+`t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+
+```ts
+schema.queryType({
+  definition(t) {
+    t.crud.posts({
+      filtering: {
+        id: true,
+        title: true,
+      },
+      ordering: { title: true },
+    })
+  },
+})
+```
+
+### Publish autogenerated mutations with computed input values
+
+`t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+
+```ts
+schema.mutationType({
+  definition(t) {
+    /* 
+    Assuming our prisma model for User has a createdByBrowser field,
+    this removes it from the input type but ensures the value is
+    inferred from context and passed to Prisma Client.
+    */
+    t.crud.createOneUser({
+      computedInputs: {
+        createdByBrowser: ({ args, ctx, info }) => ctx.session.browser,
+      },
+    })
+  },
+})
+```
+
+### Globally remove a field from input types and infer its value
+
+🚧 Work in progress.
+
+> **Note** Not yet possible in framework.
+
+```ts
+nexusPrismaPlugin({
+  ...other config...
+  /*
+  Remove fields named "user" from all input types. When resolving
+  a request whose data contains any of these types, the value is inferred
+  from context and passed to Prisma Client, even if it's nested. This is great for
+  creating data associated with one user's account.
+  */
+  computedInputs: {
+    user: ({ args, ctx, info }) => ({
+      connect: {
+        id: ctx.userId,
+      },
+    }),
+  },
+})
+```
+
+```ts
+schema.mutationType({
+  definition(t) {
+    t.crud.createOnePost()
+  },
+})
+```
+
+Without `computedInputs`:
+
+```graphql
+mutation createOnePost {
+  createOnePost(
+    data: {
+      title: "Automatically generate clean APIs!"
+      image: { url: "https://example.com/images/prancing-unicorns", user: { connect: { id: 1 } } }
+      user: { connect: { id: 1 } }
+    }
+  )
+}
+```
+
+With `computedInputs`:
+
+```graphql
+mutation createOnePost {
+  createOnePost(
+    data: {
+      title: "Automatically generate clean APIs!"
+      image: { url: "https://example.com/images/prancing-unicorns" }
+    }
+  )
+}
+```
+
+### Publish model writes along side Prisma Client-resolved fields
+
+`t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+
+```ts
+schema.mutationType({
+  definition(t) {
+    t.crud.createUser()
+    t.crud.updateUser()
+    t.crud.deleteUser()
+    t.crud.deletePost()
+
+    t.field('createDraft', {
+      type: 'Post',
+      args: {
+        title: stringArg(),
+        content: stringArg({
+          nullable: true,
+        }),
+      },
+      resolve: (parent, { title, content }, ctx) => {
+        return ctx.prisma.posts.createPost({ title, content })
+      },
+    })
+
+    t.field('publish', {
+      type: 'Post',
+      nullable: true,
+      args: {
+        id: idArg(),
+      },
+      resolve(parent, { id }, ctx) {
+        return ctx.prisma.posts.updatePost({
+          where: { id },
+          data: {
+            published: true,
+          },
+        })
+      },
+    })
+  },
+})
+```

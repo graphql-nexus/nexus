@@ -1,0 +1,327 @@
+---
+title: Recipes
+---
+
+## Use Prisma
+
+1. Install the prisma plugin
+
+   ```bash-symbol
+   npm add nexus-plugin-prisma
+   ```
+
+1. Enable the plugin
+
+   ```ts
+   import { use } from 'nexus'
+   import { prisma } from 'nexus-plugin-prisma'
+
+   use(prisma())
+   ```
+
+1. Add a `schema.prisma` file. Add a datasource. Here we're working with SQLite. Add Prisma Client.
+
+   ```prisma
+   +++ prisma/schema.prisma
+   +
+   +  datasource db {
+   +    provider = "sqlite"
+   +    url      = "file:dev.db"
+   +  }
+   +
+   +  generator prisma_client {
+   +    provider = "prisma-client-js"
+   +  }
+   ```
+
+1. Initialize your database
+
+   ```bash-symbol
+   yarn prisma migrate save --experimental && yarn prisma migrate up --experimental
+   ```
+
+Your app now includes the following:
+
+`t.model` and `t.crud` field builders e.g.:
+
+    ```ts
+    +++ src/graphql.ts
+      objectType({
+        name: 'User',
+        definition(t) {
+    -     t.id('id)
+    -     t.string('name')
+    +     t.model.id()
+    +     t.model.name()
+        },
+      })
+    ```
+
+An instance of the generated Prisma Client is a added to context under the `db` property, allowing e.g.:
+
+    ```ts
+    +++ src/graphql.ts
+      queryType({
+        definition(t) {
+          t.list.field('users', {
+            type: 'User',
+    -       resolve() {
+    -         return [{ id: '1643', name: 'newton' }]
+    +       resolve(_root, _args, ctx) {
+    +         return ctx.db.users.findMany()
+            },
+          })
+        },
+      })
+    ```
+
+The TypeScript types representing your Prisma models are registered as a Nexus data source. In short this enables proper typing of `parent` parameters in your resolves. They reflect the data of the correspondingly named Prisma model.
+
+## Create a consumable plugin
+
+1. Scaffold Your plugin project
+
+   ```bash-symbol
+   npx nexus create plugin
+   ```
+
+2. Publish it
+
+   ```bash-symbol
+   yarn publish
+   ```
+
+## Setting up PostgreSQL
+
+##### Hosted
+
+For trying things out in a deployed setting you can try Heroku's free postgres tier. Setting it up is simple:
+
+```bash-symbol
+heroku create
+heroku addons:create heroku-postgresql
+
+# Now get the connection URL
+heroku pg:credentials:url
+```
+
+For a more complete explanation of this approach see [this blog post by Nikolas Burk](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1) using the the Heroku UI.
+
+##### Local
+
+The recommended way to run postgres locally is with docker, because it is easy flexible and reliable.
+
+1. Start a postgres server for your app:
+
+   ```bash-symbol
+   docker run --detach --publish 5432:5432 -e POSTGRES_PASSWORD=postgres --name 'postgres' postgres:10.12
+   ```
+
+2. Now you can use a connection URL like:
+
+   ```
+   postgresql://postgres:postgres@localhost:5432/myapp
+   ```
+
+If you don't want to use a docker, here are some links to alternative approaches for macOS users:
+
+- [With Homebrew](https://wiki.postgresql.org/wiki/Homebrew)
+- [With Postgres.app](https://postgresapp.com)
+
+## Go to production
+
+1. Add a build script
+
+   ```json
+   +++ package.json
+   + "build": "nexus build"
+   ```
+
+2. Add a start script
+
+   ```json
+   +++ package.json
+   + "start": "node .nexus/build/api"
+   ```
+
+3. In many cases this will be enough. Many deployment platforms will call into these scripts by default. You can customize where `build` outputs to if your deployment platform requires it. There are built in guides for `vercel` and `heroku` which will check your project is prepared for deployment to those respective platforms. Take advantage of them if applicable:
+
+   ```json
+   +++ package.json
+   + "build": "nexus build --deployment vercel"
+   ```
+
+   ```json
+   +++ package.json
+   + "build": "nexus build --deployment heroku"
+   ```
+
+## Prisma + Heroku + PostgreSQL
+
+1. Confirm the name of the environment variable that Heroku will inject into your app at runtime for the database connection URL. In a simple setup, with a single attached database, it is `DATABASE_URL`.
+1. Update your Prisma Schema file to get the database connection URL from an environment variable of the same name as in step 1. Example:
+
+   ```prisma
+   --- prisma/schema.prisma
+   +++ prisma/schema.prisma
+     datasource postgresql {
+       provider = "postgresql"
+   -   url      = "postgresql://<user>:<pass>@localhost:5432/<db-name>"
+   +   url      = env("DATABASE_URL")
+     }
+   ```
+
+1. Update your local development environment to pass the local development database connection URL via an environment variable of the same name as in step 1. 
+
+   Example with [direnv](https://direnv.net/):
+
+   1. Install `direnv`
+
+      ```bash-symbol
+      brew install direnv
+      ```
+
+   1. Hook `direnv` into your shell ([instructions](https://direnv.net/docs/hook.html))
+   1. Setup an `.envrc` file inside your project
+
+      ```
+      +++ .envrc
+      + DATABASE_URL="postgresql://postgres:postgres@localhost:5432/myapp"
+      ```
+
+   1. Approve the `.envrc` file (one time, every time the envrc file changes).
+      ```bash-symbol
+      direnv allow .
+      ```
+   1. Done. Now when you work within your project with a shell, all your commands will be run with access to the environment variables defined in your `.envrc` file. The magic of `direnv` is that these environment variables are automatically exported to and removed from your environment based on you being within your project directory or not.
+
+## Integrate `createTestContext` with `jest`
+
+1. Wrap `createTestContext` so that it is integrated with the `jest` test suite lifecycle hooks:
+
+   ```ts
+   // tests/__helpers.ts
+   import { createTestContext, TestContext } from 'nexus/testing'
+
+   export function createTestContext(): TestContext {
+     let ctx: TestContext
+
+     beforeAll(async () => {
+       Object.assign(ctx, await createTestContext())
+       await ctx.app.start()
+     })
+
+     afterAll(async () => {
+       await ctx.app.stop()
+     })
+
+     return ctx
+   }
+   ```
+
+1. Import your wrapped version into all test suites needing it:
+
+   ```ts
+   // tests/foo.spec.ts
+   import { createTestContext } from './__helpers'
+
+   const ctx = createTestContext()
+
+   it('foo', () => {
+     // use `ctx` in here
+   })
+   ```
+
+   Note that `ctx` is not usable outside of `jest` blocks (`it` `before` `after` `...`). If you try to you'll find it to be `undefined`.
+
+   ```ts
+   import { createTestContext } from './__helpers'
+
+   const { app } = createTestContext() // Error!
+   ```
+
+## Debugging
+
+### With VS Code
+
+We made it very simple to debug your app with VS Code.
+
+> **Note**: If you used `npx nexus` to initialize your project, jump straight to step 2.
+
+1. Create a `.vscode/launch.json` file and paste the following content
+
+   ```json
+   {
+     "version": "0.2.0",
+     "configurations": [
+       {
+         "type": "node",
+         "request": "launch",
+         "name": "Debug Nexus App",
+         "protocol": "inspector",
+         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/nexus",
+         "runtimeArgs": ["dev"],
+         "sourceMaps": true,
+         "console": "integratedTerminal"
+       }
+     ]
+   }
+   ```
+
+2. Click on the `Run` tab on the left side of VS Code
+
+3. Make sure `Debug Nexus App` is selected in the dropdown located at the top of the panel that the `Run` tab opened
+
+4. Set some breaking points where you want to inspect your code
+
+5. Click the green "Start debugging" button located next to the dropdown
+
+6. That's it. VS Code should run your code and stop wherever your set some breakpoints
+
+## Use with Next.js
+
+Find working examples [here](https://github.com/graphql-nexus/examples#nextjs).
+
+### Steps
+
+1. Your Next.js project must be [a TypeScript](https://nextjs.org/docs/basic-features/typescript), not JavaScript, one
+1. Install `nexus`
+1. Create _one_ GraphQL endpoint, e.g. `<project root>/pages/api/graphql.ts`
+1. The minimum boilerplate needed in your GraphQL endpoint is:
+
+   ```ts
+   // <project root>/pages/api/graphql.ts
+
+   if (process.env.NODE_ENV === 'development') require('nexus').default.reset()
+
+   const app = require('nexus').default
+
+   // Require your nexus modules here.
+   // Do not write them inline, since the Nexus API is typed `any` because of `require` import.
+   // require('...')
+
+   app.assemble()
+
+   export default app.server.handlers.graphql
+   ```
+
+1. While developing, you should run Nexus reflection a separate terminal apart from your normal `next dev`. This is in order to benefit from the type safety that Nexus can give you. One of its primary benefits. For example:
+
+   ```json
+   "nexus:reflection": "nexus dev --reflection --entrypoint pages/api/graphql.ts",
+   ```
+
+1. With `compilerOptions.noEmit` set to `true` in your tsconfig (forced by Next.js), treat `nexus build` as a check step in your ci process.
+
+### Notes
+
+Overall, here are the limitations with Next.js integration that you will not find in a "normal" Nexus project.
+
+1. You must use CommonJS `require` as opposed to ES module `import` syntax for your Nexus api module. This is to preserve import order.
+1. You must run `app.assemble()` before accessing the server handlers.
+1. In development, you must run `app.reset()` in your Nexus api module, before anything else.
+1. Make sure that you only have one Nexus api module, or else you may experience difficulties in development.
+1. Make sure that your Nexus modules (ones using the `nexus` package) are only part of the import graph of your Nexus api module.
+1. You will not be able to use the Nexus testing component
+
+Integration with Next.js should improve [once it supports plugins](https://github.com/zeit/next.js/issues/9133). For example you will probably not need to think about `app.assemble()` and `app.reset()` anymore and be able to use ES module syntax in your Nexus api module.

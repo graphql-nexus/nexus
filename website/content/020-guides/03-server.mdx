@@ -1,0 +1,34 @@
+---
+title: 'Server'
+metaTitle: 'Server'
+---
+
+## Overview
+
+The Nexus server component supports two modes: "serverful" and "serverless" (experimental).
+
+## Serverless
+
+Nexus has **experimental** support for serverless deployments. Support for serverless is being tracked in [GitHub issue #782](https://github.com/graphql-nexus/nexus/issues/782).
+
+> **Note**: API documentation for the serverless features is not yet available.
+
+The server component of Nexus exposes HTTP request handlers:
+
+```ts
+import { server } from 'nexus'
+
+server.handlers.graphql // call with (req, res)
+```
+
+Use these to handle to requests in your serverless environment:
+
+```ts
+import { server } from 'nexus'
+
+export default (req, res) => {
+  server.handlers.graphql(req, res)
+}
+```
+
+See the [Next.JS example](https://github.com/graphql-nexus/examples/tree/master/with-nextjs) for a functioning serverless reference.

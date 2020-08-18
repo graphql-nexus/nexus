@@ -1,0 +1,74 @@
+---
+title: Configuration Management
+---
+
+## Configuration Management
+
+Configuration management is about how the settings of a program are manipulated and controlled. It can involve things like:
+
+- How app settings are provided in code
+- How environment variables are consumed by the app and override settings in code
+- How secrets like API keys are made securely available to the app
+- How settings are changed on the fly at runtime
+- How settings are conditionally enabled, perhaps according to a particular deployment stage
+
+Nexus currently only deals with adjsuting configuration options in code via its _Settings_ component.
+
+### Centralized
+
+Nexus takes a centralized approach to settings. All components in Nexus have their settings managed centrally rather than with a colocated API. For example disabling the server hosting of GraphQL Playground would be done like this:
+
+```ts
+import { settings } from 'nexus'
+
+settings.change({
+  server: {
+    playground: false,
+  },
+})
+```
+
+Instead of something like this:
+
+```ts
+// Nexus does NOT have this API
+
+import { server } from 'nexus'
+
+server.settings.change({
+  playground: false,
+})
+```
+
+The primary exception to this rule right now is plugins. Their configuration is managed where they are used. E.g.:
+
+```ts
+import { prisma } from 'prisma'
+import { use } from 'nexus'
+
+use(prisma({ ... }))
+```
+
+The benefit of centralized configuration is that it makes discovery of everything you can control settings-wise easy, and you get a uniform and predictable configuration experience.
+
+### Incremental
+
+Nexus takes an incremental approach to settings. Rather than a one time up-front configuration at e.g. constructor time, you have an API freeing you to make setting changes iteratively if you wish. Nexus will merge the results of multiple calls for you. Later calls take precedence. Merging of setting changes _across_ [nexus modules](/guides/project-layout#nexus-modules) does not have a guaranteed ordering. Thus take care not to do something like the following (not guaranteed here if `foo` setting will become `'bar'` or `'qux'`).
+
+```ts
+// module a.ts
+import { settings } from 'nexus'
+
+settings.change({
+  foo: 'bar',
+})
+```
+
+```ts
+// module b.ts
+import { settings } from 'nexus'
+
+settings.change({
+  foo: 'qux',
+})
+```

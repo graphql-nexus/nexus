@@ -1,0 +1,22 @@
+---
+title: Devtime
+toc: false
+---
+
+## Devtime Integration
+
+### `nexus dev`
+
+When running `nexus dev`, `nexus-plugin-prisma` will make sure your [`Prisma Client`](https://github.com/prisma/prisma-client-js) is up-to-date with your Prisma Schema by running your Prisma generators for you.
+
+Updates to your `schema.prisma` file will also be detected and will give you hints about the next steps to properly migrate your database.
+
+### `nexus build`
+
+When running `nexus build`, `nexus-plugin-prisma` will make sure your [`Prisma Client`](https://github.com/prisma/prisma-client-js) is up-to-date with your Prisma Schema, thus making sure your application is safely accessing your database.
+
+### `NexusTestContext`
+
+The testing component is augmented with an instance of the [`Prisma Client`](https://github.com/prisma/prisma-client-js), to help you easily seed your database for your tests.
+
+To learn more about its usage, [head to the Testing section](../../guides/testing#with-a-database).

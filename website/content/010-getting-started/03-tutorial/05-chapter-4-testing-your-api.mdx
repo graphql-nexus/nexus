@@ -1,0 +1,231 @@
+---
+title: 4. Testing your API
+---
+
+## Overview
+
+So far you've been validating your work by manual interacting with the Playground. That might be reasonable at first (depending on your relationship to TDD) but it will not scale. At some point you are going to want automated testing. So in this chapter you're going to add some automated tests to your e-commerce project. You'll learn about:
+
+- Nexus' approach to testing
+- Setting up a test environment
+- The `nexus/testing` module
+
+## It's at the system level
+
+<!-- TODO need feature to share content in multiple places -->
+
+> Content taken from the [testing guide](/guides/testing#testing-in-principal)
+
+There are multiple ways you can test a GraphQL API. One way is to extract resolvers into isolated functions and then unit test them. Of course these are rarely pure functions so those unit tests either become partial integration tests or mocks are introduced to try and retain the unit level of testing. Unit testing resolvers can work well, but here are some reasons why and where it might not;
+
+- The Nexus Prisma plugin (discussed later) can remove the need to even write resolvers in which case testing [those] resolvers doesn't make sense.
+- Thanks to the enhanced static type safety brought by Nexus, testing for correct handling of different input types and expected output types can be greatly reduced. For example you shouldn't need to test that your resolver checks for nulls before accessing nullable fields of an input object. And you don't need to test that your resolver is returning the right type.
+- Unit testing resolvers cannot provide a client perspective view of correctness since they focus on internals. If you want to test but have limited time/capacity to do so, you might choose to minimize/forgo the unit level in favor of system/integration tests that are closer to or at the level of a client perspective.
+
+Testing non-trivial resolvers in isolation is likely to be a good investment in most cases but its up to you as a developer. What Nexus provides help with is not at this level, but higher up in the [testing pyramid](https://codingjourneyman.com/tag/uncle-bob/page/2/), at the system level. System testing means tests that will run operations against your API just like a real client would. This chapter will focus on that. Let's dive-in!
+
+## Setting up your test environment
+
+During this tutorial, you'll use the [Jest testing framework](https://jestjs.io/) to test your API. This is not mandatory but we do recommend it. Still, in general, outside this tutorial, if you prefer another testing framework, feel free to use it.
+
+First, install `jest` and accompanying tools
+
+```bash-symbol
+npm add --save-dev jest @types/jest ts-jest
+```
+
+Then, configure jest and npm scripts in your `package.json`
+
+```json
+"scripts": {
+  "test": "jest"
+},
+"jest": {
+  "preset": "ts-jest",
+  "globals": {
+    "ts-jest": {
+      "diagnostics": { "warnOnly": true }
+    }
+  },
+  "testEnvironment": "node"
+}
+```
+
+Finally, create a `tests` folder at the root of your project and a `Post.test.ts` file inside it
+
+```bash-symbol
+mkdir tests && touch tests/Post.test.ts
+```
+
+## Testing the `publish` mutation
+
+Nexus comes with a special testing module that you can import from `nexus/testing`.
+
+Its primary export is the `createTestContext` function which is designed for running system tests. When run, it will boot your app in the same process as the test suite and expose an interface for your tests to interact with it. Jest runs each test suite in its own process, so if you have have say eight test suites running in parallel that means you'll have eight app processes running too.
+
+Before jumping into your first test we will show you a pattern that more tightly integrates `createTestContext` into jest. Nexus will probably ship something like as follows or better in the future, but for now you can just add this as test helper in your Nexus projects.
+
+Create a `tests/__helpers.ts` module with the following contents.
+
+```bash-symbol
+touch tests/__helpers.ts
+```
+
+<!-- prettier-ignore -->
+```ts
+// tests/__helpers.ts                                     // 1
+
+import { createTestContext as originalCreateTestContext, TestContext } from 'nexus/testing'
+
+export function createTestContext() {
+  let ctx = {} as TestContext                             // 2
+
+  beforeAll(async () => {
+    Object.assign(ctx, await originalCreateTestContext()) // 3
+    await ctx.app.start()                                 // 4
+  })
+
+  afterAll(async () => {
+    await ctx.app.stop()                                  // 5
+  })
+
+  return ctx
+}
+```
+
+1. The module name prefix `__` matches that of jest's for snapshot folders `__snapshots__`
+2. Create an object that will be returned immediately but mutated before tests run
+3. Before tests run create the test context. This does most of the work like getting your app instance.
+4. Before tests run start the app
+5. After tests complete, stop the app. This will for example close your app's HTTP server.
+
+Alright, now you will test your `publish` mutation. Because we want to start from a clean database, we'll just remove the pre-seeded data in the in-memory database that we've been using up until now.
+
+```ts
+// api/db.ts
+export const db = {
+- posts: [{ id: 1, title: 'Nexus', body: '...', published: false }],
++ posts: []
+}
+```
+
+Now use your new helper and scaffold your first test:
+
+<!-- prettier-ignore -->
+```ts
+// tests/Post.test.ts
+
+import { createTestContext } from './__helpers'
+
+const ctx = createTestContext()
+
+it('ensures that a draft can be created and published', async () => {
+  // Create a new draft
+  const draftResult = await ctx.client.send(`               # 1
+    mutation {
+      createDraft(title: "Nexus", body: "...") {            # 2
+        id
+        title
+        body
+        published
+      }
+    }
+  `)
+
+  // Snapshot that draft and expect `published` to be false
+  expect(draftResult).toMatchInlineSnapshot(`                // 3
+    Object {
+      "createDraft": Object {
+        "body": "...",
+        "id": 1,
+        "published": false,
+        "title": "Nexus",
+      },
+    }
+  `)
+
+  // Publish the previously created draft
+  const publishResult = await ctx.client.send(`
+    mutation publishDraft($draftId: Int!) {
+      publish(draftId: $draftId) {
+        id
+        title
+        body
+        published
+      }
+    }
+  `,
+    { draftId: draftResult.createDraft.id }
+  )
+
+  // Snapshot the published draft and expect `published` to be true
+  expect(publishResult).toMatchInlineSnapshot(`
+    Object {
+      "publish": Object {
+        "body": "...",
+        "id": 1,
+        "published": true,
+        "title": "Nexus",
+      },
+    }
+  `)
+})
+```
+
+1. The test context exposes a GraphQL client at `ctx.client.send` that will help us run operations against our API. Here We're using it to send a publish mutation.
+2. This is the mutation from the end of last chapter.
+3. The result will be snapshoted inline allowing us to see the input and output collocated!
+
+## Try it out
+
+Now run your tests and let's see the snapshots come to life! It should look similar to this:
+
+```bash-symbol
+npm run test
+```
+
+Draft snapshot
+
+```ts
+// Snapshot that draft and expect `published` to be false
+expect(result).toMatchInlineSnapshot(`
++   Object {
++     "publish": Object {
++       "id": 1,
++       "title": "Nexus",
++       "body": "...",
++       "published": false,
++     },
++   }
+  `)
+```
+
+Published draft snapshot
+
+```ts
+// Snapshot that draft and expect `published` to be false
+expect(result).toMatchInlineSnapshot(`
++   Object {
++     "publish": Object {
++       "id": 1,
++       "title": "Nexus",
++       "body": "...",
++       "published": true,
++     },
++   }
+  `)
+```
+
+Awesome, beautiful workflow isn't it? If inline snapshots get too unwieldy you can switch to regular snapshots and install [a VSCode plugin](https://marketplace.visualstudio.com/items?itemName=asvetliakov.snapshot-tools) that will display the snapshots upon hovering over the `toMatchSnapshot` method name. While not quite as fluid as seeing inline snapshots throughout your test module, it may work better for you.
+
+## Wrapping up
+
+You've just made a big step in the maintainability of your API. Here we showed how to test your `createDraft` and `publish` mutation, proving that a draft can be properly created and published. However you did _not_ test if the draft was correctly persisted into your database. That piece will come soon! But first we need a real database in the first place. That's what the next chapter is all about!
+
+<ButtonLink
+  color="dark"
+  type="primary"
+  href="/getting-started/tutorial/chapter-persisting-data-via-prisma"
+>
+  Next &rarr;
+</ButtonLink>

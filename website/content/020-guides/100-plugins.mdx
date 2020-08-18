@@ -1,0 +1,16 @@
+---
+title: Plugins
+---
+
+## Plugins
+
+Nexus has a plugin system. Plugins can extend Nexus at devtime and runtime. Devtime means things like extending the build or watcher during dev mode. Runtime means the part you deploy into production like the server and schema. The Nexus plugin system is still not mature but some plugins exist. Notably the Prisma plugin provides a rich integration between [Prisma](https://prisma.io) and Nexus. If you're curious about how to create a plugin you can refer to our [guide for that](/guides/writing-plugins).
+
+You can find plugins by looking on the sidebar on this website or searching npm `npm search nexus-plugin`. To use a plugin just import them and then use them. For example:
+
+```ts
+import { prisma } from 'nexus-plugin-prisma'
+import { use } from 'nexus'
+
+use(prisma())
+```

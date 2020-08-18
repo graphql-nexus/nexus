@@ -1,0 +1,37 @@
+---
+title: CLI
+---
+
+## Global vs local
+
+If you prefer, you can install Nexus globally and then use the global CLI to work with local Nexus projects. This is safe because the global CLI will hand off execution to the locally installed version of Nexus. For example:
+
+```bash-symbol
+npm add --global nexus
+```
+
+```bash-symbol
+yarn global add nexus
+```
+
+```bash-symbol
+nexus dev
+```
+
+This is just a convenience. It is equivalent to:
+
+```json
+"scripts": {
+  "nexus:dev": "nexus dev"
+}
+```
+
+```bash-symbol
+npm run nexus:dev
+```
+
+```bash-symbol
+yarn nexus dev
+```
+
+If you have not installed your project dependencies then the handoff will fail and tell you to do so. In other words a globally installed Nexus will never allow its version to be what is actually running your project. This protects you from unwittingly running a project with a different version of Nexus than you have installed in that project.

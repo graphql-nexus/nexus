@@ -1,0 +1,25 @@
+---
+title: use
+codeStyle: true
+---
+
+## `import { use } from 'nexus`
+
+[Guide](/guides/plugins) ⌁ [issues](https://nxs.li/issues/components/plugins) ([features](https://nxs.li/issues/components/plugins/features) | [bugs](https://nxs.li/issues/components/plugin/bugs))
+
+The Plugin component is designed for adding new functionality to your project via a Nexus plugin. If you are new to the plugin component then you may be interested in our [plugin guide](/guides/plugins).
+
+#### Signature
+
+```ts
+(nexusPlugin: NexusPlugin) => void
+```
+
+#### Example
+
+```ts
+import { use } from 'nexus'
+import { prisma } from 'nexus-plugin-prisma'
+
+use(prisma())
+```

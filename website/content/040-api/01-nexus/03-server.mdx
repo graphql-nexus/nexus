@@ -1,0 +1,31 @@
+---
+title: server
+codeStyle: true
+---
+
+## `import { server } from 'nexus'`
+
+[Guide](/guides/server) ⌁ [issues](https://nxs.li/issues/components/server) ([features](https://nxs.li/issues/components/server/features) | [bugs](https://nxs.li/issues/components/server/bugs))
+
+The Server component is designed for managing the HTTP network layer that enables clients to actually send over GraphQL operations for your app to execute. If you are new to this component then you may be interested in our [server guide](/guides/server).
+
+## `express`
+
+Gives you access to the underlying `express` instance.
+
+Use this to add middlewares or expose additional endpoints if needed.
+
+#### Example of using middlewares
+
+```ts
+import something from 'some-express-middleware'
+import { server } from 'nexus'
+
+server.express.use(something())
+```
+
+## `raw.http`
+
+The underlying [Node HTTP Server](https://nodejs.org/api/http.html#http_class_http_server) instance.
+
+Access to this is made available mostly as an escape hatch, and maybe a few valid advanced use-cases. If you haven't already/are not sure, consider [opening an issue](https://nxs.li/issues/create/feature) for your use-case. Maybe Nexus can and should provide better first-class support for what you are trying to do!

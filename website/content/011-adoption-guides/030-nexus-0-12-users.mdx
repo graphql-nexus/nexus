@@ -1,0 +1,47 @@
+---
+title: Nexus@0.12 Users
+# TODO if these frontmatter items are removed the site crashes
+duration: ''
+experimental: false
+staticLink: false
+---
+
+## Hello `nexus@0.12` or Lower User!
+
+This guide is for you if you're a `nexus` user _prior_ to version `0.20`.
+
+Prior to version `0.20`, the `nexus` package comprised only the schema component of the Nexus framework. The last version of this schema-only version of the `nexus` package was `0.12`. Subsequent versions moved to the package [`@nexus/schema`](../../components-standalone/schema). Meanwhile, `nexus` `0.20` and above became the framework package. It builds, in part, on top of `@nexus/schema`. You can read the announcement about the transition of Nexus from a schema library to a full-fledged framework in [this GitHub issue](https://github.com/graphql-nexus/schema/issues/373).)
+
+You can remain a Nexus schema library user by using the `@nexus/schema` package. Or you can upgrade to the framework by using the latest version of the `nexus` package. The following sections show how to migrate either way.
+
+## Migrating to `@nexus/schema`
+
+Remove `nexus`, add `@nexus/schema` and update imports throughout your codebase accordingly. E.g.:
+
+```
+npm remove nexus
+npm add @nexus/schema
+```
+
+```ts
+- import { makeSchema } from "nexus";
++ import { makeSchema } from "@nexus/schema";
+```
+
+If you are a `nexus-prisma` user, note that the package has migrated to `nexus-plugin-prisma`. You can learn more about the transition in [this Github issue](https://github.com/graphql-nexus/nexus-plugin-prisma/issues/630).
+
+To migrate, please remove `nexus-prisma`, `@prisma/client`, `@prisma/cli`, add `nexus-plugin-prisma`, and update imports throughout your codebase accordingly. E.g.:
+
+```
+npm remove nexus-prisma @prisma/client @prisma/cli
+npm add nexus-plugin-prisma
+```
+
+```ts
+- import { nexusPrismaPlugin } from 'nexus-prisma'
++ import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+```
+
+## Migrating to `nexus` Framework
+
+For this path, please refer to our [migration guide for Nexus Schema users](/adoption-guides/nexus-schema-users#migrating). The only difference is that instead of going from `@nexus/schema` to `nexus` you will be going from `nexus@0.12` (or lower) to `nexus@latest`.

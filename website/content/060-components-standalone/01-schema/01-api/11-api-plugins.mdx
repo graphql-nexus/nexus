@@ -1,0 +1,150 @@
+---
+title: plugin
+codeStyle: true
+---
+
+## Plugins
+
+Nexus ships with a plugin API which allows you to define your own abstractions when building out a GraphQL schema. The plugin layer allow you to:
+
+- Define new options for types and fields in a type-safe manner
+- Layer runtime execution before and after a resolver
+- Modify schema configuration
+- Customize the emit behavior of TypeScript type generation (coming soon)
+
+We also ship with several plugins out of the box, and will have more in the near future:
+
+- [Connection Plugin](../plugins/connection)
+- [Field Authorize Plugin](../plugins/field-authorize)
+- [Nullability Guard Plugin](../plugins/nullability-guard)
+- [Query Complexity Plugin](../plugins/query-complexity)
+
+### Defining a sample plugin:
+
+```ts
+import { plugin } from '@nexus/schema'
+
+export const myErrorGuardPlugin = plugin({
+  name: 'MyErrorGuardPlugin',
+  description: 'Catches errors and logs them to Sentry, ',
+})
+```
+
+## Plugin Config:
+
+### name
+
+Every plugin is required to have a unique name identifying the plugin. This is used in error-messages
+and warnings.
+
+### description
+
+A string describing the plugin. Currently not used for anything, but it could be used in the future to
+automatically create documentation for the stack of plugins used in Nexus.
+
+### onInstall(builder)
+
+The "onInstall" hook is used as it sounds - it is invoked once before any of the types are processed for the schema. This hook is primarily useful in allowing a plugin to add "dynamics fields" to augment the API of the definition block.
+
+```ts
+plugin({
+  name: 'onInstallExample',
+  onInstall(builder) {},
+})
+```
+
+The `builder` option provided has several properties, which allow you to influence the schema via the plugin.
+
+### onBeforeBuild(builder)
+
+The "onBeforeBuild" is called after all `onInstall`, but just before the schema is constructed.
+
+```ts
+plugin({
+  name: 'onBeforeBuildExample',
+  onBeforeBuild(builder) {},
+})
+```
+
+### onAfterBuild(schema)
+
+The "onAfterBuild" hook is provided the schema, and is useful to validate contract of the schema
+with the expectations of the plugin. The [nullabilityGuard](../plugins/nullability-guard)
+
+```ts
+plugin({
+  name: 'onAfterBuildExample',
+  onAfterBuild(schema) {},
+})
+```
+
+### onCreateFieldResolver(config)
+
+Every ObjectType, whether they are defined via Nexus' `objectType` api, or elsewhere is given a resolver.
+The [defaultFieldResolver](https://github.com/graphql/graphql-js/blob/82a0c336de05b4ab0d24d5557b56135c828fe888/src/execution/execute.js#L1179-L1197) is provided if none is specified by the field definition.
+
+When the resolver is created for a type, this can optionally return a "middleware" which wraps the resolve behavior of the field. Here's an example of writing a "LogMutationTimePlugin", which logs how long it takes a mutation to complete:
+
+```ts
+const LogMutationTimePlugin = plugin({
+  name: 'LogMutationTimePlugin',
+  onCreateFieldResolver(config) {
+    if (config.parentTypeConfig.name !== 'Mutation') {
+      return
+    }
+    return async (root, args, ctx, info, next) => {
+      const startTimeMs = new Date().valueOf()
+      const value = await next(root, args, ctx, info)
+      const endTimeMs = new Date().valueOf()
+      console.log(`Mutation ${info.operation.name} took ${endTimeMs - startTimeMs} ms`)
+      return value
+    }
+  },
+})
+```
+
+### onMissingType
+
+The "onMissingType" hook occurs when a type is provided as a string, but was never explicitly defined.
+This can be helpful in situations where you have boilerplate types which can be constructed
+generically / programmatically based on their name.
+
+Here is an example of a plugin which creates a "ResourceResponse" type whenever you see a string:
+
+```ts
+/**
+ * Creates a ____ResourceResponse type
+ *
+ * type OrganizationResourceResponse {
+ *   ok: Boolean!
+ *   resource: Organization!
+ *   query: Query!
+ * }
+ *
+ * @param resource
+ */
+export function resourceResponse(resource: string) {
+  return objectType({
+    name: `${resource}ResourceResponse`,
+    definition(t) {
+      t.boolean('ok', () => true)
+      t.field('resource', { type: resource as any })
+      t.field('query', { type: 'Query', resolve: () => ({}) })
+    },
+  })
+}
+
+const ResourceTypePlugin = plugin({
+  name: 'onMissingTypeExample',
+  onMissingType(typeName, builder) {
+    if (/(.*?)ResourceResponse/.test(typeName)) {
+      return resourceResponse(typeName.slice(0, -16))
+    }
+    return null
+  },
+})
+```
+
+#### Builder Object
+
+🚧 Work in progress.

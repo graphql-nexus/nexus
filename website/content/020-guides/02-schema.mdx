@@ -1,0 +1,836 @@
+---
+title: 'Schema'
+---
+
+## Overview
+
+This is the Nexus schema component guide. Here you will find concepts explained and a survey of how to use the API. If you are not familiar with Nexus this is a good document to read. If you are familiar, then the [Schema API Docs](../../api/nexus/schema) may be of more use to you.
+
+## Introduction
+
+### Importing
+
+You will use the schema component of Nexus to build your GraphQL schema. You can import it as a named export from the main module of the `nexus` package. If you prefer you can also import the default `app` export and then access the `schema` property.
+
+<!-- prettier-ignore -->
+```ts
+import app from 'nexus'        // default style
+import { schema } from 'nexus' // named-export style
+
+app.schema === schema // true
+```
+
+> Leverage [VSCode auto-import](https://code.visualstudio.com/docs/languages/typescript#_auto-imports). Anywhere in a TypeScript module in your project type either `app` to summon auto-import for the default style or `schema` for named-export style.
+
+### Singleton and mutation
+
+The schema component is part of the app singleton and usage of its methods affects the overall app state. While this is not a functionally pure approach it does allow you to use its methods throughout your project without having to think about exporting/importing values. One of Nexus' design goals is to approach the ease and readability of [GraphQL SDL](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) where we can. This is one example of doing that.
+
+As an example, the following snippet shows the addition of an object type to the GraphQL schema. Notice how the return value is not used in any way. The method is actually mutating the app state.
+
+```ts
+import { schema } from 'nexus'
+
+schema.objectType({
+  name: 'Foo',
+  definition(t) {
+    t.string('bar', () => 'qux')
+  },
+})
+```
+
+## GraphQL type builders
+
+We will now begin exploring the GraphQL schema building parts of the schema component. Having prior knowledge of GraphQL language itself will greatly help. If you are new to GraphQL you may want to read some of the resources listed below.
+
+- [graphql.org](https://graphql.org)
+- [howtographql.com](https://www.howtographql.com)
+- [Production Ready GraphQL](https://book.productionreadygraphql.com/)
+
+### Object Type
+
+[graphql.org Object Types](https://graphql.org/learn/schema/#object-types-and-fields)
+
+#### Basic anatomy
+
+<!-- prettier-ignore -->
+```ts
+                                      schema.objectType({
+// The singleton instance of ---------^      |
+// the Nexus schema component                |
+//                                           |
+// A type Builder method --------------------^
+                                        name: 'Foo',
+// The name of this type ----------------------^
+                                        definition(t) {
+// The type definition block -----------^          |
+// Where fields are defined                        |
+//                                                 |
+// Object of Object Type Field --------------------^
+// Builder methods
+                                          t.field('bar', {
+// A field builder method ------------------^      |
+// The name of this field -------------------------^
+                                            type: 'Bar',
+// The type of this field -------------------------^
+                                            resolve(parent, args, ctx, info) {
+// The method called to return a -----------^       |       |     |    |
+// value for this field when queried                |       |     |    |
+//                                                  |       |     |    |
+// The backing data model for Foo ------------------^       |     |    |
+//                                                          |     |    |
+// The client arguments to this field ----------------------^     |    |
+//                                                                |    |
+// Contextual data for this request ------------------------------^    |
+// Shared across all resolvers                                         |
+//                                                                     |
+// Technical detail about this request --------------------------------^
+// E.g. client's query AST
+
+// Your logic to return a value ------------> ...
+// for this field
+                                            },
+                                          })
+
+                                          t.string('qux')
+// A scalar-type convenience builder -------^       |
+//                                                  |
+// No resolver means Nexus returns the -------------^
+// `qux` property from the backing data model
+
+                                        },
+                                      })
+```
+
+#### Scalar fields
+
+```ts
+schema.objectType({
+  name: 'Alpha',
+  definition(t) {
+    t.id('a')
+    t.string('b')
+    t.int('c')
+    t.float('d')
+    t.boolean('e')
+  },
+})
+```
+
+```graphql
+type Alpha {
+  a: ID!
+  b: String!
+  c: Int!
+  d: Float!
+  e: Boolean!
+}
+```
+
+#### Relational fields
+
+```ts
+schema.objectType({
+  name: 'Alpha',
+  definition(t) {
+    t.field('beta', {
+      type: 'Beta',
+      resolve() {
+        return { foo: 'bar' }
+      },
+    })
+  },
+})
+schema.objectType({
+  name: 'Beta',
+  definition(t) {
+    t.string('foo')
+  },
+})
+```
+
+```graphql
+type Alpha {
+  beta: Beta!
+}
+
+type Beta {
+  foo: String!
+}
+```
+
+##### Lists and nullability
+
+```ts
+schema.objectType({
+  name: 'Alpha',
+  definition(t) {
+    t.id('a', { nullable: true })
+    t.list.id('b')
+    t.list.id('c', { nullable: true })
+    t.list.id('c', { list: [false] })
+    t.list.id('c', { list: [false], nullable: true })
+  },
+})
+```
+
+```graphql
+type Alpha {
+  a: ID
+  b: [ID!]!
+  c: [ID!]
+  c: [ID]!
+  c: [ID]
+}
+```
+
+
+### Entrypoint types
+
+### Enum type
+
+Enum types are a scalar with a finite set of allowed values. They can be used as argument types and as field types.
+
+[graphql.org Enumeration Types docs](https://graphql.org/learn/schema/#enumeration-types)
+
+
+
+```ts
+schema.enumType({
+  name: 'Alpha',
+  members: ['Zeta', 'Yolo'],
+})
+```
+
+```graphql
+enum Alpha {
+  Zeta
+  Yolo
+}
+```
+
+
+
+#### Example: As argument type and field type
+
+
+
+```ts
+schema.queryType({
+  definition(t) {
+    t.field('anyAlpha', {
+      type: 'Alpha',
+      resolve(t) {
+        return Math.random() > 0.1 : 'Zeta' : 'Yolo'
+      }
+    })
+    t.list.field('alphas', {
+      type: 'Alpha',
+      args: {
+        except: schema.arg({
+          list: true,
+          type: "Alpha",
+          required: true,
+        })
+      },
+      resolve(_root, args) {
+        return ['Zeta', 'Yolo'].filter(alpha => {
+          return !args.except.includes(alpha)
+        })
+      }
+    })
+  }
+})
+```
+
+```graphql
+type Query {
+  anyAlpha: Alpha!
+  alphas(except: [Alpha!]!): [Alpha!]!
+}
+```
+
+
+
+
+```graphql
+query {
+  anyAlpha
+  alphas(except: ["Zeta"])
+}
+```
+
+```json
+{
+  "data": {
+    "anyAlpha": "Zeta",
+    "alphas": ["Yolo"]
+  }
+}
+```
+
+
+
+### Union Type
+
+🚧 Work in progress.
+
+### Interface Type
+
+🚧 Work in progress.
+
+### Field Arguments
+
+🚧 Work in progress.
+
+### Input Object Type
+
+🚧 Work in progress.
+
+### Lists
+
+🚧 Work in progress.
+
+### Descriptions
+
+🚧 Work in progress.
+
+### Deprecations
+
+🚧 Work in progress.
+
+## Data Modelling
+
+As the API author, there are three design tasks you will invariable perform over and over again:
+
+1. Create data types that model logical entities and concepts in your business domain.
+2. Define connections between these data types that model how logical entities and concepts relate in your business domain.
+3. Define entrypoints which allow traversal into this graph of data.
+
+This is an iterative process that can generally be seen as an finite loop wherein your team gradually refines and expands (or contracts!) the data graph as you respond to changing client app needs, business needs, and so on. Data modelling is hard work. For one thing it is a subtle art, occasionally underappreciated. There are typically multiple ways to model any one thing and competing tradeoffs that leave no obvious winner abound. If the process of data modelling itself or data modelling in GraphQL is new to you, you may find this book by [Marc-Andre Giroux](https://twitter.com/__xuorig__) helpful: [Production Ready GraphQL](https://book.productionreadygraphql.com/).
+
+## Nullability in principle
+
+When creating an API, especially before going to production or lifting features out of beta, thinking about if arguments and input object fields (_inputs_) should be required and if object type fields (_outputs_) should be nullable is an important design consideration. How easy your API is to consume trades for how easy it is to change and some reliability characteristics.
+
+If inputs are optional or outputs are guaranteed then client developers will have a simpler API to deal with since making requests demands no up front configuration and handling responses presents no null cases. On the other hand, for the API developer, changing the API becomes harder since turning inputs from optional to required or making outputs go from guaranteed to nullable are breaking changes from the client's point of view.
+
+Also, as more outputs are guaranteed, the greater the potential of the "null blast radius" can be. This is the effect where, within a schema runtime, a `null` or error received from some data source where the schema states there shall be no `null` requires propagating the `null` up the data tree until a nullable type is found (or, at root, finally error).
+
+If you'd like to see these design considerations discussed further here are a few articles/resources you may find helpful:
+
+- 2019 [Nullability in GraphQL](https://medium.com/expedia-group-tech/nullability-in-graphql-b8d06fbd8a3c) by Grant Norwood
+- 2018 [Using nullability in GraphQL](https://blog.apollographql.com/using-nullability-in-graphql-2254f84c4ed7) by Sashko Stubailo
+- 2017 [When To Use GraphQL Non-Null Fields](https://medium.com/@calebmer/when-to-use-graphql-non-null-fields-4059337f6fc8) by Caleb Meredith
+- [Nullability Best Practices](https://graphql.org/learn/best-practices/#nullability) on graphql.org
+
+## Nullability in Nexus
+
+Nexus defaults to both inputs and outputs being nullable. This means by default your API is conservative in what it sends but flexible in what it accepts. With this approach, by default:
+
+- You're free to defer some hard thinking about output nullability, knowing you can always change your mind later without breaking clients.
+- Client developers work more to processing API responses, having to handle null conditions.
+- You're forced to frontload some hard thinking about inputs, since realizing something should have been required later will require breaking clients.
+- Client developers work less to satisfy minimum query requirements.
+- The "null blast radius" (refer to [Nullability in Principal](#nullability-in-principle)) is reduced to zero.
+
+There is no right or wrong answer to nullability. These are just defaults, not judgments. Understand the tradeoffs, and react to your use-case, above all.
+
+You can override the global defaults at the per-type level or per-field level. If you find yourself writing local overrides in a majority of cases then it might mean the global defaults are a bad fit for your API. In that case you can change the global defaults.
+
+When you make an input nullable then Nexus will alter its TypeScript type inside your resolver to have `null | undefined`. `null` is for the case that the client passed in an explicit `null` while `undefined` is for the case where the client simply did not specify the input at all.
+
+If an arg has been given a default value, then it will be used when the client passes nothing, but since clients can still pass explicit `null`, resolvers must still handle nullability. If this surprises you then you may be interested in [#485](https://github.com/graphql-nexus/nexus/issues/485).
+
+#### Example: Default nullability settings
+
+
+
+```ts
+schema.queryType({
+  definition(t) {
+    t.string('echo', {
+      args: {
+        message: 'String',
+      },
+      resolve(_root, args) {
+        return args.message ?? 'nil'
+      },
+    })
+  },
+})
+```
+
+```graphql
+type Query {
+  echo(message: String): String
+}
+```
+
+
+
+#### Example: Nullability flipped at global level
+
+
+
+```ts
+settings.change({
+  schema: {
+    nullable: {
+      outputs: false,
+      inputs: false,
+    },
+  },
+})
+
+schema.queryType({
+  definition(t) {
+    t.string('echo', {
+      args: {
+        message: 'String',
+      },
+      resolve(_root, args) {
+        return args.message
+      },
+    })
+  },
+})
+```
+
+```graphql
+type Query {
+  echo(message: String): String!
+}
+```
+
+
+
+#### Example: Nullability flipped at type level
+
+
+
+```ts
+schema.queryType({
+  nonNullDefaults: {
+    input: true,
+    output: true,
+  },
+  definition(t) {
+    t.string('echo', {
+      args: {
+        message: 'String',
+      },
+      resolve(_root, args) {
+        return args.message
+      },
+    })
+  },
+})
+```
+
+```graphql
+type Query {
+  echo(message: String): String!
+}
+```
+
+
+
+#### Example: Nullability flipped at input and field level
+
+
+
+```ts
+schema.queryType({
+  definition(t) {
+    t.string('echo', {
+      args: {
+        message: schema.arg({
+          type: 'String',
+          nullable: false,
+        }),
+      },
+      nullable: false,
+      resolve(_root, args) {
+        return args.message
+      },
+    })
+  },
+})
+```
+
+```graphql
+type Query {
+  echo(message: String): String!
+}
+```
+
+
+
+#### Example: Mixing levels
+
+It is possible to use type and input/field layers together. This provides flexibility to optimize for local sections of your API that have different characteristics. For example here, a type deviates from the global default for all but but one field and its input.
+
+
+
+```ts
+schema.queryType({
+  // flip the global defaults
+  nonNullDefaults: {
+    input: true,
+    output: true,
+  },
+  definition(t) {
+    // ... Everything in this type uses the type-level
+    // nullability config ... Except the following,
+    // which effectively reverts back to what the global
+    // defaults are:
+    t.string('echo', {
+      nullable: false,
+      args: {
+        message: schema.arg({
+          type: 'String',
+          nullable: false,
+        }),
+      },
+      resolve(_root, args) {
+        return args.message
+      },
+    })
+  },
+})
+```
+
+```graphql
+type Query {
+  echo(message: String!): String!
+}
+```
+
+
+
+#### Example: Args that have default values
+
+When an arg has a default you might think that then it should be nullable to the client but non-nullable within your resolver logic. However it turns out that if the client passes an _explicit_ `null` then that is considered an actual value, and hence is not subject to being assigned the default value. Thus, and then, the resolver still can observe null from the client. If you are curious about seeing this change and/or become configurable then please refer to [#485](https://github.com/graphql-nexus/nexus/issues/485).
+
+
+
+```ts
+schema.queryType({
+  definition(t) {
+    t.string('echo', {
+      args: {
+        message: schema.arg({
+          type: 'String',
+          default: 'nil via default',
+        }),
+      },
+      nullable: false,
+      resolve(_root, args) {
+        const fallback = 'nil via client null'
+        return args.message ?? fallback
+      },
+    })
+  },
+})
+```
+
+```graphql
+type Query {
+  echo(message: String = "nothing via default"): String!
+}}
+```
+
+
+
+
+```graphql
+query {
+  echo1: echo
+  echo2: echo(message: null)
+}
+```
+
+```json
+{
+  "data": {
+    "echo1": "nil via default",
+    "echo2": "nil via client null"
+  }
+}
+```
+
+
+
+## Backing types in principle
+
+As you begin to implement a schema for the first time you will notice something that may not have been obvious at first. The data that the client sees in the data graph is _not_ the same data flowing through the internal resolvers used to fulfill that graph. The client sees the API types but the API author deals with something else, _backing types_.
+
+Here is an example of resolution for a query as it would be seen roughly from a GraphQL type _only_ point of view.
+
+![](/assets/diagram-backing-types-1.png)
+
+When a field's type is an object, then the field's resolver returns a backing type. Concretely this might for example be a plain JavaScript object containing node/row/document data from a database call. This backing type data is in turn passed down to all the object type's own field resolvers.
+
+Here is the above diagram updated to include backing types now.
+
+![](/assets/diagram-backing-types-2.png)
+
+Here is a step-by-step breakdown of what is going on (follow the diagram annotation numbers):
+
+1. Client sends a query
+2. The field resolver for `Query.user` runs. Remember `Query` fields (along with `Subscription`, `Mutation`) are _entrypoints_.
+3. Within this resolver, the database client fetches a user from the database. The resolver returns this data. This data will now become **backing type** data...
+4. Resolution continues since the type of `Query.user` field is an object, not a scalar. As such its own fields need resolving. The fields that get resolved are limited to those selected by the client, in this case: `fullName`, `age`, `comments`. Those three field resolvers run. Their `parent` argument is the user model data fetched in step 3. _This is the backing type data for the GraphQL `User` object_.
+
+   ```ts
+   t.field('...', {
+     resolve(parent, args, ctx, info) {
+       //    ^------------------------------- Here
+     },
+   }
+   ```
+
+5. The `comments` field is is an object type so just like with `Query.users` before, its own fields must be resolved. The `comments` resolver fetches comments data from the database. Like in step 3 this data becomes _backing type_ data.
+
+6. Much like the GraphQL `Comment` object field were resolved, so is `Comment`. Resolution runs once for every comment retrieved from the database in the previous step. The `text` field is scalar so resolution of that path can terminate there. But the `likers` field is typed to an object and so once again goes through the object-field resolution pattern.
+
+7. A request to the database for users who liked this comment is made.
+
+8. A repeat of step 4. But this time from a different edge in the graph. Before it was the entrypoint field `Query.user`. Now we're resolving from relation with `Comment`. Note how the backing type requirements of `User`, regardless of which part of the graph is pointing at it, remain the same. One other difference from step 4 is that, like in step 6, we are dealing with a list of data. That is, this resolution is run every user returned in step 7.
+
+Hopefully you can see how the GraphQL types seen by the client are distinct from the backing types flowing through the resolvers. Below, you can find a code sample of how the implementation of this schema might look like.
+
+<details>
+<summary>See code implementation</summary>
+
+```ts
+schema.query({
+  definition(t) {
+    t.user({
+      args: {
+        id: schema.arg({ type: 'ID', required: true }),
+      },
+      resolve(_, { id }, { db }) {
+        return db.fetchUser({ where: { id } })
+      },
+    })
+  },
+})
+
+schema.object({
+  name: 'User',
+  rootTyping: 'Prisma.User',
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        return [user.firstName, user.middleName, user.lastName].join(', ')
+      },
+    })
+    t.int('age', {
+      resolve(user) {
+        return yearsSinceUnixTimestamp(user.birthDate)
+      },
+    })
+    t.list.field('comments', {
+      type: 'Comment',
+      resolve(user, _args, { db }) {
+        return db.comment.fetchMany({ where: { author: user.id } })
+      },
+    })
+  },
+})
+
+schema.object({
+  name: 'Comment',
+  rootTyping: 'Prisma.Comment',
+  definition(t) {
+    t.string('title', {
+      resolve(comment) {
+        return comment.title
+      },
+    })
+    t.field('body', {
+      resolve(comment) {
+        return comment.body
+      },
+    })
+    t.field('post', {
+      type: 'Post',
+      resolve(comment, _args, { db }) {
+        return db.post.fetchOne({ where: { id: comment.postId } })
+      },
+    })
+    t.field('author', {
+      type: 'User',
+      resolve(comment, _args, { db }) {
+        return db.user.fetchOne({ where: { id: comment.authorId } })
+      },
+    })
+  },
+})
+
+schema.object({
+  name: 'Post',
+  rootTyping: 'Prisma.Post',
+  definition(t) {
+    t.string('title', {
+      resolve(post) {
+        return post.title
+      },
+    })
+    t.field('body', {
+      resolve(post) {
+        return post.body
+      },
+    })
+    t.list.field('comments', {
+      type: 'Comment',
+      resolve(post, _args, { db }) {
+        return db.comment.fetchMany({ where: { id: post.commentId } })
+      },
+    })
+  },
+})
+```
+
+</details>
+
+## Backing types in Nexus
+
+#### Inferred types
+
+When you first begin creating your schema, you may have objects without backing types setup. In these cases Nexus infers that the backing type is an exact match of the GraphQL type. Take this schema for example:
+
+<!-- prettier-ignore -->
+```ts
+// Nexus infers the backing type of:
+//
+// { fullName: string, age: number } ---> |
+//                                        |
+schema.object({                        // |
+  name: 'User',                        // |
+  definition(t) {                      // |
+    t.string('fullName', {             // |
+      resolve(user) {                  // |
+//            ^-------------------------- | 
+        return user.fullName           // |
+      },                               // |
+    })                                 // |
+    t.int('age', {                     // |
+      resolve(user) {                  // |
+//            ^-------------------------- |
+        return user.age                // |
+      },                               // |
+    })                                 // |
+  },                                   // |
+})                                     // |
+                                       // |
+schema.queryType({                     // |
+  definition(t) {                      // |
+    t.list.field('users', {            // |
+      type: 'User',                    // |
+      resolve() {                      // |
+        return [/**/]                  // |
+//               ^----------------------- |
+      },
+    })
+  },
+})
+```
+
+This may suffice well enough for some time, but most apps will eventually see their GraphQL and backing types diverge. Once this happens, you can tell Nexus about it using the `rootTyping` object type config property.
+
+#### `rootTyping` property
+
+```ts
+export interface MyDBUser {
+  // |           ^-------------------- Create your backing type
+  // ^-------------------------------- Export your backing type (required)
+  firstName: string
+  lastName: string
+  birthDate: number
+}
+
+schema.object({
+  name: 'User',
+  rootTyping: 'MyDBUser',
+  //           ^---------------------- Tell Nexus what the backing type is.
+  //                                   Now, Nexus types...
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        //    ^----------------------- as: MyDBUser
+        return [user.firstName, user.lastName].join(', ')
+      },
+    })
+    t.int('age', {
+      resolve(user) {
+        //    ^------------------------ as: MyDBUser
+        return yearsSinceUnixTimestamp(user.birthDate)
+      },
+    })
+  },
+})
+
+schema.queryType({
+  definition(t) {
+    t.list.field('users', {
+      type: 'User',
+      resolve(_root, args, ctx) {
+        //                     ^------- return as: MyDBUser[]
+        return ctx.db.user.getMany()
+      },
+    })
+  },
+})
+```
+
+Nexus does not care about where `MyDBUser` is defined. So long as it is defined and exported from a module within your app, it will be available for use in any `rootTyping` property.
+
+The `rootTyping` property is statically typed as a union of all the valid possible types your app makes available. Thus, your IDE will/should give you autocompletion here.
+
+#### Third-party types
+
+If you would like to use types from a third party package, you can just re-export them in your own app. Here's the above example re-visited using some third party typings:
+
+```ts
+export type * as Spotify from 'spotify-api'
+//                             ^------ Export your third-party type(s)
+//                                     Can be anywhere within your app
+
+schema.object({
+  name: 'User',
+  rootTyping: 'Spotify.Foo',
+  //           ^---------------------- Tell Nexus what the backing type is.
+  //                                   Now, Nexus types...
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        //    ^----------------------- as: Spotify.Foo
+        return user.fullName
+      },
+    })
+    t.int('age', {
+      resolve(user) {
+        //    ^------------------------ as: Spotify.Foo
+        return user.age
+      },
+    })
+  },
+})
+
+schema.queryType({
+  definition(t) {
+    t.list.field('users', {
+      type: 'User',
+      resolve(_root, args, ctx) {
+        //                     ^------- return as: Spotify.Foo[]
+        return ctx.db.user.getMany()
+      },
+    })
+  },
+})
+```
+
+> **Note**: The backing type configuration is co-located with the GraphQL object because Nexus takes the view that a GraphQL object owns its backing type requirements and all nodes in the graph pointing to it must then satisfy those requirements in their own resolvers. We saw a bit of this in the Backing Types Conepts section before, where `User` object was related to by multiple nodes in the graph, and those various nodes passed the same kinds of backing types during resolution.

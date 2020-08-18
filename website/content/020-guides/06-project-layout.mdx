@@ -1,0 +1,114 @@
+---
+title: Project layout
+---
+
+## Working with `tsconfig.json`
+
+Nexus conforms to the setting defined in `tsconfig.json`, which ensures that Nexus and your IDE perform identical static analysis. If `tsconfig.json` is **not** present in the project root, Nexus scaffolds one for you. This will make [VSCode treat it as the project root too](https://vscode.readthedocs.io/en/latest/languages/typescript/#typescript-files-and-projects).
+
+Nexus interacts with `tsconfig.json` in the following ways:
+
+### Source root
+
+Source root is the base from which your source code layout starts. All of your app code **must** live within the source root. Your JavaScript build output layout will mirror it. Source root is defined by setting `compilerOptions.rootDir` and adding its value also to the `includes` array.
+
+> **Tip**: For detail into why it works like this see [microsoft/TypeScript#9858](https://github.com/microsoft/TypeScript/issues/9858#issuecomment-533287263) and this [StackOverflow answer](https://stackoverflow.com/questions/57333825/can-you-pull-in-excludes-includes-options-in-typescript-compiler-api).
+
+If you do not specify a source root, Nexus scaffolds its value for you. The default value is the directory that contains the `tsconfig.json` file - the project root. This default mirrors `tsc` default behaviour. Nexus also scaffolds the `includes` array.
+
+> **Note** Nexus requires that the `includes` array does not contain modules outside the source root. This mirrors `tsc`.
+
+### Out root
+
+The out root is the destination folder for transpiled TypeScript (to JavaScript) modules. The folder structure mimics the source root folder structure.
+
+The out ut Root is defined the `compilerOptions.outDir` setting. If you do not specify an out root, Nexus will default to `.nexus/build`. Unlike with `rootDir`, Nexus does **not** scaffold the default value in your `tsconfig.json` file VSCode does not require it. You can override the value of `compileOptions.outDir` interactively with the following command:
+
+```bash-symbol
+nexus build --outDir
+```
+
+### Check-only builds
+
+If `compilerOptions.noEmit` is set to `true`, Nexus will not output the build. This makes `nexus build` effectively a checker. This option usually [represents user error](https://github.com/graphql-nexus/nexus/issues/702) so by default Nexus will warn when this option is used. In the future ([#800](https://github.com/graphql-nexus/nexus/issues/800)) there will be ways to disable this the warning if it is really your intent.
+
+### TypeScript Language Service Plugin
+
+Nexus ships with a TypeScript Language Service Plugin. It currently helps with improved autocomplete experience. In the future it will do more. Nexus will check that you are using it correctly in dev mode. You can see an example of its effect below.
+
+Autocomplete without Nexus TS LSP:
+
+![](https://user-images.githubusercontent.com/284476/82776800-1bbe0e00-9e1a-11ea-83a1-eb175b11a2ca.png)
+
+Autocomplete with Nexus TS LSP:
+
+![](https://user-images.githubusercontent.com/284476/82776802-1cef3b00-9e1a-11ea-88c3-065869407380.png)
+
+### Conventions
+
+Nexus has some conventions about `tsconfig.json` settings designed to support your zero-config experience.
+
+#### Local package typings
+
+Sometimes you need to augment or provide outright types for some third party library. You can do this one of two ways.
+
+If you only have to write some minor typings for one or few packages then you can create a `<project-root>/types.d.ts` file.
+
+If you have to write a lot of typings for multiple packages then you can create typing files with this pattern:
+
+```
+<project-roo>/types/       <-- A "types" folder instead of "types.d.ts" file
+  <package-name>/          <-- Name not technically significant, just for human readability, do what you want
+    index.d.ts             <-- Typings
+```
+
+#### `noEmit`
+
+Nexus enforces that `compilerOptions.noEmit` is `true`. It handles this setting internally. If for some reason you want to run `tsc` you won't need to remember to pass the `--noEmit` flag.
+
+#### `typeRoots`
+
+Nexus enforces that your `compilerOptions.typeRoots` includes:
+
+- `"node_modules/@types"` –– TypeScript's default value for `typeRoots`. Used by [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped) packages. Importantly where Nexus outputs its typegen to, so you _must_ have this value.
+- `"types"` –– A convention provided by Nexus about where to store your local package typings.
+
+## Conventions
+
+Nexus imposes a few requirements about how you structure your codebase.
+
+### Project root
+
+The project root is the directory from which all all Nexus CLI commands base their CWD upon. It is also the directory that configuration paths in Nexus (e.g. `--entrypoint` flag) are often relative to as well (in other cases it can be source root).
+
+To find the project root Nexus starts with the current working directory (CWD). This usually means the current directory you're in when invoking the Nexus CLI. From this location Nexus will do the following:
+
+1. If a directory in the current hierarchy, including CWD, contains a [valid](https://docs.npmjs.com/creating-a-package-json-file#required-name-and-version-fields) `package.json` then it will be considered the project root. In case multiple such files are present in the hierarchy, only the first one is considered (in other words the one closest to CWD).
+
+2. If no `package.json` files exist then the CWD itself is taken to be the project root.
+
+### Nexus module(s)
+
+#### Pattern
+
+A file importing `nexus`. eg: `import { schema } from 'nexus'`
+
+#### About
+
+Nexus looks for modules that import `nexus` and uses codegen to statically import them before the server starts.
+
+Beware if you have module-level side-effects coming from something else than Nexus, as these side-effects will always be run when your app starts.
+
+> \*Note: `require` is not supported.
+
+### Entrypoint
+
+#### Pattern
+
+A module, anywhere in your source directory, named `app.ts`.
+
+A custom entrypoint can also be configured using the `--entrypoint` or `-e` CLI option on `nexus build` and `nexus dev`.
+
+#### About
+
+This convention is optional if Nexus modules are present, required otherwise.

@@ -1,0 +1,36 @@
+---
+title: Logger
+---
+
+## Overview
+
+Use the logger to output structured information about runtime activity.
+
+Logging is one of the primary means for knowing what is going on at runtime, what data is flowing through, and how so. It is a classic workhorse of debugging and development time feedback. There are a wealth of specialized tools but a great logging strategy can take you far. Nexus gives you a logging system built for a modern cloud native environment.
+
+Your app should only output logs via Nexus Logger. This ensures that you maintain log level control and are always working with JSON. We work hard to make the logger so good that you'll to use it.
+
+All logs are sent to stdout (not stderr). Logs are formatted as JSON but there is a pretty mode designed for development.
+
+## Child loggers
+
+```ts
+log.addToContext({ user: 'Toto' })
+
+const bar = log.child('bar').addToContext({ bar: 'bar' })
+const foo = log.child('foo').addToContext({ foo: 'foo' })
+
+log.info('hello')
+bar.info('bar')
+foo.info('foo')
+
+// { "context": { "user": "Toto"  }, path: ["app"], "event": "hello", ... }
+// { "context": { "user": "Toto", "bar": "bar"  }, path: ["app", "bar"], "event": "bar", ... }
+// { "context": { "user": "Toto", "foo": "foo"  }, path: ["app", "foo"], "event": "foo", ... }
+```
+
+You can create child loggers recursively starting from the root logger. A child logger extends their parent's component path and inherits their parent's context. Children can add context that is visible to themselves and their descendents.
+
+Child loggers are useful when you want to pass a logger to something that should be tracked as its own sub-system and/or may add context that you want isolated from the rest of the system. For example a classic use-case is the logger-instance-per-request pattern where a request-scoped logger is used for all logs in a request-response code path. This makes it much easier in production to group logs in your logging platform by request-response lifecycles.
+
+All runtime logs in your app (including from plugins come from either the `logger` itself or descendents thereof). This means if you wish absolutely every log being emitted by your app to contain some additional context you can do so simply by adding context to the root logger.

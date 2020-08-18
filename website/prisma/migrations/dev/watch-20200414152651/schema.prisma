@@ -1,0 +1,18 @@
+datasource db {
+  provider = "postgresql"
+  url = "***"
+}
+
+model Feedback {
+  id        Int       @default(autoincrement()) @id
+  pageUrl   String
+  userAgent String
+  ip        String
+  sentiment Sentiment
+  createdAt DateTime  @default(now())
+}
+
+enum Sentiment {
+  Happy
+  Unhappy
+}

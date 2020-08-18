@@ -1,0 +1,95 @@
+---
+title: Spec Sheet
+---
+
+## Lay of the land
+
+- [nxs.li/docs](https://nxs.li/docs)
+- [nxs.li/tweets](https://nxs.li/tweets)
+- [nxs.li/issues](https://nxs.li/issues)
+- [nxs.li/discussions](https://nxs.li/discussions)
+- [nxs.li/changelog](https://nxs.li/changelog) ([canary](https://nxs.li/changelog/canary))
+- [nxs.li/contributing](https://nxs.li/contributing)
+
+## Repositories and packages
+
+![Repos & Packages](https://dsc.cloud/661643/repos-and-packages.png)
+
+## Features
+
+- Pervasive zero-config philosophy.
+- You are free to use the API where and how you see fit. Few conventions on how to structure your app.
+- GraphQL schema construction
+  - Define your schema in code, abstract repeated patterns.
+  - Integrated helpers for building Relay compliant pagination
+  - Define graphql types without export/import and configuration boilerplate.
+- Type safety made simple
+  - Automatically fully typed GraphQL resolvers accounting for what you see in the `parent`, `args`, `ctx` arguments and what you're allowed to return.
+  - Automatically extracted types from return values in your `addToContext` invocations are merged into the Nexus resolver context type.
+  - Export any type in any module to make it available as a backing type for any object in your GraphQL schema.
+- Integrated logger component built atop Pino
+  - Pretty mode for development
+  - JSON mode for production
+  - Automatic request-scoped child logger available on context object
+- Integrated Testing
+  - Utils to boot a test app, integrated GraphQL client ready to make requests against it
+- Sane defaults
+  - Top-level sync and async error handling, process exit
+- Scaffolding
+  - Generate new app projects
+  - Generate new plugin projects
+- Plugins
+  - build hooks
+  - dev hooks
+  - resolver middleware
+  - add type defs
+  - add field def builders
+  - add type def builders
+- Generate GraphQL SDL from your schema, make pull-request reviews more collaborative.
+- Integrated TypeScript
+  - No install needed
+  - Builtin dynamic tsconfig guide rails
+  - Nexus CLI honours your tsconfig
+- Simple dependency management
+  - One dep
+  - Add prisma, only one dep more
+  - Nexus handles sound integration between all components
+  - Nexus handles minimal deployment size via integrated tree-shake step in build
+- Decomposable, from framework to libs
+  - @nexus/schema
+  - @nexus/logger
+- Enhanced IDE Experience via TypeScript Language Service Plugin
+  - Refined nexus lib autocomplete
+
+## Future features
+
+- Integrated query complexity analysis
+- Integrated Bundler
+  - Automatically tree shake your app into the minimum artifact size
+  - Automatically generate v8 snapshots for ultimate cold start times
+- Integrated Server
+  - Platform adaptors providing fully typed request and response objects
+  - Seamless transition between serverful and serverless
+  - Pluggable
+- Integrated Ops
+  - Deployment adaptors (Now, AWS Lambda, Google Functions)
+  - Adaptors for logging and APM (Elastic, Datadog, New Relic, ...)
+  - Alpine Docker images
+  - Pluggable
+- ...
+
+## Limitations
+
+We plan to lift these limitations one day.
+
+- Lacks good Windows support [issues](https://github.com/graphql-nexus/nexus/labels/platform%2Fwindows)
+- Does not work with JavaScript [#85](https://github.com/graphql-nexus/nexus/issues/85)
+- Does not cover the entire GraphQL Spec
+  - Subscriptions [#447](https://github.com/graphql-nexus/nexus/issues/447)
+  - Interface Extensions [#713](https://github.com/graphql-nexus/nexus/issues/713)
+
+## Non-goals
+
+We do not plan to lift these limitations.
+
+- Works with Node v9 and below

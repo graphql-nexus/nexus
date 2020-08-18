@@ -1,0 +1,61 @@
+---
+title: nexus
+toc: false
+codeStyle: true
+---
+
+## `import ... from 'nexus'`
+
+This section is about the main module of the `nexus` pacakge. Of all Nexus' modules this is the one you'll find yourself using the most in a Nexus projet. The main `nexus` module exports an application singleton. It is available as the default module export. The primary components of the application are exposed via properties on the application object. For convenience these components are also exposed as named exports. If you do not like long property chains you might prefer imported the named exports (see examples of either style later in this page). Each named export is documented on its own page. Each named export has a corollary guide page as well. Guides take time to explain concepts and motivations. The API docs focus only on dry technical details of the API.
+
+> ##### A Word About Autocomplete
+>
+> Whichever import style you go with know that you can benefit from [TypeScript's auto-import feature](https://code.visualstudio.com/docs/languages/typescript#_auto-imports). To import the defualt export by name automatically you need to use the same identifier that we use internally. That identifier is `app`. Type that anywhere and you should see the option to auto-import the default export from `nexus`.
+
+### Example of importing default export
+
+```ts
+import app from 'nexus'
+
+app.on.start(() => {
+  app.log.info('Hello World!')
+})
+
+app.settings.change({
+  server: {
+    port: 5689,
+  },
+})
+
+app.schema.queryType({
+  definition(t) {
+    t.string('foo', () => 'bar')
+  },
+})
+```
+
+### Example of importing named exports
+
+```ts
+import { schema, settings, log, on } from 'nexus'
+
+on.start(() => {
+  log.info('Hello World!')
+})
+
+settings.change({
+  server: {
+    port: 5689,
+  },
+})
+
+schema.queryType({
+  definition(t) {
+    t.string('foo', () => 'bar')
+  },
+})
+```
+
+## In this section
+
+<Subsections />

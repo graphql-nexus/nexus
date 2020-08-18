@@ -1,0 +1,36 @@
+---
+title: on
+codeStyle: true
+---
+
+## `import { on } from 'nexus`
+
+[Guide](/guides/lifecycle)
+
+The lifecycle component is designed for tapping into app events. This can be useful when you need to run eager code that wouldn't play well with Nexus' [reflection system](/guides/lifecycle#reflection). If you are new to this component then you may be interested in our [lifecycle guide](/guides/lifecycle).
+
+## start
+
+Register callback to be run when the application starts.
+
+#### Signature
+
+```ts
+(data: {
+  schema: NexusGraphQLSchema
+}) => void
+```
+
+#### Example
+
+```ts
+import { on, log } from 'nexus'
+
+on.start(data => {
+  log.info('app started', { schema: data.schema })
+})
+```
+
+#### Remarks
+
+Put initialization code here that you don't want run during [Nexus refletion](/guides/lifecycle#reflection).

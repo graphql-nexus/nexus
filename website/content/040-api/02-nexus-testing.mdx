@@ -1,0 +1,94 @@
+---
+title: nexus/testing
+metaTitle: 'nexus/testing'
+codeStyle: true
+---
+
+## `import ... from 'nexus/testing'`
+
+[Guide](/guides/testing) ⌁ [issues](https://nxs.li/issues/components/testing) ([features](https://nxs.li/issues/components/testing/features) | [bugs](https://nxs.li/issues/components/testing/bugs))
+
+This section is about the `testing` module of the `nexus` package. This module houses the testing component of Nexus which is is designed to cover your fundamental testing needs at the system level. Namely it gives you an API that allows you to control your app start and send GraphQL operations via a pre-configured client. Nothing is mocked. If you are new to this component then you may be interested in our [testing guide](/guides/testing).
+
+## `createTestContext`
+
+Setup a test context providing utilities to query against your GraphQL API.
+
+This context can be augmented by plugins.
+
+#### Signature
+
+```ts
+function createTestContext(opts?: CreateTestContextOptions): Promise<TestContext>
+```
+
+#### Example with Jest
+
+```ts
+import { TestContext, createTestContext } from 'nexus/testing'
+
+let ctx: TestContext
+
+beforeAll(async () => {
+  Object.assign(ctx, await createTestContext())
+  await ctx.app.start()
+})
+
+afterAll(async () => {
+  await ctx.app.stop()
+})
+
+test('hello', async () => {
+  const result = await ctx.query(`{ hello }`)
+
+  expect(result).toMatchInlineSnapshot()
+})
+```
+
+## `I` `CreateTestContextOptions`
+
+```ts
+export interface CreateTestContextOptions {
+  /**
+   * A path to the entrypoint of your app. Only necessary if the entrypoint falls outside of Nexus convention.
+   * You should typically use this if you're using `nexus dev --entrypoint` or `nexus build --entrypoint`.
+   */
+  entrypointPath?: string
+  /**
+   * Nexus usually determines the project root by the first `package.json` found while traversing up the file system.
+   * In some cases, e.g. usage in a monorepo, this might not always be correct.
+   * For those cases, you can specify the `projectRoot` manually.
+   * 
+   * Example: `await createTestContext({ projectRoot: path.join(__dirname, '../..') })`
+   */
+  projectRoot?: string
+}
+```
+
+## `I` `TestContext`
+
+```ts
+export interface TestContext {
+  client: {
+    send: <T>(query: string, variables: Record<string, any>): Promise<T>
+    headers: {
+      set(headers: Record<string, string>): void
+      set(name: string, value: string): void
+      set(header: [string, string]): void
+      add(headers: Record<string, string>): void
+      add(name: string, value: string): void
+      add(header: [string, string]): void
+      del(name: string): void
+      get(name: string): null | string
+      has(name: string): boolean
+      entries(): [string,string][]
+    }
+  }
+  app: {
+    server: {
+      start: () => Promise<void>
+      stop: () => Promise<void>
+    }
+  }
+}
+```

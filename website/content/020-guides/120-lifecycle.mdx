@@ -1,0 +1,15 @@
+---
+title: Lifecycle
+---
+
+## Reflection
+
+Nexus has a feature called reflection. The basic idea is that Nexus will use your source code to extract data that enhances the type-safety of that same source code.
+
+Nexus reflection takes two forms, static and dynamic.
+
+1. Nexus static reflection means using the TypeScript compiler API to analyze the your codebase for certain API patterns, and then extracting types about it which inform the types of other parts of the your codebase.
+
+2. Nexus dynamic reflection means literally running your app to derive certain information. Specifically, Nexus generates types for certain areas of the schema API.
+
+The dynamic form of reflection means that any initialization code at the module level anywhere in your app will be run during build. To avoid that happening use the [lifecycle API](/api/nexus/on) to lazily run initialization logic only on application startup.

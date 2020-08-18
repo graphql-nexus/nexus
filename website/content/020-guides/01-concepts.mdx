@@ -1,0 +1,20 @@
+---
+title: 'Concepts'
+toc: false
+---
+
+## Overview
+
+Nexus is a powerful tool built of multiple components that broadly fall into three categories: runtime, worktime, testtime.
+
+### worktime
+
+The worktime component is a command line interface (CLI). It abstracts away numerous details like how to setup TypeScript. You develop your app with zero configuration using `nexus dev`, and then when you are ready, build it for production using `nexus build`. Once built, you run it in production like any other vanilla Node app.
+
+### runtime
+
+There are a few runtime components. The one you'll deal with the most is the schema. It gives you powerful abstractions for implementing the GraphQL part of your API. Other runtime components include a JSON logger and HTTP server. It is possible to have a useful Nexus app that only ever touches the schema component, though most non-trivial apps will leverage all components.
+
+### testtime
+
+Nexus pushes the boundaries of static typing as far as it can, but recognizes an unsatisfactory limit will be reached. Thus it embraces testing and ships with testtime components that are designed to pick up where static types drop off. While testtime components are the least developed so far, we think they will be a huge part of the value proposition, bringing levels of safety typically associated with other [languages](https://www.idris-lang.org/) [and](https://www.haskell.org/) [tools](https://www.servant.dev/).
