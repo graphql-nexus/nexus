@@ -841,7 +841,7 @@ export class SchemaBuilder {
       })
     }
     if (!resolveType) {
-      resolveType = this.missingResolveType(config.name, 'union')
+      resolveType = this.missingResolveType(config.name, 'interface')
     }
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
