@@ -1,10 +1,8 @@
 import { assertValidName } from 'graphql'
-import { FieldResolver, GetGen } from '../typegenTypeHelpers'
+import { FieldResolver } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import { NexusInterfaceTypeDef } from './interfaceType'
+import { Implemented } from './interfaceType'
 import { NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexusSymbol } from './_types'
-
-export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
 export interface FieldModification<TypeName extends string, FieldName extends string> {
   /**

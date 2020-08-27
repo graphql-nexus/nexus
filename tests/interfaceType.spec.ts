@@ -45,6 +45,119 @@ describe('interfaceType', () => {
       )
     ).toMatchSnapshot()
   })
+  it('can extend other interfaces', async () => {
+    const schema = makeSchema({
+      types: [
+        interfaceType({
+          name: 'LivingOrganism',
+          definition(t) {
+            t.string('type')
+            t.resolveType(() => null)
+          },
+        }),
+        interfaceType({
+          name: 'Animal',
+          definition(t) {
+            t.implements('LivingOrganism')
+            t.string('classification')
+            t.resolveType(() => null)
+          },
+        }),
+        interfaceType({
+          name: 'Pet',
+          definition(t) {
+            t.implements('Animal')
+            t.string('owner')
+            t.resolveType(() => null)
+          },
+        }),
+        objectType({
+          name: 'Dog',
+          definition(t) {
+            t.implements('Pet')
+            t.string('breed')
+          },
+        }),
+        queryField('dog', {
+          type: 'Dog',
+          resolve: () => ({
+            type: 'Animal',
+            classification: 'Canis familiaris',
+            owner: 'Mark',
+            breed: 'Puli',
+          }),
+        }),
+      ],
+      outputs: {
+        schema: path.join(__dirname, 'interfaceTypeTest.graphql'),
+        typegen: false,
+      },
+      shouldGenerateArtifacts: false,
+    })
+    expect(
+      await graphql(
+        schema,
+        `
+          {
+            dog {
+              type
+              classification
+              owner
+              breed
+            }
+          }
+        `
+      )
+    ).toMatchSnapshot()
+  })
+  it('can not implement itself', async () => {
+    expect(() =>
+      makeSchema({
+        types: [
+          interfaceType({
+            name: 'Node',
+            definition(t) {
+              t.id('id')
+              t.implements('Node')
+            },
+          }),
+        ],
+        outputs: false,
+        shouldGenerateArtifacts: false,
+      })
+    ).toThrowErrorMatchingSnapshot()
+  })
+  it('detects circular dependencies', async () => {
+    expect(() =>
+      makeSchema({
+        types: [
+          interfaceType({
+            name: 'NodeA',
+            definition(t) {
+              t.id('a')
+              t.implements('NodeC')
+            },
+          }),
+          interfaceType({
+            name: 'NodeB',
+            definition(t) {
+              t.id('b')
+              t.implements('NodeA')
+            },
+          }),
+          interfaceType({
+            name: 'NodeC',
+            definition(t) {
+              t.id('c')
+              t.implements('NodeB')
+            },
+          }),
+        ],
+        outputs: false,
+        shouldGenerateArtifacts: false,
+      })
+    ).toThrowErrorMatchingSnapshot()
+  })
   it('logs error when resolveType is not provided for an interface', async () => {
     const spy = jest.spyOn(console, 'error').mockImplementation()
     makeSchema({
