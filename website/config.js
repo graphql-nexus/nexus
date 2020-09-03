@@ -22,10 +22,10 @@ const config = {
     //   { name: 'FAQ', link: 'https://www.prisma.io/docs/more/faq' },
     // ],
     links: [
-      { name: 'Docs', link: '/docs' },
-      { name: 'Playground', link: '/' },
-      { name: 'SDL Converter', link: '/' },
-      { name: 'Examples', link: '/' },
+      { name: 'Docs', link: '../docs' },
+      { name: 'Playground', link: '../' },
+      { name: 'SDL Converter', link: '../' },
+      { name: 'Examples', link: '../' },
     ],
     search: {
       indexName: process.env.GATSBY_ALGOLIA_INDEX_NAME,
