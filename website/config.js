@@ -1,13 +1,13 @@
 const config = {
   gatsby: {
-    pathPrefix: '',
-    siteUrl: 'https://graphql-nexus-schema.netlify.app/', // TODO
+    pathPrefix: '/docs',
+    siteUrl: 'https://graphql-nexus-schema-docs.netlify.app/', // TODO
     titlePrefix: '',
     titleSuffix: '',
   },
   redirects: [],
   header: {
-    logoLink: 'https://graphql-nexus-schema.netlify.app/', // TODO
+    logoLink: 'https://graphql-nexus-schema-website.netlify.app/', // TODO
     title: 'Nexus',
     // check all links
     // links: [
@@ -22,7 +22,7 @@ const config = {
     //   { name: 'FAQ', link: 'https://www.prisma.io/docs/more/faq' },
     // ],
     links: [
-      { name: 'Docs', link: '/' },
+      { name: 'Docs', link: '/docs' },
       { name: 'Playground', link: '/' },
       { name: 'SDL Converter', link: '/' },
       { name: 'Examples', link: '/' },
