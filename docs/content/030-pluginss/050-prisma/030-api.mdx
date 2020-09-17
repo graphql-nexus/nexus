@@ -4,7 +4,7 @@ title: API
 
 ## `t.model`
 
-Only available within [`schema.objectType`](/api/api-objecttype) definitions.
+Only available within [`objectType`](/api/api-objecttype) definitions.
 
 `t.model` contains configurable _field projectors_ that you use for projecting fields of your [Prisma models](https://github.com/prisma/prisma2/blob/master/docs/data-modeling.md#models) onto your [GraphQL Objects](https://graphql.github.io/graphql-spec/June2018/#sec-Objects). The precise behaviour of field projectors vary by the Prisma type being projected. Refer to the respective sub-sections for details.
 
@@ -27,14 +27,14 @@ model User {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.id()
   },
 })
 
-schema.objectType({
+objectType({
   name: 'Person',
   definition(t) {
     t.model('User').id()
@@ -124,7 +124,7 @@ enumType({
   members: ['MEMBER', 'EDITOR'],
 })
 
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.role()
@@ -219,7 +219,7 @@ model User {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.id()
@@ -288,7 +288,7 @@ model Post {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.latestPost()
@@ -374,14 +374,14 @@ model User {
 ```
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.crud.user()
     t.crud.users()
   },
 })
 
-schema.mutationType({
+mutationType({
   definition(t) {
     t.crud.createOneUser()
     t.crud.updateOneUser()
@@ -462,13 +462,13 @@ model Post {
 <tab>
 
 ```ts
-schema.mutationType({
+mutationType({
   definition(t) {
     t.crud.createOneUser()
   },
 })
 
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.id()
@@ -477,7 +477,7 @@ schema.objectType({
   },
 })
 
-schema.objectType({
+objectType({
   name: 'Post',
   definition(t) {
     t.model.id()
@@ -609,7 +609,7 @@ model User {
 <tab>
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.user()
   },
@@ -747,13 +747,13 @@ model Post {
 <tab>
 
 ```ts
-schema.mutationType({
+mutationType({
   definition(t) {
     t.crud.updateOneUser()
   },
 })
 
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.id()
@@ -762,7 +762,7 @@ schema.objectType({
   },
 })
 
-schema.objectType({
+objectType({
   name: 'Post',
   definition(t) {
     t.model.id()
@@ -998,13 +998,13 @@ model Post {
 <tab>
 
 ```ts
-schema.mutationType({
+mutationType({
   definition(t) {
     t.crud.deleteOneUser()
   },
 })
 
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.id()
@@ -1013,7 +1013,7 @@ schema.objectType({
   },
 })
 
-schema.objectType({
+objectType({
   name: 'Post',
   definition(t) {
     t.model.id()
@@ -1118,7 +1118,7 @@ model Post {
 <tab>
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.users()
   },
@@ -1275,7 +1275,7 @@ model Post  {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'Post',
   definition(t) {
     t.model.body({
@@ -1340,14 +1340,14 @@ model Post {
 
 
 ```ts
-schema.objectType({
+objectType({
   name: 'Article',
   definition(t) {
     t.model('Post').id()
   },
 })
 
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.posts({
@@ -1473,7 +1473,7 @@ model Post {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'Post',
   definition(t) {
     t.model.id()
@@ -1482,7 +1482,7 @@ schema.objectType({
   },
 })
 
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.id()
@@ -1493,7 +1493,7 @@ schema.objectType({
   },
 })
 
-schema.queryType({
+queryType({
   definition(t) {
     t.crud.user()
     t.crud.users({
@@ -1639,7 +1639,7 @@ model Post {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.posts({
@@ -1648,7 +1648,7 @@ schema.objectType({
   },
 })
 
-schema.queryType({
+queryType({
   definition(t) {
     t.crud.users({
       pagination: true,
@@ -1761,14 +1761,14 @@ enum UserStatus {
 <tab>
 
 ```ts
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.model.age()
   },
 })
 
-schema.objectType({
+objectType({
   name: 'Post',
   definition(t) {
     t.model.author()
@@ -1777,7 +1777,7 @@ schema.objectType({
   },
 })
 
-schema.objectType({
+objectType({
   name: 'Comment',
   definition(t) {
     t.model.author()
@@ -1785,7 +1785,7 @@ schema.objectType({
   },
 })
 
-schema.queryType({
+queryType({
   definition(t) {
     t.crud.users({
       filtering: true,
@@ -1977,7 +1977,7 @@ Allow clients to omit fields from one mutation's corresponding input type and in
 
 #### GraphQL Schema Contributions
 
-The mutation's input type fields with a name that is in the ComputedInputs object are omitted from the GraphQL schema. This modifies one existing input type but does not add new types or remove existing types.
+The mutation's input type fields with a name that is in the ComputedInputs object are omitted from the GraphQL  This modifies one existing input type but does not add new types or remove existing types.
 
 #### Example
 
@@ -1996,12 +1996,12 @@ model User {
 <tab>
 
 ```ts
-schema.queryType({
+queryType({
   definition(t: any) {
     t.crud.user()
   },
 })
-schema.mutationType({
+mutationType({
   definition(t: any) {
     t.crud.createOneUser({
       computedInputs: {
@@ -2010,7 +2010,7 @@ schema.mutationType({
     })
   },
 })
-schema.objectType({
+objectType({
   name: 'User',
   definition: (t: any) => {
     t.model.id()
@@ -2087,7 +2087,7 @@ Allow clients to omit fields with a given name across all of their GraphQL schem
 
 #### GraphQL Schema Contributions
 
-All input type fields with a name that is in the ComputedInputs object are omitted from the GraphQL schema. This modifies existing input types but does not add new types or remove existing types.
+All input type fields with a name that is in the ComputedInputs object are omitted from the GraphQL  This modifies existing input types but does not add new types or remove existing types.
 
 #### Example
 
@@ -2113,18 +2113,18 @@ model Nested {
 <tab>
 
 ```ts
-schema.queryType({
+queryType({
   definition(t: any) {
     t.crud.user()
   },
 })
-schema.mutationType({
+mutationType({
   definition(t: any) {
     t.crud.createOneUser()
     t.crud.createOneNested()
   },
 })
-schema.objectType({
+objectType({
   name: 'User',
   definition: (t: any) => {
     t.model.id()
@@ -2133,7 +2133,7 @@ schema.objectType({
     t.model.createdWithBrowser()
   },
 })
-schema.objectType({
+objectType({
   name: 'Nested',
   definition: (t: any) => {
     t.model.id()
@@ -2336,12 +2336,12 @@ model User {
 <tab>
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.crud.users()
   },
 })
-schema.objectType({
+objectType({
   name: 'User',
   definition(t) {
     t.crud.posts()
