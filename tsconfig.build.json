@@ -2,7 +2,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "outDir": "dist",
     "declaration": true,
     // "declarationMap": true,
     "sourceMap": true
@@ -10,6 +9,7 @@
   "exclude": [
     "./**/*.spec.types.ts",
     "./examples",
+    "./docs",
     "./scripts",
     "./dist",
     "./tests",
