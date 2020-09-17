@@ -2,44 +2,80 @@
 title: Overview
 ---
 
-## Introduction
-
-Prisma is a next-generation developer-centric toolkit focused on making the data layer easy. This plugin gives you:
-
-###  Workflow integration
-
-Nexus `build` and `dev` workflows are enhanced to run your Prisma generators.
-
-### Runtime integration  
-
-Nexus schema component [GraphQL type builders](/guides/schema#graphql-type-builders) are augmented with `.model` and `.crud` methods. These make it easy for you to project your Prisma models and expose operations against them in your GraphQL API. Resolvers are dynamically created for you removing the need for traditional ORMs/query builders like TypeORM, Sequelize, or Knex. Out-of-box features include pagination, filtering, and ordering. And when you do need to drop down to custom resolvers a [`Prisma Client`](https://github.com/prisma/prisma-client-js) instance on `context` is ready to go.
-
-### Testtime integration
-
-Nexus testing component is augmented with an instance of the [`Prisma Client`](https://github.com/prisma/prisma-client-js), to help you easily seed your database for your tests.
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ## Installation
 
-1. Install the plugin
+```bash-symbol
+npm add nexus-plugin-prisma @prisma/client
+npm add -D @prisma/cli
+```
 
-    ```bash-symbol
-    npm add nexus-plugin-prisma
-    ```
+## Usage
 
-    > Warning: All Prisma deps are bundled, so do _not_ install e.g. `@prisma/cli` or `@prisma/client`. If you are wondering _why_ you can read through [Nexus' philosophy on dependency management](/meta/architecture#dependency-philosophy). You can still find the the prisma CLI by running `npm run prisma` or `yarn prisma`. In an emergency you can still control version of prisma deps with Yarn [`"resolutions"`](https://classic.yarnpkg.com/en/docs/selective-version-resolutions).
+1. Import `nexusSchemaPrisma` from `nexus-plugin-prisma`
+1. Create and configure it if needed (usually not)
+1. Pass into `Nexus.makeSchema` `plugins` array
 
-2. Enable the plugin
+> **Note**: If you're looking for CRUD capabilities, you must enable the `experimentalCRUD` option.
 
-    ```ts
-    import { use } from 'nexus'
-    import { prisma } from 'nexus-plugin-prisma'
+You can find runnable examples in the [repo examples folder](https://github.com/graphql-nexus/nexus-schema-plugin-prisma/tree/master/examples/schema).
 
-    use(prisma())
-    ```
+**Example**
+
+```ts
+import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+import { makeSchema } from '@nexus/schema'
+import * as types from './types'
+
+const schema = makeSchema({
+  types,
+  plugins: [nexusSchemaPrisma()],
+})
+```
+
+## Configuration
+
+Note that, In most cases, you should not need to configure anything.
+
+```ts
+type Options = {
+  /**
+   * Enable experimental CRUD capabilities.
+   * Add a `t.crud` method in your definition block to generate CRUD resolvers in your `Query` and `Mutation` GraphQL Object Type.
+   *
+   * @default false
+   */
+
+  experimentalCRUD?: boolean
+  /**
+   * nexus-plugin-prisma will call this to get a reference to an instance of the Prisma Client.
+   * The function is passed the context object. Typically a Prisma Client instance will
+   * be available on the context to support your custom resolvers. Therefore the
+   * default getter returns `ctx.prisma`.
+   */
+  prismaClient?: PrismaClientFetcher
+  /**
+   * Same purpose as for that used in `NexusSchema.makeSchema`. Follows the same rules
+   * and permits the same environment variables.
+   */
+  shouldGenerateArtifacts?: boolean
+
+  inputs?: {
+    /**
+     * What is the path to the Prisma Client package? By default looks in
+     * `node_modules/@prisma/client`. This is needed in order to read your Prisma
+     * schema AST and Prisma Client CRUD info from the generated Prisma Client package.
+     */
+    prismaClient?: string
+  }
+  outputs?: {
+    /**
+     * Where should typegen be put on disk? By default emits into `node_modules/@types`.
+     */
+    typegen?: string
+  }
+  computedInputs?: GlobalComputedInputs
+}
+```
 
 ## Getting started
 
