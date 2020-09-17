@@ -14,8 +14,6 @@ So far you've been validating your work by manual interacting with the Playgroun
 
 <!-- TODO need feature to share content in multiple places -->
 
-> Content taken from the [testing guide](/guides/testing#testing-in-principal)
-
 There are multiple ways you can test a GraphQL API. One way is to extract resolvers into isolated functions and then unit test them. Of course these are rarely pure functions so those unit tests either become partial integration tests or mocks are introduced to try and retain the unit level of testing. Unit testing resolvers can work well, but here are some reasons why and where it might not;
 
 - The Nexus Prisma plugin (discussed later) can remove the need to even write resolvers in which case testing [those] resolvers doesn't make sense.
