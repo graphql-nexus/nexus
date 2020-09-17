@@ -6,39 +6,6 @@ title: 'Schema'
 
 This is the Nexus schema component guide. Here you will find concepts explained and a survey of how to use the API. If you are not familiar with Nexus this is a good document to read. If you are familiar, then the [Schema API Docs](../../api/nexus/schema) may be of more use to you.
 
-## Introduction
-
-### Importing
-
-You will use the schema component of Nexus to build your GraphQL schema. You can import it as a named export from the main module of the `nexus` package. If you prefer you can also import the default `app` export and then access the `schema` property.
-
-<!-- prettier-ignore -->
-```ts
-import app from 'nexus'        // default style
-import { schema } from 'nexus' // named-export style
-
-app.schema === schema // true
-```
-
-> Leverage [VSCode auto-import](https://code.visualstudio.com/docs/languages/typescript#_auto-imports). Anywhere in a TypeScript module in your project type either `app` to summon auto-import for the default style or `schema` for named-export style.
-
-### Singleton and mutation
-
-The schema component is part of the app singleton and usage of its methods affects the overall app state. While this is not a functionally pure approach it does allow you to use its methods throughout your project without having to think about exporting/importing values. One of Nexus' design goals is to approach the ease and readability of [GraphQL SDL](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) where we can. This is one example of doing that.
-
-As an example, the following snippet shows the addition of an object type to the GraphQL schema. Notice how the return value is not used in any way. The method is actually mutating the app state.
-
-```ts
-import { schema } from 'nexus'
-
-schema.objectType({
-  name: 'Foo',
-  definition(t) {
-    t.string('bar', () => 'qux')
-  },
-})
-```
-
 ## GraphQL type builders
 
 We will now begin exploring the GraphQL schema building parts of the schema component. Having prior knowledge of GraphQL language itself will greatly help. If you are new to GraphQL you may want to read some of the resources listed below.
@@ -55,7 +22,7 @@ We will now begin exploring the GraphQL schema building parts of the schema comp
 
 <!-- prettier-ignore -->
 ```ts
-                                      schema.objectType({
+                                      objectType({
 // The singleton instance of ---------^      |
 // the Nexus schema component                |
 //                                           |
@@ -105,7 +72,7 @@ We will now begin exploring the GraphQL schema building parts of the schema comp
 #### Scalar fields
 
 ```ts
-schema.objectType({
+objectType({
   name: 'Alpha',
   definition(t) {
     t.id('a')
@@ -130,7 +97,7 @@ type Alpha {
 #### Relational fields
 
 ```ts
-schema.objectType({
+objectType({
   name: 'Alpha',
   definition(t) {
     t.field('beta', {
@@ -141,7 +108,7 @@ schema.objectType({
     })
   },
 })
-schema.objectType({
+objectType({
   name: 'Beta',
   definition(t) {
     t.string('foo')
@@ -162,7 +129,7 @@ type Beta {
 ##### Lists and nullability
 
 ```ts
-schema.objectType({
+objectType({
   name: 'Alpha',
   definition(t) {
     t.id('a', { nullable: true })
@@ -196,7 +163,7 @@ Enum types are a scalar with a finite set of allowed values. They can be used as
 
 
 ```ts
-schema.enumType({
+enumType({
   name: 'Alpha',
   members: ['Zeta', 'Yolo'],
 })
@@ -216,7 +183,7 @@ enum Alpha {
 
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.field('anyAlpha', {
       type: 'Alpha',
@@ -347,7 +314,7 @@ If an arg has been given a default value, then it will be used when the client p
 
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.string('echo', {
       args: {
@@ -371,19 +338,17 @@ type Query {
 
 #### Example: Nullability flipped at global level
 
-
-
 ```ts
-settings.change({
-  schema: {
-    nullable: {
-      outputs: false,
-      inputs: false,
+makeSchema({
+    nonNullDefaults: {
+      input: false,
+      output: false
     },
-  },
+    types:[...]
 })
-
-schema.queryType({
+```
+```ts
+queryType({
   definition(t) {
     t.string('echo', {
       args: {
@@ -403,14 +368,10 @@ type Query {
 }
 ```
 
-
-
 #### Example: Nullability flipped at type level
 
-
-
 ```ts
-schema.queryType({
+queryType({
   nonNullDefaults: {
     input: true,
     output: true,
@@ -434,14 +395,10 @@ type Query {
 }
 ```
 
-
-
 #### Example: Nullability flipped at input and field level
 
-
-
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.string('echo', {
       args: {
@@ -516,7 +473,7 @@ When an arg has a default you might think that then it should be nullable to the
 
 
 ```ts
-schema.queryType({
+queryType({
   definition(t) {
     t.string('echo', {
       args: {
@@ -605,7 +562,7 @@ Hopefully you can see how the GraphQL types seen by the client are distinct from
 <summary>See code implementation</summary>
 
 ```ts
-schema.query({
+query({
   definition(t) {
     t.user({
       args: {
@@ -618,7 +575,7 @@ schema.query({
   },
 })
 
-schema.object({
+object({
   name: 'User',
   rootTyping: 'Prisma.User',
   definition(t) {
@@ -641,7 +598,7 @@ schema.object({
   },
 })
 
-schema.object({
+object({
   name: 'Comment',
   rootTyping: 'Prisma.Comment',
   definition(t) {
@@ -670,7 +627,7 @@ schema.object({
   },
 })
 
-schema.object({
+object({
   name: 'Post',
   rootTyping: 'Prisma.Post',
   definition(t) {
@@ -708,7 +665,7 @@ When you first begin creating your schema, you may have objects without backing 
 //
 // { fullName: string, age: number } ---> |
 //                                        |
-schema.object({                        // |
+object({                               // |
   name: 'User',                        // |
   definition(t) {                      // |
     t.string('fullName', {             // |
@@ -726,7 +683,7 @@ schema.object({                        // |
   },                                   // |
 })                                     // |
                                        // |
-schema.queryType({                     // |
+queryType({                            // |
   definition(t) {                      // |
     t.list.field('users', {            // |
       type: 'User',                    // |
@@ -752,7 +709,7 @@ export interface MyDBUser {
   birthDate: number
 }
 
-schema.object({
+object({
   name: 'User',
   rootTyping: 'MyDBUser',
   //           ^---------------------- Tell Nexus what the backing type is.
@@ -773,7 +730,7 @@ schema.object({
   },
 })
 
-schema.queryType({
+queryType({
   definition(t) {
     t.list.field('users', {
       type: 'User',
@@ -799,7 +756,7 @@ export type * as Spotify from 'spotify-api'
 //                             ^------ Export your third-party type(s)
 //                                     Can be anywhere within your app
 
-schema.object({
+object({
   name: 'User',
   rootTyping: 'Spotify.Foo',
   //           ^---------------------- Tell Nexus what the backing type is.
@@ -820,7 +777,7 @@ schema.object({
   },
 })
 
-schema.queryType({
+queryType({
   definition(t) {
     t.list.field('users', {
       type: 'User',
