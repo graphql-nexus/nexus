@@ -1,30 +1,6 @@
 ---
-title: Runtime
+title: API
 ---
-
-## Context 
-
-A reference to your [`Prisma Client`](https://github.com/prisma/prisma-client-js) instance will be added to the context under the `db` property.
-
-#### Example
-
-```ts
-import { schema } from 'nexus'
-
-schema.objectType({
-  name: 'Query',
-  definition(t) {
-    t.list.field('users', {
-      type: 'User',
-      resolve(parent, args, ctx) {
-        return ctx.db.user.findMany() // <== `ctx.db` is your Prisma Client instance
-      },
-    })
-  },
-})
-```
-
-
 
 ## `t.model`
 
