@@ -1,0 +1,728 @@
+---
+title: Nexus Framework Users
+---
+
+## Introduction
+
+Hello Nexus Framework user!
+
+If you are a `nexus` (Nexus Framework) user we strongly encourage you to migrate to `@nexus/schema` (Nexus Schema). For more detail about why and how this came about please see [this announcement](https://prisma.io/blog/todo). The following guide is written to help you transition from the framework back to the library.
+
+Note that there is a [separate migration guide](https://www.notion.so/prismaio/Migrating-from-Prisma-plugin-for-Nexus-Framework-to-Prisma-plugin-for-Nexus-Schema-a9cdc93b689044d99ee5d42d39e60e90) detailing how to go from the Prisma plugin for Nexus Framework to the Prisma plugin for Nexus schema.
+
+## Bundled Dependencies
+
+You will need to install `@nexus/schema` and `graphql` yourself. While you're at it, uninstall `nexus` too.
+
+```tsx
+npm uninstall nexus
+npm install @nexus/schema graphql
+```
+
+## JavaScript Support
+
+If you had been using TypeScript before only because Nexus Framework forced you to, then know that you can use JavaScript with `@nexus/schema` if you want. The rest of this guide will assume that you want to continue using TypeScript. Ignore or adapt instructions as needed if you are a JS user.
+
+## Managed TypeScript
+
+You will need to manage the TypeScript toolchain yourself.
+
+1. Install `typescript`, `ts-node`, and `ts-node-dev`.
+
+   ```tsx
+   npm add -D typescript ts-node ts-node-dev
+   ```
+
+2. The following applies to VSCode but something like it might apply to other editors as well. You must also make sure your editor is set to use the local version of TypeScript rather than the one the editor ships with. Summon the command pallet `command+shift+p` and then enter and select `typescript: select TypeScript Version...`. Then select `Workspace Version`.
+3. Ensure your tsconfig settings are correct.
+   1. If you are outputting Nexus Schema typegen to `node_modules/@types/<something>/index.d.ts` like Nexus Framework did then you must ensure that the [`compilerOptions.typeRoots`](https://www.typescriptlang.org/tsconfig#typeRoots) and [`compilerOptions.types`](https://www.typescriptlang.org/tsconfig#types) fields are correctly set or not set at all. If `typeRoots` is set then ensure that where you output Nexus Schema's typegen is listed. If `types` is set then ensure that the parent directory where you output Nexus Schema's typegen is listed.
+   2. If you are using Apollo Server then you must enable `skipLibCheck: true` in `compilerOptions`.
+   3. Enable `strict` mode in `compilerOptions` to benefit most of all from Nexus Schema's typings.
+
+## Development Mode
+
+You will need to manage running and restarting your server on changes during development yourself. If you are using TypeScript then use the following two development scripts `dev` and `dev:typecheck`. Together, these attempt to smooth over the workflow with Nexus' reflection system and approximate a subset of what `nexus dev` did.
+
+```tsx
+{
+  "scripts": {
+    "dev": "ts-node-dev --transpileOnly ./your/main/module",
+    "dev:typecheck": "tsc --noEmit --watch",
+  }
+}
+```
+
+The `dev` script launches a `ts-node-dev` process that is responsible for running your API during development. You don't want this process to perform type checking because doing so would halt programming running, and that is incompatible with Nexus' reflection system because it depends on your program running to generate your static schema types.
+
+The following applies to VSCode but it might apply to other editors as well: You cannot fully rely on your editor for static type checking because it only checks files that are open, not your entire project. There are some [ways to](https://spin.atomicobject.com/2019/11/20/type-checking-typescript-visual-studio-code/) [configure this](https://github.com/Microsoft/vscode/issues/13953#issuecomment-292483304) and [additional VSCode extensions](https://marketplace.visualstudio.com/items?itemName=basarat.god) you can try to achieve this. If those don't work for you then simply run another process in a new terminal window/shell session. That is what `dev:typecheck` script does. It launches a `tsc` process that is responsible for type checking your code during development. You don't want this process to perform transpilation as that is already being handled by the `dev` script.
+
+## Nexus Module Discovery & Singleton Schema Builder
+
+You will need to export Nexus Schema type definition values and import them into where you run your `makeSchema`. The exact module layout you use does not matter.
+
+In framework you could do this:
+
+```tsx
+import { schema } from 'nexus'
+
+schema.objectType(...)
+```
+
+Now you will need to do something like this:
+
+```tsx
+// ./User.ts
+
+import { objectType } from '@nexus/schema'
+
+export const User = objectType(...)
+```
+
+```tsx
+// ./index.ts
+
+import { makeSchema } from '@nexus/schema'
+import { User } from './User'
+
+const schema = makeSchema({
+  types: [User],
+  ...
+})
+```
+
+## Fully Abstracted Reflection System
+
+You need to run Nexus Schema reflection yourself explicitly. There are two ways you can go about this.
+
+1. Approach A: Run the subset of your app that contains the schema and that you know will exit.
+2. Approach B: Run your app as usual, but configure it up to exit once reflection has completed.
+
+The first might be simpler if your project can accommodate it. This is because it reduces the surface area of your codebase where you need to think about eager code running during reflection (which in turn is run before build and tests). On the other hand you may already be thinking about this if you are trying to develop testable code. Use whichever approach works best for you.
+
+Regardless of which choice you go with, you also need to ensure that `NODE_ENV=production` is set. If you forget to do this then Nexus Schema will (by default) run reflection. This would significantly slow down your application boot time, something you don't want in serverless environments, for example.
+
+Here is an example of approach A to managing reflection:
+
+1. Layout your Nexus Schema type defs amongst modules under a parent dir such that each module contains a part of your GraphQL schema. Put shared parts of your GraphQL schema into `shared.ts`. Re-export all type defs in `index.ts`.
+
+   ```json
+   /src
+   	/graphql
+   		User.ts
+   		Comment.ts
+   		shared.ts
+   		index.ts
+   ```
+
+2. Your `index.ts` should import all type defs and call `makeSchema`.
+
+   ```tsx
+   // src/graphql/index.ts
+
+   export * from './User'
+   ```
+
+3. Add a `schema.ts` module that imports all type defs and calls `makeSchema`.
+
+   ```tsx
+   // src/schema.ts
+
+   export { makeSchema } from '@nexus/schema'
+   import * as types from './graphql'
+
+   export const schema = makeSchema({
+     types,
+   })
+   ```
+
+4. Now you can run Nexus Schema reflection by running this subset of your app e.g. `ts-node src/schema`. You will probably want to capture this via a new npm script called e.g. `nexus:reflect`.
+
+Here is an example of approach B to managing reflection:
+
+1. Setup your app however you want
+2. When configuring `makeSchema` make sure to enable process exit when requested via an environment variable.
+
+   ```tsx
+   import { makeSchema } from '@nexus/schema'
+
+   export const schema = makeSchema({
+     shouldExitAfterGenerateArtifacts: Boolean(process.env.NEXUS_SHOULD_EXIT_AFTER_REFLECTION),
+   })
+   ```
+
+3. Now you can run Nexus Schema reflection by running your app with that environment variable set e.g. `NEXUS_SHOULD_EXIT_AFTER_REFLECTION=true ts-node src`. You will probably want to capture this via a new script called e.g. `nexus:reflect`.
+
+## Integrated Build Step With Bundling
+
+You will need to handle the build yourself. This involves a few things:
+
+1. Run Nexus Schema reflection yourself
+
+   This has been explained in the _Fully Abstracted Reflection System_ section.
+
+2. Run `tsc` yourself
+
+   Straightforward. Note that, If you are doing Step 3 then this step may be redundant.
+
+3. Optional: Run a bundler yourself
+
+   This is probably something you don't need to do. Nexus Framework took a packages-bundled approach to dependencies and this mean a large package size that bloated deployments necessitating techniques like tree-shaking (e.g. TypeScript dependency is over 50mb). This problem generally goes away when using the Nexus Schema library directly. However bundling for serverless deployments can still be desirable especially if your non-development dependencies are heavy and not fully used at runtime. If you were relying on Nexus Framework bundling here are some tools you can try out yourself:
+
+   - [`spack`](https://swc-project.github.io/docs/usage-spack-cli)
+   - [`esbuild`](https://github.com/evanw/esbuild)
+   - [`ncc`](https://github.com/vercel/ncc)
+
+   These tools take care of TypeScript transpilation so you should be able to skip using `tsc` manually with the above tools.
+
+   When you are bundling your app you may need to tweak your `tsconfig.json` to output ES modules rather than CJS modules. The options you will need to think about are [`module`](https://www.typescriptlang.org/tsconfig#module), [`moduleResolution`](https://www.typescriptlang.org/tsconfig#moduleResolution), and [`target`](https://www.typescriptlang.org/tsconfig#target). There are few ways to go about this, the following is one:
+
+   ```json
+   {
+     "compilerOptions": {
+       "moduleResolution": "Node",
+       "target": "ES2015",
+       "module": "ES2015"
+     }
+   }
+   ```
+
+Here is an example where bundling is not used:
+
+```json
+{
+  "scripts": {
+    "build": "yarn nexus:reflection && tsc",
+    "nexus:reflection": "ts-node path/to/schema/modules/entrypoint"
+  }
+}
+```
+
+## HTTP Server
+
+Nexus framework comes bundled with Apollo Server and runs it for you. You will need to figure out your server solution yourself. One common option is Apollo Server. It is actually a middleware layer that integrates with many different HTTP frameworks and libraries. Here is an example using Apollo Server with Express.
+
+1. Install new dependencies
+
+   ```tsx
+   npm add express apollo-server-express
+   ```
+
+2. If using TypeScript then Install typings for Express
+
+   ```tsx
+   npm add -D @types/express
+   ```
+
+3. If using TypeScript then you [need to](https://github.com/apollographql/apollo-server/issues/1977#issuecomment-662946590) enable `esModuleInterop` to be able to use Apollo Server
+
+   ```tsx
+   // tsconfig.json
+   {
+     "compilerOptions": {
+   		"esModuleInterop": true
+   	}
+   }
+   ```
+
+4. Write your server code
+
+   ```tsx
+   import { ApolloServer } from 'apollo-server-express'
+   import { makeSchema, objectType } from '@nexus/schema'
+   import createExpress from 'express'
+
+   const schema = makeSchema({
+     types: [objectType({ ... })]
+   })
+
+   const apollo = new ApolloServer({
+     schema
+   })
+
+   const express = createExpress()
+
+   apollo.applyMiddleware({ app: express })
+
+   express.listen(4000, () => {
+     console.log(`🚀 GraphQL service ready at http://localhost:4000/graphql`)
+   })
+   ```
+
+## HTTP Server CORS Support
+
+Nexus Framework shipped with builtin server CORS support. You can easily achieve this yourself with Apollo Server. Following from example in the _HTTP Server_ section, you can setup your CORS settings in the [`applyMiddleware`](https://www.apollographql.com/docs/apollo-server/api/apollo-server/#applymiddleware) function:
+
+```tsx
+apollo.applyMiddleware({ app: express, cors: { ... } })
+```
+
+## Integrated GraphQL Playground
+
+You need to integrate GraphQL Playground yourself if you want it. An easy way to do this is use Apollo Server which ships with GraphQL Playground enabled in development by default.
+
+## Subscriptions Server
+
+Nexus Frameworks automatically enables a subscriptions server when you use the GraphQL `Subscription` type. One way to setup a subscriptions server yourself is with Apollo Server. For details refer to [their docs](https://www.apollographql.com/docs/apollo-server/data/subscriptions/).
+
+Following from example in the _HTTP Server_ section, here is an example with a subscriptions server:
+
+```tsx
+import * as Http from 'http'
+import { ApolloServer } from 'apollo-server-express'
+import { makeSchema, subscriptionType } from '@nexus/schema'
+import createExpress from 'express'
+
+/**
+ * An example streaming data source.
+ */
+async function* truthStream() {
+  while (true) {
+    const answer = [true, false][Math.round(Math.random())]
+    yield answer
+    await new Promise(res => setTimeout(res, 1000))
+  }
+}
+
+/**
+ * An example subscription type.
+ */
+const Subscription = subscriptionType({
+  definition(t) {
+    t.field('foobars', {
+      type: 'Boolean',
+      subscribe() {
+        return truthStream()
+      },
+      resolve(eventData: boolean) {
+        return eventData
+      },
+    })
+  },
+})
+
+const schema = makeSchema({
+  types: [Subscription],
+})
+
+const apollo = new ApolloServer({
+  schema,
+})
+
+const express = createExpress()
+
+const httpServer = Http.createServer(app)
+
+apollo.installSubscriptionHandlers(httpServer)
+
+apollo.applyMiddleware({ app: express })
+
+httpServer.listen({ port: 4000 }, () => {
+  console.log(`server at http://localhost:4000${apollo.graphqlPath}`)
+  console.log(`Subscriptions server at ws://localhost:4000${apollo.subscriptionsPath}`)
+})
+```
+
+## Global Error Handling
+
+You will need to handle global error handling yourself. Nexus framework previously injected code that would catch synchronous and asynchronous unhandled errors, log them, and exit the process. For synchronous errors, this merely emulates Node's default behavior. However for asynchronous errors, it provided behavior that Node states it _will eventually have one day_.
+
+The simplest thing you can do here other than doing nothing is use [`make-promises-safe`](https://github.com/mcollina/make-promises-safe).
+
+## Builtin Logger & Logging
+
+You will need to handle logging yourself. If you liked the `@nexus/logger` from Nexus Framework you can find it now as `floggy` on npm. Another great logger you might consider is [`pino`](https://github.com/pinojs/pino). The following assumes `floggy` but adapt as needed.
+
+Nexus Framework has some builtin logging functionality. You can approximate it as follows.
+
+1. Install your logger
+
+   ```tsx
+   npm add floggy
+   ```
+
+2. Create your application logger. The logger you export here should be used across your codebase.
+
+   ```tsx
+   import * as Floggy from 'floggy'
+
+   Floggy.settings({ filter: 'app:*, *@warn+' })
+   export const log = Floggy.log.child('app')
+   ```
+
+3. Create your request logger. The idea here is to have a logger scoped to each request. You can achieve this with different loggers than `floggy` (e.g. `pino`) and with different servers than Apollo Server.
+
+   ```tsx
+   import { ApolloServer } from 'apollo-server-express'
+   import { log } from './path/to/application/logger/module'
+
+   const server = new ApolloServer({
+     context: (request) => {
+       const requestLogger = log.child('request')
+       requestLogger.addToContext({ ... }) // e.g. user ID
+   		return { log: requestLogger }
+   })
+   ```
+
+4. You still need to make this type safe. See _"Context API Type Discovery"_ section for more detail. What follows is just a code example without explanation.
+
+   ```tsx
+   import * as Nexus from '@nexus/schema'
+   import * as Floggy from 'floggy'
+
+   export type Context = {
+     log: Floggy.Logger
+   }
+
+   Nexus.makeSchema({
+     typegenAutoconfig: {
+       sources: [{ source: __filename, alias: 'ContextModule' }]
+       contextType: 'ContextModule.Context',
+     },
+     ...
+   })
+   ```
+
+## Bundled Scalars
+
+You need to explicitly setup all custom scalars yourself. To match what Nexus Framework does by default you need to do the following:
+
+1. Install the `graphql-scalars` package
+
+   ```json
+   npm add graphql-scalars
+   ```
+
+2. Setup the `Json` and `DateTime` scalars
+
+   ```tsx
+   import { makeSchema } from '@nexus/schema'
+   import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
+
+   const jsonScalar = asNexusMethod(JSONObjectResolver, 'json')
+   const dateTimeScalar = asNexusMethod(DateTimeResolver, 'date')
+
+   const schema = makeSchema({ types: [jsonScalar, dateTimeScalar] })
+   ```
+
+## Context API Type Discovery
+
+In Nexus Framework the context parameter of resolver functions is automatically typed.
+
+```tsx
+import { schema } from 'nexus'
+
+schema.addToContext(() => { qux: 1 })
+
+schema.objectType({
+  name: "Foo",
+  definition(t) {
+    t.string("bar", {
+      resolve(parent, args, ctx) {
+        ctx.qux // statically typed as: number
+        ...
+      }
+    })
+  }
+})
+```
+
+To achieve the same level of type safety you now need to do the following.
+
+1. Define and export a static context type
+2. Configure Nexus Schema to use it
+3. Attach your data to the context. How to do this depends on the GraphQL server abstraction you are using usually. The example below uses Apollo Server.
+
+Example:
+
+```tsx
+// 1
+// contextModule.ts
+
+export type Context = {
+  qux: number
+}
+```
+
+```tsx
+// 2
+
+import * as Nexus from '@nexus/schema'
+import * as Path from 'path'
+
+Nexus.makeSchema({
+  typegenAutoconfig: {
+    sources: [{
+      source: Path.join(__dirname, './path/to/contextModule'),
+      alias: 'ContextModule'
+    }],
+    contextType: 'ContextModule.Context',
+  },
+  ...
+})
+```
+
+```tsx
+// 3
+
+import { ApolloServer } from 'apollo-server-express'
+
+const server = new ApolloServer({
+  context: () => ({ qux: 1 }),
+})
+```
+
+## Backing Types Type Discovery
+
+In Nexus Framework backing types worked like this:
+
+1. Export a type from any module in your app
+2. Its name appears as an option among the string literal union populating the `rootTyping` field of Nexus Schema object type definitions.
+
+Nexus Schema does not have this functionality. There are a few things you can do instead.
+
+- Approach A: If you have a set of exported Backing types whose names match your GraphQL objects then you can set their modules as `sources` in `typegenAutoconfig` and Nexus Schema will take care of the rest.
+- Approach B: If you have a set of Backing types whose names having a differing pattern than your GraphQL objects then supply a Regular Expression to the `typeMatch` property in `typegenAutoconfig`. You can for example map `BackingUser -> User` , `BackingPost -> Post` and so on.
+- Approach C: If you have a one-off mismatch then supply an arbitrary mapping to the `backingTypeMap` property of `typegenAutoconfig`.
+- Approach D: If you want to colocate a type mapping like how it was in Nexus Framework then use the `rootTyping` field on Nexus Schema type defs. Unlike framework it accepts an object with a `path` to a module and `name` of the type to look for being exported from that module.
+
+Here is an example using approach A:
+
+```tsx
+// 1
+// someModule.ts
+
+export type Foo = {
+  bar: string
+}
+```
+
+```tsx
+// 2
+
+import * as Nexus from '@nexus/schema'
+import * as Path from 'path'
+
+Nexus.makeSchema({
+  typegenAutoconfig: {
+    sources: [{
+      source: Path.join(__dirname, 'path/to/someModule'),
+      alias: 'SomeAlias'
+    }],
+  },
+  types: [
+    Nexus.queryType({
+      definition(t) {
+        t.list.field('foos', {
+          type: 'Foo',
+          resolve(parent, args, ctx) {
+            return ctx.getFoos() // type-safe to backing types
+          }
+        })
+      }
+    }),
+    Nexus.objectType({
+      name: 'Foo', // "Foo" backing type matches to this GraphQL object
+      definition(t) {
+        t.string('barcola', {
+          resolve(parent) => {
+            return parent.bar // type safe thanks to backing types
+          }
+        })
+      }
+    })
+  ],
+})
+```
+
+## Integrated System Testing
+
+In Nexus Framework there was a testing module for system testing your app. You now need to figure this out yourself. There are several frameworks you can choose from such as [`jest`](https://jestjs.io/) and [`ava`](https://github.com/avajs/ava). This guide assumes `jest`.
+
+1.  Install your test framework
+
+    ```tsx
+    npm add jest
+    ```
+
+2.  If you are a TypeScript user then install and configure `ts-jest`
+
+    ```bash
+    npm add ts-jest
+    ```
+
+    We will configure using a `jest.config.js` module in your project root. Do not use a JSON based configuration unless you know that you won't need the dynamic code used in some later steps here.
+
+    ```tsx
+    // jest.config.js
+
+    module.exports = {
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+    }
+    ```
+
+3.  Setup your project to be able to soundly run one-off tests
+    In order to run your test suite you typically need your app to be type checking. Given the Nexus Schema reflection system, this means that we need to run the app before running the tests. To setup your project for running reflection see the section _Fully Abstracted Reflection System_.
+
+    Here is an example of how this might look in your project:
+
+    ```json
+    {
+      "scripts": {
+        "test": "yarn nexus:reflection && jest",
+        "nexus:reflection": "ts-node path/to/schema/modules/entrypoint"
+      }
+    }
+    ```
+
+4.  Understand your TDD workflow option e.g. `jest --watch`
+    In this case you need Nexus Schema reflection to be running after every change to the source code. But this also typically triggers a new test run. That test run could be faster than reflection, leading to temporary type errors that don't matter to you. You don't want these type errors to block your TDD flow otherwise you get a 🐔🥚problem. To solve this you configure ts-jest to warn instead failing on type errors. The workflow then goes like this: 1. You start your test framework in watch mode 2. You edit your source code 3. Your source code under test runs. This in turn is running Nexus schema reflection. 4. Type errors from your initial test results should be ignored. Run the test suite again (e.g. in `jest` watch mode hit `enter`). Now it is running with the complete set of types and you can trust the test results.
+
+    There are some caveats here:
+
+    1. Your tests need be importing the whole of your nexus schema modules and `makeSchema` code. Otherwise reflection will result in partially generated types that may other kinds of type errors you don't care about (for example a GraphQL string-literal-based object type reference becomes invalid).
+    2. And yes, every test run following change(s) potentially requiring two runs is not ideal
+
+    Here is the revised jest configuration you'll need.
+
+    ```tsx
+    // jest.config.js
+
+    module.exports = {
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      globals: {
+        'ts-jest': {
+          diagnostics: {
+            warnOnly: true,
+          },
+        },
+      },
+    }
+    ```
+
+    Here is how your script for starting your tdd flow in your project might look:
+
+    ```json
+    {
+      "scripts": {
+        "tdd": "jest --watch"
+      }
+    }
+    ```
+
+5.  Setup your project to be able to soundly run on CI
+
+    We've added the `warnOnly` setting as a way to support TDD but now we can't be as sure things are good after one-off test that we expect to include type checking since invalid types will not halt the test from passing. This is mostly a problem in CI where we're aren't interacting with the test run.
+
+    Here is one example of how you might solve this issue:
+
+    ```tsx
+    // jest.config.js
+
+    module.exports = {
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      globals: {
+        'ts-jest': {
+          diagnostics: {
+            warnOnly: !Boolean(process.env.TYPECHECK),
+          },
+        },
+      },
+    }
+    ```
+
+    ```tsx
+    {
+      "scripts": {
+    		"test": "yarn nexus:reflection && TYPECHECK=true jest"
+      }
+    }
+    ```
+
+6.  You will need a way to run your app in tests. Here is one way [adapted from the tutorial](https://todo.com).
+
+    ```tsx
+    npm add -D graphql-request
+    ```
+
+    ```tsx
+    import { GraphQLClient, gql } from 'graphql-request'
+    import app from '...' // Adapt to your project
+
+    type TestContext = {
+      client: GraphQLClient
+    }
+
+    export function createTestContext(): TestContext {
+      let ctx = {} as TestContext
+
+      beforeEach(async () => {
+        const port = await getPort({ port: makeRange(4000, 6000) })
+        await app.start({ port }) // Adapt to your project
+        Object.assign(ctx, {
+          client: new GraphQLClient(`http://localhost:${port}`),
+        })
+      })
+
+      afterEach(async () => {
+        await app.stop({ port })
+      })
+
+      return ctx
+    }
+
+    const ctx = createTestContext()
+
+    it('works', async () => {
+      expect(
+        await ctx.client.query(gql`
+    			...
+    	  `)
+      ).toMatchSnapshot()
+    })
+    ```
+
+## Project Scaffolding
+
+Nexus Framework had a CLI for scaffolding new projects. You can approximate this by cloning the [examples repo](https://todo) and copying the source code of one of the projects.
+
+## Settings API
+
+Nexus Framework has a gradual settings API with features such as automatic mapping of environment variables to settings. You can use the [`setset`](https://github.com/jasonkuhrt/setset) package manually to gain back this functionality.
+
+```tsx
+npm add setset
+```
+
+```tsx
+import * as Setset from 'setset'
+
+type Input = {
+  server?: {
+    port?: number
+  }
+}
+
+const settings = Ssetset.create<Input>({
+  fields: {
+    port: {
+      initial: () => 4000,
+    },
+  },
+})
+
+settings.data.server.port // 4000
+```
+
+## Other Differences
+
+Some differences between Nexus Framework and Nexus Schema and cannot be easily approximated. The follow gathers these differences for your convenience.
+
+1. CLI
+2. Framework Plugins
+3. Zero config experience
+4. Pretty error messages during development
+5. TypeScript Language Service Plugin for refined autocomplete experience
+6. Centralized settings
