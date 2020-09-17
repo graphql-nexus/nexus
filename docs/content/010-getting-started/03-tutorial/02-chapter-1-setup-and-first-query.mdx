@@ -4,78 +4,123 @@ title: 1. Setup and first query
 
 ## Overview
 
-In this first chapter we're just going to get the bare minimum of a Nexus project setup. You'll learn about:
+In this first chapter we're just going to get the bare minimum of a Nexus Schema project setup. You'll learn about:
 
-- The `nexus` package
-- The Nexus CLI
-- Laying out and running a Nexus project
+- The `@nexus/schema` package
+- The `ts-node-dev` package to run your app
+- Laying out and running a Nexus Schema project
 - GraphQL Playground
 
 ## CLI
 
-Start by creating your project directory, initializing your `package.json`, and adding the `nexus` dependency.
+Start by creating your project directory, initializing your `package.json`, and adding the needed runtime dependencies.
 
 ```bash-symbol
 mkdir nexus-tutorial && cd nexus-tutorial
 npm init -y
-npm add nexus
+npm add @nexus/schema graphql apollo-server
 ```
 
-Nexus comes out of the box with a CLI. You'll use it often while working on your app. While you can access the CLI of your local nexus via `yarn` or npm scripts or `npx` but there's an even easier way. Install `nexus` globally. Then you can access the CLI from anywhere. Nexus is smart enough to delegate all invocations to the _local_ nexus. This is the idiomatic way to work with Nexus, but you aren't forced to do this.
+> Note: `@nexus/schema` works with any GraphQL compliant server. We'll use `apollo-server` in this tutorial, but you're free to use whichever fits your use-case best.
+
+We'll also need `typescript` and `ts-node-dev` as dev dependencies. `ts-node-dev` will enable you to transpile your TS files on the fly and restart your API on changes.
 
 ```bash-symbol
-npm add --global nexus
+npm add --save-dev typescript ts-node-dev
 ```
 
-There are just two CLI commands you need to know about right now:
-
-- `nexus dev` : This command starts a development server in watch mode. Every time you change a file, your app will be restarted.
-- `nexus build` : This command builds a "production-ready" server, ready to be deployed.
-
-> Another is `nexus create app` which will scaffold a new Nexus project for you. That is how you should _normally_ start your Nexus projects. We're avoiding it in this tutorial so that you can learn the basics from the ground up.
-
-Despite having the global Nexus CLI, using package scripts can be a handy way of self-documenting your project's workflows. So feel free to add the following scripts to your `package.json`. If you work with team members this can help streamline collaboration.
+To properly get full advantage of TypeScript, we'll need a `tsconfig.json` file. Create one at the root of your project and copy paste the following
 
 ```json
-"scripts": {
-  "dev": "nexus dev",
-  "build": "nexus build"
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "lib": ["esnext"],
+    "strict": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "sourceMap": true,
+    "esModuleInterop": true
+  }
 }
 ```
 
-## Conventional entrypoint
+Let's finally add some npm scripts to simplify our future workflows
 
-We'll now create our first module at `api/app.ts`:
+```json
+"scripts": {
+  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "build": "tsc"
+}
+```
+
+## Creating our app layout
+
+We'll now create our first module at `api/schema.ts`:
 
 ```bash-symbol
 mkdir api && touch api/app.ts
 ```
 
-The directory name `api` is arbitrary but the module name `app` has special meaning. Nexus will find `app.ts` wherever you put it within your project and treat it as your entrypoint. Furthermore, every module that imports `nexus` will be automatically included into the final build by Nexus. This makes growing and refactoring your project easy as you are freed from managing import/export tedium. You might be wondering how import order is managed. The answer is that Nexus' APIs are declarative and so designed to be order independent.
+We'll then setup `@nexus/schema` to create an empty schema
 
-## Contextual feedback
+```ts
+// api/schema.ts
+import { makeSchema } from '@nexus/schema'
+import { join } from 'path'
+
+export const schema = makeSchema({
+  types: [], // 1
+  outputs: {
+    typegen: join(__dirname, '..', 'nexus-typegen.ts'), // 2
+    schema: join(__dirname, '..', 'schema.graphql') // 3
+  }
+})
+```
+
+1. GraphQL types that will be used to construct your GraphQL schema. It's voluntarily empty for now.
+1. Output path to where `@nexus/schema` should write the generated TypeScript definition types derived from your schema. This is **mandatory** to benefit from Nexus' type-safety. We call this system "reflection". More on it later.
+1. Output path to where `@nexus/schema` should write the SDL version of your GraphQL schema. More on it later as well.
+
+Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later. 
+
+Create an `api/server.ts` file and add the following code to instantiate your GraphQL server
+
+```ts
+// api/server.ts
+import { ApolloServer } from 'apollo-server'
+import { schema } from './schema'
+
+export const server = new ApolloServer({ schema })
+```
+
+Then create an `api/app.ts` file and add the following to make the server listening
+
+```ts
+// api/app.ts
+import { server } from './server'
+
+server.listen().then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`)
+})
+```
+
+## Running our app
 
 Ok, with our entrypoint setup, let's boot up dev mode and see what happens.
 
 ```bash-symbol
-nexus dev
+npm run dev
 ```
 
-Woops? You should be seeing a warning from Nexus:
+You should also see a message indicating that your server is running, and where
 
 ```bash-symbol
-▲ nexus:schema Your GraphQL schema is empty. [...]
+🚀 Server ready at http://localhost:4000/graphql
 ```
-
-All good, you indeed haven't added any types to your GraphQL schema yet so Nexus is right here. This is the first example of Nexus' rich development mode contextual feedback. One of the goals of Nexus is to never leave you in a confused disoriented state. If Nexus can give you in inline feedback it should. Add rich jsDoc and precise TypeScript types into the mix, and ideally you can largely avoid getting lost and _needing_ to consult the Nexus website, community, so on.
 
 ## Try it out
-
-Aside from the warning, you should also see a message indicating that your server is running, and where.
-
-```bash-symbol
-● nexus:server listening  --  url: 'http://localhost:4000/graphql'
-```
 
 Open it up, what do you see? It should be an instance of [GraphQL Playground](https://github.com/prisma-labs/graphql-playground).
 

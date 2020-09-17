@@ -11,29 +11,22 @@ In this chapter you're going to write your first schema. You'll learn about:
 - GraphQL SDL file generation
 - Enhanced type safety & autocompletion
 
-## What about that server?
-
-In the last chapter you probably noticed the minimal setup required to get up and running. In fact, you might even be confused and wondering:
-
-> "Hey, all I have is an empty `app.ts` file, how can my server even be running?"
-
-Well, Nexus comes with a server out of the box. There's no need for you to start or stop the server or otherwise think about it beyond your domain logic. Nexus wants you to focus on what makes your GraphQL API unique.
-
-If your lock-in fears are tingling, know that **you still have _full_ access** to the underlying server instance. So if you need to add custom middlewares, routes, and so on, you can. It happens that currently it is an `express` instance but this area of Nexus will evolve ([#295](https://github.com/graphql-nexus/nexus/issues/295)).
-
 ## Reflection?
 
-Before we get going we need a moment to introduce an important part of the Nexus development workflow. Nexus has an unconventional concept called "Reflection". It refers to the fact that, when `nexus dev` or `nexus build` is running, not only is your application code being run, but **information is being gathered and artifacts are being derived**. Some of Nexus' uses for reflection include:
+Before we get going we need a moment to introduce an important part of the Nexus development workflow. Nexus has an unconventional concept called "Reflection". It refers to the fact that, when `makeSchema` is being called, not only is your application code being run, but **information is being gathered and artifacts are being derived**. Some of Nexus' uses for reflection include:
 
-- Figuring out which plugins you are using, and the settings passed
 - Generating TypeScript types to give your resolvers complete type safety
 - Generating an SDL file
 
 This partly explains why Nexus has a declarative API. It needs a way to run your app reliably at build time. Declarative APIs give Nexus a higher degree of control to do this. Declarative APIs also encode enough semantic value for Nexus to do the things it needs to.
 
-Architecturally there's a lot more to say about reflection but for now, from a user point of view, just remember the following. You should _always_ have your `nexus dev` running when you're working on your project _even_ when you're not intending to use your server (e.g. access the GraphQL Playground). If you forget to run `nexus dev` then you will not, for example, get the static typing experience that you expect in your resolvers.
+It also explains the need for the `--transpile-only` flag passed to `ts-node-dev`. If you don't know what it is about, **it basically tells TypeScript not to typecheck your app**. Since `@nexus/schema` needs to be run in order to generate TypeScript types, we need to ensure that `@nexus/schema` won't ever be prevented from generating these types because of.. a type error.
 
-> There are plans to run Nexus Reflection as a separate process integrated into your IDE. You can learn more about and track the feature here ([#949](https://github.com/graphql-nexus/nexus/issues/949))
+You might be (rightfully) wondering: "Wait, how am I supposed to benefit from Nexus' type-safety if I disable it in `ts-node-dev`... ?". For now, the answer to that is to use your IDE's type-checker. If your IDE/terminal don't have one, then manually run an additional `tsc` process.
+
+Just remember the following though. You should _always_ have your `npm run dev` script running when you're working on your project _even_ when you're not intending to use your server (e.g. access the GraphQL Playground). If you forget to run `npm run dev` then you will not, for example, get the static typing experience that you expect in your resolvers.
+
+> There are plans to run Nexus Reflection as a separate process integrated into your IDE. You can learn more about and track the feature here ([#949](https://github.com/graphql-nexus/nexus/issues/949)) *TODO CHANGE LINK TO A NEXUS SCHEMA ISSUE?*
 
 ## Model the domain
 
@@ -43,21 +36,21 @@ Your modeling work is going to start on the API layer as opposed to the database
 
 > A note about terminology. We will be talking about the _Post Object_, not the _Post Model_. The difference is that at the API layer we have objects but at the database layer we have models. The name difference helps us talk about these different layers without confusion. It is also how GraphQL (API layer) and Prisma (database layer, discussed later) respectively refer to these things.
 
-Create a new module for your Post object at `api/graphql/Post.ts`. We _could_ write our whole schema within say `api/app.ts` or `api/graphql.ts`, but modularizing your GraphQL type definitions can help scale your codebase. Neither approach is inherently wrong though, so do as you see you fit. For this tutorial we'll use the modular style.
+Create a new module for your Post object at `api/graphql/Post.ts`. We _could_ write our whole schema within say `api/schema.ts` or `api/graphql.ts`, but modularizing your GraphQL type definitions can help scale your codebase. Neither approach is inherently wrong though, so do as you see you fit. For this tutorial we'll use the modular style.
 
 ```bash-symbol
 mkdir api/graphql && touch api/graphql/Post.ts
 ```
 
-To create the `Post` object we'll import the `schema` component from the `nexus` package. `schema` is where you'll find all the building blocks to craft your GraphQL types. Right now we are interested in the `schema.objectType` method, which, unsurprisingly, helps building [GraphQL Object Types](https://graphql.org/graphql-js/object-types/).
+To create the `Post` object we'll import the `objectType` function from the `@nexus/schema` package. This will help you building a [GraphQL Object Types](https://graphql.org/graphql-js/object-types/).
 
 <!-- prettier-ignore -->
 ```ts
 // api/graphql/Post.ts
 
-import { schema } from 'nexus'
+import { objectType } from '@nexus/schema'
 
-schema.objectType({
+export const Post = objectType({
   name: 'Post',            // <- Name of your type
   definition(t) {
     t.int('id')            // <- Field named `id` of type `Int`
@@ -68,13 +61,66 @@ schema.objectType({
 })
 ```
 
+Additionally, we need to pass that `Post` object type down to our `makeSchema` function. To achieve that, we'll create an `api/graphql/index.ts` file, which will be used as an index to re-export all types from your schema.
+
+```ts
+// api/graphql/index.ts
+
+export * from './Post'
+```
+
+Finally, we'll import this file and pass it down to `makeSchema`
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts
+// api/schema.ts
+ import { join } from 'path'
++ import * as typeDefs from './graphql'
+
+ const schema = makeSchema({
+-  types: []
++  types: typeDefs,
+   outputs: {
+     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
+     schema: join(__dirname, '..', 'schema.graphql')
+   }
+ })
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/schema.ts
+import { join } from 'path'
+import * as typeDefs from './graphql'
+
+const schema = makeSchema({
+  types: typeDefs,
+  outputs: {
+     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
+     schema: join(__dirname, '..', 'schema.graphql')
+  }
+})
+```
+
+</tab>
+
+</TabbedContent>
+
+> Note: It is considered best practice to pass your types directly from a "star import" like we've done above. Under the hood, Nexus will unwrap the types. This prevents from constantly having to manually export & import every single type of your API.
+
 <div class="NextIs SectionDivider"></div>
 
 ## SDL?
 
-Once you've saved this file change to disk, your app will be restarted and the previous warning you had about an empty GraphQL schema should be gone.
+Once you've saved this file change to disk, your app will be restarted.
 
-You may notice that there's also now a new `api.graphql` file at your project root. It contains a representation of your schema in a syntax called the GraphQL Schema Definition Language (SDL for short). In dev mode Nexus generates this for you at every app restart. In it you should see the following:
+You may notice that there's also now a new `schema.graphql` file at your project root. It contains a representation of your schema in a syntax called the GraphQL Schema Definition Language (SDL for short). In dev mode Nexus generates this for you at every app restart. In it you should see the following:
 
 ```graphql
 type Post {
@@ -98,14 +144,16 @@ Your `Post` object is in place now but there's still no way for clients to read 
 
 We'll start by letting API clients read the drafts of your blog.
 
-<div class="TightRow">
+<ParallelBlocks>
 
-<!-- prettier-ignore -->
+<block>
+
 ```ts
 // api/graphql/Post.ts      // 1
-// ...
 
-schema.extendType({
+import { objectType, extendType } from '@nexus/schema'
+
+export const PostQuery = extendType({
   type: 'Query',            // 2
   definition(t) {
     t.field('drafts', {     // 3
@@ -117,13 +165,19 @@ schema.extendType({
 })
 ```
 
+</block>
+
+<block>
+
 ```graphql
 type Query {
   drafts: [Post!]!
 }
 ```
 
-</div>
+</block>
+
+</ParallelBlocks>
 
 1. The Query object is a central place in your schema where many other types will appear. Like before with the modular GraphQL types decision we again can decide to be modular here. We could either create a new `api/graphql/Query.ts` module (not modular), or we could _collocate_ the exposure of Post object with its definition in `api/graphql/Post.ts` (modular). Staying consistent with before, we'll take the modular way.
 1. To achieve collocation in Nexus we'll use `schema.extendType`. Its API is _very_ similar to `schema.objectType` with the difference that the defined fields are merged into the _targeted_ type.
@@ -157,12 +211,39 @@ You'll see some feedback from your IDE that you're missing a `resolve` property.
 
 > You might be wondering why Nexus hasn't complained about missing resolvers in some other cases so far. The answer is a more advanced topic that we'll cover later.
 
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
 ```ts
 // api/graphql/Post.ts
-import { schema } from 'nexus'
+import { extendType } from '@nexus/schema'
 // ...
 
-schema.extendType({
+export const PostQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('drafts', {
+      type: 'Post',
+      list: true,
++      resolve() {
++        return [{ id: 1, title: 'Nexus', body: '...', published: false }]
++      },
+    })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+import { extendType } from '@nexus/schema'
+// ...
+
+export const PostQuery = extendType({
   type: 'Query',
   definition(t) {
     t.field('drafts', {
@@ -176,10 +257,17 @@ schema.extendType({
 })
 ```
 
+</tab>
+
+</TabbedContent>
+
 ## Try it out
 
 You can now open up your GraphQL playground and try the following query (left); In response, you should see something like so (right):
 
+<ParallelBlocks>
+
+<block>
 
 ```graphql
 {
@@ -191,6 +279,10 @@ You can now open up your GraphQL playground and try the following query (left); 
   }
 }
 ```
+
+</block>
+
+<block>
 
 ```json
 {
@@ -207,6 +299,9 @@ You can now open up your GraphQL playground and try the following query (left); 
 }
 ```
 
+</block>
+
+</ParallelBlocks>
 
 
 ## Wrapping up

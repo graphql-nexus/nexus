@@ -31,14 +31,43 @@ During this tutorial, you'll use the [Jest testing framework](https://jestjs.io/
 First, install `jest` and accompanying tools
 
 ```bash-symbol
-npm add --save-dev jest @types/jest ts-jest
+npm add --save-dev jest @types/jest ts-jest graphql-request
 ```
 
 Then, configure jest and npm scripts in your `package.json`
 
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
 ```json
 "scripts": {
-  "test": "jest"
+  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "build": "tsc",
++  "generate": "ts-node-dev api/schema.ts",
++  "test": "npm run generate && jest"
+},
++"jest": {
++  "preset": "ts-jest",
++  "globals": {
++    "ts-jest": {
++      "diagnostics": { "warnOnly": true }
++    }
++  },
++  "testEnvironment": "node"
++}
+```
+
+</tab>
+
+<tab>
+
+```json
+"scripts": {
+  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "build": "tsc",
+  "generate": "ts-node-dev api/schema.ts",
+  "test": "npm run generate && jest"
 },
 "jest": {
   "preset": "ts-jest",
@@ -51,6 +80,10 @@ Then, configure jest and npm scripts in your `package.json`
 }
 ```
 
+</tab>
+
+</TabbedContent>
+
 Finally, create a `tests` folder at the root of your project and a `Post.test.ts` file inside it
 
 ```bash-symbol
@@ -59,11 +92,9 @@ mkdir tests && touch tests/Post.test.ts
 
 ## Testing the `publish` mutation
 
-Nexus comes with a special testing module that you can import from `nexus/testing`.
+To ease testing, we'll create a small utility that we'll call `createTestContext`, which is designed for running integration tests.
 
-Its primary export is the `createTestContext` function which is designed for running system tests. When run, it will boot your app in the same process as the test suite and expose an interface for your tests to interact with it. Jest runs each test suite in its own process, so if you have have say eight test suites running in parallel that means you'll have eight app processes running too.
-
-Before jumping into your first test we will show you a pattern that more tightly integrates `createTestContext` into jest. Nexus will probably ship something like as follows or better in the future, but for now you can just add this as test helper in your Nexus projects.
+When run, it will boot your app in the same process as the test suite and expose an interface for your tests to interact with it. Jest runs each test suite in its own process, so if you have have say eight test suites running in parallel that means you'll have eight app processes running too.
 
 Create a `tests/__helpers.ts` module with the following contents.
 
@@ -73,33 +104,67 @@ touch tests/__helpers.ts
 
 <!-- prettier-ignore -->
 ```ts
-// tests/__helpers.ts                                     // 1
+// tests/__helpers.ts                                            // 1
+import { PrismaClient } from "@prisma/client";
+import { ServerInfo } from "apollo-server";
+import getPort, { makeRange } from "get-port";
+import { GraphQLClient } from "graphql-request";
+import { server } from "../api/server";
 
-import { createTestContext as originalCreateTestContext, TestContext } from 'nexus/testing'
+type TestContext = {
+  client: GraphQLClient;
+};
 
-export function createTestContext() {
-  let ctx = {} as TestContext                             // 2
+export function createTestContext(): TestContext {
+  let ctx = {} as TestContext;
+  const graphqlCtx = graphqlTestContext();
 
-  beforeAll(async () => {
-    Object.assign(ctx, await originalCreateTestContext()) // 3
-    await ctx.app.start()                                 // 4
-  })
+  beforeEach(async () => {                                        // 2
+    const client = await graphqlCtx.before();
 
-  afterAll(async () => {
-    await ctx.app.stop()                                  // 5
-  })
+    Object.assign(ctx, {
+      client,
+    });
+  });
 
-  return ctx
+  afterEach(async () => {                                         // 3
+    await graphqlCtx.after();
+  });
+
+  return ctx;                                                     // 7
+}
+
+function graphqlTestContext() {
+  let serverInstance: ServerInfo | null = null;
+
+  return {
+    async before() {
+      const port = await getPort({ port: makeRange(4000, 6000) });  // 4
+      serverInstance = await server.listen({ port });               // 5
+
+      return new GraphQLClient(`http://localhost:${port}`);         // 6
+    },
+    async after() {
+      serverInstance?.server.close();                               // 7
+    },
+  };
 }
 ```
 
 1. The module name prefix `__` matches that of jest's for snapshot folders `__snapshots__`
-2. Create an object that will be returned immediately but mutated before tests run
-3. Before tests run create the test context. This does most of the work like getting your app instance.
-4. Before tests run start the app
-5. After tests complete, stop the app. This will for example close your app's HTTP server.
+1. Make use of the `jest` lifecycle `beforeEach`. As the name suggest, this hook will be called by Jest _before_ each of your tests
+1. Make use of the `jest` lifecycle `afterEach`. As the name suggest, this hook will be called by Jest _after_ each of your tests
+1. Get a random port so that we can run multiple server concurrently. This is useful as Jest runs all the tests in a same file concurrently by default
+1. Start the GraphQL server before a test start
+1. Add a pre-configured GraphQL client to the test context so that each test can easily send queries to the spawned GraphQL server
+1. Stop the GraphQL server after each test is done
+1. Return an object containing a configured GraphQL client to easily send queries to your GraphQL server
 
 Alright, now you will test your `publish` mutation. Because we want to start from a clean database, we'll just remove the pre-seeded data in the in-memory database that we've been using up until now.
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
 
 ```ts
 // api/db.ts
@@ -108,6 +173,21 @@ export const db = {
 + posts: []
 }
 ```
+
+</tab>
+
+<tab>
+
+```ts
+// api/db.ts
+export const db = {
+  posts: []
+}
+```
+
+</tab>
+
+</TabbedContent>
 
 Now use your new helper and scaffold your first test:
 
@@ -121,7 +201,7 @@ const ctx = createTestContext()
 
 it('ensures that a draft can be created and published', async () => {
   // Create a new draft
-  const draftResult = await ctx.client.send(`               # 1
+  const draftResult = await ctx.client.request(`               # 1
     mutation {
       createDraft(title: "Nexus", body: "...") {            # 2
         id
@@ -133,19 +213,10 @@ it('ensures that a draft can be created and published', async () => {
   `)
 
   // Snapshot that draft and expect `published` to be false
-  expect(draftResult).toMatchInlineSnapshot(`                // 3
-    Object {
-      "createDraft": Object {
-        "body": "...",
-        "id": 1,
-        "published": false,
-        "title": "Nexus",
-      },
-    }
-  `)
+  expect(draftResult).toMatchInlineSnapshot()              // 3
 
   // Publish the previously created draft
-  const publishResult = await ctx.client.send(`
+  const publishResult = await ctx.client.request(`
     mutation publishDraft($draftId: Int!) {
       publish(draftId: $draftId) {
         id
@@ -159,20 +230,11 @@ it('ensures that a draft can be created and published', async () => {
   )
 
   // Snapshot the published draft and expect `published` to be true
-  expect(publishResult).toMatchInlineSnapshot(`
-    Object {
-      "publish": Object {
-        "body": "...",
-        "id": 1,
-        "published": true,
-        "title": "Nexus",
-      },
-    }
-  `)
+  expect(publishResult).toMatchInlineSnapshot()
 })
 ```
 
-1. The test context exposes a GraphQL client at `ctx.client.send` that will help us run operations against our API. Here We're using it to send a publish mutation.
+1. The test context exposes a GraphQL client at `ctx.client.request` that will help us run operations against our API. Here We're using it to send a publish mutation.
 2. This is the mutation from the end of last chapter.
 3. The result will be snapshoted inline allowing us to see the input and output collocated!
 
