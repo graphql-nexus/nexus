@@ -17,6 +17,8 @@ npm add -D @prisma/cli
 npm add @prisma/client
 ```
 
+You must also make sure that you are using the version `0.30` or later of `nexus-prisma-plugin`.
+
 ## Enabling the plugin
 
 You will now need to work with the `makeSchema` API of `@nexus/schema` directly.
@@ -25,12 +27,12 @@ You will now need to work with the `makeSchema` API of `@nexus/schema` directly.
 -import { use } from 'nexus'
 -import { prisma } from 'nexus-plugin-prisma'
 +import { makeSchema } from '@nexus/schema'
-+import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
++import { nexusPrisma } from 'nexus-plugin-prisma'
 
 -use(prisma())
 
 +export const schema = makeSchema({
-+  plugins: [nexusSchemaPrisma()]
++  plugins: [nexusPrisma()]
 +})
 ```
 
@@ -44,10 +46,10 @@ If you were using `t.crud` with the framework, you must also explicitly enable i
 
 ```ts diff
 import { makeSchema } from '@nexus/schema'
-import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+import { nexusPrisma } from 'nexus-plugin-prisma'
 
 makeSchema({
-  plugins: [nexusSchemaPrisma({
+  plugins: [nexusPrisma({
 +   experimentalCRUD: true
   })]
 })
@@ -59,7 +61,7 @@ To let `@nexus/schema` know of the Prisma Client types so that, for instance, yo
 
 ```ts diff
 import { makeSchema } from '@nexus/schema'
-import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+import { nexusPrisma } from 'nexus-plugin-prisma'
 
 export const schema = makeSchema({
 +  typegenAutoConfig: {
@@ -71,7 +73,7 @@ export const schema = makeSchema({
 +    ]
 +  }
   plugins: [
-    nexusSchemaPrisma({
+    nexusPrisma({
       experimentalCRUD: true
     })
   ]
@@ -95,7 +97,7 @@ Then, we'll go back to the file where we're calling `makeSchema`, and add the fo
 
 ```ts diff
 import { makeSchema } from '@nexus/schema'
-import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+import { nexusPrisma } from 'nexus-plugin-prisma'
 
 export const schema = makeSchema({
   typegenAutoConfig: {
@@ -112,7 +114,7 @@ export const schema = makeSchema({
 +   contextType: 'ContextModule.Context'
   }
   plugins: [
-    nexusSchemaPrisma({
+    nexusPrisma({
       experimentalCRUD: true
     })
   ]
@@ -133,7 +135,7 @@ If your Prisma Schema is using either the `Json` or `DateTime` type, the framewo
 
     ```ts diff
     import { makeSchema } from '@nexus/schema'
-    import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+    import { nexusPrisma } from 'nexus-plugin-prisma'
     +import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
 
     export const schema = makeSchema({
@@ -151,7 +153,7 @@ If your Prisma Schema is using either the `Json` or `DateTime` type, the framewo
         contextType: 'ContextModule.Context'
       }
       plugins: [
-        nexusSchemaPrisma({
+        nexusPrisma({
           experimentalCRUD: true
     +     scalars: {
     +       DateTime: DateTimeResolver,
