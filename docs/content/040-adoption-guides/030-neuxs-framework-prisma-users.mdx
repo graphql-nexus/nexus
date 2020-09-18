@@ -1,0 +1,196 @@
+---
+title: Nexus Framework Prisma Users
+---
+
+## Hello Nexus Framework Prisma User!
+
+If you're looking to migrate from the Nexus Framework over to Nexus Schema and you're using the Prisma plugin, this guide is for you.
+
+**This guide assumes you've already followed the [Nexus Framework Users adoption guide](/adoption-guides/nexus-framework-users).**
+
+## Dependencies
+
+You will need to install the Prisma dependencies yourself now.
+
+```
+npm add -D @prisma/cli
+npm add @prisma/client
+```
+
+## Enabling the plugin
+
+You will now need to work with the `makeSchema` API of `@nexus/schema` directly.
+
+```ts diff
+-import { use } from 'nexus'
+-import { prisma } from 'nexus-plugin-prisma'
++import { makeSchema } from '@nexus/schema'
++import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+
+-use(prisma())
+
++export const schema = makeSchema({
++  plugins: [nexusSchemaPrisma()]
++})
+```
+
+## Configuring the plugin
+
+There are a number of defaults that the framework used to provide for you. Here's how you can configure the schema plugin to behave the same.
+
+### Enabling CRUD capabilities
+
+If you were using `t.crud` with the framework, you must also explicitly enable it with the schema plugin
+
+```ts diff
+import { makeSchema } from '@nexus/schema'
+import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+
+makeSchema({
+  plugins: [nexusSchemaPrisma({
++   experimentalCRUD: true
+  })]
+})
+```
+
+### Configuring Backing types
+
+To let `@nexus/schema` know of the Prisma Client types so that, for instance, your resolvers expect the right types, you must point `makeSchema` to the Prisma Client where all the types are exported.
+
+```ts diff
+import { makeSchema } from '@nexus/schema'
+import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+
+export const schema = makeSchema({
++  typegenAutoConfig: {
++    sources: [
++      {
++        source: require.resolve('.prisma/client/index.d.ts'),
++        alias: "prisma",
++      }
++    ]
++  }
+  plugins: [
+    nexusSchemaPrisma({
+      experimentalCRUD: true
+    })
+  ]
+})
+```
+
+### Configuring Context Type
+
+The framework used to automatically inject and type your context so that an instance of the client would be there for you. We know need to configure that manually. To do so, we'll first create a `context.ts` file where we'll export a type containing the Prisma Client.
+
+```tsx
+// context.ts
+import { PrismaClient } from '@prisma/client'
+
+export type Context = {
+  db: PrismaClient
+}
+```
+
+Then, we'll go back to the file where we're calling `makeSchema`, and add the following configuration
+
+```ts diff
+import { makeSchema } from '@nexus/schema'
+import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+
+export const schema = makeSchema({
+  typegenAutoConfig: {
+    sources: [
+      {
+        source: require.resolve('.prisma/client/index.d.ts'),
+        alias: "prisma",
+      },
++     {
++       source: require.resolve('./context'),
++       alias: 'ContextModule'
++     }
+    ],
++   contextType: 'ContextModule.Context'
+  }
+  plugins: [
+    nexusSchemaPrisma({
+      experimentalCRUD: true
+    })
+  ]
+})
+```
+
+### Configuring Custom Scalars
+
+If your Prisma Schema is using either the `Json` or `DateTime` type, the framework used to provide some GraphQL scalars to map these. With `@nexus/schema`, you will need to install and do the mapping yourself.
+
+1.  Start by installing the following dependency
+
+    ```bash
+    npm install graphql-scalars
+    ```
+
+2.  Then, add the following configuration property to the Prisma plugin
+
+    ```ts diff
+    import { makeSchema } from '@nexus/schema'
+    import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+    +import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
+
+    export const schema = makeSchema({
+      typegenAutoConfig: {
+        sources: [
+          {
+            source: require.resolve('.prisma/client/index.d.ts'),
+            alias: "prisma",
+          },
+          {
+            source: require.resolve('./context'),
+            alias: 'ContextModule'
+          }
+        ],
+        contextType: 'ContextModule.Context'
+      }
+      plugins: [
+        nexusSchemaPrisma({
+          experimentalCRUD: true
+    +     scalars: {
+    +       DateTime: DateTimeResolver,
+    +       Json: new GraphQLScalarType({
+    +         ...JSONObjectResolver,
+    +         name: 'Json',
+    +         description: 'The `JSON` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).',
+    +       })
+    +     }
+        })
+      ]
+    })
+    ```
+
+## Using the plugin
+
+Once the plugin is enabled and properly configured, **none of your actual code usage of `nexus-plugin-prisma` (like `t.model` or `t.crud` calls) should have to change.**
+
+The framework plugin however was giving you a couple of conveniences in terms of development workflow. Indeed, the framework plugin was:
+
+- Regenerating the Prisma Client for you everytime you'd run `nexus dev`
+- Regenerating the Prisma Client after you'd edit your `schema.prisma` file and migrate your database
+
+This means you now have to manually regenerate the Prisma Client after migrating your database. To do this, use the Prisma CLI and run the following command:
+
+```
+npx prisma generate
+```
+
+Although you already had to run the command manually with the framework plugin, here's an additional quick reminder on how to run database migrations with Prisma Migrate:
+
+To generate a migrate file, run:
+
+```
+npx prisma migrate save --experimental
+```
+
+To apply the created migration file, run:
+
+```
+npx prisma migrate up --experimental
+```
