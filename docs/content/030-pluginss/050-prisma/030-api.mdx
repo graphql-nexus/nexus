@@ -172,14 +172,15 @@ _Scalar Mapping_
   String    <>  String
   Int       <>  Int
   Float     <>  Float
-  cuid()    <>  ID
+  Json      <>  Json (custom scalar)
   DateTime  <>  DateTime (custom scalar)
+  cuid()    <>  ID
   uuid()    <>  UUID (custom scalar)
 ```
 
 _Auto-Projection_
 
-When a Prisma scalar is encountered that does not map to the standard GraphQL scalar types, it will be automatically projected (custom scalar added to the GraphQL schema). Examples include `DateTime` and `UUID`.
+When a Prisma scalar is encountered that does not map to the standard GraphQL scalar types, it will be automatically projected (custom scalar added to the GraphQL schema). Examples include `DateTime` and `JSON`.
 
 _Option Notes_
 
@@ -681,6 +682,8 @@ input M_WhereUniqueInput {
 }
 
 input M_UpdateInput {
+  MFloatF: S_FieldUpdateOperationsInput
+  MIntF: S_FieldUpdateOperationsInput
   MSF: S
   MRF: RM_UpdateManyWithout_M_Input
 }
@@ -1175,6 +1178,8 @@ mutation {
 }
 
 input M_UpdateManyMutationInput {
+  MFloatF: S_FieldUpdateOperationsInput
+  MIntF: S_FieldUpdateOperationsInput
   MSF: S
   MEF: E
   # not possible to batch update relations
@@ -1433,11 +1438,11 @@ Allow clients to order the records in a list field. Records can be ordered by th
 
 ```graphql
 # t.crud.<BatchRead>
-M(orderBy: M_OrderByInput)
+M(orderBy: [M_OrderByInput!])
 
 # t.model.<ListRelation>
 type M {
-  MF(orderBy: M_OrderByInput)
+  MF(orderBy: [M_OrderByInput!])
 }
 
 input M_OrderByInput {
@@ -2400,10 +2405,10 @@ input M_WhereInput {
   NOT: [M_WhereInput!]
   OR: [M_WhereInput!]
   MSF: S_Filter
-  MRF: RM_Filter
+  MRF: RM_ListRelationFilter
 }
 
-input RM_Filter {
+input RM_ListRelationFilter {
   every: RM_WhereInput # recurse -> M_WhereInput
   none: RM_WhereInput # recurse -> M_WhereInput
   some: RM_WhereInput # recurse -> M_WhereInput
@@ -2421,86 +2426,143 @@ input RM_ScalarWhereInput {
 
 ## Scalar Filters
 
-#### `Boolean`
+### Patterns
+
+There are few different scalar filter patterns. Some scalars share the same filter pattern.
+
+#### String Like
 
 ```graphql
-input BooleanFilter {
-  equals: Boolean
-  not: Boolean
-}
-```
-
-#### `String`
-
-```graphql
-input StringFilter {
-  contains: String
-  endsWith: String
-  equals: String
-  gt: String
-  gte: String
-  in: [String!]
-  lt: String
-  lte: String
-  not: String
-  notIn: [String!]
-  startsWith: String
-}
-```
-
-#### `Int`
-
-```graphql
-input IntFilter {
+input S_Filter {
+  contains: S
+  endsWith: S
   equals: S
   gt: S
   gte: S
   in: [S!]
   lt: S
   lte: S
-  not: S
+  not: Nested_S_Filter
+  notIn: [S!]
+  startsWith: S
+}
+```
+
+#### Numeric Like
+
+```graphql
+input S_Filter {
+  equals: S
+  gt: S
+  gte: S
+  in: [S!]
+  lt: S
+  lte: S
+  not: Nested_S_Filter
   notIn: [S!]
 }
 ```
 
-#### `Float`
-
-Uses the same filter structure as `Int`.
+#### Boolean Like
 
 ```graphql
-input FloatFilter {
-  # ... see IntFilter
+input S_Filter {
+  equals: S
+  not: Nested_S_Filter
 }
 ```
+
+#### `S_NullableFilter`
+
+TODO
+
+#### `Nested_S_Filter`
+
+All nullable and non-nullable scalar filters have a recursive `not` field of type `Nested_S_Filter`. For example `StringFilter` has `not: NestedStringFilter`. In all cases this type is a mirror of the non-nested version. Why does it exist? Because in the future the root type may have additional filter settings that do not exist recursively. For example the [`mode` filter setting for string filters](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/filtering#case-insensitive-filtering).
+
+We have decided not to collapse the types even where possible. Instead we have opted for schema type pattern consistentcy. If you are interested in a future where we make an option to generate a GraphQL schema where scalar filters are collapsed where possible, please [open an issue](https://nxs.li/prisma/issue/feature/new).
+
+### Scalars
+
+#### `Boolean`
+
+Refer to Boolean like filter.
+
+#### `String`
+
+Refer to String like filter.
+
+#### `Float`
+
+Refer to Numeric like filter.
 
 #### `DateTime`
 
-Uses the same filter structure as `Int`. We are considering a [tailored `DateTime` filter](https://github.com/graphql-nexus/nexus-plugin-prisma/issues/484).
-
-```graphql
-input DateTimeFilter {
-  # ... see IntFilter
-}
-```
-
-#### `UUID`
-
-Uses the same filter structure as `String`.
-
-```graphql
-input UUIDFilter {
-  # ... see StringFilter
-}
-```
+Refer to Numeric like filter. We are considering a [tailored `DateTime` filter](https://github.com/graphql-nexus/nexus-plugin-prisma/issues/484).
 
 #### `ID`
 
-Uses the same filter type as `String`. We are considering a [dedicated `ID` filter type for consistentcy](https://github.com/graphql-nexus/nexus-plugin-prisma/issues/485).
+Refer to String like filter. We are considering a [dedicated `ID` filter type for consistentcy](https://github.com/graphql-nexus/nexus-plugin-prisma/issues/485).
+
+#### `Json`
+
+TODO
+
+## S_FieldUpdateOperationsInput
+
+This allows you to update the values of certain fields atomically.
+
+**Applies to**
+
+[`t.crud.updateOne<M>`](#update), [`t.crud.updateMany<M>`](#batch-update)
+
+#### GraphQL Schema Contributions [`?`](#graphql-schema-contributions-legend 'How to read this')
+
+```graphql
+# S = Float | Int
+# Only one operation can be done per field at a time.
+input S_FieldUpdateOperationsInput {
+  # Sets the value to S
+  set: S
+  # These fields only appear if "atomicNumberOperations" prisma client preview feature is enabled
+  # Adds S to the current value
+  increment: S
+  # Subtracts S from the current value
+  decrement: S
+  # Multiplies the current value by S
+  multiply: S
+  # Divides the current value by S
+  divide: S
+}
+```
 
 ## GraphQL Schema Contributions Legend
 
 #### How to read
 
+Throughout this document you will see abbreviations used in GraphQL SDL syntax to signify how Nexus Prisma plugin contributes to the shape of your GraphQL schema. Each single capital letter is an abbreviation for one of the following things. When multiple capital letters are adjacent it means they combine the below. 
+
 ```
 M = model   F = field   L = list   S = scalar   R = relation   E = enum   V = value
 ```
+
+For example take this:
+
+```gql
+input M_UpdateManyMutationInput { # 1
+  MFloatF: S_FieldUpdateOperationsInput # 2, 3
+  MIntF: S_FieldUpdateOperationsInput # 4, 5
+  MSF: S # 6, 7
+  MEF: E # 8, 9
+}
+```
+
+1. `M_UpdateManyMutationInput` means a GraphQL object whose name is your model name with the suffixed with `UpdateManyMutationInput`.
+2. `MFloatF` means a model field of float type
+3. `S_FieldUpdateOperationsInput` means a GraphQL object type reference. The name will be the name of the scalar type of the field suffixed with `FieldUpdateOperationsInput`. Since the field here is Float that means the object type name will be `FloatFieldUpdateOperationsInput`.
+4. Like point 2 but for `Int`
+5. Like point 3 but for `Int`
+6. `MSF` means a field name matching the field name of a model scalar field. Note it comes after `Float` and `Int` types have been explicitly listed, which means this excludes model fields of those types.
+7. `S` means the type of this field will match the kind of model scalar that it is (see the Scalar mapping table to see what it will really be if in doubt)
+8. Like (6) but for Enums
+9. Like (9) but for Enums
