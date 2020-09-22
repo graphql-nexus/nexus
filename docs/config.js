@@ -1,7 +1,7 @@
 const config = {
   gatsby: {
     pathPrefix: '/docs',
-    siteUrl: 'https://graphql-nexus-schema-docs.netlify.app/', // TODO
+    siteUrl: 'https://graphql-nexus-schema-website.netlify.app/', // TODO
     titlePrefix: '',
     titleSuffix: '',
   },
