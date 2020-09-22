@@ -16,6 +16,6 @@ Array [
 
 exports[`inputObjectType should output lists properly, #33 1`] = `
 "input AddToBasketInput {
-  extras: [ExtraBasketInput!]
+  extras: [ExtraBasketInput]
 }"
 `;
