@@ -525,13 +525,13 @@ As you begin to implement a schema for the first time you will notice something 
 
 Here is an example of resolution for a query as it would be seen roughly from a GraphQL type _only_ point of view.
 
-![](/assets/diagram-backing-types-1.png)
+![](/docs/assets/diagram-backing-types-1.png)
 
 When a field's type is an object, then the field's resolver returns a backing type. Concretely this might for example be a plain JavaScript object containing node/row/document data from a database call. This backing type data is in turn passed down to all the object type's own field resolvers.
 
 Here is the above diagram updated to include backing types now.
 
-![](/assets/diagram-backing-types-2.png)
+![](/docs/assets/diagram-backing-types-2.png)
 
 Here is a step-by-step breakdown of what is going on (follow the diagram annotation numbers):
 
