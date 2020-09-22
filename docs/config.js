@@ -23,9 +23,9 @@ const config = {
     // ],
     links: [
       { name: 'Docs', link: '../docs' },
-      { name: 'Playground', link: '../' },
-      { name: 'SDL Converter', link: '../' },
-      { name: 'Examples', link: '../' },
+      { name: 'Playground', link: '../playground' },
+      { name: 'SDL Converter', link: '../converter' },
+      { name: 'Examples', link: '../docs/getting-started/examples' },
     ],
     search: {
       indexName: process.env.GATSBY_ALGOLIA_INDEX_NAME,
