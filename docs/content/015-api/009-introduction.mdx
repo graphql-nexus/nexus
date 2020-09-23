@@ -28,3 +28,18 @@ Each public API is documented below, feel free to open a PR with more examples/c
 - [extendType / extendInputType](/api/extend-type)
 - [mutationField](/api/mutation-field)
 - [queryField](/api/query-field)
+
+## Resolving: Inline Function
+
+One common idiom in GraphQL is exposing fields that mask or rename the property name on the backing object. GraphQL Nexus makes this simple by allowing a function as the second parameter to any built-in scalar resolver function.
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.id('id', o => o.user_id)
+    t.string('name', o => o.user_name)
+    t.string('description', o => o.user_description)
+  },
+})
+```
