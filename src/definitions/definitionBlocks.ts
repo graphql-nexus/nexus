@@ -9,7 +9,7 @@ import {
   NeedsResolver,
 } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
-import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
+import { AllNexusNamedInputTypeDefs, AllNexusNamedOutputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
@@ -209,7 +209,7 @@ export interface ScalarInputFieldConfig<T> extends CommonFieldConfig {
 
 export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string>
   extends ScalarInputFieldConfig<GetGen3<'inputTypes', TypeName, FieldName>> {
-  type: AllInputTypes | AllNexusInputTypeDefs<string>
+  type: AllInputTypes | AllNexusNamedInputTypeDefs<string>
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {

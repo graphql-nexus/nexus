@@ -2,7 +2,7 @@ import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
 import { FieldOutConfig } from '../definitions/definitionBlocks'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
-import { AllNexusOutputTypeDefs } from '../definitions/wrapping'
+import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
 import {
@@ -134,7 +134,7 @@ export type NodeValue<TypeName extends string = any, FieldName extends string = 
 >['node']
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
-  type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+  type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
   /**
    * Additional args to use for just this field
    */

@@ -11,7 +11,7 @@ import {
 } from '../typegenTypeHelpers'
 import { CommonOutputFieldConfig } from './definitionBlocks'
 import { ObjectDefinitionBlock, ObjectDefinitionBuilder, objectType } from './objectType'
-import { AllNexusOutputTypeDefs } from './wrapping'
+import { AllNexusNamedOutputTypeDefs } from './wrapping'
 
 export interface SubscriptionScalarConfig<TypeName extends string, FieldName extends string, T = any>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
@@ -50,7 +50,7 @@ export type ScalarSubConfig<TypeName extends string, FieldName extends string> =
 
 export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string, T = any>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
-  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
+  type: GetGen<'allOutputTypes'> | AllNexusNamedOutputTypeDefs
 
   /**
    * Resolve method for the field

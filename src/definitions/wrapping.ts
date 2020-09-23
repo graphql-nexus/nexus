@@ -1,4 +1,4 @@
-import { GraphQLNamedType } from 'graphql'
+import { GraphQLList, GraphQLNamedType } from 'graphql'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from '../dynamicMethod'
 import { DynamicOutputPropertyDef } from '../dynamicProperty'
 import { NexusPlugin } from '../plugin'
@@ -10,26 +10,45 @@ import { NexusExtendInputTypeDef } from './extendInputType'
 import { NexusExtendTypeDef } from './extendType'
 import { NexusInputObjectTypeDef } from './inputObjectType'
 import { NexusInterfaceTypeDef } from './interfaceType'
+import { NexusListDef, NexusNonNullDef } from './list'
 import { NexusObjectTypeDef } from './objectType'
 import { NexusScalarTypeDef } from './scalarType'
 import { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
 
-export type AllNexusInputTypeDefs<T extends string = any> =
+GraphQLList
+
+export type AllNexusNamedInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>
 
-export type AllNexusOutputTypeDefs =
+export type AllNexusInputTypeDefs<T extends string = any> =
+  | AllNexusNamedInputTypeDefs<T>
+  | NexusListDef<T>
+  | NexusNonNullDef<T>
+
+export type AllNexusNamedOutputTypeDefs =
   | NexusObjectTypeDef<any>
   | NexusInterfaceTypeDef<any>
   | NexusUnionTypeDef<any>
   | NexusEnumTypeDef<any>
   | NexusScalarTypeDef<any>
 
-export type AllNexusNamedTypeDefs = AllNexusInputTypeDefs | AllNexusOutputTypeDefs
+export type AllNexusOutputTypeDefs<T extends string = any> =
+  | AllNexusNamedOutputTypeDefs
+  | NexusListDef<T>
+  | NexusNonNullDef<T>
+  | NexusNonNullDef<T>
 
-export type AllTypeDefs = AllNexusInputTypeDefs | AllNexusOutputTypeDefs | GraphQLNamedType
+export type AllNexusNamedTypeDefs = AllNexusNamedInputTypeDefs | AllNexusNamedOutputTypeDefs
+
+export type AllNexusTypeDefs =
+  | AllNexusNamedTypeDefs
+  | NexusListDef<AllNexusNamedTypeDefs>
+  | NexusNonNullDef<AllNexusNamedTypeDefs>
+
+export type AllTypeDefs = AllNexusTypeDefs | GraphQLNamedType
 
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
@@ -49,7 +68,7 @@ export function isNexusStruct(obj: any): obj is { [NexusWrappedSymbol]: NexusTyp
   return obj && Boolean(obj[NexusWrappedSymbol])
 }
 export function isNexusNamedTypeDef(obj: any): obj is AllNexusNamedTypeDefs {
-  return isNexusStruct(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol])
+  return isNexusStruct(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol]) && 'name' in obj
 }
 export function isNexusExtendInputTypeDef(obj: any): obj is NexusExtendInputTypeDef<string> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.ExtendInputObject

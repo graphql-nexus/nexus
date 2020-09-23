@@ -56,6 +56,7 @@ import {
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
 } from './definitions/interfaceType'
+import { NexusListDef, NexusNonNullDef } from './definitions/list'
 import {
   Implemented,
   NexusObjectTypeConfig,
@@ -65,9 +66,9 @@ import {
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
-  AllNexusInputTypeDefs,
+  AllNexusNamedInputTypeDefs,
   AllNexusNamedTypeDefs,
-  AllNexusOutputTypeDefs,
+  AllNexusNamedOutputTypeDefs,
   isNexusArgDef,
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
@@ -81,7 +82,7 @@ import {
   isNexusObjectTypeDef,
   isNexusPlugin,
   isNexusScalarTypeDef,
-  isNexusUnionTypeDef,
+  isNexusUnionTypeDef,, AllNexusTypeDefs
 } from './definitions/wrapping'
 import {
   GraphQLPossibleInputs,
@@ -1013,6 +1014,19 @@ export class SchemaBuilder {
     return fieldMap
   }
 
+  protected unwrapNexusToGraphQL(type: AllNexusTypeDefs, output = null): any {
+    
+    if (type instanceof NexusNonNullDef) {
+      return this.unwrapNexusToGraphQL()
+    }
+    else if (type instanceof NexusListDef) {
+      return this.unwrapNexusToGraphQL()
+    }
+    else {
+      return type 
+    }
+  }
+
   protected buildOutputField(
     fieldConfig: NexusOutputFieldDef,
     typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
@@ -1170,7 +1184,7 @@ export class SchemaBuilder {
     return type
   }
 
-  protected getInputType(name: string | AllNexusInputTypeDefs): GraphQLPossibleInputs {
+  protected getInputType(name: string | AllNexusNamedInputTypeDefs): GraphQLPossibleInputs {
     const type = this.getOrBuildType(name)
     if (!isInputObjectType(type) && !isLeafType(type)) {
       /* istanbul ignore next */
@@ -1179,7 +1193,7 @@ export class SchemaBuilder {
     return type
   }
 
-  protected getOutputType(name: string | AllNexusOutputTypeDefs): GraphQLPossibleOutputs {
+  protected getOutputType(name: string | AllNexusNamedOutputTypeDefs): GraphQLPossibleOutputs {
     const type = this.getOrBuildType(name)
     if (!isOutputType(type)) {
       /* istanbul ignore next */
@@ -1573,7 +1587,7 @@ function invariantGuard(val: any) {
 }
 
 function normalizeArg(
-  argVal: NexusArgDef<AllInputTypes> | AllInputTypes | AllNexusInputTypeDefs<string>
+  argVal: NexusArgDef<AllInputTypes> | AllInputTypes | AllNexusNamedInputTypeDefs<string>
 ): NexusArgDef<AllInputTypes> {
   if (isNexusArgDef(argVal)) {
     return argVal
