@@ -1,12 +1,12 @@
-import Link from '../components/link'
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import styledTS from 'styled-components-ts'
-import HeaderLogo from '../icons/Logo'
-import Github from '../icons/Git'
-import Clear from '../icons/Clear'
+import Link from '../components/link'
 import Search from '../components/search'
 import Sidebar from '../components/sidebar'
+import Clear from '../icons/Clear'
+import Github from '../icons/Git'
+import HeaderLogo from '../icons/Logo'
 import { HeaderProps } from '../interfaces/Layout.interface'
 
 type HeaderViewProps = {
@@ -201,7 +201,7 @@ const Header = ({ headerProps }: HeaderViewProps) => {
         ))}
       </NavLinks>
       <Link
-        to={'https://github.com/graphql-nexus/nexus'}
+        to={'https://github.com/graphql-nexus/schema'}
         style={{
           color: 'white',
           textDecoration: 'none',
