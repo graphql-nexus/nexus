@@ -46,12 +46,13 @@ body {
   --code-highlight-color: #a0aec0;
   --code-highlight-bg-color: #e2e8f0;
   --code-result-bg-color: #e7edf3;
+  
   /* Buttons */
   --red-color: #ff4f56;
   --green-color: #15bd76;
   --grey-color: #3d556b;
   --grey-bg-color: #8fa6b2;
-  --dark-color: #2e2c3f;
+  --dark-color: #2a6379;
 
   margin: 0;
   font-family: 'Open Sans', sans-serif;
