@@ -1,13 +1,13 @@
 const config = {
   gatsby: {
     pathPrefix: '/docs',
-    siteUrl: 'https://graphql-nexus-schema-website.netlify.app/', // TODO
+    siteUrl: 'https://nexusjs.org/',
     titlePrefix: '',
     titleSuffix: '',
   },
   redirects: [],
   header: {
-    logoLink: 'https://graphql-nexus-schema-website.netlify.app/', // TODO
+    logoLink: 'https://nexusjs.org/',
     title: 'Nexus',
     // check all links
     // links: [
@@ -38,7 +38,7 @@ const config = {
     title: 'Nexus - title',
     description: 'Nexus - desc',
     keywords: 'Docs, nexus, 1.0',
-    docsLocation: 'https://github.com/graphql-nexus/schema/tree/master/website/content',
+    docsLocation: 'https://github.com/graphql-nexus/schema/tree/develop/docs',
     twitter: {
       site: '@nexusgql',
       creator: '@nexusgql',
