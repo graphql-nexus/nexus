@@ -72,7 +72,7 @@ export interface NonNullConfig {
    *   otherField: [String!]!
    * }
    *
-   * @default true
+   * @default false
    */
   output?: boolean
   /**
