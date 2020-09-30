@@ -420,7 +420,7 @@ export class SchemaBuilder {
   constructor(protected config: BuilderConfig) {
     this.nonNullDefaults = {
       input: false,
-      output: true,
+      output: false,
       ...config.nonNullDefaults,
     }
     this.plugins = config.plugins || [fieldAuthorizePlugin()]
@@ -1147,7 +1147,7 @@ export class SchemaBuilder {
   protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(type: T, list: true | boolean[]): T {
     let finalType = type
     if (!Array.isArray(list)) {
-      return GraphQLList(GraphQLNonNull(type)) as T
+      return GraphQLList(type) as T
     }
     if (Array.isArray(list)) {
       for (let i = 0; i < list.length; i++) {
