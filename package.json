@@ -8,7 +8,7 @@
     "types",
     "typescript"
   ],
-  "homepage": "https://nexusjs.org/#/components/schema/about",
+  "homepage": "https://nexusjs.org",
   "repository": {
     "type": "git",
     "url": "git://github.com/graphql-nexus/schema.git"
