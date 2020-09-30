@@ -5,7 +5,7 @@ functions = "functions/"
 [[plugins]]
 package = "netlify-plugin-gatsby-cache"
 
-[context.production.environment]
+[context.develop.environment]
 INDEX_ALGOLIA = "true"
 
 [[redirects]]
