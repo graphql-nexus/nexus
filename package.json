@@ -40,7 +40,7 @@
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
     "link-examples": "cd website && yarn && yarn gulp link-examples",
     "lint": "tslint -p tsconfig.json",
-    "prepublish": "yarn clean && yarn lint && yarn build",
+    "prepublish": "yarn clean && yarn build",
     "postpublish": "yarn upgrade-deps || echo 'Oops...'",
     "release:pr": "dripip pr",
     "release:preview": "dripip preview",

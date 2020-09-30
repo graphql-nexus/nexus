@@ -1,2 +1,0 @@
-# Redirect domain aliases to primary domain
-https://graphql-nexus.com/* https://nexus.js.org/:splat 301!

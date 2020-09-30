@@ -1,0 +1,33 @@
+---
+title: enumType
+codeStyle: true
+---
+
+## enumType
+
+[GraphQL Docs for Enum Types](https://graphql.org/learn/schema/#enumeration-types)
+
+Defining as an array of enum values:
+
+```ts
+const Episode = enumType({
+  name: 'Episode',
+  members: ['NEWHOPE', 'EMPIRE', 'JEDI'],
+  description: 'The first Star Wars episodes released',
+})
+```
+
+As an object, with a simple mapping of enum values to internal values:
+
+```ts
+const Episode = enumType({
+  name: 'Episode',
+  members: {
+    NEWHOPE: 4,
+    EMPIRE: 5,
+    JEDI: 6,
+  },
+})
+```
+
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/schema/tree/develop/examples) for a full illustration of the various options of `enumType`, or feel free to open a PR on the docs to help document!

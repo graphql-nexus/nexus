@@ -25,13 +25,7 @@
     "no-unused-expression": true,
     "no-unbound-method": true,
     "no-floating-promises": true,
-    "one-line": [
-      true,
-      "check-catch",
-      "check-else",
-      "check-open-brace",
-      "check-whitespace"
-    ],
+    "one-line": [true, "check-catch", "check-else", "check-open-brace", "check-whitespace"],
     "radix": true,
     "restrict-plus-operands": true,
     "trailing-comma": [false],
@@ -39,6 +33,6 @@
     "whitespace": false
   },
   "linterOptions": {
-    "exclude": ["**/*.json", "examples/zeit-typescript/**/*"]
+    "exclude": ["**/*.json", "examples/zeit-typescript/**/*", "docs/**/*.ts"]
   }
 }

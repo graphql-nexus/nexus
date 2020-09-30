@@ -1,0 +1,32 @@
+{
+  "name": "with-prisma",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "yarn build:reflection && tsc",
+    "build:reflection": "NEXUS_SHOULD_EXIT_AFTER_REFLECTION=true ts-node api",
+    "dev": "ts-node-dev --transpile-only api",
+    "dev:migrate": "prisma migrate save --experimental -c && prisma migrate up --experimental -c",
+    "dev:typecheck": "tsc --watch --noEmit",
+    "format": "npx prettier --write './**/*.{ts,md}'",
+    "start": "NODE_ENV=production node .nexus/build"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "dependencies": {
+    "@nexus/schema": "^0.15.0",
+    "@prisma/client": "2.3.0",
+    "apollo-server-express": "^2.17.0",
+    "express": "^4.17.1",
+    "graphql": "^15.3.0"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.3.0",
+    "prettier": "2.0.5",
+    "ts-node-dev": "^1.0.0-pre.62",
+    "typescript": "^4.0.2"
+  }
+}
