@@ -5,12 +5,13 @@
     "start": "yarn dump-tables && ts-node-dev --ignore-watch src/generated --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
-    "apollo-server-express": "^2.3.3",
+    "apollo-server-express": "^2.18.1",
     "dataloader": "tgriesser/dataloader.git#ts-types",
     "express": "^4.16.4",
     "ghost": "^2.13.1",
     "graphql": "^15.3.0",
     "graphql-scalars": "^1.2.6",
+    "graphql-tools": "^4.0.7",
     "knex": "^0.19.5",
     "lodash": "^4.17.11",
     "mysql": "^2.16.0"

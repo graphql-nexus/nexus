@@ -8,12 +8,13 @@
     "start": "ts-node --transpile-only src/index.ts"
   },
   "dependencies": {
-    "@nexus/schema": "^0.13.1",
-    "apollo-server": "^2.2.0",
+    "@nexus/schema": "^0.16.0",
+    "apollo-server": "^2.18.1",
     "graphql": "^15.3.0",
     "graphql-query-complexity": "^0.4.1",
     "graphql-relay": "^0.6.0",
     "graphql-subscriptions": "^1.0.0",
+    "graphql-tools": "^4.0.7",
     "lodash": "^4.17.15",
     "subscriptions-transport-ws": "^0.9.15",
     "ts-node": "^8.5.4",
