@@ -11,7 +11,7 @@
     "graphql": "^15.3.0",
     "graphql-tools": "^4.0.7",
     "ts-node-dev": "1.0.0-pre.31",
-    "typescript": "^3.6.4"
+    "typescript": "^3.9"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4"
