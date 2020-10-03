@@ -19,15 +19,16 @@ jobs:
       - name: Test
         run: yarn -s test:ci
       - name: Upload Coverage
-        run: yarn codecov
+        run: yarn codecov --token=${{ secrets.CODECOV_TOKEN }}
+
   test-examples:
     strategy:
       matrix:
         example:
           - apollo-fullstack
-          - ghost
           - kitchen-sink
           - ts-ast-reader
+          # - ghost
           # - githunt-api requires node 8
           # - star-wars requires special commands
           # rm examples/star-wars/src/star-wars-typegen.ts

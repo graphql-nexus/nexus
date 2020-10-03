@@ -20,16 +20,16 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Test
         run: yarn -s test
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload Coverage
+        run: yarn codecov --token=${{ secrets.CODECOV_TOKEN }}
 
   test-examples:
     strategy:
       matrix:
         example:
+          - apollo-fullstack
           - kitchen-sink
           - ts-ast-reader
-          - apollo-fullstack
           # - ghost
           # - githunt-api requires node 8
           # - star-wars requires special commands
