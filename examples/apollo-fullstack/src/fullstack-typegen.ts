@@ -119,7 +119,7 @@ export interface NexusGenArgTypes {
   Mutation: {
     bookTrips: {
       // args
-      launchIds: Array<string | null> // [ID]!
+      launchIds: string[] // [ID!]!
     }
     cancelTrip: {
       // args
