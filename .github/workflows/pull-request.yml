@@ -17,7 +17,9 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Test
-        run: yarn -s test
+        run: yarn -s test:ci
+      - name: Upload Coverage
+        run: yarn codecov
   test-examples:
     strategy:
       matrix:
