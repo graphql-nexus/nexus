@@ -10,7 +10,7 @@ import { ApolloServer } from 'apollo-server'
 import { separateOperations } from 'graphql'
 import { fieldExtensionsEstimator, getComplexity, simpleEstimator } from 'graphql-query-complexity'
 import path from 'path'
-import { logMutationTimePlugin } from './example-plugins'
+import { logMutationTimePlugin, NodePlugin } from './example-plugins'
 import * as types from './kitchen-sink-definitions'
 
 const DEBUGGING_CURSOR = false
@@ -24,6 +24,7 @@ const schema = makeSchema({
     typegen: path.join(__dirname, './kitchen-sink.gen.ts'),
   },
   plugins: [
+    NodePlugin,
     connectionPlugin({
       encodeCursor: fn,
       decodeCursor: fn,

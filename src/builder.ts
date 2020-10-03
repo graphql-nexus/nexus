@@ -404,6 +404,16 @@ export class SchemaBuilder {
   protected onAfterBuildFns: Exclude<PluginConfig['onAfterBuild'], undefined>[] = []
 
   /**
+   * Executed after the object is defined, allowing us to add additional fields to the object
+   */
+  protected onObjectDefinitionFns: Exclude<PluginConfig['onObjectDefinition'], undefined>[] = []
+
+  /**
+   * Executed after the object is defined, allowing us to add additional fields to the object
+   */
+  protected onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
+
+  /**
    * The `schemaExtension` is created just after the types are walked,
    * but before the fields are materialized.
    */
@@ -673,6 +683,12 @@ export class SchemaBuilder {
       if (pluginConfig.onAfterBuild) {
         this.onAfterBuildFns.push(pluginConfig.onAfterBuild)
       }
+      if (pluginConfig.onObjectDefinition) {
+        this.onObjectDefinitionFns.push(pluginConfig.onObjectDefinition)
+      }
+      if (pluginConfig.onInputObjectDefinition) {
+        this.onInputObjectDefinitionFns.push(pluginConfig.onInputObjectDefinition)
+      }
     })
   }
 
@@ -761,6 +777,9 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
+    this.onInputObjectDefinitionFns.forEach((fn) => {
+      fn(definitionBlock, config)
+    })
     const extensions = this.inputTypeExtendMap[config.name]
     if (extensions) {
       extensions.forEach((extension) => {
@@ -790,6 +809,9 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
+    this.onObjectDefinitionFns.forEach((fn) => {
+      fn(definitionBlock, config)
+    })
     const extensions = this.typeExtendMap[config.name]
     if (extensions) {
       extensions.forEach((extension) => {
