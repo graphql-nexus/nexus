@@ -37,7 +37,7 @@
     "dev:examples": "yarn -s link-examples && tsc -w",
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && yarn gulp run-examples",
-    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts' 'examples/*/src/**.ts'",
     "link-examples": "yarn && yarn gulp link-examples",
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn build",
@@ -68,13 +68,11 @@
       "git add"
     ]
   },
-  "prettier": "@prisma-labs/prettier-config",
   "dependencies": {
     "iterall": "^1.2.2",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@prisma-labs/prettier-config": "^0.1.0",
     "@types/graphql-iso-date": "^3.4.0",
     "@types/graphql-relay": "^0.4.11",
     "@types/jest": "^25.2.3",
