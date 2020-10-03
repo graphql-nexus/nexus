@@ -32,13 +32,13 @@
   "scripts": {
     "build": "yarn -s clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
     "clean": "rm -rf dist*",
-    "deploy-site": "cd website && yarn && yarn gulp link-website && yarn build",
+    "deploy-site": "yarn && yarn build",
     "dev": "tsc -p tsconfig.cjs.json -w",
     "dev:examples": "yarn -s link-examples && tsc -w",
     "dev:test": "jest --watch",
-    "examples": "yarn link-examples && cd website && yarn gulp run-examples",
+    "examples": "yarn link-examples && yarn gulp run-examples",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
-    "link-examples": "cd website && yarn && yarn gulp link-examples",
+    "link-examples": "yarn && yarn gulp link-examples",
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn build",
     "postpublish": "yarn upgrade-deps || echo 'Oops...'",
@@ -50,9 +50,8 @@
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
     "test:types": "tsc -p tsconfig.spec.types.json",
     "ts-ast-reader": "cd examples/ts-ast-reader && yarn start",
-    "unlink-examples": "cd website && yarn && yarn gulp unlink-examples",
-    "upgrade-deps": "cd website && yarn && yarn gulp upgrade-deps",
-    "website": "cd website && yarn && yarn start"
+    "unlink-examples": "yarn && yarn gulp unlink-examples",
+    "upgrade-deps": "yarn && yarn gulp upgrade-deps"
   },
   "husky": {
     "hooks": {
@@ -85,9 +84,11 @@
     "codecov": "^3.6.1",
     "dripip": "^0.10.0",
     "eslint": "^6.6.0",
+    "get-port": "^5.1.1",
     "graphql": "^15.3.0",
     "graphql-relay": "^0.6.0",
     "graphql-scalars": "^1.2.6",
+    "gulp": "4.0.2",
     "husky": "^1.1.2",
     "jest": "^26.0.1",
     "jest-watch-typeahead": "^0.6.0",
@@ -99,7 +100,7 @@
     "tsd": "^0.13.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9"
   },
   "peerDependencies": {
     "graphql": "^15.3.0"
