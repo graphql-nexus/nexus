@@ -1,0 +1,15 @@
+[build]
+command = "yarn build"
+functions = "functions/"
+
+[[plugins]]
+package = "netlify-plugin-gatsby-cache"
+
+[context.production.environment]
+INDEX_ALGOLIA = "true"
+
+[[redirects]]
+from = "/gastats.js"
+to = "https://www.google-analytics.com/analytics.js"
+status = 200
+force = true

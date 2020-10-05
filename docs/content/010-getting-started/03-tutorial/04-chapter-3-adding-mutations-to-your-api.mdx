@@ -1,0 +1,600 @@
+---
+title: 3. Adding mutations to Your API
+---
+
+## Overview
+
+In this chapter you're going to add some write capability to your API. You'll learn about:
+
+- Writing GraphQL mutations
+- Exposing GraphQL objects for mutation operations
+- Working with GraphQL Context
+- Working with GraphQL arguments
+
+To keep our learning gradual we'll stick to in-memory data for now but rest assured a proper databases is coming in an upcoming chapter.
+
+## Wire up the context
+
+The first thing we'll do is setup an in-memory database and expose it to our resolvers using the _GraphQL context_.
+
+The GraphQL Context is a plain JavaScript object shared across all resolvers. Your GraphQL server creates a new one for each request. It is a good place to, for example, attach information about the logged-in user.
+
+So go ahead and create the database with its type definition.
+
+```bash-symbol
+touch api/db.ts
+```
+
+```ts
+// api/db.ts
+
+export interface Post {
+  id: number
+  title: string
+  body: string
+  published: boolean
+}
+
+export interface Db {
+  posts: Post[]
+}
+
+export const db: Db = {
+  posts: [{ id: 1, title: 'Nexus', body: '...', published: false }],
+}
+```
+
+Now to expose it in our GraphQL context there is two things we need to do:
+
+1. Pass the `db` object to our GraphQL server context
+1. Let Nexus know what the type of our context is
+
+Let's first pass our in-memory database to our GraphQL server
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts
+// api/server.ts
+import { ApolloServer } from 'apollo-server'
+import { schema } from './schema'
++import { db } from './db'
+
+export const server = new ApolloServer({
+  schema,
++  context: () => ({
++    db
++  })
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/server.ts
+import { ApolloServer } from 'apollo-server'
+import { schema } from './schema'
+import { db } from './db'
+
+export const server = new ApolloServer({
+  schema,
+  context: () => ({
+    db
+  })
+})
+```
+
+</tab>
+
+</TabbedContent>
+
+> **Note** For those familiar with GraphQL, you might be grimacing that we’re attaching static things to the context, instead of using export/import.
+> This is a matter of convenience. Feel free to take a purer approach in your apps if you prefer.
+
+Then, let's configure Nexus to know the type of our GraphQL context. We'll create an `api/context.ts` file for that
+
+```ts
+// api/context.ts
+import { Db } from './db'
+
+export interface Context {
+  db: Db
+}
+```
+
+Finally, add the following configuration to the `makeSchema` function of `@nexus/schema` in `api/app.ts`
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts
+// api/schema.ts
+import { join } from 'path'
+
+export const schema = makeSchema({
+  types: [],
+  outputs: {
+    typegen: join(__dirname, '..', 'nexus-typegen.ts'),
+    schema: join(__dirname, '..', 'schema.graphql')
+  },
++  typegenAutoConfig: {
++    sources: [
++      {
++        source: require.resolve("./context"), // 1
++        alias: "ContextModule",                         // 2
++      },
++    ],
++    contextType: "ContextModule.Context",               // 3
++  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/schema.ts
+import { join } from 'path'
+
+export const schema = makeSchema({
+  types: [],
+  outputs: {
+    typegen: join(__dirname, '..', 'nexus-typegen.ts'),
+    schema: join(__dirname, '..', 'schema.graphql')
+  },
+  typegenAutoConfig: {
+    sources: [
+      {
+        source: require.resolve("./context"), // 1
+        alias: "ContextModule",                         // 2
+      },
+    ],
+    contextType: "ContextModule.Context",               // 3
+  },
+})
+```
+
+</tab>
+
+</TabbedContent>
+
+1. Behind the scenes Nexus will parse the `context.ts` file to extract the available types.
+1. These types become available under the umbrella of our `ContextModule` alias.
+1. We can then use that alias to refer to any type defined in this file. Here, our context type is named `Context`, so we refer to it as `ContextModule.Context`.
+
+## Use the context
+
+Now let's use this data to re-implement the `Query.drafts` resolver from the previous chapter.
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+
+export const PostQuery = queryType({
+  definition(t) {
+    t.list.field('drafts', {
+      type: 'Post',
+-      resolve() {
+-        return [{ id: 1, title: 'Nexus', body: '...', published: false }]
++      resolve(_root, _args, ctx) {                              // 1
++        return ctx.db.posts.filter(p => p.published === false)  // 2
+      },
+    })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+
+export const PostQuery = queryType({
+  definition(t) {
+    t.list.field('drafts', {
+      type: 'Post',
+      resolve(_root, _args, ctx) {                             // 1
+       return ctx.db.posts.filter(p => p.published === false)  // 2
+      },
+    })
+  },
+})
+```
+
+</tab>
+
+</TabbedContent>
+
+1. Context is the _third_ parameter, usually identified as `ctx`
+2. Return the filtered data by un-published posts, _aka_ drafts . Nexus makes sure the types line up.
+
+## Your first mutation
+
+Alright, now that we know how to wire things into our context, let's implement our first mutation. We're going to make it possible for your API clients to create new drafts.
+
+This mutation will need a name. Rather than simply call it `createPost` we'll use language from our domain. In this case `createDraft` seems reasonable. There are similarities with our previous work with `Query.drafts`:
+
+- `Mutation` is a root type, its fields are entrypoints.
+- We can colocate mutation fields with the objects they relate to or centralize all mutation fields.
+
+As before we will take the collocation approach.
+
+<ParallelBlocks>
+
+<block>
+
+<!-- prettier-ignore -->
+```ts
+// api/graphql/Post.ts
+// ...
+
+export const PostMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('createDraft', {
+      type: 'Post',
+      nullable: false,
+      resolve(_root, args, ctx) {
+        ctx.db.posts.push(/*...*/)
+        return // ...
+      },
+    })
+  },
+})
+```
+
+</block>
+
+<block>
+
+```graphql
+Mutation {
+  createDraft: Post!
+}
+```
+
+</block>
+
+</ParallelBlocks>
+
+We need to get the client's input data to complete our resolver. This brings us to a new concept, GraphQL arguments. Every field in GraphQL may accept them. Effectively you can think of each field in GraphQL like a function, accepting some input, doing something, and returning an output. Most of the time "doing something" is a matter of some read-like operation but with `Mutation` fields the "doing something" usually entails a process with side-effects (e.g. writing to the database).
+
+Let's revise our implementation with GraphQL arguments.
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+
+```ts
+import { extendType, stringArg } from '@nexus/schema'
+
+export const PostMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('createDraft', {
+      type: 'Post',
+      nullable: false,
++      args: {                                        // 1
++        title: stringArg({ required: true }),        // 2
++        body: stringArg({ required: true }),         // 2
++      },
+      resolve(_root, args, ctx) {
++        const draft = {
++          id: ctx.db.posts.length + 1,
++          title: args.title,                         // 3
++          body: args.body,                           // 3
++          published: false,
++        }
++        ctx.db.posts.push(draft)
++        return draft
+-        ctx.db.posts.push(/*...*/)
+-        return // ...
+      },
+    })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+
+```ts
+import { extendType, stringArg } from '@nexus/schema'
+
+export const PostMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('createDraft', {
+      type: 'Post',
+      nullable: false,
+      args: {                                        // 1
+        title: stringArg({ required: true }),        // 2
+        body: stringArg({ required: true }),         // 2
+      },
+      resolve(_root, args, ctx) {
+        const draft = {
+          id: ctx.db.posts.length + 1,
+          title: args.title,                         // 3
+          body: args.body,                           // 3
+          published: false,
+        }
+        ctx.db.posts.push(draft)
+        return draft
+      },
+    })
+  },
+})
+```
+
+</tab>
+
+</TabbedContent>
+
+```ts
+Mutation {
+-  createDraft: Post
++  createDraft(title: String!, body: String!): Post
+}
+```
+
+1. Add an `args` property to the field definition to define its args. Keys are arg names and values are type specifications.
+2. Use the Nexus helpers for defining an arg type. There is one such helper for every GraphQL scalar such as `intArg` and `booleanArg`. If you want to reference a type like some InputObject then use `arg({ type: "..." })`.
+3. In our resolver, access the args we specified above and pass them through to our custom logic. If you hover over the `args` parameter you'll see that Nexus has properly typed them including the fact that they cannot be undefined.
+
+## Model the domain: Part 2
+
+Before we wrap this chapter let's flush out our schema a bit more. We'll add a `publish` mutation to transform a draft into an actual published post.
+
+<TabbedContent tabs={['Diff', 'Content', 'SDL']}>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+
+import { extendType, intArg, stringArg } from '@nexus/schema'
+
+export const PostMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    // ...
++    t.field('publish', {
++      type: 'Post',
++      args: {
++        draftId: intArg({ required: true }),
++      },
++      resolve(_root, args, ctx) {
++        let draftToPublish = ctx.db.posts.find(p => p.id === args.draftId)
++
++        if (!draftToPublish) {
++          throw new Error('Could not find draft with id ' + args.draftId)
++        }
++
++        draftToPublish.published = true
++
++        return draftToPublish
++      },
++    })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+
+import { extendType, intArg, stringArg } from '@nexus/schema'
+
+export const PostMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    // ...
+    t.field('publish', {
+      type: 'Post',
+      args: {
+        draftId: intArg({ required: true }),
+      },
+      resolve(_root, args, ctx) {
+        let draftToPublish = ctx.db.posts.find(p => p.id === args.draftId)
+
+        if (!draftToPublish) {
+          throw new Error('Could not find draft with id ' + args.draftId)
+        }
+
+        draftToPublish.published = true
+
+        return draftToPublish
+      },
+    })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+type Mutation {
+  createDraft(body: String!, title: String!): Post
++  publish(draftId: Int!): Post
+}
+```
+
+</tab>
+
+</TabbedContent>
+
+Then, we'll let API clients read these published posts.
+
+<TabbedContent tabs={['Diff', 'Content', 'SDL']}>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+
+import { extendType } from '@nexus/schema'
+
+export const PostQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    // ...
+
++    t.list.field('posts', {
++      type: 'Post',
++      resolve(_root, _args, ctx) {
++        return ctx.db.posts.filter(p => p.published === true)
++      },
++    })
+
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/graphql/Post.ts
+
+import { extendType } from '@nexus/schema'
+
+export const PostQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    // ...
+
+    t.list.field('posts', {
+      type: 'Post',
+      resolve(_root, _args, ctx) {
+        return ctx.db.posts.filter(p => p.published === true)
+      },
+    })
+
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```ts
+type Query {
+  drafts: [Post!]
++  posts: [Post!]
+}
+```
+
+</tab>
+
+</TabbedContent>
+
+## Try it out
+
+Great, now head on over to the GraphQL Playground and run this query (left). If everything went well, you should see a response like this (right):
+
+<ParallelBlocks>
+  
+<block>
+
+```graphql
+mutation {
+  publish(draftId: 1) {
+    id
+    title
+    body
+    published
+  }
+}
+```
+
+</block>
+
+<block>
+
+```json
+{
+  "data": {
+    "publish": {
+      "id": 1,
+      "title": "Nexus",
+      "body": "...",
+      "published": true
+    }
+  }
+}
+```
+
+</block>
+
+</ParallelBlocks>
+
+Now, that published draft should be visible via the `posts` Query. Run this query (left) and expect the following response (right):
+
+
+<ParallelBlocks>
+
+<block>
+
+```graphql
+query {
+  posts {
+    id
+    title
+    body
+    published
+  }
+}
+```
+
+</block>
+
+<block>
+
+```json
+{
+  "data": {
+    "posts": [
+      {
+        "id": 1,
+        "title": "Nexus",
+        "body": "...",
+        "published": true
+      }
+    ]
+  }
+}
+```
+
+</block>
+
+</ParallelBlocks>
+
+## Wrapping up
+
+Congratulations! You can now read and write to your API.
+
+But, so far you've been validating your work by manually interacting with the Playground. That may be reasonable at first (depending on your relationship to TDD) but it will not scale. At some point you are going to want automated testing. Nexus takes testing seriously and in the next chapter we'll show you how. See you there!
+
+<ButtonLink color="dark" type="primary" href="/getting-started/tutorial/chapter-testing-your-api">
+  Next &rarr;
+</ButtonLink>

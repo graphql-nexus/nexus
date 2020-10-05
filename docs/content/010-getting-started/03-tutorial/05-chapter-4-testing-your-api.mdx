@@ -1,0 +1,291 @@
+---
+title: 4. Testing your API
+---
+
+## Overview
+
+So far you've been validating your work by manual interacting with the Playground. That might be reasonable at first (depending on your relationship to TDD) but it will not scale. At some point you are going to want automated testing. So in this chapter you're going to add some automated tests to your e-commerce project. You'll learn about:
+
+- Nexus' approach to testing
+- Setting up a test environment
+- The `nexus/testing` module
+
+## It's at the system level
+
+<!-- TODO need feature to share content in multiple places -->
+
+There are multiple ways you can test a GraphQL API. One way is to extract resolvers into isolated functions and then unit test them. Of course these are rarely pure functions so those unit tests either become partial integration tests or mocks are introduced to try and retain the unit level of testing. Unit testing resolvers can work well, but here are some reasons why and where it might not;
+
+- The Nexus Prisma plugin (discussed later) can remove the need to even write resolvers in which case testing [those] resolvers doesn't make sense.
+- Thanks to the enhanced static type safety brought by Nexus, testing for correct handling of different input types and expected output types can be greatly reduced. For example you shouldn't need to test that your resolver checks for nulls before accessing nullable fields of an input object. And you don't need to test that your resolver is returning the right type.
+- Unit testing resolvers cannot provide a client perspective view of correctness since they focus on internals. If you want to test but have limited time/capacity to do so, you might choose to minimize/forgo the unit level in favor of system/integration tests that are closer to or at the level of a client perspective.
+
+Testing non-trivial resolvers in isolation is likely to be a good investment in most cases but its up to you as a developer. What Nexus provides help with is not at this level, but higher up in the [testing pyramid](https://codingjourneyman.com/tag/uncle-bob/page/2/), at the system level. System testing means tests that will run operations against your API just like a real client would. This chapter will focus on that. Let's dive-in!
+
+## Setting up your test environment
+
+During this tutorial, you'll use the [Jest testing framework](https://jestjs.io/) to test your API. This is not mandatory but we do recommend it. Still, in general, outside this tutorial, if you prefer another testing framework, feel free to use it.
+
+First, install `jest` and accompanying tools
+
+```bash-symbol
+npm add --save-dev jest @types/jest ts-jest graphql-request
+```
+
+Then, configure jest and npm scripts in your `package.json`
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```json
+"scripts": {
+  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "build": "tsc",
++  "generate": "ts-node-dev api/schema.ts",
++  "test": "npm run generate && jest"
+},
++"jest": {
++  "preset": "ts-jest",
++  "globals": {
++    "ts-jest": {
++      "diagnostics": { "warnOnly": true }
++    }
++  },
++  "testEnvironment": "node"
++}
+```
+
+</tab>
+
+<tab>
+
+```json
+"scripts": {
+  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "build": "tsc",
+  "generate": "ts-node-dev api/schema.ts",
+  "test": "npm run generate && jest"
+},
+"jest": {
+  "preset": "ts-jest",
+  "globals": {
+    "ts-jest": {
+      "diagnostics": { "warnOnly": true }
+    }
+  },
+  "testEnvironment": "node"
+}
+```
+
+</tab>
+
+</TabbedContent>
+
+Finally, create a `tests` folder at the root of your project and a `Post.test.ts` file inside it
+
+```bash-symbol
+mkdir tests && touch tests/Post.test.ts
+```
+
+## Testing the `publish` mutation
+
+To ease testing, we'll create a small utility that we'll call `createTestContext`, which is designed for running integration tests.
+
+When run, it will boot your app in the same process as the test suite and expose an interface for your tests to interact with it. Jest runs each test suite in its own process, so if you have have say eight test suites running in parallel that means you'll have eight app processes running too.
+
+Create a `tests/__helpers.ts` module with the following contents.
+
+```bash-symbol
+touch tests/__helpers.ts
+```
+
+<!-- prettier-ignore -->
+```ts
+// tests/__helpers.ts                                            // 1
+import { PrismaClient } from "@prisma/client";
+import { ServerInfo } from "apollo-server";
+import getPort, { makeRange } from "get-port";
+import { GraphQLClient } from "graphql-request";
+import { server } from "../api/server";
+
+type TestContext = {
+  client: GraphQLClient;
+};
+
+export function createTestContext(): TestContext {
+  let ctx = {} as TestContext;
+  const graphqlCtx = graphqlTestContext();
+
+  beforeEach(async () => {                                        // 2
+    const client = await graphqlCtx.before();
+
+    Object.assign(ctx, {
+      client,
+    });
+  });
+
+  afterEach(async () => {                                         // 3
+    await graphqlCtx.after();
+  });
+
+  return ctx;                                                     // 7
+}
+
+function graphqlTestContext() {
+  let serverInstance: ServerInfo | null = null;
+
+  return {
+    async before() {
+      const port = await getPort({ port: makeRange(4000, 6000) });  // 4
+      serverInstance = await server.listen({ port });               // 5
+
+      return new GraphQLClient(`http://localhost:${port}`);         // 6
+    },
+    async after() {
+      serverInstance?.server.close();                               // 7
+    },
+  };
+}
+```
+
+1. The module name prefix `__` matches that of jest's for snapshot folders `__snapshots__`
+1. Make use of the `jest` lifecycle `beforeEach`. As the name suggest, this hook will be called by Jest _before_ each of your tests
+1. Make use of the `jest` lifecycle `afterEach`. As the name suggest, this hook will be called by Jest _after_ each of your tests
+1. Get a random port so that we can run multiple server concurrently. This is useful as Jest runs all the tests in a same file concurrently by default
+1. Start the GraphQL server before a test start
+1. Add a pre-configured GraphQL client to the test context so that each test can easily send queries to the spawned GraphQL server
+1. Stop the GraphQL server after each test is done
+1. Return an object containing a configured GraphQL client to easily send queries to your GraphQL server
+
+Alright, now you will test your `publish` mutation. Because we want to start from a clean database, we'll just remove the pre-seeded data in the in-memory database that we've been using up until now.
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts
+// api/db.ts
+export const db = {
+- posts: [{ id: 1, title: 'Nexus', body: '...', published: false }],
++ posts: []
+}
+```
+
+</tab>
+
+<tab>
+
+```ts
+// api/db.ts
+export const db = {
+  posts: []
+}
+```
+
+</tab>
+
+</TabbedContent>
+
+Now use your new helper and scaffold your first test:
+
+<!-- prettier-ignore -->
+```ts
+// tests/Post.test.ts
+
+import { createTestContext } from './__helpers'
+
+const ctx = createTestContext()
+
+it('ensures that a draft can be created and published', async () => {
+  // Create a new draft
+  const draftResult = await ctx.client.request(`               # 1
+    mutation {
+      createDraft(title: "Nexus", body: "...") {            # 2
+        id
+        title
+        body
+        published
+      }
+    }
+  `)
+
+  // Snapshot that draft and expect `published` to be false
+  expect(draftResult).toMatchInlineSnapshot()              // 3
+
+  // Publish the previously created draft
+  const publishResult = await ctx.client.request(`
+    mutation publishDraft($draftId: Int!) {
+      publish(draftId: $draftId) {
+        id
+        title
+        body
+        published
+      }
+    }
+  `,
+    { draftId: draftResult.createDraft.id }
+  )
+
+  // Snapshot the published draft and expect `published` to be true
+  expect(publishResult).toMatchInlineSnapshot()
+})
+```
+
+1. The test context exposes a GraphQL client at `ctx.client.request` that will help us run operations against our API. Here We're using it to send a publish mutation.
+2. This is the mutation from the end of last chapter.
+3. The result will be snapshoted inline allowing us to see the input and output collocated!
+
+## Try it out
+
+Now run your tests and let's see the snapshots come to life! It should look similar to this:
+
+```bash-symbol
+npm run test
+```
+
+Draft snapshot
+
+```ts
+// Snapshot that draft and expect `published` to be false
+expect(result).toMatchInlineSnapshot(`
++   Object {
++     "publish": Object {
++       "id": 1,
++       "title": "Nexus",
++       "body": "...",
++       "published": false,
++     },
++   }
+  `)
+```
+
+Published draft snapshot
+
+```ts
+// Snapshot that draft and expect `published` to be false
+expect(result).toMatchInlineSnapshot(`
++   Object {
++     "publish": Object {
++       "id": 1,
++       "title": "Nexus",
++       "body": "...",
++       "published": true,
++     },
++   }
+  `)
+```
+
+Awesome, beautiful workflow isn't it? If inline snapshots get too unwieldy you can switch to regular snapshots and install [a VSCode plugin](https://marketplace.visualstudio.com/items?itemName=asvetliakov.snapshot-tools) that will display the snapshots upon hovering over the `toMatchSnapshot` method name. While not quite as fluid as seeing inline snapshots throughout your test module, it may work better for you.
+
+## Wrapping up
+
+You've just made a big step in the maintainability of your API. Here we showed how to test your `createDraft` and `publish` mutation, proving that a draft can be properly created and published. However you did _not_ test if the draft was correctly persisted into your database. That piece will come soon! But first we need a real database in the first place. That's what the next chapter is all about!
+
+<ButtonLink
+  color="dark"
+  type="primary"
+  href="/getting-started/tutorial/chapter-persisting-data-via-prisma"
+>
+  Next &rarr;
+</ButtonLink>

@@ -1,0 +1,332 @@
+---
+title: 6. Testing with Prisma
+---
+
+## Chapter 6: Testing With Prisma
+
+There's a couple of things you'll have to do in order to run integration tests against your API now that it's connected to a real development database. In this chapter, you'll learn about:
+
+- Custom Jest environment
+- Integration test with a real database
+
+## How does it work?
+
+To perform integration testing against a real database, here are the high level steps we will follow _for every tests_:
+
+- Connect to a Postgres database. Most likely your dev database.
+- Migrate our database schema to a randomly generated schema of that database. This ensures that every tests runs from a clean un-seeded database
+- Make the Prisma Client connect to that Postgres schema
+- Run your test
+- Teardown the schema entirely
+
+## Setting up the environment
+
+To achieve some of the steps described above, we'll tweak our test context.
+
+First, install the `pg` and `nanoid` packages
+
+```bash
+npm add --save-dev pg @types/pg nanoid
+```
+
+Then, head to your `tests/__helpers.ts` file to add the following imports and code
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts
+// tests/__helpers.ts
++import { PrismaClient } from "@prisma/client";
+import { ServerInfo } from "apollo-server";
++import { execSync } from "child_process";
+import getPort, { makeRange } from "get-port";
+import { GraphQLClient } from "graphql-request";
++import { nanoid } from "nanoid";
++import { join } from "path";
++import { Client } from "pg";
+import { server } from "../api/server";
+
+type TestContext = {
+  client: GraphQLClient;
++  db: PrismaClient;
+};
+
+export function createTestContext(): TestContext {
+  let ctx = {} as TestContext;
+  const graphqlCtx = graphqlTestContext();
++  const prismaCtx = prismaTestContext();
+
+  beforeEach(async () => {
+    const client = await graphqlCtx.before();
++    const db = await prismaCtx.before();
+
+    Object.assign(ctx, {
+      client,
++      db,
+    });
+  });
+
+  afterEach(async () => {
+    await graphqlCtx.after();
++    await prismaCtx.after();
+  });
+
+  return ctx;
+}
+
+function graphqlTestContext() {
+  let serverInstance: ServerInfo | null = null;
+
+  return {
+    async before() {
+      const port = await getPort({ port: makeRange(4000, 6000) });
+      serverInstance = await server.listen({ port });
+
+      return new GraphQLClient(`http://localhost:${port}`);
+    },
+    async after() {
+      serverInstance?.server.close();
+    },
+  };
+}
+
++function prismaTestContext() {
++  const prismaBinary = join(__dirname, "..", "node_modules", ".bin", "prisma");
++  let schema = "";
++  let databaseUrl = "";
++  let prismaClient: null | PrismaClient = null;
++
++  return {
++     async before() {
++       // Generate a unique schema identifier for this test context
++       schema = `test_${nanoid()}`;
++       // Generate the pg connection string for the test schema
++       databaseUrl = `postgres://postgres:postgres@localhost:5432/testing?schema=${schema}`;
++
++       // Set the required environment variable to contain the connection string
++       // to our database test schema
++       process.env.DATABASE_URL = databaseUrl;
++
++       // Run the migrations to ensure our schema has the required structure
++       execSync(`${prismaBinary} migrate up --create-db --experimental`, {
++         env: {
++           ...process.env,
++           DATABASE_URL: databaseUrl,
++         },
++       });
++
++       // Construct a new Prisma Client connected to the generated Postgres schema
++       prismaClient = new PrismaClient();
++
++       return prismaClient;
++     },
++     async after() {
++       // Drop the schema after the tests have completed
++       const client = new Client({
++         connectionString: databaseUrl,
++       });
++       await client.connect();
++       await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
++       await client.end();
++
++       // Release the Prisma Client connection
++       await prismaClient?.$disconnect();
++     },
++   };
++ }
+```
+
+</tab>
+
+<tab>
+
+```ts
+// tests/__helpers.ts
+import { PrismaClient } from "@prisma/client";
+import { ServerInfo } from "apollo-server";
+import { execSync } from "child_process";
+import getPort, { makeRange } from "get-port";
+import { GraphQLClient } from "graphql-request";
+import { nanoid } from "nanoid";
+import { join } from "path";
+import { Client } from "pg";
+import { server } from "../api/server";
+
+type TestContext = {
+  client: GraphQLClient;
+  db: PrismaClient;
+};
+
+export function createTestContext(): TestContext {
+  let ctx = {} as TestContext;
+  const graphqlCtx = graphqlTestContext();
+  const prismaCtx = prismaTestContext();
+
+  beforeEach(async () => {
+    const client = await graphqlCtx.before();
+    const db = await prismaCtx.before();
+
+    Object.assign(ctx, {
+      client,
+      db,
+    });
+  });
+
+  afterEach(async () => {
+    await graphqlCtx.after();
+    await prismaCtx.after();
+  });
+
+  return ctx;
+}
+
+function graphqlTestContext() {
+  let serverInstance: ServerInfo | null = null;
+
+  return {
+    async before() {
+      const port = await getPort({ port: makeRange(4000, 6000) });
+      serverInstance = await server.listen({ port });
+
+      return new GraphQLClient(`http://localhost:${port}`);
+    },
+    async after() {
+      serverInstance?.server.close();
+    },
+  };
+}
+
+function prismaTestContext() {
+  const prismaBinary = join(__dirname, "..", "node_modules", ".bin", "prisma");
+  let schema = "";
+  let databaseUrl = "";
+  let prismaClient: null | PrismaClient = null;
+
+  return {
+    async before() {
+      // Generate a unique schema identifier for this test context
+      schema = `test_${nanoid()}`;
+      // Generate the pg connection string for the test schema
+      databaseUrl = `postgres://postgres:postgres@localhost:5432/testing?schema=${schema}`;
+
+      // Set the required environment variable to contain the connection string
+      // to our database test schema
+      process.env.DATABASE_URL = databaseUrl;
+
+      // Run the migrations to ensure our schema has the required structure
+      execSync(`${prismaBinary} migrate up --create-db --experimental`, {
+        env: {
+          ...process.env,
+          DATABASE_URL: databaseUrl,
+        },
+      });
+
+      // Construct a new Prisma Client connected to the generated Postgres schema
+      prismaClient = new PrismaClient();
+
+      return prismaClient;
+    },
+    async after() {
+      // Drop the schema after the tests have completed
+      const client = new Client({
+        connectionString: databaseUrl,
+      });
+      await client.connect();
+      await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+      await client.end();
+
+      // Release the Prisma Client connection
+      await prismaClient?.$disconnect();
+    },
+  };
+}
+```
+
+</tab>
+
+</TabbedContent>
+
+The `prismaTestContext` is in charge of a couple of things:
+
+1. Migrate a randomly generated schema before each of your test. This ensure that your tests can add data to an "isolated" and clean database.
+1. Flush the migrated schema after each of your test
+1. Add an instance of a Prisma Client connected to the schema migrated specifically for your test
+
+Make sure that the `databaseUrl` variable has the right credentials to connect to your own database.
+Leave the `/testing?schema=...` part though. This ensures, once again, that your tests will add data to your Postgres instance in a separate database called `testing` in a schema that randomly generated.
+
+## Updating our test
+
+We're ready to update our test so that it uses our database. Wait though. Is there even something to change?
+No, absolutely nothing. In fact, you can already try running Jest again and your test should pass. That's precisely the point of integration tests.
+
+There's one thing we can do though. If you remember our previous test, the only part we couldn't test was whether or not the data had properly been persisted into the database.
+
+Let's use the `ctx.db` property to fetch our database right after we've published the draft to ensure that it's been created by snapshotting the result.
+
+```ts
+// tests/Post.test.ts
+
+it('ensures that a draft can be created and published', async () => {
+  // ...
+
+  // Publish the previously created draft
+  const publishResult = await ctx.client.send(
+    `
+    mutation publishDraft($draftId: Int!) {
+      publish(draftId: $draftId) {
+        id
+        title
+        body
+        published
+      }
+    }
+  `,
+    { draftId: draftResult.createDraft.id }
+  )
+
+  // Snapshot the published draft and expect `published` to be true
+  expect(publishResult).toMatchInlineSnapshot(`
+    Object {
+      "publish": Object {
+        "body": "...",
+        "id": 1,
+        "published": true,
+        "title": "Nexus",
+      },
+    }
+  `)
+
++ const persistedData = await ctx.app.db.client.post.findMany()
+
++ expect(persistedData).toMatchInlineSnapshot()
+})
+```
+
+The new snapshot should look like the following. It proves that our database did persist that data and that we have exactly one item in it.
+
+```ts
+expect(persistedData).toMatchInlineSnapshot(`
++   Array [
++     Object {
++       "body": "...",
++       "id": 1,
++       "published": true,
++       "title": "Nexus",
++     },
++   ]
+  `)
+```
+
+## Wrapping up
+
+Congrats, you've performed your first real-world integration test. The fact that integration tests are completely decoupled from the implementation of your GraphQL API makes it a lot easier to maintain your test suite as you evolve your API. What matters is only the data that it produces, which also helps you cover your app a lot more than a single unit test.
+
+About our app, it's starting to take shape but it's still lacking something pretty important in any application: authentication.
+
+Come onto the next chapter to get that added to your app!
+
+<ButtonLink color="dark" type="primary" href="/getting-started/tutorial/chapter-authentication">
+  Next &rarr;
+</ButtonLink>

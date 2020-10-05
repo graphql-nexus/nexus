@@ -17,15 +17,20 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Test
-        run: yarn -s test
+        run: yarn -s test:ci
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          directory: ./coverage
+
   test-examples:
     strategy:
       matrix:
         example:
           - apollo-fullstack
-          - ghost
           - kitchen-sink
           - ts-ast-reader
+          # - ghost
           # - githunt-api requires node 8
           # - star-wars requires special commands
           # rm examples/star-wars/src/star-wars-typegen.ts
