@@ -31,18 +31,6 @@ export const testArgs2 = {
   bar: idArg(),
 }
 
-export const Node = interfaceType({
-  name: 'Node',
-  definition(t) {
-    t.id('id', {
-      nullable: false,
-      resolve: () => {
-        throw new Error('Abstract')
-      },
-    })
-  },
-})
-
 export const Mutation = mutationType({
   definition(t) {
     t.boolean('ok', () => true)
@@ -118,6 +106,7 @@ export const TestUnion = unionType({
 
 export const TestObj = objectType({
   name: 'TestObj',
+  node: (obj) => `TestObj:${obj.item}`,
   definition(t) {
     t.implements('Bar', Baz)
     t.string('item')

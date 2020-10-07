@@ -78,6 +78,49 @@ plugin({
 })
 ```
 
+### onObjectDefinition(t, objectConfig)
+
+The "onObjectDefinition" hook is called when an `objectType` is created, and is provided `t`, the object
+passed into the `definition` block, as well as the `config` of the object.
+
+```ts
+export const NodePlugin = plugin({
+  name: 'NodePlugin',
+  description: 'Allows us to designate the field used to determine the "node" interface',
+  objectTypeDefTypes: `node?: string | core.FieldResolver<TypeName, any>`,
+  onObjectDefinition(t, { node }) {
+    if (node) {
+      let resolveFn
+      if (typeof node === 'string') {
+        const fieldResolve: FieldResolver<any, any> = (root, args, ctx, info) => {
+          return `${info.parentType.name}:${root[node]}`
+        }
+        resolveFn = fieldResolve
+      } else {
+        resolveFn = node
+      }
+      t.implements('Node')
+      t.id('id', {
+        nullable: false,
+        resolve: resolveFn,
+      })
+    }
+  },
+})
+```
+
+Usage:
+
+```ts
+const User = objectType({
+  name: 'User',
+  node: 'id', // adds `id` field
+  definition(t) {
+    t.string('name')
+  },
+})
+```
+
 ### onCreateFieldResolver(config)
 
 Every ObjectType, whether they are defined via Nexus' `objectType` api, or elsewhere is given a resolver.

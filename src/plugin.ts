@@ -11,6 +11,9 @@ import {
 } from './definitions/_types'
 import { NexusSchemaExtension } from './extensions'
 import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
+import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
+import { InputDefinitionBlock } from './definitions/definitionBlocks'
+import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 
 export { PluginBuilderLens }
 
@@ -89,6 +92,19 @@ export interface PluginConfig {
    * After the schema is built, provided the Schema to do any final config validation.
    */
   onAfterBuild?: (schema: GraphQLSchema) => void
+  /**
+   * Called immediately after the object is defined, allows for using metadata
+   * to define the shape of the object.
+   */
+  onObjectDefinition?: (block: ObjectDefinitionBlock<any>, objectConfig: NexusObjectTypeConfig<any>) => void
+  /**
+   * Called immediately after the input object is defined, allows for using metadata
+   * to define the shape of the input object
+   */
+  onInputObjectDefinition?: (
+    block: InputDefinitionBlock<any>,
+    objectConfig: NexusInputObjectTypeConfig<any>
+  ) => void
   /**
    * If a type is not defined in the schema, our plugins can register an `onMissingType` handler,
    * which will intercept the missing type name and give us an opportunity to respond with a valid
@@ -206,6 +222,8 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     'onBeforeBuild',
     'onMissingType',
     'onAfterBuild',
+    'onObjectDefinition',
+    'onInputObjectDefinition',
   ]
   const validOptionalProps = ['description', 'fieldDefTypes', 'objectTypeDefTypes', ...optionalPropFns]
 
