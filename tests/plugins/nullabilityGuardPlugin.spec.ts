@@ -92,12 +92,12 @@ const types = [
   }),
   queryField('intList', {
     type: 'Int',
-    list: true,
+    list: [true],
     resolve: () => [1, 2, null],
   }),
   queryField('userList', {
     type: 'User',
-    list: true,
+    list: [true],
     resolve: () => [null, Promise.resolve(null), null],
   }),
   queryField('interfaceType', {
@@ -122,6 +122,9 @@ const defaultSchema = makeSchema({
   types,
   plugins: [nullPlugin()],
   outputs: false,
+  nonNullDefaults: {
+    output: true,
+  },
 })
 
 describe('nullabilityGuardPlugin', () => {
@@ -230,6 +233,9 @@ describe('nullabilityGuardPlugin', () => {
     const { errors = [], data } = await graphql(
       makeSchema({
         outputs: false,
+        nonNullDefaults: {
+          output: true,
+        },
         types: [
           types,
           unionType({
@@ -290,6 +296,9 @@ describe('nullabilityGuardPlugin', () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
     const schema = makeSchema({
       outputs: false,
+      nonNullDefaults: {
+        output: true,
+      },
       types,
       plugins: [nullPlugin({ onGuarded: undefined })],
     })
@@ -312,6 +321,9 @@ describe('nullabilityGuardPlugin', () => {
   it('should not catch by default unless the env is production', async () => {
     const schema = makeSchema({
       types,
+      nonNullDefaults: {
+        output: true,
+      },
       plugins: [nullPlugin({ shouldGuard: undefined })],
     })
     const { errors = [], data } = await graphql(
@@ -330,6 +342,9 @@ describe('nullabilityGuardPlugin', () => {
     process.env.NODE_ENV = 'production'
     const schema2 = makeSchema({
       types,
+      nonNullDefaults: {
+        output: true,
+      },
       plugins: [nullPlugin({ shouldGuard: undefined })],
     })
     const { errors: errors2 = [], data: data2 } = await graphql(
@@ -402,7 +417,7 @@ describe('nullabilityGuardPlugin', () => {
         types: [
           queryField('nullableList', {
             type: 'String',
-            list: true,
+            list: [true],
             nullable: true,
             resolve: async () => null,
           }),

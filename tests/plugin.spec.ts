@@ -1,5 +1,5 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
-import { makeSchema, MiddlewareFn, objectType, plugin, queryField } from '../src/core'
+import { buildSchema, graphql, GraphQLSchema, printSchema, introspectionFromSchema } from 'graphql'
+import { makeSchema, MiddlewareFn, objectType, plugin, queryField, interfaceType } from '../src/core'
 import { nullabilityGuardPlugin } from '../src/plugins'
 import { EXAMPLE_SDL } from './_sdl'
 
@@ -203,6 +203,70 @@ describe('plugin', () => {
     )
     expect(calls).toMatchSnapshot()
   })
+
+  it('has an onObjectDefinition option, which receives the object metadata', async () => {
+    //
+    const schema = makeSchema({
+      outputs: false,
+      types: [
+        interfaceType({
+          name: 'Node',
+          definition(t) {
+            t.id('id', {
+              nullable: false,
+              resolve: () => {
+                throw new Error('Abstract')
+              },
+            })
+            t.resolveType((n) => n.__typename)
+          },
+        }),
+        objectType({
+          name: 'AddsNode',
+          // @ts-ignore
+          node: 'id',
+          definition(t) {
+            t.string('name')
+          },
+        }),
+        queryField('getNode', {
+          type: 'Node',
+          resolve: () => ({ __typename: 'AddsNode', name: 'test', id: 'abc' }),
+        }),
+      ],
+      plugins: [
+        plugin({
+          name: 'Node',
+          onObjectDefinition(t, config) {
+            const node = (config as any).node as any
+            if (node) {
+              t.implements('Node')
+              t.id('id', {
+                nullable: false,
+                resolve: (root) => `${config.name}:${root[node]}`,
+              })
+            }
+          },
+        }),
+      ],
+    })
+    const result = await graphql(
+      schema,
+      `
+        {
+          getNode {
+            __typename
+            id
+            ... on AddsNode {
+              name
+            }
+          }
+        }
+      `
+    )
+    expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
+  })
+
   it('has a plugin.completeValue fn which is used to efficiently complete a value which is possibly a promise', async () => {
     const calls: string[] = []
     const testResolve = (name: string) => (): MiddlewareFn => async (root, args, ctx, info, next) => {

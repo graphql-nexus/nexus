@@ -22,7 +22,7 @@ it('defines a field on the mutation type as shorthand', async () => {
     }
 
     type Subscription {
-      someField: Int!
+      someField: Int
     }
     "
   `)
@@ -77,7 +77,7 @@ it('can be defined as a thunk', async () => {
     }
 
     type Subscription {
-      someField: Int!
+      someField: Int
     }
     "
   `)

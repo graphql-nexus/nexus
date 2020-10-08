@@ -400,6 +400,16 @@ export class SchemaBuilder {
   protected onAfterBuildFns: Exclude<PluginConfig['onAfterBuild'], undefined>[] = []
 
   /**
+   * Executed after the object is defined, allowing us to add additional fields to the object
+   */
+  protected onObjectDefinitionFns: Exclude<PluginConfig['onObjectDefinition'], undefined>[] = []
+
+  /**
+   * Executed after the object is defined, allowing us to add additional fields to the object
+   */
+  protected onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
+
+  /**
    * The `schemaExtension` is created just after the types are walked,
    * but before the fields are materialized.
    */
@@ -416,7 +426,7 @@ export class SchemaBuilder {
   constructor(protected config: BuilderConfig) {
     this.nonNullDefaults = {
       input: false,
-      output: true,
+      output: false,
       ...config.nonNullDefaults,
     }
     this.plugins = config.plugins || [fieldAuthorizePlugin()]
@@ -669,6 +679,12 @@ export class SchemaBuilder {
       if (pluginConfig.onAfterBuild) {
         this.onAfterBuildFns.push(pluginConfig.onAfterBuild)
       }
+      if (pluginConfig.onObjectDefinition) {
+        this.onObjectDefinitionFns.push(pluginConfig.onObjectDefinition)
+      }
+      if (pluginConfig.onInputObjectDefinition) {
+        this.onInputObjectDefinitionFns.push(pluginConfig.onInputObjectDefinition)
+      }
     })
   }
 
@@ -803,6 +819,9 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
+    this.onInputObjectDefinitionFns.forEach((fn) => {
+      fn(definitionBlock, config)
+    })
     const extensions = this.inputTypeExtendMap[config.name]
     if (extensions) {
       extensions.forEach((extension) => {
@@ -832,6 +851,9 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
+    this.onObjectDefinitionFns.forEach((fn) => {
+      fn(definitionBlock, config)
+    })
     const extensions = this.typeExtendMap[config.name]
     if (extensions) {
       extensions.forEach((extension) => {
@@ -1203,7 +1225,7 @@ export class SchemaBuilder {
   protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(type: T, list: true | boolean[]): T {
     let finalType = type
     if (!Array.isArray(list)) {
-      return GraphQLList(GraphQLNonNull(type)) as T
+      return GraphQLList(type) as T
     }
     if (Array.isArray(list)) {
       for (let i = 0; i < list.length; i++) {

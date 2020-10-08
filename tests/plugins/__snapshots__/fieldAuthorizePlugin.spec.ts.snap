@@ -86,7 +86,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   Query: { // field return type
-    ok: boolean; // Boolean!
+    ok: boolean | null; // Boolean
   }
 }
 
@@ -159,6 +159,6 @@ Array [
 
 exports[`fieldAuthorizePlugin warns when a field has a non-function authorize prop 1`] = `
 Array [
-  [Error: The authorize property provided to incorrectFieldConfig with type User! should be a function, saw number],
+  [Error: The authorize property provided to incorrectFieldConfig with type User should be a function, saw number],
 ]
 `;

@@ -7,7 +7,7 @@ exports[`makeSchema shouldExitAfterGenerateArtifacts accepts a customPrintSchema
 
 type Query {
   # Example boolean field
-  ok: Boolean!
+  ok: Boolean
 }
 "
 `;

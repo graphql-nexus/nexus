@@ -2,7 +2,7 @@
 
 exports[`onInstall plugins does not have access to inline types 1`] = `
 "type Query {
-  bar(inline: Inline): String!
+  bar(inline: Inline): String
 }
 
 input Inline {
@@ -20,7 +20,7 @@ exports[`onInstall plugins does not see fallback ok-query 1`] = `
 
 exports[`onInstall plugins has access to top-level types 1`] = `
 "type foo {
-  bar: String!
+  bar: String
 }
 
 type Query {
@@ -31,7 +31,7 @@ type Query {
 
 exports[`onInstall plugins may contribute types 1`] = `
 "type Query {
-  something: String!
+  something: String
 }
 "
 `;

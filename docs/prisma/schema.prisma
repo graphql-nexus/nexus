@@ -1,0 +1,23 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+model Feedback {
+  id        Int       @default(autoincrement()) @id
+  pageUrl   String
+  userAgent String
+  ip        String
+  sentiment Sentiment
+  createdAt DateTime  @default(now())
+}
+
+enum Sentiment {
+  Happy
+  Unhappy
+}

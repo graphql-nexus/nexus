@@ -1,0 +1,12 @@
+{
+  "name": "gatsby-remark-check-links-numberless",
+  "version": "1.0.0",
+  "description": "Transformed links checker",
+  "main": "index.js",
+  "author": "Nilufar Bava <nilubava@gmail.com>",
+  "license": "ISC",
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin"
+  ]
+}

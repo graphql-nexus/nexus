@@ -59,7 +59,7 @@ const fieldDefTypes = printedGenTyping({
   optional: true,
   type: 'boolean',
   description: `
-    The nullability guard can be helpful, but is also a pottentially expensive operation for lists.
+    The nullability guard can be helpful, but is also a potentially expensive operation for lists.
     We need to iterate the entire list to check for null items to guard against. Set this to true
     to skip the null guard on a specific field if you know there's no potential for unsafe types.
   `,
