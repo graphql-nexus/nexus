@@ -170,8 +170,12 @@ describe('rootTypings', () => {
       typegenFile: '',
     })
 
-    expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
-      `"Root typing path /Users/flavian/projects/prisma/nexus-schema/tests/invalid_path.ts of the type SomeType does not exist"`
-    )
+    try {
+      typegen.print()
+    } catch (e) {
+      expect(e.message.replace(__dirname, '')).toMatchInlineSnapshot(
+        `"Root typing path /invalid_path.ts of the type SomeType does not exist"`
+      )
+    }
   })
 })
