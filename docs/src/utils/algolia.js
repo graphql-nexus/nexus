@@ -56,7 +56,7 @@ const handleRawBody = node => {
     return tocItem ? tocItem.url : ''
   }
 
-  const records = finalSections.map(fSection => ({
+  const records = finalSections.map((fSection, index) => ({
     id: index,
     objectID: rest.objectID,
     title: rest.title,

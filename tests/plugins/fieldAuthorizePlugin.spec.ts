@@ -72,6 +72,9 @@ describe('fieldAuthorizePlugin', () => {
   const testSchema = makeSchema({
     outputs: false,
     types: schemaTypes,
+    nonNullDefaults: {
+      output: true,
+    },
     plugins: [
       fieldAuthorizePlugin({
         formatError({ error, root, args, ctx, info }) {
@@ -169,6 +172,9 @@ describe('fieldAuthorizePlugin', () => {
     const schema = makeSchema({
       outputs: false,
       types: schemaTypes,
+      nonNullDefaults: {
+        output: true,
+      },
       plugins: [fieldAuthorizePlugin()],
     })
     const { data, errors = [] } = await testField('userFalse', false, schema)
@@ -181,6 +187,9 @@ describe('fieldAuthorizePlugin', () => {
   test('always throws an error, even when formatError is wrong', async () => {
     const schema = makeSchema({
       outputs: false,
+      nonNullDefaults: {
+        output: true,
+      },
       types: schemaTypes,
       plugins: [
         // @ts-ignore
@@ -222,6 +231,9 @@ describe('fieldAuthorizePlugin', () => {
   test('warns and adds the authorize plugin when a schema has an authorize prop but no plugins', async () => {
     const schema = makeSchema({
       outputs: false,
+      nonNullDefaults: {
+        output: true,
+      },
       types: [
         schemaTypes,
         queryField('shouldWarn', {

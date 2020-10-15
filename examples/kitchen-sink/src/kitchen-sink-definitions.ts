@@ -13,242 +13,240 @@ import {
   booleanArg,
   queryField,
   connectionPlugin,
-} from "@nexus/schema";
-import _ from "lodash";
-import { connectionFromArray } from "graphql-relay";
+} from '@nexus/schema'
+import _ from 'lodash'
+import { connectionFromArray } from 'graphql-relay'
 
 const USERS_DATA = _.times(100, (i) => ({
   pk: i,
   id: `User: ${i}`,
   name: `Users Connection ${i}`,
-}));
+}))
 
 export const testArgs1 = {
   foo: idArg(),
-};
+}
 
 export const testArgs2 = {
   bar: idArg(),
-};
+}
 
 export const Mutation = mutationType({
   definition(t) {
-    t.boolean("ok", () => true);
+    t.boolean('ok', () => true)
   },
-});
+})
 
-export const SomeMutationField = mutationField("someMutationField", () => ({
+export const SomeMutationField = mutationField('someMutationField', () => ({
   type: Foo,
   args: {
     id: idArg({ required: true }),
   },
   resolve(root, args) {
-    return { name: `Test${args.id}`, ok: true };
+    return { name: `Test${args.id}`, ok: true }
   },
-}));
+}))
 
 export const Bar = interfaceType({
-  name: "Bar",
-  description: "Bar description",
+  name: 'Bar',
+  description: 'Bar description',
   definition(t) {
-    t.boolean("ok", { deprecation: "Not ok?" });
-    t.boolean("argsTest", {
+    t.boolean('ok', { deprecation: 'Not ok?' })
+    t.boolean('argsTest', {
       args: {
         a: arg({
-          type: "InputType",
+          type: 'InputType',
           default: {
-            key: "one",
+            key: 'one',
             answer: 2,
           },
         }),
       },
       resolve(root, args) {
-        return true;
+        return true
       },
-    });
-    t.resolveType((root) => "Foo");
+    })
+    t.resolveType((root) => 'Foo')
   },
-});
+})
 
 export interface UnusedInterfaceTypeDef {
-  ok: boolean;
+  ok: boolean
 }
 
 export const UnusedInterface = interfaceType({
-  name: "UnusedInterface",
+  name: 'UnusedInterface',
   definition(t) {
-    t.boolean("ok");
-    t.resolveType(() => null);
+    t.boolean('ok')
+    t.resolveType(() => null)
   },
-  rootTyping: { name: "UnusedInterfaceTypeDef", path: __filename },
-});
+  rootTyping: { name: 'UnusedInterfaceTypeDef', path: __filename },
+})
 
 export const Baz = interfaceType({
-  name: "Baz",
+  name: 'Baz',
   definition(t) {
-    t.boolean("ok");
-    t.field("a", {
+    t.boolean('ok')
+    t.field('a', {
       type: Bar,
       description: "'A' description",
       nullable: true,
-    });
-    t.resolveType(() => "TestObj");
+    })
+    t.resolveType(() => 'TestObj')
   },
-});
+})
 
 export const TestUnion = unionType({
-  name: "TestUnion",
+  name: 'TestUnion',
   definition(t) {
-    t.members("Foo");
-    t.resolveType(() => "Foo");
+    t.members('Foo')
+    t.resolveType(() => 'Foo')
   },
-});
+})
 
 export const TestObj = objectType({
-  name: "TestObj",
+  name: 'TestObj',
+  node: (obj) => `TestObj:${obj.item}`,
   definition(t) {
-    t.implements("Bar", Baz);
-    t.string("item");
+    t.implements('Bar', Baz)
+    t.string('item')
   },
-});
+})
 
 export const Foo = objectType({
-  name: "Foo",
+  name: 'Foo',
   definition(t) {
-    t.implements("Bar");
-    t.string("name");
+    t.implements('Bar')
+    t.string('name')
   },
-});
+})
 
 export const InputType = inputObjectType({
-  name: "InputType",
+  name: 'InputType',
   definition(t) {
-    t.string("key", { required: true });
-    t.int("answer");
-    t.field("nestedInput", { type: InputType2 });
+    t.string('key', { required: true })
+    t.int('answer')
+    t.field('nestedInput', { type: InputType2 })
   },
-});
+})
 
 export const InputType2 = inputObjectType({
-  name: "InputType2",
+  name: 'InputType2',
   definition(t) {
-    t.string("key", { required: true });
-    t.int("answer");
-    t.date("someDate", { required: true });
+    t.string('key', { required: true })
+    t.int('answer')
+    t.date('someDate', { required: true })
   },
-});
+})
 
 export const Query = objectType({
-  name: "Query",
+  name: 'Query',
   definition(t) {
-    t.field("bar", {
-      type: "TestObj",
-      resolve: () => ({ ok: true, item: "test" }),
-    });
-    t.int("getNumberOrNull", {
+    t.field('bar', {
+      type: 'TestObj',
+      resolve: () => ({ ok: true, item: 'test' }),
+    })
+    t.int('getNumberOrNull', {
       nullable: true,
       args: { a: intArg({ required: true }) },
       async resolve(_, { a }) {
         if (a > 0) {
-          return a;
+          return a
         }
-        return null;
+        return null
       },
-    });
+    })
 
-    t.string("asArgExample", {
+    t.string('asArgExample', {
       args: {
         testAsArg: InputType.asArg({ required: true }),
       },
       skipNullGuard: true, // just checking that this isn't a type error
-      resolve: () => "ok",
-    });
+      resolve: () => 'ok',
+    })
 
-    t.string("inputAsArgExample", {
+    t.string('inputAsArgExample', {
       args: {
-        testScalar: "String",
+        testScalar: 'String',
         testInput: InputType,
       },
-      resolve: () => "ok",
-    });
+      resolve: () => 'ok',
+    })
 
-    t.string("inlineArgs", {
+    t.string('inlineArgs', {
       args: {
         someArg: arg({
           type: inputObjectType({
-            name: "SomeArg",
+            name: 'SomeArg',
             definition(i) {
-              i.string("someField");
-              i.field("arg", {
+              i.string('someField')
+              i.field('arg', {
                 type: inputObjectType({
-                  name: "NestedType",
+                  name: 'NestedType',
                   definition(j) {
-                    j.string("veryNested");
+                    j.string('veryNested')
                   },
                 }),
-              });
+              })
             },
           }),
         }),
       },
-      resolve: () => "ok",
-    });
-    t.list.date("dateAsList", () => []);
+      resolve: () => 'ok',
+    })
+    t.list.date('dateAsList', () => [])
 
-    t.connectionField("booleanConnection", {
-      type: "Boolean",
+    t.connectionField('booleanConnection', {
+      type: 'Boolean',
       disableBackwardPagination: true,
       nodes() {
-        return [true];
+        return [true]
       },
-    });
+    })
 
-    t.connectionField("guardedConnection", {
-      type: "Date",
+    t.connectionField('guardedConnection', {
+      type: 'Date',
       disableBackwardPagination: true,
       authorize() {
-        return false;
+        return false
       },
       nodes() {
-        return [new Date()];
+        return [new Date()]
       },
-    });
+    })
 
-    t.connectionField("usersConnectionNodes", {
+    t.connectionField('usersConnectionNodes', {
       type: User,
       cursorFromNode(node, args, ctx, info, { index, nodes }) {
         if (args.last && !args.before) {
-          const totalCount = USERS_DATA.length;
-          return `cursor:${totalCount - args.last! + index + 1}`;
+          const totalCount = USERS_DATA.length
+          return `cursor:${totalCount - args.last! + index + 1}`
         }
         return connectionPlugin.defaultCursorFromNode(node, args, ctx, info, {
           index,
           nodes,
-        });
+        })
       },
       nodes(root, args) {
         if (args.after) {
-          return USERS_DATA.slice(Number(args.after) + 1);
+          return USERS_DATA.slice(Number(args.after) + 1)
         }
         if (args.last) {
           if (args.before) {
-            const beforeNum = Number(args.before);
-            return USERS_DATA.slice(
-              Math.max(beforeNum - args.last, 0),
-              beforeNum
-            );
+            const beforeNum = Number(args.before)
+            return USERS_DATA.slice(Math.max(beforeNum - args.last, 0), beforeNum)
           } else {
-            return USERS_DATA.slice(-args.last - 1);
+            return USERS_DATA.slice(-args.last - 1)
           }
         }
-        return USERS_DATA;
+        return USERS_DATA
       },
-    });
+    })
 
-    t.connectionField("usersConnectionResolve", {
+    t.connectionField('usersConnectionResolve', {
       type: User,
       resolve(root, args) {
-        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args);
+        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args)
         // The typings are wrong in this package for hasNextPage & hasPreviousPage
         return {
           edges,
@@ -257,15 +255,15 @@ export const Query = objectType({
             hasNextPage: Boolean(pageInfo.hasNextPage),
             hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
           },
-        };
+        }
       },
-    });
+    })
 
-    t.connectionField("userConnectionForwardOnly", {
+    t.connectionField('userConnectionForwardOnly', {
       type: User,
       disableBackwardPagination: true,
       resolve(root, args) {
-        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args);
+        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args)
         // The typings are wrong in this package for hasNextPage & hasPreviousPage
         return {
           edges,
@@ -274,15 +272,15 @@ export const Query = objectType({
             hasNextPage: Boolean(pageInfo.hasNextPage),
             hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
           },
-        };
+        }
       },
-    });
+    })
 
-    t.connectionField("userConnectionBackwardOnly", {
+    t.connectionField('userConnectionBackwardOnly', {
       type: User,
       disableForwardPagination: true,
       resolve(root, args) {
-        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args);
+        const { edges, pageInfo } = connectionFromArray(USERS_DATA, args)
         // The typings are wrong in this package for hasNextPage & hasPreviousPage
         return {
           edges,
@@ -291,27 +289,27 @@ export const Query = objectType({
             hasNextPage: Boolean(pageInfo.hasNextPage),
             hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
           },
-        };
+        }
       },
-    });
+    })
   },
-});
+})
 
 export const userConnectionAdditionalArgs = queryField((t) => {
-  t.connectionField("userConnectionAdditionalArgs", {
+  t.connectionField('userConnectionAdditionalArgs', {
     type: User,
     disableBackwardPagination: true,
     additionalArgs: {
       isEven: booleanArg({
-        description: "If true, filters the users with an odd pk",
+        description: 'If true, filters the users with an odd pk',
       }),
     },
     resolve(root, args) {
-      let userData = USERS_DATA;
+      let userData = USERS_DATA
       if (args.isEven) {
-        userData = USERS_DATA.filter((u) => u.pk % 2 === 0);
+        userData = USERS_DATA.filter((u) => u.pk % 2 === 0)
       }
-      const { edges, pageInfo } = connectionFromArray(userData, args);
+      const { edges, pageInfo } = connectionFromArray(userData, args)
       // The typings are wrong in this package for hasNextPage & hasPreviousPage
       return {
         edges,
@@ -320,64 +318,64 @@ export const userConnectionAdditionalArgs = queryField((t) => {
           hasNextPage: Boolean(pageInfo.hasNextPage),
           hasPreviousPage: Boolean(pageInfo.hasPreviousPage),
         },
-      };
+      }
     },
-  });
-});
+  })
+})
 
 export const ComplexObject = objectType({
-  name: "ComplexObject",
+  name: 'ComplexObject',
   definition(t) {
-    t.id("id", { complexity: 5 });
+    t.id('id', { complexity: 5 })
   },
-});
+})
 
-export const complexQuery = queryField("complexQuery", {
-  type: "ComplexObject",
+export const complexQuery = queryField('complexQuery', {
+  type: 'ComplexObject',
   list: true,
   args: {
     count: intArg({ nullable: false }),
   },
   complexity: ({ args, childComplexity }) => args.count * childComplexity,
-  resolve: () => [{ id: "1" }],
-});
+  resolve: () => [{ id: '1' }],
+})
 
 export const User = objectType({
-  name: "User",
+  name: 'User',
   definition(t) {
-    t.id("id");
-    t.string("name");
+    t.id('id')
+    t.string('name')
   },
-});
+})
 
 const someItem = objectType({
-  name: "SomeItem",
+  name: 'SomeItem',
   definition(t) {
-    t.id("id");
+    t.id('id')
   },
-});
+})
 
 export const MoreQueryFields = extendType({
-  type: "Query",
+  type: 'Query',
   definition(t) {
-    t.field("extended", {
+    t.field('extended', {
       type: someItem,
       resolve(root) {
-        return { id: "SomeID" };
+        return { id: 'SomeID' }
       },
-    });
-    t.int("protectedField", {
+    })
+    t.int('protectedField', {
       authorize: () => false,
       resolve: () => 1,
-    });
+    })
   },
-});
+})
 
 export const DateScalar = scalarType({
-  name: "Date",
+  name: 'Date',
   serialize: (value) => value.getTime(),
   parseValue: (value) => new Date(value),
-  parseLiteral: (ast) => (ast.kind === "IntValue" ? new Date(ast.value) : null),
-  asNexusMethod: "date",
-  rootTyping: "Date",
-});
+  parseLiteral: (ast) => (ast.kind === 'IntValue' ? new Date(ast.value) : null),
+  asNexusMethod: 'date',
+  rootTyping: 'Date',
+})

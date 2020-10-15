@@ -1,4 +1,4 @@
-import { Character, Human, Droid } from "./types/backingTypes";
+import { Character, Human, Droid } from './types/backingTypes'
 
 /**
  * Copied from GraphQL JS:
@@ -18,85 +18,85 @@ import { Character, Human, Droid } from "./types/backingTypes";
  */
 
 const luke = {
-  type: "Human",
-  id: "1000",
-  name: "Luke Skywalker",
-  friends: ["1002", "1003", "2000", "2001"],
+  type: 'Human',
+  id: '1000',
+  name: 'Luke Skywalker',
+  friends: ['1002', '1003', '2000', '2001'],
   appears_in: [4, 5, 6],
-  home_planet: "Tatooine",
-};
+  home_planet: 'Tatooine',
+}
 
 const vader = {
-  type: "Human",
-  id: "1001",
-  name: "Darth Vader",
-  friends: ["1004"],
+  type: 'Human',
+  id: '1001',
+  name: 'Darth Vader',
+  friends: ['1004'],
   appears_in: [4, 5, 6],
-  home_planet: "Tatooine",
-};
+  home_planet: 'Tatooine',
+}
 
 const han = {
-  type: "Human",
-  id: "1002",
-  name: "Han Solo",
-  friends: ["1000", "1003", "2001"],
+  type: 'Human',
+  id: '1002',
+  name: 'Han Solo',
+  friends: ['1000', '1003', '2001'],
   appears_in: [4, 5, 6],
-};
+}
 
 const leia = {
-  type: "Human",
-  id: "1003",
-  name: "Leia Organa",
-  friends: ["1000", "1002", "2000", "2001"],
+  type: 'Human',
+  id: '1003',
+  name: 'Leia Organa',
+  friends: ['1000', '1002', '2000', '2001'],
   appears_in: [4, 5, 6],
-  home_planet: "Alderaan",
-};
+  home_planet: 'Alderaan',
+}
 
 const tarkin = {
-  type: "Human",
-  id: "1004",
-  name: "Wilhuff Tarkin",
-  friends: ["1001"],
+  type: 'Human',
+  id: '1004',
+  name: 'Wilhuff Tarkin',
+  friends: ['1001'],
   appears_in: [4],
-};
+}
 
 const humanData = {
-  "1000": luke,
-  "1001": vader,
-  "1002": han,
-  "1003": leia,
-  "1004": tarkin,
-} as { [key in string]: Human };
+  '1000': luke,
+  '1001': vader,
+  '1002': han,
+  '1003': leia,
+  '1004': tarkin,
+} as { [key in string]: Human }
 
 const threepio = {
-  type: "Droid",
-  id: "2000",
-  name: "C-3PO",
-  friends: ["1000", "1002", "1003", "2001"],
+  type: 'Droid',
+  id: '2000',
+  name: 'C-3PO',
+  friends: ['1000', '1002', '1003', '2001'],
   appears_in: [4, 5, 6],
-  primary_function: "Protocol",
-};
+  primary_function: 'Protocol',
+}
 
 const artoo = {
-  type: "Droid",
-  id: "2001",
-  name: "R2-D2",
-  friends: ["1000", "1002", "1003"],
+  type: 'Droid',
+  id: '2001',
+  name: 'R2-D2',
+  friends: ['1000', '1002', '1003'],
   appears_in: [4, 5, 6],
-  primary_function: "Astromech",
-};
+  primary_function: 'Astromech',
+}
 
 const droidData = {
-  "2000": threepio,
-  "2001": artoo,
-} as { [key in string]: Droid };
+  '2000': threepio,
+  '2001': artoo,
+} as { [key in string]: Droid }
 
 /**
  * Helper function to get a character by ID.
  */
 function getCharacter(id: string) {
   // Returning a promise just to illustrate GraphQL.js's support.
-  return Promise.resolve(humanData[id] || droidData[id]);
+  return Promise.resolve(humanData[id] || droidData[id])
 }
 
 /**
@@ -104,7 +104,7 @@ function getCharacter(id: string) {
  */
 export function getFriends(character: Character) {
   // Notice that GraphQL accepts Arrays of Promises.
-  return character.friends.map((id) => getCharacter(id));
+  return character.friends.map((id) => getCharacter(id))
 }
 
 /**
@@ -113,26 +113,26 @@ export function getFriends(character: Character) {
 export function getHero(episode?: number | null): Character {
   if (episode === 5) {
     // Luke is the hero of Episode V.
-    return luke as Human;
+    return luke as Human
   }
   // Artoo is the hero otherwise.
-  return artoo as Droid;
+  return artoo as Droid
 }
 
-export const allHumans = Object.keys(humanData).map((key) => humanData[key]);
+export const allHumans = Object.keys(humanData).map((key) => humanData[key])
 
 /**
  * Allows us to query for the human with the given id.
  */
 export function getHuman(id: string): Human {
-  return humanData[id];
+  return humanData[id]
 }
 
-export const allDroids = Object.keys(droidData).map((key) => droidData[key]);
+export const allDroids = Object.keys(droidData).map((key) => droidData[key])
 
 /**
  * Allows us to query for the droid with the given id.
  */
 export function getDroid(id: string): Droid {
-  return droidData[id];
+  return droidData[id]
 }

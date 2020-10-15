@@ -142,7 +142,7 @@ describe('objectType', () => {
     const typeMap = buildTypes<{ Account: GraphQLObjectType }>([Account])
     const fields = typeMap.Account.getFields()
     expect(Object.keys(fields).sort()).toEqual(['email', 'id', 'name', 'nestedList'])
-    expect(fields.nestedList.type.toString()).toEqual('[[String]!]!')
+    expect(fields.nestedList.type.toString()).toEqual('[[String]!]')
   })
 })
 
