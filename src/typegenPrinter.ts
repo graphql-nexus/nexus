@@ -1,3 +1,4 @@
+import fs from 'fs'
 import {
   GraphQLArgument,
   GraphQLEnumType,
@@ -159,13 +160,26 @@ export class TypegenPrinter {
       }
     }
 
-    eachObj(rootTypings, (val, key) => {
-      if (typeof val !== 'string') {
-        const importPath = (path.isAbsolute(val.path) ? relativePathTo(val.path, outputPath) : val.path)
+    eachObj(rootTypings, (rootType, typeName) => {
+      if (typeof rootType !== 'string') {
+        const rootTypePath = rootType.path
+
+        if (typeof rootTypePath !== 'string' || !path.isAbsolute(rootTypePath)) {
+          throw new Error(
+            `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+          )
+        }
+
+        if (!fs.existsSync(rootTypePath)) {
+          throw new Error(`Root typing path ${rootTypePath} of the type ${typeName} does not exist`)
+        }
+
+        const importPath = relativePathTo(rootType.path, outputPath)
           .replace(/(\.d)?\.ts/, '')
           .replace(/\\+/g, '/')
+
         importMap[importPath] = importMap[importPath] || new Set()
-        importMap[importPath].add(val.alias ? `${val.name} as ${val.alias}` : val.name)
+        importMap[importPath].add(rootType.alias ? `${rootType.name} as ${rootType.alias}` : rootType.name)
       }
     })
     eachObj(importMap, (val, key) => {
