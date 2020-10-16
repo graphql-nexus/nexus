@@ -90,12 +90,14 @@ const schema = makeSchema({
 
 ## Fully Abstracted Reflection System
 
-You need to run Nexus Schema reflection yourself explicitly. There are two ways you can go about this.
+You need to run Nexus Schema reflection yourself explicitly. You need to do this before running `tsc` to build your app. Otherwise `tsc` will fail due to type errors because of the missing typings files.
+
+There are two primary ways you can go about this.
 
 1. Approach A: Run the subset of your app that contains the schema and that you know will exit.
 2. Approach B: Run your app as usual, but configure it up to exit once reflection has completed.
 
-The first might be simpler if your project can accommodate it. This is because it reduces the surface area of your codebase where you need to think about eager code running during reflection (which in turn is run before build and tests). On the other hand you may already be thinking about this if you are trying to develop testable code. Use whichever approach works best for you.
+The first might be simpler if your project can accommodate it. The primary requirement to accomodate it is that this subset of the application can be run to completion. That is, you can run `ts-node path/to/module` and it exists. If it doesn't exit thta means you have something keeping the node process open like an awaited unresolved promise or open handle (e.g. a Prisma client connection). The reason this approach is simpler is because it reduces the surface area of your codebase where you need to think about eager code running during reflection (which in turn is run before build and tests). On the other hand you may already be thinking about this if you are trying to develop testable code. Use whichever approach works best for you.
 
 Regardless of which choice you go with, you also need to ensure that `NODE_ENV=production` is set. If you forget to do this then Nexus Schema will (by default) run reflection. This would significantly slow down your application boot time, something you don't want in serverless environments, for example.
 
@@ -133,7 +135,7 @@ Here is an example of approach A to managing reflection:
    })
    ```
 
-4. Now you can run Nexus Schema reflection by running this subset of your app e.g. `ts-node src/schema`. You will probably want to capture this via a new npm script called e.g. `nexus:reflect`.
+4. Now you can run Nexus Schema reflection by running this subset of your app e.g. `ts-node --transpile-only src/schema`. You will probably want to capture this via a new npm script called e.g. `nexus:reflect`.
 
 Here is an example of approach B to managing reflection:
 
