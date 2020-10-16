@@ -97,7 +97,9 @@ There are two primary ways you can go about this.
 1. Approach A: Run the subset of your app that contains the schema and that you know will exit.
 2. Approach B: Run your app as usual, but configure it up to exit once reflection has completed.
 
-The first might be simpler if your project can accommodate it. The primary requirement to accomodate it is that this subset of the application can be run to completion. That is, you can run `ts-node path/to/module` and it exists. If it doesn't exit thta means you have something keeping the node process open like an awaited unresolved promise or open handle (e.g. a Prisma client connection). The reason this approach is simpler is because it reduces the surface area of your codebase where you need to think about eager code running during reflection (which in turn is run before build and tests). On the other hand you may already be thinking about this if you are trying to develop testable code. Use whichever approach works best for you.
+Approach A might be simpler if your project can accommodate it. The primary requirement to accomodate it is that this subset of the application can be run to completion. That is, you can run `ts-node path/to/module` and it exits. If it doesn't exit that means you have something keeping the node process open like an awaited unresolved promise or open handle (e.g. a Prisma client connection).
+
+Approach A is simpler in that it reduces the surface area of your codebase where you need to think about eager code running during reflection (which in turn is run before build and tests). On the other hand you may already be thinking about this if you are trying to develop testable code. Use whichever approach works best for you.
 
 Regardless of which choice you go with, you also need to ensure that `NODE_ENV=production` is set. If you forget to do this then Nexus Schema will (by default) run reflection. This would significantly slow down your application boot time, something you don't want in serverless environments, for example.
 
