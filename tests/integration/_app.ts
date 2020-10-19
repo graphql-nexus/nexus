@@ -9,7 +9,9 @@ import {
   objectType,
   queryType,
   stringArg,
+  subscriptionType,
 } from '../../src'
+import { mockStream } from '../_helpers'
 import './_app.typegen'
 
 export const query = queryType({
@@ -93,6 +95,61 @@ export const Mutation = mutationType({
       type: 'User',
       args: { firstName: stringArg(), lastName: stringArg() },
       resolve: (_root) => ({ firstName: '', lastName: '' }),
+    })
+  },
+})
+
+export const Subscription = subscriptionType({
+  definition(t) {
+    //todo .list case
+    t.field('someField', {
+      type: 'Int',
+      subscribe() {
+        return mockStream(10, 0, (int) => int - 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.int('someInt', {
+      subscribe() {
+        return mockStream(10, 0, (int) => int + 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.string('someString', {
+      subscribe() {
+        return mockStream(10, '', (str) => str + '!')
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.float('someFloat', {
+      subscribe() {
+        return mockStream(10, 0.5, (f) => f)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.boolean('someBoolean', {
+      subscribe() {
+        return mockStream(10, true, (b) => b)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.id('someID', {
+      subscribe() {
+        return mockStream(10, 'abc', (id) => id)
+      },
+      resolve: (event) => {
+        return event
+      },
     })
   },
 })

@@ -1,63 +1,14 @@
 import { GraphQLResolveInfo } from 'graphql'
-import {
-  ArgsValue,
-  FieldResolver,
-  GetGen,
-  HasGen3,
-  MaybePromise,
-  MaybePromiseDeep,
-  NeedsResolver,
-  ResultValue,
-} from '../typegenTypeHelpers'
-import { CommonOutputFieldConfig } from './definitionBlocks'
-import { ObjectDefinitionBlock, ObjectDefinitionBuilder, objectType } from './objectType'
+import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
+import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
+import { ObjectDefinitionBuilder, objectType } from './objectType'
 import { AllNexusOutputTypeDefs } from './wrapping'
+import { BaseScalars } from './_types'
 
-export interface SubscriptionScalarConfig<TypeName extends string, FieldName extends string, T = any>
-  extends CommonOutputFieldConfig<TypeName, FieldName> {
-  /**
-   * Resolve method for the field
-   */
-  resolve?: FieldResolver<TypeName, FieldName>
-
-  subscribe(
-    root: object,
-    args: ArgsValue<TypeName, FieldName>,
-    ctx: GetGen<'context'>,
-    info: GraphQLResolveInfo
-  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>
-}
-
-export type ScalarSubSpread<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? HasGen3<'argTypes', TypeName, FieldName> extends true
-    ? [ScalarSubConfig<TypeName, FieldName>]
-    : [ScalarSubConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
-  : HasGen3<'argTypes', TypeName, FieldName> extends true
-  ? [ScalarSubConfig<TypeName, FieldName>]
-  : [] | [FieldResolver<TypeName, FieldName>] | [ScalarSubConfig<TypeName, FieldName>]
-
-export type ScalarSubConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? SubscriptionScalarConfig<TypeName, FieldName> & {
-      resolve: FieldResolver<TypeName, FieldName>
-    }
-  : SubscriptionScalarConfig<TypeName, FieldName>
-
-export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string, T = any>
-  extends CommonOutputFieldConfig<TypeName, FieldName> {
-  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
-
-  /**
-   * Resolve method for the field
-   */
+export interface SubscribeFieldConfigBase<FieldName extends string, Event = any> {
   resolve(
-    root: T,
-    args: ArgsValue<TypeName, FieldName>,
+    root: Event,
+    args: ArgsValue<'Subscription', FieldName>,
     context: GetGen<'context'>,
     info: GraphQLResolveInfo
   ):
@@ -66,66 +17,92 @@ export interface SubscribeFieldConfig<TypeName extends string, FieldName extends
 
   subscribe(
     root: object,
-    args: ArgsValue<TypeName, FieldName>,
+    args: ArgsValue<'Subscription', FieldName>,
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
-  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>
+  ): MaybePromise<AsyncIterator<Event>> | MaybePromiseDeep<AsyncIterator<Event>>
 }
 
-export interface SubscriptionDefinitionBuilder extends ObjectDefinitionBuilder<'Subscription'> {}
+// prettier-ignore
+export type FieldShorthandConfig<FieldName extends string> =
+    CommonOutputFieldConfig<'Subscription', FieldName>
+  & SubscribeFieldConfigBase<FieldName>
 
-export class SubscriptionDefinitionBlock extends ObjectDefinitionBlock<'Subscription'> {
-  constructor(protected typeBuilder: SubscriptionDefinitionBuilder, protected isList = false) {
-    super(typeBuilder)
+// prettier-ignore
+export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string>
+  extends SubscribeFieldConfigBase<FieldName>,
+          CommonOutputFieldConfig<'Subscription', FieldName>
+  {
+    type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
   }
+
+export interface SubscriptionBuilderInternal extends ObjectDefinitionBuilder<'Subscription'> {}
+
+export class SubscriptionBuilder {
+  constructor(protected typeBuilder: SubscriptionBuilderInternal, protected isList = false) {}
 
   get list() {
     if (this.isList) {
       throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
     }
-    return new SubscriptionDefinitionBlock(this.typeBuilder, true)
+    return new SubscriptionBuilder(this.typeBuilder, true)
   }
 
-  string<FieldName extends string>(
-    fieldName: FieldName,
-    ...opts: ScalarSubSpread<'Subscription', FieldName>
-  ) {
-    this.addScalarField(fieldName, 'String', opts)
+  string<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
+    this.fieldShorthand(fieldName, 'String', config)
   }
 
-  int<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
-    this.addScalarField(fieldName, 'Int', opts)
+  int<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
+    this.fieldShorthand(fieldName, 'Int', config)
   }
 
-  boolean<FieldName extends string>(
-    fieldName: FieldName,
-    ...opts: ScalarSubSpread<'Subscription', FieldName>
-  ) {
-    this.addScalarField(fieldName, 'Boolean', opts)
+  // prettier-ignore
+  boolean<FieldName extends string>(fieldName: FieldName, opts: FieldShorthandConfig<FieldName>) {
+    this.fieldShorthand(fieldName, 'Boolean', opts)
   }
 
-  id<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
-    this.addScalarField(fieldName, 'ID', opts)
+  id<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
+    this.fieldShorthand(fieldName, 'ID', config)
   }
 
-  float<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
-    this.addScalarField(fieldName, 'Float', opts)
+  float<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
+    this.fieldShorthand(fieldName, 'Float', config)
   }
 
-  field<FieldName extends string>(
-    name: FieldName,
-    fieldConfig: SubscribeFieldConfig<'Subscription', FieldName>
-  ) {
-    const field: any = { name, ...fieldConfig }
-    this.typeBuilder.addField(this.decorateField(field))
+  // prettier-ignore
+  field<FieldName extends string>(name: FieldName, fieldConfig: SubscribeFieldConfig<'Subscription', FieldName>) {
+    this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
+  }
+
+  protected fieldShorthand(fieldName: string, typeName: BaseScalars, config: FieldShorthandConfig<any>) {
+    this.typeBuilder.addField(
+      this.decorateField({
+        name: fieldName,
+        type: typeName,
+        ...config,
+      } as any)
+    )
+  }
+
+  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
+    if (this.isList) {
+      if (config.list) {
+        this.typeBuilder.warn(
+          `It looks like you chained .list and set list for ${config.name}. ` +
+            'You should only do one or the other'
+        )
+      } else {
+        config.list = true
+      }
+    }
+    return config
   }
 }
 
-export type NexusSubscriptionTypeConfig = {
-  name: 'Subscription'
-  definition(t: SubscriptionDefinitionBlock): void
+export type SubscriptionTypeParams = {
+  definition(t: SubscriptionBuilder): void
 }
 
-export function subscriptionType(config: Omit<NexusSubscriptionTypeConfig, 'name'>) {
-  return objectType({ name: 'Subscription', ...config })
+export function subscriptionType(config: SubscriptionTypeParams) {
+  return objectType({ name: 'Subscription', ...config } as any)
 }

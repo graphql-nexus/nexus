@@ -7,6 +7,7 @@ it('defines a field on the mutation type as shorthand', async () => {
     types: [
       subscriptionType({
         definition(t) {
+          //todo .list case
           t.field('someField', {
             type: 'Int',
             subscribe() {
