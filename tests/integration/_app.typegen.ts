@@ -83,9 +83,11 @@ export interface NexusGenFieldTypes {
     // field return type
     someBoolean: boolean | null // Boolean
     someField: number | null // Int
+    someFields: Array<number | null> | null // [Int]
     someFloat: number | null // Float
     someID: string | null // ID
     someInt: number | null // Int
+    someInts: Array<number | null> | null // [Int]
     someString: string | null // String
   }
   User: {

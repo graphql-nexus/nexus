@@ -101,7 +101,25 @@ export const Mutation = mutationType({
 
 export const Subscription = subscriptionType({
   definition(t) {
-    //todo .list case
+    // lists
+    t.list.field('someFields', {
+      type: 'Int',
+      subscribe() {
+        return mockStream(10, 0, (int) => int - 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.list.int('someInts', {
+      subscribe() {
+        return mockStream(10, 0, (int) => int + 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    // singular
     t.field('someField', {
       type: 'Int',
       subscribe() {
