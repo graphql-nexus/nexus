@@ -16,7 +16,7 @@ exports[`typegenPrinter builds the input object type defs 1`] = `
   }
   PostFilters: { // input type
     order: NexusGenEnums['OrderEnum']; // OrderEnum!
-    search?: string | null; // String
+    search: string | null; // String
   }
 }"
 `;
@@ -154,7 +154,7 @@ export interface NexusGenInputs {
   }
   PostFilters: { // input type
     order: NexusGenEnums['OrderEnum']; // OrderEnum!
-    search?: string | null; // String
+    search: string | null; // String
   }
 }
 

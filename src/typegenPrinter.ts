@@ -405,7 +405,7 @@ export class TypegenPrinter {
             if (!this.hasResolver(field, type)) {
               if (typeof obj !== 'string') {
                 obj[field.name] = [
-                  this.argSeparator(field.type as GraphQLInputType),
+                  this.argSeparator(field.type as GraphQLInputType, false),
                   this.printOutputType(field.type),
                 ]
               }
@@ -552,13 +552,14 @@ export class TypegenPrinter {
   }
 
   normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
-    return [this.argSeparator(arg.type), this.argTypeRepresentation(arg.type)]
+    return [this.argSeparator(arg.type, Boolean(arg.defaultValue)), this.argTypeRepresentation(arg.type)]
   }
 
-  argSeparator(type: GraphQLInputType) {
-    if (isNonNullType(type)) {
+  argSeparator(type: GraphQLInputType, hasDefaultValue: boolean) {
+    if (hasDefaultValue || isNonNullType(type)) {
       return ':'
     }
+
     return '?:'
   }
 
