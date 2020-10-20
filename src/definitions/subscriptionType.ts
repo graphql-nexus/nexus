@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
+import { IsEqual } from '../utils'
 import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
 import { ObjectDefinitionBuilder, objectType } from './objectType'
 import { AllNexusOutputTypeDefs } from './wrapping'
@@ -106,3 +107,5 @@ export type SubscriptionTypeParams = {
 export function subscriptionType(config: SubscriptionTypeParams) {
   return objectType({ name: 'Subscription', ...config } as any)
 }
+
+export type IsSubscriptionType<T> = IsEqual<T, 'Subscription'>
