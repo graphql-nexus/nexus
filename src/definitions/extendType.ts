@@ -1,13 +1,13 @@
 import { assertValidName } from 'graphql'
 import { AllOutputTypesPossible } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock } from './definitionBlocks'
-import { IsSubscriptionType, SubscriptionBuilder } from './subscriptionType'
 import { NexusTypes, withNexusSymbol } from './_types'
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName
   definition(
-    t: IsSubscriptionType<TypeName> extends true ? SubscriptionBuilder : OutputDefinitionBlock<TypeName>
+    // t: IsSubscriptionType<TypeName> extends true ? SubscriptionBuilder : OutputDefinitionBlock<TypeName>
+    t: OutputDefinitionBlock<TypeName>
   ): void
 }
 
