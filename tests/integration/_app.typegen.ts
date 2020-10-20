@@ -50,6 +50,7 @@ export interface NexusGenRootTypes {
     title?: string | null // String
   }
   Query: {}
+  Subscription: {}
   User: { firstName: string; lastName: string }
 }
 
@@ -77,6 +78,17 @@ export interface NexusGenFieldTypes {
     foo: string | null // String
     searchPosts: Array<NexusGenRootTypes['Post'] | null> | null // [Post]
     user: NexusGenRootTypes['User'] | null // User
+  }
+  Subscription: {
+    // field return type
+    someBoolean: boolean | null // Boolean
+    someField: number | null // Int
+    someFields: Array<number | null> | null // [Int]
+    someFloat: number | null // Float
+    someID: string | null // ID
+    someInt: number | null // Int
+    someInts: Array<number | null> | null // [Int]
+    someString: string | null // String
   }
   User: {
     // field return type
@@ -109,7 +121,7 @@ export interface NexusGenAbstractResolveReturnTypes {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Mutation' | 'Post' | 'Query' | 'User'
+export type NexusGenObjectNames = 'Mutation' | 'Post' | 'Query' | 'Subscription' | 'User'
 
 export type NexusGenInputNames = 'PostSearchInput'
 

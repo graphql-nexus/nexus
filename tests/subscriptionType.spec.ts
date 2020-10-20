@@ -7,6 +7,25 @@ it('defines a field on the mutation type as shorthand', async () => {
     types: [
       subscriptionType({
         definition(t) {
+          // lists
+          t.list.field('someFields', {
+            type: 'Int',
+            subscribe() {
+              return mockStream(10, 0, (int) => int - 1)
+            },
+            resolve: (event) => {
+              return event
+            },
+          })
+          t.list.int('someInts', {
+            subscribe() {
+              return mockStream(10, 0, (int) => int + 1)
+            },
+            resolve: (event) => {
+              return event
+            },
+          })
+          // singular
           t.field('someField', {
             type: 'Int',
             subscribe() {
@@ -64,6 +83,8 @@ it('defines a field on the mutation type as shorthand', async () => {
 
   expect(GQL.printSchema(schema)).toMatchInlineSnapshot(`
     "type Subscription {
+      someFields: [Int]
+      someInts: [Int]
       someField: Int
       someInt: Int
       someString: String
