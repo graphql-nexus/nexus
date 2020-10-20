@@ -1,3 +1,4 @@
+import fs from 'fs'
 import {
   GraphQLArgument,
   GraphQLEnumType,
@@ -159,13 +160,26 @@ export class TypegenPrinter {
       }
     }
 
-    eachObj(rootTypings, (val, key) => {
-      if (typeof val !== 'string') {
-        const importPath = (path.isAbsolute(val.path) ? relativePathTo(val.path, outputPath) : val.path)
+    eachObj(rootTypings, (rootType, typeName) => {
+      if (typeof rootType !== 'string') {
+        const rootTypePath = rootType.path
+
+        if (typeof rootTypePath !== 'string' || !path.isAbsolute(rootTypePath)) {
+          throw new Error(
+            `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+          )
+        }
+
+        if (!fs.existsSync(rootTypePath)) {
+          throw new Error(`Root typing path ${rootTypePath} of the type ${typeName} does not exist`)
+        }
+
+        const importPath = relativePathTo(rootType.path, outputPath)
           .replace(/(\.d)?\.ts/, '')
           .replace(/\\+/g, '/')
+
         importMap[importPath] = importMap[importPath] || new Set()
-        importMap[importPath].add(val.alias ? `${val.name} as ${val.alias}` : val.name)
+        importMap[importPath].add(rootType.alias ? `${rootType.name} as ${rootType.alias}` : rootType.name)
       }
     })
     eachObj(importMap, (val, key) => {
@@ -405,7 +419,7 @@ export class TypegenPrinter {
             if (!this.hasResolver(field, type)) {
               if (typeof obj !== 'string') {
                 obj[field.name] = [
-                  this.argSeparator(field.type as GraphQLInputType),
+                  this.argSeparator(field.type as GraphQLInputType, false),
                   this.printOutputType(field.type),
                 ]
               }
@@ -552,13 +566,14 @@ export class TypegenPrinter {
   }
 
   normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
-    return [this.argSeparator(arg.type), this.argTypeRepresentation(arg.type)]
+    return [this.argSeparator(arg.type, Boolean(arg.defaultValue)), this.argTypeRepresentation(arg.type)]
   }
 
-  argSeparator(type: GraphQLInputType) {
-    if (isNonNullType(type)) {
+  argSeparator(type: GraphQLInputType, hasDefaultValue: boolean) {
+    if (hasDefaultValue || isNonNullType(type)) {
       return ':'
     }
+
     return '?:'
   }
 

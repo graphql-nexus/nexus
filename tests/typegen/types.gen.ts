@@ -17,7 +17,7 @@ export interface NexusGenInputs {
   PostFilters: {
     // input type
     order: NexusGenEnums['OrderEnum'] // OrderEnum!
-    search?: string | null // String
+    search: string | null // String
   }
 }
 

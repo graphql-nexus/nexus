@@ -211,7 +211,7 @@ export const PostFilters = inputObjectType({
       type: OrderEnum,
       required: true,
     })
-    t.string(\\"search\\")
+    t.string(\\"search\\", { default: \\"nexus\\" })
   }
 });
 
@@ -354,7 +354,7 @@ const PostFilters = inputObjectType({
       type: OrderEnum,
       required: true,
     })
-    t.string(\\"search\\")
+    t.string(\\"search\\", { default: \\"nexus\\" })
   }
 });
 
