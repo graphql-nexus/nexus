@@ -14,7 +14,7 @@ export function subscriptionField<FieldName extends string>(
     type: 'Subscription',
     definition(t) {
       const finalConfig = typeof config === 'function' ? config() : config
-      t.field(fieldName, finalConfig as any)
+      t.field(fieldName, finalConfig)
     },
   })
 }

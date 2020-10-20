@@ -106,9 +106,11 @@ export interface InputDefinitionBuilder {
   warn(msg: string): void
 }
 
+// prettier-ignore
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomOutputMethods<TypeName>,
-    NexusGenCustomOutputProperties<TypeName> {}
+       extends NexusGenCustomOutputMethods<TypeName>,
+               NexusGenCustomOutputProperties<TypeName>
+       {}
 
 /**
  * The output definition block is passed to the "definition"
