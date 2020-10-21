@@ -1,5 +1,5 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema, introspectionFromSchema } from 'graphql'
-import { makeSchema, MiddlewareFn, objectType, plugin, queryField, interfaceType } from '../src/core'
+import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
+import { interfaceType, makeSchema, MiddlewareFn, objectType, plugin, queryField } from '../src/core'
 import { nullabilityGuardPlugin } from '../src/plugins'
 import { EXAMPLE_SDL } from './_sdl'
 
@@ -126,7 +126,7 @@ describe('plugin', () => {
             if (!exec) {
               return null
             }
-            const [match, typeName, fieldType] = exec
+            const [, typeName, fieldType] = exec
             switch (fieldType) {
               case 'Edge': {
                 return objectType({

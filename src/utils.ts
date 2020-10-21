@@ -415,3 +415,8 @@ export function getOwnPackage(): { name: string } {
 export function casesHandled(x: never): never {
   throw new Error(`A case was not handled for value: ${x}`)
 }
+
+/**
+ * Is the given type equal to the other given type?
+ */
+export type IsEqual<A, B> = A extends B ? (B extends A ? true : false) : false

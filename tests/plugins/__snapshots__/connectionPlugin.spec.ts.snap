@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`connectionPlugin basic behavior can define custom resolve 1`] = `
+exports[`basic behavior can define custom resolve 1`] = `
 Object {
   "data": Object {
     "users": Object {
@@ -29,44 +29,7 @@ Object {
 }
 `;
 
-exports[`connectionPlugin basic behavior can define custom resolve, supplying nodes directly 1`] = `
-Object {
-  "data": Object {
-    "users": Object {
-      "edges": Array [
-        Object {
-          "cursor": "YXJyYXljb25uZWN0aW9uOjA=",
-          "node": Object {
-            "id": "User:1",
-          },
-        },
-        Object {
-          "cursor": "YXJyYXljb25uZWN0aW9uOjE=",
-          "node": Object {
-            "id": "User:2",
-          },
-        },
-      ],
-      "nodes": Array [
-        Object {
-          "id": "User:1",
-        },
-        Object {
-          "id": "User:2",
-        },
-      ],
-      "pageInfo": Object {
-        "endCursor": "YXJyYXljb25uZWN0aW9uOjE=",
-        "hasNextPage": true,
-        "hasPreviousPage": false,
-        "startCursor": "YXJyYXljb25uZWN0aW9uOjA=",
-      },
-    },
-  },
-}
-`;
-
-exports[`connectionPlugin basic behavior can define custom resolve, which will derive nodes if includeNodesField is true 1`] = `
+exports[`basic behavior can define custom resolve, supplying nodes directly 1`] = `
 Object {
   "data": Object {
     "users": Object {
@@ -103,7 +66,44 @@ Object {
 }
 `;
 
-exports[`connectionPlugin basic behavior resolves any promises in nodes 1`] = `
+exports[`basic behavior can define custom resolve, which will derive nodes if includeNodesField is true 1`] = `
+Object {
+  "data": Object {
+    "users": Object {
+      "edges": Array [
+        Object {
+          "cursor": "YXJyYXljb25uZWN0aW9uOjA=",
+          "node": Object {
+            "id": "User:1",
+          },
+        },
+        Object {
+          "cursor": "YXJyYXljb25uZWN0aW9uOjE=",
+          "node": Object {
+            "id": "User:2",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "id": "User:1",
+        },
+        Object {
+          "id": "User:2",
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "YXJyYXljb25uZWN0aW9uOjE=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "YXJyYXljb25uZWN0aW9uOjA=",
+      },
+    },
+  },
+}
+`;
+
+exports[`basic behavior resolves any promises in nodes 1`] = `
 Object {
   "data": Object {
     "users": Object {
@@ -180,7 +180,7 @@ Object {
 }
 `;
 
-exports[`connectionPlugin basic behavior should adhere to the Relay spec 1`] = `
+exports[`basic behavior should adhere to the Relay spec 1`] = `
 "type UserConnection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
@@ -194,7 +194,7 @@ exports[`connectionPlugin basic behavior should adhere to the Relay spec 1`] = `
 }"
 `;
 
-exports[`connectionPlugin basic behavior should adhere to the Relay spec 2`] = `
+exports[`basic behavior should adhere to the Relay spec 2`] = `
 "type UserEdge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
@@ -204,7 +204,7 @@ exports[`connectionPlugin basic behavior should adhere to the Relay spec 2`] = `
 }"
 `;
 
-exports[`connectionPlugin basic behavior should adhere to the Relay spec 3`] = `
+exports[`basic behavior should adhere to the Relay spec 3`] = `
 "\\"\\"\\"
 PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
 \\"\\"\\"
@@ -231,7 +231,7 @@ type PageInfo {
 }"
 `;
 
-exports[`connectionPlugin field level configuration can configure the connection per-instance 1`] = `
+exports[`field level configuration can configure the connection per-instance 1`] = `
 "type QueryUsers_Connection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
@@ -246,7 +246,7 @@ exports[`connectionPlugin field level configuration can configure the connection
 }"
 `;
 
-exports[`connectionPlugin field level configuration can configure the edge per-instance 1`] = `
+exports[`field level configuration can configure the edge per-instance 1`] = `
 "type QueryUsers_Connection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
@@ -260,7 +260,7 @@ exports[`connectionPlugin field level configuration can configure the edge per-i
 }"
 `;
 
-exports[`connectionPlugin field level configuration can configure the edge per-instance 2`] = `
+exports[`field level configuration can configure the edge per-instance 2`] = `
 "type QueryUsers_Edge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
@@ -271,7 +271,7 @@ exports[`connectionPlugin field level configuration can configure the edge per-i
 }"
 `;
 
-exports[`connectionPlugin field level configuration can define a schema with multiple plugins, and separate them by typePrefix 1`] = `
+exports[`field level configuration can define a schema with multiple plugins, and separate them by typePrefix 1`] = `
 "type Query {
   users(
     \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
@@ -375,7 +375,7 @@ type User {
 "
 `;
 
-exports[`connectionPlugin field level configuration can define additional args for the connection 1`] = `
+exports[`field level configuration can define additional args for the connection 1`] = `
 "type Query {
   users(
     \\"\\"\\"This should be included\\"\\"\\"
@@ -396,7 +396,7 @@ exports[`connectionPlugin field level configuration can define additional args f
 }"
 `;
 
-exports[`connectionPlugin field level configuration can inherit the additional args from the main config 1`] = `
+exports[`field level configuration can inherit the additional args from the main config 1`] = `
 "type Query {
   users(
     \\"\\"\\"This should be included\\"\\"\\"
@@ -420,7 +420,7 @@ exports[`connectionPlugin field level configuration can inherit the additional a
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration allows disabling backward pagination 1`] = `
+exports[`global plugin configuration allows disabling backward pagination 1`] = `
 "type Query {
   users(
     \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
@@ -432,7 +432,7 @@ exports[`connectionPlugin global plugin configuration allows disabling backward 
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration allows disabling backward pagination w/ strictArgs: false to make \`first\` nullable 1`] = `
+exports[`global plugin configuration allows disabling backward pagination w/ strictArgs: false to make \`first\` nullable 1`] = `
 "type Query {
   users(
     \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
@@ -444,7 +444,7 @@ exports[`connectionPlugin global plugin configuration allows disabling backward 
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration allows disabling forward pagination 1`] = `
+exports[`global plugin configuration allows disabling forward pagination 1`] = `
 "type Query {
   users(
     \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
@@ -456,7 +456,7 @@ exports[`connectionPlugin global plugin configuration allows disabling forward p
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration allows disabling forward pagination w/ strictArgs:false to make \`last\` nullable 1`] = `
+exports[`global plugin configuration allows disabling forward pagination w/ strictArgs:false to make \`last\` nullable 1`] = `
 "type Query {
   users(
     \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
@@ -468,7 +468,7 @@ exports[`connectionPlugin global plugin configuration allows disabling forward p
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration can configure additional fields for the connection globally 1`] = `
+exports[`global plugin configuration can configure additional fields for the connection globally 1`] = `
 "type UserConnection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
@@ -483,7 +483,7 @@ exports[`connectionPlugin global plugin configuration can configure additional f
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration can configure additional fields for the edge globally 1`] = `
+exports[`global plugin configuration can configure additional fields for the edge globally 1`] = `
 "type UserEdge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
@@ -494,7 +494,7 @@ exports[`connectionPlugin global plugin configuration can configure additional f
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration can define additional args for all connections 1`] = `
+exports[`global plugin configuration can define additional args for all connections 1`] = `
 "type Query {
   users(
     \\"\\"\\"This should be included\\"\\"\\"
@@ -515,15 +515,15 @@ exports[`connectionPlugin global plugin configuration can define additional args
 }"
 `;
 
-exports[`connectionPlugin global plugin configuration can include a "nodes" field, with an array of nodes 1`] = `"UserConnection"`;
+exports[`global plugin configuration can include a "nodes" field, with an array of nodes 1`] = `"UserConnection"`;
 
-exports[`connectionPlugin global plugin configuration logs error if the extendConnection resolver is not specified 1`] = `
+exports[`global plugin configuration logs error if the extendConnection resolver is not specified 1`] = `
 Array [
   [Error: Nexus Connection Plugin: Missing totalCount resolver property for Query.users],
 ]
 `;
 
-exports[`connectionPlugin global plugin configuration logs error if the extendEdge resolver is not specified 1`] = `
+exports[`global plugin configuration logs error if the extendEdge resolver is not specified 1`] = `
 Array [
   [Error: Nexus Connection Plugin: Missing edgeFields.totalCount resolver property for Query.users],
 ]

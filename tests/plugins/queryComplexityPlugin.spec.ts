@@ -88,7 +88,7 @@ describe('queryComplexityPlugin', () => {
   })
 
   test('throws error if complexity is of invalid type', () => {
-    const testSchema = createTestSchema([
+    createTestSchema([
       objectType({
         name: 'User',
         definition(t) {
