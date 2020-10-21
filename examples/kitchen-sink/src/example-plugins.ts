@@ -52,6 +52,7 @@ export const NodePlugin = plugin({
             },
           })
           t.resolveType((t) => {
+            // https://github.com/graphql-nexus/schema/issues/188
             if ((t as any).__typename) {
               return (t as any).__typename
             }
