@@ -85,6 +85,29 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Mutation: {
+    // field return type
+    createUser: 'User'
+  }
+  Post: {
+    // field return type
+    body: 'String'
+    title: 'String'
+  }
+  Query: {
+    // field return type
+    foo: 'String'
+    searchPosts: 'Post'
+    user: 'User'
+  }
+  User: {
+    // field return type
+    firstName: 'String'
+    lastName: 'String'
+  }
+}
+
 export interface NexusGenArgTypes {
   Mutation: {
     createUser: {
@@ -127,6 +150,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames
