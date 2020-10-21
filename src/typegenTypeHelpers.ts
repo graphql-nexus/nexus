@@ -103,8 +103,7 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
 export type FieldTypeName<TypeName extends string, FieldName extends string> = GetGen3<
   'fieldTypeNames',
   TypeName,
-  FieldName,
-  string
+  FieldName
 >
 
 export type SubFieldResolver<
