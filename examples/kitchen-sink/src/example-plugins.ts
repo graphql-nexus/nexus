@@ -52,8 +52,8 @@ export const NodePlugin = plugin({
             },
           })
           t.resolveType((t) => {
-            if (t.__typename) {
-              return t.__typename
+            if ((t as any).__typename) {
+              return (t as any).__typename
             }
             throw new Error('__typename missing for resolving Node')
           })
