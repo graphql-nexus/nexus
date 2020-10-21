@@ -133,7 +133,7 @@ export interface NexusGenRootTypes {
   }
   Bar: NexusGenRootTypes['Foo'] | NexusGenRootTypes['TestObj']
   Baz: NexusGenRootTypes['TestObj']
-  Node: any
+  Node: NexusGenRootTypes['TestObj']
   UnusedInterface: UnusedInterfaceTypeDef
   TestUnion: NexusGenRootTypes['Foo']
 }
@@ -221,6 +221,7 @@ export interface NexusGenFieldTypes {
     // field return type
     a: NexusGenRootTypes['Bar'] | null // Bar
     argsTest: boolean | null // Boolean
+    id: string // ID!
     item: string | null // String
     ok: boolean | null // Boolean
   }
@@ -259,11 +260,120 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  BooleanConnection: {
+    // field return type
+    edges: 'BooleanEdge'
+    pageInfo: 'PageInfo'
+  }
+  BooleanEdge: {
+    // field return type
+    cursor: 'String'
+    node: 'Boolean'
+  }
+  ComplexObject: {
+    // field return type
+    id: 'ID'
+  }
+  DateConnection: {
+    // field return type
+    edges: 'DateEdge'
+    pageInfo: 'PageInfo'
+  }
+  DateEdge: {
+    // field return type
+    cursor: 'String'
+    node: 'Date'
+  }
+  Foo: {
+    // field return type
+    argsTest: 'Boolean'
+    name: 'String'
+    ok: 'Boolean'
+  }
+  Mutation: {
+    // field return type
+    ok: 'Boolean'
+    someMutationField: 'Foo'
+  }
+  PageInfo: {
+    // field return type
+    endCursor: 'String'
+    hasNextPage: 'Boolean'
+    hasPreviousPage: 'Boolean'
+    startCursor: 'String'
+  }
+  Query: {
+    // field return type
+    asArgExample: 'String'
+    bar: 'TestObj'
+    booleanConnection: 'BooleanConnection'
+    complexQuery: 'ComplexObject'
+    dateAsList: 'Date'
+    extended: 'SomeItem'
+    getNumberOrNull: 'Int'
+    guardedConnection: 'DateConnection'
+    inlineArgs: 'String'
+    inputAsArgExample: 'String'
+    protectedField: 'Int'
+    userConnectionAdditionalArgs: 'UserConnection'
+    userConnectionBackwardOnly: 'UserConnection'
+    userConnectionForwardOnly: 'UserConnection'
+    usersConnectionNodes: 'UserConnection'
+    usersConnectionResolve: 'UserConnection'
+  }
+  SomeItem: {
+    // field return type
+    id: 'ID'
+  }
+  TestObj: {
+    // field return type
+    a: 'Bar'
+    argsTest: 'Boolean'
+    id: 'ID'
+    item: 'String'
+    ok: 'Boolean'
+  }
+  User: {
+    // field return type
+    id: 'ID'
+    name: 'String'
+  }
+  UserConnection: {
+    // field return type
+    edges: 'UserEdge'
+    pageInfo: 'PageInfo'
+  }
+  UserEdge: {
+    // field return type
+    cursor: 'String'
+    node: 'User'
+  }
+  Bar: {
+    // field return type
+    argsTest: 'Boolean'
+    ok: 'Boolean'
+  }
+  Baz: {
+    // field return type
+    a: 'Bar'
+    ok: 'Boolean'
+  }
+  Node: {
+    // field return type
+    id: 'ID'
+  }
+  UnusedInterface: {
+    // field return type
+    ok: 'Boolean'
+  }
+}
+
 export interface NexusGenArgTypes {
   Foo: {
     argsTest: {
       // args
-      a?: NexusGenInputs['InputType'] | null // InputType
+      a: NexusGenInputs['InputType'] | null // InputType
     }
   }
   Mutation: {
@@ -338,13 +448,13 @@ export interface NexusGenArgTypes {
   TestObj: {
     argsTest: {
       // args
-      a?: NexusGenInputs['InputType'] | null // InputType
+      a: NexusGenInputs['InputType'] | null // InputType
     }
   }
   Bar: {
     argsTest: {
       // args
-      a?: NexusGenInputs['InputType'] | null // InputType
+      a: NexusGenInputs['InputType'] | null // InputType
     }
   }
 }
@@ -353,6 +463,7 @@ export interface NexusGenAbstractResolveReturnTypes {
   TestUnion: 'Foo'
   Bar: 'Foo' | 'TestObj'
   Baz: 'TestObj'
+  Node: 'TestObj'
 }
 
 export interface NexusGenInheritedFields {}
@@ -389,6 +500,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

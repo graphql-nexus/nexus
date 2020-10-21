@@ -73,6 +73,38 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Droid: {
+    // field return type
+    appearsIn: 'Episode'
+    friends: 'Character'
+    id: 'String'
+    name: 'String'
+    primaryFunction: 'String'
+  }
+  Human: {
+    // field return type
+    appearsIn: 'Episode'
+    friends: 'Character'
+    homePlanet: 'String'
+    id: 'String'
+    name: 'String'
+  }
+  Query: {
+    // field return type
+    droid: 'Droid'
+    hero: 'Character'
+    human: 'Human'
+  }
+  Character: {
+    // field return type
+    appearsIn: 'Episode'
+    friends: 'Character'
+    id: 'String'
+    name: 'String'
+  }
+}
+
 export interface NexusGenArgTypes {
   Droid: {
     appearsIn: {
@@ -132,6 +164,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

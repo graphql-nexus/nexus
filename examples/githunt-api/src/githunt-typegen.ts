@@ -130,6 +130,61 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Comment: {
+    // field return type
+    content: 'String'
+    createdAt: 'Float'
+    id: 'Int'
+    postedBy: 'User'
+    repoName: 'String'
+  }
+  Entry: {
+    // field return type
+    commentCount: 'Int'
+    comments: 'Comment'
+    createdAt: 'Float'
+    hotScore: 'Float'
+    id: 'Int'
+    postedBy: 'User'
+    repository: 'Repository'
+    score: 'Int'
+    vote: 'Vote'
+  }
+  Mutation: {
+    // field return type
+    submitComment: 'Comment'
+    submitRepository: 'Entry'
+    vote: 'Entry'
+  }
+  Query: {
+    // field return type
+    currentUser: 'User'
+    entry: 'Entry'
+    feed: 'Entry'
+  }
+  Repository: {
+    // field return type
+    description: 'String'
+    full_name: 'String'
+    html_url: 'String'
+    name: 'String'
+    open_issues_count: 'Int'
+    owner: 'User'
+    stargazers_count: 'Int'
+  }
+  User: {
+    // field return type
+    avatar_url: 'String'
+    html_url: 'String'
+    login: 'String'
+  }
+  Vote: {
+    // field return type
+    vote_value: 'Int'
+  }
+}
+
 export interface NexusGenArgTypes {
   Entry: {
     comments: {
@@ -190,6 +245,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames
