@@ -1,4 +1,5 @@
 import {
+  getNamedType,
   GraphQLArgument,
   GraphQLEnumType,
   GraphQLField,
@@ -85,6 +86,7 @@ export class TypegenPrinter {
       this.printRootTypeMap(),
       this.printAllTypesMap(),
       this.printReturnTypeMap(),
+      this.printReturnTypeNamesMap(),
       this.printArgTypeMap(),
       this.printAbstractResolveReturnTypeMap(),
       this.printInheritedFieldMap(),
@@ -123,6 +125,7 @@ export class TypegenPrinter {
         `  rootTypes: NexusGenRootTypes;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
+        `  fieldTypeNames: NexusGenFieldTypeNames;`,
         `  allTypes: NexusGenAllTypes;`,
         `  inheritedFields: NexusGenInheritedFields;`,
         `  objectNames: NexusGenObjectNames;`,
@@ -509,6 +512,21 @@ export class TypegenPrinter {
     return returnTypeMap
   }
 
+  buildReturnTypeNamesMap() {
+    const returnTypeMap: TypeFieldMapping = {}
+    const hasFields: (GraphQLInterfaceType | GraphQLObjectType)[] = []
+    hasFields
+      .concat(this.groupedTypes.object)
+      .concat(this.groupedTypes.interface)
+      .forEach((type) => {
+        eachObj(type.getFields(), (field) => {
+          returnTypeMap[type.name] = returnTypeMap[type.name] || {}
+          returnTypeMap[type.name][field.name] = [':', `'${getNamedType(field.type).name}'`]
+        })
+      })
+    return returnTypeMap
+  }
+
   printOutputType(type: GraphQLOutputType) {
     const returnType = this.typeToArr(type)
     function combine(item: any[]): string {
@@ -549,6 +567,14 @@ export class TypegenPrinter {
 
   printReturnTypeMap() {
     return this.printTypeFieldInterface('NexusGenFieldTypes', this.buildReturnTypeMap(), 'field return type')
+  }
+
+  printReturnTypeNamesMap() {
+    return this.printTypeFieldInterface(
+      'NexusGenFieldTypeNames',
+      this.buildReturnTypeNamesMap(),
+      'field return type'
+    )
   }
 
   normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
