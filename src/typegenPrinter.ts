@@ -587,7 +587,7 @@ export class TypegenPrinter {
     return this.printTypeFieldInterface(
       'NexusGenFieldTypeNames',
       this.buildReturnTypeNamesMap(),
-      'field return type'
+      'field return type name'
     )
   }
 

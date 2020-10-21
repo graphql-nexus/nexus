@@ -111,7 +111,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Launch: {
-    // field return type
+    // field return type name
     id: 'ID'
     isBooked: 'Boolean'
     mission: 'Mission'
@@ -119,42 +119,42 @@ export interface NexusGenFieldTypeNames {
     site: 'String'
   }
   LaunchConnection: {
-    // field return type
+    // field return type name
     cursor: 'String'
     hasMore: 'Boolean'
     launches: 'Launch'
   }
   Mission: {
-    // field return type
+    // field return type name
     missionPatch: 'String'
     name: 'String'
   }
   Mutation: {
-    // field return type
+    // field return type name
     bookTrips: 'TripUpdateResponse'
     cancelTrip: 'TripUpdateResponse'
     login: 'String'
   }
   Query: {
-    // field return type
+    // field return type name
     launch: 'Launch'
     launches: 'LaunchConnection'
     me: 'User'
   }
   Rocket: {
-    // field return type
+    // field return type name
     id: 'ID'
     name: 'String'
     type: 'String'
   }
   TripUpdateResponse: {
-    // field return type
+    // field return type name
     launches: 'Launch'
     message: 'String'
     success: 'Boolean'
   }
   User: {
-    // field return type
+    // field return type name
     email: 'String'
     id: 'ID'
     trips: 'Launch'

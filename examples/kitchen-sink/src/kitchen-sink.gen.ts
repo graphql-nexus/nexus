@@ -262,49 +262,49 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   BooleanConnection: {
-    // field return type
+    // field return type name
     edges: 'BooleanEdge'
     pageInfo: 'PageInfo'
   }
   BooleanEdge: {
-    // field return type
+    // field return type name
     cursor: 'String'
     node: 'Boolean'
   }
   ComplexObject: {
-    // field return type
+    // field return type name
     id: 'ID'
   }
   DateConnection: {
-    // field return type
+    // field return type name
     edges: 'DateEdge'
     pageInfo: 'PageInfo'
   }
   DateEdge: {
-    // field return type
+    // field return type name
     cursor: 'String'
     node: 'Date'
   }
   Foo: {
-    // field return type
+    // field return type name
     argsTest: 'Boolean'
     name: 'String'
     ok: 'Boolean'
   }
   Mutation: {
-    // field return type
+    // field return type name
     ok: 'Boolean'
     someMutationField: 'Foo'
   }
   PageInfo: {
-    // field return type
+    // field return type name
     endCursor: 'String'
     hasNextPage: 'Boolean'
     hasPreviousPage: 'Boolean'
     startCursor: 'String'
   }
   Query: {
-    // field return type
+    // field return type name
     asArgExample: 'String'
     bar: 'TestObj'
     booleanConnection: 'BooleanConnection'
@@ -323,11 +323,11 @@ export interface NexusGenFieldTypeNames {
     usersConnectionResolve: 'UserConnection'
   }
   SomeItem: {
-    // field return type
+    // field return type name
     id: 'ID'
   }
   TestObj: {
-    // field return type
+    // field return type name
     a: 'Bar'
     argsTest: 'Boolean'
     id: 'ID'
@@ -335,36 +335,36 @@ export interface NexusGenFieldTypeNames {
     ok: 'Boolean'
   }
   User: {
-    // field return type
+    // field return type name
     id: 'ID'
     name: 'String'
   }
   UserConnection: {
-    // field return type
+    // field return type name
     edges: 'UserEdge'
     pageInfo: 'PageInfo'
   }
   UserEdge: {
-    // field return type
+    // field return type name
     cursor: 'String'
     node: 'User'
   }
   Bar: {
-    // field return type
+    // field return type name
     argsTest: 'Boolean'
     ok: 'Boolean'
   }
   Baz: {
-    // field return type
+    // field return type name
     a: 'Bar'
     ok: 'Boolean'
   }
   Node: {
-    // field return type
+    // field return type name
     id: 'ID'
   }
   UnusedInterface: {
-    // field return type
+    // field return type name
     ok: 'Boolean'
   }
 }

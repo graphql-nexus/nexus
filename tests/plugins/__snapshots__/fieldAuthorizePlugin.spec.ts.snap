@@ -91,7 +91,7 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenFieldTypeNames {
-  Query: { // field return type
+  Query: { // field return type name
     ok: 'Boolean'
   }
 }

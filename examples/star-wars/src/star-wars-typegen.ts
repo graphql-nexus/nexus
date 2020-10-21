@@ -75,7 +75,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Droid: {
-    // field return type
+    // field return type name
     appearsIn: 'Episode'
     friends: 'Character'
     id: 'String'
@@ -83,7 +83,7 @@ export interface NexusGenFieldTypeNames {
     primaryFunction: 'String'
   }
   Human: {
-    // field return type
+    // field return type name
     appearsIn: 'Episode'
     friends: 'Character'
     homePlanet: 'String'
@@ -91,13 +91,13 @@ export interface NexusGenFieldTypeNames {
     name: 'String'
   }
   Query: {
-    // field return type
+    // field return type name
     droid: 'Droid'
     hero: 'Character'
     human: 'Human'
   }
   Character: {
-    // field return type
+    // field return type name
     appearsIn: 'Episode'
     friends: 'Character'
     id: 'String'

@@ -95,13 +95,13 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Mutation: {
-    // field return type
+    // field return type name
     createPost: 'Post'
     registerClick: 'Query'
     someList: 'String'
   }
   Post: {
-    // field return type
+    // field return type name
     author: 'User'
     geo: 'Float'
     id: 'ID'
@@ -109,13 +109,13 @@ export interface NexusGenFieldTypeNames {
     uuid: 'UUID'
   }
   Query: {
-    // field return type
+    // field return type name
     posts: 'Post'
     unionField: 'ExampleUnion'
     user: 'User'
   }
   User: {
-    // field return type
+    // field return type name
     email: 'String'
     id: 'ID'
     name: 'String'
@@ -124,7 +124,7 @@ export interface NexusGenFieldTypeNames {
     posts: 'Post'
   }
   Node: {
-    // field return type
+    // field return type name
     id: 'ID'
   }
 }

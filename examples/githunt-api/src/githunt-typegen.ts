@@ -132,7 +132,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Comment: {
-    // field return type
+    // field return type name
     content: 'String'
     createdAt: 'Float'
     id: 'Int'
@@ -140,7 +140,7 @@ export interface NexusGenFieldTypeNames {
     repoName: 'String'
   }
   Entry: {
-    // field return type
+    // field return type name
     commentCount: 'Int'
     comments: 'Comment'
     createdAt: 'Float'
@@ -152,19 +152,19 @@ export interface NexusGenFieldTypeNames {
     vote: 'Vote'
   }
   Mutation: {
-    // field return type
+    // field return type name
     submitComment: 'Comment'
     submitRepository: 'Entry'
     vote: 'Entry'
   }
   Query: {
-    // field return type
+    // field return type name
     currentUser: 'User'
     entry: 'Entry'
     feed: 'Entry'
   }
   Repository: {
-    // field return type
+    // field return type name
     description: 'String'
     full_name: 'String'
     html_url: 'String'
@@ -174,13 +174,13 @@ export interface NexusGenFieldTypeNames {
     stargazers_count: 'Int'
   }
   User: {
-    // field return type
+    // field return type name
     avatar_url: 'String'
     html_url: 'String'
     login: 'String'
   }
   Vote: {
-    // field return type
+    // field return type name
     vote_value: 'Int'
   }
 }

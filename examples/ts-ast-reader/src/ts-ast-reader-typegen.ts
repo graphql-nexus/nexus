@@ -1062,7 +1062,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   ArrayTypeNode: {
-    // field return type
+    // field return type name
     elementType: 'Node'
     end: 'Int'
     flags: 'NodeFlags'
@@ -1077,7 +1077,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   BindingPattern: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1091,7 +1091,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   CallSignatureDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1105,7 +1105,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ClassDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1121,7 +1121,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ComputedPropertyName: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1135,7 +1135,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ConditionalTypeNode: {
-    // field return type
+    // field return type name
     checkType: 'Node'
     end: 'Int'
     extendsType: 'Node'
@@ -1153,7 +1153,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ConstructSignatureDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1167,7 +1167,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ConstructorDeclaration: {
-    // field return type
+    // field return type name
     asteriskToken: 'Token'
     end: 'Int'
     exclamationToken: 'Token'
@@ -1188,7 +1188,7 @@ export interface NexusGenFieldTypeNames {
     typeParameters: 'TypeParameterDeclaration'
   }
   ConstructorTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1203,7 +1203,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   EnumDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1219,7 +1219,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ExportAssignment: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1233,7 +1233,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ExportDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1247,7 +1247,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   FunctionDeclaration: {
-    // field return type
+    // field return type name
     asteriskToken: 'Token'
     end: 'Int'
     exclamationToken: 'Token'
@@ -1268,7 +1268,7 @@ export interface NexusGenFieldTypeNames {
     typeParameters: 'TypeParameterDeclaration'
   }
   FunctionTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1283,7 +1283,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   GetAccessorDeclaration: {
-    // field return type
+    // field return type name
     asteriskToken: 'Token'
     end: 'Int'
     exclamationToken: 'Token'
@@ -1304,7 +1304,7 @@ export interface NexusGenFieldTypeNames {
     typeParameters: 'TypeParameterDeclaration'
   }
   Identifier: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1319,7 +1319,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ImportDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1333,7 +1333,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ImportEqualsDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1347,7 +1347,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ImportTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1361,7 +1361,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   IndexSignatureDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1376,7 +1376,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   IndexedAccessTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1390,7 +1390,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   InferTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1405,7 +1405,7 @@ export interface NexusGenFieldTypeNames {
     typeParameter: 'Node'
   }
   InterfaceDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1420,7 +1420,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   IntersectionTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1435,27 +1435,27 @@ export interface NexusGenFieldTypeNames {
     types: 'Node'
   }
   JSDoc: {
-    // field return type
+    // field return type name
     comment: 'String'
     tags: 'JSDocTag'
   }
   JSDocAugmentsTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocClassTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocEnumTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocNamespaceDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1469,32 +1469,32 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   JSDocReturnTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocTemplateTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocThisTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocTypeTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   JSDocUnknownTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   KeywordTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1508,7 +1508,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   LiteralType: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1522,7 +1522,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   MappedTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1536,7 +1536,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   MethodDeclaration: {
-    // field return type
+    // field return type name
     asteriskToken: 'Token'
     end: 'Int'
     exclamationToken: 'Token'
@@ -1557,7 +1557,7 @@ export interface NexusGenFieldTypeNames {
     typeParameters: 'TypeParameterDeclaration'
   }
   MissingDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1571,7 +1571,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ModuleDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1586,7 +1586,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   NamespaceDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1601,7 +1601,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   NamespaceExportDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1615,7 +1615,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   NumericLiteral: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1629,7 +1629,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   OptionalTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1644,7 +1644,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ParameterDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1660,7 +1660,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ParenthesizedType: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1675,7 +1675,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   PropertyDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1691,7 +1691,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   PropertyLikeDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1705,7 +1705,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   PropertySignature: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1722,7 +1722,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   QualifiedName: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1736,11 +1736,11 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   Query: {
-    // field return type
+    // field return type name
     parseFile: 'SourceFile'
   }
   RestTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1755,7 +1755,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   SetAccessorDeclaration: {
-    // field return type
+    // field return type name
     asteriskToken: 'Token'
     end: 'Int'
     exclamationToken: 'Token'
@@ -1776,7 +1776,7 @@ export interface NexusGenFieldTypeNames {
     typeParameters: 'TypeParameterDeclaration'
   }
   SourceFile: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1791,7 +1791,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   StringLiteral: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1805,7 +1805,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   StringLiteralLike: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1819,7 +1819,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   ThisTypeNode: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1833,11 +1833,11 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   Token: {
-    // field return type
+    // field return type name
     kind: 'SyntaxKind'
   }
   TupleTypeNode: {
-    // field return type
+    // field return type name
     elementTypes: 'Node'
     end: 'Int'
     flags: 'NodeFlags'
@@ -1852,7 +1852,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   TypeAliasDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     jsDoc: 'JSDoc'
@@ -1869,7 +1869,7 @@ export interface NexusGenFieldTypeNames {
     typeParameters: 'TypeParameterDeclaration'
   }
   TypeLiteral: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1883,7 +1883,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   TypeParameterDeclaration: {
-    // field return type
+    // field return type name
     constraint: 'Node'
     default: 'Node'
     end: 'Int'
@@ -1900,7 +1900,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   TypeReference: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1916,7 +1916,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   UNKNOWN_NODE: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1930,7 +1930,7 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   UnionType: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1945,11 +1945,11 @@ export interface NexusGenFieldTypeNames {
     types: 'Node'
   }
   UnnamedNode: {
-    // field return type
+    // field return type name
     text: 'String'
   }
   VariableDeclaration: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
@@ -1963,20 +1963,20 @@ export interface NexusGenFieldTypeNames {
     typeName: 'DeclarationName'
   }
   HasJSDoc: {
-    // field return type
+    // field return type name
     jsDoc: 'JSDoc'
   }
   JSDocTag: {
-    // field return type
+    // field return type name
     comment: 'String'
     tagName: 'String'
   }
   MaybeOptional: {
-    // field return type
+    // field return type name
     questionToken: 'Token'
   }
   Node: {
-    // field return type
+    // field return type name
     end: 'Int'
     flags: 'NodeFlags'
     kind: 'SyntaxKind'
