@@ -109,6 +109,58 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Launch: {
+    // field return type
+    id: 'ID'
+    isBooked: 'Boolean'
+    mission: 'Mission'
+    rocket: 'Rocket'
+    site: 'String'
+  }
+  LaunchConnection: {
+    // field return type
+    cursor: 'String'
+    hasMore: 'Boolean'
+    launches: 'Launch'
+  }
+  Mission: {
+    // field return type
+    missionPatch: 'String'
+    name: 'String'
+  }
+  Mutation: {
+    // field return type
+    bookTrips: 'TripUpdateResponse'
+    cancelTrip: 'TripUpdateResponse'
+    login: 'String'
+  }
+  Query: {
+    // field return type
+    launch: 'Launch'
+    launches: 'LaunchConnection'
+    me: 'User'
+  }
+  Rocket: {
+    // field return type
+    id: 'ID'
+    name: 'String'
+    type: 'String'
+  }
+  TripUpdateResponse: {
+    // field return type
+    launches: 'Launch'
+    message: 'String'
+    success: 'Boolean'
+  }
+  User: {
+    // field return type
+    email: 'String'
+    id: 'ID'
+    trips: 'Launch'
+  }
+}
+
 export interface NexusGenArgTypes {
   Mission: {
     missionPatch: {
@@ -174,6 +226,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames
