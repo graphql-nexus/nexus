@@ -7,10 +7,10 @@ import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
 import {
   ArgsValue,
+  FieldTypeName,
   GetGen,
   MaybePromise,
   MaybePromiseDeep,
-  ResolverReturnTypeName,
   ResultValue,
   RootValue,
 } from '../typegenTypeHelpers'
@@ -194,7 +194,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
-  extendConnection?: (def: ObjectDefinitionBlock<ResolverReturnTypeName<TypeName, FieldName>>) => void
+  extendConnection?: (def: ObjectDefinitionBlock<FieldTypeName<TypeName, FieldName>>) => void
   /**
    * Dynamically adds additional fields to the connection "edge" when it is defined.
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
@@ -354,9 +354,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       // field definition.
       if (pluginExtendConnection) {
         eachObj(pluginExtendConnection, (val, key) => {
-          dynamicConfig.push(
-            `${key}: core.FieldResolver<core.ResolverReturnTypeName<TypeName, FieldName>, "${key}">`
-          )
+          dynamicConfig.push(`${key}: core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`)
         })
       }
 
