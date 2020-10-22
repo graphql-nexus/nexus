@@ -43,7 +43,7 @@ export const NodePlugin = plugin({
       return interfaceType({
         name: 'Node',
         description:
-          'A "Node" is a field with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
+          'A "Node" is an Object with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
         definition(t) {
           t.id('id', {
             nullable: false,

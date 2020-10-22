@@ -99,7 +99,7 @@ input NestedType {
 }
 
 """
-A "Node" is a field with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification
+A "Node" is an Object with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification
 """
 interface Node {
   id: ID!
