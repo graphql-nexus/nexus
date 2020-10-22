@@ -29,7 +29,7 @@ describe('typegenPrinter', () => {
         sources: [
           {
             alias: 't',
-            source: path.join(__dirname, '_helpers.ts'),
+            source: path.join(__dirname, '__helpers/index.ts'),
           },
         ],
         contextType: 't.TestContext',
