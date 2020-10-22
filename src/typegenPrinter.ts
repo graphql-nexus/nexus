@@ -86,8 +86,8 @@ export class TypegenPrinter {
       this.printScalarTypeMap(),
       this.printRootTypeMap(),
       this.printAllTypesMap(),
-      this.printReturnTypeMap(),
-      this.printReturnTypeNamesMap(),
+      this.printFieldTypesMap(),
+      this.printFieldTypeNamesMap(),
       this.printArgTypeMap(),
       this.printAbstractResolveReturnTypeMap(),
       this.printInheritedFieldMap(),
@@ -579,11 +579,11 @@ export class TypegenPrinter {
     return typing
   }
 
-  printReturnTypeMap() {
+  printFieldTypesMap() {
     return this.printTypeFieldInterface('NexusGenFieldTypes', this.buildReturnTypeMap(), 'field return type')
   }
 
-  printReturnTypeNamesMap() {
+  printFieldTypeNamesMap() {
     return this.printTypeFieldInterface(
       'NexusGenFieldTypeNames',
       this.buildReturnTypeNamesMap(),
