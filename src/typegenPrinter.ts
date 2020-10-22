@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import {
   GraphQLArgument,
   GraphQLEnumType,
@@ -22,7 +22,7 @@ import {
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
-import path from 'path'
+import * as path from 'path'
 import { TypegenInfo } from './builder'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import { NexusGraphQLSchema } from './definitions/_types'

@@ -1,5 +1,5 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
-import path from 'path'
+import * as path from 'path'
 import { BuilderConfig, TypegenInfo } from './builder'
 import { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'

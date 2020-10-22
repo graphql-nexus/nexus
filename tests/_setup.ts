@@ -1,4 +1,5 @@
-import ts from 'typescript'
+import * as tsm from 'ts-morph'
+import * as ts from 'typescript'
 ;(global as any).TS_FORMAT_PROJECT_ROOT = 'src/'
 
 const formatTSDiagonsticsForJest = (diagnostics: readonly ts.Diagnostic[]): string => {
@@ -22,13 +23,21 @@ const formatTSDiagonsticsForJest = (diagnostics: readonly ts.Diagnostic[]): stri
 }
 
 expect.extend({
-  toTypeCheck(fileNames: string[], config: ts.CompilerOptions) {
-    const diagnostics = ts.createProgram(fileNames, config).emit().diagnostics
+  toTypeCheck(fileNames: string | string[], compilerOptions: tsm.CompilerOptions) {
+    const project = new tsm.Project({ compilerOptions: compilerOptions })
+    project.addSourceFilesAtPaths(Array.isArray(fileNames) ? fileNames : [fileNames])
 
-    const pass = diagnostics.length === 0
+    const preEmitDiagnostics = project.getPreEmitDiagnostics()
+    const emitDiagnostics = project.emitSync().getDiagnostics()
+
+    const pass = preEmitDiagnostics.length === 0 && emitDiagnostics.length === 0
 
     return {
-      message: () => (pass ? 'expected program to not typecheck' : formatTSDiagonsticsForJest(diagnostics)),
+      message: () =>
+        pass
+          ? 'expected program to not typecheck'
+          : (project.formatDiagnosticsWithColorAndContext(preEmitDiagnostics),
+            project.formatDiagnosticsWithColorAndContext(emitDiagnostics)),
       pass,
     }
   },

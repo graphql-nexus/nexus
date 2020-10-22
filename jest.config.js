@@ -1,4 +1,5 @@
 const path = require('path')
+const { env } = require('process')
 
 /**
  * @type {jest.InitialOptions}
@@ -10,7 +11,7 @@ module.exports = {
   watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
   globals: {
     'ts-jest': {
-      diagnostics: true, // (temp) true
+      diagnostics: Boolean(process.env.CI),
       tsConfig: path.join(__dirname, 'tests/tsconfig.json'),
     },
   },

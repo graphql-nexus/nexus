@@ -1,5 +1,5 @@
 import * as GQL from 'graphql'
-import { inputObjectType, objectType } from '../src'
+import { inputObjectType, objectType } from '../../src'
 
 /**
  * Used in testing, creates a generic "User" object
