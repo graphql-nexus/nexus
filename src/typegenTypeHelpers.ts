@@ -157,33 +157,16 @@ export type GetGen<K extends GenTypesShapeKeys, Fallback = any> = NexusGen exten
 
 export type GetGen2<
   K extends GenTypesShapeKeys,
-  K2 extends keyof GenTypesShape[K]
-> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? K2 extends keyof GenTypes[K]
-        ? GenTypes[K][K2]
-        : any
-      : any
-    : any
-  : any
+  K2 extends keyof GenTypesShape[K],
+  Fallback = any
+> = K2 extends keyof GetGen<K, Fallback> ? GetGen<K>[K2] : Fallback
 
 export type GetGen3<
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
   K3 extends Extract<keyof GenTypesShape[K][K2], string>,
   Fallback = any
-> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? K2 extends keyof GenTypes[K]
-        ? K3 extends keyof GenTypes[K][K2]
-          ? GenTypes[K][K2][K3]
-          : Fallback
-        : any
-      : any
-    : any
-  : any
+> = K3 extends keyof GetGen2<K, K2, Fallback> ? GetGen2<K, K2>[K3] : Fallback
 
 export type HasGen<K extends GenTypesShapeKeys> = NexusGen extends infer GenTypes
   ? GenTypes extends GenTypesShape
@@ -196,31 +179,13 @@ export type HasGen<K extends GenTypesShapeKeys> = NexusGen extends infer GenType
 export type HasGen2<
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>
-> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? K2 extends keyof GenTypes[K]
-        ? true
-        : false
-      : false
-    : false
-  : false
+> = K2 extends keyof HasGen<K> ? true : false
 
 export type HasGen3<
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>,
   K3 extends Extract<keyof GenTypesShape[K][K2], string>
-> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? K2 extends keyof GenTypes[K]
-        ? K3 extends keyof GenTypes[K][K2]
-          ? true
-          : false
-        : false
-      : false
-    : false
-  : false
+> = K3 extends keyof HasGen2<K, K2> ? true : false
 
 export type RootValue<TypeName extends string> = GetGen2<'rootTypes', TypeName>
 
