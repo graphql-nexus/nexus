@@ -40,11 +40,10 @@ export const testApp = (settings: Settings) => {
       shouldGenerateArtifacts: true,
       plugins: plugins || [],
       async formatTypegen(source, type) {
-        const content = await typegenFormatPrettier({
-          trailingComma: 'es5',
-          arrowParens: 'always',
-        })(source, type)
-        return content.replace('"@nexus/schema"', '"../../.."')
+        const prettierConfigPath = require.resolve('../../.prettierrc')
+        const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
+
+        return content.replace("'@nexus/schema'", "'../../..'")
       },
     })
   })
