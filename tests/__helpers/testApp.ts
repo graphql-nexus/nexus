@@ -22,10 +22,8 @@ export const testApp = (settings: Settings) => {
   const name = settings?.name ?? 'app'
   const rootDir = settings.rootDir
 
-  const typegenModuleName = '__typegen'
-  const typegenModulePath = join(rootDir, `${typegenModuleName}.ts`)
-  const entrypointModuleName = `__app`
-  const entrypointModulePath = join(rootDir, `${entrypointModuleName}.ts`)
+  const typegenModulePath = join(rootDir, '__typegen.ts')
+  const entrypointModulePath = join(rootDir, '__app.ts')
 
   const entrypoint = require(entrypointModulePath)
   const { plugins, ...types } = entrypoint
