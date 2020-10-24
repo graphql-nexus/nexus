@@ -74,8 +74,8 @@ export const schema = makeSchema({
   types: [], // 1
   outputs: {
     typegen: join(__dirname, '..', 'nexus-typegen.ts'), // 2
-    schema: join(__dirname, '..', 'schema.graphql') // 3
-  }
+    schema: join(__dirname, '..', 'schema.graphql'), // 3
+  },
 })
 ```
 
@@ -83,7 +83,7 @@ export const schema = makeSchema({
 1. Output path to where `@nexus/schema` should write the generated TypeScript definition types derived from your schema. This is **mandatory** to benefit from Nexus' type-safety. We call this system "reflection". More on it later.
 1. Output path to where `@nexus/schema` should write the SDL version of your GraphQL schema. More on it later as well.
 
-Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later. 
+Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later.
 
 Create an `api/server.ts` file and add the following code to instantiate your GraphQL server
 
