@@ -92,7 +92,7 @@ export class TypegenMetadata {
       }
       // VSCode reacts to file changes better if a file is first deleted,
       // apparently. See issue motivating this logic here:
-      // https://github.com/prisma-labs/nexus/issues/247.
+      // https://github.com/graphql-nexus/schema/issues/247.
       try {
         await removeFile(filePath)
       } catch (e) {
