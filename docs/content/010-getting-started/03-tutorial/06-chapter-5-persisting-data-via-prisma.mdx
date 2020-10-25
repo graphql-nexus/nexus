@@ -238,8 +238,8 @@ schema.extendType({
     t.field('createDraft', {
       type: 'Post',
       args: {
-        title: schema.stringArg({ required: true }),
-        body: schema.stringArg({ required: true }),
+        title: stringArg({ required: true }),
+        body: stringArg({ required: true }),
       },
       resolve(_root, args, ctx) {
         const draft = {
@@ -258,7 +258,7 @@ schema.extendType({
     t.field('publish', {
       type: 'Post',
       args: {
-        draftId: schema.intArg({ required: true }),
+        draftId: intArg({ required: true }),
       },
       resolve(_root, args, ctx) {
 -       let postToPublish = ctx.db.posts.find((p) => p.id === args.draftId)
@@ -316,8 +316,8 @@ schema.extendType({
     t.field('createDraft', {
       type: 'Post',
       args: {
-        title: schema.stringArg({ required: true }),
-        body: schema.stringArg({ required: true }),
+        title: stringArg({ required: true }),
+        body: stringArg({ required: true }),
       },
       resolve(_root, args, ctx) {
         const draft = {
@@ -332,7 +332,7 @@ schema.extendType({
     t.field('publish', {
       type: 'Post',
       args: {
-        draftId: schema.intArg({ required: true }),
+        draftId: intArg({ required: true }),
       },
       resolve(_root, args, ctx) {
         return ctx.db.post.update({
