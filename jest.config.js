@@ -16,7 +16,6 @@ module.exports = {
             pathRegex: '\\.(spec|test)\\.ts$',
           }
         : false,
-      tsConfig: path.join(__dirname, 'tests/tsconfig.json'),
     },
   },
   collectCoverageFrom: ['src/**/*'],
