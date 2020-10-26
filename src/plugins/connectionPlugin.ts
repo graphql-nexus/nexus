@@ -7,6 +7,7 @@ import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
 import {
   ArgsValue,
+  FieldTypeName,
   GetGen,
   MaybePromise,
   MaybePromiseDeep,
@@ -193,7 +194,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
-  extendConnection?: (def: ObjectDefinitionBlock<any>) => void
+  extendConnection?: (def: ObjectDefinitionBlock<FieldTypeName<TypeName, FieldName>>) => void
   /**
    * Dynamically adds additional fields to the connection "edge" when it is defined.
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
@@ -353,7 +354,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       // field definition.
       if (pluginExtendConnection) {
         eachObj(pluginExtendConnection, (val, key) => {
-          dynamicConfig.push(`${key}: core.SubFieldResolver<TypeName, FieldName, "${key}">`)
+          dynamicConfig.push(`${key}: core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`)
         })
       }
 
@@ -417,8 +418,11 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       })
                     }
                     if (pluginExtendConnection) {
-                      eachObj(pluginExtendConnection, (val, key) => {
-                        t2.field(key, val)
+                      eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
+                        t2.field(extensionFieldName, {
+                          ...extensionFieldConfig,
+                          resolve: (fieldConfig as any)[extensionFieldName],
+                        })
                       })
                     }
                     if (fieldConfig.extendConnection instanceof Function) {
@@ -628,7 +632,7 @@ export function makeResolveFn(
       nodes: any[]
     }>
 
-    // Get all the nodes, before any pagination sliciing
+    // Get all the nodes, before any pagination slicing
     const resolveAllNodes = () => {
       if (cachedNodes !== undefined) {
         return cachedNodes

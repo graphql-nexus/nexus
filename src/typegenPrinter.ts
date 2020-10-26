@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import {
+  getNamedType,
   GraphQLArgument,
   GraphQLEnumType,
   GraphQLField,
@@ -85,7 +86,8 @@ export class TypegenPrinter {
       this.printScalarTypeMap(),
       this.printRootTypeMap(),
       this.printAllTypesMap(),
-      this.printReturnTypeMap(),
+      this.printFieldTypesMap(),
+      this.printFieldTypeNamesMap(),
       this.printArgTypeMap(),
       this.printAbstractResolveReturnTypeMap(),
       this.printInheritedFieldMap(),
@@ -124,6 +126,7 @@ export class TypegenPrinter {
         `  rootTypes: NexusGenRootTypes;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
+        `  fieldTypeNames: NexusGenFieldTypeNames;`,
         `  allTypes: NexusGenAllTypes;`,
         `  inheritedFields: NexusGenInheritedFields;`,
         `  objectNames: NexusGenObjectNames;`,
@@ -523,6 +526,21 @@ export class TypegenPrinter {
     return returnTypeMap
   }
 
+  buildReturnTypeNamesMap() {
+    const returnTypeMap: TypeFieldMapping = {}
+    const hasFields: (GraphQLInterfaceType | GraphQLObjectType)[] = []
+    hasFields
+      .concat(this.groupedTypes.object)
+      .concat(this.groupedTypes.interface)
+      .forEach((type) => {
+        eachObj(type.getFields(), (field) => {
+          returnTypeMap[type.name] = returnTypeMap[type.name] || {}
+          returnTypeMap[type.name][field.name] = [':', `'${getNamedType(field.type).name}'`]
+        })
+      })
+    return returnTypeMap
+  }
+
   printOutputType(type: GraphQLOutputType) {
     const returnType = this.typeToArr(type)
     function combine(item: any[]): string {
@@ -561,8 +579,16 @@ export class TypegenPrinter {
     return typing
   }
 
-  printReturnTypeMap() {
+  printFieldTypesMap() {
     return this.printTypeFieldInterface('NexusGenFieldTypes', this.buildReturnTypeMap(), 'field return type')
+  }
+
+  printFieldTypeNamesMap() {
+    return this.printTypeFieldInterface(
+      'NexusGenFieldTypeNames',
+      this.buildReturnTypeNamesMap(),
+      'field return type name'
+    )
   }
 
   normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {

@@ -93,6 +93,42 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Mutation: {
+    // field return type name
+    createPost: 'Post'
+    registerClick: 'Query'
+    someList: 'String'
+  }
+  Post: {
+    // field return type name
+    author: 'User'
+    geo: 'Float'
+    id: 'ID'
+    messyGeo: 'Float'
+    uuid: 'UUID'
+  }
+  Query: {
+    // field return type name
+    posts: 'Post'
+    unionField: 'ExampleUnion'
+    user: 'User'
+  }
+  User: {
+    // field return type name
+    email: 'String'
+    id: 'ID'
+    name: 'String'
+    outEnum: 'SomeEnum'
+    phone: 'String'
+    posts: 'Post'
+  }
+  Node: {
+    // field return type name
+    id: 'ID'
+  }
+}
+
 export interface NexusGenArgTypes {
   Mutation: {
     createPost: {
@@ -151,6 +187,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

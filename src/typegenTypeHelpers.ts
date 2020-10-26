@@ -100,6 +100,12 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<TypeName, FieldName>> | MaybePromiseDeep<ResultValue<TypeName, FieldName>>
 
+export type FieldTypeName<TypeName extends string, FieldName extends string> = GetGen3<
+  'fieldTypeNames',
+  TypeName,
+  FieldName
+>
+
 export type SubFieldResolver<
   TypeName extends string,
   FieldName extends string,
@@ -130,6 +136,7 @@ export type GenTypesShapeKeys =
   | 'rootTypes'
   | 'argTypes'
   | 'fieldTypes'
+  | 'fieldTypeNames'
   | 'allTypes'
   | 'inheritedFields'
   | 'objectNames'
