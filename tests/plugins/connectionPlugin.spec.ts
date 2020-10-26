@@ -90,14 +90,6 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-function toBase64(x: string): string {
-  return new Buffer(x).toString('base64')
-}
-
-function dump(x: any) {
-  console.log(require('util').inspect(x, { depth: null }))
-}
-
 describe('defaults', () => {
   it('hasPreviousPage when paginating backwards assumes that node count equal to page size means there is another page to visit backward', async () => {
     const schema = makeTestSchema(
