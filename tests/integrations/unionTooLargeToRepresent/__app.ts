@@ -315,21 +315,21 @@ export const types = [
   unionType({
     name: 'BigUnion',
     definition(t) {
-      t.members(...(typeNames as any))
+      t.members(...typeNames)
       t.resolveType(() => null)
     },
   }),
   unionType({
     name: 'MediumUnionType',
     definition(t) {
-      t.members(...(typeNames as any).slice(50, 150))
+      t.members(...typeNames.slice(50, 150))
       t.resolveType(() => null)
     },
   }),
   unionType({
     name: 'MediumUnionTypes',
     definition(t) {
-      t.members(...(typeNames as any).slice(0, 100))
+      t.members(...typeNames.slice(0, 100))
       t.resolveType(() => null)
     },
   }),
