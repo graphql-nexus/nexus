@@ -1,3 +1,4 @@
+import './__typegen'
 import { objectType, unionType } from '../../../src'
 
 export const typeNames = [
@@ -315,7 +316,7 @@ export const types = [
   unionType({
     name: 'BigUnion',
     definition(t) {
-      t.members(...(typeNames as any))
+      t.members(...typeNames)
       t.resolveType(() => null)
     },
   }),

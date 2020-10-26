@@ -1,9 +1,8 @@
 const path = require('path')
-const { env } = require('process')
+const process = require('process')
 
-/**
- * @type {jest.InitialOptions}
- */
+/** @typedef {import('ts-jest')} */
+/** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/_setup.ts'],
   preset: 'ts-jest',
@@ -11,8 +10,12 @@ module.exports = {
   watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
   globals: {
     'ts-jest': {
-      diagnostics: Boolean(process.env.CI),
-      tsConfig: path.join(__dirname, 'tests/tsconfig.json'),
+      diagnostics: Boolean(process.env.CI)
+        ? {
+            pretty: true,
+            pathRegex: '\\.(spec|test)\\.ts$',
+          }
+        : false,
     },
   },
   collectCoverageFrom: ['src/**/*'],

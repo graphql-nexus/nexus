@@ -2941,6 +2941,1213 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  ALXAXBKq: {
+    // field return type name
+    id41: 'ID'
+  }
+  AOogKhAD: {
+    // field return type name
+    id53: 'ID'
+  }
+  AQDzZPsI: {
+    // field return type name
+    id193: 'ID'
+  }
+  ApAniugk: {
+    // field return type name
+    id51: 'ID'
+  }
+  AuMxHAoX: {
+    // field return type name
+    id146: 'ID'
+  }
+  BAzfAeMR: {
+    // field return type name
+    id191: 'ID'
+  }
+  BFohGIGQ: {
+    // field return type name
+    id286: 'ID'
+  }
+  BTIsXTrL: {
+    // field return type name
+    id250: 'ID'
+  }
+  BWwxnXpM: {
+    // field return type name
+    id294: 'ID'
+  }
+  BXowGvwZ: {
+    // field return type name
+    id63: 'ID'
+  }
+  BYPWzETJ: {
+    // field return type name
+    id266: 'ID'
+  }
+  BiZjyuaY: {
+    // field return type name
+    id25: 'ID'
+  }
+  Bjgguvhd: {
+    // field return type name
+    id170: 'ID'
+  }
+  CCXSFsMn: {
+    // field return type name
+    id268: 'ID'
+  }
+  CXumheDD: {
+    // field return type name
+    id172: 'ID'
+  }
+  CgAQHanX: {
+    // field return type name
+    id96: 'ID'
+  }
+  DBZLsxpr: {
+    // field return type name
+    id137: 'ID'
+  }
+  DGxuhtpo: {
+    // field return type name
+    id219: 'ID'
+  }
+  DKEJFUiy: {
+    // field return type name
+    id295: 'ID'
+  }
+  DMggicLd: {
+    // field return type name
+    id239: 'ID'
+  }
+  DNohRdIN: {
+    // field return type name
+    id203: 'ID'
+  }
+  DbgPTfDo: {
+    // field return type name
+    id254: 'ID'
+  }
+  DkoAlvGn: {
+    // field return type name
+    id282: 'ID'
+  }
+  DpnWHIJW: {
+    // field return type name
+    id7: 'ID'
+  }
+  ECChhDfK: {
+    // field return type name
+    id79: 'ID'
+  }
+  ETUiuOHD: {
+    // field return type name
+    id35: 'ID'
+  }
+  EhpNnQJw: {
+    // field return type name
+    id121: 'ID'
+  }
+  EjIQIfmv: {
+    // field return type name
+    id126: 'ID'
+  }
+  EqEZXLCy: {
+    // field return type name
+    id30: 'ID'
+  }
+  EtPHwkkm: {
+    // field return type name
+    id57: 'ID'
+  }
+  EzcWBhIv: {
+    // field return type name
+    id214: 'ID'
+  }
+  FDouQoXO: {
+    // field return type name
+    id173: 'ID'
+  }
+  FHLtgKoA: {
+    // field return type name
+    id258: 'ID'
+  }
+  FaJAYKqm: {
+    // field return type name
+    id93: 'ID'
+  }
+  FcFlCNAk: {
+    // field return type name
+    id228: 'ID'
+  }
+  FvftqquW: {
+    // field return type name
+    id281: 'ID'
+  }
+  GDATeumz: {
+    // field return type name
+    id256: 'ID'
+  }
+  GYbaqoRT: {
+    // field return type name
+    id105: 'ID'
+  }
+  GcpbGXTn: {
+    // field return type name
+    id218: 'ID'
+  }
+  GdxXCAak: {
+    // field return type name
+    id13: 'ID'
+  }
+  GhHKLcZe: {
+    // field return type name
+    id199: 'ID'
+  }
+  GsbHZkLK: {
+    // field return type name
+    id34: 'ID'
+  }
+  GwkBnXKj: {
+    // field return type name
+    id207: 'ID'
+  }
+  GzglazdH: {
+    // field return type name
+    id95: 'ID'
+  }
+  HENcJewx: {
+    // field return type name
+    id185: 'ID'
+  }
+  HIPZQFdS: {
+    // field return type name
+    id251: 'ID'
+  }
+  HJmsvtgX: {
+    // field return type name
+    id151: 'ID'
+  }
+  HLRWzsTU: {
+    // field return type name
+    id182: 'ID'
+  }
+  HNLQTErw: {
+    // field return type name
+    id155: 'ID'
+  }
+  HWMyawvm: {
+    // field return type name
+    id187: 'ID'
+  }
+  HXZUTyvG: {
+    // field return type name
+    id46: 'ID'
+  }
+  HZbsVdoX: {
+    // field return type name
+    id68: 'ID'
+  }
+  HdiyXGxs: {
+    // field return type name
+    id178: 'ID'
+  }
+  HgYVPDgm: {
+    // field return type name
+    id87: 'ID'
+  }
+  HjRDJhnX: {
+    // field return type name
+    id133: 'ID'
+  }
+  HwkXtjRP: {
+    // field return type name
+    id84: 'ID'
+  }
+  HxCkBUxv: {
+    // field return type name
+    id192: 'ID'
+  }
+  IAOEaBfb: {
+    // field return type name
+    id120: 'ID'
+  }
+  IBZxPcZb: {
+    // field return type name
+    id205: 'ID'
+  }
+  ICrkovFe: {
+    // field return type name
+    id73: 'ID'
+  }
+  IGibGxHO: {
+    // field return type name
+    id204: 'ID'
+  }
+  ISayJMYD: {
+    // field return type name
+    id129: 'ID'
+  }
+  IWhegzTM: {
+    // field return type name
+    id43: 'ID'
+  }
+  IZERvBgk: {
+    // field return type name
+    id32: 'ID'
+  }
+  IhSGxaNc: {
+    // field return type name
+    id103: 'ID'
+  }
+  IhtaZNUi: {
+    // field return type name
+    id238: 'ID'
+  }
+  IqZAiUKE: {
+    // field return type name
+    id223: 'ID'
+  }
+  IuVQPFJN: {
+    // field return type name
+    id152: 'ID'
+  }
+  Iypygftg: {
+    // field return type name
+    id77: 'ID'
+  }
+  JXAbemqC: {
+    // field return type name
+    id153: 'ID'
+  }
+  JZMQpjQv: {
+    // field return type name
+    id125: 'ID'
+  }
+  JbsCxxcE: {
+    // field return type name
+    id8: 'ID'
+  }
+  JjkgZKrV: {
+    // field return type name
+    id202: 'ID'
+  }
+  JsAPYbRs: {
+    // field return type name
+    id156: 'ID'
+  }
+  JuaucwDY: {
+    // field return type name
+    id134: 'ID'
+  }
+  KGbJMfhO: {
+    // field return type name
+    id159: 'ID'
+  }
+  KVIgujkc: {
+    // field return type name
+    id157: 'ID'
+  }
+  KbTYPbTr: {
+    // field return type name
+    id92: 'ID'
+  }
+  KoKtAqbt: {
+    // field return type name
+    id213: 'ID'
+  }
+  KsPfaUFr: {
+    // field return type name
+    id86: 'ID'
+  }
+  KvHHVcPa: {
+    // field return type name
+    id147: 'ID'
+  }
+  LBePcCkW: {
+    // field return type name
+    id112: 'ID'
+  }
+  LHxWkxKq: {
+    // field return type name
+    id64: 'ID'
+  }
+  LMnZbpCI: {
+    // field return type name
+    id106: 'ID'
+  }
+  LtvKCzwe: {
+    // field return type name
+    id19: 'ID'
+  }
+  MPQLFUho: {
+    // field return type name
+    id31: 'ID'
+  }
+  MvpRfuhb: {
+    // field return type name
+    id198: 'ID'
+  }
+  NETQHyFQ: {
+    // field return type name
+    id55: 'ID'
+  }
+  NbTtwcUU: {
+    // field return type name
+    id0: 'ID'
+  }
+  NczZcGdE: {
+    // field return type name
+    id209: 'ID'
+  }
+  NefQmhqG: {
+    // field return type name
+    id149: 'ID'
+  }
+  NlMnyCgu: {
+    // field return type name
+    id162: 'ID'
+  }
+  NrrBYDim: {
+    // field return type name
+    id163: 'ID'
+  }
+  NwPaWUGr: {
+    // field return type name
+    id292: 'ID'
+  }
+  OBnGIgyZ: {
+    // field return type name
+    id242: 'ID'
+  }
+  OZfGULVa: {
+    // field return type name
+    id195: 'ID'
+  }
+  OehdOjXt: {
+    // field return type name
+    id278: 'ID'
+  }
+  OfyEZrPd: {
+    // field return type name
+    id21: 'ID'
+  }
+  OjwpvBGH: {
+    // field return type name
+    id227: 'ID'
+  }
+  OwZeKGSU: {
+    // field return type name
+    id128: 'ID'
+  }
+  PBGQfXYx: {
+    // field return type name
+    id83: 'ID'
+  }
+  PGcwRfdb: {
+    // field return type name
+    id62: 'ID'
+  }
+  PHltFHbS: {
+    // field return type name
+    id226: 'ID'
+  }
+  PNeiVzWR: {
+    // field return type name
+    id113: 'ID'
+  }
+  PNgZWWwo: {
+    // field return type name
+    id148: 'ID'
+  }
+  PTtcHGFZ: {
+    // field return type name
+    id114: 'ID'
+  }
+  PVCfSccj: {
+    // field return type name
+    id224: 'ID'
+  }
+  PWOXDRzE: {
+    // field return type name
+    id56: 'ID'
+  }
+  PYCDIQQc: {
+    // field return type name
+    id24: 'ID'
+  }
+  PpTuFbFz: {
+    // field return type name
+    id6: 'ID'
+  }
+  PwzFJfRE: {
+    // field return type name
+    id90: 'ID'
+  }
+  QKdnhgbW: {
+    // field return type name
+    id3: 'ID'
+  }
+  QMkOOMdT: {
+    // field return type name
+    id122: 'ID'
+  }
+  QXSXwpMN: {
+    // field return type name
+    id211: 'ID'
+  }
+  QelISHAj: {
+    // field return type name
+    id58: 'ID'
+  }
+  QmPQoOZh: {
+    // field return type name
+    id220: 'ID'
+  }
+  Query: {
+    // field return type name
+    ok: 'Boolean'
+  }
+  QxHzTNGy: {
+    // field return type name
+    id265: 'ID'
+  }
+  RCZmHSOp: {
+    // field return type name
+    id10: 'ID'
+  }
+  RMBiaCdu: {
+    // field return type name
+    id75: 'ID'
+  }
+  RNSfiIOi: {
+    // field return type name
+    id61: 'ID'
+  }
+  RTcWEgoC: {
+    // field return type name
+    id44: 'ID'
+  }
+  RVbkKVjJ: {
+    // field return type name
+    id231: 'ID'
+  }
+  RydRYmBj: {
+    // field return type name
+    id255: 'ID'
+  }
+  SBNNVkRr: {
+    // field return type name
+    id257: 'ID'
+  }
+  ShqdAPLQ: {
+    // field return type name
+    id297: 'ID'
+  }
+  SsKBGyvg: {
+    // field return type name
+    id50: 'ID'
+  }
+  Stydvxig: {
+    // field return type name
+    id245: 'ID'
+  }
+  TDURJGny: {
+    // field return type name
+    id2: 'ID'
+  }
+  TDztrYLm: {
+    // field return type name
+    id20: 'ID'
+  }
+  TKzetlpb: {
+    // field return type name
+    id171: 'ID'
+  }
+  TWLZYGzk: {
+    // field return type name
+    id59: 'ID'
+  }
+  TZHgNTAO: {
+    // field return type name
+    id215: 'ID'
+  }
+  TbgzaUgu: {
+    // field return type name
+    id123: 'ID'
+  }
+  TeZWMTzw: {
+    // field return type name
+    id175: 'ID'
+  }
+  TppFHtyg: {
+    // field return type name
+    id82: 'ID'
+  }
+  UGJqdGDT: {
+    // field return type name
+    id54: 'ID'
+  }
+  UuNFAnQg: {
+    // field return type name
+    id263: 'ID'
+  }
+  VAvPoGEb: {
+    // field return type name
+    id217: 'ID'
+  }
+  VynhbqCL: {
+    // field return type name
+    id26: 'ID'
+  }
+  WMsrUAGp: {
+    // field return type name
+    id181: 'ID'
+  }
+  WaVLDFqC: {
+    // field return type name
+    id136: 'ID'
+  }
+  WhUVndTD: {
+    // field return type name
+    id145: 'ID'
+  }
+  WoCNZkWp: {
+    // field return type name
+    id144: 'ID'
+  }
+  WsNuPHEi: {
+    // field return type name
+    id225: 'ID'
+  }
+  WsneBHrs: {
+    // field return type name
+    id101: 'ID'
+  }
+  WurxotQy: {
+    // field return type name
+    id72: 'ID'
+  }
+  XFYbFCkA: {
+    // field return type name
+    id69: 'ID'
+  }
+  XHvdKJbC: {
+    // field return type name
+    id285: 'ID'
+  }
+  XdzKjpVP: {
+    // field return type name
+    id4: 'ID'
+  }
+  Xqkpjqni: {
+    // field return type name
+    id15: 'ID'
+  }
+  XvyULguR: {
+    // field return type name
+    id104: 'ID'
+  }
+  XwweqpQZ: {
+    // field return type name
+    id275: 'ID'
+  }
+  YBZmfmWn: {
+    // field return type name
+    id88: 'ID'
+  }
+  YNnosqXJ: {
+    // field return type name
+    id244: 'ID'
+  }
+  YZpErVkH: {
+    // field return type name
+    id264: 'ID'
+  }
+  YwFARARB: {
+    // field return type name
+    id216: 'ID'
+  }
+  YxNVEAVR: {
+    // field return type name
+    id221: 'ID'
+  }
+  ZElcDXRS: {
+    // field return type name
+    id165: 'ID'
+  }
+  ZEyINaeG: {
+    // field return type name
+    id85: 'ID'
+  }
+  ZVaYkAdb: {
+    // field return type name
+    id279: 'ID'
+  }
+  ZbrxBPat: {
+    // field return type name
+    id232: 'ID'
+  }
+  ZeyczKBv: {
+    // field return type name
+    id12: 'ID'
+  }
+  ZrPlFevQ: {
+    // field return type name
+    id248: 'ID'
+  }
+  ZzRSmAyf: {
+    // field return type name
+    id161: 'ID'
+  }
+  aEOOAAKG: {
+    // field return type name
+    id166: 'ID'
+  }
+  aKYfIihK: {
+    // field return type name
+    id212: 'ID'
+  }
+  ahctkrlN: {
+    // field return type name
+    id222: 'ID'
+  }
+  arOfyZvi: {
+    // field return type name
+    id194: 'ID'
+  }
+  awDoUlrM: {
+    // field return type name
+    id119: 'ID'
+  }
+  bGRbQdGF: {
+    // field return type name
+    id143: 'ID'
+  }
+  bLcHZPpX: {
+    // field return type name
+    id230: 'ID'
+  }
+  bNaHPVhI: {
+    // field return type name
+    id234: 'ID'
+  }
+  bdmjhrZP: {
+    // field return type name
+    id36: 'ID'
+  }
+  bndWrLAg: {
+    // field return type name
+    id180: 'ID'
+  }
+  bpcReAKs: {
+    // field return type name
+    id48: 'ID'
+  }
+  bsuhpkhX: {
+    // field return type name
+    id67: 'ID'
+  }
+  cEORMlXC: {
+    // field return type name
+    id169: 'ID'
+  }
+  cGxDWUGD: {
+    // field return type name
+    id247: 'ID'
+  }
+  cMxjKIfV: {
+    // field return type name
+    id132: 'ID'
+  }
+  cXAmxvqv: {
+    // field return type name
+    id81: 'ID'
+  }
+  ctfzshTJ: {
+    // field return type name
+    id197: 'ID'
+  }
+  dAmPEeQn: {
+    // field return type name
+    id98: 'ID'
+  }
+  dHKrfYNo: {
+    // field return type name
+    id29: 'ID'
+  }
+  dOWdqEud: {
+    // field return type name
+    id66: 'ID'
+  }
+  dbFplbat: {
+    // field return type name
+    id184: 'ID'
+  }
+  deqJYjdv: {
+    // field return type name
+    id107: 'ID'
+  }
+  dnjGpfIS: {
+    // field return type name
+    id118: 'ID'
+  }
+  dnutiEie: {
+    // field return type name
+    id60: 'ID'
+  }
+  eJSSQaaC: {
+    // field return type name
+    id140: 'ID'
+  }
+  eROeesVg: {
+    // field return type name
+    id38: 'ID'
+  }
+  eWlLfMzi: {
+    // field return type name
+    id270: 'ID'
+  }
+  eemljdwg: {
+    // field return type name
+    id1: 'ID'
+  }
+  eggnlUYr: {
+    // field return type name
+    id109: 'ID'
+  }
+  euCWAGET: {
+    // field return type name
+    id158: 'ID'
+  }
+  fDAloqko: {
+    // field return type name
+    id16: 'ID'
+  }
+  fFyvwcxZ: {
+    // field return type name
+    id274: 'ID'
+  }
+  fPXYtcbT: {
+    // field return type name
+    id276: 'ID'
+  }
+  fXnweaVk: {
+    // field return type name
+    id52: 'ID'
+  }
+  faKaQEBn: {
+    // field return type name
+    id284: 'ID'
+  }
+  fvXQFkRb: {
+    // field return type name
+    id115: 'ID'
+  }
+  gQDQWruj: {
+    // field return type name
+    id22: 'ID'
+  }
+  gfyuMPLk: {
+    // field return type name
+    id189: 'ID'
+  }
+  gqhvwsiF: {
+    // field return type name
+    id23: 'ID'
+  }
+  gvxFkejN: {
+    // field return type name
+    id290: 'ID'
+  }
+  hAfKmdaD: {
+    // field return type name
+    id168: 'ID'
+  }
+  hBCadJbD: {
+    // field return type name
+    id138: 'ID'
+  }
+  hDsbddpo: {
+    // field return type name
+    id237: 'ID'
+  }
+  hEyyqHvv: {
+    // field return type name
+    id252: 'ID'
+  }
+  hIjYlIps: {
+    // field return type name
+    id210: 'ID'
+  }
+  hLptFSis: {
+    // field return type name
+    id91: 'ID'
+  }
+  hOqSbuBE: {
+    // field return type name
+    id27: 'ID'
+  }
+  hQiYNmDV: {
+    // field return type name
+    id127: 'ID'
+  }
+  hTNuohNQ: {
+    // field return type name
+    id271: 'ID'
+  }
+  hgsVEiUk: {
+    // field return type name
+    id240: 'ID'
+  }
+  hqweSGgf: {
+    // field return type name
+    id65: 'ID'
+  }
+  iVjcPoMw: {
+    // field return type name
+    id100: 'ID'
+  }
+  iWpPsvNV: {
+    // field return type name
+    id259: 'ID'
+  }
+  iZJAoMWm: {
+    // field return type name
+    id141: 'ID'
+  }
+  iqXgPwiC: {
+    // field return type name
+    id293: 'ID'
+  }
+  ixwjWVvf: {
+    // field return type name
+    id97: 'ID'
+  }
+  jAUaKDuu: {
+    // field return type name
+    id260: 'ID'
+  }
+  jCnSiJOq: {
+    // field return type name
+    id188: 'ID'
+  }
+  jciWswYD: {
+    // field return type name
+    id208: 'ID'
+  }
+  jkcwiNhe: {
+    // field return type name
+    id74: 'ID'
+  }
+  jmnxoYAy: {
+    // field return type name
+    id287: 'ID'
+  }
+  jnFMLyxL: {
+    // field return type name
+    id277: 'ID'
+  }
+  jrmLpsfT: {
+    // field return type name
+    id201: 'ID'
+  }
+  kAFbqgpE: {
+    // field return type name
+    id102: 'ID'
+  }
+  kAqRlGFR: {
+    // field return type name
+    id299: 'ID'
+  }
+  kEhnOaCH: {
+    // field return type name
+    id111: 'ID'
+  }
+  kHLLmfcE: {
+    // field return type name
+    id164: 'ID'
+  }
+  kKQNulhi: {
+    // field return type name
+    id5: 'ID'
+  }
+  kQUqAggO: {
+    // field return type name
+    id17: 'ID'
+  }
+  kXMItaoE: {
+    // field return type name
+    id154: 'ID'
+  }
+  kkQiMyOg: {
+    // field return type name
+    id33: 'ID'
+  }
+  klkPkaYU: {
+    // field return type name
+    id272: 'ID'
+  }
+  lFbOnWGE: {
+    // field return type name
+    id280: 'ID'
+  }
+  lPtHeBuR: {
+    // field return type name
+    id160: 'ID'
+  }
+  lVumUBIa: {
+    // field return type name
+    id174: 'ID'
+  }
+  laqqtHJN: {
+    // field return type name
+    id206: 'ID'
+  }
+  ldqzvWyd: {
+    // field return type name
+    id235: 'ID'
+  }
+  lhdysNNV: {
+    // field return type name
+    id71: 'ID'
+  }
+  lifwEmKz: {
+    // field return type name
+    id246: 'ID'
+  }
+  lsDifAmH: {
+    // field return type name
+    id298: 'ID'
+  }
+  mFSUfTPi: {
+    // field return type name
+    id116: 'ID'
+  }
+  mKbKQhyO: {
+    // field return type name
+    id167: 'ID'
+  }
+  mQIYoGzu: {
+    // field return type name
+    id28: 'ID'
+  }
+  mZmlDoBs: {
+    // field return type name
+    id273: 'ID'
+  }
+  mooFGlVS: {
+    // field return type name
+    id14: 'ID'
+  }
+  mtikMWMb: {
+    // field return type name
+    id261: 'ID'
+  }
+  muuoinyp: {
+    // field return type name
+    id70: 'ID'
+  }
+  newdlmuf: {
+    // field return type name
+    id39: 'ID'
+  }
+  oLLKSNvK: {
+    // field return type name
+    id176: 'ID'
+  }
+  ogOIrhgb: {
+    // field return type name
+    id47: 'ID'
+  }
+  phBMkPER: {
+    // field return type name
+    id236: 'ID'
+  }
+  pnfpWCgc: {
+    // field return type name
+    id99: 'ID'
+  }
+  ptQOpnjR: {
+    // field return type name
+    id190: 'ID'
+  }
+  qBIjdcrW: {
+    // field return type name
+    id142: 'ID'
+  }
+  qCzvlwRD: {
+    // field return type name
+    id80: 'ID'
+  }
+  qXlhbRwq: {
+    // field return type name
+    id78: 'ID'
+  }
+  rDLkvRXw: {
+    // field return type name
+    id296: 'ID'
+  }
+  rKZaCTrp: {
+    // field return type name
+    id89: 'ID'
+  }
+  rsrjXXbp: {
+    // field return type name
+    id267: 'ID'
+  }
+  sOPJOCHV: {
+    // field return type name
+    id108: 'ID'
+  }
+  sYmZSZhS: {
+    // field return type name
+    id45: 'ID'
+  }
+  tBRvILTt: {
+    // field return type name
+    id177: 'ID'
+  }
+  tHuINsQQ: {
+    // field return type name
+    id117: 'ID'
+  }
+  tWYLhGmP: {
+    // field return type name
+    id253: 'ID'
+  }
+  tfdcstkI: {
+    // field return type name
+    id262: 'ID'
+  }
+  tgBSTWuP: {
+    // field return type name
+    id40: 'ID'
+  }
+  tndtDdZP: {
+    // field return type name
+    id18: 'ID'
+  }
+  uaVbWYYy: {
+    // field return type name
+    id94: 'ID'
+  }
+  ubXmVvgH: {
+    // field return type name
+    id139: 'ID'
+  }
+  unjJMyow: {
+    // field return type name
+    id249: 'ID'
+  }
+  uqAoXisC: {
+    // field return type name
+    id9: 'ID'
+  }
+  uxqOEIwV: {
+    // field return type name
+    id49: 'ID'
+  }
+  vKNwRocJ: {
+    // field return type name
+    id229: 'ID'
+  }
+  vWCRSMfI: {
+    // field return type name
+    id37: 'ID'
+  }
+  vmWUXlxn: {
+    // field return type name
+    id233: 'ID'
+  }
+  vveXjotS: {
+    // field return type name
+    id11: 'ID'
+  }
+  wYUTmKCU: {
+    // field return type name
+    id291: 'ID'
+  }
+  wtjYwstX: {
+    // field return type name
+    id110: 'ID'
+  }
+  wvbxCjzQ: {
+    // field return type name
+    id131: 'ID'
+  }
+  xHmRwgeG: {
+    // field return type name
+    id42: 'ID'
+  }
+  xUqWuwDO: {
+    // field return type name
+    id288: 'ID'
+  }
+  xnxcQfWx: {
+    // field return type name
+    id76: 'ID'
+  }
+  yJNnsHEj: {
+    // field return type name
+    id135: 'ID'
+  }
+  yJubHpPP: {
+    // field return type name
+    id243: 'ID'
+  }
+  yMjEoECr: {
+    // field return type name
+    id196: 'ID'
+  }
+  yNNQUmqa: {
+    // field return type name
+    id150: 'ID'
+  }
+  yNumRBxd: {
+    // field return type name
+    id200: 'ID'
+  }
+  yPDuKVOh: {
+    // field return type name
+    id241: 'ID'
+  }
+  yrGYxJeE: {
+    // field return type name
+    id130: 'ID'
+  }
+  yvlysvTB: {
+    // field return type name
+    id269: 'ID'
+  }
+  zLwooCNa: {
+    // field return type name
+    id179: 'ID'
+  }
+  zUQFahzk: {
+    // field return type name
+    id283: 'ID'
+  }
+  zjnLruIQ: {
+    // field return type name
+    id289: 'ID'
+  }
+  zlPOFwWi: {
+    // field return type name
+    id183: 'ID'
+  }
+  zpZvbHAk: {
+    // field return type name
+    id124: 'ID'
+  }
+  zvGUhtyF: {
+    // field return type name
+    id186: 'ID'
+  }
+}
+
 export interface NexusGenArgTypes {}
 
 export interface NexusGenAbstractResolveReturnTypes {
@@ -3770,6 +4977,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

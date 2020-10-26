@@ -22,8 +22,8 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
-import { decorateType } from './definitions/decorateType'
 import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
+import { decorateType } from './definitions/decorateType'
 import { PluginConfig } from './plugin'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
@@ -420,3 +420,10 @@ export function casesHandled(x: never): never {
  * Is the given type equal to the other given type?
  */
 export type IsEqual<A, B> = A extends B ? (B extends A ? true : false) : false
+
+/**
+ * Quickly log objects
+ */
+export function dump(x: any) {
+  console.log(require('util').inspect(x, { depth: null }))
+}

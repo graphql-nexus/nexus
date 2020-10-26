@@ -13,7 +13,6 @@ import {
 import { dynamicOutputProperty } from '../src/dynamicProperty'
 import { CatListFixture } from './_fixtures'
 
-let spy: jest.SpyInstance
 beforeEach(() => {
   jest.clearAllMocks()
 })

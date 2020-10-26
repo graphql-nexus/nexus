@@ -97,6 +97,40 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Mutation: {
+    // field return type name
+    createUser: 'User'
+  }
+  Post: {
+    // field return type name
+    body: 'String'
+    title: 'String'
+  }
+  Query: {
+    // field return type name
+    foo: 'String'
+    searchPosts: 'Post'
+    user: 'User'
+  }
+  Subscription: {
+    // field return type name
+    someBoolean: 'Boolean'
+    someField: 'Int'
+    someFields: 'Int'
+    someFloat: 'Float'
+    someID: 'ID'
+    someInt: 'Int'
+    someInts: 'Int'
+    someString: 'String'
+  }
+  User: {
+    // field return type name
+    firstName: 'String'
+    lastName: 'String'
+  }
+}
+
 export interface NexusGenArgTypes {
   Mutation: {
     createUser: {
@@ -139,6 +173,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames
