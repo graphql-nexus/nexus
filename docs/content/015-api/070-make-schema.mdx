@@ -76,7 +76,7 @@ makeSchema({
       {
         source: '@packages/types/src/db.ts',
         alias: 'dbt',
-        typeMatch: name => new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, 'g'),
+        typeMatch: (name) => new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, 'g'),
       },
       // We also need to import this source in order to provide it as the `contextType` below.
       {
@@ -96,7 +96,7 @@ makeSchema({
 })
 ```
 
-The [Ghost Example](https://github.com/prisma-labs/nexus/blob/develop/examples/ghost/src/ghost-schema.ts) is the best place to look for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
+The [Ghost Example](https://github.com/graphql-nexus/schema/blob/develop/examples/ghost/src/ghost-schema.ts) is the best place to look for an example of how we're able to capture the types from existing runtime objects or definitions and merge them with our schema.
 
 ## shouldExitAfterGenerateArtifacts
 
@@ -144,7 +144,7 @@ Optional, allows you to override the `printSchema` when outputting the generated
 ```ts
 makeSchema({
   // ...
-  customPrintSchemaFn: schema => {
+  customPrintSchemaFn: (schema) => {
     return printSchema(schema, { commentDescriptions: true })
   },
 })
