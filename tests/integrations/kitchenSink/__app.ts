@@ -10,9 +10,8 @@ import {
   queryType,
   stringArg,
   subscriptionType,
-} from '../../src'
-import { mockStream } from '../_helpers'
-import './_app.typegen'
+} from '../../../src'
+import { mockStream } from '../../__helpers'
 
 export const query = queryType({
   definition(t) {

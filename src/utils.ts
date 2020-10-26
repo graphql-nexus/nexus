@@ -21,7 +21,7 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import path from 'path'
+import * as path from 'path'
 import { decorateType } from './definitions/decorateType'
 import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
 import { PluginConfig } from './plugin'

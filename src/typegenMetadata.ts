@@ -1,5 +1,5 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
-import path from 'path'
+import * as path from 'path'
 import { BuilderConfig, TypegenInfo } from './builder'
 import { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
@@ -92,7 +92,7 @@ export class TypegenMetadata {
       }
       // VSCode reacts to file changes better if a file is first deleted,
       // apparently. See issue motivating this logic here:
-      // https://github.com/prisma-labs/nexus/issues/247.
+      // https://github.com/graphql-nexus/schema/issues/247.
       try {
         await removeFile(filePath)
       } catch (e) {

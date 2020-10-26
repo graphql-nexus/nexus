@@ -1,5 +1,5 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
-import path from 'path'
+import * as path from 'path'
 import { TypegenInfo } from './builder'
 import { TYPEGEN_HEADER } from './lang'
 import { getOwnPackage, log, objValues, relativePathTo } from './utils'

@@ -1,4 +1,4 @@
-import path from 'path'
+import * as path from 'path'
 import type * as Prettier from 'prettier'
 
 export type TypegenFormatFn = (content: string, type: 'types' | 'schema') => string | Promise<string>

@@ -1,6 +1,6 @@
 import * as GQL from 'graphql'
 import { makeSchema, subscriptionField } from '../src/core'
-import { mockStream, subscribe, take } from './_helpers'
+import { mockStream, subscribe, take } from './__helpers'
 
 it('defines a field on the mutation type as shorthand', async () => {
   const schema = makeSchema({
