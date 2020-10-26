@@ -43,7 +43,7 @@ export const NodePlugin = plugin({
       return interfaceType({
         name: 'Node',
         description:
-          'A "Node" is a field with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
+          'A "Node" is an Object with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
         definition(t) {
           t.id('id', {
             nullable: false,
@@ -52,8 +52,9 @@ export const NodePlugin = plugin({
             },
           })
           t.resolveType((t) => {
-            if (t.__typename) {
-              return t.__typename
+            // https://github.com/graphql-nexus/schema/issues/188
+            if ((t as any).__typename) {
+              return (t as any).__typename
             }
             throw new Error('__typename missing for resolving Node')
           })

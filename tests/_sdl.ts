@@ -43,7 +43,7 @@ enum OrderEnum {
 
 input PostFilters {
   order: OrderEnum!
-  search: String
+  search: String = "nexus"
 }
 
 """

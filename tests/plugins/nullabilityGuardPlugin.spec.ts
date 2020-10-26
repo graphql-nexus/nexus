@@ -398,7 +398,7 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('will still fail if it cant handle with a guard', async () => {
-    const { errors = [], data } = await graphql(
+    const { errors = [] } = await graphql(
       defaultSchema,
       `
         {

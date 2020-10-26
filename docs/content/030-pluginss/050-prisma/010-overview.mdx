@@ -11,7 +11,7 @@ npm add -D @prisma/cli
 
 ## Usage
 
-1. Import `nexusSchemaPrisma` from `nexus-plugin-prisma`
+1. Import `nexusPrisma` from `nexus-plugin-prisma`
 1. Create and configure it if needed (usually not)
 1. Pass into `Nexus.makeSchema` `plugins` array
 
@@ -22,13 +22,13 @@ You can find runnable examples in the [repo examples folder](https://github.com/
 **Example**
 
 ```ts
-import { nexusSchemaPrisma } from 'nexus-plugin-prisma/schema'
+import { nexusPrisma } from 'nexus-plugin-prisma'
 import { makeSchema } from '@nexus/schema'
 import * as types from './types'
 
 const schema = makeSchema({
   types,
-  plugins: [nexusSchemaPrisma()],
+  plugins: [nexusPrisma()],
 })
 ```
 
@@ -488,15 +488,16 @@ use(
 #### Using a custom instance of the Prisma Client
 
 ```ts
-import { use } from 'nexus'
-import { prisma } from 'nexus-plugin-prisma'
+import { nexusPrisma } from 'nexus-plugin-prisma'
+import { makeSchema } from '@nexus/schema'
 import { PrismaClient } from 'nexus-plugin-prisma/client'
 
-use(
-  prisma({
-    client: { instance: new PrismaClient() },
-  })
-)
+const schema = makeSchema({
+  types,
+  plugins: [nexusPrisma({
+    client: { instance: new PrismaClient()
+  })],
+})
 ```
 
 ## Recipes

@@ -1060,6 +1060,937 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  ArrayTypeNode: {
+    // field return type name
+    elementType: 'Node'
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  BindingPattern: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  CallSignatureDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ClassDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    members: 'Node'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ComputedPropertyName: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ConditionalTypeNode: {
+    // field return type name
+    checkType: 'Node'
+    end: 'Int'
+    extendsType: 'Node'
+    falseType: 'Node'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    trueType: 'Node'
+    typeName: 'DeclarationName'
+  }
+  ConstructSignatureDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ConstructorDeclaration: {
+    // field return type name
+    asteriskToken: 'Token'
+    end: 'Int'
+    exclamationToken: 'Token'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parameters: 'ParameterDeclaration'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+    typeParameters: 'TypeParameterDeclaration'
+  }
+  ConstructorTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  EnumDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    members: 'Node'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ExportAssignment: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ExportDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  FunctionDeclaration: {
+    // field return type name
+    asteriskToken: 'Token'
+    end: 'Int'
+    exclamationToken: 'Token'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parameters: 'ParameterDeclaration'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+    typeParameters: 'TypeParameterDeclaration'
+  }
+  FunctionTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  GetAccessorDeclaration: {
+    // field return type name
+    asteriskToken: 'Token'
+    end: 'Int'
+    exclamationToken: 'Token'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parameters: 'ParameterDeclaration'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+    typeParameters: 'TypeParameterDeclaration'
+  }
+  Identifier: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    text: 'String'
+    typeName: 'DeclarationName'
+  }
+  ImportDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ImportEqualsDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ImportTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  IndexSignatureDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  IndexedAccessTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  InferTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+    typeParameter: 'Node'
+  }
+  InterfaceDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  IntersectionTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+    types: 'Node'
+  }
+  JSDoc: {
+    // field return type name
+    comment: 'String'
+    tags: 'JSDocTag'
+  }
+  JSDocAugmentsTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocClassTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocEnumTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocNamespaceDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  JSDocReturnTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocTemplateTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocThisTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocTypeTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  JSDocUnknownTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  KeywordTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  LiteralType: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  MappedTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  MethodDeclaration: {
+    // field return type name
+    asteriskToken: 'Token'
+    end: 'Int'
+    exclamationToken: 'Token'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parameters: 'ParameterDeclaration'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+    typeParameters: 'TypeParameterDeclaration'
+  }
+  MissingDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ModuleDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  NamespaceDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  NamespaceExportDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  NumericLiteral: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  OptionalTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  ParameterDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  ParenthesizedType: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  PropertyDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  PropertyLikeDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  PropertySignature: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  QualifiedName: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  Query: {
+    // field return type name
+    parseFile: 'SourceFile'
+  }
+  RestTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+  }
+  SetAccessorDeclaration: {
+    // field return type name
+    asteriskToken: 'Token'
+    end: 'Int'
+    exclamationToken: 'Token'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parameters: 'ParameterDeclaration'
+    parent: 'Node'
+    pos: 'Int'
+    questionToken: 'Token'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+    typeParameters: 'TypeParameterDeclaration'
+  }
+  SourceFile: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    statements: 'Node'
+    typeName: 'DeclarationName'
+  }
+  StringLiteral: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  StringLiteralLike: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  ThisTypeNode: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  Token: {
+    // field return type name
+    kind: 'SyntaxKind'
+  }
+  TupleTypeNode: {
+    // field return type name
+    elementTypes: 'Node'
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  TypeAliasDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    jsDoc: 'JSDoc'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    type: 'Node'
+    typeName: 'DeclarationName'
+    typeParameters: 'TypeParameterDeclaration'
+  }
+  TypeLiteral: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  TypeParameterDeclaration: {
+    // field return type name
+    constraint: 'Node'
+    default: 'Node'
+    end: 'Int'
+    expression: 'Node'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  TypeReference: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    text: 'String'
+    typeArguments: 'Node'
+    typeName: 'DeclarationName'
+  }
+  UNKNOWN_NODE: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  UnionType: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+    types: 'Node'
+  }
+  UnnamedNode: {
+    // field return type name
+    text: 'String'
+  }
+  VariableDeclaration: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+  HasJSDoc: {
+    // field return type name
+    jsDoc: 'JSDoc'
+  }
+  JSDocTag: {
+    // field return type name
+    comment: 'String'
+    tagName: 'String'
+  }
+  MaybeOptional: {
+    // field return type name
+    questionToken: 'Token'
+  }
+  Node: {
+    // field return type name
+    end: 'Int'
+    flags: 'NodeFlags'
+    kind: 'SyntaxKind'
+    kindCode: 'Int'
+    modifiers: 'Token'
+    name: 'DeclarationName'
+    nameText: 'String'
+    parent: 'Node'
+    pos: 'Int'
+    rawText: 'String'
+    typeName: 'DeclarationName'
+  }
+}
+
 export interface NexusGenArgTypes {
   ArrayTypeNode: {
     modifiers: {
@@ -1938,6 +2869,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

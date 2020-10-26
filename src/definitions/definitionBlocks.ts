@@ -56,28 +56,24 @@ export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   subscribe?: GraphQLFieldResolver<any, any>
 }
 
-/**
- * Ensure type-safety by checking
- */
-export type ScalarOutSpread<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? HasGen3<'argTypes', TypeName, FieldName> extends true
-    ? [ScalarOutConfig<TypeName, FieldName>]
-    : [ScalarOutConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
-  : HasGen3<'argTypes', TypeName, FieldName> extends true
-  ? [ScalarOutConfig<TypeName, FieldName>]
-  : [] | [FieldResolver<TypeName, FieldName>] | [ScalarOutConfig<TypeName, FieldName>]
+// prettier-ignore
+export type ScalarOutSpread<TypeName extends string, FieldName extends string> =
+  NeedsResolver<TypeName, FieldName> extends true
+    ? HasGen3<'argTypes', TypeName, FieldName> extends true
+      ? [ScalarOutConfig<TypeName, FieldName>]
+      : [ScalarOutConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
+    : HasGen3<'argTypes', TypeName, FieldName> extends true
+      ? [ScalarOutConfig<TypeName, FieldName>]
+      : [] | [FieldResolver<TypeName, FieldName>] | [ScalarOutConfig<TypeName, FieldName>]
 
-export type ScalarOutConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? OutputScalarConfig<TypeName, FieldName> & {
-      resolve: FieldResolver<TypeName, FieldName>
-    }
-  : OutputScalarConfig<TypeName, FieldName>
+// prettier-ignore
+export type ScalarOutConfig<TypeName extends string, FieldName extends string> =
+    NeedsResolver<TypeName, FieldName> extends true
+    ? OutputScalarConfig<TypeName, FieldName> &
+      {
+        resolve: FieldResolver<TypeName, FieldName>
+      }
+    : OutputScalarConfig<TypeName, FieldName>
 
 export type FieldOutConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
   TypeName,
@@ -102,9 +98,11 @@ export interface InputDefinitionBuilder {
   warn(msg: string): void
 }
 
+// prettier-ignore
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomOutputMethods<TypeName>,
-    NexusGenCustomOutputProperties<TypeName> {}
+       extends NexusGenCustomOutputMethods<TypeName>,
+               NexusGenCustomOutputProperties<TypeName>
+       {}
 
 /**
  * The output definition block is passed to the "definition"
@@ -150,8 +148,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     // 2. NexusOutputFieldDef is contrained to be be a string
     // 3. so `name` is not compatible
     // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
-    const field: any = { name, ...fieldConfig }
-    this.typeBuilder.addField(this.decorateField(field))
+    this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
   }
 
   protected addScalarField(
