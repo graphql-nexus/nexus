@@ -1,7 +1,7 @@
 /// <reference path="../_setup.ts" />
 import { join } from 'path'
-import * as ts from 'typescript'
 import { core } from '../../src'
+
 const { generateSchema, typegenFormatPrettier } = core
 
 type Settings = {
@@ -16,7 +16,9 @@ type Settings = {
  * - By default looks for an `__app.ts` entrypoint
  * - All entrypoint exports are expected to be Nexus type definitions
  * - Except the optional export name "plugins" which is treated as an array of plugins for makeSchema
- * - The typegen module will be automatically included into the TypeScript build, no need to import it
+ * - Outputs a `__typegen.ts` typegen module
+ * - You must import the typegen module into your entrypoint module
+ * - If you provide a `tsconfig.json` file in the root dir it will be used.
  */
 export const testApp = (settings: Settings) => {
   const name = settings?.name ?? 'app'
@@ -47,12 +49,7 @@ export const testApp = (settings: Settings) => {
   })
 
   it(`can compile ${name} app with its typegen`, async () => {
-    expect([entrypointModulePath, typegenModulePath]).toTypeCheck({
-      downlevelIteration: true,
-      noEmitOnError: true,
-      strict: true,
-      target: ts.ScriptTarget.ES5,
-      noErrorTruncation: false,
+    expect({ rootDir }).toTypeCheck({
       outDir: `/tmp/nexus-integration-test-${Date.now()}`,
     })
   })

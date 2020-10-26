@@ -1,3 +1,4 @@
+import './__typegen'
 import { objectType, unionType } from '../../../src'
 
 export const typeNames = [

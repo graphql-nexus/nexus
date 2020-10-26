@@ -1,3 +1,4 @@
+import './__typegen'
 import {
   dynamicInputMethod,
   dynamicOutputMethod,
