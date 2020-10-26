@@ -88,7 +88,7 @@ describe('typegenPrinter', () => {
   })
 
   it('should print a return type map', () => {
-    expect(typegen.printReturnTypeMap()).toMatchSnapshot()
+    expect(typegen.printFieldTypesMap()).toMatchSnapshot()
   })
 
   it('should print the full output', () => {
