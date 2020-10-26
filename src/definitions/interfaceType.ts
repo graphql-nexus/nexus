@@ -1,7 +1,9 @@
 import { assertValidName } from 'graphql'
-import { AbstractTypeResolver } from '../typegenTypeHelpers'
-import { AbstractOutputDefinitionBuilder, OutputDefinitionBlock } from './definitionBlocks'
+import { AbstractTypeResolver, GetGen } from '../typegenTypeHelpers'
+import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
+
+export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
 export type NexusInterfaceTypeConfig<TypeName extends string> = {
   name: TypeName
@@ -31,8 +33,13 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
   rootTyping?: RootTypingDef
 }
 
+export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
+  setResolveType(fn: AbstractTypeResolver<TypeName>): void
+  addInterfaces(toAdd: Implemented[]): void
+}
+
 export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
-  constructor(protected typeBuilder: AbstractOutputDefinitionBuilder<TypeName>) {
+  constructor(protected typeBuilder: InterfaceDefinitionBuilder<TypeName>) {
     super(typeBuilder)
   }
   /**
@@ -40,6 +47,12 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
    */
   resolveType(fn: AbstractTypeResolver<TypeName>) {
     this.typeBuilder.setResolveType(fn)
+  }
+  /**
+   * @param interfaceName
+   */
+  implements(...interfaceName: Array<Implemented>) {
+    this.typeBuilder.addInterfaces(interfaceName)
   }
 }
 

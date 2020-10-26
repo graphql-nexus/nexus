@@ -11,6 +11,23 @@ Object {
 }
 `;
 
+exports[`interfaceType can extend other interfaces 1`] = `
+Object {
+  "data": Object {
+    "dog": Object {
+      "breed": "Puli",
+      "classification": "Canis familiaris",
+      "owner": "Mark",
+      "type": "Animal",
+    },
+  },
+}
+`;
+
+exports[`interfaceType can not implement itself 1`] = `"GraphQL Nexus: Interface Node can't implement itself"`;
+
+exports[`interfaceType detects circular dependencies 1`] = `"GraphQL Nexus: Interface circular dependency detected NodeA -> NodeC -> NodeB -> NodeA"`;
+
 exports[`interfaceType logs error when resolveType is not provided for an interface 1`] = `
 Array [
   [Error: Missing resolveType for the Node interface. Be sure to add one in the definition block for the type, or t.resolveType(() => null) if you don't want or need to implement.],

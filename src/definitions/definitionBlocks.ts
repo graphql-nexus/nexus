@@ -1,13 +1,5 @@
 import { GraphQLFieldResolver } from 'graphql'
-import {
-  AbstractTypeResolver,
-  AllInputTypes,
-  FieldResolver,
-  GetGen,
-  GetGen3,
-  HasGen3,
-  NeedsResolver,
-} from '../typegenTypeHelpers'
+import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
 import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
 import { BaseScalars } from './_types'
@@ -284,8 +276,4 @@ export class InputDefinitionBlock<TypeName extends string> {
     }
     return config
   }
-}
-
-export interface AbstractOutputDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
-  setResolveType(fn: AbstractTypeResolver<TypeName>): void
 }

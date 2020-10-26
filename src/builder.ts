@@ -52,16 +52,12 @@ import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitio
 import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import {
+  Implemented,
   InterfaceDefinitionBlock,
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
 } from './definitions/interfaceType'
-import {
-  Implemented,
-  NexusObjectTypeConfig,
-  NexusObjectTypeDef,
-  ObjectDefinitionBlock,
-} from './definitions/objectType'
+import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
@@ -701,6 +697,51 @@ export class SchemaBuilder {
     })
   }
 
+  checkForInterfaceCircularDependencies() {
+    const interfaces: Record<string, NexusInterfaceTypeConfig<any>> = {}
+    Object.keys(this.pendingTypeMap)
+      .map((key) => this.pendingTypeMap[key])
+      .filter(isNexusInterfaceTypeDef)
+      .forEach((type) => {
+        interfaces[type.name] = type.value
+      })
+    const alreadyChecked: Record<string, boolean> = {}
+    function walkType(obj: NexusInterfaceTypeConfig<any>, path: string[], visited: Record<string, boolean>) {
+      if (alreadyChecked[obj.name]) {
+        return
+      }
+      if (visited[obj.name]) {
+        if (obj.name === path[path.length - 1]) {
+          throw new Error(`GraphQL Nexus: Interface ${obj.name} can't implement itself`)
+        } else {
+          throw new Error(
+            `GraphQL Nexus: Interface circular dependency detected ${[
+              ...path.slice(path.lastIndexOf(obj.name)),
+              obj.name,
+            ].join(' -> ')}`
+          )
+        }
+      }
+      const definitionBlock = new InterfaceDefinitionBlock({
+        typeName: obj.name,
+        addInterfaces: (i) =>
+          i.forEach((config) => {
+            const name = typeof config === 'string' ? config : config.value.name
+            walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
+          }),
+        setResolveType: () => {},
+        addField: () => {},
+        addDynamicOutputMembers: () => {},
+        warn: () => {},
+      })
+      obj.definition(definitionBlock)
+      alreadyChecked[obj.name] = true
+    }
+    Object.keys(interfaces).forEach((name) => {
+      walkType(interfaces[name], [], {})
+    })
+  }
+
   buildNexusTypes() {
     // If Query isn't defined, set it to null so it falls through to "missingType"
     if (!this.pendingTypeMap.Query) {
@@ -758,6 +799,7 @@ export class SchemaBuilder {
     this.createSchemaExtension()
     this.walkTypes()
     this.beforeBuildTypes()
+    this.checkForInterfaceCircularDependencies()
     this.buildNexusTypes()
     return {
       finalConfig: this.config,
@@ -824,19 +866,9 @@ export class SchemaBuilder {
     }
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
-      interfaces: () => interfaces.map((i) => this.getInterface(i)),
+      interfaces: () => this.buildInterfaceList(interfaces),
       description: config.description,
-      fields: () => {
-        const allInterfaces = interfaces.map((i) => this.getInterface(i))
-        const interfaceConfigs = allInterfaces.map((i) => i.toConfig())
-        const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {}
-        interfaceConfigs.forEach((i) => {
-          Object.keys(i.fields).forEach((iFieldName) => {
-            interfaceFieldsMap[iFieldName] = i.fields[iFieldName]
-          })
-        })
-        return this.buildOutputFields(fields, objectTypeConfig, interfaceFieldsMap)
-      },
+      fields: () => this.buildOutputFields(fields, objectTypeConfig, this.buildInterfaceFields(interfaces)),
       extensions: {
         nexus: new NexusObjectTypeExtension(config),
       },
@@ -848,9 +880,11 @@ export class SchemaBuilder {
     const { name, description } = config
     let resolveType: AbstractTypeResolver<string> | undefined
     const fields: NexusOutputFieldDef[] = []
+    const interfaces: Implemented[] = []
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
       addField: (field) => fields.push(field),
+      addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
       warn: consoleWarn,
@@ -870,9 +904,11 @@ export class SchemaBuilder {
     }
     const interfaceTypeConfig: NexusGraphQLInterfaceTypeConfig = {
       name,
+      interfaces: () => this.buildInterfaceList(interfaces),
       resolveType,
       description,
-      fields: () => this.buildOutputFields(fields, interfaceTypeConfig, {}),
+      fields: () =>
+        this.buildOutputFields(fields, interfaceTypeConfig, this.buildInterfaceFields(interfaces)),
       extensions: {
         nexus: new NexusInterfaceTypeExtension(config),
       },
@@ -1011,6 +1047,26 @@ export class SchemaBuilder {
       throw new Error(`GraphQL Nexus: Union ${unionName} must have at least one member type`)
     }
     return unionMembers
+  }
+
+  protected buildInterfaceList(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
+    const list: GraphQLInterfaceType[] = []
+    interfaces.forEach((i) => {
+      const type = this.getInterface(i)
+      list.push(type, ...type.getInterfaces())
+    })
+    return list
+  }
+
+  protected buildInterfaceFields(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
+    const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {}
+    interfaces.forEach((i) => {
+      const config = this.getInterface(i).toConfig()
+      Object.keys(config.fields).forEach((field) => {
+        interfaceFieldsMap[field] = config.fields[field]
+      })
+    })
+    return interfaceFieldsMap
   }
 
   protected buildOutputFields(
@@ -1380,6 +1436,13 @@ export class SchemaBuilder {
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
+      addInterfaces: (i) => {
+        i.forEach((j) => {
+          if (typeof j !== 'string') {
+            this.addType(j)
+          }
+        })
+      },
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
