@@ -26,7 +26,7 @@ const schema = makeSchema({
     ],
     contextType: 't.Context',
   },
-  prettierConfig: require.resolve('../../../package.json'),
+  prettierConfig: require.resolve('../../../.prettierrc'),
 })
 
 const store = createStore()

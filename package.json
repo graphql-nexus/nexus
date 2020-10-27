@@ -34,7 +34,7 @@
     "clean": "rm -rf dist*",
     "deploy-site": "yarn && yarn build",
     "dev": "tsc -p tsconfig.cjs.json -w",
-    "dev:examples": "yarn -s link-examples && tsc -w",
+    "dev:examples": "yarn -s link-examples && yarn dev",
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && yarn gulp run-examples",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts' 'examples/*/src/**.ts'",
