@@ -246,7 +246,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
       nodes?: never
     }
 ) &
-  Pick<CommonFieldConfig, 'deprecation' | 'description'> &
+  Pick<CommonFieldConfig, 'deprecation' | 'description' | 'nullable'> &
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
 const ForwardPaginateArgs = {

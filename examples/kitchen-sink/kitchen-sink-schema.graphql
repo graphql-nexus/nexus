@@ -166,7 +166,7 @@ type Query {
     Returns the last n elements from the list.
     """
     last: Int
-  ): BooleanConnection @deprecated(reason: "Dont use this, use booleanConnection instead")
+  ): BooleanConnection! @deprecated(reason: "Dont use this, use booleanConnection instead")
   extended: SomeItem
   getNumberOrNull(a: Int!): Int
   guardedConnection(

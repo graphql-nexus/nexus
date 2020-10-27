@@ -201,7 +201,7 @@ export interface NexusGenFieldTypes {
     booleanConnection: NexusGenRootTypes['BooleanConnection'] | null // BooleanConnection
     complexQuery: Array<NexusGenRootTypes['ComplexObject'] | null> | null // [ComplexObject]
     dateAsList: Array<NexusGenScalars['Date'] | null> | null // [Date]
-    deprecatedConnection: NexusGenRootTypes['BooleanConnection'] | null // BooleanConnection
+    deprecatedConnection: NexusGenRootTypes['BooleanConnection'] // BooleanConnection!
     extended: NexusGenRootTypes['SomeItem'] | null // SomeItem
     getNumberOrNull: number | null // Int
     guardedConnection: NexusGenRootTypes['DateConnection'] | null // DateConnection

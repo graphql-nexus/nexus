@@ -43,7 +43,7 @@ const schema = makeSchema({
       },
     }),
   ],
-  prettierConfig: require.resolve('../../../package.json'),
+  prettierConfig: require.resolve('../../../.prettierrc'),
 })
 
 const server = new ApolloServer({

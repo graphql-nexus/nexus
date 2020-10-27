@@ -31,5 +31,5 @@ export const schema = makeSchema({
     ],
     contextType: 'swapi.ContextType',
   },
-  prettierConfig: require.resolve('../../../package.json'),
+  prettierConfig: require.resolve('../../../.prettierrc'),
 })

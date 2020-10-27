@@ -207,6 +207,7 @@ export const Query = objectType({
     t.connectionField('deprecatedConnection', {
       type: 'Boolean',
       deprecation: 'Dont use this, use booleanConnection instead',
+      nullable: false,
       nodes() {
         return [true]
       },
