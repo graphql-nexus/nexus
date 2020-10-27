@@ -1,6 +1,6 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import { FieldOutConfig } from '../definitions/definitionBlocks'
+import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import { AllNexusOutputTypeDefs } from '../definitions/wrapping'
 import { dynamicOutputMethod } from '../dynamicMethod'
@@ -246,6 +246,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
       nodes?: never
     }
 ) &
+  Pick<CommonFieldConfig, 'deprecation' | 'description'> &
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
 const ForwardPaginateArgs = {

@@ -204,6 +204,14 @@ export const Query = objectType({
       },
     })
 
+    t.connectionField('deprecatedConnection', {
+      type: 'Boolean',
+      deprecation: 'Dont use this, use booleanConnection instead',
+      nodes() {
+        return [true]
+      },
+    })
+
     t.connectionField('guardedConnection', {
       type: 'Date',
       disableBackwardPagination: true,
@@ -217,6 +225,7 @@ export const Query = objectType({
 
     t.connectionField('usersConnectionNodes', {
       type: User,
+      description: 'A connection with some user nodes',
       cursorFromNode(node, args, ctx, info, { index, nodes }) {
         if (args.last && !args.before) {
           const totalCount = USERS_DATA.length
