@@ -682,8 +682,8 @@ input M_WhereUniqueInput {
 }
 
 input M_UpdateInput {
-  MFloatF: S_FieldUpdateOperationsInput
-  MIntF: S_FieldUpdateOperationsInput
+  MFloatF: S_FieldUpdateOperationsInput # or Float if atomic operations are disabled
+  MIntF: S_FieldUpdateOperationsInput # or Int if atomic operations are disabled
   MSF: S
   MRF: RM_UpdateManyWithout_M_Input
 }
@@ -1178,8 +1178,8 @@ mutation {
 }
 
 input M_UpdateManyMutationInput {
-  MFloatF: S_FieldUpdateOperationsInput
-  MIntF: S_FieldUpdateOperationsInput
+  MFloatF: S_FieldUpdateOperationsInput # or Float if atomic operations are disabled
+  MIntF: S_FieldUpdateOperationsInput # or Int if atomic operations are disabled
   MSF: S
   MEF: E
   # not possible to batch update relations
@@ -2510,7 +2510,7 @@ TODO
 
 ## S_FieldUpdateOperationsInput
 
-This allows you to update the values of certain fields atomically.
+This allows you to update the values of certain fields atomically. You can disable this behavior by setting `atomicOperations` to `false` in plugin settings.
 
 **Applies to**
 

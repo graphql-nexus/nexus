@@ -74,6 +74,14 @@ type Options = {
     typegen?: string
   }
   computedInputs?: GlobalComputedInputs
+  
+  /**
+   * GraphQL doesn't support union types. The plugin has to apply a flattening heuristic and pick by default the broadest member of the union.
+   * On update and upsert, the broadest member is the atomic operation, which is not ideal in many cases.
+   *
+   * @default true
+   */
+  atomicOperations?: boolean
 }
 ```
 
