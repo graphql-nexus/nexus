@@ -1,3 +1,6 @@
+import * as blocks from './blocks'
+import * as core from './core'
+
 // All of the Public API definitions
 export { makeSchema } from './builder'
 export { arg, booleanArg, floatArg, idArg, intArg, stringArg } from './definitions/args'
@@ -21,7 +24,4 @@ export * from './plugins'
 export { convertSDL } from './sdlConverter'
 export { AllInputTypes, AllOutputTypes, FieldResolver, FieldType } from './typegenTypeHelpers'
 export { groupTypes } from './utils'
-export { core, blocks, ext }
-import * as blocks from './blocks'
-import * as core from './core'
-import * as ext from './dynamicMethods'
+export { blocks, core }

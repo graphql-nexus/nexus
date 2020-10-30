@@ -1,160 +1,43 @@
-import { graphql } from 'graphql'
 import { GraphQLDateTime } from 'graphql-scalars'
 import path from 'path'
 import {
   decorateType,
   dynamicInputMethod,
-  ext,
+  dynamicOutputMethod,
   inputObjectType,
   makeSchema,
   objectType,
-  queryType,
 } from '../src'
 import { dynamicOutputProperty } from '../src/dynamicProperty'
-import { CatListFixture } from './_fixtures'
 
 beforeEach(() => {
   jest.clearAllMocks()
 })
 
 describe('dynamicOutputMethod', () => {
-  const Cat = objectType({
-    name: 'Cat',
-    definition(t) {
-      t.id('id')
-      t.string('name')
-    },
-  })
-
-  test('RelayConnectionFieldMethod example', async () => {
-    const Query = queryType({
-      definition(t) {
-        // @ts-ignore
-        t.relayConnectionField('cats', {
-          type: Cat,
-          pageInfo: () => ({
-            hasNextPage: false,
-            hasPreviousPage: false,
-          }),
-          edges: () => CatListFixture.map((c) => ({ cursor: `Cursor: ${c.id}`, node: c })),
-        })
-      },
-    })
-    const schema = makeSchema({
-      types: [Query, ext.RelayConnectionFieldMethod],
+  it('should provide a method on the output type builder', async () => {
+    makeSchema({
+      types: [
+        dynamicOutputMethod({
+          name: 'foo',
+          typeDefinition: 'String',
+          factory({ typeDef }) {
+            typeDef.field('viaFoo', { type: 'Int' })
+          },
+        }),
+        objectType({
+          name: 'Bar',
+          definition(t) {
+            //@ts-expect-error
+            t.foo()
+          },
+        }),
+      ],
       outputs: {
         typegen: path.join(__dirname, 'test-output.ts'),
         schema: path.join(__dirname, 'schema.graphql'),
       },
       shouldGenerateArtifacts: false,
-    })
-    expect(
-      await graphql(
-        schema,
-        `
-          {
-            cats {
-              edges {
-                node {
-                  id
-                  name
-                }
-              }
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-              }
-            }
-          }
-        `
-      )
-    ).toMatchSnapshot()
-  })
-
-  test('CollectionFieldMethod example', async () => {
-    const dynamicOutputMethod = queryType({
-      definition(t) {
-        // @ts-ignore
-        t.collectionField('cats', {
-          type: Cat,
-          totalCount: () => CatListFixture.length,
-          nodes: () => CatListFixture,
-        })
-      },
-    })
-
-    const schema = makeSchema({
-      types: [dynamicOutputMethod, ext.CollectionFieldMethod],
-      outputs: {
-        typegen: path.join(__dirname, 'test-output'),
-        schema: path.join(__dirname, 'schema.graphql'),
-      },
-      shouldGenerateArtifacts: false,
-    })
-
-    expect(
-      await graphql(
-        schema,
-        `
-          {
-            cats {
-              totalCount
-              nodes {
-                id
-                name
-              }
-            }
-          }
-        `
-      )
-    ).toMatchSnapshot()
-  })
-
-  test('CollectionFieldMethod example with string type ref', () => {
-    makeSchema({
-      types: [
-        queryType({
-          definition(t) {
-            // @ts-ignore
-            t.collectionField('cats', {
-              type: 'Cat',
-              totalCount: () => CatListFixture.length,
-              nodes: () => CatListFixture,
-            })
-          },
-        }),
-        ext.CollectionFieldMethod,
-      ],
-      outputs: false,
-    })
-  })
-
-  test('RelayConnectionFieldMethod example with string type ref', async () => {
-    makeSchema({
-      types: [
-        queryType({
-          definition(t) {
-            // @ts-ignore
-            t.relayConnectionField('cats', {
-              type: 'Cat',
-              nodes(root: any, args: any, ctx: any, info: any) {
-                return CatListFixture
-              },
-              pageInfo: () => ({
-                hasNextPage: false,
-                hasPreviousPage: false,
-              }),
-              edges: () =>
-                CatListFixture.map((c) => ({
-                  cursor: `Cursor: ${c.id}`,
-                  node: c,
-                })),
-            })
-          },
-        }),
-        ext.RelayConnectionFieldMethod,
-      ],
-      outputs: false,
     })
   })
 })
@@ -170,7 +53,7 @@ describe('dynamicInputMethod', () => {
           name: 'SomeInput',
           definition(t) {
             t.id('id')
-            // @ts-ignore
+            //@ts-expect-error
             t.timestamps()
           },
         }),
