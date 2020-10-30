@@ -1,6 +1,13 @@
 import { GraphQLDateTime } from 'graphql-scalars'
 import path from 'path'
-import { decorateType, dynamicInputMethod, inputObjectType, makeSchema, objectType } from '../src'
+import {
+  decorateType,
+  dynamicInputMethod,
+  dynamicOutputMethod,
+  inputObjectType,
+  makeSchema,
+  objectType,
+} from '../src'
 import { dynamicOutputProperty } from '../src/dynamicProperty'
 
 beforeEach(() => {
@@ -8,12 +15,30 @@ beforeEach(() => {
 })
 
 describe('dynamicOutputMethod', () => {
-  const Cat = objectType({
-    name: 'Cat',
-    definition(t) {
-      t.id('id')
-      t.string('name')
-    },
+  it('should provide a method on the output type builder', async () => {
+    makeSchema({
+      types: [
+        dynamicOutputMethod({
+          name: 'foo',
+          typeDefinition: 'String',
+          factory({ typeDef }) {
+            typeDef.field('viaFoo', { type: 'Int' })
+          },
+        }),
+        objectType({
+          name: 'Bar',
+          definition(t) {
+            //@ts-expect-error
+            t.foo()
+          },
+        }),
+      ],
+      outputs: {
+        typegen: path.join(__dirname, 'test-output.ts'),
+        schema: path.join(__dirname, 'schema.graphql'),
+      },
+      shouldGenerateArtifacts: false,
+    })
   })
 })
 
@@ -28,7 +53,7 @@ describe('dynamicInputMethod', () => {
           name: 'SomeInput',
           definition(t) {
             t.id('id')
-            // @ts-ignore
+            //@ts-expect-error
             t.timestamps()
           },
         }),
