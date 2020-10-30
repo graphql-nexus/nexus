@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@nexus/schema@0.17.0-next.2":
-  version "0.17.0-next.2"
-  resolved "https://registry.yarnpkg.com/@nexus/schema/-/schema-0.17.0-next.2.tgz#b85fcb1cd35d4fd65618404f406d0e1e309ffda7"
-  integrity sha512-EMUYhEvo6DkbZSBC/ErlSN59KWDVrZbuBbRY+QbRn2EsOcOhA3Y6g+/SDYEfJwqJzKjiC9AjqOmOqzmBXBNJQA==
+"@nexus/schema@0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@nexus/schema/-/schema-0.17.0.tgz#5b6ec9630a9cd17f64a7ffc999378fa9835df3a9"
+  integrity sha512-X/DdvXGDNw2VMi1F2un7JRY17yFbuxXHM+U4ViejAf9jCkhlasdljK3TLTqA5wSFfriFIx0eWtYHkUeOvIjLkg==
   dependencies:
     iterall "^1.2.2"
     tslib "^1.9.3"
