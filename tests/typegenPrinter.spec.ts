@@ -15,7 +15,7 @@ describe('typegenPrinter', () => {
       },
       shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
-      prettierConfig: path.join(__dirname, '../package.json'),
+      prettierConfig: path.join(__dirname, '../.prettierrc'),
     }) as core.NexusGraphQLSchema
     metadata = new TypegenMetadata({
       outputs: {
