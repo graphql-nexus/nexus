@@ -26,6 +26,19 @@ Object {
 
 exports[`interfaceType can not implement itself 1`] = `"GraphQL Nexus: Interface Node can't implement itself"`;
 
+exports[`interfaceType can resolve interfaces 1`] = `
+Object {
+  "data": Object {
+    "organism": Object {
+      "breed": "Puli",
+      "classification": "Canis familiaris",
+      "owner": "Mark",
+      "type": "Animal",
+    },
+  },
+}
+`;
+
 exports[`interfaceType detects circular dependencies 1`] = `"GraphQL Nexus: Interface circular dependency detected NodeA -> NodeC -> NodeB -> NodeA"`;
 
 exports[`interfaceType logs error when resolveType is not provided for an interface 1`] = `

@@ -176,4 +176,76 @@ describe('interfaceType', () => {
     expect(spy).toBeCalledTimes(1)
     spy.mockRestore()
   })
+  it('can resolve interfaces', async () => {
+    const schema = makeSchema({
+      types: [
+        interfaceType({
+          name: 'LivingOrganism',
+          definition(t) {
+            t.string('type')
+            t.resolveType(() => 'Animal')
+          },
+        }),
+        interfaceType({
+          name: 'Animal',
+          definition(t) {
+            t.implements('LivingOrganism')
+            t.string('classification')
+            t.resolveType(() => 'Pet')
+          },
+        }),
+        interfaceType({
+          name: 'Pet',
+          definition(t) {
+            t.implements('Animal')
+            t.string('owner')
+            t.resolveType((o) => o.__typename)
+          },
+        }),
+        objectType({
+          name: 'Dog',
+          definition(t) {
+            t.implements('Pet')
+            t.string('breed')
+          },
+        }),
+        queryField('organism', {
+          type: 'LivingOrganism',
+          resolve: () => ({
+            __typename: 'Dog',
+            type: 'Animal',
+            classification: 'Canis familiaris',
+            owner: 'Mark',
+            breed: 'Puli',
+          }),
+        }),
+      ],
+      outputs: {
+        schema: path.join(__dirname, 'interfaceTypeTest.graphql'),
+        typegen: false,
+      },
+      shouldGenerateArtifacts: false,
+    })
+    expect(
+      await graphql(
+        schema,
+        `
+          {
+            organism {
+              type
+              ... on Animal {
+                classification
+              }
+              ... on Pet {
+                owner
+              }
+              ... on Dog {
+                breed
+              }
+            }
+          }
+        `
+      )
+    ).toMatchSnapshot()
+  })
 })

@@ -905,7 +905,7 @@ export class SchemaBuilder {
     const interfaceTypeConfig: NexusGraphQLInterfaceTypeConfig = {
       name,
       interfaces: () => this.buildInterfaceList(interfaces),
-      resolveType,
+      resolveType: this.makeInterfaceResolveType(resolveType),
       description,
       fields: () =>
         this.buildOutputFields(fields, interfaceTypeConfig, this.buildInterfaceFields(interfaces)),
@@ -914,6 +914,24 @@ export class SchemaBuilder {
       },
     }
     return this.finalize(new GraphQLInterfaceType(interfaceTypeConfig))
+  }
+
+  /**
+   * When interfaces implement other interfaces, we want to allow users to return `resolveType`
+   * with that interface name, and cascade to that interface's resolveType to determine the concrete type.
+   */
+  makeInterfaceResolveType(resolveType: AbstractTypeResolver<string>): AbstractTypeResolver<string> {
+    return (source, ctx, info, absType) => {
+      const typeName = resolveType(source, ctx, info, absType)
+      if (typeof typeName === 'string') {
+        const type = info.schema.getType(typeName)
+        if (isInterfaceType(type) && type.resolveType) {
+          return type.resolveType(source, ctx, info, absType)
+        }
+        return typeName
+      }
+      return typeName
+    }
   }
 
   buildEnumType(config: EnumTypeConfig<any>) {
