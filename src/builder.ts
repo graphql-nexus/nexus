@@ -1217,15 +1217,22 @@ export class SchemaBuilder {
     isNonNull: boolean
   ): T {
     if (list) {
-      type = this.decorateList(type, list)
+      type = this.decorateList(type, list, isNonNull)
     }
     return (isNonNull ? GraphQLNonNull(type) : type) as T
   }
 
-  protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(type: T, list: true | boolean[]): T {
+  protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(
+    type: T,
+    list: true | boolean[],
+    isNonNull: boolean
+  ): T {
     let finalType = type
     if (!Array.isArray(list)) {
-      return GraphQLList(type) as T
+      if (isNonNull) {
+        finalType = GraphQLNonNull(finalType) as T
+      }
+      return GraphQLList(finalType) as T
     }
     if (Array.isArray(list)) {
       for (let i = 0; i < list.length; i++) {

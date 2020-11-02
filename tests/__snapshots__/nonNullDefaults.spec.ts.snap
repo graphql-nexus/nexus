@@ -3,6 +3,7 @@
 exports[`nonNullDefaults false/false on schema 1`] = `
 "type Query {
   test(test: Int): Boolean
+  stringList: [String]
 }
 "
 `;
@@ -10,6 +11,7 @@ exports[`nonNullDefaults false/false on schema 1`] = `
 exports[`nonNullDefaults false/false on type 1`] = `
 "type Query {
   test(test: Int): Boolean
+  stringList: [String]
 }
 "
 `;
@@ -17,6 +19,7 @@ exports[`nonNullDefaults false/false on type 1`] = `
 exports[`nonNullDefaults true/true on schema 1`] = `
 "type Query {
   test(test: Int!): Boolean!
+  stringList: [String!]!
 }
 "
 `;
@@ -24,6 +27,7 @@ exports[`nonNullDefaults true/true on schema 1`] = `
 exports[`nonNullDefaults true/true on type 1`] = `
 "type Query {
   test(test: Int!): Boolean!
+  stringList: [String!]!
 }
 "
 `;

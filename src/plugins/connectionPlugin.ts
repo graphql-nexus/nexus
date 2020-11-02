@@ -23,6 +23,7 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
+import { NonNullConfig } from '../definitions/_types'
 
 export interface ConnectionPluginConfig {
   /**
@@ -126,6 +127,11 @@ export interface ConnectionPluginConfig {
    * direct dependency at the application level.
    */
   nexusSchemaImportId?: string
+  /**
+   * Configures the default "nonNullDefaults" settings for any connection types
+   * created globally by this config / connection field.
+   */
+  nonNullDefaults?: NonNullConfig
 }
 
 // Extract the node value from the connection for a given field.
@@ -201,6 +207,11 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * so as not to conflict with any non-extended connections.
    */
   extendEdge?: (def: ObjectDefinitionBlock<any>) => void
+  /**
+   * Configures the default "nonNullDefaults" for connection type generated
+   * for this connection
+   */
+  nonNullDefaults?: NonNullConfig
 } & (
   | {
       /**
@@ -401,11 +412,9 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: connectionName as any,
                   definition(t2) {
-                    t2.field('edges', {
+                    t2.list.field('edges', {
                       type: edgeName as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
-                      nullable: true,
-                      list: [false],
                     })
                     t2.field('pageInfo', {
                       type: 'PageInfo' as any,
@@ -430,6 +439,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       fieldConfig.extendConnection(t2)
                     }
                   },
+                  nonNullDefaults: fieldConfig.nonNullDefaults ?? pluginConfig.nonNullDefaults,
                 })
               )
             }
@@ -460,6 +470,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       fieldConfig.extendEdge(t2)
                     }
                   },
+                  nonNullDefaults: fieldConfig.nonNullDefaults ?? pluginConfig.nonNullDefaults,
                 })
               )
             }
