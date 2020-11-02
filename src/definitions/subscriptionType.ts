@@ -1,12 +1,12 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
 import { IsEqual } from '../utils'
+import { BaseScalars } from './_types'
 import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
 import { ObjectDefinitionBuilder, objectType } from './objectType'
 import { AllNexusOutputTypeDefs } from './wrapping'
-import { BaseScalars } from './_types'
 
-export interface SubscribeFieldConfigBase<FieldName extends string, Event = any> {
+export interface SubscriptionTypeConfigBase<FieldName extends string, Event = any> {
   resolve(
     root: Event,
     args: ArgsValue<'Subscription', FieldName>,
@@ -27,11 +27,11 @@ export interface SubscribeFieldConfigBase<FieldName extends string, Event = any>
 // prettier-ignore
 export type FieldShorthandConfig<FieldName extends string> =
     CommonOutputFieldConfig<'Subscription', FieldName>
-  & SubscribeFieldConfigBase<FieldName>
+  & SubscriptionTypeConfigBase<FieldName>
 
 // prettier-ignore
-export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string>
-  extends SubscribeFieldConfigBase<FieldName>,
+export interface SubscriptionTypeConfig<TypeName extends string, FieldName extends string>
+  extends SubscriptionTypeConfigBase<FieldName>,
           CommonOutputFieldConfig<'Subscription', FieldName>
   {
     type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
@@ -71,7 +71,7 @@ export class SubscriptionBuilder {
   }
 
   // prettier-ignore
-  field<FieldName extends string>(name: FieldName, fieldConfig: SubscribeFieldConfig<'Subscription', FieldName>) {
+  field<FieldName extends string>(name: FieldName, fieldConfig: SubscriptionTypeConfig<'Subscription', FieldName>) {
     this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
   }
 

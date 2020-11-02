@@ -1,5 +1,5 @@
 import { extendType } from './extendType'
-import { SubscribeFieldConfig } from './subscriptionType'
+import { SubscriptionTypeConfig } from './subscriptionType'
 
 /**
  * Add one field to the Subscription type
@@ -7,8 +7,8 @@ import { SubscribeFieldConfig } from './subscriptionType'
 export function subscriptionField<FieldName extends string>(
   fieldName: FieldName,
   config:
-    | SubscribeFieldConfig<'Subscription', FieldName>
-    | (() => SubscribeFieldConfig<'Subscription', FieldName>)
+    | SubscriptionTypeConfig<'Subscription', FieldName>
+    | (() => SubscriptionTypeConfig<'Subscription', FieldName>)
 ) {
   return extendType({
     type: 'Subscription',
