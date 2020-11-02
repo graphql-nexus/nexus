@@ -39,6 +39,7 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
+  defaultTypeResolver,
 } from 'graphql'
 import { arg, ArgsRecord, NexusArgConfig, NexusArgDef } from './definitions/args'
 import {
@@ -925,8 +926,9 @@ export class SchemaBuilder {
       const typeName = resolveType(source, ctx, info, absType)
       if (typeof typeName === 'string') {
         const type = info.schema.getType(typeName)
-        if (isInterfaceType(type) && type.resolveType) {
-          return type.resolveType(source, ctx, info, absType)
+        if (isInterfaceType(type)) {
+          let interfaceResolveType = type.resolveType ?? defaultTypeResolver
+          return interfaceResolveType(source, ctx, info, absType)
         }
         return typeName
       }
