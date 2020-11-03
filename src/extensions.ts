@@ -48,10 +48,10 @@ export class NexusInputObjectTypeExtension<TypeName extends string = any> {
  * Container object living on `objectType.extensions.nexus`
  */
 export class NexusObjectTypeExtension<TypeName extends string = any> {
-  readonly config: Omit<NexusObjectTypeConfig<TypeName>, 'definition'>
+  readonly config: Omit<NexusObjectTypeConfig<TypeName>, 'definition' | 'isTypeOf'>
   constructor(config: NexusObjectTypeConfig<TypeName>) {
-    const { definition, ...rest } = config
-    this.config = rest
+    const { definition, isTypeOf, ...rest } = config
+    this.config = rest as any
   }
 }
 
@@ -59,10 +59,10 @@ export class NexusObjectTypeExtension<TypeName extends string = any> {
  * Container object living on `interfaceType.extensions.nexus`
  */
 export class NexusInterfaceTypeExtension<TypeName extends string = any> {
-  readonly config: Omit<NexusInterfaceTypeConfig<TypeName>, 'definition'>
+  readonly config: Omit<NexusInterfaceTypeConfig<TypeName>, 'definition' | 'resolveType'>
   constructor(config: NexusInterfaceTypeConfig<TypeName>) {
-    const { definition, ...rest } = config
-    this.config = rest
+    const { definition, resolveType, ...rest } = config
+    this.config = rest as any
   }
 }
 

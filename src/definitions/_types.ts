@@ -163,3 +163,11 @@ export type NexusGraphQLInterfaceTypeConfig = WithExt<
 export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
   extensions: { nexus: NexusSchemaExtension }
 }
+
+export interface NexusChecks {
+  unions?: {
+    isTypeOf?: boolean
+    resolveType?: boolean
+    backingType?: boolean
+  }
+}

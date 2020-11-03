@@ -97,6 +97,9 @@ export class TypegenPrinter {
       this.printTypeNames('interface', 'NexusGenInterfaceNames'),
       this.printTypeNames('scalar', 'NexusGenScalarNames'),
       this.printTypeNames('union', 'NexusGenUnionNames'),
+      this.printIsTypeOfObjectNames('NexusGenIsTypeOfObjectNames'),
+      this.printResolveTypeUnionInterface('NexusGenResolveTypeImplemented'),
+      this.printChecksConfig('NexusGenChecksConfig'),
       this.printGenTypeMap(),
       this.printPlugins(),
     ].join('\n\n')
@@ -140,6 +143,9 @@ export class TypegenPrinter {
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
         `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
+        `  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames;`,
+        `  resolveTypeImplemented: NexusGenResolveTypeImplemented;`,
+        `  checks: NexusGenChecksConfig;`,
       ])
       .concat('}')
       .join('\n')
@@ -331,6 +337,46 @@ export class TypegenPrinter {
             .sort()
             .join(' | ')
     return `export type ${exportName} = ${typeDef};`
+  }
+
+  printIsTypeOfObjectNames(exportName: string) {
+    const obj = this.groupedTypes.object.filter((o) => o.isTypeOf !== undefined)
+    const typeDef =
+      obj.length === 0
+        ? 'never'
+        : obj
+            .map((o) => JSON.stringify(o.name))
+            .sort()
+            .join(' | ')
+    return `export type ${exportName} = ${typeDef};`
+  }
+
+  printResolveTypeUnionInterface(exportName: string) {
+    const obj = [...this.groupedTypes.interface, ...this.groupedTypes.union].filter(
+      (o) => o.resolveType !== undefined
+    )
+    const typeDef =
+      obj.length === 0
+        ? 'never'
+        : obj
+
+            .map((o) => JSON.stringify(o.name))
+            .sort()
+            .join(' | ')
+    return `export type ${exportName} = ${typeDef};`
+  }
+
+  printChecksConfig(exportName: string) {
+    const unionChecks = this.schema.extensions.nexus.config.checks?.unions ?? {}
+    const unionProps = [
+      '{',
+      mapObj(unionChecks, (val, key) => {
+        return `    ${key}: ${val ?? false}`
+      }).join('\n'),
+      '  }',
+    ].join('\n')
+
+    return [`export type ${exportName} = {`].concat(`  unions: ${unionProps}`).concat('}').join('\n')
   }
 
   buildEnumTypeMap() {

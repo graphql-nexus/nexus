@@ -150,6 +150,9 @@ export type GenTypesShapeKeys =
   | 'allNamedTypes'
   | 'abstractTypes'
   | 'abstractResolveReturn'
+  | 'isTypeOfObjectNames'
+  | 'resolveTypeImplemented'
+  | 'checks'
 
 /**
  * Helpers for handling the generated schema
@@ -232,11 +235,13 @@ export type ArgsValue<TypeName extends string, FieldName extends string> = HasGe
   ? GetGen3<'argTypes', TypeName, FieldName, {}>
   : any
 
-export type ResultValue<TypeName extends string, FieldName extends string> = GetGen3<
-  'fieldTypes',
-  TypeName,
-  FieldName
->
+export type ResultValue<
+  TypeName extends string,
+  FieldName extends string,
+  ReturnTypeName extends string = FieldTypeName<TypeName, FieldName>
+> = ShouldEnableTypeNameIdentifier<TypeName, FieldName> extends true
+  ? WithTypeNameIdentifier<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
+  : GetGen3<'fieldTypes', TypeName, FieldName>
 
 export type NeedsResolver<TypeName extends string, FieldName extends string> = HasGen3<
   'fieldTypes',
@@ -255,3 +260,127 @@ export type NeedsResolver<TypeName extends string, FieldName extends string> = H
     ? true
     : false
   : false
+
+/**
+ * Borrowed from `type-fest`
+ * Extract the keys from a type where the value type of the key extends the given `Condition`.
+ */
+type ConditionalKeys<Base, Condition> = NonNullable<
+  // Wrap in `NonNullable` to strip away the `undefined` type from the produced union.
+  {
+    // Map through all the keys of the given base type.
+    [Key in keyof Base]: Condition extends Base[Key] // Pick only keys with types extending the given `Condition` type.
+      ? Key // Retain this key since the condition passes.
+      : never // Discard this key since the condition fails.
+
+    // Convert the produced object into a union type of the keys which passed the conditional test.
+  }[keyof Base]
+>
+
+/**
+ * Taken from `type-fest`
+ * Pick keys from the shape that matches the given `Condition`.
+ */
+export type ConditionalPick<Base, Condition> = Pick<Base, ConditionalKeys<Base, Condition>>
+
+/**
+ * Taken from `type-fest`
+ * Get the values of a mapped types
+ */
+export type ValueOf<ObjectType, ValueType extends keyof ObjectType = keyof ObjectType> = ObjectType[ValueType]
+
+export type PossibleTypeNames<TypeName extends string> = ValueOf<
+  ConditionalPick<GetGen<'abstractResolveReturn'>, TypeName>
+>
+export type PossibleTypes<TypeName extends string> = RootValue<PossibleTypeNames<TypeName>>
+
+export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
+  GetGen<'abstractResolveReturn'>,
+  TypeName
+>
+
+export type ResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
+  TypeName
+> extends GetGen<'resolveTypeImplemented'>
+  ? true
+  : false
+
+export type IsTypeOfImplementedInAllChildren<TypeName extends string> = GetGen2<
+  'abstractResolveReturn',
+  TypeName
+> extends GetGen<'isTypeOfObjectNames'>
+  ? true
+  : false
+
+export type IsTypeOfHandler<TypeName extends string> = (
+  source: PossibleTypes<TypeName>,
+  context: GetGen<'context'>,
+  info: GraphQLResolveInfo
+) => MaybePromise<boolean>
+
+export type IsTypeOf<TypeName extends string> = GetGen3<'checks', 'unions', 'isTypeOf'> extends false
+  ? {
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  : ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
+  ? {
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  : { isTypeOf: IsTypeOfHandler<TypeName> }
+
+export type ResolveType<TypeName extends string> = GetGen3<'checks', 'unions', 'resolveType'> extends false
+  ? {
+      /**
+       * Optionally provide a custom type resolver function. If one is not provided,
+       * the default implementation will call `isTypeOf` on each implementing
+       * Object type.
+       */
+      resolveType?: AbstractTypeResolver<TypeName>
+    }
+  : IsTypeOfImplementedInAllChildren<TypeName> extends true
+  ? {
+      /**
+       * Optionally provide a custom type resolver function. If one is not provided,
+       * the default implementation will call `isTypeOf` on each implementing
+       * Object type.
+       */
+      resolveType?: AbstractTypeResolver<TypeName>
+    }
+  : {
+      /**
+       * Optionally provide a custom type resolver function. If one is not provided,
+       * the default implementation will call `isTypeOf` on each implementing
+       * Object type.
+       */
+      resolveType: AbstractTypeResolver<TypeName>
+    }
+
+/**
+ * Represents a POJO. Prevents from allowing arrays and functions
+ */
+export type PlainObject = {
+  [x: string]: null | undefined | string | number | boolean | symbol | bigint | object
+}
+export type ShouldEnableTypeNameIdentifier<
+  TypeName extends string,
+  FieldName extends string,
+  ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
+> = GetGen3<'checks', 'unions', 'backingType'> extends true
+  ? ReturnTypeName extends GetGen<'objectNames'> // If it's an object type
+    ? ReturnTypeName extends GetGen<'isTypeOfObjectNames'> // if it implements isTypeOf already
+      ? false // so don't enable __typename feature false
+      : ResolveTypeImplementedInAllAbstractTypes<ReturnTypeName> extends true // all abstract implement resolve type
+      ? false // so don't enable __typename feature false
+      : true // otherwise enable it true
+    : false // false
+  : false // false
+
+export type WithTypeNameIdentifier<TypeName extends string, O> = O extends Promise<infer A>
+  ? Promise<WithTypeNameIdentifier<TypeName, A>>
+  : O extends Array<infer B>
+  ? Array<WithTypeNameIdentifier<TypeName, B>>
+  : O extends ReadonlyArray<infer C>
+  ? ReadonlyArray<WithTypeNameIdentifier<TypeName, C>>
+  : O extends PlainObject
+  ? O & { __typename: TypeName }
+  : O

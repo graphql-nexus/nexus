@@ -83,6 +83,7 @@ import {
   GraphQLPossibleInputs,
   GraphQLPossibleOutputs,
   MissingType,
+  NexusChecks,
   NexusGraphQLFieldConfig,
   NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
@@ -229,6 +230,7 @@ export interface BuilderConfig {
    * Otherwise, uses `printSchema` from graphql-js
    */
   customPrintSchemaFn?: typeof printSchema
+  checks?: NexusChecks
 }
 
 export type SchemaConfig = BuilderConfig & {
@@ -729,7 +731,6 @@ export class SchemaBuilder {
             const name = typeof config === 'string' ? config : config.value.name
             walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
           }),
-        setResolveType: () => {},
         addField: () => {},
         addDynamicOutputMembers: () => {},
         warn: () => {},
@@ -869,6 +870,7 @@ export class SchemaBuilder {
       interfaces: () => this.buildInterfaceList(interfaces),
       description: config.description,
       fields: () => this.buildOutputFields(fields, objectTypeConfig, this.buildInterfaceFields(interfaces)),
+      isTypeOf: config.isTypeOf as any,
       extensions: {
         nexus: new NexusObjectTypeExtension(config),
       },
@@ -878,14 +880,14 @@ export class SchemaBuilder {
 
   buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config
-    let resolveType: AbstractTypeResolver<string> | undefined
+    let resolveType: AbstractTypeResolver<string> | undefined = config.resolveType
+
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
       addField: (field) => fields.push(field),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
       warn: consoleWarn,
     })
@@ -896,9 +898,9 @@ export class SchemaBuilder {
         e.definition(definitionBlock)
       })
     }
-    if (!resolveType) {
-      resolveType = this.missingResolveType(config.name, 'interface')
-    }
+    // if (!resolveType) {
+    //   resolveType = this.missingResolveType(config.name, 'interface')
+    // }
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -964,16 +966,16 @@ export class SchemaBuilder {
 
   buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined
-    let resolveType: AbstractTypeResolver<string> | undefined
+    let resolveType: AbstractTypeResolver<string> | undefined = config.resolveType
+
     config.definition(
       new UnionDefinitionBlock({
-        setResolveType: (fn) => (resolveType = fn),
         addUnionMembers: (unionMembers) => (members = unionMembers),
       })
     )
-    if (!resolveType) {
-      resolveType = this.missingResolveType(config.name, 'union')
-    }
+    // if (!resolveType) {
+    //   resolveType = this.missingResolveType(config.name, 'union')
+    // }
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -1443,7 +1445,6 @@ export class SchemaBuilder {
           }
         })
       },
-      setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
       warn: () => {},
@@ -1574,6 +1575,26 @@ export function makeSchemaInternal(config: SchemaConfig) {
   return { schema, missingTypes, finalConfig }
 }
 
+function setConfigDefaults(config: SchemaConfig): SchemaConfig {
+  const unionsDefault: NexusChecks['unions'] = {
+    isTypeOf: true,
+    backingType: false,
+    resolveType: false,
+  }
+
+  if (!config.checks) {
+    config.checks = {
+      unions: unionsDefault,
+    }
+  }
+
+  if (!config.checks.unions) {
+    config.checks.unions = unionsDefault
+  }
+
+  return config
+}
+
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
  * by the GraphQL Nexus layer or any manually defined GraphQLType objects.
@@ -1581,7 +1602,8 @@ export function makeSchemaInternal(config: SchemaConfig) {
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
+export function makeSchema(inputConfig: SchemaConfig): NexusGraphQLSchema {
+  const config = setConfigDefaults(inputConfig)
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
