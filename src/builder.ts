@@ -83,7 +83,7 @@ import {
   GraphQLPossibleInputs,
   GraphQLPossibleOutputs,
   MissingType,
-  NexusChecks,
+  NexusFeatures,
   NexusGraphQLFieldConfig,
   NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
@@ -230,7 +230,7 @@ export interface BuilderConfig {
    * Otherwise, uses `printSchema` from graphql-js
    */
   customPrintSchemaFn?: typeof printSchema
-  checks?: NexusChecks
+  features?: NexusFeatures
 }
 
 export type SchemaConfig = BuilderConfig & {
@@ -870,7 +870,7 @@ export class SchemaBuilder {
       interfaces: () => this.buildInterfaceList(interfaces),
       description: config.description,
       fields: () => this.buildOutputFields(fields, objectTypeConfig, this.buildInterfaceFields(interfaces)),
-      isTypeOf: config.isTypeOf as any,
+      isTypeOf: (config as any).isTypeOf,
       extensions: {
         nexus: new NexusObjectTypeExtension(config),
       },
@@ -880,7 +880,7 @@ export class SchemaBuilder {
 
   buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config
-    let resolveType: AbstractTypeResolver<string> | undefined = config.resolveType
+    let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
 
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
@@ -898,9 +898,7 @@ export class SchemaBuilder {
         e.definition(definitionBlock)
       })
     }
-    // if (!resolveType) {
-    //   resolveType = this.missingResolveType(config.name, 'interface')
-    // }
+
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -966,16 +964,14 @@ export class SchemaBuilder {
 
   buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined
-    let resolveType: AbstractTypeResolver<string> | undefined = config.resolveType
+    let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
 
     config.definition(
       new UnionDefinitionBlock({
         addUnionMembers: (unionMembers) => (members = unionMembers),
       })
     )
-    // if (!resolveType) {
-    //   resolveType = this.missingResolveType(config.name, 'union')
-    // }
+
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -1576,20 +1572,20 @@ export function makeSchemaInternal(config: SchemaConfig) {
 }
 
 function setConfigDefaults(config: SchemaConfig): SchemaConfig {
-  const unionsDefault: NexusChecks['unions'] = {
+  const unionsDefault: NexusFeatures['abstractTypes'] = {
     isTypeOf: true,
     backingType: false,
     resolveType: false,
   }
 
-  if (!config.checks) {
-    config.checks = {
-      unions: unionsDefault,
+  if (!config.features) {
+    config.features = {
+      abstractTypes: unionsDefault,
     }
   }
 
-  if (!config.checks.unions) {
-    config.checks.unions = unionsDefault
+  if (!config.features.abstractTypes) {
+    config.features.abstractTypes = unionsDefault
   }
 
   return config
