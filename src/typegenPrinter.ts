@@ -99,7 +99,7 @@ export class TypegenPrinter {
       this.printTypeNames('union', 'NexusGenUnionNames'),
       this.printIsTypeOfObjectNames('NexusGenIsTypeOfObjectNames'),
       this.printResolveTypeUnionInterface('NexusGenResolveTypeImplemented'),
-      this.printChecksConfig('NexusGenChecksConfig'),
+      this.printChecksConfig('NexusGenFeaturesConfig'),
       this.printGenTypeMap(),
       this.printPlugins(),
     ].join('\n\n')
@@ -145,7 +145,7 @@ export class TypegenPrinter {
         `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
         `  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames;`,
         `  resolveTypeImplemented: NexusGenResolveTypeImplemented;`,
-        `  checks: NexusGenChecksConfig;`,
+        `  features: NexusGenFeaturesConfig;`,
       ])
       .concat('}')
       .join('\n')
@@ -367,7 +367,7 @@ export class TypegenPrinter {
   }
 
   printChecksConfig(exportName: string) {
-    const unionChecks = this.schema.extensions.nexus.config.checks?.unions ?? {}
+    const unionChecks = this.schema.extensions.nexus.config.features?.abstractTypes ?? {}
     const unionProps = [
       '{',
       mapObj(unionChecks, (val, key) => {
@@ -376,7 +376,7 @@ export class TypegenPrinter {
       '  }',
     ].join('\n')
 
-    return [`export type ${exportName} = {`].concat(`  unions: ${unionProps}`).concat('}').join('\n')
+    return [`export type ${exportName} = {`].concat(`  abstractTypes: ${unionProps}`).concat('}').join('\n')
   }
 
   buildEnumTypeMap() {

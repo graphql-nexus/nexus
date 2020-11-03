@@ -152,7 +152,7 @@ export type GenTypesShapeKeys =
   | 'abstractResolveReturn'
   | 'isTypeOfObjectNames'
   | 'resolveTypeImplemented'
-  | 'checks'
+  | 'features'
 
 /**
  * Helpers for handling the generated schema
@@ -239,8 +239,8 @@ export type ResultValue<
   TypeName extends string,
   FieldName extends string,
   ReturnTypeName extends string = FieldTypeName<TypeName, FieldName>
-> = ShouldEnableTypeNameIdentifier<TypeName, FieldName> extends true
-  ? WithTypeNameIdentifier<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
+> = ShouldDiscriminateResultValue<TypeName, FieldName> extends true
+  ? Discriminate<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
   : GetGen3<'fieldTypes', TypeName, FieldName>
 
 export type NeedsResolver<TypeName extends string, FieldName extends string> = HasGen3<
@@ -289,55 +289,91 @@ export type ConditionalPick<Base, Condition> = Pick<Base, ConditionalKeys<Base, 
  */
 export type ValueOf<ObjectType, ValueType extends keyof ObjectType = keyof ObjectType> = ObjectType[ValueType]
 
-export type PossibleTypeNames<TypeName extends string> = ValueOf<
-  ConditionalPick<GetGen<'abstractResolveReturn'>, TypeName>
+/**
+ * Returns a union of all the type names of the members of an abstract type
+ *
+ * @example
+ *
+ * union D = A | B | C
+ * PossibleTypeNames<'D> // 'A' | 'B' | 'C'
+ */
+export type PossibleTypeNames<AbstractTypeName extends string> = ValueOf<
+  ConditionalPick<GetGen<'abstractResolveReturn'>, AbstractTypeName>
 >
-export type PossibleTypes<TypeName extends string> = RootValue<PossibleTypeNames<TypeName>>
+/**
+ * Returns a union of all the members of an abstract type
+ *
+ * @example
+ * union D = A | B | C
+ * PossibleTypes<'D> // A | B | C
+ */
+export type PossibleTypes<AbstractTypeName extends string> = RootValue<PossibleTypeNames<AbstractTypeName>>
 
+/**
+ * Returns a union of all the abstract type names where TypeName is used
+ *
+ * @example
+ * union D = A | B
+ * union E = A
+ * AbstractTypeNames<'A'> // 'D' | 'E'
+ */
 export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
   GetGen<'abstractResolveReturn'>,
   TypeName
 >
 
+/**
+ * Returns whether all the abstract type names where TypeName is used have implemented `resolveType`
+ */
 export type ResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
   TypeName
 > extends GetGen<'resolveTypeImplemented'>
   ? true
   : false
 
-export type IsTypeOfImplementedInAllChildren<TypeName extends string> = GetGen2<
+/**
+ * Returns whether all the members of an abstract type have implemented `isTypeOf`
+ */
+export type IsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
   'abstractResolveReturn',
-  TypeName
+  AbstractTypeName
 > extends GetGen<'isTypeOfObjectNames'>
   ? true
   : false
 
 export type IsTypeOfHandler<TypeName extends string> = (
-  source: PossibleTypes<TypeName>,
+  source: PossibleTypes<TypeName>, // typed as never if TypeName is not a member of any abstract type
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
 ) => MaybePromise<boolean>
 
-export type IsTypeOf<TypeName extends string> = GetGen3<'checks', 'unions', 'isTypeOf'> extends false
-  ? {
-      isTypeOf?: IsTypeOfHandler<TypeName>
-    }
-  : ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
-  ? {
-      isTypeOf?: IsTypeOfHandler<TypeName>
-    }
-  : { isTypeOf: IsTypeOfHandler<TypeName> }
+/**
+ * Conditionally returns the `isTypeOf` field
+ */
+export type IsTypeOf<TypeName extends string> = GetGen3<
+  'features',
+  'abstractTypes',
+  'isTypeOf',
+  false
+> extends true
+  ? ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
+    ? {
+        isTypeOf?: IsTypeOfHandler<TypeName>
+      }
+    : { isTypeOf: IsTypeOfHandler<TypeName> }
+  : {}
 
-export type ResolveType<TypeName extends string> = GetGen3<'checks', 'unions', 'resolveType'> extends false
-  ? {
-      /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
-       */
-      resolveType?: AbstractTypeResolver<TypeName>
-    }
-  : IsTypeOfImplementedInAllChildren<TypeName> extends true
+/**
+ * Conditionally returns the `resolveType` field
+ */
+export type ResolveType<TypeName extends string> = GetGen3<
+  'features',
+  'abstractTypes',
+  'resolveType',
+  false
+> extends false
+  ? {} // remove field altogether is feature is not enabled
+  : IsTypeOfImplementedInAllMembers<TypeName> extends true
   ? {
       /**
        * Optionally provide a custom type resolver function. If one is not provided,
@@ -356,31 +392,74 @@ export type ResolveType<TypeName extends string> = GetGen3<'checks', 'unions', '
     }
 
 /**
- * Represents a POJO. Prevents from allowing arrays and functions
+ * Returns whether a field which type is either an 'Object | Interface | Enum' should discriminate its return type with __typename
  */
-export type PlainObject = {
-  [x: string]: null | undefined | string | number | boolean | symbol | bigint | object
-}
-export type ShouldEnableTypeNameIdentifier<
+export type ShouldDiscriminateOutputTypeField<OutputTypeName extends string> = OutputTypeName extends GetGen<
+  'isTypeOfObjectNames'
+> // if it implements isTypeOf already
+  ? false // then don't disable __typename feature
+  : ResolveTypeImplementedInAllAbstractTypes<OutputTypeName> extends true // else if abstract implement resolve type
+  ? false // then disable __typename feature
+  : true // otherwise enable __typename feature
+
+export type ShouldDiscriminateAbstractTypeField<
+  AbstractTypeName extends string
+> = AbstractTypeName extends GetGen<'resolveTypeImplemented'> // if the abstract type has resolve type already
+  ? false // then disable __typename feature
+  : IsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
+  ? false // then disable __typename feature
+  : true // otherwise enable __typename feature
+
+/**
+ * Returns whether a field which type is a union should discriminate its return type with __typename
+ */
+export type ShouldDiscriminateResultValue<
   TypeName extends string,
   FieldName extends string,
   ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
-> = GetGen3<'checks', 'unions', 'backingType'> extends true
-  ? ReturnTypeName extends GetGen<'objectNames'> // If it's an object type
-    ? ReturnTypeName extends GetGen<'isTypeOfObjectNames'> // if it implements isTypeOf already
-      ? false // so don't enable __typename feature false
-      : ResolveTypeImplementedInAllAbstractTypes<ReturnTypeName> extends true // all abstract implement resolve type
-      ? false // so don't enable __typename feature false
-      : true // otherwise enable it true
-    : false // false
-  : false // false
+> = GetGen3<'features', 'abstractTypes', 'backingType', false> extends true // if feature is enabled
+  ? ReturnTypeName extends GetGen<'objectNames'> | GetGen<'interfaceNames'> | GetGen<'enumNames'> // and return type is either an object type || interface || enum
+    ? ShouldDiscriminateOutputTypeField<ReturnTypeName> extends true // call sub function
+      ? true
+      : false
+    : ReturnTypeName extends GetGen<'abstractTypes'> // else if return type is an abstract type
+    ? ShouldDiscriminateAbstractTypeField<ReturnTypeName> extends true // call sub function
+      ? true
+      : false
+    : false
+  : false
 
-export type WithTypeNameIdentifier<TypeName extends string, O> = O extends Promise<infer A>
-  ? Promise<WithTypeNameIdentifier<TypeName, A>>
-  : O extends Array<infer B>
-  ? Array<WithTypeNameIdentifier<TypeName, B>>
-  : O extends ReadonlyArray<infer C>
-  ? ReadonlyArray<WithTypeNameIdentifier<TypeName, C>>
-  : O extends PlainObject
-  ? O & { __typename: TypeName }
-  : O
+/**
+ * Discriminate a type with a __typename: TypeName field
+ */
+type DiscriminateImpl<TypeName extends string, Type> = Type extends Promise<infer A>
+  ? Promise<DiscriminateImpl<TypeName, A>>
+  : Type extends Array<infer B>
+  ? Array<DiscriminateImpl<TypeName, B>>
+  : Type extends ReadonlyArray<infer C>
+  ? ReadonlyArray<DiscriminateImpl<TypeName, C>>
+  : Type extends object
+  ? Type & { __typename: TypeName }
+  : Type
+
+/**
+ * Discriminate a type with a __typename: TypeName field
+ */
+export type Discriminate<TypeName extends string, Type> = TypeName extends
+  | GetGen<'objectNames'>
+  | GetGen<'interfaceNames'>
+  | GetGen<'enumNames'> // if typename is output type
+  ? DiscriminateImpl<TypeName, Type> // inject __typename discriminator
+  : TypeName extends GetGen<'abstractTypes'> // if typename is abstract type (meaning that `Type` can be a union)
+  ?
+      | ValueOf<
+          // rebuild output type as union with __typename discriminator injected in every member of the union/interface
+          {
+            [MemberTypeName in GetGen2<'abstractResolveReturn', TypeName>]: DiscriminateImpl<
+              MemberTypeName,
+              RootValue<MemberTypeName>
+            >
+          }
+        >
+      | Extract<Type, null | undefined> // add back in the nullability if there's any
+  : Type
