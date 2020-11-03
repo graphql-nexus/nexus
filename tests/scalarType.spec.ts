@@ -8,6 +8,7 @@ import {
   objectType,
   queryField,
   resolveTypegenConfig,
+  scalarType,
 } from '../src/core'
 import { TypegenMetadata } from '../src/typegenMetadata'
 
@@ -68,5 +69,24 @@ describe('scalarType', () => {
         `
       )
     ).toMatchSnapshot()
+  })
+
+  it('rootTyping: allows importing a node module for the typing path', async () => {
+    const schema = makeSchemaInternal({
+      types: [
+        scalarType({
+          name: 'TestScalar',
+          rootTyping: {
+            path: 'graphql',
+            name: 'GraphQLScalar',
+          },
+        }),
+      ],
+      outputs: false,
+      shouldExitAfterGenerateArtifacts: false,
+    })
+    const generator = new TypegenMetadata(resolveTypegenConfig(schema.finalConfig))
+    const typegen = await generator.generateTypesFile(schema.schema, 'foo.ts')
+    expect(typegen).toMatch(/import { GraphQLScalar } from \"graphql\"/)
   })
 })
