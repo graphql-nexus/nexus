@@ -64,12 +64,12 @@ export type ScalarOutSpread<TypeName extends string, FieldName extends string> =
 
 // prettier-ignore
 export type ScalarOutConfig<TypeName extends string, FieldName extends string> =
-    NeedsResolver<TypeName, FieldName> extends true
-    ? OutputScalarConfig<TypeName, FieldName> &
-      {
-        resolve: FieldResolver<TypeName, FieldName>
-      }
-    : OutputScalarConfig<TypeName, FieldName>
+  NeedsResolver<TypeName, FieldName> extends true
+    // todo static test for case where resolver needed
+    ? [ScalarOutConfig<TypeName, FieldName>]
+    : HasGen3<'argTypes', TypeName, FieldName> extends true
+      ? [ScalarOutConfig<TypeName, FieldName>]
+      : [] | [ScalarOutConfig<TypeName, FieldName>]
 
 export type FieldOutConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
   TypeName,
