@@ -162,7 +162,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
       this.decorateField({
         name: fieldName,
         type: typeName,
-        ...opts[0],
+        ...(opts[0] as any),
       })
     )
   }

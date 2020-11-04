@@ -640,7 +640,7 @@ describe('field level configuration', () => {
       {},
       {
         extendConnection(t) {
-          t.int('totalCount', () => 1)
+          t.int('totalCount', { resolve: () => 1 })
         },
       }
     )
@@ -653,7 +653,7 @@ describe('field level configuration', () => {
       {},
       {
         extendEdge(t) {
-          t.string('role', () => 'admin')
+          t.string('role', { resolve: () => 'admin' })
         },
       }
     )
