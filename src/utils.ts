@@ -9,6 +9,7 @@ import {
   GraphQLSchema,
   GraphQLType,
   GraphQLUnionType,
+  isAbstractType,
   isEnumType,
   isInputObjectType,
   isInterfaceType,
@@ -337,9 +338,7 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
     return
   }
 
-  const abstractTypes = Object.values(schema.getTypeMap()).filter(
-    (type) => isInterfaceType(type) || isUnionType(type)
-  ) as Array<GraphQLInterfaceType | GraphQLUnionType>
+  const abstractTypes = Object.values(schema.getTypeMap()).filter(isAbstractType)
 
   abstractTypes.forEach((type) => {
     const kind = isInterfaceType(type) ? 'Interface' : 'Union'
