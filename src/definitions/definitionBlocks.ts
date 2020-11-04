@@ -58,13 +58,15 @@ export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
 
 // prettier-ignore
 export type ScalarOutSpread<TypeName extends string, FieldName extends string> =
-  HasGen3<'argTypes', TypeName, FieldName> extends true
+  NeedsResolver<TypeName, FieldName> extends true
     ? [ScalarOutConfig<TypeName, FieldName>]
-    : [ScalarOutConfig<TypeName, FieldName>] | []
+    : HasGen3<'argTypes', TypeName, FieldName> extends true
+      ? [ScalarOutConfig<TypeName, FieldName>]
+      : [ScalarOutConfig<TypeName, FieldName>] | []
 
 // prettier-ignore
 export type ScalarOutConfig<TypeName extends string, FieldName extends string> =
-    NeedsResolver<TypeName, FieldName> extends true
+  NeedsResolver<TypeName, FieldName> extends true
     ? OutputScalarConfig<TypeName, FieldName> &
       {
         resolve: FieldResolver<TypeName, FieldName>
