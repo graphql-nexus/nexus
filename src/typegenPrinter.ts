@@ -36,6 +36,7 @@ import {
   mapObj,
   PrintedGenTypingImport,
   relativePathTo,
+  isNodeModule,
 } from './utils'
 
 const SpecifiedScalars = {
@@ -173,19 +174,30 @@ export class TypegenPrinter {
       if (typeof rootType !== 'string') {
         const rootTypePath = rootType.path
 
-        if (typeof rootTypePath !== 'string' || !path.isAbsolute(rootTypePath)) {
+        if (
+          typeof rootTypePath !== 'string' ||
+          (!path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))
+        ) {
           throw new Error(
             `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
           )
         }
 
-        if (!fs.existsSync(rootTypePath)) {
-          throw new Error(`Root typing path ${rootTypePath} of the type ${typeName} does not exist`)
+        if (isNodeModule(rootTypePath)) {
+          try {
+            require.resolve(rootTypePath)
+          } catch (e) {
+            throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
+          }
+        } else if (!fs.existsSync(rootTypePath)) {
+          throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
         }
 
-        const importPath = relativePathTo(rootType.path, outputPath)
-          .replace(/(\.d)?\.ts/, '')
-          .replace(/\\+/g, '/')
+        const importPath = isNodeModule(rootTypePath)
+          ? rootTypePath
+          : relativePathTo(rootTypePath, outputPath)
+              .replace(/(\.d)?\.ts/, '')
+              .replace(/\\+/g, '/')
 
         importMap[importPath] = importMap[importPath] || new Set()
         importMap[importPath].add(rootType.alias ? `${rootType.name} as ${rootType.alias}` : rootType.name)

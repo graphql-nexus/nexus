@@ -49,6 +49,9 @@ function makeQuery(config?: Partial<core.NexusObjectTypeConfig<string>>) {
           test: intArg(),
         },
       })
+      t.list.field('stringList', {
+        type: 'String',
+      })
     },
   })
 }
