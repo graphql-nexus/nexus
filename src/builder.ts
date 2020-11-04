@@ -1583,7 +1583,7 @@ function setConfigDefaults(config: SchemaConfig): SchemaConfig {
   const unionsDefault: NexusFeatures['abstractTypes'] = {
     isTypeOf: true,
     resolveType: false,
-    backingType: false,
+    __typename: false,
   }
 
   if (!config.features) {

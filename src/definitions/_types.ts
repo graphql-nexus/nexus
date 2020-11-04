@@ -168,6 +168,6 @@ export interface NexusFeatures {
   abstractTypes?: {
     isTypeOf?: boolean
     resolveType?: boolean
-    backingType?: boolean
+    __typename?: boolean
   }
 }

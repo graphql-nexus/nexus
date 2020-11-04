@@ -15,10 +15,10 @@ describe('typegenPrinter', () => {
       },
       shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
-      // backingType put to true to prevent from erroring because of missing resolveType
+      // __typename put to true to prevent from erroring because of missing resolveType
       features: {
         abstractTypes: {
-          backingType: true,
+          __typename: true,
         },
       },
       prettierConfig: path.join(__dirname, '../.prettierrc'),

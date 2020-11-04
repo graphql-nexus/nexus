@@ -48,7 +48,7 @@ describe('plugin', () => {
       ],
       features: {
         abstractTypes: {
-          backingType: true,
+          __typename: true,
         },
       },
     })
@@ -98,7 +98,7 @@ describe('plugin', () => {
       plugins: [nullGuardPlugin],
       features: {
         abstractTypes: {
-          backingType: true,
+          __typename: true,
         },
       },
     })
