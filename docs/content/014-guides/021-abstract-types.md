@@ -75,7 +75,7 @@ query {
 }
 ```
 
-In order for this builtin polymorphic system to work, your GrpahQL API must ultimately annotate the outgoing data with a property to discriminate results by on the client side. The spec states that this discriminant property is `__typename`.
+In order for this builtin polymorphic system to work, your GraphQL API must ultimately annotate the outgoing data with a property to discriminate results by on the client side. The spec states that this discriminant property is `__typename`.
 
 ### Union Types in Practice
 
