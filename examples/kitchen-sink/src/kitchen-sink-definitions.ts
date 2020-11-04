@@ -1,21 +1,21 @@
+import { connectionFromArray } from 'graphql-relay'
+import _ from 'lodash'
 import {
-  objectType,
-  inputObjectType,
-  interfaceType,
-  unionType,
   arg,
+  booleanArg,
+  connectionPlugin,
   extendType,
-  scalarType,
-  intArg,
   idArg,
+  inputObjectType,
+  intArg,
+  interfaceType,
   mutationField,
   mutationType,
-  booleanArg,
+  objectType,
   queryField,
-  connectionPlugin,
+  scalarType,
+  unionType,
 } from '@nexus/schema'
-import _ from 'lodash'
-import { connectionFromArray } from 'graphql-relay'
 
 const USERS_DATA = _.times(100, (i) => ({
   pk: i,
@@ -33,7 +33,7 @@ export const testArgs2 = {
 
 export const Mutation = mutationType({
   definition(t) {
-    t.boolean('ok', () => true)
+    t.boolean('ok', { resolve: () => true })
   },
 })
 
@@ -194,7 +194,7 @@ export const Query = objectType({
       },
       resolve: () => 'ok',
     })
-    t.list.date('dateAsList', () => [])
+    t.list.date('dateAsList', { resolve: () => [] })
 
     t.connectionField('booleanConnection', {
       type: 'Boolean',

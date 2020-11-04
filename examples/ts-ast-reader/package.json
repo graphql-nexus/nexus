@@ -1,6 +1,7 @@
 {
   "name": "@graphql-nexus/ts-ast-reader",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
