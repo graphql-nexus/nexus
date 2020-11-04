@@ -152,17 +152,19 @@ export class OutputDefinitionBlock<TypeName extends string> {
     typeName: BaseScalars,
     opts: [] | ScalarOutSpread<TypeName, any>
   ) {
-    let config: NexusOutputFieldDef = {
-      name: fieldName,
-      type: typeName,
-    }
     if (typeof opts[0] === 'function') {
-      // FIXME ditto to the one in `field` method
-      config.resolve = opts[0] as any
-    } else {
-      config = { ...config, ...opts[0] }
+      console.warn(
+        `Since v0.18.0 Nexus no longer supports resolver shorthands like:\n\n    t.string("${fieldName}", () => ...).\n\nInstead please write:\n\n    t.string("${fieldName}", { resolve: () => ... })`
+      )
     }
-    this.typeBuilder.addField(this.decorateField(config))
+
+    this.typeBuilder.addField(
+      this.decorateField({
+        name: fieldName,
+        type: typeName,
+        ...opts[0],
+      })
+    )
   }
 
   protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
