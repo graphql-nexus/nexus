@@ -382,7 +382,7 @@ type Query {
 }
 ```
 
-When a client sends a `serarch` query they will be able to select common fields as specified by the interface. Note this is unlike unions in which GraphQL assumes zero overlap between members. In contrast in GraphQL interfaces signify an intersection of fields between implementors and thus can be selected unqualified.
+When a client sends a `search` query they will be able to select common fields as specified by the interface. Note this is unlike unions in which GraphQL assumes zero overlap between members. In contrast in GraphQL interfaces signify an intersection of fields between implementors and thus can be selected unqualified.
 
 ```graphql
 query {
