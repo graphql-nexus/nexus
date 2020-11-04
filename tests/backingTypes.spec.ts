@@ -140,7 +140,7 @@ describe('rootTypings', () => {
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
-      `"Expected an absolute path for the root typing path of the type SomeType, saw fzeffezpokm"`
+      `"Module fzeffezpokm for the type SomeType does not exist"`
     )
   })
 
@@ -174,7 +174,7 @@ describe('rootTypings', () => {
       typegen.print()
     } catch (e) {
       expect(e.message.replace(__dirname, '')).toMatchInlineSnapshot(
-        `"Root typing path /invalid_path.ts of the type SomeType does not exist"`
+        `"Root typing path /invalid_path.ts for the type SomeType does not exist"`
       )
     }
   })
