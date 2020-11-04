@@ -315,6 +315,16 @@ export type NexusGenScalarNames = \\"Boolean\\" | \\"Float\\" | \\"ID\\" | \\"In
 
 export type NexusGenUnionNames = \\"ExampleUnion\\";
 
+export type NexusGenIsTypeOfObjectNames = never;
+
+export type NexusGenResolveTypeImplemented = never;
+
+export type NexusGenFeaturesConfig = {
+  abstractTypes: {
+    backingType: true
+  }
+}
+
 export interface NexusGenTypes {
   context: t.TestContext;
   inputTypes: NexusGenInputs;
@@ -335,6 +345,9 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames;
+  resolveTypeImplemented: NexusGenResolveTypeImplemented;
+  features: NexusGenFeaturesConfig;
 }
 
 

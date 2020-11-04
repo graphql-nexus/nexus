@@ -8,9 +8,11 @@ describe('interfaceType', () => {
       types: [
         interfaceType({
           name: 'Node',
+          resolveType() {
+            return null
+          },
           definition(t) {
             t.id('id')
-            t.resolveType(() => null)
           },
         }),
         objectType({
@@ -50,25 +52,31 @@ describe('interfaceType', () => {
       types: [
         interfaceType({
           name: 'LivingOrganism',
+          resolveType() {
+            return null
+          },
           definition(t) {
             t.string('type')
-            t.resolveType(() => null)
           },
         }),
         interfaceType({
           name: 'Animal',
+          resolveType() {
+            return null
+          },
           definition(t) {
             t.implements('LivingOrganism')
             t.string('classification')
-            t.resolveType(() => null)
           },
         }),
         interfaceType({
           name: 'Pet',
+          resolveType() {
+            return null
+          },
           definition(t) {
             t.implements('Animal')
             t.string('owner')
-            t.resolveType(() => null)
           },
         }),
         objectType({
@@ -171,6 +179,11 @@ describe('interfaceType', () => {
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
+      features: {
+        abstractTypes: {
+          resolveType: true,
+        },
+      },
     })
     expect(spy.mock.calls[0]).toMatchSnapshot()
     expect(spy).toBeCalledTimes(1)

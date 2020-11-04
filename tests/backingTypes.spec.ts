@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { core, enumType, makeSchema, objectType, queryType } from '..'
+import { core, enumType, makeSchema, objectType, queryType } from '../src'
 import { A, B } from './_types'
 
 const { TypegenPrinter, TypegenMetadata } = core

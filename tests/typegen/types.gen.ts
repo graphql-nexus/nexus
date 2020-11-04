@@ -181,6 +181,16 @@ export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String' 
 
 export type NexusGenUnionNames = 'ExampleUnion'
 
+export type NexusGenIsTypeOfObjectNames = never
+
+export type NexusGenResolveTypeImplemented = never
+
+export type NexusGenFeaturesConfig = {
+  abstractTypes: {
+    backingType: true
+  }
+}
+
 export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
@@ -206,6 +216,9 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames
+  resolveTypeImplemented: NexusGenResolveTypeImplemented
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

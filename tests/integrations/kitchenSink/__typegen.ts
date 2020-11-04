@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import { core } from '../../..'
+import { core } from '../../../src'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     title(...args: any): void
@@ -167,6 +167,16 @@ export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
 export type NexusGenUnionNames = never
 
+export type NexusGenIsTypeOfObjectNames = never
+
+export type NexusGenResolveTypeImplemented = never
+
+export type NexusGenFeaturesConfig = {
+  abstractTypes: {
+    resolveType: true
+  }
+}
+
 export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
@@ -192,6 +202,9 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames
+  resolveTypeImplemented: NexusGenResolveTypeImplemented
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

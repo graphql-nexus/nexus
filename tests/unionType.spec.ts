@@ -23,9 +23,11 @@ describe('unionType', () => {
         }),
         unionType({
           name: 'UserOrError',
+          resolveType(o) {
+            return o.deletedAt ? 'DeletedUser' : 'User'
+          },
           definition(t) {
             t.members('User', 'DeletedUser')
-            t.resolveType((o) => (o.deletedAt ? 'DeletedUser' : 'User'))
           },
         }),
         queryField('userTest', {

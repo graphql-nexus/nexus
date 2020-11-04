@@ -44,10 +44,12 @@ const types = [
   }),
   interfaceType({
     name: 'UserLike',
+    resolveType(o) {
+      return o.__typename
+    },
     definition(t) {
       t.id('id')
       t.string('login')
-      t.resolveType((o) => o.__typename || null)
     },
   }),
   objectType({
@@ -124,6 +126,11 @@ const defaultSchema = makeSchema({
   outputs: false,
   nonNullDefaults: {
     output: true,
+  },
+  features: {
+    abstractTypes: {
+      resolveType: true,
+    },
   },
 })
 
@@ -250,6 +257,11 @@ describe('nullabilityGuardPlugin', () => {
           }),
         ],
         plugins: [nullPlugin()],
+        features: {
+          abstractTypes: {
+            resolveType: true,
+          },
+        },
       }),
       `
         {
@@ -275,7 +287,9 @@ describe('nullabilityGuardPlugin', () => {
     })
     expect(onGuardedMock).toBeCalledTimes(3)
     expect(errSpy).toHaveBeenCalledTimes(1)
-    expect(errSpy.mock.calls[0][0].message).toContain('Missing resolveType for the UserOrAccount union')
+    expect(errSpy.mock.calls[0][0].message).toContain(
+      'Union "UserOrAccount" is missing a `resolveType` implementation.'
+    )
   })
 
   it('should guard on enumType fields', async () => {
@@ -301,6 +315,11 @@ describe('nullabilityGuardPlugin', () => {
       },
       types,
       plugins: [nullPlugin({ onGuarded: undefined })],
+      features: {
+        abstractTypes: {
+          resolveType: true,
+        },
+      },
     })
     const { errors = [], data } = await graphql(
       schema,
@@ -325,6 +344,11 @@ describe('nullabilityGuardPlugin', () => {
         output: true,
       },
       plugins: [nullPlugin({ shouldGuard: undefined })],
+      features: {
+        abstractTypes: {
+          resolveType: true,
+        },
+      },
     })
     const { errors = [], data } = await graphql(
       schema,
@@ -372,6 +396,11 @@ describe('nullabilityGuardPlugin', () => {
           },
         }),
       ],
+      features: {
+        abstractTypes: {
+          resolveType: true,
+        },
+      },
     })
     expect(errSpy).toHaveBeenCalledTimes(1)
     expect(errSpy).toHaveBeenCalledWith(
@@ -390,6 +419,11 @@ describe('nullabilityGuardPlugin', () => {
           },
         }),
       ],
+      features: {
+        abstractTypes: {
+          resolveType: true,
+        },
+      },
     })
     expect(errSpy).toHaveBeenCalledTimes(1)
     expect(errSpy).toHaveBeenCalledWith(

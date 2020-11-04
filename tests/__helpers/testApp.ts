@@ -43,7 +43,12 @@ export const testApp = (settings: Settings) => {
         const prettierConfigPath = require.resolve('../../.prettierrc')
         const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
 
-        return content.replace("'@nexus/schema'", "'../../..'")
+        return content.replace("'@nexus/schema'", "'../../../src'")
+      },
+      features: {
+        abstractTypes: {
+          resolveType: true,
+        },
       },
     })
   })

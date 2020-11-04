@@ -74,6 +74,16 @@ export type NexusGenScalarNames = \\"Boolean\\" | \\"Float\\" | \\"ID\\" | \\"In
 
 export type NexusGenUnionNames = never;
 
+export type NexusGenIsTypeOfObjectNames = never;
+
+export type NexusGenResolveTypeImplemented = never;
+
+export type NexusGenFeaturesConfig = {
+  abstractTypes: {
+
+  }
+}
+
 export interface NexusGenTypes {
   context: any;
   inputTypes: NexusGenInputs;
@@ -94,6 +104,9 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames;
+  resolveTypeImplemented: NexusGenResolveTypeImplemented;
+  features: NexusGenFeaturesConfig;
 }
 
 
