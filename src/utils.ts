@@ -427,3 +427,7 @@ export type IsEqual<A, B> = A extends B ? (B extends A ? true : false) : false
 export function dump(x: any) {
   console.log(require('util').inspect(x, { depth: null }))
 }
+
+export function isNodeModule(path: string) {
+  return /^([A-z0-9@])/.test(path)
+}
