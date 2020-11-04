@@ -321,21 +321,28 @@ Like with `resolveType` and `__typename` Nexus leverages TypeScript to ensure yo
    - The model type includes `__typename` property whose type is a string literal matching the GraphQL object name (case sensitive).
    - The fields where the union type is used include `__typename` in the returned model data
 
-#### Multiple Strategies at Runtime
+### Picking Your Strategy (Or Strategies)
 
-It is possible to have all three strategies enabled and thus use at once. In that case the following runtime precedence rules apply. Using a strategy here means the implementations of others of lower priority are discarded.
+Nexus enables you to pick the strategy you want to use. By default only the `isTypeOf` strategy is enabled. You can pick your strategy in the `makeSchema` configuration.
 
-1. `resolveType`
-2. `__typename`
-3. `isTypeOf`
+```ts
+import { makeSchema } from '@nexus/schema'
 
-> The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
+makeSchema({
+  features: {
+    abstractTypes: {
+      isTypeOf: true, // default
+      resolveType: false, // default
+      __typename: false, // default
+    },
+  },
+  //...
+})
+```
 
-#### Multiple Strategies at Buildtime
+Nexus enables enabling/disabling strategies because having them all enabled at can lead to a confusing excess of type errors when there is an invalid implementation of an abstract type. Nexus doesn't force you to pick only one strategy however it does consider using multiple strategies sightly more advanced. Refer to the [Multiple Strategies](#multiple-strategies) section for details.
 
-Nexus leverages TypeScript statically encode all the rules discussed in this guide. When you have enabled multiple strategies it means that when Nexus detects a faulty implementation, then static type errors will be raised in _all_ places where a fix _could_ be made, but _might not_ be made. In practice this means that some of the errors you'll see will be noise since only a subset are pointing toward the strategy you will ultimately want to use. This is one reason why Nexus considers having multiple strategies an advanced pattern. The static errors produced are likely to confuse newcomers, who cannot tell which ones stem from which strategy (or that there even are multiple strategies!).
-
-#### Picking a Strategy
+#### One Strategy
 
 There is no right or wrong strategy to use. Use the one that you and/or your team agree upon. These are some questions you can ask yourself:
 
@@ -345,6 +352,26 @@ There is no right or wrong strategy to use. Use the one that you and/or your tea
 | Is my schema simple? Do I develop alone?                                              | Centralized (`resolveType`)                                                                       |
 | Do I keep a discriminant property in the databse already?                             | `__typename` in your model layer if you have one                                                  |
 | Do I have objects that are part of multiple unions types and/or implement interfaces? | `__typename` or `isTypeOf` to avoid repeated logic across multiple `resolveType` implementations) |
+
+#### Multiple Strategies
+
+It is possible to enable multiple strategies at once. The following discusses the build and runtime ramifications of this.
+
+_At Buildtime_
+
+Nexus leverages TypeScript statically encode all the rules discussed in this guide. When you have enabled multiple strategies it means that when Nexus detects a faulty implementation, then static type errors will be raised in _all_ places where a fix _could_ be made, but _might not_ be made.
+
+In practice this means that some of the errors you'll see will be noise since only a subset are pointing toward the strategy you will ultimately want to use. This is one reason why Nexus considers having multiple strategies an advanced pattern. The static errors produced are likely to confuse newcomers, who cannot tell which ones stem from which strategy (or that there even are multiple strategies!).
+
+_At Runtime_
+
+In that case the following runtime precedence rules apply. Using a strategy here means the implementations of others of lower priority are discarded.
+
+1. `resolveType`
+2. `__typename`
+3. `isTypeOf`
+
+> The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
 
 ## Interface Types
 
