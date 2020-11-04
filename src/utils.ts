@@ -22,7 +22,8 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
-import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
+import fs from 'fs'
+import { MissingType, NexusTypes, withNexusSymbol, TypingImport } from './definitions/_types'
 import { decorateType } from './definitions/decorateType'
 import { PluginConfig } from './plugin'
 
@@ -428,6 +429,34 @@ export function dump(x: any) {
   console.log(require('util').inspect(x, { depth: null }))
 }
 
-export function isNodeModule(path: string) {
+function isNodeModule(path: string) {
   return /^([A-z0-9@])/.test(path)
+}
+
+export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
+  const rootTypePath = rootType.path
+
+  if (typeof rootTypePath !== 'string' || (!path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
+    throw new Error(
+      `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+    )
+  }
+
+  if (isNodeModule(rootTypePath)) {
+    try {
+      require.resolve(rootTypePath)
+    } catch (e) {
+      throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
+    }
+  } else if (!fs.existsSync(rootTypePath)) {
+    throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
+  }
+
+  const importPath = isNodeModule(rootTypePath)
+    ? rootTypePath
+    : relativePathTo(rootTypePath, outputPath)
+        .replace(/(\.d)?\.ts/, '')
+        .replace(/\\+/g, '/')
+
+  return importPath
 }

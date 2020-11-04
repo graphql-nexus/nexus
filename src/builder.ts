@@ -90,6 +90,7 @@ import {
   NexusGraphQLSchema,
   NonNullConfig,
   RootTypings,
+  TypingImport,
 } from './definitions/_types'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
 import { DynamicOutputPropertyDef } from './dynamicProperty'
@@ -262,9 +263,13 @@ export interface TypegenInfo {
    */
   backingTypeMap: { [K in GetGen<'objectNames'>]?: string }
   /**
-   * The type of the context for the resolvers
+   * The string type of the context for the resolvers
    */
   contextType?: string
+  /**
+   * Info about where to import the context from
+   */
+  contextTypeImport?: TypingImport
   /**
    * The path to the @nexus/schema package.
    *

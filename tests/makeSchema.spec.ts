@@ -81,4 +81,30 @@ describe('makeSchema', () => {
       expect(schemaTypes).toMatchSnapshot()
     })
   })
+
+  describe('contextType', () => {
+    it('can specify contextType as a typing import', async () => {
+      const { tsTypes } = await generateSchema.withArtifacts(
+        {
+          types: [
+            queryField('ok', {
+              description: 'Example boolean field',
+              type: 'Boolean',
+            }),
+          ],
+          shouldGenerateArtifacts: true,
+          typegenAutoConfig: {
+            sources: [],
+            contextType: {
+              path: 'graphql',
+              name: 'GraphQLInputFieldConfigMap',
+            },
+          },
+        },
+        path.normalize(`/dev/null/file.ts`)
+      )
+      expect(tsTypes).toContain(`import { GraphQLInputFieldConfigMap } from "graphql"`)
+      expect(tsTypes).toContain(`context: GraphQLInputFieldConfigMap`)
+    })
+  })
 })
