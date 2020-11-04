@@ -417,7 +417,7 @@ export type ShouldDiscriminateResultValue<
   TypeName extends string,
   FieldName extends string,
   ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
-> = GetGen3<'features', 'abstractTypes', 'backingType', false> extends true // if feature is enabled
+> = GetGen3<'features', 'abstractTypes', '__typename', false> extends true // if feature is enabled
   ? ReturnTypeName extends GetGen<'objectNames'> | GetGen<'interfaceNames'> | GetGen<'enumNames'> // and return type is either an object type || interface || enum
     ? ShouldDiscriminateOutputTypeField<ReturnTypeName> extends true // call sub function
       ? true
