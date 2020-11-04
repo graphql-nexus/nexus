@@ -16,7 +16,7 @@ import { mockStream } from '../../__helpers'
 
 export const query = queryType({
   definition(t) {
-    t.string('foo', () => 'bar')
+    t.string('foo', { resolve: () => 'bar' })
   },
 })
 

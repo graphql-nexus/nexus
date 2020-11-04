@@ -121,7 +121,7 @@ describe('rootTypings', () => {
       name: 'SomeType',
       rootTyping: {
         name: 'invalid',
-        path: 'fzeffezpokm',
+        path: './fzeffezpokm',
       },
       definition(t) {
         t.id('id')
