@@ -45,7 +45,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
 } & ResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {
-  constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<string>) {
+  constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<TypeName>) {
     assertValidName(name)
   }
   get value() {

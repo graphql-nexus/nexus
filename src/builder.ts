@@ -115,6 +115,7 @@ import { TypegenMetadata } from './typegenMetadata'
 import { AbstractTypeResolver, AllInputTypes, GetGen } from './typegenTypeHelpers'
 import { resolveTypegenConfig } from './typegenUtils'
 import {
+  assertAbstractTypesCanBeDiscriminated,
   assertNoMissingTypes,
   casesHandled,
   consoleWarn,
@@ -1574,8 +1575,8 @@ export function makeSchemaInternal(config: SchemaConfig) {
 function setConfigDefaults(config: SchemaConfig): SchemaConfig {
   const unionsDefault: NexusFeatures['abstractTypes'] = {
     isTypeOf: true,
-    backingType: false,
     resolveType: false,
+    backingType: false,
   }
 
   if (!config.features) {
@@ -1625,6 +1626,7 @@ export function makeSchema(inputConfig: SchemaConfig): NexusGraphQLSchema {
     }
   }
   assertNoMissingTypes(schema, missingTypes)
+  assertAbstractTypesCanBeDiscriminated(schema, config.features ?? {})
   return schema
 }
 

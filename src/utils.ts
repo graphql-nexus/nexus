@@ -22,8 +22,14 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
-import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
 import { decorateType } from './definitions/decorateType'
+import {
+  MissingType,
+  NexusFeatures,
+  NexusGraphQLSchema,
+  NexusTypes,
+  withNexusSymbol,
+} from './definitions/_types'
 import { PluginConfig } from './plugin'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
@@ -322,6 +328,64 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
 
     throw new Error('\n' + errors)
   }
+}
+
+export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema, features: NexusFeatures) {
+  // If backing type check is enabled, we can no longer know for sure if a type is properly discriminated
+  // since it could be discriminated via the `__typename` field in resolvers, which we can't check at runtime
+  if (features.abstractTypes?.backingType === true) {
+    return
+  }
+
+  const abstractTypes = Object.values(schema.getTypeMap()).filter(
+    (type) => isInterfaceType(type) || isUnionType(type)
+  ) as Array<GraphQLInterfaceType | GraphQLUnionType>
+
+  abstractTypes.forEach((type) => {
+    const kind = isInterfaceType(type) ? 'Interface' : 'Union'
+    const resolveTypeImplemented = type.resolveType !== undefined
+    const typesWithoutIsTypeOf = schema.getPossibleTypes(type).filter((type) => type.isTypeOf === undefined)
+
+    if (
+      resolveTypeImplemented === false &&
+      features.abstractTypes?.resolveType === true &&
+      !features.abstractTypes.isTypeOf
+    ) {
+      console.error(new Error(`${kind} "${type.name}" is missing a \`resolveType\` implementation.`))
+    }
+
+    if (
+      typesWithoutIsTypeOf.length > 0 &&
+      features.abstractTypes?.isTypeOf === true &&
+      !features.abstractTypes.resolveType
+    ) {
+      console.error(
+        new Error(
+          `${kind} "${
+            type.name
+          }" has some members missing an \`isTypeOf\` implementation: ${typesWithoutIsTypeOf
+            .map((t) => `"${t.name}"`)
+            .join(', ')}`
+        )
+      )
+    }
+
+    if (
+      (resolveTypeImplemented === false || typesWithoutIsTypeOf.length > 0) &&
+      features.abstractTypes?.isTypeOf === true &&
+      features.abstractTypes?.resolveType === true
+    ) {
+      console.error(
+        new Error(
+          `${kind} "${
+            type.name
+          }" is either missing a \`resolveType\` implementation or its members are missing an \`isTypeOf\` implementation: ${typesWithoutIsTypeOf
+            .map((t) => `"${t.name}"`)
+            .join(', ')}`
+        )
+      )
+    }
+  })
 }
 
 export function consoleWarn(msg: string) {
