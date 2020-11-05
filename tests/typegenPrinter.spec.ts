@@ -15,7 +15,7 @@ describe('typegenPrinter', () => {
       },
       shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
-      prettierConfig: path.join(__dirname, '../package.json'),
+      prettierConfig: path.join(__dirname, '../.prettierrc'),
     }) as core.NexusGraphQLSchema
     metadata = new TypegenMetadata({
       outputs: {
@@ -29,7 +29,7 @@ describe('typegenPrinter', () => {
         sources: [
           {
             alias: 't',
-            source: path.join(__dirname, '_helpers.ts'),
+            source: path.join(__dirname, '__helpers/index.ts'),
           },
         ],
         contextType: 't.TestContext',
@@ -88,7 +88,7 @@ describe('typegenPrinter', () => {
   })
 
   it('should print a return type map', () => {
-    expect(typegen.printReturnTypeMap()).toMatchSnapshot()
+    expect(typegen.printFieldTypesMap()).toMatchSnapshot()
   })
 
   it('should print the full output', () => {

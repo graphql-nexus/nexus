@@ -1,12 +1,13 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import { FieldOutConfig } from '../definitions/definitionBlocks'
+import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
 import {
   ArgsValue,
+  FieldTypeName,
   GetGen,
   MaybePromise,
   MaybePromiseDeep,
@@ -22,6 +23,7 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
+import { NonNullConfig } from '../definitions/_types'
 
 export interface ConnectionPluginConfig {
   /**
@@ -125,6 +127,11 @@ export interface ConnectionPluginConfig {
    * direct dependency at the application level.
    */
   nexusSchemaImportId?: string
+  /**
+   * Configures the default "nonNullDefaults" settings for any connection types
+   * created globally by this config / connection field.
+   */
+  nonNullDefaults?: NonNullConfig
 }
 
 // Extract the node value from the connection for a given field.
@@ -193,13 +200,18 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
-  extendConnection?: (def: ObjectDefinitionBlock<any>) => void
+  extendConnection?: (def: ObjectDefinitionBlock<FieldTypeName<TypeName, FieldName>>) => void
   /**
    * Dynamically adds additional fields to the connection "edge" when it is defined.
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended connections.
    */
   extendEdge?: (def: ObjectDefinitionBlock<any>) => void
+  /**
+   * Configures the default "nonNullDefaults" for connection type generated
+   * for this connection
+   */
+  nonNullDefaults?: NonNullConfig
 } & (
   | {
       /**
@@ -245,6 +257,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
       nodes?: never
     }
 ) &
+  Pick<CommonFieldConfig, 'deprecation' | 'description' | 'nullable'> &
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
 const ForwardPaginateArgs = {
@@ -353,7 +366,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       // field definition.
       if (pluginExtendConnection) {
         eachObj(pluginExtendConnection, (val, key) => {
-          dynamicConfig.push(`${key}: core.SubFieldResolver<TypeName, FieldName, "${key}">`)
+          dynamicConfig.push(`${key}: core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`)
         })
       }
 
@@ -399,11 +412,9 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: connectionName as any,
                   definition(t2) {
-                    t2.field('edges', {
+                    t2.list.field('edges', {
                       type: edgeName as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
-                      nullable: true,
-                      list: [false],
                     })
                     t2.field('pageInfo', {
                       type: 'PageInfo' as any,
@@ -417,14 +428,18 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       })
                     }
                     if (pluginExtendConnection) {
-                      eachObj(pluginExtendConnection, (val, key) => {
-                        t2.field(key, val)
+                      eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
+                        t2.field(extensionFieldName, {
+                          ...extensionFieldConfig,
+                          resolve: (fieldConfig as any)[extensionFieldName],
+                        })
                       })
                     }
                     if (fieldConfig.extendConnection instanceof Function) {
                       fieldConfig.extendConnection(t2)
                     }
                   },
+                  nonNullDefaults: fieldConfig.nonNullDefaults ?? pluginConfig.nonNullDefaults,
                 })
               )
             }
@@ -455,6 +470,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       fieldConfig.extendEdge(t2)
                     }
                   },
+                  nonNullDefaults: fieldConfig.nonNullDefaults ?? pluginConfig.nonNullDefaults,
                 })
               )
             }
@@ -628,7 +644,7 @@ export function makeResolveFn(
       nodes: any[]
     }>
 
-    // Get all the nodes, before any pagination sliciing
+    // Get all the nodes, before any pagination slicing
     const resolveAllNodes = () => {
       if (cachedNodes !== undefined) {
         return cachedNodes

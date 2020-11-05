@@ -1,9 +1,0 @@
-{
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "noUnusedLocals": false, // FIXME
-    "noEmit": true,
-    "rootDir": "."
-  },
-  "include": ["**/*.ts"]
-}

@@ -52,17 +52,12 @@ import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitio
 import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import {
+  Implemented,
   InterfaceDefinitionBlock,
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
 } from './definitions/interfaceType'
-import { NexusListDef, NexusNonNullDef } from './definitions/list'
-import {
-  Implemented,
-  NexusObjectTypeConfig,
-  NexusObjectTypeDef,
-  ObjectDefinitionBlock,
-} from './definitions/objectType'
+import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
@@ -82,7 +77,8 @@ import {
   isNexusObjectTypeDef,
   isNexusPlugin,
   isNexusScalarTypeDef,
-  isNexusUnionTypeDef,, AllNexusTypeDefs
+  isNexusUnionTypeDef,
+  AllNexusTypeDefs,
 } from './definitions/wrapping'
 import {
   GraphQLPossibleInputs,
@@ -405,6 +401,16 @@ export class SchemaBuilder {
   protected onAfterBuildFns: Exclude<PluginConfig['onAfterBuild'], undefined>[] = []
 
   /**
+   * Executed after the object is defined, allowing us to add additional fields to the object
+   */
+  protected onObjectDefinitionFns: Exclude<PluginConfig['onObjectDefinition'], undefined>[] = []
+
+  /**
+   * Executed after the object is defined, allowing us to add additional fields to the object
+   */
+  protected onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
+
+  /**
    * The `schemaExtension` is created just after the types are walked,
    * but before the fields are materialized.
    */
@@ -674,6 +680,12 @@ export class SchemaBuilder {
       if (pluginConfig.onAfterBuild) {
         this.onAfterBuildFns.push(pluginConfig.onAfterBuild)
       }
+      if (pluginConfig.onObjectDefinition) {
+        this.onObjectDefinitionFns.push(pluginConfig.onObjectDefinition)
+      }
+      if (pluginConfig.onInputObjectDefinition) {
+        this.onInputObjectDefinitionFns.push(pluginConfig.onInputObjectDefinition)
+      }
     })
   }
 
@@ -683,6 +695,51 @@ export class SchemaBuilder {
       if (this.typesToWalk.length > 0) {
         this.walkTypes()
       }
+    })
+  }
+
+  checkForInterfaceCircularDependencies() {
+    const interfaces: Record<string, NexusInterfaceTypeConfig<any>> = {}
+    Object.keys(this.pendingTypeMap)
+      .map((key) => this.pendingTypeMap[key])
+      .filter(isNexusInterfaceTypeDef)
+      .forEach((type) => {
+        interfaces[type.name] = type.value
+      })
+    const alreadyChecked: Record<string, boolean> = {}
+    function walkType(obj: NexusInterfaceTypeConfig<any>, path: string[], visited: Record<string, boolean>) {
+      if (alreadyChecked[obj.name]) {
+        return
+      }
+      if (visited[obj.name]) {
+        if (obj.name === path[path.length - 1]) {
+          throw new Error(`GraphQL Nexus: Interface ${obj.name} can't implement itself`)
+        } else {
+          throw new Error(
+            `GraphQL Nexus: Interface circular dependency detected ${[
+              ...path.slice(path.lastIndexOf(obj.name)),
+              obj.name,
+            ].join(' -> ')}`
+          )
+        }
+      }
+      const definitionBlock = new InterfaceDefinitionBlock({
+        typeName: obj.name,
+        addInterfaces: (i) =>
+          i.forEach((config) => {
+            const name = typeof config === 'string' ? config : config.value.name
+            walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
+          }),
+        setResolveType: () => {},
+        addField: () => {},
+        addDynamicOutputMembers: () => {},
+        warn: () => {},
+      })
+      obj.definition(definitionBlock)
+      alreadyChecked[obj.name] = true
+    }
+    Object.keys(interfaces).forEach((name) => {
+      walkType(interfaces[name], [], {})
     })
   }
 
@@ -743,6 +800,7 @@ export class SchemaBuilder {
     this.createSchemaExtension()
     this.walkTypes()
     this.beforeBuildTypes()
+    this.checkForInterfaceCircularDependencies()
     this.buildNexusTypes()
     return {
       finalConfig: this.config,
@@ -762,6 +820,9 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
+    this.onInputObjectDefinitionFns.forEach((fn) => {
+      fn(definitionBlock, config)
+    })
     const extensions = this.inputTypeExtendMap[config.name]
     if (extensions) {
       extensions.forEach((extension) => {
@@ -791,6 +852,9 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
+    this.onObjectDefinitionFns.forEach((fn) => {
+      fn(definitionBlock, config)
+    })
     const extensions = this.typeExtendMap[config.name]
     if (extensions) {
       extensions.forEach((extension) => {
@@ -803,19 +867,9 @@ export class SchemaBuilder {
     }
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
-      interfaces: () => interfaces.map((i) => this.getInterface(i)),
+      interfaces: () => this.buildInterfaceList(interfaces),
       description: config.description,
-      fields: () => {
-        const allInterfaces = interfaces.map((i) => this.getInterface(i))
-        const interfaceConfigs = allInterfaces.map((i) => i.toConfig())
-        const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {}
-        interfaceConfigs.forEach((i) => {
-          Object.keys(i.fields).forEach((iFieldName) => {
-            interfaceFieldsMap[iFieldName] = i.fields[iFieldName]
-          })
-        })
-        return this.buildOutputFields(fields, objectTypeConfig, interfaceFieldsMap)
-      },
+      fields: () => this.buildOutputFields(fields, objectTypeConfig, this.buildInterfaceFields(interfaces)),
       extensions: {
         nexus: new NexusObjectTypeExtension(config),
       },
@@ -827,9 +881,11 @@ export class SchemaBuilder {
     const { name, description } = config
     let resolveType: AbstractTypeResolver<string> | undefined
     const fields: NexusOutputFieldDef[] = []
+    const interfaces: Implemented[] = []
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
       addField: (field) => fields.push(field),
+      addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
       warn: consoleWarn,
@@ -849,9 +905,11 @@ export class SchemaBuilder {
     }
     const interfaceTypeConfig: NexusGraphQLInterfaceTypeConfig = {
       name,
+      interfaces: () => this.buildInterfaceList(interfaces),
       resolveType,
       description,
-      fields: () => this.buildOutputFields(fields, interfaceTypeConfig, {}),
+      fields: () =>
+        this.buildOutputFields(fields, interfaceTypeConfig, this.buildInterfaceFields(interfaces)),
       extensions: {
         nexus: new NexusInterfaceTypeExtension(config),
       },
@@ -992,6 +1050,26 @@ export class SchemaBuilder {
     return unionMembers
   }
 
+  protected buildInterfaceList(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
+    const list: GraphQLInterfaceType[] = []
+    interfaces.forEach((i) => {
+      const type = this.getInterface(i)
+      list.push(type, ...type.getInterfaces())
+    })
+    return list
+  }
+
+  protected buildInterfaceFields(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
+    const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {}
+    interfaces.forEach((i) => {
+      const config = this.getInterface(i).toConfig()
+      Object.keys(config.fields).forEach((field) => {
+        interfaceFieldsMap[field] = config.fields[field]
+      })
+    })
+    return interfaceFieldsMap
+  }
+
   protected buildOutputFields(
     fields: NexusOutputFieldDef[],
     typeConfig: NexusGraphQLInterfaceTypeConfig | NexusGraphQLObjectTypeConfig,
@@ -1015,15 +1093,12 @@ export class SchemaBuilder {
   }
 
   protected unwrapNexusToGraphQL(type: AllNexusTypeDefs, output = null): any {
-    
     if (type instanceof NexusNonNullDef) {
       return this.unwrapNexusToGraphQL()
-    }
-    else if (type instanceof NexusListDef) {
+    } else if (type instanceof NexusListDef) {
       return this.unwrapNexusToGraphQL()
-    }
-    else {
-      return type 
+    } else {
+      return type
     }
   }
 
@@ -1153,15 +1228,22 @@ export class SchemaBuilder {
     isNonNull: boolean
   ): T {
     if (list) {
-      type = this.decorateList(type, list)
+      type = this.decorateList(type, list, isNonNull)
     }
     return (isNonNull ? GraphQLNonNull(type) : type) as T
   }
 
-  protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(type: T, list: true | boolean[]): T {
+  protected decorateList<T extends GraphQLOutputType | GraphQLInputType>(
+    type: T,
+    list: true | boolean[],
+    isNonNull: boolean
+  ): T {
     let finalType = type
     if (!Array.isArray(list)) {
-      return GraphQLList(type) as T
+      if (isNonNull) {
+        finalType = GraphQLNonNull(finalType) as T
+      }
+      return GraphQLList(finalType) as T
     }
     if (Array.isArray(list)) {
       for (let i = 0; i < list.length; i++) {
@@ -1372,6 +1454,13 @@ export class SchemaBuilder {
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
+      addInterfaces: (i) => {
+        i.forEach((j) => {
+          if (typeof j !== 'string') {
+            this.addType(j)
+          }
+        })
+      },
       setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
@@ -1581,7 +1670,7 @@ function invariantGuard(val: any) {
   if (Boolean(val) === false) {
     throw new Error(
       'Nexus Error: This should never happen, ' +
-        'please check your code or if you think this is a bug open a GitHub issue https://github.com/prisma-labs/nexus/issues/new.'
+        'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
     )
   }
 }

@@ -14,7 +14,7 @@ This plugin helps us guard against non-null values crashing our queries in produ
 import { nullabilityGuardPlugin } from '@nexus/schema'
 
 const guardPlugin = nullabilityGuardPlugin({
-  onNullGuarded(ctx, info) {
+  onGuarded({ ctx, info }) {
     // This could report to a service like Sentry, or log internally - up to you!
     console.error(
       `Error: Saw a null value for non-null field ${info.parentType.name}.${info.fieldName} ${

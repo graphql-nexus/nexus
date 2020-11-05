@@ -3,7 +3,6 @@
  * Do not make changes to this file directly
  */
 
-import { core } from '../..'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     title(...args: any): void
@@ -50,6 +49,7 @@ export interface NexusGenRootTypes {
     title?: string | null // String
   }
   Query: {}
+  Subscription: {}
   User: { firstName: string; lastName: string }
 }
 
@@ -78,10 +78,55 @@ export interface NexusGenFieldTypes {
     searchPosts: Array<NexusGenRootTypes['Post'] | null> | null // [Post]
     user: NexusGenRootTypes['User'] | null // User
   }
+  Subscription: {
+    // field return type
+    someBoolean: boolean | null // Boolean
+    someField: number | null // Int
+    someFields: Array<number | null> | null // [Int]
+    someFloat: number | null // Float
+    someID: string | null // ID
+    someInt: number | null // Int
+    someInts: Array<number | null> | null // [Int]
+    someString: string | null // String
+  }
   User: {
     // field return type
     firstName: string | null // String
     lastName: string | null // String
+  }
+}
+
+export interface NexusGenFieldTypeNames {
+  Mutation: {
+    // field return type name
+    createUser: 'User'
+  }
+  Post: {
+    // field return type name
+    body: 'String'
+    title: 'String'
+  }
+  Query: {
+    // field return type name
+    foo: 'String'
+    searchPosts: 'Post'
+    user: 'User'
+  }
+  Subscription: {
+    // field return type name
+    someBoolean: 'Boolean'
+    someField: 'Int'
+    someFields: 'Int'
+    someFloat: 'Float'
+    someID: 'ID'
+    someInt: 'Int'
+    someInts: 'Int'
+    someString: 'String'
+  }
+  User: {
+    // field return type name
+    firstName: 'String'
+    lastName: 'String'
   }
 }
 
@@ -109,7 +154,7 @@ export interface NexusGenAbstractResolveReturnTypes {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Mutation' | 'Post' | 'Query' | 'User'
+export type NexusGenObjectNames = 'Mutation' | 'Post' | 'Query' | 'Subscription' | 'User'
 
 export type NexusGenInputNames = 'PostSearchInput'
 
@@ -127,6 +172,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

@@ -34,11 +34,11 @@ gulp.task('link-examples', async () => {
 })
 
 gulp.task('api-tsc', () => {
-  runService('yarn', 'tsc -w -p api/tsconfig.json', { stdio: 'ignore' })
+  runService('yarn', 'tsc -w -p api/tsconfig.cjs.json', { stdio: 'ignore' })
 })
 
 gulp.task('core-tsc', () => {
-  runService('yarn', 'tsc -w -p tsconfig.json', {
+  runService('yarn', 'tsc -w -p tsconfig.cjs.json', {
     stdio: 'ignore',
     cwd: path.join(__dirname, '..'),
   })

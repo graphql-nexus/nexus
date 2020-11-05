@@ -1,4 +1,6 @@
+import * as fs from 'fs'
 import {
+  getNamedType,
   GraphQLArgument,
   GraphQLEnumType,
   GraphQLField,
@@ -21,7 +23,7 @@ import {
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
-import path from 'path'
+import * as path from 'path'
 import { TypegenInfo } from './builder'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import { NexusGraphQLSchema } from './definitions/_types'
@@ -34,6 +36,7 @@ import {
   mapObj,
   PrintedGenTypingImport,
   relativePathTo,
+  isNodeModule,
 } from './utils'
 
 const SpecifiedScalars = {
@@ -84,7 +87,8 @@ export class TypegenPrinter {
       this.printScalarTypeMap(),
       this.printRootTypeMap(),
       this.printAllTypesMap(),
-      this.printReturnTypeMap(),
+      this.printFieldTypesMap(),
+      this.printFieldTypeNamesMap(),
       this.printArgTypeMap(),
       this.printAbstractResolveReturnTypeMap(),
       this.printInheritedFieldMap(),
@@ -123,6 +127,7 @@ export class TypegenPrinter {
         `  rootTypes: NexusGenRootTypes;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
+        `  fieldTypeNames: NexusGenFieldTypeNames;`,
         `  allTypes: NexusGenAllTypes;`,
         `  inheritedFields: NexusGenInheritedFields;`,
         `  objectNames: NexusGenObjectNames;`,
@@ -159,13 +164,39 @@ export class TypegenPrinter {
       }
     }
 
-    eachObj(rootTypings, (val, key) => {
-      if (typeof val !== 'string') {
-        const importPath = (path.isAbsolute(val.path) ? relativePathTo(val.path, outputPath) : val.path)
-          .replace(/(\.d)?\.ts/, '')
-          .replace(/\\+/g, '/')
+    eachObj(rootTypings, (rootType, typeName) => {
+      if (typeof rootType !== 'string') {
+        const rootTypePath = rootType.path
+
+        if (
+          typeof rootTypePath !== 'string' ||
+          (!path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))
+        ) {
+          throw new Error(
+            `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+          )
+        }
+
+        if (path.isAbsolute(rootTypePath)) {
+          if (!fs.existsSync(rootTypePath)) {
+            throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
+          }
+        } else {
+          try {
+            require.resolve(rootTypePath)
+          } catch (e) {
+            throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
+          }
+        }
+
+        const importPath = path.isAbsolute(rootTypePath)
+          ? relativePathTo(rootTypePath, outputPath)
+              .replace(/(\.d)?\.ts/, '')
+              .replace(/\\+/g, '/')
+          : rootTypePath
+
         importMap[importPath] = importMap[importPath] || new Set()
-        importMap[importPath].add(val.alias ? `${val.name} as ${val.alias}` : val.name)
+        importMap[importPath].add(rootType.alias ? `${rootType.name} as ${rootType.alias}` : rootType.name)
       }
     })
     eachObj(importMap, (val, key) => {
@@ -405,7 +436,7 @@ export class TypegenPrinter {
             if (!this.hasResolver(field, type)) {
               if (typeof obj !== 'string') {
                 obj[field.name] = [
-                  this.argSeparator(field.type as GraphQLInputType),
+                  this.argSeparator(field.type as GraphQLInputType, false),
                   this.printOutputType(field.type),
                 ]
               }
@@ -509,6 +540,21 @@ export class TypegenPrinter {
     return returnTypeMap
   }
 
+  buildReturnTypeNamesMap() {
+    const returnTypeMap: TypeFieldMapping = {}
+    const hasFields: (GraphQLInterfaceType | GraphQLObjectType)[] = []
+    hasFields
+      .concat(this.groupedTypes.object)
+      .concat(this.groupedTypes.interface)
+      .forEach((type) => {
+        eachObj(type.getFields(), (field) => {
+          returnTypeMap[type.name] = returnTypeMap[type.name] || {}
+          returnTypeMap[type.name][field.name] = [':', `'${getNamedType(field.type).name}'`]
+        })
+      })
+    return returnTypeMap
+  }
+
   printOutputType(type: GraphQLOutputType) {
     const returnType = this.typeToArr(type)
     function combine(item: any[]): string {
@@ -547,18 +593,27 @@ export class TypegenPrinter {
     return typing
   }
 
-  printReturnTypeMap() {
+  printFieldTypesMap() {
     return this.printTypeFieldInterface('NexusGenFieldTypes', this.buildReturnTypeMap(), 'field return type')
   }
 
-  normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
-    return [this.argSeparator(arg.type), this.argTypeRepresentation(arg.type)]
+  printFieldTypeNamesMap() {
+    return this.printTypeFieldInterface(
+      'NexusGenFieldTypeNames',
+      this.buildReturnTypeNamesMap(),
+      'field return type name'
+    )
   }
 
-  argSeparator(type: GraphQLInputType) {
-    if (isNonNullType(type)) {
+  normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
+    return [this.argSeparator(arg.type, Boolean(arg.defaultValue)), this.argTypeRepresentation(arg.type)]
+  }
+
+  argSeparator(type: GraphQLInputType, hasDefaultValue: boolean) {
+    if (hasDefaultValue || isNonNullType(type)) {
       return ':'
     }
+
     return '?:'
   }
 

@@ -1,21 +1,21 @@
+import { connectionFromArray } from 'graphql-relay'
+import _ from 'lodash'
 import {
-  objectType,
-  inputObjectType,
-  interfaceType,
-  unionType,
   arg,
+  booleanArg,
+  connectionPlugin,
   extendType,
-  scalarType,
-  intArg,
   idArg,
+  inputObjectType,
+  intArg,
+  interfaceType,
   mutationField,
   mutationType,
-  booleanArg,
+  objectType,
   queryField,
-  connectionPlugin,
+  scalarType,
+  unionType,
 } from '@nexus/schema'
-import _ from 'lodash'
-import { connectionFromArray } from 'graphql-relay'
 
 const USERS_DATA = _.times(100, (i) => ({
   pk: i,
@@ -31,21 +31,9 @@ export const testArgs2 = {
   bar: idArg(),
 }
 
-export const Node = interfaceType({
-  name: 'Node',
-  definition(t) {
-    t.id('id', {
-      nullable: false,
-      resolve: () => {
-        throw new Error('Abstract')
-      },
-    })
-  },
-})
-
 export const Mutation = mutationType({
   definition(t) {
-    t.boolean('ok', () => true)
+    t.boolean('ok', { resolve: () => true })
   },
 })
 
@@ -118,6 +106,7 @@ export const TestUnion = unionType({
 
 export const TestObj = objectType({
   name: 'TestObj',
+  node: (obj) => `TestObj:${obj.item}`,
   definition(t) {
     t.implements('Bar', Baz)
     t.string('item')
@@ -205,11 +194,20 @@ export const Query = objectType({
       },
       resolve: () => 'ok',
     })
-    t.list.date('dateAsList', () => [])
+    t.list.date('dateAsList', { resolve: () => [] })
 
     t.connectionField('booleanConnection', {
       type: 'Boolean',
       disableBackwardPagination: true,
+      nodes() {
+        return [true]
+      },
+    })
+
+    t.connectionField('deprecatedConnection', {
+      type: 'Boolean',
+      deprecation: 'Dont use this, use booleanConnection instead',
+      nullable: false,
       nodes() {
         return [true]
       },
@@ -228,6 +226,7 @@ export const Query = objectType({
 
     t.connectionField('usersConnectionNodes', {
       type: User,
+      description: 'A connection with some user nodes',
       cursorFromNode(node, args, ctx, info, { index, nodes }) {
         if (args.last && !args.before) {
           const totalCount = USERS_DATA.length

@@ -613,6 +613,7 @@ enum NodeFlags {
   Namespace
   NestedNamespace
   None
+  OptionalChain
   PermanentlySetIncrementalFlags
   PossiblyContainsDynamicImport
   PossiblyContainsImportMeta
@@ -621,6 +622,7 @@ enum NodeFlags {
   Synthesized
   ThisNodeHasError
   ThisNodeOrAnySubNodesHasError
+  TypeCached
   TypeExcludesFlags
   UNKNOWN
   YieldContext
@@ -842,6 +844,7 @@ enum SyntaxKind {
   ArrowFunction
   AsExpression
   AsKeyword
+  AssertsKeyword
   AsteriskAsteriskEqualsToken
   AsteriskAsteriskToken
   AsteriskEqualsToken
@@ -942,6 +945,7 @@ enum SyntaxKind {
   FirstNode
   FirstPunctuation
   FirstReservedWord
+  FirstStatement
   FirstTemplateToken
   FirstToken
   FirstTriviaToken
@@ -994,12 +998,17 @@ enum SyntaxKind {
   JSDocComment
   JSDocEnumTag
   JSDocFunctionType
+  JSDocImplementsTag
   JSDocNamepathType
   JSDocNonNullableType
   JSDocNullableType
   JSDocOptionalType
   JSDocParameterTag
+  JSDocPrivateTag
   JSDocPropertyTag
+  JSDocProtectedTag
+  JSDocPublicTag
+  JSDocReadonlyTag
   JSDocReturnTag
   JSDocSignature
   JSDocTag
@@ -1037,6 +1046,7 @@ enum SyntaxKind {
   LastLiteralToken
   LastPunctuation
   LastReservedWord
+  LastStatement
   LastTemplateToken
   LastToken
   LastTriviaToken
@@ -1063,6 +1073,7 @@ enum SyntaxKind {
   MultiLineCommentTrivia
   NamedExports
   NamedImports
+  NamespaceExport
   NamespaceExportDeclaration
   NamespaceImport
   NamespaceKeyword
@@ -1097,6 +1108,7 @@ enum SyntaxKind {
   PlusToken
   PostfixUnaryExpression
   PrefixUnaryExpression
+  PrivateIdentifier
   PrivateKeyword
   PropertyAccessExpression
   PropertyAssignment
@@ -1105,6 +1117,8 @@ enum SyntaxKind {
   ProtectedKeyword
   PublicKeyword
   QualifiedName
+  QuestionDotToken
+  QuestionQuestionToken
   QuestionToken
   ReadonlyKeyword
   RegularExpressionLiteral
@@ -1133,6 +1147,7 @@ enum SyntaxKind {
   SymbolKeyword
   SyntaxList
   SyntheticExpression
+  SyntheticReferenceExpression
   TaggedTemplateExpression
   TemplateExpression
   TemplateHead

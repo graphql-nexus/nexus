@@ -1,3 +1,4 @@
+import './__typegen'
 import {
   dynamicInputMethod,
   dynamicOutputMethod,
@@ -9,12 +10,13 @@ import {
   objectType,
   queryType,
   stringArg,
-} from '../../src'
-import './_app.typegen'
+  subscriptionType,
+} from '../../../src'
+import { mockStream } from '../../__helpers'
 
 export const query = queryType({
   definition(t) {
-    t.string('foo', () => 'bar')
+    t.string('foo', { resolve: () => 'bar' })
   },
 })
 
@@ -93,6 +95,79 @@ export const Mutation = mutationType({
       type: 'User',
       args: { firstName: stringArg(), lastName: stringArg() },
       resolve: (_root) => ({ firstName: '', lastName: '' }),
+    })
+  },
+})
+
+export const Subscription = subscriptionType({
+  definition(t) {
+    // lists
+    t.list.field('someFields', {
+      type: 'Int',
+      subscribe() {
+        return mockStream(10, 0, (int) => int - 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.list.int('someInts', {
+      subscribe() {
+        return mockStream(10, 0, (int) => int + 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    // singular
+    t.field('someField', {
+      type: 'Int',
+      subscribe() {
+        return mockStream(10, 0, (int) => int - 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.int('someInt', {
+      subscribe() {
+        return mockStream(10, 0, (int) => int + 1)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.string('someString', {
+      subscribe() {
+        return mockStream(10, '', (str) => str + '!')
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.float('someFloat', {
+      subscribe() {
+        return mockStream(10, 0.5, (f) => f)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.boolean('someBoolean', {
+      subscribe() {
+        return mockStream(10, true, (b) => b)
+      },
+      resolve: (event) => {
+        return event
+      },
+    })
+    t.id('someID', {
+      subscribe() {
+        return mockStream(10, 'abc', (id) => id)
+      },
+      resolve: (event) => {
+        return event
+      },
     })
   },
 })

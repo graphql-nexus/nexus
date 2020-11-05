@@ -1,15 +1,7 @@
 import { GraphQLFieldResolver } from 'graphql'
-import {
-  AbstractTypeResolver,
-  AllInputTypes,
-  FieldResolver,
-  GetGen,
-  GetGen3,
-  HasGen3,
-  NeedsResolver,
-} from '../typegenTypeHelpers'
+import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
-import { AllNexusNamedInputTypeDefs, AllNexusNamedOutputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
+import { AllNexusNamedInputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
@@ -64,28 +56,22 @@ export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   subscribe?: GraphQLFieldResolver<any, any>
 }
 
-/**
- * Ensure type-safety by checking
- */
-export type ScalarOutSpread<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? HasGen3<'argTypes', TypeName, FieldName> extends true
+// prettier-ignore
+export type ScalarOutSpread<TypeName extends string, FieldName extends string> =
+  NeedsResolver<TypeName, FieldName> extends true
     ? [ScalarOutConfig<TypeName, FieldName>]
-    : [ScalarOutConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
-  : HasGen3<'argTypes', TypeName, FieldName> extends true
-  ? [ScalarOutConfig<TypeName, FieldName>]
-  : [] | [FieldResolver<TypeName, FieldName>] | [ScalarOutConfig<TypeName, FieldName>]
+    : HasGen3<'argTypes', TypeName, FieldName> extends true
+      ? [ScalarOutConfig<TypeName, FieldName>]
+      : [ScalarOutConfig<TypeName, FieldName>] | []
 
-export type ScalarOutConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? OutputScalarConfig<TypeName, FieldName> & {
-      resolve: FieldResolver<TypeName, FieldName>
-    }
-  : OutputScalarConfig<TypeName, FieldName>
+// prettier-ignore
+export type ScalarOutConfig<TypeName extends string, FieldName extends string> =
+  NeedsResolver<TypeName, FieldName> extends true
+    ? OutputScalarConfig<TypeName, FieldName> &
+      {
+        resolve: FieldResolver<TypeName, FieldName>
+      }
+    : OutputScalarConfig<TypeName, FieldName>
 
 export type FieldOutConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
   TypeName,
@@ -110,9 +96,11 @@ export interface InputDefinitionBuilder {
   warn(msg: string): void
 }
 
+// prettier-ignore
 export interface OutputDefinitionBlock<TypeName extends string>
-  extends NexusGenCustomOutputMethods<TypeName>,
-    NexusGenCustomOutputProperties<TypeName> {}
+       extends NexusGenCustomOutputMethods<TypeName>,
+               NexusGenCustomOutputProperties<TypeName>
+       {}
 
 /**
  * The output definition block is passed to the "definition"
@@ -158,8 +146,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     // 2. NexusOutputFieldDef is contrained to be be a string
     // 3. so `name` is not compatible
     // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
-    const field: any = { name, ...fieldConfig }
-    this.typeBuilder.addField(this.decorateField(field))
+    this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
   }
 
   protected addScalarField(
@@ -171,12 +158,16 @@ export class OutputDefinitionBlock<TypeName extends string> {
       name: fieldName,
       type: typeName,
     }
+
     if (typeof opts[0] === 'function') {
-      // FIXME ditto to the one in `field` method
       config.resolve = opts[0] as any
+      console.warn(
+        `Since v0.18.0 Nexus no longer supports resolver shorthands like:\n\n    t.string("${fieldName}", () => ...).\n\nInstead please write:\n\n    t.string("${fieldName}", { resolve: () => ... })\n\nIn the next version of Nexus this will be a runtime error.`
+      )
     } else {
       config = { ...config, ...opts[0] }
     }
+
     this.typeBuilder.addField(this.decorateField(config))
   }
 
@@ -287,8 +278,4 @@ export class InputDefinitionBlock<TypeName extends string> {
     }
     return config
   }
-}
-
-export interface AbstractOutputDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
-  setResolveType(fn: AbstractTypeResolver<TypeName>): void
 }

@@ -40,7 +40,7 @@ type Post implements Node {
 
 input PostFilters {
   order: OrderEnum!
-  search: String
+  search: String = "nexus"
 }
 
 type Query {

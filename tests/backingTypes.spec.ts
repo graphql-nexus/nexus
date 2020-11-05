@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { core, enumType, makeSchema, queryType } from '..'
+import { core, enumType, makeSchema, objectType, queryType } from '../'
 import { A, B } from './_types'
 
 const { TypegenPrinter, TypegenMetadata } = core
@@ -111,5 +111,71 @@ describe('rootTypings', () => {
       typegenFile: '',
     })
     expect(typegen.print()).toMatchSnapshot()
+  })
+
+  it('throws error if root typing path is not an absolute path', async () => {
+    const metadata = new TypegenMetadata({
+      outputs: { typegen: false, schema: false },
+    })
+    const someType = objectType({
+      name: 'SomeType',
+      rootTyping: {
+        name: 'invalid',
+        path: './fzeffezpokm',
+      },
+      definition(t) {
+        t.id('id')
+      },
+    })
+
+    const schema = makeSchema({
+      types: [someType],
+      outputs: false,
+    })
+
+    const typegenInfo = await metadata.getTypegenInfo(schema)
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: '',
+    })
+
+    expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
+      `"Expected an absolute path for the root typing path of the type SomeType, saw ./fzeffezpokm"`
+    )
+  })
+
+  it('throws error if root typing path does not exist', async () => {
+    const metadata = new TypegenMetadata({
+      outputs: { typegen: false, schema: false },
+    })
+    const someType = objectType({
+      name: 'SomeType',
+      rootTyping: {
+        name: 'invalid',
+        path: __dirname + '/invalid_path.ts',
+      },
+      definition(t) {
+        t.id('id')
+      },
+    })
+
+    const schema = makeSchema({
+      types: [someType],
+      outputs: false,
+    })
+
+    const typegenInfo = await metadata.getTypegenInfo(schema)
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenFile: '',
+    })
+
+    try {
+      typegen.print()
+    } catch (e) {
+      expect(e.message.replace(__dirname, '')).toMatchInlineSnapshot(
+        `"Root typing path /invalid_path.ts for the type SomeType does not exist"`
+      )
+    }
   })
 })

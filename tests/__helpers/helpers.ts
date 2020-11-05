@@ -1,5 +1,5 @@
 import * as GQL from 'graphql'
-import { inputObjectType, objectType } from '../src'
+import { inputObjectType, objectType } from '../../src'
 
 /**
  * Used in testing, creates a generic "User" object
@@ -7,9 +7,9 @@ import { inputObjectType, objectType } from '../src'
 export const UserObject = objectType({
   name: 'User',
   definition(t) {
-    t.id('id', () => `User:1` as any)
-    t.string('email', () => 'test@example.com' as any)
-    t.string('name', () => `Test User` as any)
+    t.id('id', { resolve: () => `User:1` as any })
+    t.string('email', { resolve: () => 'test@example.com' as any })
+    t.string('name', { resolve: () => `Test User` as any })
   },
 })
 
