@@ -1274,11 +1274,9 @@ export class SchemaBuilder {
   }
 
   protected getOrBuildType(
-    inputType: string | AllNexusNamedTypeDefs,
+    type: string | AllNexusNamedTypeDefs,
     fromObject: boolean = false
   ): GraphQLNamedType {
-    const type = getNexusNamedType(inputType)
-
     invariantGuard(type)
 
     if (isNexusNamedTypeDef(type)) {
