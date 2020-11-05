@@ -20,6 +20,6 @@ exports[`inputObject throws when chaining .list twice 1`] = `"Cannot chain list.
 
 exports[`inputObject warns when specifying .list and list: true 1`] = `
 Array [
-  "It looks like you chained .list and set list for someField. You should only do one or the other",
+  "It looks like you chained .list and used list() for someField. You should only do one or the other",
 ]
 `;

@@ -1,9 +1,13 @@
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
+  GraphQLInputType,
   GraphQLInterfaceType,
+  GraphQLList,
   GraphQLNamedType,
+  GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLOutputType,
   GraphQLResolveInfo,
   GraphQLScalarType,
   GraphQLSchema,
@@ -22,8 +26,16 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
-import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
 import { decorateType } from './definitions/decorateType'
+import {
+  AllNexusInputTypeDefs,
+  AllNexusNamedTypeDefs,
+  AllNexusOutputTypeDefs,
+  AllNexusTypeDefs,
+  isNexusListTypeDef,
+  isNexusNonNullTypeDef,
+} from './definitions/wrapping'
+import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
 import { PluginConfig } from './plugin'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
@@ -430,4 +442,67 @@ export function dump(x: any) {
 
 export function isNodeModule(path: string) {
   return /^([A-z0-9@])/.test(path)
+}
+
+function unwrapNexusType(
+  type: AllNexusTypeDefs
+): { namedType: AllNexusNamedTypeDefs; wrapping: ('List' | 'NonNull')[] } {
+  const wrapping: ('List' | 'NonNull')[] = []
+  let namedType = type
+
+  while (isNexusListTypeDef(namedType) || isNexusNonNullTypeDef(namedType)) {
+    wrapping.unshift(isNexusListTypeDef(namedType) ? 'List' : 'NonNull')
+    namedType = namedType.ofType
+  }
+
+  return { namedType, wrapping }
+}
+
+export function unwrapGraphQLType(
+  type: GraphQLType
+): { namedType: GraphQLType; wrapping: ('List' | 'NonNull')[] } {
+  const wrapping: ('List' | 'NonNull')[] = []
+  let namedType = type
+
+  while (isListType(namedType) || isNonNullType(namedType)) {
+    wrapping.unshift(isListType(namedType) ? 'List' : 'NonNull')
+    namedType = namedType.ofType
+  }
+
+  return { namedType, wrapping }
+}
+
+export function nexusWrappedTypeToGraphQL(
+  type: AllNexusOutputTypeDefs | string,
+  graphqlNamedType: GraphQLNamedType
+): GraphQLOutputType
+export function nexusWrappedTypeToGraphQL(
+  type: AllNexusInputTypeDefs | string,
+  graphqlNamedType: GraphQLNamedType
+): GraphQLInputType
+export function nexusWrappedTypeToGraphQL(
+  type: AllNexusTypeDefs | string,
+  graphqlNamedType: GraphQLNamedType
+) {
+  if (typeof type === 'string') {
+    return graphqlNamedType
+  }
+
+  return unwrapNexusType(type).wrapping.reduce<GraphQLType>((acc, kind) => {
+    return kind === 'List' ? GraphQLList(acc) : kind === 'NonNull' ? GraphQLNonNull(acc) : acc
+  }, graphqlNamedType)
+}
+
+export function getNexusNamedType(type: AllNexusTypeDefs | string): AllNexusNamedTypeDefs | string {
+  if (typeof type === 'string') {
+    return type
+  }
+
+  let namedType = type
+
+  while (isNexusNonNullTypeDef(namedType) || isNexusListTypeDef(namedType)) {
+    namedType = namedType.ofType
+  }
+
+  return namedType
 }

@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { inputObjectType, makeSchema, objectType, queryField } from '../src/core'
+import { inputObjectType, list, makeSchema, objectType, queryField } from '../src/core'
 
 describe('inputObject', () => {
   it('builds creates an inputObject type', async () => {
@@ -81,8 +81,7 @@ describe('inputObject', () => {
           name: 'throwingList',
           definition(t) {
             t.list.field('someField', {
-              list: true,
-              type: 'Boolean',
+              type: list('Boolean'),
             })
           },
         }),

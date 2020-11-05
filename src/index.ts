@@ -4,6 +4,7 @@ import * as core from './core'
 // All of the Public API definitions
 export { makeSchema } from './builder'
 export { arg, booleanArg, floatArg, idArg, intArg, stringArg } from './definitions/args'
+export { list, nonNull } from './definitions/list'
 export { decorateType } from './definitions/decorateType'
 export { enumType } from './definitions/enumType'
 export { extendInputType } from './definitions/extendInputType'

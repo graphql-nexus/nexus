@@ -40,6 +40,7 @@ export enum NexusTypes {
   Interface = 'Interface',
   List = 'List',
   NonNull = 'NonNull',
+  Null = 'Null',
   Object = 'Object',
   OutputField = 'OutputField',
   Plugin = 'Plugin',

@@ -1,15 +1,11 @@
 import { GraphQLFieldResolver } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
-import { AllNexusNamedInputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
+import { list } from './list'
+import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, isNexusListTypeDef } from './wrapping'
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
-  /**
-   * Whether the field can be null
-   * @default (depends on whether nullability is configured in type or schema)
-   */
-  nullable?: boolean
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -19,16 +15,6 @@ export interface CommonFieldConfig {
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string // | DeprecationInfo;
-  /**
-   * Whether the field is list of values, or just a single value.
-   *
-   * If list is true, we assume the field is a list. If list is an array,
-   * we'll assume that it's a list with the depth. The boolean indicates whether
-   * the field is required (non-null).
-   *
-   * @see TODO: Examples
-   */
-  list?: true | boolean[]
 }
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
@@ -173,13 +159,13 @@ export class OutputDefinitionBlock<TypeName extends string> {
 
   protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
     if (this.isList) {
-      if (config.list) {
+      if (isNexusListTypeDef(config.type)) {
         this.typeBuilder.warn(
-          `It looks like you chained .list and set list for ${config.name}. ` +
+          `It looks like you chained .list and used list() for ${config.name}. ` +
             'You should only do one or the other'
         )
       } else {
-        config.list = true
+        config.type = list(config.type)
       }
     }
     return config
@@ -200,7 +186,7 @@ export interface ScalarInputFieldConfig<T> extends CommonFieldConfig {
 
 export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string>
   extends ScalarInputFieldConfig<GetGen3<'inputTypes', TypeName, FieldName>> {
-  type: AllInputTypes | AllNexusNamedInputTypeDefs<string>
+  type: AllInputTypes | AllNexusInputTypeDefs<string>
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -267,13 +253,13 @@ export class InputDefinitionBlock<TypeName extends string> {
 
   protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
     if (this.isList) {
-      if (config.list) {
+      if (isNexusListTypeDef(config.type)) {
         this.typeBuilder.warn(
-          `It looks like you chained .list and set list for ${config.name}. ` +
+          `It looks like you chained .list and used list() for ${config.name}. ` +
             'You should only do one or the other'
         )
       } else {
-        config.list = true
+        config.type = list(config.type)
       }
     }
     return config

@@ -1,5 +1,5 @@
 import * as GQL from 'graphql'
-import { makeSchema, subscriptionType } from '../src/core'
+import { list, makeSchema, subscriptionType } from '../src/core'
 import { mockStream, subscribe, take } from './__helpers'
 
 it('defines a field on the mutation type as shorthand', async () => {
@@ -17,7 +17,8 @@ it('defines a field on the mutation type as shorthand', async () => {
               return event
             },
           })
-          t.list.int('someInts', {
+          t.field('someInts', {
+            type: list('Int'),
             subscribe() {
               return mockStream(10, 0, (int) => int + 1)
             },

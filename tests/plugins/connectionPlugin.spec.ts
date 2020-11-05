@@ -8,7 +8,7 @@ import {
   printType,
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
-import { arg, connectionPlugin, makeSchema, objectType } from '../../src'
+import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -624,8 +624,7 @@ describe('global plugin configuration', () => {
     const schema = makeTestSchema({
       additionalArgs: {
         order: arg({
-          type: 'String',
-          required: true,
+          type: nonNull('String'),
           description: 'This should be included',
         }),
       },
@@ -668,8 +667,7 @@ describe('field level configuration', () => {
       {
         additionalArgs: {
           order: arg({
-            type: 'String',
-            required: true,
+            type: nonNull('String'),
             description: 'This should be ignored',
           }),
         },
@@ -691,8 +689,7 @@ describe('field level configuration', () => {
       {
         additionalArgs: {
           order: arg({
-            type: 'String',
-            required: true,
+            type: nonNull('String'),
             description: 'This should be included',
           }),
         },
