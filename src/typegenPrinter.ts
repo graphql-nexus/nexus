@@ -98,8 +98,8 @@ export class TypegenPrinter {
       this.printTypeNames('interface', 'NexusGenInterfaceNames'),
       this.printTypeNames('scalar', 'NexusGenScalarNames'),
       this.printTypeNames('union', 'NexusGenUnionNames'),
-      this.printIsTypeOfObjectNames('NexusGenIsTypeOfObjectNames'),
-      this.printResolveTypeUnionInterface('NexusGenResolveTypeImplemented'),
+      this.printIsTypeOfObjectTypeNames('NexusGenIsTypeOfObjectNames'),
+      this.printResolveTypeAbstractTypes('NexusGenResolveTypeImplemented'),
       this.printChecksConfig('NexusGenFeaturesConfig'),
       this.printGenTypeMap(),
       this.printPlugins(),
@@ -351,7 +351,7 @@ export class TypegenPrinter {
     return `export type ${exportName} = ${typeDef};`
   }
 
-  printIsTypeOfObjectNames(exportName: string) {
+  printIsTypeOfObjectTypeNames(exportName: string) {
     const obj = this.groupedTypes.object.filter((o) => o.isTypeOf !== undefined)
     const typeDef =
       obj.length === 0
@@ -363,7 +363,7 @@ export class TypegenPrinter {
     return `export type ${exportName} = ${typeDef};`
   }
 
-  printResolveTypeUnionInterface(exportName: string) {
+  printResolveTypeAbstractTypes(exportName: string) {
     const obj = [...this.groupedTypes.interface, ...this.groupedTypes.union].filter(
       (o) => o.resolveType !== undefined
     )

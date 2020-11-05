@@ -1580,7 +1580,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
 }
 
 function setConfigDefaults(config: SchemaConfig): SchemaConfig {
-  const unionsDefault: NexusFeatures['abstractTypes'] = {
+  const abstractTypesDefault: NexusFeatures['abstractTypes'] = {
     isTypeOf: true,
     resolveType: false,
     __typename: false,
@@ -1588,12 +1588,12 @@ function setConfigDefaults(config: SchemaConfig): SchemaConfig {
 
   if (!config.features) {
     config.features = {
-      abstractTypes: unionsDefault,
+      abstractTypes: abstractTypesDefault,
     }
   }
 
   if (!config.features.abstractTypes) {
-    config.features.abstractTypes = unionsDefault
+    config.features.abstractTypes = abstractTypesDefault
   }
 
   return config
