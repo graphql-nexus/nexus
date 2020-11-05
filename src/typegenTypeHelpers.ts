@@ -355,13 +355,18 @@ export type IsTypeOf<TypeName extends string> = GetGen3<
   'abstractTypes',
   'isTypeOf',
   false
-> extends true
-  ? ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
-    ? {
-        isTypeOf?: IsTypeOfHandler<TypeName>
-      }
-    : { isTypeOf: IsTypeOfHandler<TypeName> }
-  : {}
+> extends false
+  ? {}
+  : ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
+  ? {
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  : // Make isTypeOf optional as soon as __typename is enabled
+  GetGen3<'features', 'abstractTypes', '__typename', false> extends true
+  ? {
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  : { isTypeOf: IsTypeOfHandler<TypeName> }
 
 /**
  * Conditionally returns the `resolveType` field
@@ -374,6 +379,16 @@ export type ResolveType<TypeName extends string> = GetGen3<
 > extends false
   ? {} // remove field altogether is feature is not enabled
   : IsTypeOfImplementedInAllMembers<TypeName> extends true
+  ? {
+      /**
+       * Optionally provide a custom type resolver function. If one is not provided,
+       * the default implementation will call `isTypeOf` on each implementing
+       * Object type.
+       */
+      resolveType?: AbstractTypeResolver<TypeName>
+    }
+  : // Make resolveType optional as soon as __typename is enabled
+  GetGen3<'features', 'abstractTypes', '__typename', false> extends true
   ? {
       /**
        * Optionally provide a custom type resolver function. If one is not provided,
