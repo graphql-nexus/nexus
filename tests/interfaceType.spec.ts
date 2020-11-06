@@ -1,6 +1,6 @@
 import { graphql } from 'graphql'
 import path from 'path'
-import { interfaceType, makeSchema, objectType, queryField } from '../src/core'
+import { interfaceType, makeSchema, objectType, queryField, generateSchema } from '../src/core'
 
 describe('interfaceType', () => {
   it('can be implemented by object types', async () => {
@@ -134,6 +134,38 @@ describe('interfaceType', () => {
         shouldGenerateArtifacts: false,
       })
     ).toThrowErrorMatchingSnapshot()
+  })
+  it('deduplicates interfaces implementing interfaces', async () => {
+    const { schemaTypes } = await generateSchema.withArtifacts(
+      {
+        types: [
+          interfaceType({
+            name: 'Node',
+            definition(t) {
+              t.id('id')
+              t.resolveType(() => null)
+            },
+          }),
+          interfaceType({
+            name: 'Node2',
+            definition(t) {
+              t.implements('Node')
+              t.id('id2')
+              t.resolveType(() => null)
+            },
+          }),
+          objectType({
+            name: 'Foo',
+            definition(t) {
+              t.implements('Node2', 'Node')
+            },
+          }),
+        ],
+        outputs: false,
+      },
+      false
+    )
+    expect(schemaTypes).toMatchSnapshot()
   })
   it('detects circular dependencies', async () => {
     expect(() =>

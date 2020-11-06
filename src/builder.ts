@@ -1054,7 +1054,7 @@ export class SchemaBuilder {
       const type = this.getInterface(i)
       list.push(type, ...type.getInterfaces())
     })
-    return list
+    return Array.from(new Set(list))
   }
 
   protected buildInterfaceFields(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
