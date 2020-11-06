@@ -1,0 +1,469 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`nonNullDefaults: { output: false } graphql native list(String) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(list(String)) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(list(list(String))) ; nonNullDefault=false 1`] = `"[[[String]]]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(list(nonNull(String))) ; nonNullDefault=false 1`] = `"[[String!]]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(list(nullable(String))) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nonNull(String)) ; nonNullDefault=false 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nonNull(list(String))) ; nonNullDefault=false 1`] = `"[[String]!]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nonNull(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nonNull(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nullable(String)) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nullable(list(String))) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nullable(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native list(nullable(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(String) ; nonNullDefault=false 1`] = `"String!"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(list(String)) ; nonNullDefault=false 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(list(list(String))) ; nonNullDefault=false 1`] = `"[[String]]!"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(list(nonNull(String))) ; nonNullDefault=false 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(list(nullable(String))) ; nonNullDefault=false 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nonNull(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nonNull(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nonNull(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nonNull(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nullable(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nullable(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nullable(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nonNull(nullable(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(String) ; nonNullDefault=false 1`] = `"String"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(list(String)) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(list(list(String))) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(list(nonNull(String))) ; nonNullDefault=false 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(list(nullable(String))) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nonNull(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nonNull(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nonNull(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nonNull(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nullable(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nullable(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nullable(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } graphql native nullable(nullable(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } list(String) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } list(list(String)) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } list(list(list(String))) ; nonNullDefault=false 1`] = `"[[[String]]]"`;
+
+exports[`nonNullDefaults: { output: false } list(list(nonNull(String))) ; nonNullDefault=false 1`] = `"[[String!]]"`;
+
+exports[`nonNullDefaults: { output: false } list(list(nullable(String))) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } list(nonNull(String)) ; nonNullDefault=false 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: false } list(nonNull(list(String))) ; nonNullDefault=false 1`] = `"[[String]!]"`;
+
+exports[`nonNullDefaults: { output: false } list(nonNull(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } list(nonNull(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } list(nullable(String)) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } list(nullable(list(String))) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } list(nullable(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } list(nullable(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(Foo) ; nonNullDefault=false 1`] = `"[Foo]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(list(Foo)) ; nonNullDefault=false 1`] = `"[[Foo]]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(list(list(Foo))) ; nonNullDefault=false 1`] = `"[[[Foo]]]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(list(nonNull(Foo))) ; nonNullDefault=false 1`] = `"[[Foo!]]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(list(nullable(Foo))) ; nonNullDefault=false 1`] = `"[[Foo]]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nonNull(Foo)) ; nonNullDefault=false 1`] = `"[Foo!]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nonNull(list(Foo))) ; nonNullDefault=false 1`] = `"[[Foo]!]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nonNull(nonNull(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nonNull(nullable(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nullable(Foo)) ; nonNullDefault=false 1`] = `"[Foo]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nullable(list(Foo))) ; nonNullDefault=false 1`] = `"[[Foo]]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nullable(nonNull(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def list(nullable(nullable(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(Foo) ; nonNullDefault=false 1`] = `"Foo!"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(list(Foo)) ; nonNullDefault=false 1`] = `"[Foo]!"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(list(list(Foo))) ; nonNullDefault=false 1`] = `"[[Foo]]!"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(list(nonNull(Foo))) ; nonNullDefault=false 1`] = `"[Foo!]!"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(list(nullable(Foo))) ; nonNullDefault=false 1`] = `"[Foo]!"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nonNull(Foo)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nonNull(list(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nonNull(nonNull(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nonNull(nullable(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nullable(Foo)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nullable(list(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nullable(nonNull(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nonNull(nullable(nullable(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(Foo) ; nonNullDefault=false 1`] = `"Foo"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(list(Foo)) ; nonNullDefault=false 1`] = `"[Foo]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(list(list(Foo))) ; nonNullDefault=false 1`] = `"[[Foo]]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(list(nonNull(Foo))) ; nonNullDefault=false 1`] = `"[Foo!]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(list(nullable(Foo))) ; nonNullDefault=false 1`] = `"[Foo]"`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nonNull(Foo)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nonNull(list(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nonNull(nonNull(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nonNull(nullable(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nullable(Foo)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nullable(list(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nullable(nonNull(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nexus def nullable(nullable(nullable(Foo))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(String) ; nonNullDefault=false 1`] = `"String!"`;
+
+exports[`nonNullDefaults: { output: false } nonNull(list(String)) ; nonNullDefault=false 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: false } nonNull(list(list(String))) ; nonNullDefault=false 1`] = `"[[String]]!"`;
+
+exports[`nonNullDefaults: { output: false } nonNull(list(nonNull(String))) ; nonNullDefault=false 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: false } nonNull(list(nullable(String))) ; nonNullDefault=false 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nonNull(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nonNull(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nonNull(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nonNull(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nullable(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nullable(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nullable(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nonNull(nullable(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nullable(String) ; nonNullDefault=false 1`] = `"String"`;
+
+exports[`nonNullDefaults: { output: false } nullable(list(String)) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } nullable(list(list(String))) ; nonNullDefault=false 1`] = `"[[String]]"`;
+
+exports[`nonNullDefaults: { output: false } nullable(list(nonNull(String))) ; nonNullDefault=false 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: false } nullable(list(nullable(String))) ; nonNullDefault=false 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: false } nullable(nonNull(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nonNull(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nonNull(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nonNull(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nullable(String)) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nullable(list(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nullable(nonNull(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: false } nullable(nullable(nullable(String))) ; nonNullDefault=false 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(String) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(list(String)) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(list(list(String))) ; nonNullDefault=true 1`] = `"[[[String!]!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(list(nonNull(String))) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(list(nullable(String))) ; nonNullDefault=true 1`] = `"[[String]!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nonNull(String)) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nonNull(list(String))) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nonNull(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nonNull(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nullable(String)) ; nonNullDefault=true 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nullable(list(String))) ; nonNullDefault=true 1`] = `"[[String!]]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nullable(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native list(nullable(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(String) ; nonNullDefault=true 1`] = `"String!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(list(String)) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(list(list(String))) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(list(nonNull(String))) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(list(nullable(String))) ; nonNullDefault=true 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nonNull(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nonNull(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nonNull(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nonNull(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nullable(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nullable(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nullable(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nonNull(nullable(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(String) ; nonNullDefault=true 1`] = `"String"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(list(String)) ; nonNullDefault=true 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(list(list(String))) ; nonNullDefault=true 1`] = `"[[String!]!]"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(list(nonNull(String))) ; nonNullDefault=true 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(list(nullable(String))) ; nonNullDefault=true 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nonNull(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nonNull(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nonNull(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nonNull(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nullable(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nullable(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nullable(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } graphql native nullable(nullable(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } list(String) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(list(String)) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(list(list(String))) ; nonNullDefault=true 1`] = `"[[[String!]!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(list(nonNull(String))) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(list(nullable(String))) ; nonNullDefault=true 1`] = `"[[String]!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(nonNull(String)) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(nonNull(list(String))) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } list(nonNull(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } list(nonNull(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } list(nullable(String)) ; nonNullDefault=true 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: true } list(nullable(list(String))) ; nonNullDefault=true 1`] = `"[[String!]]!"`;
+
+exports[`nonNullDefaults: { output: true } list(nullable(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } list(nullable(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(Foo) ; nonNullDefault=true 1`] = `"[Foo!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(list(Foo)) ; nonNullDefault=true 1`] = `"[[Foo!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(list(list(Foo))) ; nonNullDefault=true 1`] = `"[[[Foo!]!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(list(nonNull(Foo))) ; nonNullDefault=true 1`] = `"[[Foo!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(list(nullable(Foo))) ; nonNullDefault=true 1`] = `"[[Foo]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nonNull(Foo)) ; nonNullDefault=true 1`] = `"[Foo!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nonNull(list(Foo))) ; nonNullDefault=true 1`] = `"[[Foo!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nonNull(nonNull(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nonNull(nullable(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nullable(Foo)) ; nonNullDefault=true 1`] = `"[Foo]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nullable(list(Foo))) ; nonNullDefault=true 1`] = `"[[Foo!]]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nullable(nonNull(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def list(nullable(nullable(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(Foo) ; nonNullDefault=true 1`] = `"Foo!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(list(Foo)) ; nonNullDefault=true 1`] = `"[Foo!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(list(list(Foo))) ; nonNullDefault=true 1`] = `"[[Foo!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(list(nonNull(Foo))) ; nonNullDefault=true 1`] = `"[Foo!]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(list(nullable(Foo))) ; nonNullDefault=true 1`] = `"[Foo]!"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nonNull(Foo)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nonNull(list(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nonNull(nonNull(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nonNull(nullable(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nullable(Foo)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nullable(list(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nullable(nonNull(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nonNull(nullable(nullable(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(Foo) ; nonNullDefault=true 1`] = `"Foo"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(list(Foo)) ; nonNullDefault=true 1`] = `"[Foo!]"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(list(list(Foo))) ; nonNullDefault=true 1`] = `"[[Foo!]!]"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(list(nonNull(Foo))) ; nonNullDefault=true 1`] = `"[Foo!]"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(list(nullable(Foo))) ; nonNullDefault=true 1`] = `"[Foo]"`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nonNull(Foo)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nonNull(list(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nonNull(nonNull(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nonNull(nullable(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nullable(Foo)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nullable(list(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nullable(nonNull(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nexus def nullable(nullable(nullable(Foo))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(String) ; nonNullDefault=true 1`] = `"String!"`;
+
+exports[`nonNullDefaults: { output: true } nonNull(list(String)) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } nonNull(list(list(String))) ; nonNullDefault=true 1`] = `"[[String!]!]!"`;
+
+exports[`nonNullDefaults: { output: true } nonNull(list(nonNull(String))) ; nonNullDefault=true 1`] = `"[String!]!"`;
+
+exports[`nonNullDefaults: { output: true } nonNull(list(nullable(String))) ; nonNullDefault=true 1`] = `"[String]!"`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nonNull(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nonNull(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nonNull(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nonNull(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nullable(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nullable(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nullable(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nonNull(nullable(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nullable(String) ; nonNullDefault=true 1`] = `"String"`;
+
+exports[`nonNullDefaults: { output: true } nullable(list(String)) ; nonNullDefault=true 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: true } nullable(list(list(String))) ; nonNullDefault=true 1`] = `"[[String!]!]"`;
+
+exports[`nonNullDefaults: { output: true } nullable(list(nonNull(String))) ; nonNullDefault=true 1`] = `"[String!]"`;
+
+exports[`nonNullDefaults: { output: true } nullable(list(nullable(String))) ; nonNullDefault=true 1`] = `"[String]"`;
+
+exports[`nonNullDefaults: { output: true } nullable(nonNull(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nonNull(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nonNull(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nonNull(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nonNull]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nullable(String)) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nullable(list(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nullable(nonNull(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nonNull in a nullable]`;
+
+exports[`nonNullDefaults: { output: true } nullable(nullable(nullable(String))) ; nonNullDefault=true 1`] = `[Error: Cannot wrap a nullable in a nullable]`;

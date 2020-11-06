@@ -18,7 +18,6 @@ import {
   GraphQLInputType,
   GraphQLInt,
   GraphQLInterfaceType,
-  GraphQLList,
   GraphQLNamedType,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -31,9 +30,7 @@ import {
   isInputObjectType,
   isInterfaceType,
   isLeafType,
-  isListType,
   isNamedType,
-  isNonNullType,
   isObjectType,
   isOutputType,
   isScalarType,
@@ -120,11 +117,10 @@ import {
   consoleWarn,
   eachObj,
   firstDefined,
-  unwrapGraphQLType,
   getNexusNamedType,
   isObject,
   mapValues,
-  nexusWrappedTypeToGraphQL,
+  wrapGraphQLType,
   objValues,
   UNKNOWN_TYPE_SCALAR,
   validateOnInstallHookResult,
@@ -1095,6 +1091,17 @@ export class SchemaBuilder {
     return fieldMap
   }
 
+  protected getNonNullDefault(
+    typeConfig:
+      | NexusGraphQLObjectTypeConfig
+      | NexusGraphQLInterfaceTypeConfig
+      | NexusGraphQLInputObjectTypeConfig,
+    kind: 'input' | 'output'
+  ): boolean {
+    const { nonNullDefaults = {} } = typeConfig.extensions?.nexus?.config || {}
+    return firstDefined(nonNullDefaults[kind], this.nonNullDefaults[kind], false)
+  }
+
   protected buildOutputField(
     fieldConfig: NexusOutputFieldDef,
     typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
@@ -1104,9 +1111,11 @@ export class SchemaBuilder {
       throw new Error(`Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`)
     }
     const fieldExtension = new NexusFieldExtension(fieldConfig)
+
+    const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
     const builderFieldConfig: Omit<NexusGraphQLFieldConfig, 'resolve' | 'subscribe'> = {
       name: fieldConfig.name,
-      type: this.decorateType(typeConfig, this.getOutputType(fieldConfig.type), 'output'),
+      type: this.getOutputType(fieldConfig.type, nonNullDefault),
       args: this.buildArgs(fieldConfig.args || {}, typeConfig),
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
@@ -1146,8 +1155,10 @@ export class SchemaBuilder {
     field: NexusInputFieldDef,
     typeConfig: NexusGraphQLInputObjectTypeConfig
   ): GraphQLInputFieldConfig {
+    const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
+
     return {
-      type: this.decorateType(typeConfig, this.getInputType(field.type), 'output'),
+      type: this.getInputType(field.type, nonNullDefault),
       defaultValue: field.default,
       description: field.description,
     }
@@ -1163,71 +1174,15 @@ export class SchemaBuilder {
       // TODO: figure out how to elegantly enable NexusArgsDef to be passed to getNexusNamedType
       const namedArg = getNexusNamedType(args[argName] as any) as AllNexusNamedInputTypeDefs
       const argDef = normalizeArg(namedArg).value
+      const nonNullDefault = this.getNonNullDefault(typeConfig, 'input')
+
       allArgs[argName] = {
-        type: this.decorateType(typeConfig, this.getInputType(argDef.type), 'input'),
+        type: this.getInputType(argDef.type, nonNullDefault),
         description: argDef.description,
         defaultValue: argDef.default,
       }
     })
     return allArgs
-  }
-
-  protected decorateListWithNonNulls(type: GraphQLList<any>): GraphQLType {
-    const { wrapping, namedType } = unwrapGraphQLType(type)
-
-    return wrapping.reduce<GraphQLType>((namedType, kind) => {
-      namedType = GraphQLNonNull(namedType)
-
-      if (kind === 'List') {
-        namedType = GraphQLNonNull(GraphQLList(namedType))
-      }
-
-      return namedType
-    }, namedType)
-  }
-
-  protected decorateType(
-    typeDef:
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLInputObjectTypeConfig,
-    type: GraphQLInputType,
-    kind: 'input' | 'output'
-  ): GraphQLInputType | GraphQLNonNull<GraphQLInputType>
-  protected decorateType(
-    typeDef:
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLInputObjectTypeConfig,
-    type: GraphQLOutputType,
-    kind: 'input' | 'output'
-  ): GraphQLOutputType | GraphQLNonNull<GraphQLOutputType>
-  protected decorateType(
-    typeDef:
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLInputObjectTypeConfig,
-    type: GraphQLOutputType | GraphQLInputType,
-    kind: 'input' | 'output'
-  ): GraphQLOutputType | GraphQLInputType | GraphQLNonNull<GraphQLOutputType | GraphQLInputType> {
-    const { nonNullDefaults = {} } = typeDef.extensions?.nexus?.config || {}
-    const isNonNull = firstDefined(nonNullDefaults[kind], this.nonNullDefaults[kind], false)
-
-    if (isNonNull) {
-      if (isListType(type) || (isNonNullType(type) && isListType(type.ofType))) {
-        return this.decorateListWithNonNulls(type)
-      }
-
-      return GraphQLNonNull(type)
-    }
-
-    return type
   }
 
   protected getInterface(name: string | NexusInterfaceTypeDef<any>): GraphQLInterfaceType {
@@ -1239,26 +1194,37 @@ export class SchemaBuilder {
     return type
   }
 
-  protected getInputType(name: string | AllNexusInputTypeDefs): GraphQLInputType {
-    const namedType = getNexusNamedType(name)
-    const type = this.getOrBuildType(namedType)
-    if (!isInputObjectType(type) && !isLeafType(type)) {
+  protected getInputType(
+    nexusType: string | AllNexusInputTypeDefs,
+    nonNullDefault: boolean
+  ): GraphQLInputType {
+    const nexusNamedType = getNexusNamedType(nexusType)
+    const graphqlType = this.getOrBuildType(nexusNamedType)
+    if (!isInputObjectType(graphqlType) && !isLeafType(graphqlType)) {
       /* istanbul ignore next */
-      throw new Error(`Expected ${namedType} to be a possible input type, saw ${type.constructor.name}`)
+      throw new Error(
+        `Expected ${nexusNamedType} to be a possible input type, saw ${graphqlType.constructor.name}`
+      )
     }
 
-    return nexusWrappedTypeToGraphQL(name, type)
+    return wrapGraphQLType(nexusType, graphqlType, nonNullDefault)
   }
 
-  protected getOutputType(name: string | AllNexusOutputTypeDefs): GraphQLOutputType {
-    const namedType = getNexusNamedType(name)
-    const type = this.getOrBuildType(namedType)
-    if (!isOutputType(type)) {
+  protected getOutputType(
+    nexusType: string | AllNexusOutputTypeDefs,
+    nonNullDefault: boolean
+  ): GraphQLOutputType {
+    const nexusNamedType = getNexusNamedType(nexusType)
+    const graphqlType = this.getOrBuildType(nexusNamedType)
+
+    if (!isOutputType(graphqlType)) {
       /* istanbul ignore next */
-      throw new Error(`Expected ${namedType} to be a valid output type, saw ${type.constructor.name}`)
+      throw new Error(
+        `Expected ${nexusNamedType} to be a valid output type, saw ${graphqlType.constructor.name}`
+      )
     }
 
-    return nexusWrappedTypeToGraphQL(name, type)
+    return wrapGraphQLType(nexusType, graphqlType, nonNullDefault)
   }
 
   protected getObjectType(name: string | NexusObjectTypeDef<string>): GraphQLObjectType {

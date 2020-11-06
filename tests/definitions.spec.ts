@@ -2,7 +2,8 @@
 import { GraphQLEnumType, GraphQLObjectType, printType } from 'graphql'
 import { TypeMap } from 'graphql/type/schema'
 import { enumType, extendInputType, extendType, idArg, inputObjectType, makeSchema, objectType } from '../src'
-import { list, nonNull } from '../src/definitions/list'
+import { list } from '../src/definitions/list'
+import { nonNull } from '../src/definitions/nonNull'
 import { PostObject, UserObject } from './__helpers'
 
 enum NativeColors {
