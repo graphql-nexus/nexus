@@ -25,18 +25,18 @@ import {
 } from 'graphql'
 import * as path from 'path'
 import { TypegenInfo } from './builder'
-import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import { NexusGraphQLSchema } from './definitions/_types'
+import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import { StringLike } from './plugin'
 import {
   eachObj,
   getOwnPackage,
   GroupedTypes,
   groupTypes,
+  isNodeModule,
   mapObj,
   PrintedGenTypingImport,
   relativePathTo,
-  isNodeModule,
 } from './utils'
 
 const SpecifiedScalars = {
@@ -98,8 +98,8 @@ export class TypegenPrinter {
       this.printTypeNames('interface', 'NexusGenInterfaceNames'),
       this.printTypeNames('scalar', 'NexusGenScalarNames'),
       this.printTypeNames('union', 'NexusGenUnionNames'),
-      this.printIsTypeOfObjectTypeNames('NexusGenIsTypeOfObjectNames'),
-      this.printResolveTypeAbstractTypes('NexusGenResolveTypeImplemented'),
+      this.printIsTypeOfObjectTypeNames('NexusGenObjectsUsingAbstractStrategyIsTypeOf'),
+      this.printResolveTypeAbstractTypes('NexusGenAbstractsUsingStrategyResolveType'),
       this.printChecksConfig('NexusGenFeaturesConfig'),
       this.printGenTypeMap(),
       this.printPlugins(),
@@ -144,8 +144,8 @@ export class TypegenPrinter {
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
         `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
-        `  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames;`,
-        `  resolveTypeImplemented: NexusGenResolveTypeImplemented;`,
+        `  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;`,
+        `  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;`,
         `  features: NexusGenFeaturesConfig;`,
       ])
       .concat('}')

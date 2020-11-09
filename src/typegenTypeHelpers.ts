@@ -150,8 +150,8 @@ export type GenTypesShapeKeys =
   | 'allNamedTypes'
   | 'abstractTypes'
   | 'abstractResolveReturn'
-  | 'isTypeOfObjectNames'
-  | 'resolveTypeImplemented'
+  | 'objectsUsingAbstractStrategyIsTypeOf'
+  | 'abstractsUsingStrategyResolveType'
   | 'features'
 
 /**
@@ -327,7 +327,7 @@ export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
  */
 export type ResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
   TypeName
-> extends GetGen<'resolveTypeImplemented'>
+> extends GetGen<'abstractsUsingStrategyResolveType'>
   ? true
   : false
 
@@ -337,7 +337,7 @@ export type ResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = 
 export type IsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
   'abstractResolveReturn',
   AbstractTypeName
-> extends GetGen<'isTypeOfObjectNames'>
+> extends GetGen<'objectsUsingAbstractStrategyIsTypeOf'>
   ? true
   : false
 
@@ -360,9 +360,8 @@ export type IsTypeOf<TypeName extends string> = GetGen3<
   : ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
   ? {
       isTypeOf?: IsTypeOfHandler<TypeName>
-    }
-  : // Make isTypeOf optional as soon as __typename is enabled
-  GetGen3<'features', 'abstractTypes', '__typename', false> extends true
+    } // Make isTypeOf optional as soon as __typename is enabled
+  : GetGen3<'features', 'abstractTypes', '__typename', false> extends true
   ? {
       isTypeOf?: IsTypeOfHandler<TypeName>
     }
@@ -386,9 +385,8 @@ export type ResolveType<TypeName extends string> = GetGen3<
        * Object type.
        */
       resolveType?: AbstractTypeResolver<TypeName>
-    }
-  : // Make resolveType optional as soon as __typename is enabled
-  GetGen3<'features', 'abstractTypes', '__typename', false> extends true
+    } // Make resolveType optional as soon as __typename is enabled
+  : GetGen3<'features', 'abstractTypes', '__typename', false> extends true
   ? {
       /**
        * Optionally provide a custom type resolver function. If one is not provided,
@@ -410,7 +408,7 @@ export type ResolveType<TypeName extends string> = GetGen3<
  * Returns whether a field which type is either an 'Object | Interface | Enum' should discriminate its return type with __typename
  */
 export type ShouldDiscriminateOutputTypeField<OutputTypeName extends string> = OutputTypeName extends GetGen<
-  'isTypeOfObjectNames'
+  'objectsUsingAbstractStrategyIsTypeOf'
 > // if it implements isTypeOf already
   ? false // then don't disable __typename feature
   : ResolveTypeImplementedInAllAbstractTypes<OutputTypeName> extends true // else if abstract implement resolve type
@@ -419,7 +417,7 @@ export type ShouldDiscriminateOutputTypeField<OutputTypeName extends string> = O
 
 export type ShouldDiscriminateAbstractTypeField<
   AbstractTypeName extends string
-> = AbstractTypeName extends GetGen<'resolveTypeImplemented'> // if the abstract type has resolve type already
+> = AbstractTypeName extends GetGen<'abstractsUsingStrategyResolveType'> // if the abstract type has resolve type already
   ? false // then disable __typename feature
   : IsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
   ? false // then disable __typename feature

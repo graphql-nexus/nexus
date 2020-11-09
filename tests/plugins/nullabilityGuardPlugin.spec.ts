@@ -288,7 +288,7 @@ describe('nullabilityGuardPlugin', () => {
     expect(onGuardedMock).toBeCalledTimes(3)
     expect(errSpy).toHaveBeenCalledTimes(1)
     expect(errSpy.mock.calls[0][0].message).toContain(
-      'Union "UserOrAccount" is missing a `resolveType` implementation.'
+      'You have a faulty implementation for your union type "UserOrAccount". It is missing a `resolveType` implementation.'
     )
   })
 

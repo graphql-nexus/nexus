@@ -23,7 +23,6 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
-import { decorateType } from './definitions/decorateType'
 import {
   MissingType,
   NexusFeatures,
@@ -31,6 +30,7 @@ import {
   NexusTypes,
   withNexusSymbol,
 } from './definitions/_types'
+import { decorateType } from './definitions/decorateType'
 import { PluginConfig } from './plugin'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
@@ -350,7 +350,11 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
       features.abstractTypes?.resolveType === true &&
       !features.abstractTypes.isTypeOf
     ) {
-      console.error(new Error(`${kind} "${type.name}" is missing a \`resolveType\` implementation.`))
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }".`
+      const message = `${messagePrefix} It is missing a \`resolveType\` implementation.`
+      console.error(new Error(message))
     }
 
     if (
@@ -358,15 +362,20 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
       features.abstractTypes?.isTypeOf === true &&
       !features.abstractTypes.resolveType
     ) {
-      console.error(
-        new Error(
-          `${kind} "${
-            type.name
-          }" has some members missing an \`isTypeOf\` implementation: ${typesWithoutIsTypeOf
-            .map((t) => `"${t.name}"`)
-            .join(', ')}`
-        )
-      )
+      const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }".`
+      const messageSuffix = `are missing an \`isTypeOf\` implementation: ${messageBadTypes}`
+      let message
+      if (kind === 'Union') {
+        message = `${messagePrefix} Some members of union type "${type.name}" ${messageSuffix}`
+      } else if (kind === 'Interface') {
+        message = `${messagePrefix} Some objects implementing the interface type "${type.name}" ${messageSuffix}`
+      } else {
+        casesHandled(kind)
+      }
+      console.error(new Error(message))
     }
 
     if (
@@ -374,15 +383,20 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
       features.abstractTypes?.isTypeOf === true &&
       features.abstractTypes?.resolveType === true
     ) {
-      console.error(
-        new Error(
-          `${kind} "${
-            type.name
-          }" is either missing a \`resolveType\` implementation or its members are missing an \`isTypeOf\` implementation: ${typesWithoutIsTypeOf
-            .map((t) => `"${t.name}"`)
-            .join(', ')}`
-        )
-      )
+      const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }". Either implement its \`resolveType\` or implement \`isTypeOf\` on each object`
+      const messageSuffix = `These objects are missing an \`isTypeOf\` implementation: ${messageBadTypes}`
+      let message
+      if (kind === 'Union') {
+        message = `${messagePrefix} in the union. ${messageSuffix}`
+      } else if (kind === 'Interface') {
+        message = `${messagePrefix} that implements this interface. ${messageSuffix}`
+      } else {
+        casesHandled(kind)
+      }
+      console.error(new Error(message))
     }
   })
 }

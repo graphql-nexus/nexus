@@ -167,9 +167,9 @@ export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
 export type NexusGenUnionNames = never
 
-export type NexusGenIsTypeOfObjectNames = never
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenResolveTypeImplemented = never
+export type NexusGenAbstractsUsingStrategyResolveType = never
 
 export type NexusGenFeaturesConfig = {
   abstractTypes: {
@@ -202,8 +202,8 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes
-  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames
-  resolveTypeImplemented: NexusGenResolveTypeImplemented
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig
 }
 

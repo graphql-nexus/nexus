@@ -55,6 +55,6 @@ exports[`interfaceType detects circular dependencies 1`] = `"GraphQL Nexus: Inte
 
 exports[`interfaceType logs error when resolveType is not provided for an interface 1`] = `
 Array [
-  [Error: Interface "Node" is missing a \`resolveType\` implementation.],
+  [Error: You have a faulty implementation for your interface type "Node". It is missing a \`resolveType\` implementation.],
 ]
 `;

@@ -4971,9 +4971,9 @@ export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
 export type NexusGenUnionNames = 'BigUnion' | 'MediumUnionType' | 'MediumUnionTypes'
 
-export type NexusGenIsTypeOfObjectNames = never
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenResolveTypeImplemented = 'BigUnion' | 'MediumUnionType' | 'MediumUnionTypes'
+export type NexusGenAbstractsUsingStrategyResolveType = 'BigUnion' | 'MediumUnionType' | 'MediumUnionTypes'
 
 export type NexusGenFeaturesConfig = {
   abstractTypes: {
@@ -5006,8 +5006,8 @@ export interface NexusGenTypes {
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes
-  isTypeOfObjectNames: NexusGenIsTypeOfObjectNames
-  resolveTypeImplemented: NexusGenResolveTypeImplemented
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig
 }
 
