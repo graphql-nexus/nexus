@@ -187,7 +187,7 @@ export type NexusGenResolveTypeImplemented = never
 
 export type NexusGenFeaturesConfig = {
   abstractTypes: {
-    backingType: true
+    __typename: true
   }
 }
 

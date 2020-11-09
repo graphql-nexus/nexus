@@ -1,6 +1,6 @@
 import { graphql } from 'graphql'
 import path from 'path'
-import { interfaceType, makeSchema, objectType, queryField, generateSchema } from '../src/core'
+import { generateSchema, interfaceType, makeSchema, objectType, queryField } from '../src/core'
 
 describe('interfaceType', () => {
   it('can be implemented by object types', async () => {
@@ -17,6 +17,9 @@ describe('interfaceType', () => {
         }),
         objectType({
           name: 'User',
+          isTypeOf(data) {
+            return typeof data.name === 'string'
+          },
           definition(t) {
             t.implements('Node')
             t.string('name')
@@ -52,18 +55,12 @@ describe('interfaceType', () => {
       types: [
         interfaceType({
           name: 'LivingOrganism',
-          resolveType() {
-            return null
-          },
           definition(t) {
             t.string('type')
           },
         }),
         interfaceType({
           name: 'Animal',
-          resolveType() {
-            return null
-          },
           definition(t) {
             t.implements('LivingOrganism')
             t.string('classification')
@@ -71,9 +68,6 @@ describe('interfaceType', () => {
         }),
         interfaceType({
           name: 'Pet',
-          resolveType() {
-            return null
-          },
           definition(t) {
             t.implements('Animal')
             t.string('owner')
@@ -81,6 +75,9 @@ describe('interfaceType', () => {
         }),
         objectType({
           name: 'Dog',
+          isTypeOf(data) {
+            return typeof data.breed === 'string'
+          },
           definition(t) {
             t.implements('Pet')
             t.string('breed')
@@ -141,17 +138,21 @@ describe('interfaceType', () => {
         types: [
           interfaceType({
             name: 'Node',
+            resolveType() {
+              return null
+            },
             definition(t) {
               t.id('id')
-              t.resolveType(() => null)
             },
           }),
           interfaceType({
             name: 'Node2',
+            resolveType() {
+              return null
+            },
             definition(t) {
               t.implements('Node')
               t.id('id2')
-              t.resolveType(() => null)
             },
           }),
           objectType({

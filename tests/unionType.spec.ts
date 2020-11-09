@@ -5,6 +5,7 @@ import { makeSchema, objectType, queryField, unionType } from '../src'
 describe('unionType', () => {
   test('unionType', async () => {
     const schema = makeSchema({
+      features: { abstractTypes: { resolveType: true } },
       types: [
         objectType({
           name: 'DeletedUser',

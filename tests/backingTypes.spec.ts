@@ -140,7 +140,7 @@ describe('rootTypings', () => {
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
-      `"Module fzeffezpokm for the type SomeType does not exist"`
+      `"Expected an absolute path for the root typing path of the type SomeType, saw ./fzeffezpokm"`
     )
   })
 

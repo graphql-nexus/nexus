@@ -96,7 +96,7 @@ export type NexusGenFeaturesConfig = {
   abstractTypes: {
     isTypeOf: true
     resolveType: false
-    backingType: false
+    __typename: false
   }
 }
 
