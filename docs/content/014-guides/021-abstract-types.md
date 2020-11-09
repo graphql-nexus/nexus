@@ -135,13 +135,13 @@ const Query = queryType({
 
 But what is missing here is the implementation of the discriminant property. In Nexus there are three possible implementations to choose from, depending on your preferences or requirements (e.g. team standards).
 
-1. Implement `resolveType` on the union type itself
-2. Implement `isTypeOf` on each member of the union
-3. Return a `__typename` discriminant property in the model data.
+1. ResolveType Strategy: Implement `resolveType` on the union type itself
+2. IsTypeOf Strategy: Implement `isTypeOf` on each member of the union
+3. Discriminant Model Property (DMP) Strategy: Return a `__typename` discriminant property in the model data.
 
-Let's explore each of these.
+Let's explore each of these strategies.
 
-#### `resolveType`
+#### ResolveType Strategy
 
 The `resolveType` strategy allows to discriminate your union member types in a centralized (to the union type) way. For example:
 
@@ -170,12 +170,13 @@ Nexus leverages TypeScript to statically ensure that your implementation is corr
 1. `resolveType` field will be required, unless one of:
    - Each member type has had `isTypeOf` implemented
    - Each member type has had its model type (backing type) specified to include `__typename`
+   - The ResolveType strategy is disabled globally
 2. `resolveType` `data` param will be typed as a union of all the member types' model types (backing types).
 3. `resolveType` return type will be typed as a union of string literals matching the GraphQL object type names of all members in the GraphQL union type.
 
-#### `__typename`
+#### Discriminant Model Property (DMP) Strategy
 
-The `__typename` strategy allows you to discriminate your union member types in a modular (to GraphQL objects) way like `isTypeOf`. Unlike `isTypeOf` however it is based on the shape of the underlying model data. Here is an example:
+The DMP strategy allows you to discriminate your union member types in a modular way like IsTypeOf strategy. Unlike the IsTypeOf strategy however DMP strategy is based on the shape of the underlying model data. Here is an example:
 
 ```ts
 const Query = queryType({
@@ -212,7 +213,7 @@ const Query = queryType({
 })
 ```
 
-As you can see the technique looks quite similar at face value to the previous `resolveType` one. However your implementation might not look like this at all. For example maybe your data models already contain you a discriminat property `typeName`. For example:
+As you can see the technique looks quite similar at face value to the previous `resolveType` one. However your implementation might not look like this at all. For example maybe your data models already contain a discriminant property `typeName`. For example:
 
 ```ts
 const Query = queryType({
@@ -237,7 +238,7 @@ const Query = queryType({
 
 In a serious/large application with a model layer in the codebase its likely this kind of logic would not live in your resolvers at all.
 
-Like with `resolveType` Nexus leverages TypeScript to ensure your implementation is correct.
+Like with ResolveType strategy Nexus leverages TypeScript to ensure your implementation is correct.
 
 1. The resolver return type for fields whose type is a union will ensure all returned data includes a `__typename` field.
 2. For a given union type, if all fields that are typed as it have their resolvers returning data with `__typename` then back on the union type `resolveType` will be optional.
@@ -272,9 +273,9 @@ Like with `resolveType` Nexus leverages TypeScript to ensure your implementation
    })
    ```
 
-#### `isTypeOf`
+#### IsTypeOf Strategy
 
-This strategy allows you to discriminate your union member types in a modular (to GraphQL objects) way like `__typename`. Unlike `__typename` it is not based on the shape of your model data. It is instead a predicate function that allows Nexus to know if a given object is of the respective type or not. Here is an example:
+The IsTypeOf strategy allows you to discriminate your union member types in a modular way like the DMP strategy. Unlike the DMP strategy however it is not based on the shape of your underlying model data. Instead the IsTypeOf strategy uses a predicate function that you implement that allows Nexus (actually GraphQL.js under the hood) to know at runtime if data being sent to the client is of the respective type or not. Here is an example:
 
 ```ts
 const Movie = objectType({
@@ -314,16 +315,19 @@ const Song = objectType({
 })
 ```
 
-Like with `resolveType` and `__typename` Nexus leverages TypeScript to ensure your implementation is correct in the following ways:
+Like with the ResolveType and DMP strategies Nexus leverages TypeScript to ensure your implementation is correct in the following ways:
 
-1. If an object appears in a union type its `isTypeOf` field will be required, unless:
+1. If an object is a member of a union type then that object's `isTypeOf` field will be required, unless:
    - The union type has defined `resolveType`
    - The model type includes `__typename` property whose type is a string literal matching the GraphQL object name (case sensitive).
    - The fields where the union type is used include `__typename` in the returned model data
+   - The IsTypeOf strategy is disabled globally
 
 ### Picking Your Strategy (Or Strategies)
 
-Nexus enables you to pick the strategy you want to use. By default only the `isTypeOf` strategy is enabled. You can pick your strategy in the `makeSchema` configuration.
+#### Configuration
+
+Nexus enables you to pick the strategy you want to use. By default only the `isTypeOf` strategy is enabled. You can pick your strategies in the `makeSchema` configuration.
 
 ```ts
 import { makeSchema } from '@nexus/schema'
@@ -342,16 +346,55 @@ makeSchema({
 
 Nexus enables enabling/disabling strategies because having them all enabled at can lead to a confusing excess of type errors when there is an invalid implementation of an abstract type. Nexus doesn't force you to pick only one strategy however it does consider using multiple strategies sightly more advanced. Refer to the [Multiple Strategies](#multiple-strategies) section for details.
 
+When you customize the strategy settings all strategies become disabled except for those that you opt into. For example in the following:
+
+```ts
+import { makeSchema } from '@nexus/schema'
+
+makeSchema({
+  features: {
+    abstractTypes: {
+      resolveType: true,
+    },
+  },
+  //...
+})
+```
+
+The resolved settings would be:
+
+```ts
+{
+  abstractTypes: {
+    resolveType: true,
+    isTypeOf: false, // The `true` default when no config is given is NOT inherited here
+    __typename: false,
+  }
+}
+```
+
+_Not_:
+
+```ts
+{
+  abstractTypes: {
+    resolveType: true,
+    isTypeOf: true, // <-- NOT what actually happens
+    __typename: false,
+  }
+}
+```
+
 #### One Strategy
 
 There is no right or wrong strategy to use. Use the one that you and/or your team agree upon. These are some questions you can ask yourself:
 
-| Questions                                                                             | If affirmative, then maybe                                                                        |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Is my schema large? Do I have many collaborators?                                     | Modular (`__typename`, `isTypeOf`)                                                                |
-| Is my schema simple? Do I develop alone?                                              | Centralized (`resolveType`)                                                                       |
-| Do I keep a discriminant property in the databse already?                             | `__typename` in your model layer if you have one                                                  |
-| Do I have objects that are part of multiple unions types and/or implement interfaces? | `__typename` or `isTypeOf` to avoid repeated logic across multiple `resolveType` implementations) |
+| Questions                                                                             | If affirmative, then maybe                                                                                                 |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Is my schema large? Do I have many collaborators?                                     | Modular (DMP, IsTypeOf)                                                                                                    |
+| Is my schema simple? Do I develop alone?                                              | Centralized (ResolveType)                                                                                                  |
+| Do I keep a discriminant property in the databse already?                             | DMP: implement `__typename` in your model layer if you have one                                                            |
+| Do I have objects that are part of multiple unions types and/or implement interfaces? | DMP or IsTypeOf to avoid repeated logic across multiple `resolveType` implementations required by the ResolveType strategy |
 
 #### Multiple Strategies
 
@@ -367,9 +410,9 @@ _At Runtime_
 
 In that case the following runtime precedence rules apply. Using a strategy here means the implementations of others of lower priority are discarded.
 
-1. `resolveType`
-2. `__typename`
-3. `isTypeOf`
+1. ResolveType
+2. Discriminant Model Property
+3. IsTypeOf
 
 > The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
 
