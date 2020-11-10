@@ -3,14 +3,14 @@ import { GetGen, MaybeTypeDefConfigFieldResolveType } from '../typegenTypeHelper
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 import { NexusObjectTypeDef } from './objectType'
 
-export interface UnionDefinitionBuilder<_TypeName extends string> {
+export interface UnionDefinitionBuilder {
   addUnionMembers(members: UnionMembers): void
 }
 
 export type UnionMembers = Array<GetGen<'objectNames'> | NexusObjectTypeDef<any>>
 
-export class UnionDefinitionBlock<TypeName extends string> {
-  constructor(protected typeBuilder: UnionDefinitionBuilder<TypeName>) {}
+export class UnionDefinitionBlock {
+  constructor(protected typeBuilder: UnionDefinitionBuilder) {}
   /**
    * All ObjectType names that should be part of the union, either
    * as string names or as references to the `objectType()` return value
@@ -28,7 +28,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
   /**
    * Builds the definition for the union
    */
-  definition(t: UnionDefinitionBlock<TypeName>): void
+  definition(t: UnionDefinitionBlock): void
   /**
    * The description to annotate the GraphQL SDL
    */
