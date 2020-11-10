@@ -40,9 +40,9 @@ function getLabel(type: any, wraps: string[]) {
 }
 
 const map: Record<string, any> = {
-  nullable: (type) => nullable(type),
-  nonNull: (type) => nonNull(type),
-  list: (type) => list(type),
+  nullable: (type: any) => nullable(type),
+  nonNull: (type: any) => nonNull(type),
+  list: (type: any) => list(type),
 }
 
 type GeneratedType = { type?: any; error?: Error; wraps: string[]; label: string }
