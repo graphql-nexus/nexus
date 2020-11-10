@@ -174,11 +174,6 @@ export class OutputDefinitionBlock<TypeName extends string> {
 
 export interface ScalarInputFieldConfig<T> extends CommonFieldConfig {
   /**
-   * Whether the field is required (non-nullable)
-   * @default
-   */
-  required?: boolean
-  /**
    * The default value for the field, if any
    */
   default?: T
