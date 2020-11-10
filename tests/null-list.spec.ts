@@ -256,13 +256,13 @@ describe('wrapping for input types; nonNullDefault = true;', () => {
 describe('edges cases', () => {
   test('cannot wrap non nexus types', () => {
     expect(() => list(GraphQLString as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a type not constructed by Nexus"`
+      `"Cannot wrap a type not constructed by Nexus in a list(). Saw String"`
     )
     expect(() => nonNull(GraphQLString as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a type not constructed by Nexus"`
+      `"Cannot wrap a type not constructed by Nexus in a nonNull(). Saw String"`
     )
     expect(() => nullable(GraphQLString as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a type not constructed by Nexus"`
+      `"Cannot wrap a type not constructed by Nexus in a nullable(). Saw String"`
     )
   })
 

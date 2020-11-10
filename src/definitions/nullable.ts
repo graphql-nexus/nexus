@@ -16,7 +16,7 @@ export class NexusNullDef<TypeName extends NexusNullableTypes> {
     }
 
     if (!isNexusStruct(ofType) && typeof ofType !== 'string') {
-      throw new Error('Cannot wrap a type not constructed by Nexus')
+      throw new Error('Cannot wrap a type not constructed by Nexus in a nullable(). Saw ' + ofType)
     }
   }
 }
