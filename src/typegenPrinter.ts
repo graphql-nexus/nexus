@@ -354,11 +354,11 @@ export class TypegenPrinter {
   }
 
   printIsTypeOfObjectTypeNames(exportName: string) {
-    const obj = this.groupedTypes.object.filter((o) => o.isTypeOf !== undefined)
+    const objectTypes = this.groupedTypes.object.filter((o) => o.isTypeOf !== undefined)
     const typeDef =
-      obj.length === 0
+      objectTypes.length === 0
         ? 'never'
-        : obj
+        : objectTypes
             .map((o) => JSON.stringify(o.name))
             .sort()
             .join(' | ')
@@ -366,13 +366,13 @@ export class TypegenPrinter {
   }
 
   printResolveTypeAbstractTypes(exportName: string) {
-    const obj = [...this.groupedTypes.interface, ...this.groupedTypes.union].filter(
+    const abstractTypes = [...this.groupedTypes.interface, ...this.groupedTypes.union].filter(
       (o) => o.resolveType !== undefined
     )
     const typeDef =
-      obj.length === 0
+      abstractTypes.length === 0
         ? 'never'
-        : obj
+        : abstractTypes
 
             .map((o) => JSON.stringify(o.name))
             .sort()
