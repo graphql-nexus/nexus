@@ -164,6 +164,9 @@ export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
   extensions: { nexus: NexusSchemaExtension }
 }
 
+/**
+ * Customize and toggle on or off various features of Nexus.
+ */
 export interface NexusFeatures {
   abstractTypes?: {
     isTypeOf?: boolean
