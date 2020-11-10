@@ -218,6 +218,11 @@ describe('plugin', () => {
     //
     const schema = makeSchema({
       outputs: false,
+      features: {
+        abstractTypes: {
+          __typename: true,
+        },
+      },
       types: [
         interfaceType({
           name: 'Node',
