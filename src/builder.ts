@@ -297,7 +297,7 @@ export type DynamicOutputProperties = Record<string, DynamicOutputPropertyDef<st
 
 export type TypeDef =
   | GraphQLNamedType
-  | Exclude<AllNexusNamedTypeDefs, string>
+  | AllNexusNamedTypeDefs
   | NexusExtendInputTypeDef<string>
   | NexusExtendTypeDef<string>
 
@@ -1116,7 +1116,6 @@ export class SchemaBuilder {
       throw new Error(`Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`)
     }
     const fieldExtension = new NexusFieldExtension(fieldConfig)
-
     const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
     const builderFieldConfig: Omit<NexusGraphQLFieldConfig, 'resolve' | 'subscribe'> = {
       name: fieldConfig.name,
@@ -1241,14 +1240,10 @@ export class SchemaBuilder {
   }
 
   protected getOrBuildType(
-    type: string | AllNexusNamedTypeDefs | GraphQLNamedType,
+    type: string | AllNexusNamedTypeDefs,
     fromObject: boolean = false
   ): GraphQLNamedType {
     invariantGuard(type)
-
-    if (isNamedType(type)) {
-      return type
-    }
 
     if (isNexusNamedTypeDef(type)) {
       return this.getOrBuildType(type.name, true)

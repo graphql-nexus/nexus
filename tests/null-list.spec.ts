@@ -88,7 +88,7 @@ function testField(type: AllNexusOutputTypeDefs | string, params: { nonNullDefau
     outputs: false,
   })
 
-  return schema.getQueryType().getFields()['foo']!.type.toString()
+  return schema.getQueryType()!.getFields()['foo']!.type.toString()
 }
 
 function testArg(
@@ -115,7 +115,7 @@ function testArg(
   })
 
   return schema
-    .getQueryType()
+    .getQueryType()!
     .getFields()
     ['foo']!.args.find((a) => a.name === 'foo')!
     .type.toString()
