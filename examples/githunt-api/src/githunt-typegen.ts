@@ -26,6 +26,7 @@ export interface NexusGenRootTypes {
   Comment: {
     // root type
     content?: string | null // String
+    createdAt?: number | null // Float
     id?: number | null // Int
     postedBy?: NexusGenRootTypes['User'] | null // User
     repoName?: string | null // String
@@ -35,6 +36,7 @@ export interface NexusGenRootTypes {
     commentCount?: number | null // Int
     comments?: Array<NexusGenRootTypes['Comment'] | null> | null // [Comment]
     createdAt?: number | null // Float
+    hotScore?: number | null // Float
     id?: number | null // Int
     postedBy?: NexusGenRootTypes['User'] | null // User
     repository?: NexusGenRootTypes['Repository'] | null // Repository

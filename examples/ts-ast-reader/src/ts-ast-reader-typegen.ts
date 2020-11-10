@@ -91,12 +91,12 @@ export interface NexusGenRootTypes {
   TypeReference: ts.TypeReferenceNode
   UNKNOWN_NODE: {
     // root type
-    end?: number | null // Int
-    flags?: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind?: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
     name?: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    parent?: NexusGenRootTypes['Node'] | null // Node
-    pos?: number | null // Int
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     typeName?: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   UnionType: ts.UnionTypeNode
@@ -132,381 +132,381 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 export interface NexusGenFieldTypes {
   ArrayTypeNode: {
     // field return type
-    elementType: NexusGenRootTypes['Node'] | null // Node
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    elementType: NexusGenRootTypes['Node'] // Node!
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   BindingPattern: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   CallSignatureDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ClassDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    members: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    members: NexusGenRootTypes['Node'][] // [Node!]!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ComputedPropertyName: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ConditionalTypeNode: {
     // field return type
-    checkType: NexusGenRootTypes['Node'] | null // Node
-    end: number | null // Int
-    extendsType: NexusGenRootTypes['Node'] | null // Node
-    falseType: NexusGenRootTypes['Node'] | null // Node
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    checkType: NexusGenRootTypes['Node'] // Node!
+    end: number // Int!
+    extendsType: NexusGenRootTypes['Node'] // Node!
+    falseType: NexusGenRootTypes['Node'] // Node!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    trueType: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    trueType: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ConstructSignatureDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ConstructorDeclaration: {
     // field return type
     asteriskToken: NexusGenRootTypes['Token'] | null // Token
-    end: number | null // Int
+    end: number // Int!
     exclamationToken: NexusGenRootTypes['Token'] | null // Token
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parameters: Array<NexusGenRootTypes['ParameterDeclaration'] | null> | null // [ParameterDeclaration]
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parameters: NexusGenRootTypes['ParameterDeclaration'][] // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameters: Array<NexusGenRootTypes['TypeParameterDeclaration'] | null> | null // [TypeParameterDeclaration]
+    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null // [TypeParameterDeclaration!]
   }
   ConstructorTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    type: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    type: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   EnumDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    members: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    members: NexusGenRootTypes['Node'][] // [Node!]!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ExportAssignment: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ExportDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   FunctionDeclaration: {
     // field return type
     asteriskToken: NexusGenRootTypes['Token'] | null // Token
-    end: number | null // Int
+    end: number // Int!
     exclamationToken: NexusGenRootTypes['Token'] | null // Token
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parameters: Array<NexusGenRootTypes['ParameterDeclaration'] | null> | null // [ParameterDeclaration]
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parameters: NexusGenRootTypes['ParameterDeclaration'][] // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameters: Array<NexusGenRootTypes['TypeParameterDeclaration'] | null> | null // [TypeParameterDeclaration]
+    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null // [TypeParameterDeclaration!]
   }
   FunctionTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    type: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    type: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   GetAccessorDeclaration: {
     // field return type
     asteriskToken: NexusGenRootTypes['Token'] | null // Token
-    end: number | null // Int
+    end: number // Int!
     exclamationToken: NexusGenRootTypes['Token'] | null // Token
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parameters: Array<NexusGenRootTypes['ParameterDeclaration'] | null> | null // [ParameterDeclaration]
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parameters: NexusGenRootTypes['ParameterDeclaration'][] // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameters: Array<NexusGenRootTypes['TypeParameterDeclaration'] | null> | null // [TypeParameterDeclaration]
+    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null // [TypeParameterDeclaration!]
   }
   Identifier: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    text: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    text: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ImportDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ImportEqualsDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ImportTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   IndexSignatureDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   IndexedAccessTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   InferTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameter: NexusGenRootTypes['Node'] | null // Node
+    typeParameter: NexusGenRootTypes['Node'] // Node!
   }
   InterfaceDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   IntersectionTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    types: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
+    types: NexusGenRootTypes['Node'][] // [Node!]!
   }
   JSDoc: {
     // field return type
     comment: string | null // String
-    tags: Array<NexusGenRootTypes['JSDocTag'] | null> | null // [JSDocTag]
+    tags: Array<NexusGenRootTypes['JSDocTag'] | null> // [JSDocTag]!
   }
   JSDocAugmentsTag: {
     // field return type
@@ -525,16 +525,16 @@ export interface NexusGenFieldTypes {
   }
   JSDocNamespaceDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   JSDocReturnTag: {
@@ -564,454 +564,454 @@ export interface NexusGenFieldTypes {
   }
   KeywordTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   LiteralType: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   MappedTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   MethodDeclaration: {
     // field return type
     asteriskToken: NexusGenRootTypes['Token'] | null // Token
-    end: number | null // Int
+    end: number // Int!
     exclamationToken: NexusGenRootTypes['Token'] | null // Token
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parameters: Array<NexusGenRootTypes['ParameterDeclaration'] | null> | null // [ParameterDeclaration]
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parameters: NexusGenRootTypes['ParameterDeclaration'][] // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameters: Array<NexusGenRootTypes['TypeParameterDeclaration'] | null> | null // [TypeParameterDeclaration]
+    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null // [TypeParameterDeclaration!]
   }
   MissingDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ModuleDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   NamespaceDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   NamespaceExportDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   NumericLiteral: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   OptionalTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    type: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    type: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ParameterDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    type: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    type: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ParenthesizedType: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    type: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    type: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   PropertyDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   PropertyLikeDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   PropertySignature: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   QualifiedName: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   Query: {
     // field return type
-    parseFile: NexusGenRootTypes['SourceFile'] | null // SourceFile
+    parseFile: NexusGenRootTypes['SourceFile'] // SourceFile!
   }
   RestTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    type: NexusGenRootTypes['Node'] | null // Node
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    type: NexusGenRootTypes['Node'] // Node!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   SetAccessorDeclaration: {
     // field return type
     asteriskToken: NexusGenRootTypes['Token'] | null // Token
-    end: number | null // Int
+    end: number // Int!
     exclamationToken: NexusGenRootTypes['Token'] | null // Token
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parameters: Array<NexusGenRootTypes['ParameterDeclaration'] | null> | null // [ParameterDeclaration]
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
+    parameters: NexusGenRootTypes['ParameterDeclaration'][] // [ParameterDeclaration!]!
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
     questionToken: NexusGenRootTypes['Token'] | null // Token
-    rawText: string | null // String
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameters: Array<NexusGenRootTypes['TypeParameterDeclaration'] | null> | null // [TypeParameterDeclaration]
+    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null // [TypeParameterDeclaration!]
   }
   SourceFile: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
-    statements: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
+    statements: NexusGenRootTypes['Node'][] // [Node!]!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   StringLiteral: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   StringLiteralLike: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   ThisTypeNode: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   Token: {
     // field return type
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
   }
   TupleTypeNode: {
     // field return type
-    elementTypes: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    elementTypes: NexusGenRootTypes['Node'][] // [Node!]!
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   TypeAliasDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     type: NexusGenRootTypes['Node'] | null // Node
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    typeParameters: Array<NexusGenRootTypes['TypeParameterDeclaration'] | null> | null // [TypeParameterDeclaration]
+    typeParameters: NexusGenRootTypes['TypeParameterDeclaration'][] | null // [TypeParameterDeclaration!]
   }
   TypeLiteral: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   TypeParameterDeclaration: {
     // field return type
-    constraint: NexusGenRootTypes['Node'] | null // Node
-    default: NexusGenRootTypes['Node'] | null // Node
-    end: number | null // Int
-    expression: NexusGenRootTypes['Node'] | null // Node
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    constraint: NexusGenRootTypes['Node'] // Node!
+    default: NexusGenRootTypes['Node'] // Node!
+    end: number // Int!
+    expression: NexusGenRootTypes['Node'] // Node!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   TypeReference: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     text: string | null // String
-    typeArguments: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
+    typeArguments: NexusGenRootTypes['Node'][] | null // [Node!]
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   UNKNOWN_NODE: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   UnionType: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
-    types: Array<NexusGenRootTypes['Node'] | null> | null // [Node]
+    types: NexusGenRootTypes['Node'][] // [Node!]!
   }
   UnnamedNode: {
     // field return type
@@ -1019,21 +1019,21 @@ export interface NexusGenFieldTypes {
   }
   VariableDeclaration: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
   HasJSDoc: {
     // field return type
-    jsDoc: Array<NexusGenRootTypes['JSDoc'] | null> | null // [JSDoc]
+    jsDoc: NexusGenRootTypes['JSDoc'][] | null // [JSDoc!]
   }
   JSDocTag: {
     // field return type
@@ -1046,16 +1046,16 @@ export interface NexusGenFieldTypes {
   }
   Node: {
     // field return type
-    end: number | null // Int
-    flags: NexusGenEnums['NodeFlags'] | null // NodeFlags
-    kind: NexusGenEnums['SyntaxKind'] | null // SyntaxKind
-    kindCode: number | null // Int
-    modifiers: Array<NexusGenRootTypes['Token'] | null> | null // [Token]
+    end: number // Int!
+    flags: NexusGenEnums['NodeFlags'] // NodeFlags!
+    kind: NexusGenEnums['SyntaxKind'] // SyntaxKind!
+    kindCode: number // Int!
+    modifiers: NexusGenRootTypes['Token'][] | null // [Token!]
     name: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
     nameText: string | null // String
-    parent: NexusGenRootTypes['Node'] | null // Node
-    pos: number | null // Int
-    rawText: string | null // String
+    parent: NexusGenRootTypes['Node'] // Node!
+    pos: number // Int!
+    rawText: string // String!
     typeName: NexusGenRootTypes['DeclarationName'] | null // DeclarationName
   }
 }

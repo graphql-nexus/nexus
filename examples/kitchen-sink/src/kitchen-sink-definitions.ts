@@ -1,5 +1,3 @@
-import { connectionFromArray } from 'graphql-relay'
-import _ from 'lodash'
 import {
   arg,
   booleanArg,
@@ -9,13 +7,17 @@ import {
   inputObjectType,
   intArg,
   interfaceType,
+  list,
   mutationField,
   mutationType,
+  nonNull,
   objectType,
   queryField,
   scalarType,
   unionType,
 } from '@nexus/schema'
+import { connectionFromArray } from 'graphql-relay'
+import _ from 'lodash'
 
 const USERS_DATA = _.times(100, (i) => ({
   pk: i,
@@ -40,7 +42,7 @@ export const Mutation = mutationType({
 export const SomeMutationField = mutationField('someMutationField', () => ({
   type: Foo,
   args: {
-    id: idArg({ required: true }),
+    id: nonNull(idArg()),
   },
   resolve(root, args) {
     return { name: `Test${args.id}`, ok: true }
@@ -90,7 +92,6 @@ export const Baz = interfaceType({
     t.field('a', {
       type: Bar,
       description: "'A' description",
-      nullable: true,
     })
     t.resolveType(() => 'TestObj')
   },
@@ -124,7 +125,7 @@ export const Foo = objectType({
 export const InputType = inputObjectType({
   name: 'InputType',
   definition(t) {
-    t.string('key', { required: true })
+    t.field('key', { type: nonNull('String') })
     t.int('answer')
     t.field('nestedInput', { type: InputType2 })
   },
@@ -133,9 +134,9 @@ export const InputType = inputObjectType({
 export const InputType2 = inputObjectType({
   name: 'InputType2',
   definition(t) {
-    t.string('key', { required: true })
+    t.field('key', { type: nonNull('String') })
     t.int('answer')
-    t.date('someDate', { required: true })
+    t.field('someDate', { type: nonNull('Date') })
   },
 })
 
@@ -147,8 +148,7 @@ export const Query = objectType({
       resolve: () => ({ ok: true, item: 'test' }),
     })
     t.int('getNumberOrNull', {
-      nullable: true,
-      args: { a: intArg({ required: true }) },
+      args: { a: nonNull(intArg()) },
       async resolve(_, { a }) {
         if (a > 0) {
           return a
@@ -159,7 +159,7 @@ export const Query = objectType({
 
     t.string('asArgExample', {
       args: {
-        testAsArg: InputType.asArg({ required: true }),
+        testAsArg: nonNull(InputType.asArg()),
       },
       skipNullGuard: true, // just checking that this isn't a type error
       resolve: () => 'ok',
@@ -205,9 +205,8 @@ export const Query = objectType({
     })
 
     t.connectionField('deprecatedConnection', {
-      type: 'Boolean',
+      type: nonNull('Boolean'),
       deprecation: 'Dont use this, use booleanConnection instead',
-      nullable: false,
       nodes() {
         return [true]
       },
@@ -341,10 +340,9 @@ export const ComplexObject = objectType({
 })
 
 export const complexQuery = queryField('complexQuery', {
-  type: 'ComplexObject',
-  list: true,
+  type: list('ComplexObject'),
   args: {
-    count: intArg({ nullable: false }),
+    count: nonNull(intArg()),
   },
   complexity: ({ args, childComplexity }) => args.count * childComplexity,
   resolve: () => [{ id: '1' }],

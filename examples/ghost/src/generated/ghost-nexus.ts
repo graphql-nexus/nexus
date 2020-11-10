@@ -59,44 +59,88 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 export interface NexusGenFieldTypes {
   Post: {
     // field return type
-    html: string | null // String
-    slug: string | null // String
-    title: string | null // String
-    uuid: string | null // String
+    html: string // String!
+    slug: string // String!
+    title: string // String!
+    uuid: string // String!
   }
   Query: {
     // field return type
     me: NexusGenRootTypes['User'] | null // User
-    postById: NexusGenRootTypes['Post'] | null // Post
-    userById: NexusGenRootTypes['User'] | null // User
+    postById: NexusGenRootTypes['Post'] // Post!
+    userById: NexusGenRootTypes['User'] // User!
   }
   User: {
     // field return type
     accessibility: string | null // String
     bio: string | null // String
     coverImage: string | null // String
-    createdAt: NexusGenScalars['Date'] | null // Date
-    createdBy: NexusGenRootTypes['User'] | null // User
-    email: string | null // String
+    createdAt: NexusGenScalars['Date'] // Date!
+    createdBy: NexusGenRootTypes['User'] // User!
+    email: string // String!
     facebook: string | null // String
     ghostAuthAccessToken: string | null // String
     ghostAuthId: string | null // String
-    id: string | null // String
+    id: string // String!
     lastSeen: NexusGenScalars['Date'] | null // Date
     locale: string | null // String
     location: string | null // String
     metaDescription: string | null // String
     metaTitle: string | null // String
-    name: string | null // String
+    name: string // String!
     profileImage: string | null // String
-    slug: string | null // String
-    status: string | null // String
+    slug: string // String!
+    status: string // String!
     tour: string | null // String
     twitter: string | null // String
     updatedAt: NexusGenScalars['Date'] | null // Date
     updatedBy: string | null // String
-    visibility: string | null // String
+    visibility: string // String!
     website: string | null // String
+  }
+}
+
+export interface NexusGenFieldTypeNames {
+  Post: {
+    // field return type name
+    html: 'String'
+    slug: 'String'
+    title: 'String'
+    uuid: 'String'
+  }
+  Query: {
+    // field return type name
+    me: 'User'
+    postById: 'Post'
+    userById: 'User'
+  }
+  User: {
+    // field return type name
+    accessibility: 'String'
+    bio: 'String'
+    coverImage: 'String'
+    createdAt: 'Date'
+    createdBy: 'User'
+    email: 'String'
+    facebook: 'String'
+    ghostAuthAccessToken: 'String'
+    ghostAuthId: 'String'
+    id: 'String'
+    lastSeen: 'Date'
+    locale: 'String'
+    location: 'String'
+    metaDescription: 'String'
+    metaTitle: 'String'
+    name: 'String'
+    profileImage: 'String'
+    slug: 'String'
+    status: 'String'
+    tour: 'String'
+    twitter: 'String'
+    updatedAt: 'Date'
+    updatedBy: 'String'
+    visibility: 'String'
+    website: 'String'
   }
 }
 
@@ -135,6 +179,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames

@@ -1,4 +1,4 @@
-import { plugin, interfaceType, FieldResolver } from '@nexus/schema'
+import { plugin, interfaceType, FieldResolver, nonNull } from '@nexus/schema'
 
 export const logMutationTimePlugin = plugin({
   name: 'LogMutationTime',
@@ -32,8 +32,8 @@ export const NodePlugin = plugin({
         resolveFn = node
       }
       t.implements('Node')
-      t.id('id', {
-        nullable: false,
+      t.field('id', {
+        type: nonNull('ID'),
         resolve: resolveFn,
       })
     }
@@ -45,8 +45,8 @@ export const NodePlugin = plugin({
         description:
           'A "Node" is an Object with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
         definition(t) {
-          t.id('id', {
-            nullable: false,
+          t.field('id', {
+            type: nonNull('ID'),
             resolve: () => {
               throw new Error('Abstract')
             },

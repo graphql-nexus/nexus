@@ -30,6 +30,9 @@ export const schema = makeSchema({
     // debug: true,
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
+  nonNullDefaults: {
+    output: true,
+  },
 })
 
 /**
