@@ -35,6 +35,7 @@ import {
   groupTypes,
   isNodeModule,
   mapObj,
+  mapValues,
   PrintedGenTypingImport,
   relativePathTo,
 } from './utils'
@@ -100,7 +101,7 @@ export class TypegenPrinter {
       this.printTypeNames('union', 'NexusGenUnionNames'),
       this.printIsTypeOfObjectTypeNames('NexusGenObjectsUsingAbstractStrategyIsTypeOf'),
       this.printResolveTypeAbstractTypes('NexusGenAbstractsUsingStrategyResolveType'),
-      this.printChecksConfig('NexusGenFeaturesConfig'),
+      this.printFeaturesConfig('NexusGenFeaturesConfig'),
       this.printGenTypeMap(),
       this.printPlugins(),
     ].join('\n\n')
@@ -380,15 +381,9 @@ export class TypegenPrinter {
     return `export type ${exportName} = ${typeDef};`
   }
 
-  printChecksConfig(exportName: string) {
-    const unionChecks = this.schema.extensions.nexus.config.features?.abstractTypes ?? {}
-    const unionProps = [
-      '{',
-      mapObj(unionChecks, (val, key) => {
-        return `    ${key}: ${val ?? false}`
-      }).join('\n'),
-      '  }',
-    ].join('\n')
+  printFeaturesConfig(exportName: string) {
+    const abstractTypes = this.schema.extensions.nexus.config.features?.abstractTypes ?? {}
+    const unionProps = renderObject(mapValues(abstractTypes, (val) => val ?? false))
 
     return [`export type ${exportName} = {`].concat(`  abstractTypes: ${unionProps}`).concat('}').join('\n')
   }
@@ -844,3 +839,13 @@ const GLOBAL_DECLARATION = `
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }`
+
+function renderObject(object: Record<string, any>): string {
+  return [
+    '{',
+    mapObj(object, (val, key) => {
+      return `    ${key}: ${val}`
+    }).join('\n'),
+    '  }',
+  ].join('\n')
+}
