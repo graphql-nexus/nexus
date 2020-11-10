@@ -2,7 +2,8 @@ import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { arg, ArgsRecord } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { list } from '../definitions/list'
-import { nonNull } from '../definitions/nonNull'
+import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
+import { NexusNullDef } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
 import { NonNullConfig } from '../definitions/_types'
@@ -19,12 +20,15 @@ import {
 } from '../typegenTypeHelpers'
 import {
   eachObj,
+  getNexusNamedType,
   getOwnPackage,
   isObject,
   isPromiseLike,
   mapObj,
   pathToArray,
   printedGenTypingImport,
+  unwrapNexusDef,
+  wrapAsNexusType,
 } from '../utils'
 
 export interface ConnectionPluginConfig {
@@ -143,7 +147,11 @@ export type NodeValue<TypeName extends string = any, FieldName extends string = 
 >['node']
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
-  type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
+  type:
+    | GetGen<'allOutputTypes', string>
+    | NexusNonNullDef<any>
+    | NexusNullDef<any>
+    | AllNexusNamedOutputTypeDefs
   /**
    * Additional args to use for just this field
    */
@@ -393,7 +401,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             fieldName: FieldName, 
             config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> ${printedDynamicConfig}
           ): void`,
-          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage }) {
+          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage, builder }) {
             const [fieldName, fieldConfig] = factoryArgs as [string, ConnectionFieldConfig]
             const targetType = fieldConfig.type
 
@@ -566,11 +574,16 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               resolveFn = makeResolveFn(pluginConfig, fieldConfig)
             }
 
+            const { wrapping } = unwrapNexusDef(
+              fieldConfig.type,
+              builder.getConfigOption('nonNullDefaults')?.output ?? false
+            )
+
             // Add the field to the type.
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
-              type: connectionName as any,
+              type: wrapAsNexusType(connectionName, wrapping),
               resolve(root, args: PaginationArgs, ctx, info) {
                 validateArgs(args, info)
                 return resolveFn(root, args, ctx, info)
@@ -715,7 +728,7 @@ export function makeResolveFn(
 
         return {
           nodes: resolvedNodeList,
-          // todo find typesafe way of doing this
+          // todo find type-safe way of doing this
           edges: resolvedEdgeList as EdgeLike[],
         }
       })
@@ -863,8 +876,8 @@ const getTypeNames = (
   fieldConfig: ConnectionFieldConfig,
   pluginConfig: ConnectionPluginConfig
 ) => {
-  const targetTypeName =
-    typeof fieldConfig.type === 'string' ? fieldConfig.type : (fieldConfig.type.name as string)
+  const namedType = getNexusNamedType(fieldConfig.type)
+  const targetTypeName = typeof namedType === 'string' ? namedType : namedType.name
 
   // If we have changed the config specific to this field, on either the connection,
   // edge, or page info, then we need a custom type for the connection & edge.
