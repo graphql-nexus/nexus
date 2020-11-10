@@ -40,6 +40,19 @@ import {
   isWrappingType,
   printSchema,
 } from 'graphql'
+import {
+  GraphQLPossibleInputs,
+  GraphQLPossibleOutputs,
+  MissingType,
+  NexusFeatures,
+  NexusGraphQLFieldConfig,
+  NexusGraphQLInputObjectTypeConfig,
+  NexusGraphQLInterfaceTypeConfig,
+  NexusGraphQLObjectTypeConfig,
+  NexusGraphQLSchema,
+  NonNullConfig,
+  RootTypings,
+} from './definitions/_types'
 import { arg, ArgsRecord, NexusArgConfig, NexusArgDef } from './definitions/args'
 import {
   InputDefinitionBlock,
@@ -79,19 +92,6 @@ import {
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
 } from './definitions/wrapping'
-import {
-  GraphQLPossibleInputs,
-  GraphQLPossibleOutputs,
-  MissingType,
-  NexusFeatures,
-  NexusGraphQLFieldConfig,
-  NexusGraphQLInputObjectTypeConfig,
-  NexusGraphQLInterfaceTypeConfig,
-  NexusGraphQLObjectTypeConfig,
-  NexusGraphQLSchema,
-  NonNullConfig,
-  RootTypings,
-} from './definitions/_types'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
 import { DynamicOutputPropertyDef } from './dynamicProperty'
 import {
@@ -231,6 +231,9 @@ export interface BuilderConfig {
    * Otherwise, uses `printSchema` from graphql-js
    */
   customPrintSchemaFn?: typeof printSchema
+  /**
+   * Customize and toggle on or off various features of Nexus.
+   */
   features?: NexusFeatures
 }
 
