@@ -1,7 +1,7 @@
 import { assertValidName } from 'graphql'
-import { GetGen, ResolveType } from '../typegenTypeHelpers'
-import { NexusObjectTypeDef } from './objectType'
+import { GetGen, MaybeTypeDefConfigFieldResolveType } from '../typegenTypeHelpers'
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
+import { NexusObjectTypeDef } from './objectType'
 
 export interface UnionDefinitionBuilder<_TypeName extends string> {
   addUnionMembers(members: UnionMembers): void
@@ -42,7 +42,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef
-} & ResolveType<TypeName>
+} & MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<TypeName>) {

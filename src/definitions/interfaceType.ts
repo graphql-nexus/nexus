@@ -1,7 +1,7 @@
 import { assertValidName } from 'graphql'
-import { GetGen, ResolveType } from '../typegenTypeHelpers'
-import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
+import { GetGen, MaybeTypeDefConfigFieldResolveType } from '../typegenTypeHelpers'
 import { NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
+import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
@@ -31,7 +31,7 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef
-} & ResolveType<TypeName>
+} & MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void

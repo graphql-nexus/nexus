@@ -325,7 +325,7 @@ export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
 /**
  * Returns whether all the abstract type names where TypeName is used have implemented `resolveType`
  */
-export type ResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
+export type IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
   TypeName
 > extends GetGen<'abstractsUsingStrategyResolveType'>
   ? true
@@ -334,7 +334,7 @@ export type ResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = 
 /**
  * Returns whether all the members of an abstract type have implemented `isTypeOf`
  */
-export type IsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
+export type IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
   'abstractResolveReturn',
   AbstractTypeName
 > extends GetGen<'objectsUsingAbstractStrategyIsTypeOf'>
@@ -348,61 +348,59 @@ export type IsTypeOfHandler<TypeName extends string> = (
 ) => MaybePromise<boolean>
 
 /**
- * Conditionally returns the `isTypeOf` field
+ * Get an object with the `isTypeOf` field if applicable for the given object Type.
+ *
+ * @remarks
+ *
+ * Intersect the result of this with other things to build up the final options for a type def.
  */
-export type IsTypeOf<TypeName extends string> = GetGen3<
-  'features',
-  'abstractTypes',
-  'isTypeOf',
-  false
-> extends false
+// prettier-ignore
+export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
+  GetGen3<'features','abstractTypes','isTypeOf',false> extends false
   ? {}
-  : ResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
-  ? {
-      isTypeOf?: IsTypeOfHandler<TypeName>
-    } // Make isTypeOf optional as soon as __typename is enabled
-  : GetGen3<'features', 'abstractTypes', '__typename', false> extends true
-  ? {
-      isTypeOf?: IsTypeOfHandler<TypeName>
-    }
-  : { isTypeOf: IsTypeOfHandler<TypeName> }
+  : IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
+    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional as soon as __typename is enabled
+    : GetGen3<'features', 'abstractTypes', '__typename', false> extends true
+      ? { isTypeOf?: IsTypeOfHandler<TypeName> }
+      : { isTypeOf: IsTypeOfHandler<TypeName> }
 
 /**
- * Conditionally returns the `resolveType` field
+ * Get an object with the `resolveType` field if applicable for the given abstract Type.
+ *
+ * @remarks
+ *
+ * Intersect the result of this with other things to build up the final options for a type def.
  */
-export type ResolveType<TypeName extends string> = GetGen3<
-  'features',
-  'abstractTypes',
-  'resolveType',
-  false
-> extends false
-  ? {} // remove field altogether is feature is not enabled
-  : IsTypeOfImplementedInAllMembers<TypeName> extends true
-  ? {
-      /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
-       */
-      resolveType?: AbstractTypeResolver<TypeName>
-    } // Make resolveType optional as soon as __typename is enabled
-  : GetGen3<'features', 'abstractTypes', '__typename', false> extends true
-  ? {
-      /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
-       */
-      resolveType?: AbstractTypeResolver<TypeName>
-    }
-  : {
-      /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
-       */
-      resolveType: AbstractTypeResolver<TypeName>
-    }
+// prettier-ignore
+export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> =
+  GetGen3<'features','abstractTypes','resolveType',false> extends false
+    ? {} // remove field altogether is feature is not enabled
+    : IsStrategyIsTypeOfImplementedInAllMembers<TypeName> extends true
+      ? {
+          /**
+           * Optionally provide a custom type resolver function. If one is not provided,
+           * the default implementation will call `isTypeOf` on each implementing
+           * Object type.
+           */
+          resolveType?: AbstractTypeResolver<TypeName>
+        } // Make resolveType optional as soon as __typename is enabled
+      : GetGen3<'features', 'abstractTypes', '__typename', false> extends true
+        ? {
+            /**
+             * Optionally provide a custom type resolver function. If one is not provided,
+             * the default implementation will call `isTypeOf` on each implementing
+             * Object type.
+             */
+            resolveType?: AbstractTypeResolver<TypeName>
+          }
+        : {
+            /**
+             * Optionally provide a custom type resolver function. If one is not provided,
+             * the default implementation will call `isTypeOf` on each implementing
+             * Object type.
+             */
+            resolveType: AbstractTypeResolver<TypeName>
+          }
 
 /**
  * Returns whether a field which type is either an 'Object | Interface | Enum' should discriminate its return type with __typename
@@ -411,7 +409,7 @@ export type ShouldDiscriminateOutputTypeField<OutputTypeName extends string> = O
   'objectsUsingAbstractStrategyIsTypeOf'
 > // if it implements isTypeOf already
   ? false // then don't disable __typename feature
-  : ResolveTypeImplementedInAllAbstractTypes<OutputTypeName> extends true // else if abstract implement resolve type
+  : IsStrategyResolveTypeImplementedInAllAbstractTypes<OutputTypeName> extends true // else if abstract implement resolve type
   ? false // then disable __typename feature
   : true // otherwise enable __typename feature
 
@@ -419,7 +417,7 @@ export type ShouldDiscriminateAbstractTypeField<
   AbstractTypeName extends string
 > = AbstractTypeName extends GetGen<'abstractsUsingStrategyResolveType'> // if the abstract type has resolve type already
   ? false // then disable __typename feature
-  : IsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
+  : IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
   ? false // then disable __typename feature
   : true // otherwise enable __typename feature
 
