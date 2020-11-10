@@ -1635,9 +1635,11 @@ function normalizeArg(argVal: AllNexusArgsDefs, nonNullDefault: boolean): NexusA
   // unwrap an arg if it is
   if (isNexusWrappingType(argVal)) {
     let { namedType, wrapping } = unwrapNexusDef(argVal, nonNullDefault)
+    let innerArgDef: undefined | NexusArgDef<any> = undefined
 
     // if what is wrapped is an arg def, get it's inner type
     if (isNexusArgDef(namedType)) {
+      innerArgDef = namedType
       namedType = namedType.value.type
     }
 
@@ -1648,8 +1650,8 @@ function normalizeArg(argVal: AllNexusArgsDefs, nonNullDefault: boolean): NexusA
       )
     }
 
-    // re-wrap the inner type with the outer wrapping
-    return arg({ type: wrapAsNexusType(namedType, wrapping) })
+    // re-wrap the inner type wrapped with the outer wrapping
+    return arg({ ...innerArgDef?.value, type: wrapAsNexusType(namedType, wrapping) })
   }
 
   return arg({ type: argVal })

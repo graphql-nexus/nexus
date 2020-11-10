@@ -1,4 +1,4 @@
-import { GraphQLString } from 'graphql'
+import { GraphQLArgument, GraphQLInputType, GraphQLOutputType, GraphQLString } from 'graphql'
 import { list, makeSchema, nonNull, nullable } from '../src'
 import {
   AllNexusArgsDefs,
@@ -71,7 +71,10 @@ function genWrappedTypes(baseType: AllNexusOutputTypeDefs | string): Array<Gener
   })
 }
 
-function testField(type: AllNexusOutputTypeDefs | string, params: { nonNullDefault: boolean }): string {
+function testField(
+  type: AllNexusOutputTypeDefs | string,
+  params: { nonNullDefault: boolean }
+): GraphQLOutputType {
   const schema = makeSchema({
     types: [
       queryType({
@@ -88,13 +91,13 @@ function testField(type: AllNexusOutputTypeDefs | string, params: { nonNullDefau
     outputs: false,
   })
 
-  return schema.getQueryType()!.getFields()['foo']!.type.toString()
+  return schema.getQueryType()!.getFields()['foo']!.type
 }
 
 function testArg(
   type: AllNexusArgsDefs,
   params: { nonNullDefault: boolean; wrappedInArg?: boolean }
-): string {
+): GraphQLArgument {
   const schema = makeSchema({
     types: [
       queryType({
@@ -118,13 +121,12 @@ function testArg(
     .getQueryType()!
     .getFields()
     ['foo']!.args.find((a) => a.name === 'foo')!
-    .type.toString()
 }
 
 function getTestDataForOutputType(
   baseType: any,
   params: { nonNullDefault: boolean }
-): Array<[string, string | Error]> {
+): Array<[string, GraphQLOutputType | Error]> {
   const wrappedTypes = genWrappedTypes(baseType)
 
   return wrappedTypes.map((wrappedType) => {
@@ -141,7 +143,7 @@ function getTestDataForOutputType(
 function getTestDataForInputType(
   baseType: any,
   params: { nonNullDefault: boolean; wrappedInArg?: boolean }
-): Array<[string, string | Error]> {
+): Array<[string, GraphQLInputType | Error]> {
   const wrappedTypes = genWrappedTypes(baseType)
 
   return wrappedTypes.map((wrappedType) => {
@@ -149,9 +151,9 @@ function getTestDataForInputType(
       return [wrappedType.label, wrappedType.error]
     }
 
-    const inputType = testArg(wrappedType.type, params)
+    const arg = testArg(wrappedType.type, params)
 
-    return [wrappedType.label, inputType]
+    return [wrappedType.label, arg.type]
   })
 }
 
@@ -168,10 +170,10 @@ describe('wrapping for output types; nonNullDefault = true;', () => {
   )
 
   it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
   it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
 })
 
@@ -188,10 +190,10 @@ describe('wrapping for output types; nonNullDefault = false;', () => {
   )
 
   it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
   it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
 })
 
@@ -210,17 +212,17 @@ describe('wrapping for input types; nonNullDefault = false;', () => {
   const argDefTestData = getTestDataForInputType('String', { nonNullDefault: false, wrappedInArg: true })
 
   it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
   it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
   it.each(wrappedArgDefTestData)('wrapped arg def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
 
   it.each(argDefTestData)('arg def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
 })
 
@@ -239,17 +241,17 @@ describe('wrapping for input types; nonNullDefault = true;', () => {
   const argDefTestData = getTestDataForInputType('String', { nonNullDefault: true, wrappedInArg: true })
 
   it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
   it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
   it.each(wrappedArgDefTestData)('wrapped arg def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
 
   it.each(argDefTestData)('arg def %s', (_, typeOrError) => {
-    expect(typeOrError).toMatchSnapshot()
+    expect(typeOrError.toString()).toMatchSnapshot()
   })
 })
 
@@ -282,10 +284,26 @@ describe('edges cases', () => {
   })
 
   test('cannot wrap at the same time an arg def and its type', () => {
-    const type = list(arg({ type: list('String') }))
+    const wrappedArgDef = list(arg({ type: list('String') }))
 
-    expect(() => testArg(type, { nonNullDefault: false })).toThrowErrorMatchingInlineSnapshot(
+    expect(() => testArg(wrappedArgDef, { nonNullDefault: false })).toThrowErrorMatchingInlineSnapshot(
       `"Cannot wrap arg() and \`type\` property in list() or nonNull() or nullable() at the same time"`
     )
+  })
+
+  test('wrapped arg def retains metadata description etc', () => {
+    const wrappedArgDef = list(nonNull(stringArg({ description: 'Bonjour !', default: 'Au revoir!' })))
+    const graphqlArg = testArg(wrappedArgDef, { nonNullDefault: false })
+
+    expect(graphqlArg).toMatchInlineSnapshot(`
+      Object {
+        "astNode": undefined,
+        "defaultValue": "Au revoir!",
+        "description": "Bonjour !",
+        "extensions": undefined,
+        "name": "foo",
+        "type": "[String!]",
+      }
+    `)
   })
 })
