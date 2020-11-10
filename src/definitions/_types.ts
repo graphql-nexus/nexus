@@ -168,6 +168,9 @@ export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
  * Customize and toggle on or off various features of Nexus.
  */
 export interface NexusFeatures {
+  /**
+   * Toggle abstract-type strategies. For more detail about this feature please refer to to the [abstract types guide](https://nxs.li/guides/abstract-types).
+   */
   abstractTypes?: {
     isTypeOf?: boolean
     resolveType?: boolean
