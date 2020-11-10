@@ -4978,6 +4978,8 @@ export type NexusGenAbstractsUsingStrategyResolveType = 'BigUnion' | 'MediumUnio
 export type NexusGenFeaturesConfig = {
   abstractTypes: {
     resolveType: true
+    __typename: false
+    isTypeOf: false
   }
 }
 

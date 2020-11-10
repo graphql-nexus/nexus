@@ -44,7 +44,7 @@ import {
   GraphQLPossibleInputs,
   GraphQLPossibleOutputs,
   MissingType,
-  NexusFeatures,
+  NexusFeaturesInput,
   NexusGraphQLFieldConfig,
   NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
@@ -121,9 +121,11 @@ import {
   consoleWarn,
   eachObj,
   firstDefined,
+  invariantGuard,
   isObject,
   mapValues,
   objValues,
+  RequiredDeeply,
   UNKNOWN_TYPE_SCALAR,
   validateOnInstallHookResult,
 } from './utils'
@@ -234,10 +236,10 @@ export interface BuilderConfig {
   /**
    * Customize and toggle on or off various features of Nexus.
    */
-  features?: NexusFeatures
+  features?: NexusFeaturesInput
 }
 
-export type SchemaConfig = BuilderConfig & {
+export type SchemaConfigInput = BuilderConfig & {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -252,6 +254,10 @@ export type SchemaConfig = BuilderConfig & {
    */
   shouldExitAfterGenerateArtifacts?: boolean
 } & NexusGenPluginSchemaConfig
+
+export type SchemaConfig = Omit<SchemaConfigInput, 'features'> & {
+  features: RequiredDeeply<SchemaConfigInput['features']>
+}
 
 export interface TypegenInfo {
   /**
@@ -1582,24 +1588,30 @@ export function makeSchemaInternal(config: SchemaConfig) {
   return { schema, missingTypes, finalConfig }
 }
 
-function setConfigDefaults(config: SchemaConfig): SchemaConfig {
-  const abstractTypesDefault: NexusFeatures['abstractTypes'] = {
-    isTypeOf: true,
-    resolveType: false,
-    __typename: false,
+function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
+  const defaults: { features: SchemaConfig['features'] } = {
+    features: {
+      abstractTypes: {
+        isTypeOf: true,
+        resolveType: false,
+        __typename: false,
+      },
+    },
   }
 
   if (!config.features) {
     config.features = {
-      abstractTypes: abstractTypesDefault,
+      abstractTypes: defaults.features.abstractTypes,
     }
+  } else if (!config.features.abstractTypes) {
+    config.features.abstractTypes = defaults.features.abstractTypes
+  } else {
+    config.features.abstractTypes.__typename = config.features.abstractTypes.__typename ?? false
+    config.features.abstractTypes.isTypeOf = config.features.abstractTypes.isTypeOf ?? false
+    config.features.abstractTypes.resolveType = config.features.abstractTypes.resolveType ?? false
   }
 
-  if (!config.features.abstractTypes) {
-    config.features.abstractTypes = abstractTypesDefault
-  }
-
-  return config
+  return config as SchemaConfig
 }
 
 /**
@@ -1609,8 +1621,8 @@ function setConfigDefaults(config: SchemaConfig): SchemaConfig {
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(inputConfig: SchemaConfig): NexusGraphQLSchema {
-  const config = setConfigDefaults(inputConfig)
+export function makeSchema(configInput: SchemaConfigInput): NexusGraphQLSchema {
+  const config = setConfigDefaults(configInput)
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
@@ -1644,7 +1656,8 @@ export function makeSchema(inputConfig: SchemaConfig): NexusGraphQLSchema {
  * Like makeSchema except that typegen is always run
  * and waited upon.
  */
-export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQLSchema> {
+export async function generateSchema(configInput: SchemaConfigInput): Promise<NexusGraphQLSchema> {
+  const config = setConfigDefaults(configInput)
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   assertNoMissingTypes(schema, missingTypes)
@@ -1657,13 +1670,14 @@ export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQL
  * that would have been otherwise written to the filesystem.
  */
 generateSchema.withArtifacts = async (
-  config: SchemaConfig,
+  configInput: SchemaConfigInput,
   typeFilePath: string | false
 ): Promise<{
   schema: NexusGraphQLSchema
   schemaTypes: string
   tsTypes: string
 }> => {
+  const config = setConfigDefaults(configInput)
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   assertNoMissingTypes(schema, missingTypes)
@@ -1672,19 +1686,6 @@ generateSchema.withArtifacts = async (
     typeFilePath
   )
   return { schema, schemaTypes, tsTypes }
-}
-
-/**
- * Assertion utility with nexus-aware feedback for users.
- */
-function invariantGuard(val: any) {
-  /* istanbul ignore next */
-  if (Boolean(val) === false) {
-    throw new Error(
-      'Nexus Error: This should never happen, ' +
-        'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
-    )
-  }
 }
 
 function normalizeArg(

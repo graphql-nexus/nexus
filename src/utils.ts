@@ -334,7 +334,7 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
 export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema, features: NexusFeatures) {
   // If backing type check is enabled, we can no longer know for sure if a type is properly discriminated
   // since it could be discriminated via the `__typename` field in resolvers, which we can't check at runtime
-  if (features.abstractTypes?.__typename === true) {
+  if (features.abstractTypes.__typename === true) {
     return
   }
 
@@ -498,6 +498,30 @@ export function casesHandled(x: never): never {
  */
 export type IsEqual<A, B> = A extends B ? (B extends A ? true : false) : false
 
+export type RequiredDeeply<T> = DoRequireDeeply<Exclude<T, undefined>>
+
+type DoRequireDeeply<T> = {
+  [K in keyof T]-?: Exclude<T[K], undefined> extends PlainObject
+    ? DoRequireDeeply<Exclude<T[K], undefined>>
+    : Exclude<T[K], undefined>
+}
+
+/**
+ * Represents a POJO. Prevents from allowing arrays and functions.
+ *
+ * @remarks
+ *
+ * TypeScript interfaces will not be considered sub-types.
+ */
+export type PlainObject = {
+  [x: string]: Primitive | object
+}
+
+/**
+ * Matches any [primitive value](https://developer.mozilla.org/en-US/docs/Glossary/Primitive).
+ */
+export type Primitive = null | undefined | string | number | boolean | symbol | bigint
+
 /**
  * Quickly log objects
  */
@@ -507,4 +531,17 @@ export function dump(x: any) {
 
 export function isNodeModule(path: string) {
   return /^([A-z0-9@])/.test(path)
+}
+
+/**
+ * Assertion utility with nexus-aware feedback for users.
+ */
+export function invariantGuard(val: any) {
+  /* istanbul ignore next */
+  if (Boolean(val) === false) {
+    throw new Error(
+      'Nexus Error: This should never happen, ' +
+        'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
+    )
+  }
 }

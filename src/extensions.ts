@@ -1,10 +1,10 @@
 import { GraphQLNamedType } from 'graphql'
-import { DynamicFieldDefs, SchemaConfig } from './builder'
+import { DynamicFieldDefs, SchemaConfigInput } from './builder'
+import { RootTypings } from './definitions/_types'
 import { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import { NexusInterfaceTypeConfig } from './definitions/interfaceType'
 import { NexusObjectTypeConfig } from './definitions/objectType'
-import { RootTypings } from './definitions/_types'
 
 export type NexusGraphQLNamedType = GraphQLNamedType & {
   extensions?: {
@@ -66,7 +66,7 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
   }
 }
 
-export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
+export interface NexusSchemaExtensionConfig extends Omit<SchemaConfigInput, 'types'> {
   dynamicFields: DynamicFieldDefs
   rootTypings: RootTypings
 }

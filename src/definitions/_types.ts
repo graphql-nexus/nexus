@@ -20,6 +20,7 @@ import {
   NexusObjectTypeExtension,
   NexusSchemaExtension,
 } from '../extensions'
+import { RequiredDeeply } from '../utils'
 
 export type Maybe<T> = T | null
 
@@ -164,10 +165,7 @@ export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
   extensions: { nexus: NexusSchemaExtension }
 }
 
-/**
- * Customize and toggle on or off various features of Nexus.
- */
-export interface NexusFeatures {
+export type NexusFeaturesInput = {
   /**
    * Toggle abstract-type strategies. For more detail about this feature please refer to to the [abstract types guide](https://nxs.li/guides/abstract-types).
    */
@@ -177,3 +175,5 @@ export interface NexusFeatures {
     __typename?: boolean
   }
 }
+
+export type NexusFeatures = RequiredDeeply<NexusFeaturesInput>
