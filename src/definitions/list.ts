@@ -1,4 +1,4 @@
-import { AllNamedTypeDefs, NexusListableTypes } from './wrapping'
+import { AllNamedTypeDefs, isNexusStruct, NexusListableTypes } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 /**
  * list()
@@ -12,11 +12,15 @@ export class NexusListDef<TypeName extends NexusListableTypes> {
   // Required field for TS to differentiate NonNull from Null from List
   private _isNexusListDef: boolean = true
 
-  constructor(readonly ofType: TypeName) {}
+  constructor(readonly ofType: TypeName) {
+    if (!isNexusStruct(ofType) && typeof ofType !== 'string') {
+      throw new Error('Cannot wrap a type not constructed by Nexus')
+    }
+  }
 }
 
 withNexusSymbol(NexusListDef, NexusTypes.List)
 
-export function list<TypeName extends NexusListableTypes>(type: TypeName) {
+export function list<TypeName extends NexusListableTypes>(type: TypeName): NexusListDef<TypeName> {
   return new NexusListDef(type)
 }

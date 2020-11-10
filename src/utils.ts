@@ -17,7 +17,6 @@ import {
   isInputObjectType,
   isInterfaceType,
   isListType,
-  isNamedType,
   isNonNullType,
   isObjectType,
   isScalarType,
@@ -27,20 +26,27 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
+import { NexusArgDef } from './definitions/args'
 import { decorateType } from './definitions/decorateType'
+import { list } from './definitions/list'
+import { nonNull } from './definitions/nonNull'
 import {
-  AllNamedTypeDefs,
+  AllNexusArgsDefs,
   AllNexusInputTypeDefs,
+  AllNexusNamedArgsDefs,
   AllNexusNamedTypeDefs,
   AllNexusOutputTypeDefs,
   AllNexusTypeDefs,
+  isNexusArgDef,
   isNexusListTypeDef,
   isNexusNamedTypeDef,
   isNexusNonNullTypeDef,
   isNexusNullTypeDef,
+  isNexusWrappingType,
 } from './definitions/wrapping'
 import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
 import { PluginConfig } from './plugin'
+import { AllInputTypes } from './typegenTypeHelpers'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
   return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]))
@@ -392,7 +398,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
     name: 'NEXUS__UNKNOWN__TYPE',
     description: `
     This scalar should never make it into production. It is used as a placeholder for situations
-    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    where GraphQL Nexus encounters a missing type. We don't want to error immediately, otherwise
     the TypeScript definitions will not be updated.
   `,
     parseValue(value) {
@@ -448,23 +454,23 @@ export function isNodeModule(path: string) {
   return /^([A-z0-9@])/.test(path)
 }
 
-type NexusWrapKind = { type: 'List'; nullable: boolean } | { type: 'NamedType'; nullable: boolean }
+type NexusWrapKind = { type: 'List'; nullable: boolean } | { type: 'WrappedType'; nullable: boolean }
 
-export function unwrapNexusType(
-  type: AllNexusTypeDefs | string,
+export function unwrapNexusDef(
+  typeDef: AllNexusTypeDefs | AllNexusArgsDefs | string,
   nonNullDefault: boolean
-): { namedType: AllNamedTypeDefs | string; wrapping: NexusWrapKind[] } {
+): { namedType: AllNexusNamedTypeDefs | AllNexusArgsDefs | string; wrapping: NexusWrapKind[] } {
   const wrapping: NexusWrapKind[] = []
-  let namedType = type
+  let namedType = typeDef
 
-  const isNamedTypeOrString = (obj: any): obj is GraphQLNamedType | AllNexusNamedTypeDefs | string =>
-    isNamedType(obj) || isNexusNamedTypeDef(obj) || typeof obj === 'string'
+  const isWrappedType = (obj: any): obj is AllNexusNamedTypeDefs | NexusArgDef<any> | string =>
+    isNexusNamedTypeDef(obj) || isNexusArgDef(obj) || typeof obj === 'string'
 
-  if (isNamedTypeOrString(type)) {
-    return { namedType: type, wrapping: [{ type: 'NamedType', nullable: !nonNullDefault }] }
+  if (isWrappedType(typeDef)) {
+    return { namedType: typeDef, wrapping: [{ type: 'WrappedType', nullable: !nonNullDefault }] }
   }
 
-  while (isNexusListTypeDef(namedType) || isNexusNonNullTypeDef(namedType) || isNexusNullTypeDef(namedType)) {
+  while (isNexusWrappingType(namedType)) {
     // nullable(list(Type))
     if (isNexusNullTypeDef(namedType) && isNexusListTypeDef(namedType.ofType)) {
       wrapping.unshift({ type: 'List', nullable: true })
@@ -472,8 +478,8 @@ export function unwrapNexusType(
     }
 
     // nullable(Type)
-    if (isNexusNullTypeDef(namedType) && isNamedTypeOrString(namedType.ofType)) {
-      wrapping.unshift({ type: 'NamedType', nullable: true })
+    if (isNexusNullTypeDef(namedType) && isWrappedType(namedType.ofType)) {
+      wrapping.unshift({ type: 'WrappedType', nullable: true })
       namedType = namedType.ofType
       break
     }
@@ -485,8 +491,8 @@ export function unwrapNexusType(
     }
 
     // nonNull(Type)
-    if (isNexusNonNullTypeDef(namedType) && isNamedTypeOrString(namedType.ofType)) {
-      wrapping.unshift({ type: 'NamedType', nullable: false })
+    if (isNexusNonNullTypeDef(namedType) && isWrappedType(namedType.ofType)) {
+      wrapping.unshift({ type: 'WrappedType', nullable: false })
       namedType = namedType.ofType
       break
     }
@@ -498,33 +504,33 @@ export function unwrapNexusType(
     }
 
     // Type
-    if (isNamedTypeOrString(namedType)) {
-      wrapping.unshift({ type: 'NamedType', nullable: !nonNullDefault })
+    if (!isNexusWrappingType(namedType)) {
+      wrapping.unshift({ type: 'WrappedType', nullable: !nonNullDefault })
     }
   }
 
   return { namedType, wrapping }
 }
 
-export function wrapGraphQLType(
-  type: AllNexusOutputTypeDefs | string,
-  graphqlNamedType: GraphQLNamedType,
+export function wrapType(
+  nexusDef: AllNexusOutputTypeDefs | string,
+  baseType: GraphQLNamedType,
   nonNullDefault: boolean
 ): GraphQLOutputType
-export function wrapGraphQLType(
-  type: AllNexusInputTypeDefs | string,
-  graphqlNamedType: GraphQLNamedType,
+export function wrapType(
+  nexusDef: AllNexusInputTypeDefs | string,
+  baseType: GraphQLNamedType,
   nonNullDefault: boolean
 ): GraphQLInputType
-export function wrapGraphQLType(
-  type: AllNexusTypeDefs | string,
-  graphqlNamedType: GraphQLNamedType,
+export function wrapType(
+  nexusDef: AllNexusTypeDefs | string,
+  baseType: GraphQLNamedType,
   nonNullDefault: boolean
-) {
-  const { wrapping } = unwrapNexusType(type, nonNullDefault)
+): GraphQLOutputType | GraphQLInputType {
+  const { wrapping } = unwrapNexusDef(nexusDef, nonNullDefault)
 
   return wrapping.reduce<GraphQLType>((type, kind) => {
-    if (kind.type === 'NamedType' && kind.nullable === false) {
+    if (kind.type === 'WrappedType' && kind.nullable === false) {
       return GraphQLNonNull(type)
     }
 
@@ -537,7 +543,50 @@ export function wrapGraphQLType(
     }
 
     return type
-  }, graphqlNamedType)
+  }, baseType)
+}
+
+export function wrapAsNexusType(
+  baseType: AllNexusNamedTypeDefs | string,
+  wrapping: NexusWrapKind[]
+): AllNexusOutputTypeDefs
+export function wrapAsNexusType(
+  baseType: AllNexusNamedTypeDefs | string,
+  wrapping: NexusWrapKind[]
+): AllNexusInputTypeDefs
+export function wrapAsNexusType(
+  baseType: AllNexusNamedTypeDefs | string,
+  wrapping: NexusWrapKind[]
+): AllNexusTypeDefs {
+  return wrapping.reduce<any>((type, kind) => {
+    if (kind.type === 'WrappedType' && kind.nullable === false) {
+      return nonNull(type)
+    }
+
+    if (kind.type === 'List' && kind.nullable === true) {
+      return list(type)
+    }
+
+    if (kind.type === 'List' && kind.nullable === false) {
+      return nonNull(list(type))
+    }
+
+    return type
+  }, baseType)
+}
+
+export function getNexusNamedArgDef(argDef: AllNexusArgsDefs | AllInputTypes): AllNexusNamedArgsDefs {
+  if (typeof argDef === 'string') {
+    return argDef
+  }
+
+  let namedType = argDef
+
+  while (isNexusWrappingType(namedType)) {
+    namedType = namedType.ofType
+  }
+
+  return namedType
 }
 
 export function getNexusNamedType(type: AllNexusTypeDefs | string): AllNexusNamedTypeDefs | string {
@@ -547,7 +596,7 @@ export function getNexusNamedType(type: AllNexusTypeDefs | string): AllNexusName
 
   let namedType = type
 
-  while (isNexusNonNullTypeDef(namedType) || isNexusListTypeDef(namedType) || isNexusNullTypeDef(namedType)) {
+  while (isNexusWrappingType(namedType)) {
     namedType = namedType.ofType
   }
 

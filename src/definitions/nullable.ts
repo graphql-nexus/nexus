@@ -1,4 +1,4 @@
-import { isNexusNonNullTypeDef, isNexusNullTypeDef, NexusNullableTypes } from './wrapping'
+import { isNexusNonNullTypeDef, isNexusNullTypeDef, isNexusStruct, NexusNullableTypes } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 
 export class NexusNullDef<TypeName extends NexusNullableTypes> {
@@ -8,11 +8,15 @@ export class NexusNullDef<TypeName extends NexusNullableTypes> {
 
   constructor(readonly ofType: TypeName) {
     if (isNexusNonNullTypeDef(ofType)) {
-      throw new Error('Cannot wrap a nonNull in a nullable')
+      throw new Error('Cannot wrap a nonNull() in a nullable()')
     }
 
     if (isNexusNullTypeDef(ofType)) {
-      throw new Error('Cannot wrap a nullable in a nullable')
+      throw new Error('Cannot wrap a nullable() in a nullable()')
+    }
+
+    if (!isNexusStruct(ofType) && typeof ofType !== 'string') {
+      throw new Error('Cannot wrap a type not constructed by Nexus')
     }
   }
 }

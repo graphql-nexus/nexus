@@ -129,7 +129,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
   field<FieldName extends string>(name: FieldName, fieldConfig: FieldOutConfig<TypeName, FieldName>) {
     // FIXME
     // 1. FieldOutConfig<TypeName is constrained to any string subtype
-    // 2. NexusOutputFieldDef is contrained to be be a string
+    // 2. NexusOutputFieldDef is constrained to be be a string
     // 3. so `name` is not compatible
     // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
     this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
