@@ -352,7 +352,7 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
         type.name
       }".`
       const message = `${messagePrefix} It is missing a \`resolveType\` implementation.`
-      console.error(new Error(message))
+      raiseProgrammerError(new Error(message))
     }
 
     if (
@@ -373,7 +373,7 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
       } else {
         casesHandled(kind)
       }
-      console.error(new Error(message))
+      raiseProgrammerError(new Error(message))
     }
 
     if (
@@ -394,7 +394,7 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
       } else {
         casesHandled(kind)
       }
-      console.error(new Error(message))
+      raiseProgrammerError(new Error(message))
     }
   })
 }
@@ -541,5 +541,23 @@ export function invariantGuard(val: any) {
       'Nexus Error: This should never happen, ' +
         'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
     )
+  }
+}
+
+/**
+ * Is the current stage production? If NODE_ENV envar is set to "production" or "prod" then yes it is.
+ */
+export function isProductionStage() {
+  return process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod'
+}
+
+/**
+ * Throw a programmer error in production but only log it in development.
+ */
+export function raiseProgrammerError(error: Error) {
+  if (isProductionStage()) {
+    throw error
+  } else {
+    console.error(error)
   }
 }
