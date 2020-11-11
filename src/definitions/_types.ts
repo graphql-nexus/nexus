@@ -214,13 +214,11 @@ export type NexusFeaturesInput = {
      *
      * @remarks
      *
-     * Beware: When this strategy is enabled the "abstractTypeRuntimeChecks" will
+     * Beware: When this strategy is enabled the "abstractTypeRuntimeChecks" feature will
      * automatically be disabled. This is because it is not practical at runtime
      * to find out if resolvers will return objects that include the
-     * "__typename" field. This is acceptable since the runtime checks are a redundant safety
-     * measure over the static typing. So as long as you are not ignoring the
-     * static type errors in Nexus then you should still have a safe implementation.
-     *
+     * "__typename" field. This trade-off can be acceptable since the runtime checks are a redundant safety
+     * measure over the static typing. So as long as you are not ignoring static errors related to Nexus' abstract type type checks then you then you should still have a safe implementation.
      */
     __typename?: boolean
   }

@@ -137,13 +137,13 @@ But what is missing here is the implementation of the discriminant property. In 
 
 1. ResolveType Strategy: Implement `resolveType` on the union type itself
 2. IsTypeOf Strategy: Implement `isTypeOf` on each member of the union
-3. Discriminant Model Property (DMP) Strategy: Return a `__typename` discriminant property in the model data.
+3. Discriminant Model Field (DMF) Strategy: Return a `__typename` discriminant property in the model data.
 
 Let's explore each of these strategies.
 
-#### ResolveType Strategy
+#### Centralized Strategy (`resolveType`)
 
-The `resolveType` strategy allows to discriminate your union member types in a centralized (to the union type) way. For example:
+The Centralized strategy allows to discriminate your union member types in a centralized (to the union type) way. For example:
 
 ```ts
 const SearchResult = unionType({
@@ -174,9 +174,9 @@ Nexus leverages TypeScript to statically ensure that your implementation is corr
 2. `resolveType` `data` param will be typed as a union of all the member types' model types (backing types).
 3. `resolveType` return type will be typed as a union of string literals matching the GraphQL object type names of all members in the GraphQL union type.
 
-#### Discriminant Model Property (DMP) Strategy
+#### Discriminant Model Field (DMF) Strategy (`__typename`)
 
-The DMP strategy allows you to discriminate your union member types in a modular way like IsTypeOf strategy. Unlike the IsTypeOf strategy however DMP strategy is based on the shape of the underlying model data. Here is an example:
+The DMF strategy allows you to discriminate your union member types in a _potentialy_ modular way. It is based on supplying at `__tpename` field in the model data returned by resolvers of fields typed as an abstract type. Here is an example:
 
 ```ts
 const Query = queryType({
@@ -187,7 +187,7 @@ const Query = queryType({
         pattern: stringArg(),
       },
       resolve(root, args, ctx) {
-        return ctx.db.search(args.pattern).map((result) => {
+        return ctx.db.search(args.pattern).map(result => {
           const __typename = result.album
             ? 'Song'
             : result.rating
@@ -213,7 +213,7 @@ const Query = queryType({
 })
 ```
 
-As you can see the technique looks quite similar at face value to the previous `resolveType` one. However your implementation might not look like this at all. For example maybe your data models already contain a discriminant property `typeName`. For example:
+As you can see the technique looks quite similar at face value to the Centralized strategy shown before. However your implementation might not look like this at all. For example maybe your data models already contain a discriminant property `typeName`. For example:
 
 ```ts
 const Query = queryType({
@@ -224,7 +224,7 @@ const Query = queryType({
         pattern: stringArg(),
       },
       resolve(root, args, ctx) {
-        return ctx.db.search(args.pattern).map((result) => {
+        return ctx.db.search(args.pattern).map(result => {
           return {
             ...result,
             __typename: result.typeName,
@@ -261,7 +261,7 @@ Like with ResolveType strategy Nexus leverages TypeScript to ensure your impleme
          },
          resolve(root, args, ctx) {
            // Nexus requires __typename here
-           return ctx.db.search(args.pattern).map((result) => {
+           return ctx.db.search(args.pattern).map(result => {
              return {
                ...result,
                __typename: result.typeName,
@@ -273,9 +273,11 @@ Like with ResolveType strategy Nexus leverages TypeScript to ensure your impleme
    })
    ```
 
-#### IsTypeOf Strategy
+Beware that when this strategy is enabled the `abstractTypeRuntimeChecks` feature will automatically be disabled. This is because it is not practical at runtime to find out if resolvers will return objects that include the `__typename` field. This trade-off can be acceptable since the runtime checks are a redundant safety measure over the static type checks. So as long as you are not ignoring static errors related to Nexus' abstract type type checks then you then you should still have a safe implementation.
 
-The IsTypeOf strategy allows you to discriminate your union member types in a modular way like the DMP strategy. Unlike the DMP strategy however it is not based on the shape of your underlying model data. Instead the IsTypeOf strategy uses a predicate function that you implement that allows Nexus (actually GraphQL.js under the hood) to know at runtime if data being sent to the client is of the respective type or not. Here is an example:
+#### Modular Strategy (`isTypeOf`)
+
+The Modular strategy allows you to discriminate your union member types in a modular way like the DMF strategy. Unlike the DMF strategy however it is not based on the shape of your underlying model data. Instead the IsTypeOf strategy uses a predicate function that you implement that allows Nexus (actually GraphQL.js under the hood) to know at runtime if data being sent to the client is of the respective type or not. Here is an example:
 
 ```ts
 const Movie = objectType({
@@ -315,7 +317,7 @@ const Song = objectType({
 })
 ```
 
-Like with the ResolveType and DMP strategies Nexus leverages TypeScript to ensure your implementation is correct in the following ways:
+Like with the ResolveType and DMF strategies Nexus leverages TypeScript to ensure your implementation is correct in the following ways:
 
 1. If an object is a member of a union type then that object's `isTypeOf` field will be required, unless:
    - The union type has defined `resolveType`
@@ -334,7 +336,7 @@ import { makeSchema } from '@nexus/schema'
 
 makeSchema({
   features: {
-    abstractTypes: {
+    abstractTypeStrategies: {
       isTypeOf: true, // default
       resolveType: false, // default
       __typename: false, // default
@@ -353,7 +355,7 @@ import { makeSchema } from '@nexus/schema'
 
 makeSchema({
   features: {
-    abstractTypes: {
+    abstractTypeStrategies: {
       resolveType: true,
     },
   },
@@ -365,7 +367,7 @@ The resolved settings would be:
 
 ```ts
 {
-  abstractTypes: {
+  abstractTypeStrategies: {
     resolveType: true,
     isTypeOf: false, // The `true` default when no config is given is NOT inherited here
     __typename: false,
@@ -377,7 +379,7 @@ _Not_:
 
 ```ts
 {
-  abstractTypes: {
+  abstractTypeStrategies: {
     resolveType: true,
     isTypeOf: true, // <-- NOT what actually happens
     __typename: false,
@@ -391,10 +393,31 @@ There is no right or wrong strategy to use. Use the one that you and/or your tea
 
 | Questions                                                                             | If affirmative, then maybe                                                                                                 |
 | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Is my schema large? Do I have many collaborators?                                     | Modular (DMP, IsTypeOf)                                                                                                    |
+| Is my schema large? Do I have many collaborators?                                     | Modular (DMF, IsTypeOf)                                                                                                    |
 | Is my schema simple? Do I develop alone?                                              | Centralized (ResolveType)                                                                                                  |
-| Do I keep a discriminant property in the databse already?                             | DMP: implement `__typename` in your model layer if you have one                                                            |
-| Do I have objects that are part of multiple unions types and/or implement interfaces? | DMP or IsTypeOf to avoid repeated logic across multiple `resolveType` implementations required by the ResolveType strategy |
+| Do I keep a discriminant property in the databse already?                             | DMF: implement `__typename` in your model layer if you have one                                                            |
+| Do I have objects that are part of multiple unions types and/or implement interfaces? | DMF or IsTypeOf to avoid repeated logic across multiple `resolveType` implementations required by the ResolveType strategy |
+
+### Runtime Checks Picking Your Strategy (Or Strategies)
+
+In addition to giving typings for static type checks Nexus also performs runtime checks. This redundancy exists for a few reasons:
+
+1. Nexus can provide clear and concise feedback at runtime whereas with TypeScript the error messages and reasons can be cryptic.
+1. Can help you in the case where you miss the type errors for some reason.
+
+Runtime checks are automatically enabled. In development they will be a warning but in production they will be a thrown error. This way your development flow will not be unduly interrupted but your e.g. deployment pipeline in CI will be halted helping ensure you ship correct code to your users.
+
+If ever you need to diable this runtime check you can disable the feature like so:
+
+```ts
+makeSchema({
+  features: {
+    abstractTypeRuntimeChecks: false,
+  },
+})
+```
+
+Note that if you enable the DMF strategy (`features.abstractTypeStrategies.__typename`) then this runtime checks feature will be automatically disabled. For details about why refer to the DMF strategy docs above.
 
 #### Multiple Strategies
 
@@ -410,9 +433,9 @@ _At Runtime_
 
 In that case the following runtime precedence rules apply. Using a strategy here means the implementations of others of lower priority are discarded.
 
-1. ResolveType
-2. Discriminant Model Property
-3. IsTypeOf
+1. Centralized (`resolveType`)
+2. Discriminant Model Field (`__typename`)
+3. Modular (`isTypeOf`)
 
 > The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
 
