@@ -115,7 +115,6 @@ import { TypegenMetadata } from './typegenMetadata'
 import { AbstractTypeResolver, AllInputTypes, GetGen } from './typegenTypeHelpers'
 import { resolveTypegenConfig } from './typegenUtils'
 import {
-  assertAbstractTypesCanBeDiscriminated,
   assertNoMissingTypes,
   casesHandled,
   consoleWarn,
@@ -126,6 +125,7 @@ import {
   mapValues,
   objValues,
   RequiredDeeply,
+  runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   validateOnInstallHookResult,
 } from './utils'
@@ -1589,8 +1589,11 @@ export function makeSchemaInternal(config: SchemaConfig) {
 }
 
 function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
-  const defaults: { features: SchemaConfig['features'] } = {
+  const defaults: {
+    features: SchemaConfig['features']
+  } = {
     features: {
+      abstractTypeRuntimeChecks: true,
       abstractTypeStrategies: {
         isTypeOf: true,
         resolveType: false,
@@ -1600,17 +1603,31 @@ function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
   }
 
   if (!config.features) {
-    config.features = {
-      abstractTypeStrategies: defaults.features.abstractTypeStrategies,
-    }
-  } else if (!config.features.abstractTypeStrategies) {
-    config.features.abstractTypeStrategies = defaults.features.abstractTypeStrategies
+    config.features = defaults.features
   } else {
-    config.features.abstractTypeStrategies.__typename =
-      config.features.abstractTypeStrategies.__typename ?? false
-    config.features.abstractTypeStrategies.isTypeOf = config.features.abstractTypeStrategies.isTypeOf ?? false
-    config.features.abstractTypeStrategies.resolveType =
-      config.features.abstractTypeStrategies.resolveType ?? false
+    // abstractTypeStrategies
+
+    if (!config.features.abstractTypeStrategies) {
+      config.features.abstractTypeStrategies = defaults.features.abstractTypeStrategies
+    } else {
+      config.features.abstractTypeStrategies.__typename =
+        config.features.abstractTypeStrategies.__typename ?? false
+      config.features.abstractTypeStrategies.isTypeOf =
+        config.features.abstractTypeStrategies.isTypeOf ?? false
+      config.features.abstractTypeStrategies.resolveType =
+        config.features.abstractTypeStrategies.resolveType ?? false
+    }
+
+    // abstractTypeRuntimeChecks
+
+    if (config.features.abstractTypeStrategies.__typename) {
+      // Discriminant Model Field strategy cannot be used with runtime checks because at runtime
+      // we cannot know if a resolver for a field whose type is an abstract type includes __typename
+      // in the returned model data.
+      config.features.abstractTypeRuntimeChecks = false
+    } else if (!config.features.abstractTypeRuntimeChecks) {
+      config.features.abstractTypeRuntimeChecks = defaults.features.abstractTypeRuntimeChecks
+    }
   }
 
   return config as SchemaConfig
@@ -1650,7 +1667,7 @@ export function makeSchema(configInput: SchemaConfigInput): NexusGraphQLSchema {
     }
   }
   assertNoMissingTypes(schema, missingTypes)
-  assertAbstractTypesCanBeDiscriminated(schema, config.features ?? {})
+  runAbstractTypeRuntimeChecks(schema, config.features ?? {})
   return schema
 }
 

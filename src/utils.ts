@@ -331,10 +331,8 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
   }
 }
 
-export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema, features: NexusFeatures) {
-  // If backing type check is enabled, we can no longer know for sure if a type is properly discriminated
-  // since it could be discriminated via the `__typename` field in resolvers, which we can't check at runtime
-  if (features.abstractTypeStrategies.__typename === true) {
+export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, features: NexusFeatures) {
+  if (!features.abstractTypeRuntimeChecks) {
     return
   }
 
