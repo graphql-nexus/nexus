@@ -47,7 +47,7 @@ describe('plugin', () => {
         nullGuardPlugin,
       ],
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           __typename: true,
         },
       },
@@ -97,7 +97,7 @@ describe('plugin', () => {
       types: [buildSchema(EXAMPLE_SDL), nullGuardPlugin],
       plugins: [nullGuardPlugin],
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           __typename: true,
         },
       },
@@ -219,7 +219,7 @@ describe('plugin', () => {
     const schema = makeSchema({
       outputs: false,
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           __typename: true,
         },
       },

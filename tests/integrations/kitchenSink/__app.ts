@@ -6,6 +6,7 @@ import {
   extendType,
   idArg,
   inputObjectType,
+  interfaceType,
   mutationType,
   objectType,
   queryType,
@@ -24,6 +25,30 @@ const mockData = {
   posts: [{ title: '', body: '' }],
   user: { firstName: '', lastName: '' },
 }
+
+export const I = interfaceType({
+  name: 'I',
+  resolveType() {
+    return 'OfI'
+  },
+  definition(t) {
+    t.string('hello')
+  },
+})
+
+export const i = objectType({
+  name: 'OfI',
+  definition(t) {
+    t.implements('I')
+  },
+})
+
+export const i2 = objectType({
+  name: 'OfI2',
+  definition(t) {
+    t.implements('I')
+  },
+})
 
 export const dom = dynamicOutputMethod({
   name: 'title',

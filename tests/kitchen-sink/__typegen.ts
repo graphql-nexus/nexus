@@ -150,7 +150,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {}
+export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {}
 
 export interface NexusGenInheritedFields {}
 
@@ -190,7 +190,7 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
 }
 
 declare global {

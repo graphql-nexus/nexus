@@ -3,10 +3,11 @@
  * Do not make changes to this file directly
  */
 
-import { UnusedInterfaceTypeDef } from './kitchen-sink-definitions'
-import { core, connectionPluginCore } from '@nexus/schema'
-import { QueryComplexity } from '@nexus/schema/dist/plugins/queryComplexityPlugin'
+import { connectionPluginCore, core } from '@nexus/schema'
 import { FieldAuthorizeResolver } from '@nexus/schema/dist/plugins/fieldAuthorizePlugin'
+import { QueryComplexity } from '@nexus/schema/dist/plugins/queryComplexityPlugin'
+import { UnusedInterfaceTypeDef } from './kitchen-sink-definitions'
+
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(
@@ -468,7 +469,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
   TestUnion: 'Foo'
   Bar: 'Foo' | 'TestObj'
   Baz: 'TestObj'
@@ -527,7 +528,7 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
 }
 
 declare global {

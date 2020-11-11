@@ -4150,7 +4150,7 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {}
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
   BigUnion:
     | 'aEOOAAKG'
     | 'ahctkrlN'
@@ -4976,7 +4976,7 @@ export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 export type NexusGenAbstractsUsingStrategyResolveType = 'BigUnion' | 'MediumUnionType' | 'MediumUnionTypes'
 
 export type NexusGenFeaturesConfig = {
-  abstractTypes: {
+  abstractTypeStrategies: {
     resolveType: true
     __typename: false
     isTypeOf: false
@@ -5007,7 +5007,7 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
   abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig

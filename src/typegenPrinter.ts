@@ -91,7 +91,7 @@ export class TypegenPrinter {
       this.printFieldTypesMap(),
       this.printFieldTypeNamesMap(),
       this.printArgTypeMap(),
-      this.printAbstractResolveReturnTypeMap(),
+      this.printAbstractTypesMapResolveTypeMethodReturnType(),
       this.printInheritedFieldMap(),
       this.printTypeNames('object', 'NexusGenObjectNames'),
       this.printTypeNames('input', 'NexusGenInputNames'),
@@ -144,7 +144,7 @@ export class TypegenPrinter {
         `  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];`,
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
-        `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
+        `  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType;`,
         `  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;`,
         `  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;`,
         `  features: NexusGenFeaturesConfig;`,
@@ -316,8 +316,11 @@ export class TypegenPrinter {
     return sourceMap
   }
 
-  printAbstractResolveReturnTypeMap() {
-    return this.printTypeInterface('NexusGenAbstractResolveReturnTypes', this.buildResolveReturnTypesMap())
+  printAbstractTypesMapResolveTypeMethodReturnType() {
+    return this.printTypeInterface(
+      'NexusGenAbstractTypesMapResolveTypeMethodReturnType',
+      this.buildResolveReturnTypesMap()
+    )
   }
 
   buildResolveReturnTypesMap() {
@@ -385,7 +388,10 @@ export class TypegenPrinter {
     const abstractTypes = this.schema.extensions.nexus.config.features?.abstractTypeStrategies ?? {}
     const unionProps = renderObject(mapValues(abstractTypes, (val) => val ?? false))
 
-    return [`export type ${exportName} = {`].concat(`  abstractTypes: ${unionProps}`).concat('}').join('\n')
+    return [`export type ${exportName} = {`]
+      .concat(`  abstractTypeStrategies: ${unionProps}`)
+      .concat('}')
+      .join('\n')
   }
 
   buildEnumTypeMap() {

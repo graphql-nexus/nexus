@@ -213,7 +213,7 @@ describe('interfaceType', () => {
       outputs: false,
       shouldGenerateArtifacts: false,
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },

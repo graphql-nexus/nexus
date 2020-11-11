@@ -44,6 +44,14 @@ export interface NexusGenScalars {
 
 export interface NexusGenRootTypes {
   Mutation: {}
+  OfI: {
+    // root type
+    hello?: string | null // String
+  }
+  OfI2: {
+    // root type
+    hello?: string | null // String
+  }
   Post: {
     // root type
     body?: string | null // String
@@ -52,6 +60,7 @@ export interface NexusGenRootTypes {
   Query: {}
   Subscription: {}
   User: { firstName: string; lastName: string }
+  I: NexusGenRootTypes['OfI'] | NexusGenRootTypes['OfI2']
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -67,6 +76,14 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     createUser: NexusGenRootTypes['User'] | null // User
+  }
+  OfI: {
+    // field return type
+    hello: string | null // String
+  }
+  OfI2: {
+    // field return type
+    hello: string | null // String
   }
   Post: {
     // field return type
@@ -95,12 +112,24 @@ export interface NexusGenFieldTypes {
     firstName: string | null // String
     lastName: string | null // String
   }
+  I: {
+    // field return type
+    hello: string | null // String
+  }
 }
 
 export interface NexusGenFieldTypeNames {
   Mutation: {
     // field return type name
     createUser: 'User'
+  }
+  OfI: {
+    // field return type name
+    hello: 'String'
+  }
+  OfI2: {
+    // field return type name
+    hello: 'String'
   }
   Post: {
     // field return type name
@@ -129,6 +158,10 @@ export interface NexusGenFieldTypeNames {
     firstName: 'String'
     lastName: 'String'
   }
+  I: {
+    // field return type name
+    hello: 'String'
+  }
 }
 
 export interface NexusGenArgTypes {
@@ -151,17 +184,19 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {}
+export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
+  I: 'OfI' | 'OfI2'
+}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Mutation' | 'Post' | 'Query' | 'Subscription' | 'User'
+export type NexusGenObjectNames = 'Mutation' | 'OfI' | 'OfI2' | 'Post' | 'Query' | 'Subscription' | 'User'
 
 export type NexusGenInputNames = 'PostSearchInput'
 
 export type NexusGenEnumNames = never
 
-export type NexusGenInterfaceNames = never
+export type NexusGenInterfaceNames = 'I'
 
 export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
@@ -169,10 +204,10 @@ export type NexusGenUnionNames = never
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenAbstractsUsingStrategyResolveType = never
+export type NexusGenAbstractsUsingStrategyResolveType = 'I'
 
 export type NexusGenFeaturesConfig = {
-  abstractTypes: {
+  abstractTypeStrategies: {
     resolveType: true
     __typename: false
     isTypeOf: false
@@ -203,7 +238,7 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
   abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig

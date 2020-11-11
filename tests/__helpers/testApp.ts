@@ -46,7 +46,7 @@ export const testApp = (settings: Settings) => {
         return content.replace("'@nexus/schema'", "'../../../src'")
       },
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },

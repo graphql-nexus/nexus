@@ -162,7 +162,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
   ExampleUnion: 'Post' | 'User'
   Node: 'Post' | 'User'
 }
@@ -186,7 +186,7 @@ export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 export type NexusGenAbstractsUsingStrategyResolveType = never
 
 export type NexusGenFeaturesConfig = {
-  abstractTypes: {
+  abstractTypeStrategies: {
     __typename: true
     isTypeOf: false
     resolveType: false
@@ -217,7 +217,7 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
   abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig

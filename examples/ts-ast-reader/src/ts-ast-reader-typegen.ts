@@ -3,8 +3,8 @@
  * Do not make changes to this file directly
  */
 
-import * as t from './types/index'
 import ts from 'typescript'
+import * as t from './types/index'
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -2682,7 +2682,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
   DeclarationName:
     | 'BindingPattern'
     | 'ComputedPropertyName'
@@ -2887,7 +2887,7 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
 }
 
 declare global {

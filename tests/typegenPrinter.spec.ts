@@ -2,6 +2,7 @@ import { buildSchema, GraphQLField, GraphQLInterfaceType, GraphQLObjectType } fr
 import * as path from 'path'
 import { core } from '../src'
 import { EXAMPLE_SDL } from './_sdl'
+
 const { makeSchema, TypegenPrinter, TypegenMetadata } = core
 
 describe('typegenPrinter', () => {
@@ -17,7 +18,7 @@ describe('typegenPrinter', () => {
       types: [buildSchema(EXAMPLE_SDL)],
       // __typename put to true to prevent from erroring because of missing resolveType
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           __typename: true,
         },
       },

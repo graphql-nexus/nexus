@@ -26,7 +26,7 @@ describe('GH #361, interfaceType & implements', () => {
       types: [User],
       outputs: false,
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },

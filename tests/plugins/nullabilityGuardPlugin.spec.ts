@@ -128,7 +128,7 @@ const defaultSchema = makeSchema({
     output: true,
   },
   features: {
-    abstractTypes: {
+    abstractTypeStrategies: {
       resolveType: true,
     },
   },
@@ -258,7 +258,7 @@ describe('nullabilityGuardPlugin', () => {
         ],
         plugins: [nullPlugin()],
         features: {
-          abstractTypes: {
+          abstractTypeStrategies: {
             resolveType: true,
           },
         },
@@ -316,7 +316,7 @@ describe('nullabilityGuardPlugin', () => {
       types,
       plugins: [nullPlugin({ onGuarded: undefined })],
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },
@@ -345,7 +345,7 @@ describe('nullabilityGuardPlugin', () => {
       },
       plugins: [nullPlugin({ shouldGuard: undefined })],
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },
@@ -397,7 +397,7 @@ describe('nullabilityGuardPlugin', () => {
         }),
       ],
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },
@@ -420,7 +420,7 @@ describe('nullabilityGuardPlugin', () => {
         }),
       ],
       features: {
-        abstractTypes: {
+        abstractTypeStrategies: {
           resolveType: true,
         },
       },
