@@ -382,7 +382,7 @@ export class TypegenPrinter {
   }
 
   printFeaturesConfig(exportName: string) {
-    const abstractTypes = this.schema.extensions.nexus.config.features?.abstractTypes ?? {}
+    const abstractTypes = this.schema.extensions.nexus.config.features?.abstractTypeStrategies ?? {}
     const unionProps = renderObject(mapValues(abstractTypes, (val) => val ?? false))
 
     return [`export type ${exportName} = {`].concat(`  abstractTypes: ${unionProps}`).concat('}').join('\n')

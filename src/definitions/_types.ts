@@ -167,11 +167,61 @@ export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
 
 export type NexusFeaturesInput = {
   /**
-   * Toggle abstract-type strategies. For more detail about this feature please refer to to the [abstract types guide](https://nxs.li/guides/abstract-types).
+   * Toggle runtime checks for correct implementation of abstract types. This is
+   * a redundant check Nexus makes over the existing static typings it provides.
+   *
+   * @remarks
+   *
+   * This is useful for beginners because Nexus can give clear concise error
+   * messages unlike the static type errors.
+   *
+   * Note that if you enable the "abstractTypeStrategies.__typename" feature
+   * then this feature will be automatically disabled. For why this is, see that
+   * features' remarks.
    */
-  abstractTypes?: {
+  abstractTypeRuntimeChecks?: boolean
+  /**
+   * Toggle abstract-type strategies. For more detail about this feature please refer to to the [abstract types guide](https://nxs.li/guides/abstract-types).
+   *
+   * @default
+   *
+   * {
+   *    isTypeOf: true,
+   *    resolveType: false,
+   *    __typename: false
+   * }
+   */
+  abstractTypeStrategies?: {
+    /**
+     * The Modular abstract type strategy. Every member object of an abstract
+     * type (union members or interface implementors) will generally be required
+     * to implement isTypeOf method. Nexus will not require it in cases where it
+     * detects you have implemented another strategy. For more detail see the
+     * guide for the [Modular Abstract Type Strategy](https://nxs.li/guides/abstract-types/modular-strategy).
+     */
     isTypeOf?: boolean
+    /**
+     * The Centralized abstract type strategy. Every abstract type (union or
+     * interface) will generally be required to implement its resolveType
+     * method. Nexus will not require it in cases where it detects you have
+     * implemented another strategy. For more detail see the guide for the [Central Abstract Type Strategy](https://nxs.li/guides/abstract-types/centralized-strategy).
+     */
     resolveType?: boolean
+    /**
+     * The Discriminant Model Field strategy. In this mode the resolvers of fields typed as
+     * abstract types will be required to include "__typename" field in the
+     * returned data. For more detail see the guide for the [Discriminant Model Field Strategy](https://nxs.li/guides/abstract-types/discriminant-model-field-strategy).
+     *
+     * @remarks
+     *
+     * Beware: When this strategy is enabled the "abstractTypeRuntimeChecks" will
+     * automatically be disabled. This is because it is not practical at runtime
+     * to find out if resolvers will return objects that include the
+     * "__typename" field. This is acceptable since the runtime checks are a redundant safety
+     * measure over the static typing. So as long as you are not ignoring the
+     * static type errors in Nexus then you should still have a safe implementation.
+     *
+     */
     __typename?: boolean
   }
 }

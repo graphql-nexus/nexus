@@ -1591,7 +1591,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
 function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
   const defaults: { features: SchemaConfig['features'] } = {
     features: {
-      abstractTypes: {
+      abstractTypeStrategies: {
         isTypeOf: true,
         resolveType: false,
         __typename: false,
@@ -1601,14 +1601,16 @@ function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
 
   if (!config.features) {
     config.features = {
-      abstractTypes: defaults.features.abstractTypes,
+      abstractTypeStrategies: defaults.features.abstractTypeStrategies,
     }
-  } else if (!config.features.abstractTypes) {
-    config.features.abstractTypes = defaults.features.abstractTypes
+  } else if (!config.features.abstractTypeStrategies) {
+    config.features.abstractTypeStrategies = defaults.features.abstractTypeStrategies
   } else {
-    config.features.abstractTypes.__typename = config.features.abstractTypes.__typename ?? false
-    config.features.abstractTypes.isTypeOf = config.features.abstractTypes.isTypeOf ?? false
-    config.features.abstractTypes.resolveType = config.features.abstractTypes.resolveType ?? false
+    config.features.abstractTypeStrategies.__typename =
+      config.features.abstractTypeStrategies.__typename ?? false
+    config.features.abstractTypeStrategies.isTypeOf = config.features.abstractTypeStrategies.isTypeOf ?? false
+    config.features.abstractTypeStrategies.resolveType =
+      config.features.abstractTypeStrategies.resolveType ?? false
   }
 
   return config as SchemaConfig

@@ -334,7 +334,7 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
 export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema, features: NexusFeatures) {
   // If backing type check is enabled, we can no longer know for sure if a type is properly discriminated
   // since it could be discriminated via the `__typename` field in resolvers, which we can't check at runtime
-  if (features.abstractTypes.__typename === true) {
+  if (features.abstractTypeStrategies.__typename === true) {
     return
   }
 
@@ -347,8 +347,8 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
 
     if (
       resolveTypeImplemented === false &&
-      features.abstractTypes?.resolveType === true &&
-      !features.abstractTypes.isTypeOf
+      features.abstractTypeStrategies?.resolveType === true &&
+      !features.abstractTypeStrategies.isTypeOf
     ) {
       const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
         type.name
@@ -359,8 +359,8 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
 
     if (
       typesWithoutIsTypeOf.length > 0 &&
-      features.abstractTypes?.isTypeOf === true &&
-      !features.abstractTypes.resolveType
+      features.abstractTypeStrategies?.isTypeOf === true &&
+      !features.abstractTypeStrategies.resolveType
     ) {
       const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
       const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
@@ -380,8 +380,8 @@ export function assertAbstractTypesCanBeDiscriminated(schema: NexusGraphQLSchema
 
     if (
       (resolveTypeImplemented === false || typesWithoutIsTypeOf.length > 0) &&
-      features.abstractTypes?.isTypeOf === true &&
-      features.abstractTypes?.resolveType === true
+      features.abstractTypeStrategies?.isTypeOf === true &&
+      features.abstractTypeStrategies?.resolveType === true
     ) {
       const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
       const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
