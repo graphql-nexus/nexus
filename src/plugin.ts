@@ -96,7 +96,10 @@ export interface PluginConfig {
    * Called immediately after the object is defined, allows for using metadata
    * to define the shape of the object.
    */
-  onObjectDefinition?: (block: ObjectDefinitionBlock<any>, objectConfig: NexusObjectTypeConfig<any>) => void
+  onObjectDefinition?: (
+    block: ObjectDefinitionBlock<string>,
+    objectConfig: NexusObjectTypeConfig<string>
+  ) => void
   /**
    * Called immediately after the input object is defined, allows for using metadata
    * to define the shape of the input object

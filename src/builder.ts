@@ -851,7 +851,7 @@ export class SchemaBuilder {
     return this.finalize(new GraphQLInputObjectType(inputObjectTypeConfig))
   }
 
-  buildObjectType(config: NexusObjectTypeConfig<any>) {
+  buildObjectType(config: NexusObjectTypeConfig<string>) {
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const definitionBlock = new ObjectDefinitionBlock({
