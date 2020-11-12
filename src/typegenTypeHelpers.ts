@@ -443,7 +443,7 @@ IsFeatureEnabled2<'abstractTypeStrategies','resolveType'> extends false
     : false
 
   /**
-   * Discriminate a type with a __typename: TypeName field
+   * Apply the discriminant strategy to a model type. This adds the __typename: "<TypeNameHere>" property to the model type
    */
   type DiscriminateImpl<TypeName extends string, Type> = Type extends Promise<infer A>
     ? Promise<DiscriminateImpl<TypeName, A>>
@@ -456,7 +456,7 @@ IsFeatureEnabled2<'abstractTypeStrategies','resolveType'> extends false
     : Type
 
   /**
-   * Discriminate a type with a __typename: TypeName field
+   * Apply the discriminant strategy to a model type. This adds the __typename: "<TypeNameHere>" property to the model type
    */
   export type Discriminate<TypeName extends string, Type> = TypeName extends
     | GetGen<'objectNames'>

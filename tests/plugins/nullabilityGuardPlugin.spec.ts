@@ -340,6 +340,7 @@ describe('nullabilityGuardPlugin', () => {
   it('should not catch by default unless the env is production', async () => {
     const schema = makeSchema({
       types,
+      outputs: false,
       nonNullDefaults: {
         output: true,
       },
@@ -366,10 +367,16 @@ describe('nullabilityGuardPlugin', () => {
     process.env.NODE_ENV = 'production'
     const schema2 = makeSchema({
       types,
+      outputs: false,
       nonNullDefaults: {
         output: true,
       },
       plugins: [nullPlugin({ shouldGuard: undefined })],
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     const { errors: errors2 = [], data: data2 } = await graphql(
       schema2,
@@ -389,6 +396,7 @@ describe('nullabilityGuardPlugin', () => {
     const { String, ...rest } = defaultFallbacks
     makeSchema({
       types,
+      outputs: false,
       plugins: [
         nullPlugin({
           fallbackValues: {
@@ -411,6 +419,7 @@ describe('nullabilityGuardPlugin', () => {
   it('logs an error for unknown/unused scalars', () => {
     makeSchema({
       types,
+      outputs: false,
       plugins: [
         nullPlugin({
           fallbackValues: {
@@ -456,6 +465,7 @@ describe('nullabilityGuardPlugin', () => {
             resolve: async () => null,
           }),
         ],
+        outputs: false,
         plugins: [
           nullPlugin({
             onGuarded: onGuardedMock,

@@ -1619,7 +1619,6 @@ function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
     }
 
     // abstractTypeRuntimeChecks
-
     if (config.features.abstractTypeStrategies.__typename) {
       // Discriminant Model Field strategy cannot be used with runtime checks because at runtime
       // we cannot know if a resolver for a field whose type is an abstract type includes __typename
@@ -1667,7 +1666,7 @@ export function makeSchema(configInput: SchemaConfigInput): NexusGraphQLSchema {
     }
   }
   assertNoMissingTypes(schema, missingTypes)
-  runAbstractTypeRuntimeChecks(schema, config.features ?? {})
+  runAbstractTypeRuntimeChecks(schema, config.features)
   return schema
 }
 

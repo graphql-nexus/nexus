@@ -332,7 +332,7 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
 }
 
 export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, features: NexusFeatures) {
-  if (!features.abstractTypeRuntimeChecks) {
+  if (features.abstractTypeRuntimeChecks === false) {
     return
   }
 
@@ -343,10 +343,11 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
     const resolveTypeImplemented = type.resolveType !== undefined
     const typesWithoutIsTypeOf = schema.getPossibleTypes(type).filter((type) => type.isTypeOf === undefined)
 
+    // if no resolveType implemented but resolveType strategy enabled and isTypeOf strategy disabled
     if (
       resolveTypeImplemented === false &&
-      features.abstractTypeStrategies?.resolveType === true &&
-      !features.abstractTypeStrategies.isTypeOf
+      features.abstractTypeStrategies.resolveType === true &&
+      features.abstractTypeStrategies.isTypeOf === false
     ) {
       const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
         type.name
@@ -355,10 +356,11 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
       raiseProgrammerError(new Error(message))
     }
 
+    // if some isTypeOf implementations are missing but isTypeOf strategy enabled
     if (
       typesWithoutIsTypeOf.length > 0 &&
-      features.abstractTypeStrategies?.isTypeOf === true &&
-      !features.abstractTypeStrategies.resolveType
+      features.abstractTypeStrategies.isTypeOf === true &&
+      features.abstractTypeStrategies.resolveType === false
     ) {
       const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
       const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
@@ -376,10 +378,11 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
       raiseProgrammerError(new Error(message))
     }
 
+    // if some isTypeOf or resolveType implementations are missing but isTypeOf and resolveType strategy enabled
     if (
       (resolveTypeImplemented === false || typesWithoutIsTypeOf.length > 0) &&
-      features.abstractTypeStrategies?.isTypeOf === true &&
-      features.abstractTypeStrategies?.resolveType === true
+      features.abstractTypeStrategies.isTypeOf === true &&
+      features.abstractTypeStrategies.resolveType === true
     ) {
       const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
       const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
