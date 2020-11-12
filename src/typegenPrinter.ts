@@ -91,7 +91,7 @@ export class TypegenPrinter {
       this.printFieldTypesMap(),
       this.printFieldTypeNamesMap(),
       this.printArgTypeMap(),
-      this.printAbstractTypesMapResolveTypeMethodReturnType(),
+      this.printAbstractTypeMembers(),
       this.printInheritedFieldMap(),
       this.printTypeNames('object', 'NexusGenObjectNames'),
       this.printTypeNames('input', 'NexusGenInputNames'),
@@ -144,7 +144,7 @@ export class TypegenPrinter {
         `  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];`,
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
-        `  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType;`,
+        `  abstractTypeMembers: NexusGenAbstractTypeMembers;`,
         `  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;`,
         `  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;`,
         `  features: NexusGenFeaturesConfig;`,
@@ -316,14 +316,11 @@ export class TypegenPrinter {
     return sourceMap
   }
 
-  printAbstractTypesMapResolveTypeMethodReturnType() {
-    return this.printTypeInterface(
-      'NexusGenAbstractTypesMapResolveTypeMethodReturnType',
-      this.buildResolveReturnTypesMap()
-    )
+  printAbstractTypeMembers() {
+    return this.printTypeInterface('NexusGenAbstractTypeMembers', this.buildAbstractTypeMembers())
   }
 
-  buildResolveReturnTypesMap() {
+  buildAbstractTypeMembers() {
     const sourceMap: TypeMapping = {}
     const abstractTypes: (GraphQLInterfaceType | GraphQLUnionType)[] = []
     abstractTypes
