@@ -1,5 +1,5 @@
 import { assertValidName } from 'graphql'
-import { FieldResolver, MaybeTypeDefConfigFieldIsTypeOf } from '../typegenTypeHelpers'
+import { FieldResolver, AbstractType } from '../typegenTypeHelpers'
 import { NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { Implemented } from './interfaceType'
@@ -63,7 +63,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef
-} & MaybeTypeDefConfigFieldIsTypeOf<TypeName> &
+} & AbstractType.MaybeTypeDefConfigFieldIsTypeOf<TypeName> &
   NexusGenPluginTypeConfig<TypeName>
 
 export class NexusObjectTypeDef<TypeName extends string> {

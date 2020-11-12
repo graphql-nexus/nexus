@@ -241,8 +241,8 @@ export type ResultValue<
   TypeName extends string,
   FieldName extends string,
   ReturnTypeName extends string = FieldTypeName<TypeName, FieldName>
-> = ShouldDiscriminateResultValue<TypeName, FieldName> extends true
-  ? Discriminate<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
+> = AbstractType.ShouldDiscriminateResultValue<TypeName, FieldName> extends true
+  ? AbstractType.Discriminate<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
   : GetGen3<'fieldTypes', TypeName, FieldName>
 
 export type NeedsResolver<TypeName extends string, FieldName extends string> = HasGen3<
@@ -291,95 +291,105 @@ export type ConditionalPick<Base, Condition> = Pick<Base, ConditionalKeys<Base, 
  */
 export type ValueOf<ObjectType, ValueType extends keyof ObjectType = keyof ObjectType> = ObjectType[ValueType]
 
-/**
- * Returns a union of all the type names of the members of an abstract type
- *
- * @example
- *
- * union D = A | B | C
- * PossibleTypeNames<'D> // 'A' | 'B' | 'C'
- */
-export type PossibleTypeNames<AbstractTypeName extends string> = ValueOf<
-  ConditionalPick<GetGen<'abstractTypesMapResolveTypeMethodReturnType'>, AbstractTypeName>
->
-/**
- * Returns a union of all the members of an abstract type
- *
- * @example
- * union D = A | B | C
- * PossibleTypes<'D> // A | B | C
- */
-export type PossibleTypes<AbstractTypeName extends string> = RootValue<PossibleTypeNames<AbstractTypeName>>
+export namespace AbstractType {
+  /**
+   * Returns a union of all the type names of the members of an abstract type
+   *
+   * @example
+   *
+   * union D = A | B | C
+   * PossibleTypeNames<'D> // 'A' | 'B' | 'C'
+   */
+  export type PossibleTypeNames<AbstractTypeName extends string> = ValueOf<
+    ConditionalPick<GetGen<'abstractTypesMapResolveTypeMethodReturnType'>, AbstractTypeName>
+  >
+  /**
+   * Returns a union of all the members of an abstract type
+   *
+   * @example
+   * union D = A | B | C
+   * PossibleTypes<'D> // A | B | C
+   */
+  export type PossibleTypes<AbstractTypeName extends string> = RootValue<PossibleTypeNames<AbstractTypeName>>
 
-/**
- * Returns a union of all the abstract type names where TypeName is used
- *
- * @example
- * union D = A | B
- * union E = A
- * AbstractTypeNames<'A'> // 'D' | 'E'
- */
-export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
-  GetGen<'abstractTypesMapResolveTypeMethodReturnType'>,
-  TypeName
->
+  /**
+   * Returns a union of all the abstract type names where TypeName is used
+   *
+   * @example
+   * union D = A | B
+   * union E = A
+   * AbstractTypeNames<'A'> // 'D' | 'E'
+   */
+  export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
+    GetGen<'abstractTypesMapResolveTypeMethodReturnType'>,
+    TypeName
+  >
 
-/**
- * Returns whether all the abstract type names where TypeName is used have implemented `resolveType`
- */
-export type IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
-  TypeName
-> extends GetGen<'abstractsUsingStrategyResolveType'>
-  ? true
-  : false
+  /**
+   * Returns whether all the abstract type names where TypeName is used have implemented `resolveType`
+   */
+  export type IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
+    TypeName
+  > extends GetGen<'abstractsUsingStrategyResolveType'>
+    ? true
+    : false
 
-/**
- * Returns whether all the members of an abstract type have implemented `isTypeOf`
- */
-export type IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
-  'abstractTypesMapResolveTypeMethodReturnType',
-  AbstractTypeName
-> extends GetGen<'objectsUsingAbstractStrategyIsTypeOf'>
-  ? true
-  : false
+  /**
+   * Returns whether all the members of an abstract type have implemented `isTypeOf`
+   */
+  export type IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
+    'abstractTypesMapResolveTypeMethodReturnType',
+    AbstractTypeName
+  > extends GetGen<'objectsUsingAbstractStrategyIsTypeOf'>
+    ? true
+    : false
 
-export type IsTypeOfHandler<TypeName extends string> = (
-  source: PossibleTypes<TypeName>, // typed as never if TypeName is not a member of any abstract type
-  context: GetGen<'context'>,
-  info: GraphQLResolveInfo
-) => MaybePromise<boolean>
+  export type IsTypeOfHandler<TypeName extends string> = (
+    source: PossibleTypes<TypeName>, // typed as never if TypeName is not a member of any abstract type
+    context: GetGen<'context'>,
+    info: GraphQLResolveInfo
+  ) => MaybePromise<boolean>
 
-/**
- * Get an object with the `isTypeOf` field if applicable for the given object Type.
- *
- * @remarks
- *
- * Intersect the result of this with other things to build up the final options for a type def.
- */
-// prettier-ignore
-export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
-  IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
-  ? {}
-  : IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
-    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if all resolveTypes are implemented
+  /**
+   * Get an object with the `isTypeOf` field if applicable for the given object Type.
+   *
+   * @remarks
+   *
+   * Intersect the result of this with other things to build up the final options for a type def.
+   */
+  // prettier-ignore
+  export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
+IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
+? {}
+: IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
+  ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if all resolveTypes are implemented
+  : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
+    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if __typename is enabled
+    : AbstractTypeNames<TypeName> extends never
+    ? { isTypeOf?: IsTypeOfHandler<TypeName> }
+    : { isTypeOf: IsTypeOfHandler<TypeName> }
+
+  /**
+   * Get an object with the `resolveType` field if applicable for the given abstract Type.
+   *
+   * @remarks
+   *
+   * Intersect the result of this with other things to build up the final options for a type def.
+   */
+  // prettier-ignore
+  export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> =
+IsFeatureEnabled2<'abstractTypeStrategies','resolveType'> extends false
+  ? {} // remove field altogether is feature is not enabled
+  : IsStrategyIsTypeOfImplementedInAllMembers<TypeName> extends true
+    ? {
+        /**
+         * Optionally provide a custom type resolver function. If one is not provided,
+         * the default implementation will call `isTypeOf` on each implementing
+         * Object type.
+         */
+        resolveType?: AbstractTypeResolver<TypeName>
+      } // Make resolveType optional as soon as __typename is enabled
     : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
-      ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if __typename is enabled
-      : AbstractTypeNames<TypeName> extends never
-      ? { isTypeOf?: IsTypeOfHandler<TypeName> }
-      : { isTypeOf: IsTypeOfHandler<TypeName> }
-
-/**
- * Get an object with the `resolveType` field if applicable for the given abstract Type.
- *
- * @remarks
- *
- * Intersect the result of this with other things to build up the final options for a type def.
- */
-// prettier-ignore
-export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> =
-  IsFeatureEnabled2<'abstractTypeStrategies','resolveType'> extends false
-    ? {} // remove field altogether is feature is not enabled
-    : IsStrategyIsTypeOfImplementedInAllMembers<TypeName> extends true
       ? {
           /**
            * Optionally provide a custom type resolver function. If one is not provided,
@@ -387,91 +397,83 @@ export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> =
            * Object type.
            */
           resolveType?: AbstractTypeResolver<TypeName>
-        } // Make resolveType optional as soon as __typename is enabled
-      : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
-        ? {
-            /**
-             * Optionally provide a custom type resolver function. If one is not provided,
-             * the default implementation will call `isTypeOf` on each implementing
-             * Object type.
-             */
-            resolveType?: AbstractTypeResolver<TypeName>
-          }
-        : {
-            /**
-             * Optionally provide a custom type resolver function. If one is not provided,
-             * the default implementation will call `isTypeOf` on each implementing
-             * Object type.
-             */
-            resolveType: AbstractTypeResolver<TypeName>
-          }
+        }
+      : {
+          /**
+           * Optionally provide a custom type resolver function. If one is not provided,
+           * the default implementation will call `isTypeOf` on each implementing
+           * Object type.
+           */
+          resolveType: AbstractTypeResolver<TypeName>
+        }
 
-/**
- * Returns whether a field, which type is an abstract type, should discriminate its return type with __typename
- */
-export type ShouldDiscriminateAbstractTypeField<
-  AbstractTypeName extends string
-> = AbstractTypeName extends GetGen<'abstractsUsingStrategyResolveType'> // if the abstract type has resolve type already
-  ? false // then disable __typename feature
-  : IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
-  ? false // then disable __typename feature
-  : true // otherwise enable __typename feature
+  /**
+   * Returns whether a field, which type is an abstract type, should discriminate its return type with __typename
+   */
+  export type ShouldDiscriminateAbstractTypeField<
+    AbstractTypeName extends string
+  > = AbstractTypeName extends GetGen<'abstractsUsingStrategyResolveType'> // if the abstract type has resolve type already
+    ? false // then disable __typename feature
+    : IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
+    ? false // then disable __typename feature
+    : true // otherwise enable __typename feature
 
-export type IsFeatureEnabled2<PathPart1 extends string, PathPart2 extends string> = GetGen3<
-  'features',
-  PathPart1,
-  PathPart2,
-  false
-> extends true
-  ? true
-  : false
+  export type IsFeatureEnabled2<PathPart1 extends string, PathPart2 extends string> = GetGen3<
+    'features',
+    PathPart1,
+    PathPart2,
+    false
+  > extends true
+    ? true
+    : false
 
-/**
- * Returns whether a field whose type is a union should discriminate its return type with __typename
- */
-export type ShouldDiscriminateResultValue<
-  TypeName extends string,
-  FieldName extends string,
-  ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
-> = IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
-  ? ReturnTypeName extends GetGen<'abstractTypes'> // else if return type is an abstract type
-    ? ShouldDiscriminateAbstractTypeField<ReturnTypeName> extends true // call sub function
-      ? true
+  /**
+   * Returns whether a field whose type is a union should discriminate its return type with __typename
+   */
+  export type ShouldDiscriminateResultValue<
+    TypeName extends string,
+    FieldName extends string,
+    ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
+  > = IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
+    ? ReturnTypeName extends GetGen<'abstractTypes'> // else if return type is an abstract type
+      ? ShouldDiscriminateAbstractTypeField<ReturnTypeName> extends true // call sub function
+        ? true
+        : false
       : false
     : false
-  : false
 
-/**
- * Discriminate a type with a __typename: TypeName field
- */
-type DiscriminateImpl<TypeName extends string, Type> = Type extends Promise<infer A>
-  ? Promise<DiscriminateImpl<TypeName, A>>
-  : Type extends Array<infer B>
-  ? Array<DiscriminateImpl<TypeName, B>>
-  : Type extends ReadonlyArray<infer C>
-  ? ReadonlyArray<DiscriminateImpl<TypeName, C>>
-  : Type extends object
-  ? Type & { __typename: TypeName }
-  : Type
+  /**
+   * Discriminate a type with a __typename: TypeName field
+   */
+  type DiscriminateImpl<TypeName extends string, Type> = Type extends Promise<infer A>
+    ? Promise<DiscriminateImpl<TypeName, A>>
+    : Type extends Array<infer B>
+    ? Array<DiscriminateImpl<TypeName, B>>
+    : Type extends ReadonlyArray<infer C>
+    ? ReadonlyArray<DiscriminateImpl<TypeName, C>>
+    : Type extends object
+    ? Type & { __typename: TypeName }
+    : Type
 
-/**
- * Discriminate a type with a __typename: TypeName field
- */
-export type Discriminate<TypeName extends string, Type> = TypeName extends
-  | GetGen<'objectNames'>
-  | GetGen<'interfaceNames'>
-  | GetGen<'enumNames'> // if typename is output type
-  ? DiscriminateImpl<TypeName, Type> // inject __typename discriminator
-  : TypeName extends GetGen<'abstractTypes'> // if typename is abstract type (meaning that `Type` can be a union)
-  ?
-      | ValueOf<
-          // rebuild output type as union with __typename discriminator injected in every member of the union/interface
-          {
-            [MemberTypeName in GetGen2<
-              'abstractTypesMapResolveTypeMethodReturnType',
-              TypeName
-            >]: DiscriminateImpl<MemberTypeName, RootValue<MemberTypeName>>
-          }
-        >
-      | Extract<Type, null | undefined> // add back in the nullability if there's any
-  : Type
+  /**
+   * Discriminate a type with a __typename: TypeName field
+   */
+  export type Discriminate<TypeName extends string, Type> = TypeName extends
+    | GetGen<'objectNames'>
+    | GetGen<'interfaceNames'>
+    | GetGen<'enumNames'> // if typename is output type
+    ? DiscriminateImpl<TypeName, Type> // inject __typename discriminator
+    : TypeName extends GetGen<'abstractTypes'> // if typename is abstract type (meaning that `Type` can be a union)
+    ?
+        | ValueOf<
+            // rebuild output type as union with __typename discriminator injected in every member of the union/interface
+            {
+              [MemberTypeName in GetGen2<
+                'abstractTypesMapResolveTypeMethodReturnType',
+                TypeName
+              >]: DiscriminateImpl<MemberTypeName, RootValue<MemberTypeName>>
+            }
+          >
+        | Extract<Type, null | undefined> // add back in the nullability if there's any
+    : Type
+}
