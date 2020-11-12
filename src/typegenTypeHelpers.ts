@@ -361,8 +361,10 @@ export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
   IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
   ? {}
   : IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
-    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional as soon as __typename is enabled
+    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if all resolveTypes are implemented
     : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
+      ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if __typename is enabled
+      : AbstractTypeNames<TypeName> extends never
       ? { isTypeOf?: IsTypeOfHandler<TypeName> }
       : { isTypeOf: IsTypeOfHandler<TypeName> }
 
