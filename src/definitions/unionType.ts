@@ -1,5 +1,5 @@
 import { assertValidName } from 'graphql'
-import { GetGen, AbstractType } from '../typegenTypeHelpers'
+import { GetGen, AbstractTypes } from '../typegenTypeHelpers'
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 import { NexusObjectTypeDef } from './objectType'
 
@@ -42,7 +42,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef
-} & AbstractType.MaybeTypeDefConfigFieldResolveType<TypeName>
+} & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<TypeName>) {

@@ -241,8 +241,8 @@ export type ResultValue<
   TypeName extends string,
   FieldName extends string,
   ReturnTypeName extends string = FieldTypeName<TypeName, FieldName>
-> = AbstractType.ShouldDiscriminateResultValue<TypeName, FieldName> extends true
-  ? AbstractType.Discriminate<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
+> = AbstractTypes.ShouldDiscriminateResultValue<TypeName, FieldName> extends true
+  ? AbstractTypes.Discriminate<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
   : GetGen3<'fieldTypes', TypeName, FieldName>
 
 export type NeedsResolver<TypeName extends string, FieldName extends string> = HasGen3<
@@ -291,7 +291,7 @@ export type ConditionalPick<Base, Condition> = Pick<Base, ConditionalKeys<Base, 
  */
 export type ValueOf<ObjectType, ValueType extends keyof ObjectType = keyof ObjectType> = ObjectType[ValueType]
 
-export namespace AbstractType {
+export namespace AbstractTypes {
   /**
    * Returns a union of all the type names of the members of an abstract type
    *
