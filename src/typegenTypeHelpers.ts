@@ -407,16 +407,8 @@ export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> =
           }
 
 /**
- * Returns whether a field which type is either an 'Object | Interface | Enum' should discriminate its return type with __typename
+ * Returns whether a field, which type is an abstract type, should discriminate its return type with __typename
  */
-export type ShouldDiscriminateOutputTypeField<OutputTypeName extends string> = OutputTypeName extends GetGen<
-  'objectsUsingAbstractStrategyIsTypeOf'
-> // if it implements isTypeOf already
-  ? false // then don't disable __typename feature
-  : IsStrategyResolveTypeImplementedInAllAbstractTypes<OutputTypeName> extends true // else if abstract implement resolve type
-  ? false // then disable __typename feature
-  : true // otherwise enable __typename feature
-
 export type ShouldDiscriminateAbstractTypeField<
   AbstractTypeName extends string
 > = AbstractTypeName extends GetGen<'abstractsUsingStrategyResolveType'> // if the abstract type has resolve type already
@@ -442,11 +434,7 @@ export type ShouldDiscriminateResultValue<
   FieldName extends string,
   ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
 > = IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
-  ? ReturnTypeName extends GetGen<'objectNames'> | GetGen<'interfaceNames'> | GetGen<'enumNames'> // and return type is either an object type || interface || enum
-    ? ShouldDiscriminateOutputTypeField<ReturnTypeName> extends true // call sub function
-      ? true
-      : false
-    : ReturnTypeName extends GetGen<'abstractTypes'> // else if return type is an abstract type
+  ? ReturnTypeName extends GetGen<'abstractTypes'> // else if return type is an abstract type
     ? ShouldDiscriminateAbstractTypeField<ReturnTypeName> extends true // call sub function
       ? true
       : false
