@@ -15,6 +15,7 @@ describe('unknownType', () => {
 
       // Won't work
       t.field('user2', {
+        // @ts-ignore
         type: 'User',
         resolve(root, args, ctx) {
           return { id: 'test', name: 'test' }
