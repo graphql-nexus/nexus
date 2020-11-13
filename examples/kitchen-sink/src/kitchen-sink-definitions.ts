@@ -1,5 +1,3 @@
-import { connectionFromArray } from 'graphql-relay'
-import _ from 'lodash'
 import {
   arg,
   booleanArg,
@@ -16,6 +14,8 @@ import {
   scalarType,
   unionType,
 } from '@nexus/schema'
+import { connectionFromArray } from 'graphql-relay'
+import _ from 'lodash'
 
 const USERS_DATA = _.times(100, (i) => ({
   pk: i,
@@ -50,6 +50,9 @@ export const SomeMutationField = mutationField('someMutationField', () => ({
 export const Bar = interfaceType({
   name: 'Bar',
   description: 'Bar description',
+  resolveType(source) {
+    return 'Foo'
+  },
   definition(t) {
     t.boolean('ok', { deprecation: 'Not ok?' })
     t.boolean('argsTest', {
@@ -66,7 +69,6 @@ export const Bar = interfaceType({
         return true
       },
     })
-    t.resolveType((root) => 'Foo')
   },
 })
 
@@ -78,13 +80,15 @@ export const UnusedInterface = interfaceType({
   name: 'UnusedInterface',
   definition(t) {
     t.boolean('ok')
-    t.resolveType(() => null)
   },
   rootTyping: { name: 'UnusedInterfaceTypeDef', path: __filename },
 })
 
 export const Baz = interfaceType({
   name: 'Baz',
+  resolveType() {
+    return 'TestObj'
+  },
   definition(t) {
     t.boolean('ok')
     t.field('a', {
@@ -92,15 +96,16 @@ export const Baz = interfaceType({
       description: "'A' description",
       nullable: true,
     })
-    t.resolveType(() => 'TestObj')
   },
 })
 
 export const TestUnion = unionType({
   name: 'TestUnion',
+  resolveType() {
+    return 'Foo'
+  },
   definition(t) {
     t.members('Foo')
-    t.resolveType(() => 'Foo')
   },
 })
 
