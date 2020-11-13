@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import {
   getNamedType,
+  GraphQLAbstractType,
   GraphQLArgument,
   GraphQLEnumType,
   GraphQLField,
@@ -75,10 +76,12 @@ interface TypegenInfoWithFile extends TypegenInfo {
 export class TypegenPrinter {
   groupedTypes: GroupedTypes
   printImports: Record<string, Record<string, boolean | string>>
+  hasDiscriminatedTypes: boolean
 
   constructor(protected schema: NexusGraphQLSchema, protected typegenInfo: TypegenInfoWithFile) {
     this.groupedTypes = groupTypes(schema)
     this.printImports = {}
+    this.hasDiscriminatedTypes = false
   }
 
   print() {
@@ -164,7 +167,10 @@ export class TypegenPrinter {
     const nexusSchemaImportId = this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name
 
     if (!this.printImports[nexusSchemaImportId]) {
-      if ([dynamicInputFields, dynamicOutputFields].some((o) => Object.keys(o).length > 0)) {
+      if (
+        [dynamicInputFields, dynamicOutputFields].some((o) => Object.keys(o).length > 0) ||
+        this.hasDiscriminatedTypes === true
+      ) {
         this.printImports[nexusSchemaImportId] = {
           core: true,
         }
@@ -445,6 +451,37 @@ export class TypegenPrinter {
     return this.printTypeInterface('NexusGenScalars', this.buildScalarTypeMap())
   }
 
+  shouldDiscriminateType(
+    abstractType: GraphQLAbstractType,
+    objectType: GraphQLObjectType
+  ): 'required' | 'optional' | false {
+    if (!this.schema.extensions.nexus.config.features?.abstractTypeStrategies?.__typename) {
+      return false
+    }
+
+    if (abstractType.resolveType !== undefined) {
+      return 'optional'
+    }
+
+    if (objectType.isTypeOf !== undefined) {
+      return 'optional'
+    }
+
+    return 'required'
+  }
+
+  maybeDiscriminate(abstractType: GraphQLAbstractType, objectType: GraphQLObjectType) {
+    const requiredOrOptional = this.shouldDiscriminateType(abstractType, objectType)
+
+    if (requiredOrOptional === false) {
+      return `NexusGenRootTypes['${objectType.name}']`
+    }
+
+    this.hasDiscriminatedTypes = true
+
+    return `core.Discriminate<'${objectType.name}', '${requiredOrOptional}'>`
+  }
+
   buildRootTypeMap() {
     const rootTypeMap: RootTypeMapping = {}
     const hasFields: (GraphQLInterfaceType | GraphQLObjectType | GraphQLUnionType)[] = []
@@ -461,12 +498,10 @@ export class TypegenPrinter {
         if (isUnionType(type)) {
           rootTypeMap[type.name] = type
             .getTypes()
-            .map((t) => `NexusGenRootTypes['${t.name}']`)
+            .map((t) => this.maybeDiscriminate(type, t))
             .join(' | ')
         } else if (isInterfaceType(type)) {
-          const possibleRoots = this.schema
-            .getPossibleTypes(type)
-            .map((t) => `NexusGenRootTypes['${t.name}']`)
+          const possibleRoots = this.schema.getPossibleTypes(type).map((t) => this.maybeDiscriminate(type, t))
           if (possibleRoots.length > 0) {
             rootTypeMap[type.name] = possibleRoots.join(' | ')
           } else {

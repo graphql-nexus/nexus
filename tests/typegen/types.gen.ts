@@ -3,6 +3,8 @@
  * Do not make changes to this file directly
  */
 
+import { core } from '@nexus/schema'
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
@@ -40,8 +42,8 @@ export interface NexusGenRootTypes {
   Post: {}
   Query: {}
   User: {}
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User']
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User']
+  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>
+  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {

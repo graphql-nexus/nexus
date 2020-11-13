@@ -229,13 +229,11 @@ export type ArgsValue<TypeName extends string, FieldName extends string> = HasGe
   ? GetGen3<'argTypes', TypeName, FieldName, {}>
   : any
 
-export type ResultValue<
-  TypeName extends string,
-  FieldName extends string,
-  ReturnTypeName extends string = FieldTypeName<TypeName, FieldName>
-> = AbstractTypes.ShouldDiscriminateResultValue<TypeName, FieldName> extends true
-  ? AbstractTypes.Discriminate<ReturnTypeName, GetGen3<'fieldTypes', TypeName, FieldName>>
-  : GetGen3<'fieldTypes', TypeName, FieldName>
+export type ResultValue<TypeName extends string, FieldName extends string> = GetGen3<
+  'fieldTypes',
+  TypeName,
+  FieldName
+>
 
 export type NeedsResolver<TypeName extends string, FieldName extends string> = HasGen3<
   'fieldTypes',
@@ -282,6 +280,27 @@ export type ConditionalPick<Base, Condition> = Pick<Base, ConditionalKeys<Base, 
  * Get the values of a mapped types
  */
 export type ValueOf<ObjectType, ValueType extends keyof ObjectType = keyof ObjectType> = ObjectType[ValueType]
+
+export type IsFeatureEnabled2<PathPart1 extends string, PathPart2 extends string> = GetGen3<
+  'features',
+  PathPart1,
+  PathPart2,
+  false
+> extends true
+  ? true
+  : false
+
+export type Discriminate<
+  TypeName extends string,
+  Required extends 'required' | 'optional',
+  Type = RootValue<TypeName>
+> = Type extends { __typename: TypeName }
+  ? Type
+  : Type extends { __typename?: TypeName }
+  ? Type
+  : Required extends 'required'
+  ? Type & { __typename: TypeName }
+  : Type & { __typename?: TypeName }
 
 export namespace AbstractTypes {
   /**
@@ -351,15 +370,15 @@ export namespace AbstractTypes {
    */
   // prettier-ignore
   export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
-IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
-? {}
-: IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
-  ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if all resolveTypes are implemented
-  : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
-    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // Make isTypeOf optional if __typename is enabled
-    : AbstractTypeNames<TypeName> extends never
-    ? { isTypeOf?: IsTypeOfHandler<TypeName> }
-    : { isTypeOf: IsTypeOfHandler<TypeName> }
+IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false // is isTypeOf strategy disabled ?
+? {} // then hide isTypeOf property entirely
+: IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true // is resolveType implemented in all abstract types where TypeName is a member?
+  ? { isTypeOf?: IsTypeOfHandler<TypeName> } // then make isTypeOf optional
+  : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true // is __typename strategy is enabled?
+    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // then make isTypeOf optional
+    : AbstractTypeNames<TypeName> extends never  // is TypeName not part of any abstract type?
+    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // then make isTypeOf optional
+    : { isTypeOf: IsTypeOfHandler<TypeName> } // otherwise, make it required
 
   /**
    * Get an object with the `resolveType` field if applicable for the given abstract Type.
@@ -372,7 +391,7 @@ IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
     'abstractTypeStrategies',
     'resolveType'
   > extends false
-    ? {} // remove field altogether is feature is not enabled
+    ? {} // remove field altogether is resolveType strategy is disabled
     : IsStrategyIsTypeOfImplementedInAllMembers<TypeName> extends true
     ? {
         /**
@@ -381,7 +400,7 @@ IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
          * Object type.
          */
         resolveType?: AbstractTypeResolver<TypeName>
-      } // Make resolveType optional as soon as __typename is enabled
+      } // Make resolveType optional when __typename strategy is enabled
     : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
     ? {
         /**
@@ -399,74 +418,4 @@ IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
          */
         resolveType: AbstractTypeResolver<TypeName>
       }
-
-  /**
-   * Returns whether a field, which type is an abstract type, should discriminate its return type with __typename
-   */
-  export type ShouldDiscriminateAbstractTypeField<
-    AbstractTypeName extends string
-  > = AbstractTypeName extends GetGen<'abstractsUsingStrategyResolveType'> // if the abstract type has resolve type already
-    ? false // then disable __typename feature
-    : IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName> extends true // if all members of the abstract type implements isTypeOf
-    ? false // then disable __typename feature
-    : true // otherwise enable __typename feature
-
-  export type IsFeatureEnabled2<PathPart1 extends string, PathPart2 extends string> = GetGen3<
-    'features',
-    PathPart1,
-    PathPart2,
-    false
-  > extends true
-    ? true
-    : false
-
-  /**
-   * Returns whether a field whose type is a union should discriminate its return type with __typename
-   */
-  export type ShouldDiscriminateResultValue<
-    TypeName extends string,
-    FieldName extends string,
-    ReturnTypeName extends string = GetGen3<'fieldTypeNames', TypeName, FieldName>
-  > = IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
-    ? ReturnTypeName extends GetGen<'abstractTypes'> // else if return type is an abstract type
-      ? ShouldDiscriminateAbstractTypeField<ReturnTypeName> extends true // call sub function
-        ? true
-        : false
-      : false
-    : false
-
-  /**
-   * Apply the discriminant strategy to a model type. This adds the __typename: "<TypeNameHere>" property to the model type
-   */
-  type DiscriminateImpl<TypeName extends string, Type> = Type extends Promise<infer A>
-    ? Promise<DiscriminateImpl<TypeName, A>>
-    : Type extends Array<infer B>
-    ? Array<DiscriminateImpl<TypeName, B>>
-    : Type extends ReadonlyArray<infer C>
-    ? ReadonlyArray<DiscriminateImpl<TypeName, C>>
-    : Type extends object
-    ? Type & { __typename: TypeName }
-    : Type
-
-  /**
-   * Apply the discriminant strategy to a model type. This adds the __typename: "<TypeNameHere>" property to the model type
-   */
-  export type Discriminate<TypeName extends string, Type> = TypeName extends
-    | GetGen<'objectNames'>
-    | GetGen<'interfaceNames'>
-    | GetGen<'enumNames'> // if typename is output type
-    ? DiscriminateImpl<TypeName, Type> // inject __typename discriminator
-    : TypeName extends GetGen<'abstractTypes'> // if typename is abstract type (meaning that `Type` can be a union)
-    ?
-        | ValueOf<
-            // rebuild output type as union with __typename discriminator injected in every member of the union/interface
-            {
-              [MemberTypeName in GetGen2<'abstractTypeMembers', TypeName>]: DiscriminateImpl<
-                MemberTypeName,
-                RootValue<MemberTypeName>
-              >
-            }
-          >
-        | Extract<Type, null | undefined> // add back in the nullability if there's any
-    : Type
 }

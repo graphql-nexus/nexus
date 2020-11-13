@@ -6,7 +6,7 @@ export const Query = queryType({
     t.field('union', {
       type: UnionType,
       resolve() {
-        return { name: 'string' }
+        return { name: '' }
       },
     })
   },

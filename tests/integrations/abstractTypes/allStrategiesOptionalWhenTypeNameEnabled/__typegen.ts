@@ -3,6 +3,8 @@
  * Do not make changes to this file directly
  */
 
+import { core } from '../../../../src'
+
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
@@ -29,7 +31,7 @@ export interface NexusGenRootTypes {
     age?: number | null // Int
   }
   Query: {}
-  Union: NexusGenRootTypes['A'] | NexusGenRootTypes['B']
+  Union: core.Discriminate<'A', 'required'> | core.Discriminate<'B', 'required'>
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {

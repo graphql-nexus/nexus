@@ -15,7 +15,7 @@ installGenerateTypegenHook({
   },
 })
 
-it('fails when missing isTypeOf implementation', async () => {
+it('fails when missing resolveType implementation', async () => {
   const { emitDiagnostics, preEmitDiagnostics } = typeCheck({ rootDir })
 
   expect(preEmitDiagnostics.map((e) => e.getMessageText())).toMatchInlineSnapshot(`

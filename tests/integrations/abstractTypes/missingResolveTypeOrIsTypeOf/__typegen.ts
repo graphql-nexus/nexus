@@ -3,8 +3,6 @@
  * Do not make changes to this file directly
  */
 
-import { core } from '../../../../src'
-
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
@@ -26,12 +24,9 @@ export interface NexusGenRootTypes {
     // root type
     name?: string | null // String
   }
-  B: {
-    // root type
-    age?: number | null // Int
-  }
   Query: {}
-  Union: core.Discriminate<'A', 'required'> | core.Discriminate<'B', 'required'>
+  U1: NexusGenRootTypes['A']
+  U2: NexusGenRootTypes['A']
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -47,13 +42,9 @@ export interface NexusGenFieldTypes {
     // field return type
     name: string | null // String
   }
-  B: {
-    // field return type
-    age: number | null // Int
-  }
   Query: {
     // field return type
-    union: NexusGenRootTypes['Union'] | null // Union
+    ok: boolean // Boolean!
   }
 }
 
@@ -62,25 +53,22 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     name: 'String'
   }
-  B: {
-    // field return type name
-    age: 'Int'
-  }
   Query: {
     // field return type name
-    union: 'Union'
+    ok: 'Boolean'
   }
 }
 
 export interface NexusGenArgTypes {}
 
 export interface NexusGenAbstractTypeMembers {
-  Union: 'A' | 'B'
+  U1: 'A'
+  U2: 'A'
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'A' | 'B' | 'Query'
+export type NexusGenObjectNames = 'A' | 'Query'
 
 export type NexusGenInputNames = never
 
@@ -90,17 +78,17 @@ export type NexusGenInterfaceNames = never
 
 export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
-export type NexusGenUnionNames = 'Union'
+export type NexusGenUnionNames = 'U1' | 'U2'
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenAbstractsUsingStrategyResolveType = never
+export type NexusGenAbstractsUsingStrategyResolveType = 'U1'
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {
-    __typename: true
-    isTypeOf: false
-    resolveType: false
+    resolveType: true
+    isTypeOf: true
+    __typename: false
   }
 }
 

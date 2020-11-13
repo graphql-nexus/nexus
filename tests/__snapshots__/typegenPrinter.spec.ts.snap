@@ -68,8 +68,8 @@ exports[`typegenPrinter should not print roots for fields with resolvers 1`] = `
     outEnum?: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone?: string | null; // String
   }
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
 }"
 `;
 
@@ -125,8 +125,8 @@ exports[`typegenPrinter should print a root type map 1`] = `
     phone?: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
 }"
 `;
 
@@ -137,7 +137,7 @@ exports[`typegenPrinter should print the full output 1`] = `
  */
 
 import * as t from \\"./__helpers/index\\"
-
+import { core } from \\"@nexus/schema\\"
 
 
 
@@ -190,8 +190,8 @@ export interface NexusGenRootTypes {
     phone?: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
   }
-  Node: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
-  ExampleUnion: NexusGenRootTypes['Post'] | NexusGenRootTypes['User'];
+  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
