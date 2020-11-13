@@ -6,7 +6,7 @@ describe('GH #361, interfaceType & implements', () => {
     const Node = interfaceType({
       name: 'Node',
       resolveType() {
-        return null
+        return 'User' as const
       },
       definition(t) {
         t.id('id', { description: 'Unique identifier for the resource' })
