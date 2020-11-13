@@ -1335,17 +1335,6 @@ export class SchemaBuilder {
     return this.missingType(name, fromObject)
   }
 
-  missingResolveType(name: string, location: 'union' | 'interface') {
-    console.error(
-      new Error(
-        `Missing resolveType for the ${name} ${location}. ` +
-          `Be sure to add one in the definition block for the type, ` +
-          `or t.resolveType(() => null) if you don't want or need to implement.`
-      )
-    )
-    return (obj: any) => obj?.__typename || null
-  }
-
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
     const definitionBlock = new InputDefinitionBlock({
       typeName: obj.name,
