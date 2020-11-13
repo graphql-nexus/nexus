@@ -15,7 +15,7 @@ export async function generateTypegen(settings: HookSettings) {
 
   const typegenModulePath = join(rootDir, '__typegen.ts')
   const entrypointModulePath = join(rootDir, '__app.ts')
-  const importPath = relative(rootDir, join(__dirname, '..', '..', 'src'))
+  const importPath = relative(rootDir, join(__dirname, '..', '..', 'src')).replace(/\\/g, '/')
 
   const entrypoint = require(entrypointModulePath)
   const { plugins, ...types } = entrypoint
