@@ -429,7 +429,12 @@ Nexus leverages TypeScript statically encode all the rules discussed in this gui
 
 In practice this means that some of the errors you'll see will be noise since only a subset are pointing toward the strategy you will ultimately want to use. This is one reason why Nexus considers having multiple strategies an advanced pattern. The static errors produced are likely to confuse newcomers, who cannot tell which ones stem from which strategy (or that there even are multiple strategies!).
 
-When DMF (`__typename`) and Centralized (`resolveType`) strategies are both enabled then `__typename` becomes optional. This is because Nexus no longer knows in a given case which strategy you will definitely use at runtime. For example:
+When DMF (`__typename`) and Centralized (`resolveType`) strategies are both enabled then `__typename` becomes an optional model field on all members of all abstract types _that **do** implement `resolveType`_. All members of abstract types that _do **not** implement_ `resolveType` will have their `__typename` model property be _required_. The reason for this behaviour is that when both strategies are enabled and an abstract type has `resolveType` implemented Nexus cannot statically know what your implementation is actually doing and if `__typename` should actually be required for it.
+
+For example:
+
+<TabbedContent tabs={['With resolveType implemented', 'Without resolveType implemented']}>
+<tab>
 
 ```ts
 makeSchema({
@@ -455,7 +460,7 @@ queryType({
         return ctx.db.search(args.pattern).map(result => {
           return {
             ...result,
-            __typename: 'Photo', // <-- This property is __OPTIONAL__
+            __typename: 'Photo', // <-- OPTIONAL b/c resolveType present (below)
           }
         })
       },
@@ -465,8 +470,8 @@ queryType({
 
 unionType({
   name: 'SearchResult',
-  resolveType(data) {
-    if (data.__typename /* <-- This property is __OPTIONAL__ */) {
+  resolveType(data) { // <-- OPTIONAL; If given, __typename becomes OPTIONAL
+    if (data.__typename /* <-- OPTIONAL b/c resolveType used */) {
       return data.__typename
     }
 
@@ -487,22 +492,24 @@ objectType({
 })
 ```
 
-###### Local Abstract Type Settings in the Future?
-
-This behaviour is a consequence of the fact that Nexus' abstract types settings are currently global. In the future however ([#623](https://github.com/graphql-nexus/schema/issues/623)) there may be ways to enable a particular strategy for only a subset of your schema. This way you could have, for example, DMF (`__typename`) required for one abstract type so that resolvers for fields of that type would be required to include `__typename` in the returned data, while another abstract type use the Centralized stratey.
-
-Here's that example in code:
-
-> Note the following is just for illustration purposes. Not an API that has been committed to.
+</tab>
+<tab>
 
 ```ts
+makeSchema({
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+      __typename: true,
+    },
+  },
+  //...
+})
+
+// ... your types elsewhere ...
+
 queryType({
   definition(t) {
-    t.field('somethingElse', {
-      type: 'SomethingElse',
-      // ...
-    })
-
     t.field('search', {
       type: 'SearchResult',
       args: {
@@ -512,7 +519,7 @@ queryType({
         return ctx.db.search(args.pattern).map(result => {
           return {
             ...result,
-            __typename: 'Photo', // <-- This property is __REQUIRED__
+            __typename: 'Photo', // <-- REQUIRED b/c resolveType not present
           }
         })
       },
@@ -522,13 +529,7 @@ queryType({
 
 unionType({
   name: 'SearchResult',
-  strategy: 'DiscriminantModelField', // <-- Set the strategy only for this abstract type
-  resolveType(data) { // <-- Optional method b/c strategy is DMF
-    // Re-implementation of the default resolveType behaviour
-    // for demonstration purposes only.
-
-    return data.__typename // <-- This property is __GURANTEED__
-  },
+  // resolveType <-- OPTIONAL
   definition(t) {
     t.members('Photo' /* ... */)
   },
@@ -542,19 +543,14 @@ objectType({
     t.int('height')
   },
 })
-
-unionType({
-  name: 'SomethingElse'
-  strategy: 'Centralized', // <-- Set the strategy only for this abstract type
-  resolveType(data) { // <-- Required method because strategy is DMF
-    data.__typename // <-- Type error: This property __DOES NOT EXIST__
-    // ...
-  },
-  definition(t) {
-    t.members(/* ... */)
-  },
-})
 ```
+
+</tab>
+</TabbedContent>
+
+> **Local Abstract Type Settings in the Future?**
+
+Currently Nexus only supports global abstract type strategy settings. In the future however ([#623](https://github.com/graphql-nexus/schema/issues/623)) there may be ways to enable a particular strategy for only a subset of your schema. This way you could for example express that `__typename` is required in the returned model data of resolvers for one abstract type but require all other objects whom are members of _other_ abstract types to implement `isTypeOf`.
 
 ##### _At Runtime_
 
