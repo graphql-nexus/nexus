@@ -1,5 +1,5 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
-import { NexusAcceptedTypeDef, PluginBuilderLens, SchemaConfigInput } from './builder'
+import { NexusAcceptedTypeDef, PluginBuilderLens, SchemaConfig } from './builder'
 import {
   Maybe,
   NexusGraphQLFieldConfig,
@@ -42,7 +42,7 @@ export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   /**
    * The root-level SchemaConfig passed
    */
-  schemaConfig: Omit<SchemaConfigInput, 'types'>
+  schemaConfig: Omit<SchemaConfig, 'types'>
   /**
    * Nexus specific metadata provided to the schema.
    */

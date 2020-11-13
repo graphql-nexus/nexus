@@ -148,7 +148,7 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   Boolean: GraphQLBoolean,
 }
 
-export interface BuilderConfig {
+export interface BuilderConfigInput {
   /**
    * Generated artifact settings. Set to false to disable all.
    * Set to true to enable all and use default paths. Leave
@@ -239,7 +239,13 @@ export interface BuilderConfig {
   features?: NexusFeaturesInput
 }
 
-export type SchemaConfigInput = BuilderConfig & {
+export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
+  nonNullDefaults: RequiredDeeply<BuilderConfigInput['nonNullDefaults']>
+  features: RequiredDeeply<BuilderConfigInput['features']>
+  plugins: RequiredDeeply<BuilderConfigInput['plugins']>
+}
+
+export type SchemaConfig = BuilderConfigInput & {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -254,10 +260,6 @@ export type SchemaConfigInput = BuilderConfig & {
    */
   shouldExitAfterGenerateArtifacts?: boolean
 } & NexusGenPluginSchemaConfig
-
-export type SchemaConfig = Omit<SchemaConfigInput, 'features'> & {
-  features: RequiredDeeply<SchemaConfigInput['features']>
-}
 
 export interface TypegenInfo {
   /**
@@ -357,10 +359,7 @@ export class SchemaBuilder {
    * All "extensions" to input types (adding fields on types from many locations)
    */
   protected inputTypeExtendMap: Record<string, NexusExtendInputTypeConfig<string>[] | null> = {}
-  /**
-   * Configures the root-level nonNullDefaults defaults
-   */
-  protected nonNullDefaults: NonNullConfig = {}
+
   protected dynamicInputFields: DynamicInputFields = {}
   protected dynamicOutputFields: DynamicOutputFields = {}
   protected dynamicOutputProperties: DynamicOutputProperties = {}
@@ -427,6 +426,8 @@ export class SchemaBuilder {
    */
   protected _schemaExtension?: NexusSchemaExtension
 
+  protected config: BuilderConfig
+
   get schemaExtension() {
     /* istanbul ignore next */
     if (!this._schemaExtension) {
@@ -435,13 +436,12 @@ export class SchemaBuilder {
     return this._schemaExtension
   }
 
-  constructor(protected config: BuilderConfig) {
-    this.nonNullDefaults = {
-      input: false,
-      output: false,
-      ...config.nonNullDefaults,
-    }
-    this.plugins = config.plugins || [fieldAuthorizePlugin()]
+  constructor(config: BuilderConfigInput) {
+    this.config = setConfigDefaults(config)
+    /**
+     * This array of plugin is used to keep retro-co
+     */
+    this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
     this.builderLens = Object.freeze({
       hasType: this.hasType,
       addType: this.addType,
@@ -451,18 +451,18 @@ export class SchemaBuilder {
     })
   }
 
-  setConfigOption = <K extends keyof BuilderConfig>(key: K, value: BuilderConfig[K]) => {
+  setConfigOption = <K extends keyof BuilderConfigInput>(key: K, value: BuilderConfigInput[K]) => {
     this.config = {
       ...this.config,
       [key]: value,
     }
   }
 
-  hasConfigOption = (key: keyof BuilderConfig): boolean => {
+  hasConfigOption = (key: keyof BuilderConfigInput): boolean => {
     return this.config.hasOwnProperty(key)
   }
 
-  getConfigOption = <K extends keyof BuilderConfig>(key: K): BuilderConfig[K] => {
+  getConfigOption = <K extends keyof BuilderConfigInput>(key: K): BuilderConfigInput[K] => {
     return this.config[key]
   }
 
@@ -590,7 +590,7 @@ export class SchemaBuilder {
       this.addTypes(types.getTypeMap())
     }
     if (isNexusPlugin(types)) {
-      if (!this.config.plugins?.includes(types)) {
+      if (!this.plugins?.includes(types)) {
         throw new Error(
           `Nexus plugin ${types.config.name} was seen in the "types" config, but should instead be provided to the "plugins" array.`
         )
@@ -1203,7 +1203,7 @@ export class SchemaBuilder {
       return required
     }
     // Null by default
-    return firstDefined(nonNullDefaults.input, this.nonNullDefaults.input, false)
+    return firstDefined(nonNullDefaults.input, this.config.nonNullDefaults.input, false)
   }
 
   protected outputNonNull(
@@ -1216,7 +1216,7 @@ export class SchemaBuilder {
       return !nullable
     }
     // Non-Null by default
-    return firstDefined(nonNullDefaults.output, this.nonNullDefaults.output, true)
+    return firstDefined(nonNullDefaults.output, this.config.nonNullDefaults.output, true)
   }
 
   protected decorateType<T extends GraphQLNamedType>(
@@ -1588,9 +1588,11 @@ export function makeSchemaInternal(config: SchemaConfig) {
   return { schema, missingTypes, finalConfig }
 }
 
-function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
+export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {
   const defaults: {
-    features: SchemaConfig['features']
+    features: BuilderConfig['features']
+    nonNullDefaults: BuilderConfig['nonNullDefaults']
+    plugins: BuilderConfig['plugins']
   } = {
     features: {
       abstractTypeRuntimeChecks: true,
@@ -1600,6 +1602,11 @@ function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
         __typename: false,
       },
     },
+    nonNullDefaults: {
+      input: false,
+      output: false,
+    },
+    plugins: [fieldAuthorizePlugin()],
   }
 
   if (!config.features) {
@@ -1619,17 +1626,24 @@ function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
     }
 
     // abstractTypeRuntimeChecks
-    if (config.features.abstractTypeStrategies.__typename) {
+    if (config.features.abstractTypeStrategies.__typename === true) {
       // Discriminant Model Field strategy cannot be used with runtime checks because at runtime
       // we cannot know if a resolver for a field whose type is an abstract type includes __typename
       // in the returned model data.
       config.features.abstractTypeRuntimeChecks = false
-    } else if (!config.features.abstractTypeRuntimeChecks) {
+    }
+    if (config.features.abstractTypeRuntimeChecks === undefined) {
       config.features.abstractTypeRuntimeChecks = defaults.features.abstractTypeRuntimeChecks
     }
   }
 
-  return config as SchemaConfig
+  config.plugins = config.plugins ?? []
+  config.nonNullDefaults = {
+    ...defaults.nonNullDefaults,
+    ...(config.nonNullDefaults ?? {}),
+  }
+
+  return config as BuilderConfig
 }
 
 /**
@@ -1639,8 +1653,7 @@ function setConfigDefaults(config: SchemaConfigInput): SchemaConfig {
  * Requires at least one type be named "Query", which will be used as the
  * root query type.
  */
-export function makeSchema(configInput: SchemaConfigInput): NexusGraphQLSchema {
-  const config = setConfigDefaults(configInput)
+export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
@@ -1666,7 +1679,7 @@ export function makeSchema(configInput: SchemaConfigInput): NexusGraphQLSchema {
     }
   }
   assertNoMissingTypes(schema, missingTypes)
-  runAbstractTypeRuntimeChecks(schema, config.features)
+  runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return schema
 }
 
@@ -1674,12 +1687,12 @@ export function makeSchema(configInput: SchemaConfigInput): NexusGraphQLSchema {
  * Like makeSchema except that typegen is always run
  * and waited upon.
  */
-export async function generateSchema(configInput: SchemaConfigInput): Promise<NexusGraphQLSchema> {
-  const config = setConfigDefaults(configInput)
+export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQLSchema> {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  assertNoMissingTypes(schema, missingTypes)
   await new TypegenMetadata(typegenConfig).generateArtifacts(schema)
+  assertNoMissingTypes(schema, missingTypes)
+  runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return schema
 }
 
@@ -1688,21 +1701,21 @@ export async function generateSchema(configInput: SchemaConfigInput): Promise<Ne
  * that would have been otherwise written to the filesystem.
  */
 generateSchema.withArtifacts = async (
-  configInput: SchemaConfigInput,
+  config: SchemaConfig,
   typeFilePath: string | false
 ): Promise<{
   schema: NexusGraphQLSchema
   schemaTypes: string
   tsTypes: string
 }> => {
-  const config = setConfigDefaults(configInput)
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  assertNoMissingTypes(schema, missingTypes)
   const { schemaTypes, tsTypes } = await new TypegenMetadata(typegenConfig).generateArtifactContents(
     schema,
     typeFilePath
   )
+  assertNoMissingTypes(schema, missingTypes)
+  runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return { schema, schemaTypes, tsTypes }
 }
 

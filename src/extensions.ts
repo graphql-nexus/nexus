@@ -1,5 +1,5 @@
 import { GraphQLNamedType } from 'graphql'
-import { DynamicFieldDefs, SchemaConfigInput } from './builder'
+import { DynamicFieldDefs, SchemaConfig } from './builder'
 import { RootTypings } from './definitions/_types'
 import { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
@@ -66,7 +66,7 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
   }
 }
 
-export interface NexusSchemaExtensionConfig extends Omit<SchemaConfigInput, 'types'> {
+export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
   dynamicFields: DynamicFieldDefs
   rootTypings: RootTypings
 }
