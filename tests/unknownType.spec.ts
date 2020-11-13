@@ -6,6 +6,7 @@ describe('unknownType', () => {
     name: 'Query',
     definition(t) {
       t.field('user', {
+        // @ts-ignore
         type: User,
         resolve(root, args, ctx) {
           return { id: 'test', name: 'test' }
