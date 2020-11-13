@@ -9,6 +9,7 @@ import {
   GraphQLSchema,
   GraphQLType,
   GraphQLUnionType,
+  isAbstractType,
   isEnumType,
   isInputObjectType,
   isInterfaceType,
@@ -22,7 +23,13 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
-import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
+import {
+  MissingType,
+  NexusFeatures,
+  NexusGraphQLSchema,
+  NexusTypes,
+  withNexusSymbol,
+} from './definitions/_types'
 import { decorateType } from './definitions/decorateType'
 import { PluginConfig } from './plugin'
 
@@ -324,6 +331,77 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
   }
 }
 
+export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, features: NexusFeatures) {
+  if (features.abstractTypeRuntimeChecks === false) {
+    return
+  }
+
+  const abstractTypes = Object.values(schema.getTypeMap()).filter(isAbstractType)
+
+  abstractTypes.forEach((type) => {
+    const kind = isInterfaceType(type) ? 'Interface' : 'Union'
+    const resolveTypeImplemented = type.resolveType !== undefined
+    const typesWithoutIsTypeOf = schema.getPossibleTypes(type).filter((type) => type.isTypeOf === undefined)
+
+    // if no resolveType implemented but resolveType strategy enabled and isTypeOf strategy disabled
+    if (
+      resolveTypeImplemented === false &&
+      features.abstractTypeStrategies.resolveType === true &&
+      features.abstractTypeStrategies.isTypeOf === false
+    ) {
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }".`
+      const message = `${messagePrefix} It is missing a \`resolveType\` implementation.`
+      raiseProgrammerError(new Error(message))
+    }
+
+    // if some isTypeOf implementations are missing but isTypeOf strategy enabled
+    if (
+      typesWithoutIsTypeOf.length > 0 &&
+      features.abstractTypeStrategies.isTypeOf === true &&
+      features.abstractTypeStrategies.resolveType === false
+    ) {
+      const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }".`
+      const messageSuffix = `are missing an \`isTypeOf\` implementation: ${messageBadTypes}`
+      let message
+      if (kind === 'Union') {
+        message = `${messagePrefix} Some members of union type "${type.name}" ${messageSuffix}`
+      } else if (kind === 'Interface') {
+        message = `${messagePrefix} Some objects implementing the interface type "${type.name}" ${messageSuffix}`
+      } else {
+        casesHandled(kind)
+      }
+      raiseProgrammerError(new Error(message))
+    }
+
+    // if some isTypeOf or resolveType implementations are missing but isTypeOf and resolveType strategy enabled
+    if (
+      (resolveTypeImplemented === false || typesWithoutIsTypeOf.length > 0) &&
+      features.abstractTypeStrategies.isTypeOf === true &&
+      features.abstractTypeStrategies.resolveType === true
+    ) {
+      const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }". Either implement its \`resolveType\` or implement \`isTypeOf\` on each object`
+      const messageSuffix = `These objects are missing an \`isTypeOf\` implementation: ${messageBadTypes}`
+      let message
+      if (kind === 'Union') {
+        message = `${messagePrefix} in the union. ${messageSuffix}`
+      } else if (kind === 'Interface') {
+        message = `${messagePrefix} that implements this interface. ${messageSuffix}`
+      } else {
+        casesHandled(kind)
+      }
+      raiseProgrammerError(new Error(message))
+    }
+  })
+}
+
 export function consoleWarn(msg: string) {
   console.warn(msg)
 }
@@ -421,6 +499,30 @@ export function casesHandled(x: never): never {
  */
 export type IsEqual<A, B> = A extends B ? (B extends A ? true : false) : false
 
+export type RequiredDeeply<T> = DoRequireDeeply<Exclude<T, undefined>>
+
+type DoRequireDeeply<T> = {
+  [K in keyof T]-?: Exclude<T[K], undefined> extends PlainObject
+    ? DoRequireDeeply<Exclude<T[K], undefined>>
+    : Exclude<T[K], undefined>
+}
+
+/**
+ * Represents a POJO. Prevents from allowing arrays and functions.
+ *
+ * @remarks
+ *
+ * TypeScript interfaces will not be considered sub-types.
+ */
+export type PlainObject = {
+  [x: string]: Primitive | object
+}
+
+/**
+ * Matches any [primitive value](https://developer.mozilla.org/en-US/docs/Glossary/Primitive).
+ */
+export type Primitive = null | undefined | string | number | boolean | symbol | bigint
+
 /**
  * Quickly log objects
  */
@@ -430,4 +532,35 @@ export function dump(x: any) {
 
 export function isNodeModule(path: string) {
   return /^([A-z0-9@])/.test(path)
+}
+
+/**
+ * Assertion utility with nexus-aware feedback for users.
+ */
+export function invariantGuard(val: any) {
+  /* istanbul ignore next */
+  if (Boolean(val) === false) {
+    throw new Error(
+      'Nexus Error: This should never happen, ' +
+        'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
+    )
+  }
+}
+
+/**
+ * Is the current stage production? If NODE_ENV envar is set to "production" or "prod" then yes it is.
+ */
+export function isProductionStage() {
+  return process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod'
+}
+
+/**
+ * Throw a programmer error in production but only log it in development.
+ */
+export function raiseProgrammerError(error: Error) {
+  if (isProductionStage()) {
+    throw error
+  } else {
+    console.error(error)
+  }
 }

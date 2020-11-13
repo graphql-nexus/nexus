@@ -1,17 +1,16 @@
 import { assertValidName } from 'graphql'
-import { AbstractTypeResolver, GetGen } from '../typegenTypeHelpers'
-import { NexusObjectTypeDef } from './objectType'
+import { GetGen, AbstractTypes } from '../typegenTypeHelpers'
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
+import { NexusObjectTypeDef } from './objectType'
 
-export interface UnionDefinitionBuilder<TypeName extends string> {
-  setResolveType(fn: AbstractTypeResolver<TypeName>): void
+export interface UnionDefinitionBuilder {
   addUnionMembers(members: UnionMembers): void
 }
 
 export type UnionMembers = Array<GetGen<'objectNames'> | NexusObjectTypeDef<any>>
 
-export class UnionDefinitionBlock<TypeName extends string> {
-  constructor(protected typeBuilder: UnionDefinitionBuilder<TypeName>) {}
+export class UnionDefinitionBlock {
+  constructor(protected typeBuilder: UnionDefinitionBuilder) {}
   /**
    * All ObjectType names that should be part of the union, either
    * as string names or as references to the `objectType()` return value
@@ -19,15 +18,9 @@ export class UnionDefinitionBlock<TypeName extends string> {
   members(...unionMembers: UnionMembers) {
     this.typeBuilder.addUnionMembers(unionMembers)
   }
-  /**
-   * Sets the "resolveType" method for the current union
-   */
-  resolveType(fn: AbstractTypeResolver<TypeName>) {
-    this.typeBuilder.setResolveType(fn)
-  }
 }
 
-export interface NexusUnionTypeConfig<TypeName extends string> {
+export type NexusUnionTypeConfig<TypeName extends string> = {
   /**
    * The name of the union type
    */
@@ -35,7 +28,7 @@ export interface NexusUnionTypeConfig<TypeName extends string> {
   /**
    * Builds the definition for the union
    */
-  definition(t: UnionDefinitionBlock<TypeName>): void
+  definition(t: UnionDefinitionBlock): void
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -49,10 +42,10 @@ export interface NexusUnionTypeConfig<TypeName extends string> {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef
-}
+} & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {
-  constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<string>) {
+  constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<TypeName>) {
     assertValidName(name)
   }
   get value() {

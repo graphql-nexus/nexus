@@ -315,23 +315,29 @@ export const types = [
   }),
   unionType({
     name: 'BigUnion',
+    resolveType() {
+      return null
+    },
     definition(t) {
       t.members(...typeNames)
-      t.resolveType(() => null)
     },
   }),
   unionType({
     name: 'MediumUnionType',
+    resolveType() {
+      return null
+    },
     definition(t) {
       t.members(...typeNames.slice(50, 150))
-      t.resolveType(() => null)
     },
   }),
   unionType({
     name: 'MediumUnionTypes',
+    resolveType() {
+      return null
+    },
     definition(t) {
       t.members(...typeNames.slice(0, 100))
-      t.resolveType(() => null)
     },
   }),
 ]

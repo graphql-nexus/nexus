@@ -44,10 +44,12 @@ const types = [
   }),
   interfaceType({
     name: 'UserLike',
+    resolveType(o) {
+      return o.__typename
+    },
     definition(t) {
       t.id('id')
       t.string('login')
-      t.resolveType((o) => o.__typename || null)
     },
   }),
   objectType({
@@ -124,6 +126,11 @@ const defaultSchema = makeSchema({
   outputs: false,
   nonNullDefaults: {
     output: true,
+  },
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+    },
   },
 })
 
@@ -250,6 +257,11 @@ describe('nullabilityGuardPlugin', () => {
           }),
         ],
         plugins: [nullPlugin()],
+        features: {
+          abstractTypeStrategies: {
+            resolveType: true,
+          },
+        },
       }),
       `
         {
@@ -275,7 +287,9 @@ describe('nullabilityGuardPlugin', () => {
     })
     expect(onGuardedMock).toBeCalledTimes(3)
     expect(errSpy).toHaveBeenCalledTimes(1)
-    expect(errSpy.mock.calls[0][0].message).toContain('Missing resolveType for the UserOrAccount union')
+    expect(errSpy.mock.calls[0][0].message).toContain(
+      'You have a faulty implementation for your union type "UserOrAccount". It is missing a `resolveType` implementation.'
+    )
   })
 
   it('should guard on enumType fields', async () => {
@@ -301,6 +315,11 @@ describe('nullabilityGuardPlugin', () => {
       },
       types,
       plugins: [nullPlugin({ onGuarded: undefined })],
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     const { errors = [], data } = await graphql(
       schema,
@@ -321,10 +340,16 @@ describe('nullabilityGuardPlugin', () => {
   it('should not catch by default unless the env is production', async () => {
     const schema = makeSchema({
       types,
+      outputs: false,
       nonNullDefaults: {
         output: true,
       },
       plugins: [nullPlugin({ shouldGuard: undefined })],
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     const { errors = [], data } = await graphql(
       schema,
@@ -342,10 +367,16 @@ describe('nullabilityGuardPlugin', () => {
     process.env.NODE_ENV = 'production'
     const schema2 = makeSchema({
       types,
+      outputs: false,
       nonNullDefaults: {
         output: true,
       },
       plugins: [nullPlugin({ shouldGuard: undefined })],
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     const { errors: errors2 = [], data: data2 } = await graphql(
       schema2,
@@ -365,6 +396,7 @@ describe('nullabilityGuardPlugin', () => {
     const { String, ...rest } = defaultFallbacks
     makeSchema({
       types,
+      outputs: false,
       plugins: [
         nullPlugin({
           fallbackValues: {
@@ -372,6 +404,11 @@ describe('nullabilityGuardPlugin', () => {
           },
         }),
       ],
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     expect(errSpy).toHaveBeenCalledTimes(1)
     expect(errSpy).toHaveBeenCalledWith(
@@ -382,6 +419,7 @@ describe('nullabilityGuardPlugin', () => {
   it('logs an error for unknown/unused scalars', () => {
     makeSchema({
       types,
+      outputs: false,
       plugins: [
         nullPlugin({
           fallbackValues: {
@@ -390,6 +428,11 @@ describe('nullabilityGuardPlugin', () => {
           },
         }),
       ],
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     expect(errSpy).toHaveBeenCalledTimes(1)
     expect(errSpy).toHaveBeenCalledWith(
@@ -422,6 +465,7 @@ describe('nullabilityGuardPlugin', () => {
             resolve: async () => null,
           }),
         ],
+        outputs: false,
         plugins: [
           nullPlugin({
             onGuarded: onGuardedMock,

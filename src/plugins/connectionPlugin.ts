@@ -410,7 +410,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             if (!b.hasType(connectionName)) {
               b.addType(
                 objectType({
-                  name: connectionName as any,
+                  name: connectionName,
                   definition(t2) {
                     t2.list.field('edges', {
                       type: edgeName as any,

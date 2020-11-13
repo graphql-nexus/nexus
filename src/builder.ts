@@ -40,6 +40,19 @@ import {
   isWrappingType,
   printSchema,
 } from 'graphql'
+import {
+  GraphQLPossibleInputs,
+  GraphQLPossibleOutputs,
+  MissingType,
+  NexusFeaturesInput,
+  NexusGraphQLFieldConfig,
+  NexusGraphQLInputObjectTypeConfig,
+  NexusGraphQLInterfaceTypeConfig,
+  NexusGraphQLObjectTypeConfig,
+  NexusGraphQLSchema,
+  NonNullConfig,
+  RootTypings,
+} from './definitions/_types'
 import { arg, ArgsRecord, NexusArgConfig, NexusArgDef } from './definitions/args'
 import {
   InputDefinitionBlock,
@@ -79,18 +92,6 @@ import {
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
 } from './definitions/wrapping'
-import {
-  GraphQLPossibleInputs,
-  GraphQLPossibleOutputs,
-  MissingType,
-  NexusGraphQLFieldConfig,
-  NexusGraphQLInputObjectTypeConfig,
-  NexusGraphQLInterfaceTypeConfig,
-  NexusGraphQLObjectTypeConfig,
-  NexusGraphQLSchema,
-  NonNullConfig,
-  RootTypings,
-} from './definitions/_types'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
 import { DynamicOutputPropertyDef } from './dynamicProperty'
 import {
@@ -119,9 +120,12 @@ import {
   consoleWarn,
   eachObj,
   firstDefined,
+  invariantGuard,
   isObject,
   mapValues,
   objValues,
+  RequiredDeeply,
+  runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   validateOnInstallHookResult,
 } from './utils'
@@ -144,7 +148,7 @@ const SCALARS: Record<string, GraphQLScalarType> = {
   Boolean: GraphQLBoolean,
 }
 
-export interface BuilderConfig {
+export interface BuilderConfigInput {
   /**
    * Generated artifact settings. Set to false to disable all.
    * Set to true to enable all and use default paths. Leave
@@ -229,9 +233,19 @@ export interface BuilderConfig {
    * Otherwise, uses `printSchema` from graphql-js
    */
   customPrintSchemaFn?: typeof printSchema
+  /**
+   * Customize and toggle on or off various features of Nexus.
+   */
+  features?: NexusFeaturesInput
 }
 
-export type SchemaConfig = BuilderConfig & {
+export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
+  nonNullDefaults: RequiredDeeply<BuilderConfigInput['nonNullDefaults']>
+  features: RequiredDeeply<BuilderConfigInput['features']>
+  plugins: RequiredDeeply<BuilderConfigInput['plugins']>
+}
+
+export type SchemaConfig = BuilderConfigInput & {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience,
    * if it's an object we get the values, if it's an array we flatten out the
@@ -345,10 +359,7 @@ export class SchemaBuilder {
    * All "extensions" to input types (adding fields on types from many locations)
    */
   protected inputTypeExtendMap: Record<string, NexusExtendInputTypeConfig<string>[] | null> = {}
-  /**
-   * Configures the root-level nonNullDefaults defaults
-   */
-  protected nonNullDefaults: NonNullConfig = {}
+
   protected dynamicInputFields: DynamicInputFields = {}
   protected dynamicOutputFields: DynamicOutputFields = {}
   protected dynamicOutputProperties: DynamicOutputProperties = {}
@@ -415,6 +426,8 @@ export class SchemaBuilder {
    */
   protected _schemaExtension?: NexusSchemaExtension
 
+  protected config: BuilderConfig
+
   get schemaExtension() {
     /* istanbul ignore next */
     if (!this._schemaExtension) {
@@ -423,13 +436,12 @@ export class SchemaBuilder {
     return this._schemaExtension
   }
 
-  constructor(protected config: BuilderConfig) {
-    this.nonNullDefaults = {
-      input: false,
-      output: false,
-      ...config.nonNullDefaults,
-    }
-    this.plugins = config.plugins || [fieldAuthorizePlugin()]
+  constructor(config: BuilderConfigInput) {
+    this.config = setConfigDefaults(config)
+    /**
+     * This array of plugin is used to keep retro-co
+     */
+    this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
     this.builderLens = Object.freeze({
       hasType: this.hasType,
       addType: this.addType,
@@ -439,18 +451,18 @@ export class SchemaBuilder {
     })
   }
 
-  setConfigOption = <K extends keyof BuilderConfig>(key: K, value: BuilderConfig[K]) => {
+  setConfigOption = <K extends keyof BuilderConfigInput>(key: K, value: BuilderConfigInput[K]) => {
     this.config = {
       ...this.config,
       [key]: value,
     }
   }
 
-  hasConfigOption = (key: keyof BuilderConfig): boolean => {
+  hasConfigOption = (key: keyof BuilderConfigInput): boolean => {
     return this.config.hasOwnProperty(key)
   }
 
-  getConfigOption = <K extends keyof BuilderConfig>(key: K): BuilderConfig[K] => {
+  getConfigOption = <K extends keyof BuilderConfigInput>(key: K): BuilderConfigInput[K] => {
     return this.config[key]
   }
 
@@ -578,7 +590,7 @@ export class SchemaBuilder {
       this.addTypes(types.getTypeMap())
     }
     if (isNexusPlugin(types)) {
-      if (!this.config.plugins?.includes(types)) {
+      if (!this.plugins?.includes(types)) {
         throw new Error(
           `Nexus plugin ${types.config.name} was seen in the "types" config, but should instead be provided to the "plugins" array.`
         )
@@ -729,7 +741,6 @@ export class SchemaBuilder {
             const name = typeof config === 'string' ? config : config.value.name
             walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
           }),
-        setResolveType: () => {},
         addField: () => {},
         addDynamicOutputMembers: () => {},
         warn: () => {},
@@ -840,7 +851,7 @@ export class SchemaBuilder {
     return this.finalize(new GraphQLInputObjectType(inputObjectTypeConfig))
   }
 
-  buildObjectType(config: NexusObjectTypeConfig<any>) {
+  buildObjectType(config: NexusObjectTypeConfig<string>) {
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const definitionBlock = new ObjectDefinitionBlock({
@@ -869,6 +880,7 @@ export class SchemaBuilder {
       interfaces: () => this.buildInterfaceList(interfaces),
       description: config.description,
       fields: () => this.buildOutputFields(fields, objectTypeConfig, this.buildInterfaceFields(interfaces)),
+      isTypeOf: (config as any).isTypeOf,
       extensions: {
         nexus: new NexusObjectTypeExtension(config),
       },
@@ -878,14 +890,14 @@ export class SchemaBuilder {
 
   buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config
-    let resolveType: AbstractTypeResolver<string> | undefined
+    let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
+
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
       addField: (field) => fields.push(field),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      setResolveType: (fn) => (resolveType = fn),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
       warn: consoleWarn,
     })
@@ -896,9 +908,7 @@ export class SchemaBuilder {
         e.definition(definitionBlock)
       })
     }
-    if (!resolveType) {
-      resolveType = this.missingResolveType(config.name, 'interface')
-    }
+
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -964,16 +974,14 @@ export class SchemaBuilder {
 
   buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined
-    let resolveType: AbstractTypeResolver<string> | undefined
+    let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
+
     config.definition(
       new UnionDefinitionBlock({
-        setResolveType: (fn) => (resolveType = fn),
         addUnionMembers: (unionMembers) => (members = unionMembers),
       })
     )
-    if (!resolveType) {
-      resolveType = this.missingResolveType(config.name, 'union')
-    }
+
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -1195,7 +1203,7 @@ export class SchemaBuilder {
       return required
     }
     // Null by default
-    return firstDefined(nonNullDefaults.input, this.nonNullDefaults.input, false)
+    return firstDefined(nonNullDefaults.input, this.config.nonNullDefaults.input, false)
   }
 
   protected outputNonNull(
@@ -1208,7 +1216,7 @@ export class SchemaBuilder {
       return !nullable
     }
     // Non-Null by default
-    return firstDefined(nonNullDefaults.output, this.nonNullDefaults.output, true)
+    return firstDefined(nonNullDefaults.output, this.config.nonNullDefaults.output, true)
   }
 
   protected decorateType<T extends GraphQLNamedType>(
@@ -1327,17 +1335,6 @@ export class SchemaBuilder {
     return this.missingType(name, fromObject)
   }
 
-  missingResolveType(name: string, location: 'union' | 'interface') {
-    console.error(
-      new Error(
-        `Missing resolveType for the ${name} ${location}. ` +
-          `Be sure to add one in the definition block for the type, ` +
-          `or t.resolveType(() => null) if you don't want or need to implement.`
-      )
-    )
-    return (obj: any) => obj?.__typename || null
-  }
-
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
     const definitionBlock = new InputDefinitionBlock({
       typeName: obj.name,
@@ -1450,7 +1447,6 @@ export class SchemaBuilder {
           }
         })
       },
-      setResolveType: () => {},
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
       warn: () => {},
@@ -1581,6 +1577,64 @@ export function makeSchemaInternal(config: SchemaConfig) {
   return { schema, missingTypes, finalConfig }
 }
 
+export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {
+  const defaults: {
+    features: BuilderConfig['features']
+    nonNullDefaults: BuilderConfig['nonNullDefaults']
+    plugins: BuilderConfig['plugins']
+  } = {
+    features: {
+      abstractTypeRuntimeChecks: true,
+      abstractTypeStrategies: {
+        isTypeOf: true,
+        resolveType: false,
+        __typename: false,
+      },
+    },
+    nonNullDefaults: {
+      input: false,
+      output: false,
+    },
+    plugins: [fieldAuthorizePlugin()],
+  }
+
+  if (!config.features) {
+    config.features = defaults.features
+  } else {
+    // abstractTypeStrategies
+
+    if (!config.features.abstractTypeStrategies) {
+      config.features.abstractTypeStrategies = defaults.features.abstractTypeStrategies
+    } else {
+      config.features.abstractTypeStrategies.__typename =
+        config.features.abstractTypeStrategies.__typename ?? false
+      config.features.abstractTypeStrategies.isTypeOf =
+        config.features.abstractTypeStrategies.isTypeOf ?? false
+      config.features.abstractTypeStrategies.resolveType =
+        config.features.abstractTypeStrategies.resolveType ?? false
+    }
+
+    // abstractTypeRuntimeChecks
+    if (config.features.abstractTypeStrategies.__typename === true) {
+      // Discriminant Model Field strategy cannot be used with runtime checks because at runtime
+      // we cannot know if a resolver for a field whose type is an abstract type includes __typename
+      // in the returned model data.
+      config.features.abstractTypeRuntimeChecks = false
+    }
+    if (config.features.abstractTypeRuntimeChecks === undefined) {
+      config.features.abstractTypeRuntimeChecks = defaults.features.abstractTypeRuntimeChecks
+    }
+  }
+
+  config.plugins = config.plugins ?? []
+  config.nonNullDefaults = {
+    ...defaults.nonNullDefaults,
+    ...(config.nonNullDefaults ?? {}),
+  }
+
+  return config as BuilderConfig
+}
+
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined
  * by the GraphQL Nexus layer or any manually defined GraphQLType objects.
@@ -1614,6 +1668,7 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
     }
   }
   assertNoMissingTypes(schema, missingTypes)
+  runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return schema
 }
 
@@ -1624,8 +1679,9 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
 export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQLSchema> {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  assertNoMissingTypes(schema, missingTypes)
   await new TypegenMetadata(typegenConfig).generateArtifacts(schema)
+  assertNoMissingTypes(schema, missingTypes)
+  runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return schema
 }
 
@@ -1643,25 +1699,13 @@ generateSchema.withArtifacts = async (
 }> => {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  assertNoMissingTypes(schema, missingTypes)
   const { schemaTypes, tsTypes } = await new TypegenMetadata(typegenConfig).generateArtifactContents(
     schema,
     typeFilePath
   )
+  assertNoMissingTypes(schema, missingTypes)
+  runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return { schema, schemaTypes, tsTypes }
-}
-
-/**
- * Assertion utility with nexus-aware feedback for users.
- */
-function invariantGuard(val: any) {
-  /* istanbul ignore next */
-  if (Boolean(val) === false) {
-    throw new Error(
-      'Nexus Error: This should never happen, ' +
-        'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
-    )
-  }
 }
 
 function normalizeArg(

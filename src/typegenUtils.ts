@@ -1,13 +1,13 @@
-import { BuilderConfig } from './builder'
+import { BuilderConfigInput } from './builder'
 import { TypegenMetadataConfig } from './typegenMetadata'
 import { assertAbsolutePath, getOwnPackage } from './utils'
 
 /**
  * Normalizes the builder config into the config we need for typegen
  *
- * @param config {BuilderConfig}
+ * @param config {BuilderConfigInput}
  */
-export function resolveTypegenConfig(config: BuilderConfig): TypegenMetadataConfig {
+export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadataConfig {
   const {
     outputs,
     shouldGenerateArtifacts = Boolean(!process.env.NODE_ENV || process.env.NODE_ENV === 'development'),
