@@ -7,6 +7,7 @@ installGenerateTypegenHook({
   rootDir,
   config: {
     features: {
+      abstractTypeRuntimeChecks: false,
       abstractTypeStrategies: {
         isTypeOf: true,
       },

@@ -8,6 +8,7 @@ testApp({
   name: 'isTypeOfsImplemented',
   config: {
     features: {
+      abstractTypeRuntimeChecks: false,
       abstractTypeStrategies: {
         resolveType: true,
         isTypeOf: true,

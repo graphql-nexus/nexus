@@ -1,13 +1,13 @@
 /// <reference path="../_setup.ts" />
 import { join, relative } from 'path'
 import { core } from '../../src'
-import { BuilderConfig } from '../../src/core'
+import { BuilderConfigInput } from '../../src/core'
 
 const { generateSchema, typegenFormatPrettier } = core
 
 type HookSettings = {
   rootDir: string
-  config?: Partial<BuilderConfig>
+  config?: Partial<BuilderConfigInput>
 }
 
 export async function generateTypegen(settings: HookSettings) {

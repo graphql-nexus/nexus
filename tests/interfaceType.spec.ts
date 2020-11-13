@@ -8,9 +8,6 @@ describe('interfaceType', () => {
       types: [
         interfaceType({
           name: 'Node',
-          resolveType() {
-            return null
-          },
           definition(t) {
             t.id('id')
           },
@@ -157,6 +154,9 @@ describe('interfaceType', () => {
           }),
           objectType({
             name: 'Foo',
+            isTypeOf() {
+              return true
+            },
             definition(t) {
               t.implements('Node2', 'Node')
             },
