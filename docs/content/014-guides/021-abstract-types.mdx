@@ -421,17 +421,24 @@ Note that if you enable the DMF strategy (`features.abstractTypeStrategies.__typ
 
 #### Multiple Strategies
 
-It is possible to enable multiple strategies at once. The following discusses the build and runtime ramifications of this.
+It is possible to enable multiple strategies at once. However doing so creates harder to understand feedback. The following discusses the build and runtime ramifications in detail. Enabling multiple strategies is not recommended for people new to GraphQL.
 
 ##### _At Buildtime_
 
-Nexus leverages TypeScript statically encode all the rules discussed in this guide. When you have enabled multiple strategies it means that when Nexus detects a faulty implementation, then static type errors will be raised in _all_ places where a fix _could_ be made, but _might not_ be made.
+Nexus leverages TypeScript to statically encode all the rules discussed in this guide. When you have enabled multiple strategies it will degrade Nexus' ability to provide precise feedback. This is why Nexus considers having multiple strategies an advanced pattern. The static errors produced are likely to confuse newcomers, who cannot tell which ones stem from which strategy or why `__typename` is required while not `isTypeOf`/`resolveType`.
 
-In practice this means that some of the errors you'll see will be noise since only a subset are pointing toward the strategy you will ultimately want to use. This is one reason why Nexus considers having multiple strategies an advanced pattern. The static errors produced are likely to confuse newcomers, who cannot tell which ones stem from which strategy (or that there even are multiple strategies!).
+Here is a summary of the effects:
 
-When DMF (`__typename`) and Centralized (`resolveType`) strategies are both enabled then `__typename` becomes an optional model field on all members of all abstract types _that **do** implement `resolveType`_. All members of abstract types that _do **not** implement_ `resolveType` will have their `__typename` model property be _required_. The reason for this behaviour is that when both strategies are enabled and an abstract type has `resolveType` implemented Nexus cannot statically know what your implementation is actually doing and if `__typename` should actually be required for it.
+| Combination                 | Effect                                                                                                                                                         |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Modular & Centralized       | `isTypeOf` on all member types & `resolveType` on abstract type required until either all members have `isTypeOf` implemented or `resolveType` is implemented. |
+| DMF & Centralized           | `*` `__typename` required _unless_ `resolveType` implemented on the abstract type.                                                                             |
+| DMF & Modular               | `*` `__typename` required _unless_ `isTypeOf` implemented on all member types of the abstract type.                                                            |
+| DMF & Modular & centralized | `*` `__typename` required _unless_ `isTypeOf` implemented on all member types of the abstract type _or_ `resolveType` on the abstract type.                    |
 
-For example:
+`*` Nexus cannot require `resolveType`/`isTypeOf` even though it _should_ becuase it cannot statically detect when you have implemented `__typename`.
+
+Here is a code example:
 
 <TabbedContent tabs={['With resolveType implemented', 'Without resolveType implemented']}>
 <tab>
@@ -470,7 +477,8 @@ queryType({
 
 unionType({
   name: 'SearchResult',
-  resolveType(data) { // <-- OPTIONAL; If given, __typename becomes OPTIONAL
+  resolveType(data) {
+    // <-- OPTIONAL; If given, __typename becomes OPTIONAL
     if (data.__typename /* <-- OPTIONAL b/c resolveType used */) {
       return data.__typename
     }
@@ -560,7 +568,7 @@ When multiple strategies are enabled the following runtime precedence rules appl
 2. DMF (`__typename`)
 3. Modular (`isTypeOf`)
 
-> The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
+The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
 
 ## Interface Types
 
