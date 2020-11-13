@@ -3,8 +3,8 @@
  * Do not make changes to this file directly
  */
 
-import ts from 'typescript'
 import * as t from './types/index'
+import ts from 'typescript'
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -2682,7 +2682,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
+export interface NexusGenAbstractTypeMembers {
   DeclarationName:
     | 'BindingPattern'
     | 'ComputedPropertyName'
@@ -2863,6 +2863,23 @@ export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
 export type NexusGenUnionNames = 'DeclarationName'
 
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType =
+  | 'DeclarationName'
+  | 'HasJSDoc'
+  | 'JSDocTag'
+  | 'MaybeOptional'
+  | 'Node'
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    resolveType: true
+    __typename: false
+    isTypeOf: false
+  }
+}
+
 export interface NexusGenTypes {
   context: t.ContextType
   inputTypes: NexusGenInputs
@@ -2887,7 +2904,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

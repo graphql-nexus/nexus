@@ -1,9 +1,18 @@
 import ts from 'typescript'
 import { unionType } from '@nexus/schema'
-import { NexusGenAbstractTypesMapResolveTypeMethodReturnType } from '../ts-ast-reader-typegen'
+import { NexusGenAbstractTypeMembers } from '../ts-ast-reader-typegen'
 
 export const DeclarationName = unionType({
   name: 'DeclarationName',
+  resolveType(obj) {
+    if ('kind' in obj) {
+      if ((obj.kind as unknown) === ts.SyntaxKind.FirstNode) {
+        return 'QualifiedName'
+      }
+      return ts.SyntaxKind[obj.kind] as NexusGenAbstractTypeMembers['DeclarationName']
+    }
+    return 'UnnamedNode'
+  },
   definition(t) {
     t.members(
       'Identifier',
@@ -15,16 +24,5 @@ export const DeclarationName = unionType({
       'QualifiedName'
       // ComputedPropertyName
     )
-    t.resolveType((obj) => {
-      if ('kind' in obj) {
-        if ((obj.kind as unknown) === ts.SyntaxKind.FirstNode) {
-          return 'QualifiedName'
-        }
-        return ts.SyntaxKind[
-          obj.kind
-        ] as NexusGenAbstractTypesMapResolveTypeMethodReturnType['DeclarationName']
-      }
-      return 'UnnamedNode'
-    })
   },
 })

@@ -140,7 +140,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {
+export interface NexusGenAbstractTypeMembers {
   Character: 'Droid' | 'Human'
 }
 
@@ -157,6 +157,18 @@ export type NexusGenInterfaceNames = 'Character'
 export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
 export type NexusGenUnionNames = never
+
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType = 'Character'
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    resolveType: true
+    __typename: false
+    isTypeOf: false
+  }
+}
 
 export interface NexusGenTypes {
   context: swapi.ContextType
@@ -182,7 +194,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

@@ -9,14 +9,25 @@ const syntaxKindArgs = {
 
 export const MaybeOptional = interfaceType({
   name: 'MaybeOptional',
+  resolveType(o) {
+    return o.kind as any
+  },
   definition(t) {
     t.field('questionToken', { type: 'Token', nullable: true })
-    t.resolveType((o) => o.kind as any)
   },
 })
 
 export const Node = interfaceType({
   name: 'Node',
+  resolveType(node, ctx, info) {
+    if (KeywordKinds.has(node.kind)) {
+      return 'KeywordTypeNode'
+    }
+    if (allKnownNodes(info.schema).has(SyntaxKind[node.kind])) {
+      return SyntaxKind[node.kind] as any
+    }
+    return 'UNKNOWN_NODE'
+  },
   definition(t) {
     t.int('pos')
     t.int('end')
@@ -51,20 +62,17 @@ export const Node = interfaceType({
         return filtered.length ? filtered[0].getText(ctx.source) : ''
       },
     })
-    t.resolveType((node, ctx, info) => {
-      if (KeywordKinds.has(node.kind)) {
-        return 'KeywordTypeNode'
-      }
-      if (allKnownNodes(info.schema).has(SyntaxKind[node.kind])) {
-        return SyntaxKind[node.kind] as any
-      }
-      return 'UNKNOWN_NODE'
-    })
   },
 })
 
 export const JSDocInterface = interfaceType({
   name: 'HasJSDoc',
+  resolveType(node, ctx, info) {
+    if (allKnownNodes(info.schema).has(SyntaxKind[node.kind])) {
+      return SyntaxKind[node.kind] as any
+    }
+    return 'UNKNOWN_NODE'
+  },
   definition(t) {
     t.list.field('jsDoc', {
       type: 'JSDoc',
@@ -76,12 +84,6 @@ export const JSDocInterface = interfaceType({
         }
         return null
       },
-    })
-    t.resolveType((node, ctx, info) => {
-      if (allKnownNodes(info.schema).has(SyntaxKind[node.kind])) {
-        return SyntaxKind[node.kind] as any
-      }
-      return 'UNKNOWN_NODE'
     })
   },
 })
