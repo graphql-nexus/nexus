@@ -176,7 +176,7 @@ Nexus leverages TypeScript to statically ensure that your implementation is corr
 
 #### Discriminant Model Field (DMF) Strategy (`__typename`)
 
-The DMF strategy allows you to discriminate your union member types in a _potentialy_ modular way. It is based on supplying at `__tpename` field in the model data returned by resolvers of fields typed as an abstract type. Here is an example:
+The DMF strategy allows you to discriminate your union member types in a _potentialy_ modular way. It is based on supplying at `__typename` field in the model data returned by resolvers of fields typed as an abstract type. Here is an example:
 
 ```ts
 const Query = queryType({
