@@ -1,6 +1,6 @@
 import { assertValidName } from 'graphql'
-import { FieldResolver, AbstractTypes } from '../typegenTypeHelpers'
-import { NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexusSymbol } from './_types'
+import { FieldResolver } from '../typegenTypeHelpers'
+import { AbstractTypes, NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { Implemented } from './interfaceType'
 

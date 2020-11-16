@@ -124,11 +124,11 @@ import {
   isObject,
   mapValues,
   objValues,
-  RequiredDeeply,
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   validateOnInstallHookResult,
 } from './utils'
+import { RequiredDeeply } from './typeHelpersInternal'
 
 type NexusShapedOutput = {
   name: string

@@ -20,7 +20,10 @@ import {
   NexusObjectTypeExtension,
   NexusSchemaExtension,
 } from '../extensions'
-import { RequiredDeeply } from '../utils'
+import { RequiredDeeply } from '../typeHelpersInternal'
+import * as AbstractTypes from '../typegenAbstractTypes'
+
+export { AbstractTypes }
 
 export type Maybe<T> = T | null
 
