@@ -495,35 +495,6 @@ export function casesHandled(x: never): never {
 }
 
 /**
- * Is the given type equal to the other given type?
- */
-export type IsEqual<A, B> = A extends B ? (B extends A ? true : false) : false
-
-export type RequiredDeeply<T> = DoRequireDeeply<Exclude<T, undefined>>
-
-type DoRequireDeeply<T> = {
-  [K in keyof T]-?: Exclude<T[K], undefined> extends PlainObject
-    ? DoRequireDeeply<Exclude<T[K], undefined>>
-    : Exclude<T[K], undefined>
-}
-
-/**
- * Represents a POJO. Prevents from allowing arrays and functions.
- *
- * @remarks
- *
- * TypeScript interfaces will not be considered sub-types.
- */
-export type PlainObject = {
-  [x: string]: Primitive | object
-}
-
-/**
- * Matches any [primitive value](https://developer.mozilla.org/en-US/docs/Glossary/Primitive).
- */
-export type Primitive = null | undefined | string | number | boolean | symbol | bigint
-
-/**
  * Quickly log objects
  */
 export function dump(x: any) {

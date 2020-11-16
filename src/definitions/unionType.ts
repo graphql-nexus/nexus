@@ -1,6 +1,6 @@
 import { assertValidName } from 'graphql'
-import { GetGen, AbstractTypes } from '../typegenTypeHelpers'
-import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
+import { GetGen } from '../typegenTypeHelpers'
+import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 import { NexusObjectTypeDef } from './objectType'
 
 export interface UnionDefinitionBuilder {
