@@ -11,18 +11,18 @@ export const JSDoc = objectType({
 
 export const JSDocTag = interfaceType({
   name: 'JSDocTag',
+  resolveType(tag, _ctx, info) {
+    if (info.schema.getType(ts.SyntaxKind[tag.kind])) {
+      return ts.SyntaxKind[tag.kind] as any
+    }
+    return 'JSDocUnknownTag'
+  },
   definition(t) {
     t.field('tagName', {
       type: nullable('String'),
       resolve: (root) => `${root.tagName.escapedText}`,
     })
     t.field('comment', { type: nullable('String') })
-    t.resolveType((tag, ctx, info) => {
-      if (info.schema.getType(ts.SyntaxKind[tag.kind])) {
-        return ts.SyntaxKind[tag.kind] as any
-      }
-      return 'JSDocUnknownTag'
-    })
   },
 })
 

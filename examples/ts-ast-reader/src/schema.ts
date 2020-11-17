@@ -33,6 +33,11 @@ export const schema = makeSchema({
   nonNullDefaults: {
     output: true,
   },
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+    },
+  },
 })
 
 /**

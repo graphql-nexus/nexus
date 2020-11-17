@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
-import { IsEqual } from '../utils'
+import { IsEqual } from '../typeHelpersInternal'
 import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
 import { list } from './list'
 import { ObjectDefinitionBuilder, objectType } from './objectType'

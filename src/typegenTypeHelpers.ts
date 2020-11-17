@@ -119,13 +119,7 @@ export type SubFieldResolver<
   | MaybePromise<ResultValue<TypeName, FieldName>[SubFieldName]>
   | MaybePromiseDeep<ResultValue<TypeName, FieldName>[SubFieldName]>
 
-export type AbstractResolveReturn<TypeName extends string> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? TypeName extends keyof GenTypes['abstractResolveReturn']
-      ? GenTypes['abstractResolveReturn'][TypeName]
-      : any
-    : any
-  : any
+export type AbstractResolveReturn<TypeName extends string> = GetGen2<'abstractTypeMembers', TypeName, any>
 
 /**
  * Generated type helpers:
@@ -149,7 +143,10 @@ export type GenTypesShapeKeys =
   | 'allOutputTypes'
   | 'allNamedTypes'
   | 'abstractTypes'
-  | 'abstractResolveReturn'
+  | 'abstractTypeMembers'
+  | 'objectsUsingAbstractStrategyIsTypeOf'
+  | 'abstractsUsingStrategyResolveType'
+  | 'features'
 
 /**
  * Helpers for handling the generated schema
@@ -255,3 +252,24 @@ export type NeedsResolver<TypeName extends string, FieldName extends string> = H
     ? true
     : false
   : false
+
+export type IsFeatureEnabled2<PathPart1 extends string, PathPart2 extends string> = GetGen3<
+  'features',
+  PathPart1,
+  PathPart2,
+  false
+> extends true
+  ? true
+  : false
+
+export type Discriminate<
+  TypeName extends string,
+  Required extends 'required' | 'optional',
+  Type = RootValue<TypeName>
+> = Type extends { __typename: TypeName }
+  ? Type
+  : Type extends { __typename?: TypeName }
+  ? Type
+  : Required extends 'required'
+  ? Type & { __typename: TypeName }
+  : Type & { __typename?: TypeName }

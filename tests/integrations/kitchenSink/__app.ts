@@ -1,4 +1,3 @@
-import './__typegen'
 import {
   dynamicInputMethod,
   dynamicOutputMethod,
@@ -6,7 +5,7 @@ import {
   extendType,
   idArg,
   inputObjectType,
-  list,
+  interfaceType,
   mutationType,
   objectType,
   queryType,
@@ -14,6 +13,7 @@ import {
   subscriptionType,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
+import './__typegen'
 
 export const query = queryType({
   definition(t) {
@@ -25,6 +25,30 @@ const mockData = {
   posts: [{ title: '', body: '' }],
   user: { firstName: '', lastName: '' },
 }
+
+export const I = interfaceType({
+  name: 'I',
+  resolveType() {
+    return 'OfI'
+  },
+  definition(t) {
+    t.string('hello')
+  },
+})
+
+export const i = objectType({
+  name: 'OfI',
+  definition(t) {
+    t.implements('I')
+  },
+})
+
+export const i2 = objectType({
+  name: 'OfI2',
+  definition(t) {
+    t.implements('I')
+  },
+})
 
 export const dom = dynamicOutputMethod({
   name: 'title',

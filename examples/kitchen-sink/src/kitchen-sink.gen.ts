@@ -131,11 +131,11 @@ export interface NexusGenRootTypes {
     cursor: string // String!
     node?: NexusGenRootTypes['User'] | null // User
   }
-  Bar: NexusGenRootTypes['Foo'] | NexusGenRootTypes['TestObj']
-  Baz: NexusGenRootTypes['TestObj']
-  Node: NexusGenRootTypes['TestObj']
+  Bar: core.Discriminate<'Foo', 'optional'> | core.Discriminate<'TestObj', 'optional'>
+  Baz: core.Discriminate<'TestObj', 'optional'>
+  Node: core.Discriminate<'TestObj', 'optional'>
   UnusedInterface: UnusedInterfaceTypeDef
-  TestUnion: NexusGenRootTypes['Foo']
+  TestUnion: core.Discriminate<'Foo', 'optional'>
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -468,7 +468,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypeMembers {
   TestUnion: 'Foo'
   Bar: 'Foo' | 'TestObj'
   Baz: 'TestObj'
@@ -503,6 +503,18 @@ export type NexusGenScalarNames = 'Boolean' | 'Date' | 'Float' | 'ID' | 'Int' | 
 
 export type NexusGenUnionNames = 'TestUnion'
 
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType = 'Bar' | 'Baz' | 'Node' | 'TestUnion'
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    __typename: true
+    resolveType: true
+    isTypeOf: false
+  }
+}
+
 export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
@@ -527,7 +539,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

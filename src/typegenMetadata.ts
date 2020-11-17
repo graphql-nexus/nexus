@@ -1,13 +1,14 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
 import * as path from 'path'
-import { BuilderConfig, TypegenInfo } from './builder'
+import { BuilderConfigInput, TypegenInfo } from './builder'
 import { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
 import { typegenAutoConfig } from './typegenAutoConfig'
 import { TypegenFormatFn, typegenFormatPrettier } from './typegenFormatPrettier'
 import { TypegenPrinter } from './typegenPrinter'
 
-export interface TypegenMetadataConfig extends Omit<BuilderConfig, 'outputs' | 'shouldGenerateArtifacts'> {
+export interface TypegenMetadataConfig
+  extends Omit<BuilderConfigInput, 'outputs' | 'shouldGenerateArtifacts'> {
   nexusSchemaImportId?: string
   outputs: {
     schema: false | string

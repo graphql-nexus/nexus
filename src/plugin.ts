@@ -9,11 +9,11 @@ import {
   Omit,
   withNexusSymbol,
 } from './definitions/_types'
-import { NexusSchemaExtension } from './extensions'
-import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
-import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
 import { InputDefinitionBlock } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
+import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
+import { NexusSchemaExtension } from './extensions'
+import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
 
 export { PluginBuilderLens }
 
@@ -96,7 +96,10 @@ export interface PluginConfig {
    * Called immediately after the object is defined, allows for using metadata
    * to define the shape of the object.
    */
-  onObjectDefinition?: (block: ObjectDefinitionBlock<any>, objectConfig: NexusObjectTypeConfig<any>) => void
+  onObjectDefinition?: (
+    block: ObjectDefinitionBlock<string>,
+    objectConfig: NexusObjectTypeConfig<string>
+  ) => void
   /**
    * Called immediately after the input object is defined, allows for using metadata
    * to define the shape of the input object

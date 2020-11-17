@@ -44,6 +44,12 @@ const schema = makeSchema({
     }),
   ],
   prettierConfig: require.resolve('../../../.prettierrc'),
+  features: {
+    abstractTypeStrategies: {
+      __typename: true,
+      resolveType: true,
+    },
+  },
 })
 
 const server = new ApolloServer({

@@ -52,6 +52,9 @@ export const SomeMutationField = mutationField('someMutationField', () => ({
 export const Bar = interfaceType({
   name: 'Bar',
   description: 'Bar description',
+  resolveType(source) {
+    return 'Foo'
+  },
   definition(t) {
     t.boolean('ok', { deprecation: 'Not ok?' })
     t.boolean('argsTest', {
@@ -68,7 +71,6 @@ export const Bar = interfaceType({
         return true
       },
     })
-    t.resolveType((root) => 'Foo')
   },
 })
 
@@ -80,28 +82,31 @@ export const UnusedInterface = interfaceType({
   name: 'UnusedInterface',
   definition(t) {
     t.boolean('ok')
-    t.resolveType(() => null)
   },
   rootTyping: { name: 'UnusedInterfaceTypeDef', path: __filename },
 })
 
 export const Baz = interfaceType({
   name: 'Baz',
+  resolveType() {
+    return 'TestObj'
+  },
   definition(t) {
     t.boolean('ok')
     t.field('a', {
       type: Bar,
       description: "'A' description",
     })
-    t.resolveType(() => 'TestObj')
   },
 })
 
 export const TestUnion = unionType({
   name: 'TestUnion',
+  resolveType() {
+    return 'Foo'
+  },
   definition(t) {
     t.members('Foo')
-    t.resolveType(() => 'Foo')
   },
 })
 
