@@ -5,6 +5,8 @@ describe('GH #361, interfaceType & implements', () => {
   test('should pass', () => {
     const Node = interfaceType({
       name: 'Node',
+      // other typegen file interfering here...
+      // @ts-ignore
       resolveType() {
         return 'User' as const
       },
