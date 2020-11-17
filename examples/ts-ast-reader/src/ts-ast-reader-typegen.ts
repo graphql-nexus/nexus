@@ -25,7 +25,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   ArrayTypeNode: ts.ArrayTypeNode
   BindingPattern: ts.BindingPattern
   CallSignatureDeclaration: ts.CallSignatureDeclaration
@@ -105,6 +105,9 @@ export interface NexusGenRootTypes {
     text?: string | null // String
   }
   VariableDeclaration: ts.VariableDeclaration
+}
+
+export interface NexusGenInterfaces {
   HasJSDoc: ts.HasJSDoc
   JSDocTag: ts.JSDocTag
   MaybeOptional:
@@ -116,18 +119,15 @@ export interface NexusGenRootTypes {
     | NexusGenRootTypes['PropertySignature']
     | NexusGenRootTypes['SetAccessorDeclaration']
   Node: ts.Node
+}
+
+export interface NexusGenUnions {
   DeclarationName: ts.DeclarationName
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  NodeFlags: NexusGenEnums['NodeFlags']
-  SyntaxKind: NexusGenEnums['SyntaxKind']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-}
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   ArrayTypeNode: {
@@ -2784,84 +2784,17 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames =
-  | 'ArrayTypeNode'
-  | 'BindingPattern'
-  | 'CallSignatureDeclaration'
-  | 'ClassDeclaration'
-  | 'ComputedPropertyName'
-  | 'ConditionalTypeNode'
-  | 'ConstructSignatureDeclaration'
-  | 'ConstructorDeclaration'
-  | 'ConstructorTypeNode'
-  | 'EnumDeclaration'
-  | 'ExportAssignment'
-  | 'ExportDeclaration'
-  | 'FunctionDeclaration'
-  | 'FunctionTypeNode'
-  | 'GetAccessorDeclaration'
-  | 'Identifier'
-  | 'ImportDeclaration'
-  | 'ImportEqualsDeclaration'
-  | 'ImportTypeNode'
-  | 'IndexSignatureDeclaration'
-  | 'IndexedAccessTypeNode'
-  | 'InferTypeNode'
-  | 'InterfaceDeclaration'
-  | 'IntersectionTypeNode'
-  | 'JSDoc'
-  | 'JSDocAugmentsTag'
-  | 'JSDocClassTag'
-  | 'JSDocEnumTag'
-  | 'JSDocNamespaceDeclaration'
-  | 'JSDocReturnTag'
-  | 'JSDocTemplateTag'
-  | 'JSDocThisTag'
-  | 'JSDocTypeTag'
-  | 'JSDocUnknownTag'
-  | 'KeywordTypeNode'
-  | 'LiteralType'
-  | 'MappedTypeNode'
-  | 'MethodDeclaration'
-  | 'MissingDeclaration'
-  | 'ModuleDeclaration'
-  | 'NamespaceDeclaration'
-  | 'NamespaceExportDeclaration'
-  | 'NumericLiteral'
-  | 'OptionalTypeNode'
-  | 'ParameterDeclaration'
-  | 'ParenthesizedType'
-  | 'PropertyDeclaration'
-  | 'PropertyLikeDeclaration'
-  | 'PropertySignature'
-  | 'QualifiedName'
-  | 'Query'
-  | 'RestTypeNode'
-  | 'SetAccessorDeclaration'
-  | 'SourceFile'
-  | 'StringLiteral'
-  | 'StringLiteralLike'
-  | 'ThisTypeNode'
-  | 'Token'
-  | 'TupleTypeNode'
-  | 'TypeAliasDeclaration'
-  | 'TypeLiteral'
-  | 'TypeParameterDeclaration'
-  | 'TypeReference'
-  | 'UNKNOWN_NODE'
-  | 'UnionType'
-  | 'UnnamedNode'
-  | 'VariableDeclaration'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
-export type NexusGenEnumNames = 'NodeFlags' | 'SyntaxKind'
+export type NexusGenEnumNames = keyof NexusGenEnums
 
-export type NexusGenInterfaceNames = 'HasJSDoc' | 'JSDocTag' | 'MaybeOptional' | 'Node'
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
-export type NexusGenUnionNames = 'DeclarationName'
+export type NexusGenUnionNames = keyof NexusGenUnions
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 

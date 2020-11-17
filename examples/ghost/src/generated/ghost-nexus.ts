@@ -3,11 +3,10 @@
  * Do not make changes to this file directly
  */
 
-import { core } from '@nexus/schema'
-import { FieldAuthorizeResolver } from '@nexus/schema/dist/plugins/fieldAuthorizePlugin'
 import * as ctx from '../data-sources/Context'
 import * as db from './ghost-db-types'
-
+import { FieldAuthorizeResolver } from '@nexus/schema/dist/plugins/fieldAuthorizePlugin'
+import { core } from '@nexus/schema'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(
@@ -42,20 +41,19 @@ export interface NexusGenScalars {
   Date: Date
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   Post: db.Posts
   Query: {}
   User: db.Users
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-  Date: NexusGenScalars['Date']
-}
+export interface NexusGenInterfaces {}
+
+export interface NexusGenUnions {}
+
+export type NexusGenRootTypes = NexusGenObjects
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Post: {
@@ -158,11 +156,11 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractTypesMapResolveTypeMethodReturnType {}
+export interface NexusGenAbstractTypeMembers {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Post' | 'Query' | 'User'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
@@ -170,9 +168,21 @@ export type NexusGenEnumNames = never
 
 export type NexusGenInterfaceNames = never
 
-export type NexusGenScalarNames = 'Boolean' | 'Date' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
+
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType = never
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    isTypeOf: true
+    resolveType: false
+    __typename: false
+  }
+}
 
 export interface NexusGenTypes {
   context: ctx.Context
@@ -198,7 +208,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractTypesMapResolveTypeMethodReturnType: NexusGenAbstractTypesMapResolveTypeMethodReturnType
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

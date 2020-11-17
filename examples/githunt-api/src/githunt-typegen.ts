@@ -22,7 +22,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   Comment: {
     // root type
     content?: string | null // String
@@ -67,15 +67,13 @@ export interface NexusGenRootTypes {
   }
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  FeedType: NexusGenEnums['FeedType']
-  VoteType: NexusGenEnums['VoteType']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-}
+export interface NexusGenInterfaces {}
+
+export interface NexusGenUnions {}
+
+export type NexusGenRootTypes = NexusGenObjects
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   Comment: {
@@ -229,15 +227,15 @@ export interface NexusGenAbstractTypeMembers {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Comment' | 'Entry' | 'Mutation' | 'Query' | 'Repository' | 'User' | 'Vote'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
-export type NexusGenEnumNames = 'FeedType' | 'VoteType'
+export type NexusGenEnumNames = keyof NexusGenEnums
 
 export type NexusGenInterfaceNames = never
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
 

@@ -67,7 +67,7 @@ export interface NexusGenScalars {
   Date: Date
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   BooleanConnection: {
     // root type
     edges?: Array<NexusGenRootTypes['BooleanEdge'] | null> | null // [BooleanEdge]
@@ -131,25 +131,22 @@ export interface NexusGenRootTypes {
     cursor: string // String!
     node?: NexusGenRootTypes['User'] | null // User
   }
+}
+
+export interface NexusGenInterfaces {
   Bar: core.Discriminate<'Foo', 'optional'> | core.Discriminate<'TestObj', 'optional'>
   Baz: core.Discriminate<'TestObj', 'optional'>
   Node: core.Discriminate<'TestObj', 'optional'>
   UnusedInterface: UnusedInterfaceTypeDef
+}
+
+export interface NexusGenUnions {
   TestUnion: core.Discriminate<'Foo', 'optional'>
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  InputType: NexusGenInputs['InputType']
-  InputType2: NexusGenInputs['InputType2']
-  NestedType: NexusGenInputs['NestedType']
-  SomeArg: NexusGenInputs['SomeArg']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-  Date: NexusGenScalars['Date']
-}
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   BooleanConnection: {
@@ -477,31 +474,17 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames =
-  | 'BooleanConnection'
-  | 'BooleanEdge'
-  | 'ComplexObject'
-  | 'DateConnection'
-  | 'DateEdge'
-  | 'Foo'
-  | 'Mutation'
-  | 'PageInfo'
-  | 'Query'
-  | 'SomeItem'
-  | 'TestObj'
-  | 'User'
-  | 'UserConnection'
-  | 'UserEdge'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
-export type NexusGenInputNames = 'InputType' | 'InputType2' | 'NestedType' | 'SomeArg'
+export type NexusGenInputNames = keyof NexusGenInputs
 
 export type NexusGenEnumNames = never
 
-export type NexusGenInterfaceNames = 'Bar' | 'Baz' | 'Node' | 'UnusedInterface'
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces
 
-export type NexusGenScalarNames = 'Boolean' | 'Date' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
-export type NexusGenUnionNames = 'TestUnion'
+export type NexusGenUnionNames = keyof NexusGenUnions
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 

@@ -50,30 +50,6 @@ export interface ApiKeys {
   updatedBy: ApiKeysFields.updatedBy
 }
 
-export namespace AppsFields {
-  export type id = string
-  export type name = string
-  export type slug = string
-  export type version = string
-  export type status = string
-  export type createdAt = Date
-  export type createdBy = string
-  export type updatedAt = Date | null
-  export type updatedBy = string | null
-}
-
-export interface Apps {
-  id: AppsFields.id
-  name: AppsFields.name
-  slug: AppsFields.slug
-  version: AppsFields.version
-  status: AppsFields.status
-  createdAt: AppsFields.createdAt
-  createdBy: AppsFields.createdBy
-  updatedAt: AppsFields.updatedAt
-  updatedBy: AppsFields.updatedBy
-}
-
 export namespace AppFieldsFields {
   export type id = string
   export type key = string
@@ -126,6 +102,30 @@ export interface AppSettings {
   updatedBy: AppSettingsFields.updatedBy
 }
 
+export namespace AppsFields {
+  export type id = string
+  export type name = string
+  export type slug = string
+  export type version = string
+  export type status = string
+  export type createdAt = Date
+  export type createdBy = string
+  export type updatedAt = Date | null
+  export type updatedBy = string | null
+}
+
+export interface Apps {
+  id: AppsFields.id
+  name: AppsFields.name
+  slug: AppsFields.slug
+  version: AppsFields.version
+  status: AppsFields.status
+  createdAt: AppsFields.createdAt
+  createdBy: AppsFields.createdBy
+  updatedAt: AppsFields.updatedAt
+  updatedBy: AppsFields.updatedBy
+}
+
 export namespace BruteFields {
   export type key = string
   export type firstRequest = number
@@ -140,6 +140,46 @@ export interface Brute {
   lastRequest: BruteFields.lastRequest
   lifetime: BruteFields.lifetime
   count: BruteFields.count
+}
+
+export namespace EmailBatchesFields {
+  export type id = string
+  export type emailId = string
+  export type providerId = string | null
+  export type status = string
+  export type createdAt = Date
+  export type updatedAt = Date
+}
+
+export interface EmailBatches {
+  id: EmailBatchesFields.id
+  emailId: EmailBatchesFields.emailId
+  providerId: EmailBatchesFields.providerId
+  status: EmailBatchesFields.status
+  createdAt: EmailBatchesFields.createdAt
+  updatedAt: EmailBatchesFields.updatedAt
+}
+
+export namespace EmailRecipientsFields {
+  export type id = string
+  export type emailId = string
+  export type memberId = string
+  export type batchId = string
+  export type processedAt = Date | null
+  export type memberUuid = string
+  export type memberEmail = string
+  export type memberName = string | null
+}
+
+export interface EmailRecipients {
+  id: EmailRecipientsFields.id
+  emailId: EmailRecipientsFields.emailId
+  memberId: EmailRecipientsFields.memberId
+  batchId: EmailRecipientsFields.batchId
+  processedAt: EmailRecipientsFields.processedAt
+  memberUuid: EmailRecipientsFields.memberUuid
+  memberEmail: EmailRecipientsFields.memberEmail
+  memberName: EmailRecipientsFields.memberName
 }
 
 export namespace EmailsFields {
@@ -186,49 +226,8 @@ export interface Emails {
   updatedBy: EmailsFields.updatedBy
 }
 
-export namespace EmailBatchesFields {
-  export type id = string
-  export type emailId = string
-  export type providerId = string | null
-  export type status = string
-  export type createdAt = Date
-  export type updatedAt = Date
-}
-
-export interface EmailBatches {
-  id: EmailBatchesFields.id
-  emailId: EmailBatchesFields.emailId
-  providerId: EmailBatchesFields.providerId
-  status: EmailBatchesFields.status
-  createdAt: EmailBatchesFields.createdAt
-  updatedAt: EmailBatchesFields.updatedAt
-}
-
-export namespace EmailRecipientsFields {
-  export type id = string
-  export type emailId = string
-  export type memberId = string
-  export type batchId = string
-  export type processedAt = Date | null
-  export type memberUuid = string
-  export type memberEmail = string
-  export type memberName = string | null
-}
-
-export interface EmailRecipients {
-  id: EmailRecipientsFields.id
-  emailId: EmailRecipientsFields.emailId
-  memberId: EmailRecipientsFields.memberId
-  batchId: EmailRecipientsFields.batchId
-  processedAt: EmailRecipientsFields.processedAt
-  memberUuid: EmailRecipientsFields.memberUuid
-  memberEmail: EmailRecipientsFields.memberEmail
-  memberName: EmailRecipientsFields.memberName
-}
-
 export namespace IntegrationsFields {
   export type id = string
-  export type type = string
   export type name = string
   export type slug = string
   export type iconImage = string | null
@@ -237,11 +236,11 @@ export namespace IntegrationsFields {
   export type createdBy = string
   export type updatedAt = Date | null
   export type updatedBy = string | null
+  export type type = string
 }
 
 export interface Integrations {
   id: IntegrationsFields.id
-  type: IntegrationsFields.type
   name: IntegrationsFields.name
   slug: IntegrationsFields.slug
   iconImage: IntegrationsFields.iconImage
@@ -250,6 +249,7 @@ export interface Integrations {
   createdBy: IntegrationsFields.createdBy
   updatedAt: IntegrationsFields.updatedAt
   updatedBy: IntegrationsFields.updatedBy
+  type: IntegrationsFields.type
 }
 
 export namespace InvitesFields {
@@ -300,30 +300,30 @@ export interface Labels {
 
 export namespace MembersFields {
   export type id = string
-  export type uuid = string | null
   export type email = string
-  export type name = string | null
-  export type note = string | null
-  export type geolocation = string | null
-  export type subscribed = boolean | null
   export type createdAt = Date
   export type createdBy = string
   export type updatedAt = Date | null
   export type updatedBy = string | null
+  export type name = string | null
+  export type note = string | null
+  export type subscribed = boolean | null
+  export type uuid = string | null
+  export type geolocation = string | null
 }
 
 export interface Members {
   id: MembersFields.id
-  uuid: MembersFields.uuid
   email: MembersFields.email
-  name: MembersFields.name
-  note: MembersFields.note
-  geolocation: MembersFields.geolocation
-  subscribed: MembersFields.subscribed
   createdAt: MembersFields.createdAt
   createdBy: MembersFields.createdBy
   updatedAt: MembersFields.updatedAt
   updatedBy: MembersFields.updatedBy
+  name: MembersFields.name
+  note: MembersFields.note
+  subscribed: MembersFields.subscribed
+  uuid: MembersFields.uuid
+  geolocation: MembersFields.geolocation
 }
 
 export namespace MembersLabelsFields {
@@ -519,11 +519,9 @@ export namespace PostsFields {
   export type plaintext = string | null
   export type featureImage = string | null
   export type featured = boolean
-  export type type = string
   export type status = string
   export type locale = string | null
   export type visibility = string
-  export type sendEmailWhenPublished = boolean | null
   export type authorId = string
   export type createdAt = Date
   export type createdBy = string
@@ -536,6 +534,8 @@ export namespace PostsFields {
   export type codeinjectionFoot = string | null
   export type customTemplate = string | null
   export type canonicalUrl = string | null
+  export type type = string
+  export type sendEmailWhenPublished = boolean | null
 }
 
 export interface Posts {
@@ -549,11 +549,9 @@ export interface Posts {
   plaintext: PostsFields.plaintext
   featureImage: PostsFields.featureImage
   featured: PostsFields.featured
-  type: PostsFields.type
   status: PostsFields.status
   locale: PostsFields.locale
   visibility: PostsFields.visibility
-  sendEmailWhenPublished: PostsFields.sendEmailWhenPublished
   authorId: PostsFields.authorId
   createdAt: PostsFields.createdAt
   createdBy: PostsFields.createdBy
@@ -566,6 +564,8 @@ export interface Posts {
   codeinjectionFoot: PostsFields.codeinjectionFoot
   customTemplate: PostsFields.customTemplate
   canonicalUrl: PostsFields.canonicalUrl
+  type: PostsFields.type
+  sendEmailWhenPublished: PostsFields.sendEmailWhenPublished
 }
 
 export namespace PostsAuthorsFields {
@@ -676,28 +676,28 @@ export interface Sessions {
 
 export namespace SettingsFields {
   export type id = string
-  export type group = string
   export type key = string
   export type value = string | null
   export type type = string
-  export type flags = string | null
   export type createdAt = Date
   export type createdBy = string
   export type updatedAt = Date | null
   export type updatedBy = string | null
+  export type group = string
+  export type flags = string | null
 }
 
 export interface Settings {
   id: SettingsFields.id
-  group: SettingsFields.group
   key: SettingsFields.key
   value: SettingsFields.value
   type: SettingsFields.type
-  flags: SettingsFields.flags
   createdAt: SettingsFields.createdAt
   createdBy: SettingsFields.createdBy
   updatedAt: SettingsFields.updatedAt
   updatedBy: SettingsFields.updatedBy
+  group: SettingsFields.group
+  flags: SettingsFields.flags
 }
 
 export namespace TagsFields {
@@ -708,22 +708,22 @@ export namespace TagsFields {
   export type featureImage = string | null
   export type parentId = string | null
   export type visibility = string
+  export type metaTitle = string | null
+  export type metaDescription = string | null
+  export type createdAt = Date
+  export type createdBy = string
+  export type updatedAt = Date | null
+  export type updatedBy = string | null
   export type ogImage = string | null
   export type ogTitle = string | null
   export type ogDescription = string | null
   export type twitterImage = string | null
   export type twitterTitle = string | null
   export type twitterDescription = string | null
-  export type metaTitle = string | null
-  export type metaDescription = string | null
   export type codeinjectionHead = string | null
   export type codeinjectionFoot = string | null
   export type canonicalUrl = string | null
   export type accentColor = string | null
-  export type createdAt = Date
-  export type createdBy = string
-  export type updatedAt = Date | null
-  export type updatedBy = string | null
 }
 
 export interface Tags {
@@ -734,22 +734,22 @@ export interface Tags {
   featureImage: TagsFields.featureImage
   parentId: TagsFields.parentId
   visibility: TagsFields.visibility
+  metaTitle: TagsFields.metaTitle
+  metaDescription: TagsFields.metaDescription
+  createdAt: TagsFields.createdAt
+  createdBy: TagsFields.createdBy
+  updatedAt: TagsFields.updatedAt
+  updatedBy: TagsFields.updatedBy
   ogImage: TagsFields.ogImage
   ogTitle: TagsFields.ogTitle
   ogDescription: TagsFields.ogDescription
   twitterImage: TagsFields.twitterImage
   twitterTitle: TagsFields.twitterTitle
   twitterDescription: TagsFields.twitterDescription
-  metaTitle: TagsFields.metaTitle
-  metaDescription: TagsFields.metaDescription
   codeinjectionHead: TagsFields.codeinjectionHead
   codeinjectionFoot: TagsFields.codeinjectionFoot
   canonicalUrl: TagsFields.canonicalUrl
   accentColor: TagsFields.accentColor
-  createdAt: TagsFields.createdAt
-  createdBy: TagsFields.createdBy
-  updatedAt: TagsFields.updatedAt
-  updatedBy: TagsFields.updatedBy
 }
 
 export namespace TokensFields {

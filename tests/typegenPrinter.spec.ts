@@ -74,8 +74,20 @@ describe('typegenPrinter', () => {
     expect(typegen.printArgTypeMap()).toMatchSnapshot()
   })
 
+  it('should print a object type map', () => {
+    expect(typegen.printObjectTypeMap()).toMatchSnapshot()
+  })
+
+  it('should print a interface type map', () => {
+    expect(typegen.printInterfaceTypeMap()).toMatchSnapshot()
+  })
+
+  it('should print a union type map', () => {
+    expect(typegen.printUnionTypeMap()).toMatchSnapshot()
+  })
+
   it('should print a root type map', () => {
-    expect(typegen.printRootTypeMap()).toMatchSnapshot()
+    expect(typegen.printRootTypeDef()).toMatchSnapshot()
   })
 
   it('should not print roots for fields with resolvers', () => {
@@ -94,7 +106,8 @@ describe('typegenPrinter', () => {
         }
         return false
       })
-    expect(typegen.printRootTypeMap()).toMatchSnapshot()
+    expect(typegen.printObjectTypeMap()).toMatchSnapshot()
+    expect(typegen.printRootTypeDef()).toMatchSnapshot()
   })
 
   it('should print a return type map', () => {
