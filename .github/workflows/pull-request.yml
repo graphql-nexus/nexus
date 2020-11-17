@@ -8,6 +8,7 @@ jobs:
       matrix:
         node-version: [10.x, 12.x]
         os: [macos-latest, ubuntu-latest, windows-latest]
+        test-types: [integrations, unit]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +18,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Test
-        run: yarn -s test:ci
+        run: yarn -s test:ci:${{ matrix.test-types }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '10.x'

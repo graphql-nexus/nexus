@@ -46,9 +46,12 @@
     "release:preview": "dripip preview",
     "release:stable": "dripip stable",
     "test": "yarn test:types && jest",
-    "test:ci": "yarn test:types && jest --coverage --maxWorkers 2",
+    "test:ci:integrations": "yarn test:integrations --coverage",
+    "test:ci:unit": "yarn test:unit --coverage",
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
+    "test:integrations": "yarn test integrations --maxWorkers 1",
     "test:types": "tsc -p tsconfig.spec.types.json",
+    "test:unit": "yarn test --testPathIgnorePatterns integrations",
     "ts-ast-reader": "cd examples/ts-ast-reader && yarn start",
     "unlink-examples": "yarn && yarn gulp unlink-examples",
     "upgrade-deps": "yarn && yarn gulp upgrade-deps"
