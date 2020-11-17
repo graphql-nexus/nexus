@@ -3,12 +3,14 @@ import {
   ExecutionArgs,
   GraphQLError,
   GraphQLFieldResolver,
+  GraphQLSchema,
   parse,
   printSchema,
   printType,
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
+import { SchemaConfig } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -59,7 +61,8 @@ const customResolveFn: GraphQLFieldResolver<any, any> = (root: any, args: any) =
 
 const makeTestSchema = (
   pluginConfig: ConnectionPluginConfig = {},
-  fieldConfig: Omit<ConnectionFieldConfig<any, any>, 'type'> = {}
+  fieldConfig: Omit<ConnectionFieldConfig<any, any>, 'type'> = {},
+  makeSchemaConfig: Omit<SchemaConfig, 'types'> = {}
 ) =>
   makeSchema({
     outputs: false,
@@ -84,6 +87,7 @@ const makeTestSchema = (
       input: false,
       output: false,
     },
+    ...makeSchemaConfig,
   })
 
 beforeEach(() => {
@@ -517,6 +521,51 @@ describe('basic behavior', () => {
       variableValues: { first: 1000 },
     })
     expect(result.data?.users.nodes.length).toEqual(10)
+  })
+
+  it('should respect nullability of connection field', async () => {
+    const getConnectionFieldType = (schema: GraphQLSchema) =>
+      schema.getQueryType().getFields()['users'].type.toString()
+
+    const nullable = makeTestSchema(
+      {},
+      {
+        nullable: true,
+      }
+    )
+    const nonNullable = makeTestSchema(
+      {},
+      {
+        nullable: false,
+      }
+    )
+    const nullableWithDefaultTrue = makeTestSchema(
+      {},
+      {
+        nullable: true,
+      },
+      {
+        nonNullDefaults: {
+          output: true,
+        },
+      }
+    )
+    const nonNullWithDefaultTrue = makeTestSchema(
+      {},
+      {
+        nullable: false,
+      },
+      {
+        nonNullDefaults: {
+          output: true,
+        },
+      }
+    )
+
+    expect(getConnectionFieldType(nullable)).toEqual('UserConnection')
+    expect(getConnectionFieldType(nonNullable)).toEqual('UserConnection!')
+    expect(getConnectionFieldType(nullableWithDefaultTrue)).toEqual('UserConnection')
+    expect(getConnectionFieldType(nonNullWithDefaultTrue)).toEqual('UserConnection!')
   })
 })
 

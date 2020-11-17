@@ -3,7 +3,7 @@ import { arg, ArgsRecord } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { list } from '../definitions/list'
 import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
-import { NexusNullDef } from '../definitions/nullable'
+import { NexusNullDef, nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
 import { NonNullConfig } from '../definitions/_types'
@@ -27,8 +27,6 @@ import {
   mapObj,
   pathToArray,
   printedGenTypingImport,
-  unwrapNexusDef,
-  wrapAsNexusType,
 } from '../utils'
 
 export interface ConnectionPluginConfig {
@@ -152,6 +150,11 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     | NexusNonNullDef<any>
     | NexusNullDef<any>
     | AllNexusNamedOutputTypeDefs
+  /**
+   * Whether the connection field can be null
+   * @default (depends on whether nullability is configured in type or schema)
+   */
+  nullable?: boolean
   /**
    * Additional args to use for just this field
    */
@@ -574,16 +577,19 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               resolveFn = makeResolveFn(pluginConfig, fieldConfig)
             }
 
-            const { wrapping } = unwrapNexusDef(
-              fieldConfig.type,
-              builder.getConfigOption('nonNullDefaults')?.output ?? false
-            )
+            const nonNullDefault =
+              fieldConfig.nonNullDefaults?.output ??
+              builder.getConfigOption('nonNullDefaults')?.output ??
+              false
+
+            const shouldBeNonNull =
+              fieldConfig.nullable !== undefined ? !fieldConfig.nullable : nonNullDefault
 
             // Add the field to the type.
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
-              type: wrapAsNexusType(connectionName, wrapping),
+              type: shouldBeNonNull ? nonNull(connectionName) : nullable(connectionName),
               resolve(root, args: PaginationArgs, ctx, info) {
                 validateArgs(args, info)
                 return resolveFn(root, args, ctx, info)
