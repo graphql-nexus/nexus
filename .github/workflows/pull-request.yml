@@ -8,7 +8,7 @@ jobs:
       matrix:
         node-version: [10.x, 12.x]
         os: [macos-latest, ubuntu-latest, windows-latest]
-        test-types: [integrations, unit]
+        test-types: [integration, unit]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
