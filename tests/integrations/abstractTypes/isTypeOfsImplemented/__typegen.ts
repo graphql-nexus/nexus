@@ -19,7 +19,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   A: {
     // root type
     name?: string | null // String
@@ -29,16 +29,17 @@ export interface NexusGenRootTypes {
     age?: number | null // Int
   }
   Query: {}
+}
+
+export interface NexusGenInterfaces {}
+
+export interface NexusGenUnions {
   Union: NexusGenRootTypes['A'] | NexusGenRootTypes['B']
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-}
+export type NexusGenRootTypes = NexusGenObjects & NexusGenUnions
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   A: {
@@ -78,7 +79,7 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'A' | 'B' | 'Query'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
@@ -86,9 +87,9 @@ export type NexusGenEnumNames = never
 
 export type NexusGenInterfaceNames = never
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
-export type NexusGenUnionNames = 'Union'
+export type NexusGenUnionNames = keyof NexusGenUnions
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = 'A' | 'B'
 

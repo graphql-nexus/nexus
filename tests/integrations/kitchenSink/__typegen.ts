@@ -42,7 +42,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   Mutation: {}
   OfI: {
     // root type
@@ -60,17 +60,17 @@ export interface NexusGenRootTypes {
   Query: {}
   Subscription: {}
   User: { firstName: string; lastName: string }
+}
+
+export interface NexusGenInterfaces {
   I: NexusGenRootTypes['OfI'] | NexusGenRootTypes['OfI2']
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  PostSearchInput: NexusGenInputs['PostSearchInput']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-}
+export interface NexusGenUnions {}
+
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Mutation: {
@@ -190,15 +190,15 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Mutation' | 'OfI' | 'OfI2' | 'Post' | 'Query' | 'Subscription' | 'User'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
-export type NexusGenInputNames = 'PostSearchInput'
+export type NexusGenInputNames = keyof NexusGenInputs
 
 export type NexusGenEnumNames = never
 
-export type NexusGenInterfaceNames = 'I'
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
 

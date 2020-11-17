@@ -37,27 +37,24 @@ export interface NexusGenScalars {
   UUID: any
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   Mutation: {}
   Post: {}
   Query: {}
   User: {}
+}
+
+export interface NexusGenInterfaces {
   Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>
+}
+
+export interface NexusGenUnions {
   ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  CreatePostInput: NexusGenInputs['CreatePostInput']
-  PostFilters: NexusGenInputs['PostFilters']
-  OrderEnum: NexusGenEnums['OrderEnum']
-  SomeEnum: NexusGenEnums['SomeEnum']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-  UUID: NexusGenScalars['UUID']
-}
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   Mutation: {
@@ -171,17 +168,17 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Mutation' | 'Post' | 'Query' | 'User'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
-export type NexusGenInputNames = 'CreatePostInput' | 'PostFilters'
+export type NexusGenInputNames = keyof NexusGenInputs
 
-export type NexusGenEnumNames = 'OrderEnum' | 'SomeEnum'
+export type NexusGenEnumNames = keyof NexusGenEnums
 
-export type NexusGenInterfaceNames = 'Node'
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String' | 'UUID'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
-export type NexusGenUnionNames = 'ExampleUnion'
+export type NexusGenUnionNames = keyof NexusGenUnions
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
