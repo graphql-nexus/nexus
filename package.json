@@ -46,7 +46,7 @@
     "release:preview": "dripip preview",
     "release:stable": "dripip stable",
     "test": "yarn test:types && jest",
-    "test:ci:integration": "yarn test:integrations --coverage",
+    "test:ci:integration": "yarn test:integration --coverage",
     "test:ci:unit": "yarn test:unit --coverage",
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
     "test:integration": "yarn test integrations",
