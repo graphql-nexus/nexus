@@ -23,7 +23,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjectTypes {
   Launch: t.Launch
   LaunchConnection: {
     // root type
@@ -47,6 +47,12 @@ export interface NexusGenRootTypes {
     id?: string | null // ID
   }
 }
+
+export interface NexusGenInterfaceTypes {}
+
+export interface NexusGenUnionTypes {}
+
+export type NexusGenRootTypes = NexusGenObjectTypes
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   PatchSize: NexusGenEnums['PatchSize']

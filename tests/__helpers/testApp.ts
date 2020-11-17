@@ -1,6 +1,5 @@
 /// <reference path="../_setup.ts" />
 import { writeFileSync } from 'fs'
-import { unlinkSync } from 'fs'
 import { join, relative } from 'path'
 import { core } from '../../src'
 import { BuilderConfigInput } from '../../src/core'
