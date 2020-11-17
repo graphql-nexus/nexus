@@ -589,7 +589,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
-              type: shouldBeNonNull ? nonNull(connectionName) : nullable(connectionName),
+              type: shouldBeNonNull ? nonNull(connectionName as any) : nullable(connectionName as any),
               resolve(root, args: PaginationArgs, ctx, info) {
                 validateArgs(args, info)
                 return resolveFn(root, args, ctx, info)
