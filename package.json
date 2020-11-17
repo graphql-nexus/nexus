@@ -46,7 +46,7 @@
     "release:preview": "dripip preview",
     "release:stable": "dripip stable",
     "test": "yarn test:types && jest",
-    "test:ci": "yarn test:types && jest --coverage --maxWorkers 2",
+    "test:ci": "yarn test:types && jest --coverage --runInBand",
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
     "test:types": "tsc -p tsconfig.spec.types.json",
     "ts-ast-reader": "cd examples/ts-ast-reader && yarn start",
