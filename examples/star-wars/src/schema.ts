@@ -32,4 +32,9 @@ export const schema = makeSchema({
     contextType: 'swapi.ContextType',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+    },
+  },
 })

@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { core, enumType, makeSchema, objectType, queryType } from '..'
+import { core, enumType, makeSchema, objectType, queryType } from '../src'
 import { A, B } from './_types'
 
 const { TypegenPrinter, TypegenMetadata } = core
@@ -121,7 +121,7 @@ describe('rootTypings', () => {
       name: 'SomeType',
       rootTyping: {
         name: 'invalid',
-        path: 'fzeffezpokm',
+        path: './fzeffezpokm',
       },
       definition(t) {
         t.id('id')
@@ -140,7 +140,7 @@ describe('rootTypings', () => {
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
-      `"Expected an absolute path for the root typing path of the type SomeType, saw fzeffezpokm"`
+      `"Expected an absolute path for the root typing path of the type SomeType, saw ./fzeffezpokm"`
     )
   })
 
@@ -174,7 +174,7 @@ describe('rootTypings', () => {
       typegen.print()
     } catch (e) {
       expect(e.message.replace(__dirname, '')).toMatchInlineSnapshot(
-        `"Root typing path /invalid_path.ts of the type SomeType does not exist"`
+        `"Root typing path /invalid_path.ts for the type SomeType does not exist"`
       )
     }
   })

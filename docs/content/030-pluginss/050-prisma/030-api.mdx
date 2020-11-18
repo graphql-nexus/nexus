@@ -427,13 +427,19 @@ input M_CreateInput {
   MRF: RM_CreateManyWithout_M  # ! <-- if not ? or @default
 }
 
-input RM_CreateManyWithout_M {
+input RM_CreateManyWithout_M_Input {
   connect: [RM_WhereUniqueInput!]
   create: [RM_CreateWithout_M_Input!]
+  connectOrCreate: [RM_CreateOrConnectWithout_M_Input]
 }
 
 input RM_WhereUniqueInput {
   MRF@unique: S
+}
+
+input RM_CreateOrConnectWithout_M_Input {
+  where: RM_WhereUniqueInput!
+  create: RM_CreateWithout_M_Input!
 }
 
 input RM_CreateWithout_M_Input = RM_CreateInput - RMRF: M
@@ -446,7 +452,7 @@ input RM_CreateWithout_M_Input = RM_CreateInput - RMRF: M
 
 ```prisma
 model User {
-  id    Int    @id @unique
+  id    Int    @id
   email String @unique
   posts Post[]
 }
@@ -501,19 +507,26 @@ type Mutation {
 
 type Post {
   author: User!
+  body: String!
   id: Int!
   title: String!
-  body: String!
 }
 
-input PostCreateManyWithoutPostsInput {
+input PostCreateManyWithoutAuthorInput {
   connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithoutauthorInput!]
   create: [PostCreateWithoutAuthorInput!]
 }
 
+input PostCreateOrConnectWithoutauthorInput {
+  create: PostCreateWithoutAuthorInput!
+  where: PostWhereUniqueInput!
+}
+
 input PostCreateWithoutAuthorInput {
-  title: String!
   body: String!
+  id: Int!
+  title: String!
 }
 
 input PostWhereUniqueInput {
@@ -524,12 +537,13 @@ input PostWhereUniqueInput {
 type User {
   email: String!
   id: Int!
-  posts: [Post!]!
+  posts(after: PostWhereUniqueInput, before: PostWhereUniqueInput, first: Int, last: Int): [Post!]!
 }
 
 input UserCreateInput {
   email: String!
-  posts: PostCreateManyWithoutPostsInput
+  id: Int!
+  posts: PostCreateManyWithoutAuthorInput
 }
 ```
 
@@ -601,7 +615,7 @@ input M_WhereUniqueInput {
 
 ```prisma
 model User {
-  id    Int    @id @unique
+  id    Int    @id
   email String @unique
 }
 ```
@@ -690,6 +704,7 @@ input M_UpdateInput {
 
 input RM_UpdateManyWithout_M_Input {
   connect: [RM_WhereUniqueInput!]
+  connectOrCreate: [RM_CreateOrConnectWithout_M_Input!]
   create: [RM_CreateWithout_M_Input!]
   delete: [RM_WhereUniqueInput!]
   deleteMany: [RM_ScalarWhereInput!] # see batch filtering reference
@@ -700,26 +715,31 @@ input RM_UpdateManyWithout_M_Input {
   upsert: [RM_UpsertWithWhereUniqueWithout_M_Input!]
 }
 
+input PostCreateOrConnectWithout_M_Input {
+  create: RM_CreateWithout_M_Input!
+  where: RM_WhereUniqueInput!
+}
+
 input RM_WhereUniqueInput {} # recurse pattern like M_WhereUniqueInput
 
 input RM_CreateWithout_M_Input {} # RM_CreateInput - RMRF: M
 
 input RM_UpdateWithWhereUniqueWithout_M_Input {
-  data: RM_UpdateWithout_M_DataInput!
+  data: RM_UpdateWithout_M_Input!
   where: RM_WhereUniqueInput!
 }
-input RM_UpdateWithout_M_DataInput {
+input RM_UpdateWithout_M_Input {
   RMSF: S
 }
 
 input RM_UpdateManyWithWhereNestedInput {
-  data: RM_UpdateManyDataInput!
+  data: RM_UpdateManyInput!
   where: RM_ScalarWhereInput! # see batch filtering reference
 }
 
 input RM_UpsertWithWhereUniqueWithout_M_Input {
   create: RM_CreateWithout_M_Input!
-  update: RM_UpdateWithout_M_DataInput!
+  update: RM_UpdateWithout_M_Input!
   where: RM_WhereUniqueInput!
 }
 ```
@@ -733,7 +753,7 @@ For `S_ScalarWhereInput` see [batch filtering](#batch-filtering) contributions.
 
 ```prisma
 model User {
-  id    Int    @id @unique
+  id    Int    @id
   email String @unique
   posts Post[]
 }
@@ -781,6 +801,14 @@ objectType({
 ```graphql
 # Generated
 
+input IntFieldUpdateOperationsInput {
+  decrement: Int
+  divide: Int
+  increment: Int
+  multiply: Int
+  set: Int
+}
+
 input IntFilter {
   equals: Int
   gt: Int
@@ -788,12 +816,37 @@ input IntFilter {
   in: [Int!]
   lt: Int
   lte: Int
-  not: Int
+  not: NestedIntFilter
   notIn: [Int!]
 }
 
 type Mutation {
   updateOneUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+}
+
+input NestedIntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input NestedStringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
 }
 
 type Post {
@@ -802,8 +855,14 @@ type Post {
   title: String!
 }
 
+input PostCreateOrConnectWithoutauthorInput {
+  create: PostCreateWithoutAuthorInput!
+  where: PostWhereUniqueInput!
+}
+
 input PostCreateWithoutAuthorInput {
   body: String!
+  id: Int!
   title: String!
 }
 
@@ -814,45 +873,47 @@ input PostScalarWhereInput {
   NOT: [PostScalarWhereInput!]
   OR: [PostScalarWhereInput!]
   title: StringFilter
+  userId: IntFilter
 }
 
-input PostUpdateManyDataInput {
-  body: String
-  id: Int
-  title: String
+input PostUpdateManyMutationInput {
+  body: StringFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
 }
 
 input PostUpdateManyWithoutAuthorInput {
   connect: [PostWhereUniqueInput!]
+  connectOrCreate: [PostCreateOrConnectWithoutauthorInput!]
   create: [PostCreateWithoutAuthorInput!]
   delete: [PostWhereUniqueInput!]
   deleteMany: [PostScalarWhereInput!]
   disconnect: [PostWhereUniqueInput!]
   set: [PostWhereUniqueInput!]
   update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
-  updateMany: [PostUpdateManyWithWhereNestedInput!]
+  updateMany: [PostUpdateManyWithWhereWithoutAuthorInput!]
   upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
 }
 
-input PostUpdateManyWithWhereNestedInput {
-  data: PostUpdateManyDataInput!
+input PostUpdateManyWithWhereWithoutAuthorInput {
+  data: PostUpdateManyMutationInput!
   where: PostScalarWhereInput!
 }
 
-input PostUpdateWithoutAuthorDataInput {
-  body: String
-  id: Int
-  title: String
+input PostUpdateWithoutAuthorInput {
+  body: StringFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
 }
 
 input PostUpdateWithWhereUniqueWithoutAuthorInput {
-  data: PostUpdateWithoutAuthorDataInput!
+  data: PostUpdateWithoutAuthorInput!
   where: PostWhereUniqueInput!
 }
 
 input PostUpsertWithWhereUniqueWithoutAuthorInput {
   create: PostCreateWithoutAuthorInput!
-  update: PostUpdateWithoutAuthorDataInput!
+  update: PostUpdateWithoutAuthorInput!
   where: PostWhereUniqueInput!
 }
 
@@ -861,8 +922,13 @@ input PostWhereUniqueInput {
   title: String
 }
 
-type Query {
-  ok: Boolean!
+enum QueryMode {
+  default
+  insensitive
+}
+
+input StringFieldUpdateOperationsInput {
+  set: String
 }
 
 input StringFilter {
@@ -874,7 +940,8 @@ input StringFilter {
   in: [String!]
   lt: String
   lte: String
-  not: String
+  mode: QueryMode
+  not: NestedStringFilter
   notIn: [String!]
   startsWith: String
 }
@@ -882,12 +949,12 @@ input StringFilter {
 type User {
   email: String!
   id: Int!
-  posts: [Post!]!
+  posts(after: PostWhereUniqueInput, before: PostWhereUniqueInput, first: Int, last: Int): [Post!]!
 }
 
 input UserUpdateInput {
-  email: String
-  id: Int
+  email: StringFieldUpdateOperationsInput
+  id: IntFieldUpdateOperationsInput
   posts: PostUpdateManyWithoutAuthorInput
 }
 
@@ -895,6 +962,7 @@ input UserWhereUniqueInput {
   email: String
   id: Int
 }
+
 ```
 
 </tab>
@@ -984,7 +1052,7 @@ input M_WhereUniqueInput {
 
 ```prisma
 model User {
-  id    Int    @id @unique
+  id    Int    @id
   email String @unique
   posts Post[]
 }
@@ -1104,7 +1172,7 @@ type Query {
 
 ```prisma
 model User {
-  id    Int    @id @unique
+  id    Int    @id
   email String @unique
   posts Post[]
 }
@@ -1736,21 +1804,21 @@ See [batch filtering contributions](#batch-filtering)
 
 ```prisma
 model User {
-  id     String     @id @unique @default(cuid())
+  id     String     @id @default(cuid())
   posts  Post[]
   age    Int
   status UserStatus
 }
 
 model Post {
-  id       String    @id @unique @default(cuid())
+  id       String    @id @default(cuid())
   author   User
   comments Comment[]
   rating   Float
 }
 
 model Comment {
-  id      String     @id @unique @default(cuid())
+  id      String     @id @default(cuid())
   author  User
   post    Post
   content String

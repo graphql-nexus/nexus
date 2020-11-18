@@ -1,12 +1,68 @@
 /// <reference path="../_setup.ts" />
-import { join } from 'path'
+import { writeFileSync } from 'fs'
+import { join, relative } from 'path'
 import { core } from '../../src'
+import { BuilderConfigInput } from '../../src/core'
 
 const { generateSchema, typegenFormatPrettier } = core
+
+type HookSettings = {
+  rootDir: string
+  config?: Partial<BuilderConfigInput>
+}
+
+export async function generateTypegen(settings: HookSettings) {
+  const rootDir = settings.rootDir
+
+  const typegenModulePath = join(rootDir, '__typegen.ts')
+  const entrypointModulePath = join(rootDir, '__app.ts')
+  const importPath = relative(rootDir, join(__dirname, '..', '..', 'src')).replace(/\\/g, '/')
+
+  const entrypoint = require(entrypointModulePath)
+  const { plugins, ...types } = entrypoint
+
+  await generateSchema({
+    types: types,
+    outputs: {
+      typegen: typegenModulePath,
+      schema: false,
+    },
+    shouldGenerateArtifacts: true,
+    plugins: plugins || [],
+    async formatTypegen(source, type) {
+      const prettierConfigPath = require.resolve('../../.prettierrc')
+      const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
+
+      return content.replace("'@nexus/schema'", `'${importPath}'`)
+    },
+    features: {
+      abstractTypeStrategies: {
+        resolveType: true,
+      },
+    },
+    ...(settings.config ?? {}),
+  })
+
+  return { typegenModulePath }
+}
+
+export function installGenerateTypegenHook(settings: HookSettings) {
+  let typegenPath: string | null = null
+  beforeAll(async () => {
+    const { typegenModulePath } = await generateTypegen(settings)
+
+    typegenPath = typegenModulePath
+  })
+
+  afterAll(() => {
+    writeFileSync(typegenPath!, '')
+  })
+}
 
 type Settings = {
   rootDir: string
   name?: string
+  typeCheckShouldSucceed?: boolean
 }
 
 /**
@@ -20,37 +76,22 @@ type Settings = {
  * - You must import the typegen module into your entrypoint module
  * - If you provide a `tsconfig.json` file in the root dir it will be used.
  */
-export const testApp = (settings: Settings) => {
+export function testApp(settings: Settings & HookSettings) {
   const name = settings?.name ?? 'app'
   const rootDir = settings.rootDir
+  const typeCheckShouldSucceed = settings.typeCheckShouldSucceed ?? true
 
-  const typegenModulePath = join(rootDir, '__typegen.ts')
-  const entrypointModulePath = join(rootDir, '__app.ts')
-
-  const entrypoint = require(entrypointModulePath)
-  const { plugins, ...types } = entrypoint
-
-  beforeAll(async () => {
-    await generateSchema({
-      types: types,
-      outputs: {
-        typegen: typegenModulePath,
-        schema: false,
-      },
-      shouldGenerateArtifacts: true,
-      plugins: plugins || [],
-      async formatTypegen(source, type) {
-        const prettierConfigPath = require.resolve('../../.prettierrc')
-        const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
-
-        return content.replace("'@nexus/schema'", "'../../..'")
-      },
-    })
-  })
+  installGenerateTypegenHook(settings)
 
   it(`can compile ${name} app with its typegen`, async () => {
-    expect({ rootDir }).toTypeCheck({
-      outDir: `/tmp/nexus-integration-test-${Date.now()}`,
-    })
+    if (typeCheckShouldSucceed) {
+      expect({ rootDir }).toTypeCheck({
+        outDir: `/tmp/nexus-integration-test-${Date.now()}`,
+      })
+    } else {
+      expect({ rootDir }).toNotTypeCheck({
+        outDir: `/tmp/nexus-integration-test-${Date.now()}`,
+      })
+    }
   })
 }

@@ -1,8 +1,8 @@
 import { GraphQLFieldResolver } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
+import { BaseScalars } from './_types'
 import { ArgsRecord } from './args'
 import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from './wrapping'
-import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
   /**
@@ -59,16 +59,14 @@ export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
 // prettier-ignore
 export type ScalarOutSpread<TypeName extends string, FieldName extends string> =
   NeedsResolver<TypeName, FieldName> extends true
-    ? HasGen3<'argTypes', TypeName, FieldName> extends true
-      ? [ScalarOutConfig<TypeName, FieldName>]
-      : [ScalarOutConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
+    ? [ScalarOutConfig<TypeName, FieldName>]
     : HasGen3<'argTypes', TypeName, FieldName> extends true
       ? [ScalarOutConfig<TypeName, FieldName>]
-      : [] | [FieldResolver<TypeName, FieldName>] | [ScalarOutConfig<TypeName, FieldName>]
+      : [ScalarOutConfig<TypeName, FieldName>] | []
 
 // prettier-ignore
 export type ScalarOutConfig<TypeName extends string, FieldName extends string> =
-    NeedsResolver<TypeName, FieldName> extends true
+  NeedsResolver<TypeName, FieldName> extends true
     ? OutputScalarConfig<TypeName, FieldName> &
       {
         resolve: FieldResolver<TypeName, FieldName>
@@ -160,12 +158,16 @@ export class OutputDefinitionBlock<TypeName extends string> {
       name: fieldName,
       type: typeName,
     }
+
     if (typeof opts[0] === 'function') {
-      // FIXME ditto to the one in `field` method
       config.resolve = opts[0] as any
+      console.warn(
+        `Since v0.18.0 Nexus no longer supports resolver shorthands like:\n\n    t.string("${fieldName}", () => ...).\n\nInstead please write:\n\n    t.string("${fieldName}", { resolve: () => ... })\n\nIn the next version of Nexus this will be a runtime error.`
+      )
     } else {
       config = { ...config, ...opts[0] }
     }
+
     this.typeBuilder.addField(this.decorateField(config))
   }
 

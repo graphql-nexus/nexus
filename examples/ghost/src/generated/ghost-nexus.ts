@@ -41,20 +41,19 @@ export interface NexusGenScalars {
   Date: Date
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   Post: db.Posts
   Query: {}
   User: db.Users
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-  Date: NexusGenScalars['Date']
-}
+export interface NexusGenInterfaces {}
+
+export interface NexusGenUnions {}
+
+export type NexusGenRootTypes = NexusGenObjects
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Post: {
@@ -100,6 +99,50 @@ export interface NexusGenFieldTypes {
   }
 }
 
+export interface NexusGenFieldTypeNames {
+  Post: {
+    // field return type name
+    html: 'String'
+    slug: 'String'
+    title: 'String'
+    uuid: 'String'
+  }
+  Query: {
+    // field return type name
+    me: 'User'
+    postById: 'Post'
+    userById: 'User'
+  }
+  User: {
+    // field return type name
+    accessibility: 'String'
+    bio: 'String'
+    coverImage: 'String'
+    createdAt: 'Date'
+    createdBy: 'User'
+    email: 'String'
+    facebook: 'String'
+    ghostAuthAccessToken: 'String'
+    ghostAuthId: 'String'
+    id: 'String'
+    lastSeen: 'Date'
+    locale: 'String'
+    location: 'String'
+    metaDescription: 'String'
+    metaTitle: 'String'
+    name: 'String'
+    profileImage: 'String'
+    slug: 'String'
+    status: 'String'
+    tour: 'String'
+    twitter: 'String'
+    updatedAt: 'Date'
+    updatedBy: 'String'
+    visibility: 'String'
+    website: 'String'
+  }
+}
+
 export interface NexusGenArgTypes {
   Query: {
     postById: {
@@ -113,11 +156,11 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {}
+export interface NexusGenAbstractTypeMembers {}
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Post' | 'Query' | 'User'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
@@ -125,9 +168,21 @@ export type NexusGenEnumNames = never
 
 export type NexusGenInterfaceNames = never
 
-export type NexusGenScalarNames = 'Boolean' | 'Date' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
+
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType = never
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    isTypeOf: true
+    resolveType: false
+    __typename: false
+  }
+}
 
 export interface NexusGenTypes {
   context: ctx.Context
@@ -135,6 +190,7 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
+  fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
   inheritedFields: NexusGenInheritedFields
   objectNames: NexusGenObjectNames
@@ -152,7 +208,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

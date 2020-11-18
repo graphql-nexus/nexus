@@ -1,10 +1,10 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
-import { IsEqual } from '../utils'
 import { BaseScalars } from './_types'
 import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
 import { ObjectDefinitionBuilder, objectType } from './objectType'
 import { AllNexusOutputTypeDefs } from './wrapping'
+import { IsEqual } from '../typeHelpersInternal'
 
 export interface SubscriptionTypeConfigBase<FieldName extends string, Event = any> {
   resolve(

@@ -24,22 +24,21 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   Droid: swapi.Droid
   Human: swapi.Human
   Query: {}
+}
+
+export interface NexusGenInterfaces {
   Character: swapi.Character
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  Episode: NexusGenEnums['Episode']
-  MoreEpisodes: NexusGenEnums['MoreEpisodes']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-}
+export interface NexusGenUnions {}
+
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects
+
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   Droid: {
@@ -140,23 +139,35 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypeMembers {
   Character: 'Droid' | 'Human'
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'Droid' | 'Human' | 'Query'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
-export type NexusGenEnumNames = 'Episode' | 'MoreEpisodes'
+export type NexusGenEnumNames = keyof NexusGenEnums
 
-export type NexusGenInterfaceNames = 'Character'
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
+
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType = 'Character'
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    resolveType: true
+    __typename: false
+    isTypeOf: false
+  }
+}
 
 export interface NexusGenTypes {
   context: swapi.ContextType
@@ -182,7 +193,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {

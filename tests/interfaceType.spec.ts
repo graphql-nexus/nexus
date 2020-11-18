@@ -1,6 +1,6 @@
 import { graphql } from 'graphql'
 import path from 'path'
-import { interfaceType, makeSchema, objectType, queryField } from '../src/core'
+import { generateSchema, interfaceType, makeSchema, objectType, queryField } from '../src/core'
 
 describe('interfaceType', () => {
   it('can be implemented by object types', async () => {
@@ -10,11 +10,13 @@ describe('interfaceType', () => {
           name: 'Node',
           definition(t) {
             t.id('id')
-            t.resolveType(() => null)
           },
         }),
         objectType({
           name: 'User',
+          isTypeOf(data) {
+            return typeof data.name === 'string'
+          },
           definition(t) {
             t.implements('Node')
             t.string('name')
@@ -52,7 +54,6 @@ describe('interfaceType', () => {
           name: 'LivingOrganism',
           definition(t) {
             t.string('type')
-            t.resolveType(() => null)
           },
         }),
         interfaceType({
@@ -60,7 +61,6 @@ describe('interfaceType', () => {
           definition(t) {
             t.implements('LivingOrganism')
             t.string('classification')
-            t.resolveType(() => null)
           },
         }),
         interfaceType({
@@ -68,11 +68,13 @@ describe('interfaceType', () => {
           definition(t) {
             t.implements('Animal')
             t.string('owner')
-            t.resolveType(() => null)
           },
         }),
         objectType({
           name: 'Dog',
+          isTypeOf(data) {
+            return typeof data.breed === 'string'
+          },
           definition(t) {
             t.implements('Pet')
             t.string('breed')
@@ -127,6 +129,45 @@ describe('interfaceType', () => {
       })
     ).toThrowErrorMatchingSnapshot()
   })
+  it('deduplicates interfaces implementing interfaces', async () => {
+    const { schemaTypes } = await generateSchema.withArtifacts(
+      {
+        types: [
+          interfaceType({
+            name: 'Node',
+            resolveType() {
+              return null
+            },
+            definition(t) {
+              t.id('id')
+            },
+          }),
+          interfaceType({
+            name: 'Node2',
+            resolveType() {
+              return null
+            },
+            definition(t) {
+              t.implements('Node')
+              t.id('id2')
+            },
+          }),
+          objectType({
+            name: 'Foo',
+            isTypeOf() {
+              return true
+            },
+            definition(t) {
+              t.implements('Node2', 'Node')
+            },
+          }),
+        ],
+        outputs: false,
+      },
+      false
+    )
+    expect(schemaTypes).toMatchSnapshot()
+  })
   it('detects circular dependencies', async () => {
     expect(() =>
       makeSchema({
@@ -171,6 +212,11 @@ describe('interfaceType', () => {
       ],
       outputs: false,
       shouldGenerateArtifacts: false,
+      features: {
+        abstractTypeStrategies: {
+          resolveType: true,
+        },
+      },
     })
     expect(spy.mock.calls[0]).toMatchSnapshot()
     expect(spy).toBeCalledTimes(1)

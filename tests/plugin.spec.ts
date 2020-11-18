@@ -46,6 +46,11 @@ describe('plugin', () => {
         }),
         nullGuardPlugin,
       ],
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
     })
     const result = await graphql(
       schema,
@@ -91,6 +96,11 @@ describe('plugin', () => {
       outputs: false,
       types: [buildSchema(EXAMPLE_SDL), nullGuardPlugin],
       plugins: [nullGuardPlugin],
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
     })
   })
 
@@ -208,9 +218,17 @@ describe('plugin', () => {
     //
     const schema = makeSchema({
       outputs: false,
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
       types: [
         interfaceType({
           name: 'Node',
+          resolveType(n) {
+            return n.__typename
+          },
           definition(t) {
             t.id('id', {
               nullable: false,
@@ -218,7 +236,6 @@ describe('plugin', () => {
                 throw new Error('Abstract')
               },
             })
-            t.resolveType((n) => n.__typename)
           },
         }),
         objectType({

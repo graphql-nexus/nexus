@@ -2,6 +2,7 @@ import { buildSchema, GraphQLField, GraphQLInterfaceType, GraphQLObjectType } fr
 import * as path from 'path'
 import { core } from '../src'
 import { EXAMPLE_SDL } from './_sdl'
+
 const { makeSchema, TypegenPrinter, TypegenMetadata } = core
 
 describe('typegenPrinter', () => {
@@ -9,12 +10,15 @@ describe('typegenPrinter', () => {
   let metadata: core.TypegenMetadata
   beforeEach(async () => {
     const schema = makeSchema({
-      outputs: {
-        typegen: path.join(__dirname, 'typegen/types.gen.ts'),
-        schema: path.join(__dirname, 'typegen/schema.gen.graphql'),
-      },
+      outputs: false,
       shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
+      // __typename put to true to prevent from erroring because of missing resolveType
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
       prettierConfig: path.join(__dirname, '../.prettierrc'),
     }) as core.NexusGraphQLSchema
     metadata = new TypegenMetadata({
@@ -64,8 +68,20 @@ describe('typegenPrinter', () => {
     expect(typegen.printArgTypeMap()).toMatchSnapshot()
   })
 
+  it('should print a object type map', () => {
+    expect(typegen.printObjectTypeMap()).toMatchSnapshot()
+  })
+
+  it('should print a interface type map', () => {
+    expect(typegen.printInterfaceTypeMap()).toMatchSnapshot()
+  })
+
+  it('should print a union type map', () => {
+    expect(typegen.printUnionTypeMap()).toMatchSnapshot()
+  })
+
   it('should print a root type map', () => {
-    expect(typegen.printRootTypeMap()).toMatchSnapshot()
+    expect(typegen.printRootTypeDef()).toMatchSnapshot()
   })
 
   it('should not print roots for fields with resolvers', () => {
@@ -84,7 +100,8 @@ describe('typegenPrinter', () => {
         }
         return false
       })
-    expect(typegen.printRootTypeMap()).toMatchSnapshot()
+    expect(typegen.printObjectTypeMap()).toMatchSnapshot()
+    expect(typegen.printRootTypeDef()).toMatchSnapshot()
   })
 
   it('should print a return type map', () => {

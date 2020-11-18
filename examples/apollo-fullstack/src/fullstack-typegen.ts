@@ -23,7 +23,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjectTypes {
   Launch: t.Launch
   LaunchConnection: {
     // root type
@@ -47,6 +47,12 @@ export interface NexusGenRootTypes {
     id?: string | null // ID
   }
 }
+
+export interface NexusGenInterfaceTypes {}
+
+export interface NexusGenUnionTypes {}
+
+export type NexusGenRootTypes = NexusGenObjectTypes
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   PatchSize: NexusGenEnums['PatchSize']
@@ -196,7 +202,7 @@ export interface NexusGenArgTypes {
   }
 }
 
-export interface NexusGenAbstractResolveReturnTypes {}
+export interface NexusGenAbstractTypeMembers {}
 
 export interface NexusGenInheritedFields {}
 
@@ -219,6 +225,18 @@ export type NexusGenInterfaceNames = never
 export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
 
 export type NexusGenUnionNames = never
+
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
+
+export type NexusGenAbstractsUsingStrategyResolveType = never
+
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    isTypeOf: true
+    resolveType: false
+    __typename: false
+  }
+}
 
 export interface NexusGenTypes {
   context: t.Context
@@ -244,7 +262,10 @@ export interface NexusGenTypes {
     | NexusGenTypes['scalarNames']
   allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames']
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes
+  abstractTypeMembers: NexusGenAbstractTypeMembers
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
+  features: NexusGenFeaturesConfig
 }
 
 declare global {
