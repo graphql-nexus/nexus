@@ -1,8 +1,7 @@
-import { GraphQLNamedType } from 'graphql'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from '../dynamicMethod'
 import { DynamicOutputPropertyDef } from '../dynamicProperty'
 import { NexusPlugin } from '../plugin'
-import { AllInputTypes } from '../typegenTypeHelpers'
+import { AllInputTypes, GetGen } from '../typegenTypeHelpers'
 import { PrintedGenTyping, PrintedGenTypingImport } from '../utils'
 import { NexusArgDef } from './args'
 import { NexusEnumTypeDef } from './enumType'
@@ -10,26 +9,65 @@ import { NexusExtendInputTypeDef } from './extendInputType'
 import { NexusExtendTypeDef } from './extendType'
 import { NexusInputObjectTypeDef } from './inputObjectType'
 import { NexusInterfaceTypeDef } from './interfaceType'
+import { NexusListDef } from './list'
+import { NexusNonNullDef } from './nonNull'
+import { NexusNullDef } from './nullable'
 import { NexusObjectTypeDef } from './objectType'
 import { NexusScalarTypeDef } from './scalarType'
 import { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
 
-export type AllNexusInputTypeDefs<T extends string = any> =
+export type AllNexusNamedInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>
 
-export type AllNexusOutputTypeDefs =
+export type AllNexusInputTypeDefs<T extends string = any> =
+  | AllNexusNamedInputTypeDefs<T>
+  | NexusListDef<any>
+  | NexusNonNullDef<any>
+  | NexusNullDef<any>
+
+export type AllNexusNamedOutputTypeDefs =
   | NexusObjectTypeDef<any>
   | NexusInterfaceTypeDef<any>
   | NexusUnionTypeDef<any>
   | NexusEnumTypeDef<any>
   | NexusScalarTypeDef<any>
 
-export type AllNexusNamedTypeDefs = AllNexusInputTypeDefs | AllNexusOutputTypeDefs
+export type AllNexusOutputTypeDefs =
+  | AllNexusNamedOutputTypeDefs
+  | NexusListDef<any>
+  | NexusNonNullDef<any>
+  | NexusNullDef<any>
 
-export type AllTypeDefs = AllNexusInputTypeDefs | AllNexusOutputTypeDefs | GraphQLNamedType
+export type AllNexusNamedTypeDefs = AllNexusNamedInputTypeDefs | AllNexusNamedOutputTypeDefs
+
+export type AllNexusTypeDefs = AllNexusOutputTypeDefs | AllNexusInputTypeDefs
+
+export type NexusListableTypes =
+  | AllNamedTypeDefs
+  | NexusArgDef<any>
+  | NexusListDef<NexusListableTypes>
+  | NexusNonNullDef<NexusNonNullableTypes>
+  | NexusNullDef<NexusNullableTypes>
+
+export type NexusNonNullableTypes = AllNamedTypeDefs | NexusListDef<NexusListableTypes> | NexusArgDef<any>
+
+export type NexusNullableTypes = AllNamedTypeDefs | NexusListDef<NexusListableTypes> | NexusArgDef<any>
+
+export type AllNamedTypeDefs = GetGen<'allNamedTypes', string> | AllNexusNamedTypeDefs
+
+export type AllNexusNamedArgsDefs<T extends AllInputTypes = AllInputTypes> =
+  | T
+  | NexusArgDef<T>
+  | AllNexusNamedInputTypeDefs<T>
+
+export type AllNexusArgsDefs =
+  | AllNexusNamedArgsDefs
+  | NexusListDef<any>
+  | NexusNonNullDef<any>
+  | NexusNullDef<any>
 
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
@@ -49,8 +87,26 @@ export function isNexusStruct(obj: any): obj is { [NexusWrappedSymbol]: NexusTyp
   return obj && Boolean(obj[NexusWrappedSymbol])
 }
 export function isNexusNamedTypeDef(obj: any): obj is AllNexusNamedTypeDefs {
-  return isNexusStruct(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol])
+  return isNexusStruct(obj) && NamedTypeDefs.has(obj[NexusWrappedSymbol]) && 'name' in obj
 }
+export function isNexusListTypeDef(obj: any): obj is NexusListDef<any> {
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.List
+}
+
+export function isNexusNonNullTypeDef(obj: any): obj is NexusNonNullDef<any> {
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.NonNull
+}
+
+export function isNexusNullTypeDef(obj: any): obj is NexusNullDef<any> {
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Null
+}
+
+export function isNexusWrappingType(
+  obj: any
+): obj is NexusListDef<any> | NexusNullDef<any> | NexusNonNullDef<any> {
+  return isNexusListTypeDef(obj) || isNexusNullTypeDef(obj) || isNexusNonNullTypeDef(obj)
+}
+
 export function isNexusExtendInputTypeDef(obj: any): obj is NexusExtendInputTypeDef<string> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.ExtendInputObject
 }

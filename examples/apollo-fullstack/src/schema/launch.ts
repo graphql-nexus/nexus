@@ -1,11 +1,11 @@
+import { list, objectType } from '@nexus/schema'
 import dedent from 'dedent'
-import { objectType } from '@nexus/schema'
 
 export const Launch = objectType({
   name: 'Launch',
   definition: (t) => {
     t.id('id')
-    t.string('site', { nullable: true })
+    t.string('site')
     t.field('mission', { type: 'Mission' })
     t.field('rocket', { type: 'Rocket' })
     t.boolean('isBooked', {
@@ -26,8 +26,8 @@ export const LaunchConnection = objectType({
     after these.
   `,
   definition: (t) => {
-    t.string('cursor', { nullable: true })
+    t.string('cursor')
     t.boolean('hasMore')
-    t.field('launches', { type: 'Launch', list: [false] })
+    t.field('launches', { type: list('Launch') })
   },
 })

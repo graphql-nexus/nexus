@@ -1,242 +1,240 @@
-import { objectType, arg } from "@nexus/schema";
-import { nodeType, functionLikeDeclaration, hasTypeParameters } from "./mixins";
-import { filteredNodesList } from "./utils";
+import { objectType, arg, list, nullable } from '@nexus/schema'
+import { nodeType, functionLikeDeclaration, hasTypeParameters } from './mixins'
+import { filteredNodesList } from './utils'
 
 const nodeSkipSyntax = {
-  skip: arg({ type: "SyntaxKind", list: true }),
-  only: arg({ type: "SyntaxKind", list: true }),
-};
+  skip: arg({ type: list('SyntaxKind') }),
+  only: arg({ type: list('SyntaxKind') }),
+}
 
 export const ExportAssignment = objectType({
-  name: "ExportAssignment",
+  name: 'ExportAssignment',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const SourceFile = objectType({
-  name: "SourceFile",
+  name: 'SourceFile',
   definition(t) {
-    nodeType(t);
-    t.list.field("statements", {
-      type: "Node",
+    nodeType(t)
+    t.list.field('statements', {
+      type: 'Node',
       args: nodeSkipSyntax,
-      resolve: (root, args) =>
-        filteredNodesList(args, Array.from(root.statements)),
-    });
+      resolve: (root, args) => filteredNodesList(args, Array.from(root.statements)),
+    })
   },
-});
+})
 
 export const TypeParameterDeclaration = objectType({
-  name: "TypeParameterDeclaration",
+  name: 'TypeParameterDeclaration',
   definition(t) {
-    nodeType(t);
-    t.field("constraint", { type: "Node" });
-    t.field("default", { type: "Node" });
-    t.field("expression", { type: "Node" });
+    nodeType(t)
+    t.field('constraint', { type: 'Node' })
+    t.field('default', { type: 'Node' })
+    t.field('expression', { type: 'Node' })
   },
-});
+})
 
 export const CallSignatureDeclaration = objectType({
-  name: "CallSignatureDeclaration",
+  name: 'CallSignatureDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ConstructSignatureDeclaration = objectType({
-  name: "ConstructSignatureDeclaration",
+  name: 'ConstructSignatureDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const VariableDeclaration = objectType({
-  name: "VariableDeclaration",
+  name: 'VariableDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ParameterDeclaration = objectType({
-  name: "ParameterDeclaration",
+  name: 'ParameterDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    t.field("type", { type: "Node", nullable: true });
+    nodeType(t)
+    t.implements('HasJSDoc')
+    t.field('type', { type: 'Node' })
   },
-});
+})
 
 export const PropertySignature = objectType({
-  name: "PropertySignature",
+  name: 'PropertySignature',
   definition(t) {
-    t.implements("Node", "HasJSDoc", "MaybeOptional");
-    t.field("type", { type: "Node", nullable: true });
+    t.implements('Node', 'HasJSDoc', 'MaybeOptional')
+    t.field('type', { type: nullable('Node') })
   },
-});
+})
 
 export const PropertyDeclaration = objectType({
-  name: "PropertyDeclaration",
+  name: 'PropertyDeclaration',
   definition(t) {
-    t.implements("Node", "HasJSDoc", "MaybeOptional");
+    t.implements('Node', 'HasJSDoc', 'MaybeOptional')
   },
-});
+})
 
 export const PropertyLikeDeclaration = objectType({
-  name: "PropertyLikeDeclaration",
+  name: 'PropertyLikeDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const FunctionDeclaration = objectType({
-  name: "FunctionDeclaration",
+  name: 'FunctionDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    functionLikeDeclaration(t);
+    nodeType(t)
+    t.implements('HasJSDoc')
+    functionLikeDeclaration(t)
   },
-});
+})
 
 export const MethodDeclaration = objectType({
-  name: "MethodDeclaration",
+  name: 'MethodDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    functionLikeDeclaration(t);
+    nodeType(t)
+    t.implements('HasJSDoc')
+    functionLikeDeclaration(t)
   },
-});
+})
 
 export const ConstructorDeclaration = objectType({
-  name: "ConstructorDeclaration",
+  name: 'ConstructorDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    functionLikeDeclaration(t);
+    nodeType(t)
+    t.implements('HasJSDoc')
+    functionLikeDeclaration(t)
   },
-});
+})
 
 export const GetAccessorDeclaration = objectType({
-  name: "GetAccessorDeclaration",
+  name: 'GetAccessorDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    functionLikeDeclaration(t);
+    nodeType(t)
+    t.implements('HasJSDoc')
+    functionLikeDeclaration(t)
   },
-});
+})
 
 export const SetAccessorDeclaration = objectType({
-  name: "SetAccessorDeclaration",
+  name: 'SetAccessorDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    functionLikeDeclaration(t);
+    nodeType(t)
+    t.implements('HasJSDoc')
+    functionLikeDeclaration(t)
   },
-});
+})
 
 export const IndexSignatureDeclaration = objectType({
-  name: "IndexSignatureDeclaration",
+  name: 'IndexSignatureDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
+    nodeType(t)
+    t.implements('HasJSDoc')
   },
-});
+})
 
 export const MissingDeclaration = objectType({
-  name: "MissingDeclaration",
+  name: 'MissingDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ClassDeclaration = objectType({
-  name: "ClassDeclaration",
+  name: 'ClassDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    t.list.field("members", {
-      type: "Node",
+    nodeType(t)
+    t.implements('HasJSDoc')
+    t.list.field('members', {
+      type: 'Node',
       args: nodeSkipSyntax,
-      resolve: (root, args) =>
-        filteredNodesList(args, Array.from(root.members)),
-    });
+      resolve: (root, args) => filteredNodesList(args, Array.from(root.members)),
+    })
   },
-});
+})
 
 export const InterfaceDeclaration = objectType({
-  name: "InterfaceDeclaration",
+  name: 'InterfaceDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
+    nodeType(t)
+    t.implements('HasJSDoc')
   },
-});
+})
 
 export const TypeAliasDeclaration = objectType({
-  name: "TypeAliasDeclaration",
+  name: 'TypeAliasDeclaration',
   definition(t) {
-    nodeType(t);
-    hasTypeParameters(t);
-    t.implements("HasJSDoc");
-    t.field("type", { type: "Node", nullable: true });
+    nodeType(t)
+    hasTypeParameters(t)
+    t.implements('HasJSDoc')
+    t.field('type', { type: nullable('Node') })
   },
-});
+})
 
 export const EnumDeclaration = objectType({
-  name: "EnumDeclaration",
+  name: 'EnumDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
-    t.field("members", { type: "Node", list: true });
+    nodeType(t)
+    t.implements('HasJSDoc')
+    t.field('members', { type: list('Node') })
   },
-});
+})
 
 export const ModuleDeclaration = objectType({
-  name: "ModuleDeclaration",
+  name: 'ModuleDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
+    nodeType(t)
+    t.implements('HasJSDoc')
   },
-});
+})
 
 export const NamespaceDeclaration = objectType({
-  name: "NamespaceDeclaration",
+  name: 'NamespaceDeclaration',
   definition(t) {
-    nodeType(t);
-    t.implements("HasJSDoc");
+    nodeType(t)
+    t.implements('HasJSDoc')
   },
-});
+})
 
 export const JSDocNamespaceDeclaration = objectType({
-  name: "JSDocNamespaceDeclaration",
+  name: 'JSDocNamespaceDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ImportEqualsDeclaration = objectType({
-  name: "ImportEqualsDeclaration",
+  name: 'ImportEqualsDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ImportDeclaration = objectType({
-  name: "ImportDeclaration",
+  name: 'ImportDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const NamespaceExportDeclaration = objectType({
-  name: "NamespaceExportDeclaration",
+  name: 'NamespaceExportDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ExportDeclaration = objectType({
-  name: "ExportDeclaration",
+  name: 'ExportDeclaration',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})

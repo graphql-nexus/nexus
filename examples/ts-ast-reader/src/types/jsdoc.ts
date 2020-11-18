@@ -1,11 +1,11 @@
-import { interfaceType, objectType, blocks } from '@nexus/schema'
+import { interfaceType, objectType, blocks, nullable } from '@nexus/schema'
 import ts from 'typescript'
 
 export const JSDoc = objectType({
   name: 'JSDoc',
   definition: (t) => {
-    t.string('comment', { nullable: true })
-    t.list.field('tags', { type: 'JSDocTag', nullable: true })
+    t.field('comment', { type: nullable('String') })
+    t.list.field('tags', { type: nullable('JSDocTag') })
   },
 })
 
@@ -18,11 +18,11 @@ export const JSDocTag = interfaceType({
     return 'JSDocUnknownTag'
   },
   definition(t) {
-    t.string('tagName', {
-      nullable: true,
+    t.field('tagName', {
+      type: nullable('String'),
       resolve: (root) => `${root.tagName.escapedText}`,
     })
-    t.string('comment', { nullable: true })
+    t.field('comment', { type: nullable('String') })
   },
 })
 

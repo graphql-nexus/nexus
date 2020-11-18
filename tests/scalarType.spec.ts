@@ -43,9 +43,9 @@ describe('scalarType', () => {
               name: 'SomeInput',
               definition(t) {
                 // @ts-ignore
-                t.date('date', { required: true })
+                t.date('date')
               },
-            }).asArg({ required: true }),
+            }).asArg(),
           },
           resolve: (root, args) => ({
             id: `User:1`,

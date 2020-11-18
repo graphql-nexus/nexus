@@ -2,6 +2,7 @@ import { graphql, GraphQLID, GraphQLNonNull, GraphQLObjectType } from 'graphql'
 import {
   enumType,
   interfaceType,
+  list,
   makeSchema,
   NullabilityGuardConfig,
   nullabilityGuardPlugin,
@@ -93,13 +94,11 @@ const types = [
     }),
   }),
   queryField('intList', {
-    type: 'Int',
-    list: [true],
+    type: list('Int'),
     resolve: () => [1, 2, null],
   }),
   queryField('userList', {
-    type: 'User',
-    list: [true],
+    type: list('User'),
     resolve: () => [null, Promise.resolve(null), null],
   }),
   queryField('interfaceType', {
@@ -459,9 +458,7 @@ describe('nullabilityGuardPlugin', () => {
       makeSchema({
         types: [
           queryField('nullableList', {
-            type: 'String',
-            list: [true],
-            nullable: true,
+            type: list('String'),
             resolve: async () => null,
           }),
         ],

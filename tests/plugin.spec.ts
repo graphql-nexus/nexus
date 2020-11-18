@@ -1,5 +1,14 @@
 import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
-import { interfaceType, makeSchema, MiddlewareFn, objectType, plugin, queryField } from '../src/core'
+import {
+  interfaceType,
+  list,
+  makeSchema,
+  MiddlewareFn,
+  nonNull,
+  objectType,
+  plugin,
+  queryField,
+} from '../src/core'
 import { nullabilityGuardPlugin } from '../src/plugins'
 import { EXAMPLE_SDL } from './_sdl'
 
@@ -151,8 +160,8 @@ describe('plugin', () => {
                 return objectType({
                   name: name,
                   definition(t) {
-                    t.list.field('edges', {
-                      type: `${typeName}Edge`,
+                    t.field('edges', {
+                      type: list(`${typeName}Edge`),
                     })
                     t.field('connectionInfo', {
                       type: 'ConnectionInfo',
@@ -230,8 +239,8 @@ describe('plugin', () => {
             return n.__typename
           },
           definition(t) {
-            t.id('id', {
-              nullable: false,
+            t.field('id', {
+              type: nonNull('ID'),
               resolve: () => {
                 throw new Error('Abstract')
               },
@@ -258,8 +267,8 @@ describe('plugin', () => {
             const node = (config as any).node as any
             if (node) {
               t.implements('Node')
-              t.id('id', {
-                nullable: false,
+              t.field('id', {
+                type: nonNull('ID'),
                 resolve: (root) => `${config.name}:${root[node]}`,
               })
             }

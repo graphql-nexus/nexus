@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { makeSchema, objectType, queryField } from '../src/core'
+import { list, makeSchema, objectType, queryField } from '../src/core'
 
 describe('objectType', () => {
   it('builds creates an object type', async () => {
@@ -68,8 +68,7 @@ describe('objectType', () => {
           name: 'throwingList',
           definition(t) {
             t.list.field('someField', {
-              list: true,
-              type: 'Boolean',
+              type: list('Boolean'),
             })
           },
         }),

@@ -1,6 +1,7 @@
 import { buildSchema, GraphQLField, GraphQLInterfaceType, GraphQLObjectType } from 'graphql'
 import * as path from 'path'
 import { core } from '../src'
+import { typegenFormatPrettier } from '../src/core'
 import { EXAMPLE_SDL } from './_sdl'
 
 const { makeSchema, TypegenPrinter, TypegenMetadata } = core
@@ -19,7 +20,12 @@ describe('typegenPrinter', () => {
           __typename: true,
         },
       },
-      prettierConfig: path.join(__dirname, '../.prettierrc'),
+      async formatTypegen(source, type) {
+        const prettierConfigPath = require.resolve('../.prettierrc')
+        const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
+
+        return content.replace("'@nexus/schema'", `'../../src'`)
+      },
     }) as core.NexusGraphQLSchema
     metadata = new TypegenMetadata({
       outputs: {
