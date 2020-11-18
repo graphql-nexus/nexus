@@ -2,8 +2,8 @@ import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { arg, ArgsRecord } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { list } from '../definitions/list'
-import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
-import { NexusNullDef, nullable } from '../definitions/nullable'
+import { nonNull } from '../definitions/nonNull'
+import { nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
 import { NonNullConfig } from '../definitions/_types'
@@ -20,7 +20,6 @@ import {
 } from '../typegenTypeHelpers'
 import {
   eachObj,
-  getNexusNamedType,
   getOwnPackage,
   isObject,
   isPromiseLike,
