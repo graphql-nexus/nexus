@@ -41,14 +41,14 @@ import {
   stringArg,
 } from '@nexus/schema'
 
-export const Node = interfaceType({
+const Node = interfaceType({
   name: 'Node',
   definition(t) {
     t.id('id', { description: 'Unique identifier for the resource' })
   },
 })
 
-export const Account = objectType({
+const Account = objectType({
   name: 'Account',
   isTypeOf(source) {
     return 'email' in source
@@ -60,12 +60,12 @@ export const Account = objectType({
   },
 })
 
-export const StatusEnum = enumType({
+const StatusEnum = enumType({
   name: 'StatusEnum',
   members: ['ACTIVE', 'DISABLED'],
 })
 
-export const Query = queryType({
+const Query = queryType({
   definition(t) {
     t.field('account', {
       type: Account, // or "Account"
@@ -83,4 +83,12 @@ export const Query = queryType({
   },
 })
 
+// Recursively traverses the value passed to types looking for
+// any valid Nexus or graphql-js objects to add to the schema,
+// so you can be pretty flexible with how you import types here.
+const schema = makeSchema({
+  types: [Account, Node, Query, StatusEnum],
+  // or types: { Account, Node, Query }
+  // or types: [Account, [Node], { Query }]
+})
 ```
