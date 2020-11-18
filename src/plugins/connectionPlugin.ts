@@ -593,9 +593,6 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
           },
         })
       )
-
-      // TODO: Deprecate this syntax
-      return { types: [] }
     },
   })
 }
