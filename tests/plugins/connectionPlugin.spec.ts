@@ -525,7 +525,7 @@ describe('basic behavior', () => {
 
   it('should respect nullability of connection field', async () => {
     const getConnectionFieldType = (schema: GraphQLSchema) =>
-      schema.getQueryType().getFields()['users'].type.toString()
+      schema.getQueryType()?.getFields()['users'].type.toString()
 
     const nullable = makeTestSchema(
       {},
