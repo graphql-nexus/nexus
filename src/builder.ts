@@ -129,7 +129,6 @@ import {
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   unwrapNexusDef,
-  validateOnInstallHookResult,
   wrapAsNexusType,
 } from './utils'
 
@@ -675,9 +674,15 @@ export class SchemaBuilder {
       }
       const { config: pluginConfig } = obj
       if (pluginConfig.onInstall) {
-        const installResult = pluginConfig.onInstall(this.builderLens)
-        validateOnInstallHookResult(pluginConfig.name, installResult)
-        installResult.types.forEach((t) => this.addType(t))
+        // TODO(tim): remove anys/warning at 1.0
+        const installResult = pluginConfig.onInstall(this.builderLens) as any
+        if (Array.isArray(installResult?.types)) {
+          console.warn(
+            `Since v0.19.0 Nexus no longer supports a return value from onInstall, you should instead use the hasType/addType api (seen in plugin ${pluginConfig.name}). ` +
+              `In the next major version of Nexus this will be a runtime error.`
+          )
+          installResult.types.forEach((t: any) => this.addType(t))
+        }
       }
       if (pluginConfig.onCreateFieldResolver) {
         this.onCreateResolverFns.push(pluginConfig.onCreateFieldResolver)

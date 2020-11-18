@@ -1,5 +1,5 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
-import { NexusAcceptedTypeDef, PluginBuilderLens, SchemaConfig } from './builder'
+import { PluginBuilderLens, SchemaConfig } from './builder'
 import {
   Maybe,
   NexusGraphQLFieldConfig,
@@ -81,7 +81,7 @@ export interface PluginConfig {
    * for types the user has defined top level in their app, and any types added by
    * upstream plugins.
    */
-  onInstall?: (builder: PluginBuilderLens) => { types: NexusAcceptedTypeDef[] }
+  onInstall?: (builder: PluginBuilderLens) => void
   /**
    * Executed once, just after types have been walked but also before the schema definition
    * types are materialized into GraphQL types. Use this opportunity to add / modify / remove
