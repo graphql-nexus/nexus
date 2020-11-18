@@ -7,7 +7,7 @@ codeStyle: true
 
 [GraphQL Docs on List Type](https://graphql.org/learn/schema/#lists-and-non-null)
 
-Types and Arguments can be passed to the `list()` helper to mark them as list.
+Types (including arguments) can be passed into the `list()` function to wrap them in a list type.
 
 ```ts
 import { queryType, stringArg, list } from '@nexus/schema'
@@ -45,7 +45,7 @@ Below are some usage examples of `list()`:
 
 [GraphQL Docs on List Type](https://graphql.org/learn/schema/#lists-and-non-null)
 
-Types and Arguments can be passed to the `nonNull()` helper to mark them as non-null.
+Types (including arguments) can be passed into the `nonNull()` function to mark them as non-null.
 
 ```ts
 import { queryType, stringArg, nonNull } from '@nexus/schema'
