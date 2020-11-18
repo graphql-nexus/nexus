@@ -274,12 +274,12 @@ export type Discriminate<
   ? Type & { __typename: TypeName }
   : Type & { __typename?: TypeName }
 
-export declare type InterfaceFieldsFor<TypeName extends string> = {
+export type InterfaceFieldsFor<TypeName extends string> = {
   [K in GetGen2<'typeInterfaces', TypeName, never>]: keyof GetGen2<'fieldTypeNames', K>
 }[GetGen2<'typeInterfaces', TypeName, never>]
 
 export type ModificationType<TypeName extends string, FieldName extends string> = GetGen2<
   'abstractTypeMembers',
-  GetGen3<'fieldTypeNames', TypeName, FieldName>,
+  GetGen3<'fieldTypeNames', GetGen2<'typeInterfaces', TypeName, never>, FieldName>,
   never
 >

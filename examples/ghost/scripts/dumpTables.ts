@@ -19,11 +19,14 @@ async function generateTypes() {
   const connectionString = dbConnectionString()
   await knex.destroy()
   console.log(`Reading from: ${connectionString}`)
+  const prettierConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../.prettierrc'), 'utf8'))
   const contents = await typescriptOfSchema(connectionString, tableNames, null, {
     writeHeader: false,
     camelCase: true,
+    prettier: true,
+    prettierConfig,
   })
-  await fs.writeFile(OUT_TYPES, format(contents, { parser: 'typescript' }))
+  await fs.writeFile(OUT_TYPES, format(contents, { ...prettierConfig, parser: 'typescript' }))
   const tableRows = tableNames.reduce((result: string[], tbl) => {
     return result.concat(`${_.camelCase(tbl)}: dbt.${_.upperFirst(_.camelCase(tbl))};`)
   }, [])
@@ -41,6 +44,7 @@ async function generateTypes() {
       export type DBTableName = Extract<keyof DBTables, string>;
     `,
       {
+        ...prettierConfig,
         parser: 'typescript',
       }
     )
