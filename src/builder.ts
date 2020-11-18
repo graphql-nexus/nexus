@@ -119,19 +119,18 @@ import {
   casesHandled,
   consoleWarn,
   eachObj,
-  firstDefined,
   getNexusNamedArgDef,
   getNexusNamedType,
   invariantGuard,
   isObject,
   mapValues,
   objValues,
+  rewrapAsGraphQLType,
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   unwrapNexusDef,
   validateOnInstallHookResult,
   wrapAsNexusType,
-  wrapType,
 } from './utils'
 
 type NexusShapedOutput = {
@@ -1112,7 +1111,7 @@ export class SchemaBuilder {
   ): boolean {
     const { nonNullDefaults = {} } = typeConfig.extensions?.nexus?.config || {}
 
-    return firstDefined(nonNullDefaults[kind], this.config.nonNullDefaults[kind], false)
+    return nonNullDefaults[kind] ?? this.config.nonNullDefaults[kind] ?? false
   }
 
   protected buildOutputField(
@@ -1215,7 +1214,7 @@ export class SchemaBuilder {
       )
     }
 
-    return wrapType(nexusType, graphqlType, nonNullDefault)
+    return rewrapAsGraphQLType(nexusType, graphqlType, nonNullDefault)
   }
 
   protected getOutputType(
@@ -1232,7 +1231,7 @@ export class SchemaBuilder {
       )
     }
 
-    return wrapType(nexusType, graphqlType, nonNullDefault)
+    return rewrapAsGraphQLType(nexusType, graphqlType, nonNullDefault)
   }
 
   protected getObjectType(name: string | NexusObjectTypeDef<string>): GraphQLObjectType {
