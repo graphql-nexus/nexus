@@ -143,7 +143,7 @@ There are two ways you can start with the Prisma plugin. Either from scratch, or
     npm run prisma migrate save --experimental
     ```
 
-4. Migrate your database: 
+4. Migrate your database:
 
     ```bash-symbol
     npm run prisma migrate up --experimental
@@ -495,7 +495,7 @@ import { PrismaClient } from 'nexus-plugin-prisma/client'
 const schema = makeSchema({
   types,
   plugins: [nexusPrisma({
-    client: { instance: new PrismaClient()
+    client: { instance: new PrismaClient() }
   })],
 })
 ```
@@ -630,7 +630,7 @@ schema.queryType({
 ```ts
 schema.mutationType({
   definition(t) {
-    /* 
+    /*
     Assuming our prisma model for User has a createdByBrowser field,
     this removes it from the input type but ensures the value is
     inferred from context and passed to Prisma Client.
