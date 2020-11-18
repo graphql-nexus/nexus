@@ -145,11 +145,7 @@ export type NodeValue<TypeName extends string = any, FieldName extends string = 
 >['node']
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
-  type:
-    | GetGen<'allOutputTypes', string>
-    | NexusNonNullDef<any>
-    | NexusNullDef<any>
-    | AllNexusNamedOutputTypeDefs
+  type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
   /**
    * Whether the connection field can be null
    * @default (depends on whether nullability is configured in type or schema)
@@ -882,8 +878,8 @@ const getTypeNames = (
   fieldConfig: ConnectionFieldConfig,
   pluginConfig: ConnectionPluginConfig
 ) => {
-  const namedType = getNexusNamedType(fieldConfig.type)
-  const targetTypeName = typeof namedType === 'string' ? namedType : namedType.name
+  const targetTypeName =
+    typeof fieldConfig.type === 'string' ? fieldConfig.type : (fieldConfig.type.name as string)
 
   // If we have changed the config specific to this field, on either the connection,
   // edge, or page info, then we need a custom type for the connection & edge.
