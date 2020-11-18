@@ -86,6 +86,7 @@ describe('makeSchema', () => {
     it('can specify contextType as a typing import', async () => {
       const { tsTypes } = await generateSchema.withArtifacts(
         {
+          outputs: false,
           types: [
             queryField('ok', {
               description: 'Example boolean field',
