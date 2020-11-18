@@ -31,14 +31,14 @@ queryType({
 
 Below are some usage examples of `list()`:
 
-| Examples                           | Produced GraphQL Type | nonNullDefaults |
-| ---------------------------------- | --------------------- | --------------- |
-| `list('String')`                   | `[String]`            | `false`         |
-| `list(list('String'))`             | `[[String]]`          | `false`         |
-| `nonNull(list('String'))`          | `[String]!`           | `false`         |
-| `nonNull(list(nonNull('String')))` | `[String!]!`          | `false`         |
-| `list('String')`                   | `[String!]!`          | `true`          |
-| `list(list('String'))`             | `[[String!]!]!`       | `true`          |
+| Example                            | GraphQL Type (nonNullDefaults = false) | GraphQL Type (nonNullDefaults = true) |
+| ---------------------------------- | -------------------------------------- | ------------------------------------- |
+| `nonNull('String')`                | `String!`                              | `String!`                             |
+| `nonNull(list('String'))`          | `[String]!`                            | `[String!]!`                          |
+| `list(nonNull('String'))`          | `[String!]`                            | `[String!]!`                          |
+| `nonNull(list(nonNull('String')))` | `[String!]!`                           | `[String!]!`                          |
+| `nonNull(nonNull('String'))`       | `Error`                                | `Error`                               |
+| `nonNull(nullable('String'))`      | `Error`                                | `Error`                               |
 
 
 ## nonNull
@@ -114,14 +114,15 @@ queryType({
 })
 ```
 
+In case `nonNullDefaults.output` or `nonNullDefaults.input` is `false`, `nullable` will behave as a no-op.
+
 Below are some more usage examples of `nullable()`:
 
-| Example                              | Produced GraphQL Type | nonNullDefaults   |
-| ------------------------------------ | --------------------- | ----------------- |
-| `nullable('String')`                 | `String`              | `true`            |
-| `nullable(list('String'))`           | `[String!]`           | `true`            |
-| `list(nullable('String'))`           | `[String]!`           | `true`            |
-| `nullable(list(nullable('String')))` | `[String]`            | `true`            |
-| `nullable(nonNull('String'))`        | `Error`               | `true` || `false` |
-| `nullable(nullable('String'))`       | `Error`               | `true` || `false` |
-
+| Example                              | GraphQL Type (nonNullDefaults = false) | GraphQL Type (nonNullDefaults = true) |
+| ------------------------------------ | -------------------------------------- | ------------------------------------- |
+| `nullable('String')`                 | `String`                               | `String`                              |
+| `nullable(list('String'))`           | `[String]`                             | `[String!]`                           |
+| `list(nullable('String'))`           | `[String]`                             | `[String]!`                           |
+| `nullable(list(nullable('String')))` | `[String]`                             | `[String]`                            |
+| `nullable(nonNull('String'))`        | `Error`                                | `Error`                               |
+| `nullable(nullable('String'))`       | `Error`                                | `Error`                                 |
