@@ -79,20 +79,4 @@ describe('objectType', () => {
     expect(spy).toBeCalledTimes(1)
     spy.mockRestore()
   })
-
-  it('throws when modifyType is used', () => {
-    expect(() => {
-      makeSchema({
-        outputs: false,
-        types: [
-          objectType({
-            name: 'testing',
-            definition(t) {
-              t.modify('someField', {})
-            },
-          }),
-        ],
-      })
-    }).toThrowErrorMatchingSnapshot()
-  })
 })

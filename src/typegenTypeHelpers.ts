@@ -132,7 +132,7 @@ export type GenTypesShapeKeys =
   | 'fieldTypes'
   | 'fieldTypeNames'
   | 'allTypes'
-  | 'inheritedFields'
+  | 'typeInterfaces'
   | 'objectNames'
   | 'inputNames'
   | 'enumNames'
@@ -273,3 +273,13 @@ export type Discriminate<
   : Required extends 'required'
   ? Type & { __typename: TypeName }
   : Type & { __typename?: TypeName }
+
+export declare type InterfaceFieldsFor<TypeName extends string> = {
+  [K in GetGen2<'typeInterfaces', TypeName, never>]: keyof GetGen2<'fieldTypeNames', K>
+}[GetGen2<'typeInterfaces', TypeName, never>]
+
+export type ModificationType<TypeName extends string, FieldName extends string> = GetGen2<
+  'abstractTypeMembers',
+  GetGen3<'fieldTypeNames', TypeName, FieldName>,
+  never
+>

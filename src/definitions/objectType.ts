@@ -1,27 +1,12 @@
 import { assertValidName } from 'graphql'
-import { FieldResolver } from '../typegenTypeHelpers'
+import { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import { Implemented } from './interfaceType'
-
-export interface FieldModification<TypeName extends string, FieldName extends string> {
-  /**
-   * The description to annotate the GraphQL SDL
-   */
-  description?: string | null
-  /**
-   * The resolve method we should be resolving the field with
-   */
-  resolve?: FieldResolver<TypeName, FieldName>
-}
-
-export interface FieldModificationDef<TypeName extends string, FieldName extends string>
-  extends FieldModification<TypeName, FieldName> {
-  field: FieldName
-}
+import { Implemented, FieldModificationDef, FieldModification } from './interfaceType'
 
 export interface ObjectDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void
+  addModification(toAdd: FieldModificationDef<TypeName, any>): void
 }
 
 export class ObjectDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
@@ -37,11 +22,11 @@ export class ObjectDefinitionBlock<TypeName extends string> extends OutputDefini
   /**
    * Modifies a field added via an interface
    */
-  modify(field: any, modifications: any) {
-    throw new Error(`
-      The Nexus objectType.modify API has been removed. If you were using this API, please open an issue on 
-      GitHub to discuss your use case so we can discuss a suitable replacement.
-    `)
+  modify<FieldName extends Extract<InterfaceFieldsFor<TypeName>, string>>(
+    field: FieldName,
+    modifications: FieldModification<TypeName, FieldName>
+  ) {
+    this.typeBuilder.addModification({ ...modifications, field })
   }
 }
 

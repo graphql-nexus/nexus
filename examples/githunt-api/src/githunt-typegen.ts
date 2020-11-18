@@ -225,7 +225,7 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {}
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
@@ -259,7 +259,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames

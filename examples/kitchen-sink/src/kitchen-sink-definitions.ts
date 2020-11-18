@@ -116,6 +116,11 @@ export const TestObj = objectType({
   definition(t) {
     t.implements('Bar', Baz)
     t.string('item')
+    t.modify('ok', {
+      resolve(root, args, ctx, info) {
+        return false
+      },
+    })
   },
 })
 
@@ -392,4 +397,27 @@ export const DateScalar = scalarType({
   parseLiteral: (ast) => (ast.kind === 'IntValue' ? new Date(ast.value) : null),
   asNexusMethod: 'date',
   rootTyping: 'Date',
+})
+
+export const Node = interfaceType({
+  name: 'Node',
+  definition(t) {
+    t.id('id', {
+      resolve: () => `id`,
+    })
+    t.field('data', { type: Node })
+  },
+})
+
+export const SomeNode = objectType({
+  name: 'SomeNode',
+  definition(t) {
+    t.implements(Node)
+    t.modify('id', {
+      resolve: () => 'somenode',
+    })
+    t.modify('data', {
+      type: 'SomeNode',
+    })
+  },
 })

@@ -38,6 +38,7 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
+  isNullableType,
 } from 'graphql'
 import { arg, ArgsRecord, NexusArgDef } from './definitions/args'
 import {
@@ -55,6 +56,7 @@ import {
   InterfaceDefinitionBlock,
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
+  FieldModificationDef,
 } from './definitions/interfaceType'
 import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
@@ -749,6 +751,7 @@ export class SchemaBuilder {
             const name = typeof config === 'string' ? config : config.value.name
             walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
           }),
+        addModification: () => {},
         addField: () => {},
         addDynamicOutputMembers: () => {},
         warn: () => {},
@@ -862,10 +865,12 @@ export class SchemaBuilder {
   buildObjectType(config: NexusObjectTypeConfig<string>) {
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
+    const modifications: Record<string, FieldModificationDef<any, any>> = {}
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: config.name,
       addField: (fieldDef) => fields.push(fieldDef),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
+      addModification: (modification) => (modifications[modification.field] = modification),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
       warn: consoleWarn,
     })
@@ -887,7 +892,12 @@ export class SchemaBuilder {
       name: config.name,
       interfaces: () => this.buildInterfaceList(interfaces),
       description: config.description,
-      fields: () => this.buildOutputFields(fields, objectTypeConfig, this.buildInterfaceFields(interfaces)),
+      fields: () =>
+        this.buildOutputFields(
+          fields,
+          objectTypeConfig,
+          this.buildInterfaceFields(interfaces, modifications)
+        ),
       isTypeOf: (config as any).isTypeOf,
       extensions: {
         nexus: new NexusObjectTypeExtension(config),
@@ -902,10 +912,12 @@ export class SchemaBuilder {
 
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
+    const modifications: Record<string, FieldModificationDef<any, any>> = {}
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
       addField: (field) => fields.push(field),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
+      addModification: (modification) => (modifications[modification.field] = modification),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
       warn: consoleWarn,
     })
@@ -926,7 +938,11 @@ export class SchemaBuilder {
       resolveType,
       description,
       fields: () =>
-        this.buildOutputFields(fields, interfaceTypeConfig, this.buildInterfaceFields(interfaces)),
+        this.buildOutputFields(
+          fields,
+          interfaceTypeConfig,
+          this.buildInterfaceFields(interfaces, modifications)
+        ),
       extensions: {
         nexus: new NexusInterfaceTypeExtension(config),
       },
@@ -1074,12 +1090,32 @@ export class SchemaBuilder {
     return Array.from(new Set(list))
   }
 
-  protected buildInterfaceFields(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
+  protected buildInterfaceFields(
+    interfaces: (string | NexusInterfaceTypeDef<any>)[],
+    modifications: Record<string, FieldModificationDef<any, any>>
+  ) {
     const interfaceFieldsMap: GraphQLFieldConfigMap<any, any> = {}
     interfaces.forEach((i) => {
       const config = this.getInterface(i).toConfig()
       Object.keys(config.fields).forEach((field) => {
         interfaceFieldsMap[field] = config.fields[field]
+        if (modifications[field]) {
+          const { type, field: _field, args, ...rest } = modifications[field]
+          interfaceFieldsMap[field] = {
+            ...interfaceFieldsMap[field],
+            ...rest,
+          }
+          if (typeof type !== 'undefined') {
+            const nonNullDefault = isNullableType(config.fields[field].type)
+            interfaceFieldsMap[field].type = this.getOutputType(type, !nonNullDefault)
+          }
+          if (typeof args !== 'undefined') {
+            interfaceFieldsMap[field].args = {
+              ...interfaceFieldsMap[field].args,
+              ...this.buildArgs(args),
+            }
+          }
+        }
       })
     })
     return interfaceFieldsMap
@@ -1181,11 +1217,11 @@ export class SchemaBuilder {
 
   protected buildArgs(
     args: ArgsRecord,
-    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
+    typeConfig?: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {}
     Object.keys(args).forEach((argName) => {
-      const nonNullDefault = this.getNonNullDefault(typeConfig, 'input')
+      const nonNullDefault = typeConfig ? this.getNonNullDefault(typeConfig, 'input') : false
       const argDef = normalizeArg(args[argName], nonNullDefault).value
 
       allArgs[argName] = {
@@ -1392,6 +1428,11 @@ export class SchemaBuilder {
       },
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
+      addModification: (toAdd) => {
+        if (toAdd.type && typeof toAdd.type !== 'string') {
+          this.addType(toAdd.type)
+        }
+      },
       warn: () => {},
     })
     obj.definition(definitionBlock)
@@ -1401,6 +1442,11 @@ export class SchemaBuilder {
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
+      addModification: (toAdd) => {
+        if (toAdd.type && typeof toAdd.type !== 'string') {
+          this.addType(toAdd.type)
+        }
+      },
       addInterfaces: (i) => {
         i.forEach((j) => {
           if (typeof j !== 'string') {
