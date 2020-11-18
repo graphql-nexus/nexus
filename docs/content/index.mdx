@@ -32,26 +32,27 @@ As documented in the [API reference](/api/introduction) GraphQL Nexus provides a
 
 ```js
 import {
-  objectType,
-  interfaceType,
-  queryType,
-  stringArg,
+  arg,
   enumType,
   intArg,
-  arg,
-  makeSchema,
+  interfaceType,
+  objectType,
+  queryType,
+  stringArg,
 } from '@nexus/schema'
 
-const Node = interfaceType({
+export const Node = interfaceType({
   name: 'Node',
   definition(t) {
     t.id('id', { description: 'Unique identifier for the resource' })
-    t.resolveType(() => null)
   },
 })
 
-const Account = objectType({
+export const Account = objectType({
   name: 'Account',
+  isTypeOf(source) {
+    return 'email' in source
+  },
   definition(t) {
     t.implements(Node) // or t.implements("Node")
     t.string('username')
@@ -59,12 +60,12 @@ const Account = objectType({
   },
 })
 
-const StatusEnum = enumType({
+export const StatusEnum = enumType({
   name: 'StatusEnum',
   members: ['ACTIVE', 'DISABLED'],
 })
 
-const Query = queryType({
+export const Query = queryType({
   definition(t) {
     t.field('account', {
       type: Account, // or "Account"
@@ -82,12 +83,4 @@ const Query = queryType({
   },
 })
 
-// Recursively traverses the value passed to types looking for
-// any valid Nexus or graphql-js objects to add to the schema,
-// so you can be pretty flexible with how you import types here.
-const schema = makeSchema({
-  types: [Account, Node, Query, StatusEnum],
-  // or types: { Account, Node, Query }
-  // or types: [Account, [Node], { Query }]
-})
 ```
