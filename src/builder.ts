@@ -131,6 +131,7 @@ import {
   unwrapNexusDef,
   validateOnInstallHookResult,
   wrapAsNexusType,
+  wrapAsNexusTypeFromOldApi,
 } from './utils'
 
 type NexusShapedOutput = {
@@ -1124,6 +1125,15 @@ export class SchemaBuilder {
     }
     const fieldExtension = new NexusFieldExtension(fieldConfig)
     const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
+
+    if (fieldConfig.list !== undefined || fieldConfig.nullable !== undefined) {
+      fieldConfig.type = wrapAsNexusTypeFromOldApi(
+        fieldConfig.type as any, // should never be in a wrapped type anyway
+        fieldConfig.list,
+        fieldConfig.nullable !== undefined ? !fieldConfig.nullable : nonNullDefault
+      ) as any
+    }
+
     const builderFieldConfig: Omit<NexusGraphQLFieldConfig, 'resolve' | 'subscribe'> = {
       name: fieldConfig.name,
       type: this.getOutputType(fieldConfig.type, nonNullDefault),
