@@ -38,7 +38,6 @@ describe('plugin', () => {
           onBeforeBuild: () => lifecycleCalls.push('onBeforeBuild'),
           onInstall: () => {
             lifecycleCalls.push('onInstall')
-            return { types: [] }
           },
           onCreateFieldResolver({ fieldConfig }) {
             return async (root, args, ctx, info, next) => {
