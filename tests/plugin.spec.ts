@@ -339,7 +339,7 @@ describe('plugin', () => {
           },
           onArgDefinition(arg, config) {
             // @ts-ignore
-            if (config.list && !isListType(arg.type)) {
+            if (config.value.list && !isListType(arg.type)) {
               arg.type = new GraphQLList(arg.type)
             }
           },
