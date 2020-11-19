@@ -496,7 +496,7 @@ describe('edge-cases', () => {
         list: true,
       })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped your type for the field 'Query.foo'. You should only do one or the other"`
     )
   })
 
@@ -504,7 +504,7 @@ describe('edge-cases', () => {
     expect(() =>
       testField('output', { list: true, useDotListShorthand: true })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped your type for the field 'Query.foo'. You should only do one or the other"`
     )
   })
 
@@ -512,7 +512,7 @@ describe('edge-cases', () => {
     expect(() =>
       testField('output', { type: list('String'), nullable: false })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used nullable: true and wrapped your type for foo. You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped your type for the field 'Query.foo'. You should only do one or the other"`
     )
   })
 
@@ -523,7 +523,7 @@ describe('edge-cases', () => {
         list: true,
       })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped your type for the field 'Foo.foo'. You should only do one or the other"`
     )
   })
 
@@ -534,7 +534,7 @@ describe('edge-cases', () => {
         useDotListShorthand: true,
       })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped your type for the field 'Query.foo'. You should only do one or the other"`
     )
   })
 
@@ -542,7 +542,7 @@ describe('edge-cases', () => {
     expect(() =>
       testField('input', { type: list('String'), nullable: false })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used nullable: true and wrapped your type for foo. You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped your type for the field 'Foo.foo'. You should only do one or the other"`
     )
   })
 
@@ -553,7 +553,7 @@ describe('edge-cases', () => {
         list: true,
       })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used list: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
     )
   })
 
@@ -561,7 +561,7 @@ describe('edge-cases', () => {
     expect(() =>
       testField('arg', { type: list('String'), nullable: false })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used nullable: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
+      `"[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
     )
   })
 
@@ -579,7 +579,7 @@ describe('edge-cases', () => {
             },
           }),
         ],
-        plugins: [nullableListPlugin()],
+        plugins: [legacyNullListApiPlugin()],
       })
     ).toThrowErrorMatchingInlineSnapshot(`"nullableListPlugin is not defined"`)
   })
@@ -598,7 +598,7 @@ describe('edge-cases', () => {
             },
           }),
         ],
-        plugins: [nullableListPlugin()],
+        plugins: [legacyNullListApiPlugin()],
       })
     ).toThrowErrorMatchingInlineSnapshot(`"nullableListPlugin is not defined"`)
   })

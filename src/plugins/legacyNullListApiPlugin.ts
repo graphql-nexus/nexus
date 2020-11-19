@@ -59,15 +59,13 @@ the field is required (non-null).`,
   }),
 ]
 
-interface LegacyNullListApiPluginConfig {}
-
-export const legacyNullListApiPlugin = (config?: LegacyNullListApiPluginConfig) => {
+export const legacyNullListApiPlugin = () => {
   return plugin({
     name: 'legacyNullListApiPlugin',
     fieldDefTypes: FieldDefTypes,
     argTypeDefTypes: ArgDefTypes,
     description: 'Brings back the legacy nullable/list API',
-    onOutputFieldDefinition(field, fieldConfig, builder) {
+    onOutputFieldDefinition(field, fieldConfig, typeConfig, builder) {
       const nullable: boolean | undefined = (fieldConfig as any).nullable
       const list: true | boolean[] | undefined = (fieldConfig as any).list
 
@@ -79,13 +77,13 @@ export const legacyNullListApiPlugin = (config?: LegacyNullListApiPluginConfig) 
       if (isNexusWrappingType(fieldConfig.type)) {
         if (list !== undefined) {
           throw new Error(
-            `It looks like you used list: true and wrapped your type for ${fieldConfig.name}. You should only do one or the other`
+            `[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped your type for the field '${typeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
 
         if (nullable !== undefined) {
           throw new Error(
-            `It looks like you used nullable: true and wrapped your type for ${fieldConfig.name}. You should only do one or the other`
+            `[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped your type for the field '${typeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
         return
@@ -101,7 +99,7 @@ export const legacyNullListApiPlugin = (config?: LegacyNullListApiPluginConfig) 
 
       return field
     },
-    onInputFieldDefinition(field, fieldConfig, builder) {
+    onInputFieldDefinition(field, fieldConfig, typeConfig, builder) {
       const nullable: boolean | undefined = (fieldConfig as any).nullable
       const list: true | boolean[] | undefined = (fieldConfig as any).list
 
@@ -113,13 +111,13 @@ export const legacyNullListApiPlugin = (config?: LegacyNullListApiPluginConfig) 
       if (isNexusWrappingType(fieldConfig.type)) {
         if (list !== undefined) {
           throw new Error(
-            `It looks like you used list: true and wrapped your type for ${fieldConfig.name}. You should only do one or the other`
+            `[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped your type for the field '${typeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
 
         if (nullable !== undefined) {
           throw new Error(
-            `It looks like you used nullable: true and wrapped your type for ${fieldConfig.name}. You should only do one or the other`
+            `[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped your type for the field '${typeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
         return
@@ -146,19 +144,21 @@ export const legacyNullListApiPlugin = (config?: LegacyNullListApiPluginConfig) 
       }
 
       if (nullable !== undefined && required !== undefined) {
-        throw new Error('It looks like you used nullable and required. You should only use one or the other')
+        throw new Error(
+          '[legacyNullListApiPlugin] It looks like you used `nullable` and `required`. You should only use one or the other'
+        )
       }
 
       if (isNexusWrappingType(argConfig.value.type)) {
         if (list !== undefined) {
           throw new Error(
-            `It looks like you used list: true and wrapped the type of the arg "${argConfig.name}" of the field "${fieldConfig.name}" of the parent type "${parentTypeConfig.name}". You should only do one or the other`
+            `[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped the type of the arg '${argConfig.name}' of the field '${parentTypeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
 
         if (nullable !== undefined) {
           throw new Error(
-            `It looks like you used nullable: true and wrapped the type of the arg "${argConfig.name}" of the field "${fieldConfig.name}" of the parent type "${parentTypeConfig.name}". You should only do one or the other`
+            `[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped the type of the arg '${argConfig.name}' of the field '${parentTypeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
         return
