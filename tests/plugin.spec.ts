@@ -8,7 +8,6 @@ import {
   objectType,
   plugin,
   queryField,
-  idArg,
   booleanArg,
   inputObjectType,
 } from '../src/core'
