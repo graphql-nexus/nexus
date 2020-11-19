@@ -1,9 +1,31 @@
 import { assertValidName } from 'graphql'
-import { GetGen } from '../typegenTypeHelpers'
+import { GetGen, InterfaceFieldsFor, FieldResolver, ModificationType } from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
+import { ArgsRecord } from './args'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
+
+export interface FieldModification<TypeName extends string, FieldName extends string> {
+  type?: ModificationType<TypeName, FieldName>
+  /**
+   * The description to annotate the GraphQL SDL
+   */
+  description?: string | null
+  /**
+   * The resolve method we should be resolving the field with
+   */
+  resolve?: FieldResolver<TypeName, FieldName>
+  /**
+   * You are allowed to add non-required args when modifying a field
+   */
+  args?: ArgsRecord
+}
+
+export interface FieldModificationDef<TypeName extends string, FieldName extends string>
+  extends FieldModification<TypeName, FieldName> {
+  field: FieldName
+}
 
 export type NexusInterfaceTypeConfig<TypeName extends string> = {
   name: TypeName
@@ -35,6 +57,7 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
 
 export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void
+  addModification(toAdd: FieldModificationDef<TypeName, any>): void
 }
 
 export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
@@ -46,6 +69,15 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
    */
   implements(...interfaceName: Array<Implemented>) {
     this.typeBuilder.addInterfaces(interfaceName)
+  }
+  /**
+   * Modifies a field added via an interface
+   */
+  modify<FieldName extends Extract<InterfaceFieldsFor<TypeName>, string>>(
+    field: FieldName,
+    modifications: FieldModification<TypeName, FieldName>
+  ) {
+    this.typeBuilder.addModification({ ...modifications, field })
   }
 }
 

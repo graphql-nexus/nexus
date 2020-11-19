@@ -98,11 +98,9 @@ input NestedType {
   veryNested: String
 }
 
-"""
-A "Node" is an Object with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification
-"""
 interface Node {
-  id: ID!
+  data: Node
+  id: ID
 }
 
 """
@@ -278,12 +276,18 @@ type SomeItem {
   id: ID
 }
 
+type SomeNode implements Node {
+  data: SomeNode
+  id: ID
+}
+
 type TestObj implements Bar & Baz & Node {
   """
   'A' description
   """
   a: Bar
   argsTest(a: InputType = { answer: 2, key: "one" }): Boolean
+  data: Node
   id: ID!
   item: String
   ok: Boolean
