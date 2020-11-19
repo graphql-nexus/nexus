@@ -31,6 +31,7 @@ import {
   isInterfaceType,
   isLeafType,
   isNamedType,
+  isNullableType,
   isObjectType,
   isOutputType,
   isScalarType,
@@ -38,7 +39,6 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
-  isNullableType,
 } from 'graphql'
 import { arg, ArgsRecord, NexusArgDef } from './definitions/args'
 import {
@@ -52,11 +52,11 @@ import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitio
 import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import {
+  FieldModificationDef,
   Implemented,
   InterfaceDefinitionBlock,
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
-  FieldModificationDef,
 } from './definitions/interfaceType'
 import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
@@ -132,7 +132,6 @@ import {
   UNKNOWN_TYPE_SCALAR,
   unwrapNexusDef,
   wrapAsNexusType,
-  wrapAsNexusTypeFromOldApi,
 } from './utils'
 
 type NexusShapedOutput = {
@@ -471,18 +470,18 @@ export class SchemaBuilder {
     })
   }
 
-  setConfigOption = <K extends keyof BuilderConfigInput>(key: K, value: BuilderConfigInput[K]) => {
+  setConfigOption = <K extends keyof BuilderConfig>(key: K, value: BuilderConfig[K]) => {
     this.config = {
       ...this.config,
       [key]: value,
     }
   }
 
-  hasConfigOption = (key: keyof BuilderConfigInput): boolean => {
+  hasConfigOption = (key: keyof BuilderConfig): boolean => {
     return this.config.hasOwnProperty(key)
   }
 
-  getConfigOption = <K extends keyof BuilderConfigInput>(key: K): BuilderConfigInput[K] => {
+  getConfigOption = <K extends keyof BuilderConfig>(key: K): BuilderConfig[K] => {
     return this.config[key]
   }
 
@@ -913,6 +912,7 @@ export class SchemaBuilder {
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
+
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
       interfaces: () => this.buildInterfaceList(interfaces),
@@ -921,7 +921,7 @@ export class SchemaBuilder {
         this.buildOutputFields(
           fields,
           objectTypeConfig,
-          this.buildInterfaceFields(interfaces, modifications)
+          this.buildInterfaceFields(objectTypeConfig, interfaces, modifications)
         ),
       isTypeOf: (config as any).isTypeOf,
       extensions: {
@@ -966,7 +966,7 @@ export class SchemaBuilder {
         this.buildOutputFields(
           fields,
           interfaceTypeConfig,
-          this.buildInterfaceFields(interfaces, modifications)
+          this.buildInterfaceFields(interfaceTypeConfig, interfaces, modifications)
         ),
       extensions: {
         nexus: new NexusInterfaceTypeExtension(config),
@@ -1116,6 +1116,7 @@ export class SchemaBuilder {
   }
 
   protected buildInterfaceFields(
+    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig,
     interfaces: (string | NexusInterfaceTypeDef<any>)[],
     modifications: Record<string, FieldModificationDef<any, any>>
   ) {
@@ -1137,9 +1138,12 @@ export class SchemaBuilder {
             interfaceFieldsMap[field].type = this.getOutputType(type, !nonNullDefault)
           }
           if (typeof args !== 'undefined') {
+            const fieldConfig = interfaceFieldsMap[field]?.extensions?.nexus
+              .fieldConfig as NexusFieldExtension
+
             interfaceFieldsMap[field].args = {
               ...interfaceFieldsMap[field].args,
-              ...this.buildArgs(args),
+              ...this.buildArgs(args, { name: field, ...fieldConfig.config }, typeConfig),
             }
           }
         }
@@ -1157,7 +1161,7 @@ export class SchemaBuilder {
       intoObject[field.name] = this.buildOutputField(field, typeConfig)
       if (this.onOutputFieldDefinitionFns.length) {
         this.onOutputFieldDefinitionFns.forEach((o) => {
-          const result = o(intoObject[field.name], field)
+          const result = o(intoObject[field.name], field, this.builderLens)
           if (result != null) {
             intoObject[field.name] = result
           }
@@ -1176,7 +1180,7 @@ export class SchemaBuilder {
       fieldMap[field.name] = this.buildInputObjectField(field, typeConfig)
       if (this.onInputFieldDefinitionFns.length) {
         this.onInputFieldDefinitionFns.forEach((o) => {
-          const result = o(fieldMap[field.name], field)
+          const result = o(fieldMap[field.name], field, this.builderLens)
           if (result != null) {
             fieldMap[field.name] = result
           }
@@ -1209,18 +1213,10 @@ export class SchemaBuilder {
     const fieldExtension = new NexusFieldExtension(fieldConfig)
     const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
 
-    if (fieldConfig.list !== undefined || fieldConfig.nullable !== undefined) {
-      fieldConfig.type = wrapAsNexusTypeFromOldApi(
-        fieldConfig.type as any, // should never be in a wrapped type anyway
-        fieldConfig.list,
-        fieldConfig.nullable !== undefined ? !fieldConfig.nullable : nonNullDefault
-      ) as any
-    }
-
     const builderFieldConfig: Omit<NexusGraphQLFieldConfig, 'resolve' | 'subscribe'> = {
       name: fieldConfig.name,
       type: this.getOutputType(fieldConfig.type, nonNullDefault),
-      args: this.buildArgs(fieldConfig.args || {}, typeConfig),
+      args: this.buildArgs(fieldConfig.args ?? {}, fieldConfig, typeConfig),
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
       extensions: {
@@ -1269,7 +1265,8 @@ export class SchemaBuilder {
 
   protected buildArgs(
     args: ArgsRecord,
-    typeConfig?: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
+    fieldConfig: NexusOutputFieldDef | NexusInputFieldDef,
+    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {}
     Object.keys(args).forEach((argName) => {
@@ -1281,7 +1278,13 @@ export class SchemaBuilder {
         defaultValue: argDef.default,
       }
       this.onArgDefinitionFns.forEach((onArgDef) => {
-        const result = onArgDef(allArgs[argName], argDef)
+        const result = onArgDef(
+          allArgs[argName],
+          { name: argName, value: argDef },
+          fieldConfig,
+          typeConfig,
+          this.builderLens
+        )
         if (result != null) {
           allArgs[argName] = result
         }

@@ -35,8 +35,6 @@ import {
   AllNexusArgsDefs,
   AllNexusInputTypeDefs,
   AllNexusNamedArgsDefs,
-  AllNexusNamedInputTypeDefs,
-  AllNexusNamedOutputTypeDefs,
   AllNexusNamedTypeDefs,
   AllNexusOutputTypeDefs,
   AllNexusTypeDefs,
@@ -695,46 +693,4 @@ export function raiseProgrammerError(error: Error) {
   } else {
     console.error(error)
   }
-}
-
-/**
- * TODO: Remove once we remove the nullable/list API
- */
-export function wrapAsNexusTypeFromOldApi(
-  type: string | AllNexusNamedInputTypeDefs | AllNexusNamedOutputTypeDefs,
-  list: null | undefined | true | boolean[],
-  isNonNull: boolean
-): AllNexusInputTypeDefs | AllNexusOutputTypeDefs | string {
-  let finalType: AllNexusTypeDefs | string = type
-
-  if (list) {
-    finalType = decorateList(type, list, isNonNull)
-  }
-
-  return isNonNull ? nonNull(finalType as any) : finalType
-}
-
-function decorateList(
-  type: AllNexusNamedInputTypeDefs | AllNexusNamedOutputTypeDefs | string,
-  isList: true | boolean[],
-  isNonNull: boolean
-): AllNexusTypeDefs | string {
-  let finalType: AllNexusTypeDefs | string = type
-
-  if (!Array.isArray(isList)) {
-    if (isNonNull) {
-      finalType = nonNull(finalType)
-    }
-    return list(finalType)
-  }
-  if (Array.isArray(isList)) {
-    for (let i = 0; i < isList.length; i++) {
-      const isNull = !isList[i]
-      if (!isNull) {
-        finalType = nonNull(finalType)
-      }
-      finalType = list(finalType)
-    }
-  }
-  return finalType
 }

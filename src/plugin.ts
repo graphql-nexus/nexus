@@ -1,12 +1,16 @@
 import {
+  GraphQLArgumentConfig,
+  GraphQLFieldConfig,
   GraphQLFieldResolver,
+  GraphQLInputFieldConfig,
   GraphQLResolveInfo,
   GraphQLSchema,
-  GraphQLFieldConfig,
-  GraphQLInputFieldConfig,
-  GraphQLArgumentConfig,
 } from 'graphql'
 import { PluginBuilderLens, SchemaConfig } from './builder'
+import { NexusArgConfig } from './definitions/args'
+import { InputDefinitionBlock, NexusInputFieldDef, NexusOutputFieldDef } from './definitions/definitionBlocks'
+import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
+import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
 import {
   Maybe,
   NexusGraphQLFieldConfig,
@@ -16,12 +20,8 @@ import {
   Omit,
   withNexusSymbol,
 } from './definitions/_types'
-import { InputDefinitionBlock, NexusOutputFieldDef, NexusInputFieldDef } from './definitions/definitionBlocks'
-import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
-import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusSchemaExtension } from './extensions'
 import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
-import { NexusArgConfig } from './definitions/args'
 
 export { PluginBuilderLens }
 
@@ -118,7 +118,8 @@ export interface PluginConfig {
    */
   onOutputFieldDefinition?: (
     field: GraphQLFieldConfig<any, any>,
-    fieldConfig: NexusOutputFieldDef
+    fieldConfig: NexusOutputFieldDef,
+    builder: PluginBuilderLens
   ) => GraphQLFieldConfig<any, any> | void
   /**
    * Called immediately after the field is defined, allows for using metadata
@@ -126,7 +127,8 @@ export interface PluginConfig {
    */
   onInputFieldDefinition?: (
     inputField: GraphQLInputFieldConfig,
-    fieldConfig: NexusInputFieldDef
+    fieldConfig: NexusInputFieldDef,
+    builder: PluginBuilderLens
   ) => GraphQLInputFieldConfig | void
   /**
    * Called immediately after the field is defined, allows for using metadata
@@ -134,7 +136,10 @@ export interface PluginConfig {
    */
   onArgDefinition?: (
     arg: GraphQLArgumentConfig,
-    argConfig: NexusArgConfig<any>
+    argConfig: { name: string; value: NexusArgConfig<any> },
+    fieldConfig: NexusInputFieldDef | NexusOutputFieldDef,
+    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig,
+    builder: PluginBuilderLens
   ) => GraphQLArgumentConfig | void
   /**
    * Called immediately after the input object is defined, allows for using metadata
@@ -267,7 +272,13 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     'onInputFieldDefinition',
     'onInputObjectDefinition',
   ]
-  const validOptionalProps = ['description', 'fieldDefTypes', 'objectTypeDefTypes', ...optionalPropFns]
+  const validOptionalProps = [
+    'description',
+    'fieldDefTypes',
+    'objectTypeDefTypes',
+    'argTypeDefTypes',
+    ...optionalPropFns,
+  ]
 
   const validProps = [...validRequiredProps, ...validOptionalProps]
   const givenProps = Object.keys(pluginConfig)

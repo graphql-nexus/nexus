@@ -1,4 +1,4 @@
-import { GraphQLFieldResolver, isWrappingType } from 'graphql'
+import { GraphQLFieldResolver } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
 import { list } from './list'
@@ -6,13 +6,6 @@ import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, isNexusListTypeDef } fro
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
-  /**
-   * Whether the field can be null
-   * @default (depends on whether nullability is configured in type or schema)
-   *
-   * @deprecated Use `nullable` or `nonNull` instead
-   */
-  nullable?: boolean
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -22,16 +15,6 @@ export interface CommonFieldConfig {
    * deprecated directive on field/enum types and as a comment on input fields.
    */
   deprecation?: string // | DeprecationInfo;
-  /**
-   * Whether the field is list of values, or just a single value.
-   *
-   * If list is true, we assume the field is a list. If list is an array,
-   * we'll assume that it's a list with the depth. The boolean indicates whether
-   * the field is required (non-null).
-   *
-   * @deprecated Use `list()` instead
-   */
-  list?: true | boolean[]
 }
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
@@ -175,24 +158,6 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
-    if (config.list) {
-      this.typeBuilder.warn(
-        'The list: boolean API is now deprecated. Please use the list() function instead.'
-      )
-    }
-
-    if (config.list !== undefined && isWrappingType(config.type)) {
-      throw new Error(
-        `It looks like you used list: true and wrapped your type for ${config.name}. You should only do one or the other`
-      )
-    }
-
-    if (config.nullable !== undefined && isWrappingType(config.type)) {
-      throw new Error(
-        `It looks like you used nullable: true and wrapped your type for ${config.name}. You should only do one or the other`
-      )
-    }
-
     if (this.isList) {
       if (isNexusListTypeDef(config.type)) {
         this.typeBuilder.warn(
@@ -282,22 +247,6 @@ export class InputDefinitionBlock<TypeName extends string> {
   }
 
   protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
-    if (config.list !== undefined) {
-      this.typeBuilder.warn('The list: true API is now deprecated. Please use the list() function instead.')
-    }
-
-    if (config.list !== undefined && isWrappingType(config.type)) {
-      throw new Error(
-        `It looks like you used list: true and wrapped your type for ${config.name}. You should only do one or the other`
-      )
-    }
-
-    if (config.nullable !== undefined && isWrappingType(config.type)) {
-      throw new Error(
-        `It looks like you used nullable: true and wrapped your type for ${config.name}. You should only do one or the other`
-      )
-    }
-
     if (this.isList) {
       if (isNexusListTypeDef(config.type)) {
         this.typeBuilder.warn(

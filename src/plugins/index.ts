@@ -9,3 +9,5 @@ export * as nullabilityGuardPluginCore from './nullabilityGuardPlugin'
 
 export { queryComplexityPlugin } from './queryComplexityPlugin'
 export * as queryComplexityPluginCore from './queryComplexityPlugin'
+export { nullableListPlugin } from './nullableListPlugin'
+export * as nullableListPluginCore from './nullableListPlugin'
