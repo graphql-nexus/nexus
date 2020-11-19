@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, GraphQLObjectType } from 'graphql'
+import { GraphQLResolveInfo } from 'graphql'
 import { NexusObjectTypeDef } from './definitions/objectType'
 import { NexusInterfaceTypeDef } from './definitions/interfaceType'
 
