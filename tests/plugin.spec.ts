@@ -1,4 +1,4 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
+import { buildSchema, graphql, GraphQLSchema, printSchema, GraphQLList, isListType } from 'graphql'
 import {
   interfaceType,
   list,
@@ -8,6 +8,9 @@ import {
   objectType,
   plugin,
   queryField,
+  idArg,
+  booleanArg,
+  inputObjectType,
 } from '../src/core'
 import { nullabilityGuardPlugin } from '../src/plugins'
 import { EXAMPLE_SDL } from './_sdl'
@@ -290,6 +293,61 @@ describe('plugin', () => {
       `
     )
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
+  })
+
+  it('has an onFieldDefinition / onArgDefinition / onInputFieldDefinition option, which receives the field metadata, and can modify the field', async () => {
+    //
+    const schema = makeSchema({
+      outputs: false,
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
+      types: [
+        queryField('ok', {
+          type: 'Boolean',
+          // @ts-ignore
+          list: true,
+          args: {
+            // @ts-ignore
+            filter: booleanArg({ list: true }),
+            input: inputObjectType({
+              name: 'SomeType',
+              definition(t) {
+                // @ts-ignore
+                t.boolean('inputField', { list: true })
+              },
+            }),
+          },
+          resolve: () => [true],
+        }),
+      ],
+      plugins: [
+        plugin({
+          name: 'Node',
+          onFieldDefinition(field, config) {
+            // @ts-ignore
+            if (config.list && !isListType(field.type)) {
+              field.type = new GraphQLList(field.type)
+            }
+          },
+          onInputFieldDefinition(field, config) {
+            // @ts-ignore
+            if (config.list && !isListType(field.type)) {
+              field.type = new GraphQLList(field.type)
+            }
+          },
+          onArgDefinition(arg, config) {
+            // @ts-ignore
+            if (config.list && !isListType(arg.type)) {
+              arg.type = new GraphQLList(arg.type)
+            }
+          },
+        }),
+      ],
+    })
+    expect(printSchema(schema)).toMatchSnapshot()
   })
 
   it('has a plugin.completeValue fn which is used to efficiently complete a value which is possibly a promise', async () => {

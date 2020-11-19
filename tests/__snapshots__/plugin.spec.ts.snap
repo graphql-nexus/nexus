@@ -24,6 +24,17 @@ Array [
 ]
 `;
 
+exports[`plugin has an onFieldDefinition / onArgDefinition / onInputFieldDefinition option, which receives the field metadata, and can modify the field 1`] = `
+"input SomeType {
+  inputField: [Boolean]
+}
+
+type Query {
+  ok(filter: [Boolean], input: SomeType): [Boolean]
+}
+"
+`;
+
 exports[`plugin has an onMissingType, which will be called in order when we encounter a missing type 1`] = `
 "type User {
   id: ID

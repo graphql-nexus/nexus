@@ -4,12 +4,12 @@ import { NexusTypes, withNexusSymbol } from './_types'
 
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
-export interface CommonArgConfig {
+export type CommonArgConfig = {
   /**
    * The description to annotate the GraphQL SDL
    */
   description?: string | null
-}
+} & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
   /**

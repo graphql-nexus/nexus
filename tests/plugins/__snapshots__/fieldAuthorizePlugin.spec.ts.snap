@@ -173,6 +173,8 @@ declare global {
   }
   interface NexusGenPluginSchemaConfig {
   }
+  interface NexusGenPluginArgConfig {
+  }
 }"
 `;
 

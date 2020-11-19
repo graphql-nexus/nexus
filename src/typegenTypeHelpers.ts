@@ -10,6 +10,7 @@ declare global {
   interface NexusGenPluginSchemaConfig {}
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
+  interface NexusGenPluginArgConfig {}
 }
 
 export type AllInputTypes = GetGen<'allInputTypes', string>
