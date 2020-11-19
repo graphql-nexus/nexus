@@ -1,12 +1,4 @@
-import {
-  getNamedType,
-  GraphQLInputType,
-  GraphQLList,
-  GraphQLNamedType,
-  GraphQLNonNull,
-  GraphQLOutputType,
-  GraphQLType,
-} from 'graphql'
+import { getNamedType, GraphQLInputType, GraphQLList, GraphQLNonNull, GraphQLOutputType } from 'graphql'
 import { isNexusWrappingType } from '../core'
 import { GraphQLNamedInputType, GraphQLNamedOutputType } from '../definitions/_types'
 import { plugin } from '../plugin'
