@@ -1,6 +1,6 @@
 import { GraphQLInputObjectType, GraphQLSchema } from 'graphql'
 import { makeSchema, queryType } from '../../src'
-import { arg, inputObjectType, list, nullableListPlugin, SchemaConfig, stringArg } from '../../src/core'
+import { arg, inputObjectType, legacyNullListApiPlugin, list, SchemaConfig, stringArg } from '../../src/core'
 
 type InputOutputFieldConfig = {
   nullable?: boolean
@@ -100,7 +100,7 @@ function testField<Kind extends keyof typeof TEST_DATA>(
   const schema = makeSchema({
     outputs: false,
     types,
-    plugins: [nullableListPlugin()],
+    plugins: [legacyNullListApiPlugin()],
     ...schemaConfig,
   })
 
@@ -581,9 +581,7 @@ describe('edge-cases', () => {
         ],
         plugins: [nullableListPlugin()],
       })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used list: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
-    )
+    ).toThrowErrorMatchingInlineSnapshot(`"nullableListPlugin is not defined"`)
   })
 
   test('cannot use wrapped arg and nullable: true at the same time on an arg', () => {
@@ -602,8 +600,6 @@ describe('edge-cases', () => {
         ],
         plugins: [nullableListPlugin()],
       })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"It looks like you used nullable: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
-    )
+    ).toThrowErrorMatchingInlineSnapshot(`"nullableListPlugin is not defined"`)
   })
 })

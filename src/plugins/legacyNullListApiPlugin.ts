@@ -59,12 +59,14 @@ the field is required (non-null).`,
   }),
 ]
 
-export const nullableListPlugin = () => {
+interface LegacyNullListApiPluginConfig {}
+
+export const legacyNullListApiPlugin = (config?: LegacyNullListApiPluginConfig) => {
   return plugin({
-    name: 'nullableList',
+    name: 'legacyNullListApiPlugin',
     fieldDefTypes: FieldDefTypes,
     argTypeDefTypes: ArgDefTypes,
-    description: 'Adds back the nullable/list API for retro-compatibility',
+    description: 'Brings back the legacy nullable/list API',
     onOutputFieldDefinition(field, fieldConfig, builder) {
       const nullable: boolean | undefined = (fieldConfig as any).nullable
       const list: true | boolean[] | undefined = (fieldConfig as any).list
