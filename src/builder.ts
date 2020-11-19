@@ -425,6 +425,21 @@ export class SchemaBuilder {
   protected onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
 
   /**
+   * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
+   */
+  protected onArgDefinitionFns: Exclude<PluginConfig['onArgDefinition'], undefined>[] = []
+
+  /**
+   * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
+   */
+  protected onOutputFieldDefinitionFns: Exclude<PluginConfig['onOutputFieldDefinition'], undefined>[] = []
+
+  /**
+   * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
+   */
+  protected onInputFieldDefinitionFns: Exclude<PluginConfig['onInputFieldDefinition'], undefined>[] = []
+
+  /**
    * The `schemaExtension` is created just after the types are walked,
    * but before the fields are materialized.
    */
@@ -703,6 +718,15 @@ export class SchemaBuilder {
       }
       if (pluginConfig.onObjectDefinition) {
         this.onObjectDefinitionFns.push(pluginConfig.onObjectDefinition)
+      }
+      if (pluginConfig.onOutputFieldDefinition) {
+        this.onOutputFieldDefinitionFns.push(pluginConfig.onOutputFieldDefinition)
+      }
+      if (pluginConfig.onInputFieldDefinition) {
+        this.onInputFieldDefinitionFns.push(pluginConfig.onInputFieldDefinition)
+      }
+      if (pluginConfig.onArgDefinition) {
+        this.onArgDefinitionFns.push(pluginConfig.onArgDefinition)
       }
       if (pluginConfig.onInputObjectDefinition) {
         this.onInputObjectDefinitionFns.push(pluginConfig.onInputObjectDefinition)
@@ -1130,6 +1154,14 @@ export class SchemaBuilder {
   ) {
     fields.forEach((field) => {
       intoObject[field.name] = this.buildOutputField(field, typeConfig)
+      if (this.onOutputFieldDefinitionFns.length) {
+        this.onOutputFieldDefinitionFns.forEach((o) => {
+          const result = o(intoObject[field.name], field)
+          if (result != null) {
+            intoObject[field.name] = result
+          }
+        })
+      }
     })
     return intoObject
   }
@@ -1141,6 +1173,14 @@ export class SchemaBuilder {
     const fieldMap: GraphQLInputFieldConfigMap = {}
     fields.forEach((field) => {
       fieldMap[field.name] = this.buildInputObjectField(field, typeConfig)
+      if (this.onInputFieldDefinitionFns.length) {
+        this.onInputFieldDefinitionFns.forEach((o) => {
+          const result = o(fieldMap[field.name], field)
+          if (result != null) {
+            fieldMap[field.name] = result
+          }
+        })
+      }
     })
     return fieldMap
   }
@@ -1225,12 +1265,17 @@ export class SchemaBuilder {
     Object.keys(args).forEach((argName) => {
       const nonNullDefault = typeConfig ? this.getNonNullDefault(typeConfig, 'input') : false
       const argDef = normalizeArg(args[argName], nonNullDefault).value
-
       allArgs[argName] = {
         type: this.getInputType(argDef.type, nonNullDefault),
         description: argDef.description,
         defaultValue: argDef.default,
       }
+      this.onArgDefinitionFns.forEach((onArgDef) => {
+        const result = onArgDef(allArgs[argName], argDef)
+        if (result != null) {
+          allArgs[argName] = result
+        }
+      })
     })
     return allArgs
   }

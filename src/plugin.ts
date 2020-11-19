@@ -1,4 +1,11 @@
-import { GraphQLFieldResolver, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
+import {
+  GraphQLFieldResolver,
+  GraphQLResolveInfo,
+  GraphQLSchema,
+  GraphQLFieldConfig,
+  GraphQLInputFieldConfig,
+  GraphQLArgumentConfig,
+} from 'graphql'
 import { PluginBuilderLens, SchemaConfig } from './builder'
 import {
   Maybe,
@@ -9,11 +16,12 @@ import {
   Omit,
   withNexusSymbol,
 } from './definitions/_types'
-import { InputDefinitionBlock } from './definitions/definitionBlocks'
+import { InputDefinitionBlock, NexusOutputFieldDef, NexusInputFieldDef } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusSchemaExtension } from './extensions'
 import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
+import { NexusArgConfig } from './definitions/args'
 
 export { PluginBuilderLens }
 
@@ -69,6 +77,10 @@ export interface PluginConfig {
    */
   objectTypeDefTypes?: StringLike | StringLike[]
   /**
+   * Any type definitions we want to add to the arg definition option
+   */
+  argTypeDefTypes?: StringLike | StringLike[]
+  /**
    * Executed once, just before the types are walked. Useful for defining custom extensions
    * to the "definition" builders that are needed while traversing the type definitions, as
    * are defined by `dynamicOutput{Method,Property}` / `dynamicInput{Method,Property}`
@@ -100,6 +112,30 @@ export interface PluginConfig {
     block: ObjectDefinitionBlock<string>,
     objectConfig: NexusObjectTypeConfig<string>
   ) => void
+  /**
+   * Called immediately after the field is defined, allows for using metadata
+   * to define the shape of the field.
+   */
+  onOutputFieldDefinition?: (
+    field: GraphQLFieldConfig<any, any>,
+    fieldConfig: NexusOutputFieldDef
+  ) => GraphQLFieldConfig<any, any> | void
+  /**
+   * Called immediately after the field is defined, allows for using metadata
+   * to define the shape of the field.
+   */
+  onInputFieldDefinition?: (
+    inputField: GraphQLInputFieldConfig,
+    fieldConfig: NexusInputFieldDef
+  ) => GraphQLInputFieldConfig | void
+  /**
+   * Called immediately after the field is defined, allows for using metadata
+   * to define the shape of the field.
+   */
+  onArgDefinition?: (
+    arg: GraphQLArgumentConfig,
+    argConfig: NexusArgConfig<any>
+  ) => GraphQLArgumentConfig | void
   /**
    * Called immediately after the input object is defined, allows for using metadata
    * to define the shape of the input object
@@ -226,6 +262,9 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     'onMissingType',
     'onAfterBuild',
     'onObjectDefinition',
+    'onOutputFieldDefinition',
+    'onArgDefinition',
+    'onInputFieldDefinition',
     'onInputObjectDefinition',
   ]
   const validOptionalProps = ['description', 'fieldDefTypes', 'objectTypeDefTypes', ...optionalPropFns]
