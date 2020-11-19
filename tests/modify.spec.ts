@@ -7,6 +7,7 @@ import {
   objectType,
   queryField,
   stringArg,
+  nonNull,
 } from '../src/core'
 
 describe('modify', () => {
@@ -62,7 +63,7 @@ describe('modify', () => {
         queryField('node', {
           type: 'Node',
           args: {
-            id: idArg({ required: true }),
+            id: nonNull(idArg()),
           },
           resolve: (root, args) => {
             const [__typename, id] = args.id.split(':')
@@ -100,10 +101,10 @@ describe('modify', () => {
         }
       `
     )
-    expect(result.data?.node.fields.find((f) => f.name === 'id').description).toEqual(
+    expect(result.data?.node.fields.find((f: { name: string }) => f.name === 'id').description).toEqual(
       'Some Node ID Description'
     )
-    expect(result.data?.user.fields.find((f) => f.name === 'id').description).toEqual(
+    expect(result.data?.user.fields.find((f: { name: string }) => f.name === 'id').description).toEqual(
       'Some User ID Description'
     )
   })
@@ -176,7 +177,11 @@ describe('modify', () => {
         }
       `
     )
-    expect(result.data?.node.fields.find((f) => f.name === 'subNode').type.name).toEqual('Node')
-    expect(result.data?.user.fields.find((f) => f.name === 'subNode').type.name).toEqual('User')
+    expect(result.data?.node.fields.find((f: { name: string }) => f.name === 'subNode').type.name).toEqual(
+      'Node'
+    )
+    expect(result.data?.user.fields.find((f: { name: string }) => f.name === 'subNode').type.name).toEqual(
+      'User'
+    )
   })
 })
