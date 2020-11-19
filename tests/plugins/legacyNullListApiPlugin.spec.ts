@@ -50,7 +50,7 @@ const TEST_DATA = {
       return inputType.getFields()['foo']?.type
     },
   }),
-  arg: (config: Omit<InputOutputFieldConfig, 'useDotListShorthand'>) => ({
+  arg: (config: Omit<InputOutputFieldConfig, 'useDotListShorthand'> & { required?: boolean }) => ({
     types: [
       queryType({
         definition(t) {
@@ -386,6 +386,23 @@ describe('arg def ; nonNullDefaults = false ;', () => {
 
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
+
+  test('required: false', () => {
+    const field = testField('arg', {
+      required: false,
+    })
+
+    expect(field).toMatchInlineSnapshot(`"String"`)
+  })
+
+  test('required: true', () => {
+    const field = testField('arg', {
+      required: true,
+    })
+
+    expect(field).toMatchInlineSnapshot(`"String!"`)
+  })
+
   test('list: true ; nullable: true', () => {
     const field = testField('arg', {
       list: true,
@@ -422,7 +439,7 @@ describe('arg def ; nonNullDefaults = true ;', () => {
       },
       {
         nonNullDefaults: {
-          output: true,
+          input: true,
         },
       }
     )
@@ -438,13 +455,46 @@ describe('arg def ; nonNullDefaults = true ;', () => {
       },
       {
         nonNullDefaults: {
-          output: true,
+          input: true,
         },
       }
     )
 
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
+
+  test('required: false', () => {
+    const field = testField(
+      'arg',
+      {
+        required: false,
+      },
+      {
+        nonNullDefaults: {
+          input: true,
+        },
+      }
+    )
+
+    expect(field).toMatchInlineSnapshot(`"String"`)
+  })
+
+  test('required: true', () => {
+    const field = testField(
+      'arg',
+      {
+        required: true,
+      },
+      {
+        nonNullDefaults: {
+          input: true,
+        },
+      }
+    )
+
+    expect(field).toMatchInlineSnapshot(`"String!"`)
+  })
+
   test('list: true ; nullable: true', () => {
     const field = testField(
       'arg',
@@ -454,7 +504,7 @@ describe('arg def ; nonNullDefaults = true ;', () => {
       },
       {
         nonNullDefaults: {
-          output: true,
+          input: true,
         },
       }
     )
@@ -471,7 +521,7 @@ describe('arg def ; nonNullDefaults = true ;', () => {
       },
       {
         nonNullDefaults: {
-          output: true,
+          input: true,
         },
       }
     )
@@ -581,7 +631,9 @@ describe('edge-cases', () => {
         ],
         plugins: [legacyNullListApiPlugin()],
       })
-    ).toThrowErrorMatchingInlineSnapshot(`"nullableListPlugin is not defined"`)
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"[legacyNullListApiPlugin] It looks like you used \`list\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
+    )
   })
 
   test('cannot use wrapped arg and nullable: true at the same time on an arg', () => {
@@ -600,6 +652,8 @@ describe('edge-cases', () => {
         ],
         plugins: [legacyNullListApiPlugin()],
       })
-    ).toThrowErrorMatchingInlineSnapshot(`"nullableListPlugin is not defined"`)
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
+    )
   })
 })
