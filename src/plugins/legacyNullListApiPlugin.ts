@@ -161,16 +161,21 @@ export const legacyNullListApiPlugin = () => {
             `[legacyNullListApiPlugin] It looks like you used \`nullable\` and wrapped the type of the arg '${argConfig.name}' of the field '${parentTypeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
           )
         }
+
+        if (required !== undefined) {
+          throw new Error(
+            `[legacyNullListApiPlugin] It looks like you used \`required\` and wrapped the type of the arg '${argConfig.name}' of the field '${parentTypeConfig.name}.${fieldConfig.name}'. You should only do one or the other`
+          )
+        }
+
         return
       }
 
       const nonNullDefault = builder.getConfigOption('nonNullDefaults').input
+      const isNonNull =
+        nullable !== undefined ? !nullable : required !== undefined ? required : nonNullDefault
 
-      arg.type = decorateType(
-        getNamedType(arg.type) as GraphQLNamedInputType,
-        list,
-        nullable !== undefined ? !nullable : nonNullDefault
-      )
+      arg.type = decorateType(getNamedType(arg.type) as GraphQLNamedInputType, list, isNonNull)
 
       return arg
     },
