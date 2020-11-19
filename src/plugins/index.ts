@@ -1,6 +1,11 @@
 export { connectionPlugin } from './connectionPlugin'
-export * from './fieldAuthorizePlugin'
-export * from './nullabilityGuardPlugin'
-export * from './queryComplexityPlugin'
-export { connectionPluginCore }
-import * as connectionPluginCore from './connectionPlugin'
+export * as connectionPluginCore from './connectionPlugin'
+
+export { fieldAuthorizePlugin } from './fieldAuthorizePlugin'
+export * as fieldAuthorizePluginCore from './fieldAuthorizePlugin'
+
+export { nullabilityGuardPlugin } from './nullabilityGuardPlugin'
+export * as nullabilityGuardPluginCore from './nullabilityGuardPlugin'
+
+export { queryComplexityPlugin } from './queryComplexityPlugin'
+export * as queryComplexityPluginCore from './queryComplexityPlugin'
