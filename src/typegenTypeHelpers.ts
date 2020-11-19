@@ -1,4 +1,6 @@
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLObjectType } from 'graphql'
+import { NexusObjectTypeDef } from './definitions/objectType'
+import { NexusInterfaceTypeDef } from './definitions/interfaceType'
 
 declare global {
   interface NexusGen {}
@@ -278,8 +280,20 @@ export type InterfaceFieldsFor<TypeName extends string> = {
   [K in GetGen2<'typeInterfaces', TypeName, never>]: keyof GetGen2<'fieldTypeNames', K>
 }[GetGen2<'typeInterfaces', TypeName, never>]
 
-export type ModificationType<TypeName extends string, FieldName extends string> = GetGen2<
-  'abstractTypeMembers',
-  GetGen3<'fieldTypeNames', GetGen2<'typeInterfaces', TypeName, never>, FieldName>,
-  never
->
+export type ModificationType<TypeName, FieldName> = TypeName extends string
+  ? FieldName extends string
+    ? GetGen2<
+        'abstractTypeMembers',
+        GetGen3<'fieldTypeNames', GetGen2<'typeInterfaces', TypeName, never>, FieldName>,
+        never
+      > extends infer U
+      ? U extends string
+        ? U | ConcreteModificationType<U>
+        : never
+      : never
+    : any
+  : any
+
+export type ConcreteModificationType<U extends string> = GetGen2<'objectNames', U, never> extends string
+  ? NexusObjectTypeDef<U>
+  : NexusInterfaceTypeDef<U>

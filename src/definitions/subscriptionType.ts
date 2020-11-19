@@ -38,10 +38,8 @@ export interface SubscriptionTypeConfig<TypeName extends string, FieldName exten
     type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
   }
 
-export interface SubscriptionBuilderInternal extends ObjectDefinitionBuilder<'Subscription'> {}
-
 export class SubscriptionBuilder {
-  constructor(protected typeBuilder: SubscriptionBuilderInternal, protected isList = false) {}
+  constructor(protected typeBuilder: ObjectDefinitionBuilder, protected isList = false) {}
 
   get list() {
     if (this.isList) {

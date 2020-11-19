@@ -417,7 +417,7 @@ export const SomeNode = objectType({
       resolve: () => 'somenode',
     })
     t.modify('data', {
-      type: 'SomeNode',
+      type: SomeNode,
     })
   },
 })

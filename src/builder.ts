@@ -481,7 +481,7 @@ export class SchemaBuilder {
    * those in too, so you can define types anonymously, without
    * exporting them.
    */
-  addType = (typeDef: TypeDef | DynamicBlockDef) => {
+  addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef
       return
@@ -1106,6 +1106,8 @@ export class SchemaBuilder {
             ...rest,
           }
           if (typeof type !== 'undefined') {
+            // TODO(tim): we probably need unwrapping logic for core graphql types, so we can unwrap the
+            // parent type, and rewrap as this new concrete type.
             const nonNullDefault = isNullableType(config.fields[field].type)
             interfaceFieldsMap[field].type = this.getOutputType(type, !nonNullDefault)
           }
@@ -1428,11 +1430,7 @@ export class SchemaBuilder {
       },
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
-      addModification: (toAdd) => {
-        if (toAdd.type && typeof toAdd.type !== 'string') {
-          this.addType(toAdd.type)
-        }
-      },
+      addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
       warn: () => {},
     })
     obj.definition(definitionBlock)
@@ -1442,11 +1440,7 @@ export class SchemaBuilder {
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
-      addModification: (toAdd) => {
-        if (toAdd.type && typeof toAdd.type !== 'string') {
-          this.addType(toAdd.type)
-        }
-      },
+      addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
       addInterfaces: (i) => {
         i.forEach((j) => {
           if (typeof j !== 'string') {

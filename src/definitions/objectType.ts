@@ -4,13 +4,13 @@ import { AbstractTypes, NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexu
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { Implemented, FieldModificationDef, FieldModification } from './interfaceType'
 
-export interface ObjectDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
+export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void
-  addModification(toAdd: FieldModificationDef<TypeName, any>): void
+  addModification(toAdd: FieldModificationDef<any, any>): void
 }
 
 export class ObjectDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
-  constructor(protected typeBuilder: ObjectDefinitionBuilder<TypeName>) {
+  constructor(protected typeBuilder: ObjectDefinitionBuilder) {
     super(typeBuilder)
   }
   /**
