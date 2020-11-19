@@ -1160,7 +1160,7 @@ export class SchemaBuilder {
       intoObject[field.name] = this.buildOutputField(field, typeConfig)
       if (this.onOutputFieldDefinitionFns.length) {
         this.onOutputFieldDefinitionFns.forEach((o) => {
-          const result = o(intoObject[field.name], field, this.builderLens)
+          const result = o(intoObject[field.name], field, typeConfig, this.builderLens)
           if (result != null) {
             intoObject[field.name] = result
           }
@@ -1179,7 +1179,7 @@ export class SchemaBuilder {
       fieldMap[field.name] = this.buildInputObjectField(field, typeConfig)
       if (this.onInputFieldDefinitionFns.length) {
         this.onInputFieldDefinitionFns.forEach((o) => {
-          const result = o(fieldMap[field.name], field, this.builderLens)
+          const result = o(fieldMap[field.name], field, typeConfig, this.builderLens)
           if (result != null) {
             fieldMap[field.name] = result
           }

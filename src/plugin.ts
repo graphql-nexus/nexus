@@ -14,6 +14,7 @@ import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/obje
 import {
   Maybe,
   NexusGraphQLFieldConfig,
+  NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
   NexusGraphQLObjectTypeConfig,
   NexusTypes,
@@ -119,6 +120,7 @@ export interface PluginConfig {
   onOutputFieldDefinition?: (
     field: GraphQLFieldConfig<any, any>,
     fieldConfig: NexusOutputFieldDef,
+    typeConfig: NexusGraphQLInterfaceTypeConfig | NexusGraphQLObjectTypeConfig,
     builder: PluginBuilderLens
   ) => GraphQLFieldConfig<any, any> | void
   /**
@@ -128,6 +130,7 @@ export interface PluginConfig {
   onInputFieldDefinition?: (
     inputField: GraphQLInputFieldConfig,
     fieldConfig: NexusInputFieldDef,
+    typeConfig: NexusGraphQLInputObjectTypeConfig,
     builder: PluginBuilderLens
   ) => GraphQLInputFieldConfig | void
   /**
