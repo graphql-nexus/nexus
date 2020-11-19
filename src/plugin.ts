@@ -116,7 +116,7 @@ export interface PluginConfig {
    * Called immediately after the field is defined, allows for using metadata
    * to define the shape of the field.
    */
-  onFieldDefinition?: (
+  onOutputFieldDefinition?: (
     field: GraphQLFieldConfig<any, any>,
     fieldConfig: NexusOutputFieldDef
   ) => GraphQLFieldConfig<any, any> | void
@@ -262,7 +262,7 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     'onMissingType',
     'onAfterBuild',
     'onObjectDefinition',
-    'onFieldDefinition',
+    'onOutputFieldDefinition',
     'onArgDefinition',
     'onInputFieldDefinition',
     'onInputObjectDefinition',

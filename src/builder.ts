@@ -432,7 +432,7 @@ export class SchemaBuilder {
   /**
    * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
    */
-  protected onFieldDefinitionFns: Exclude<PluginConfig['onFieldDefinition'], undefined>[] = []
+  protected onOutputFieldDefinitionFns: Exclude<PluginConfig['onOutputFieldDefinition'], undefined>[] = []
 
   /**
    * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
@@ -719,8 +719,8 @@ export class SchemaBuilder {
       if (pluginConfig.onObjectDefinition) {
         this.onObjectDefinitionFns.push(pluginConfig.onObjectDefinition)
       }
-      if (pluginConfig.onFieldDefinition) {
-        this.onFieldDefinitionFns.push(pluginConfig.onFieldDefinition)
+      if (pluginConfig.onOutputFieldDefinition) {
+        this.onOutputFieldDefinitionFns.push(pluginConfig.onOutputFieldDefinition)
       }
       if (pluginConfig.onInputFieldDefinition) {
         this.onInputFieldDefinitionFns.push(pluginConfig.onInputFieldDefinition)
@@ -1154,8 +1154,8 @@ export class SchemaBuilder {
   ) {
     fields.forEach((field) => {
       intoObject[field.name] = this.buildOutputField(field, typeConfig)
-      if (this.onFieldDefinitionFns.length) {
-        this.onFieldDefinitionFns.forEach((o) => {
+      if (this.onOutputFieldDefinitionFns.length) {
+        this.onOutputFieldDefinitionFns.forEach((o) => {
           const result = o(intoObject[field.name], field)
           if (result != null) {
             intoObject[field.name] = result

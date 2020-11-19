@@ -295,7 +295,7 @@ describe('plugin', () => {
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
   })
 
-  it('has an onFieldDefinition / onArgDefinition / onInputFieldDefinition option, which receives the field metadata, and can modify the field', async () => {
+  it('has an onOutputFieldDefinition / onArgDefinition / onInputFieldDefinition option, which receives the field metadata, and can modify the field', async () => {
     //
     const schema = makeSchema({
       outputs: false,
@@ -326,7 +326,7 @@ describe('plugin', () => {
       plugins: [
         plugin({
           name: 'Node',
-          onFieldDefinition(field, config) {
+          onOutputFieldDefinition(field, config) {
             // @ts-ignore
             if (config.list && !isListType(field.type)) {
               field.type = new GraphQLList(field.type)
