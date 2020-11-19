@@ -1239,7 +1239,7 @@ export class SchemaBuilder {
     const type = this.getOrBuildType(name)
     if (!isInterfaceType(type)) {
       /* istanbul ignore next */
-      throw new Error(`Expected ${name} to be an interfaceType, saw ${type.constructor.name}`)
+      throw new Error(`Expected ${name} to be an interfaceType, saw ${type.constructor.name}(${type.name})`)
     }
     return type
   }
@@ -1253,7 +1253,7 @@ export class SchemaBuilder {
     if (!isInputObjectType(graphqlType) && !isLeafType(graphqlType)) {
       /* istanbul ignore next */
       throw new Error(
-        `Expected ${nexusNamedType} to be a possible input type, saw ${graphqlType.constructor.name}`
+        `Expected ${nexusNamedType} to be a possible input type, saw ${graphqlType.constructor.name}(${graphqlType.name})`
       )
     }
 
@@ -1698,7 +1698,7 @@ export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQL
  */
 generateSchema.withArtifacts = async (
   config: SchemaConfig,
-  typeFilePath: string | false
+  typeFilePath: string | false = false
 ): Promise<{
   schema: NexusGraphQLSchema
   schemaTypes: string
