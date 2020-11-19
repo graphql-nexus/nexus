@@ -1,34 +1,32 @@
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLInputObjectType, GraphQLSchema } from 'graphql'
 import { makeSchema, queryType } from '../../src'
-import { inputObjectType, nullableListPlugin, SchemaConfig, stringArg } from '../../src/core'
+import { arg, inputObjectType, list, nullableListPlugin, SchemaConfig, stringArg } from '../../src/core'
 
-function testOutputField(
-  fieldConfig: { nullable?: boolean; list?: true | boolean[] },
-  makeSchemaConfig: Omit<SchemaConfig, 'types'> = {}
-) {
-  const schema = makeSchema({
-    outputs: false,
-    ...makeSchemaConfig,
+type InputOutputFieldConfig = {
+  nullable?: boolean
+  list?: true | boolean[]
+  type?: any
+  useDotListShorthand?: boolean
+}
+
+const TEST_DATA = {
+  output: (config: InputOutputFieldConfig) => ({
     types: [
       queryType({
         definition(t) {
-          t.string('foo', fieldConfig as any)
+          if (config.useDotListShorthand) {
+            t.list.field('foo', { ...config, type: config.type ?? 'String' })
+          } else {
+            t.field('foo', { ...config, type: config.type ?? 'String' })
+          }
         },
       }),
     ],
-    plugins: [nullableListPlugin()],
-  })
-
-  return schema.getQueryType()?.getFields()['foo']!.type
-}
-
-function testInputField(
-  fieldConfig: { nullable?: boolean; list?: true | boolean[] },
-  makeSchemaConfig: Omit<SchemaConfig, 'types'> = {}
-) {
-  const schema = makeSchema({
-    outputs: false,
-    ...makeSchemaConfig,
+    getTypeFromSchema(schema: GraphQLSchema) {
+      return schema.getQueryType()?.getFields()['foo']!.type
+    },
+  }),
+  input: (config: InputOutputFieldConfig) => ({
     types: [
       queryType({
         definition(t) {
@@ -38,46 +36,42 @@ function testInputField(
       inputObjectType({
         name: 'Foo',
         definition(t) {
-          t.string('foo', fieldConfig as any)
+          if (config.useDotListShorthand) {
+            t.list.field('foo', { ...config, type: config.type ?? 'String' })
+          } else {
+            t.field('foo', { ...config, type: config.type ?? 'String' })
+          }
         },
       }),
     ],
-    plugins: [nullableListPlugin()],
-  })
+    getTypeFromSchema(schema: GraphQLSchema) {
+      const inputType = schema.getType('Foo') as GraphQLInputObjectType
 
-  const inputType = schema.getType('Foo') as GraphQLInputObjectType
-
-  return inputType.getFields()['foo']?.type
-}
-
-function testArg(
-  argConfig: { nullable?: boolean; list?: true | boolean[] },
-  makeSchemaConfig: Omit<SchemaConfig, 'types'> = {}
-) {
-  const schema = makeSchema({
-    outputs: false,
-    ...makeSchemaConfig,
+      return inputType.getFields()['foo']?.type
+    },
+  }),
+  arg: (config: Omit<InputOutputFieldConfig, 'useDotListShorthand'>) => ({
     types: [
       queryType({
         definition(t) {
           t.string('foo', {
             args: {
-              id: stringArg(argConfig as any),
+              id: arg({ ...config, type: config.type ?? 'String' }),
             },
           })
         },
       }),
     ],
-    plugins: [nullableListPlugin()],
-  })
-
-  return schema
-    .getQueryType()
-    ?.getFields()
-    ['foo'].args.find((a) => a.name === 'id')!.type
+    getTypeFromSchema(schema: GraphQLSchema) {
+      return schema
+        .getQueryType()
+        ?.getFields()
+        ['foo'].args.find((a) => a.name === 'id')!.type
+    },
+  }),
 }
 
-function getListCombinations() {
+const getListCombinations = () => {
   const dataset = [true, false]
   const output: Array<boolean[]> = []
 
@@ -94,11 +88,55 @@ function getListCombinations() {
   return output
 }
 
-function getTestData(kind: 'input' | 'output' | 'arg') {}
+const LIST_COMBINATIONS = getListCombinations()
+
+function testField<Kind extends keyof typeof TEST_DATA>(
+  kind: Kind,
+  config: Parameters<typeof TEST_DATA[Kind]>[0],
+  schemaConfig: Omit<SchemaConfig, 'types'> = {}
+) {
+  const { types, getTypeFromSchema } = TEST_DATA[kind](config)
+
+  const schema = makeSchema({
+    outputs: false,
+    types,
+    plugins: [nullableListPlugin()],
+    ...schemaConfig,
+  })
+
+  return getTypeFromSchema(schema)
+}
+
+function genTestData<Kind extends keyof typeof TEST_DATA>(
+  kind: Kind,
+  schemaConfig: Omit<SchemaConfig, 'types'> = {}
+) {
+  const gen = (kind: Kind, config: { nullable: boolean }) =>
+    LIST_COMBINATIONS.map((comb) => {
+      const field = testField(kind, { list: comb, nullable: config.nullable }, schemaConfig)
+      const label = `[${comb.join(',')}]`
+
+      return [label, field]
+    })
+
+  return {
+    nonNull: gen(kind, { nullable: false }),
+    nullable: gen(kind, { nullable: true }),
+  }
+}
+
+const OUTPUT_TYPES_NON_NULL_DEFAULTS_TRUE = genTestData('output', { nonNullDefaults: { output: true } })
+const OUTPUT_TYPES_NON_NULL_DEFAULTS_FALSE = genTestData('output', { nonNullDefaults: { output: false } })
+
+const INPUT_TYPES_NON_NULL_DEFAULTS_TRUE = genTestData('output', { nonNullDefaults: { input: true } })
+const INPUT_TYPES_NON_NULL_DEFAULTS_FALSE = genTestData('output', { nonNullDefaults: { input: false } })
+
+const ARG_DEF_NON_NULL_DEFAULTS_TRUE = genTestData('arg', { nonNullDefaults: { input: true } })
+const ARG_DEF_NON_NULL_DEFAULTS_FALSE = genTestData('arg', { nonNullDefaults: { input: false } })
 
 describe('output types ; nonNullDefaults = false ;', () => {
   test('nullable: false', () => {
-    const field = testOutputField({
+    const field = testField('output', {
       nullable: false,
     })
 
@@ -106,14 +144,14 @@ describe('output types ; nonNullDefaults = false ;', () => {
   })
 
   test('nullable: true', () => {
-    const field = testOutputField({
+    const field = testField('output', {
       nullable: true,
     })
 
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
   test('list: true ; nullable: true', () => {
-    const field = testOutputField({
+    const field = testField('output', {
       list: true,
       nullable: true,
     })
@@ -122,7 +160,7 @@ describe('output types ; nonNullDefaults = false ;', () => {
   })
 
   test('list: true ; nullable: false', () => {
-    const field = testOutputField({
+    const field = testField('output', {
       list: true,
       nullable: false,
     })
@@ -130,38 +168,19 @@ describe('output types ; nonNullDefaults = false ;', () => {
     expect(field).toMatchInlineSnapshot(`"[String!]"`)
   })
 
-  const testDataNullableFalse = getListCombinations().map((comb) => {
-    const field = testOutputField({
-      list: comb,
-      nullable: false,
-    })
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableFalse)('%s ; nullable = false', (_, field) => {
+  it.each(OUTPUT_TYPES_NON_NULL_DEFAULTS_FALSE.nonNull)('%s ; nullable = false', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 
-  const testDataNullableTrue = getListCombinations().map((comb) => {
-    const field = testOutputField({
-      list: comb,
-      nullable: true,
-    })
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableTrue)('%s ; nullable = true', (_, field) => {
+  it.each(OUTPUT_TYPES_NON_NULL_DEFAULTS_FALSE.nullable)('%s ; nullable = true', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 })
 
 describe('output types ; nonNullDefaults = true ;', () => {
   test('nullable: false', () => {
-    const field = testOutputField(
+    const field = testField(
+      'output',
       {
         nullable: false,
       },
@@ -176,7 +195,8 @@ describe('output types ; nonNullDefaults = true ;', () => {
   })
 
   test('nullable: true', () => {
-    const field = testOutputField(
+    const field = testField(
+      'output',
       {
         nullable: true,
       },
@@ -190,7 +210,8 @@ describe('output types ; nonNullDefaults = true ;', () => {
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
   test('list: true ; nullable: true', () => {
-    const field = testOutputField(
+    const field = testField(
+      'output',
       {
         list: true,
         nullable: true,
@@ -206,7 +227,8 @@ describe('output types ; nonNullDefaults = true ;', () => {
   })
 
   test('list: true ; nullable: false', () => {
-    const field = testOutputField(
+    const field = testField(
+      'output',
       {
         list: true,
         nullable: false,
@@ -221,52 +243,18 @@ describe('output types ; nonNullDefaults = true ;', () => {
     expect(field).toMatchInlineSnapshot(`"[String!]"`)
   })
 
-  const testDataNullableFalse = getListCombinations().map((comb) => {
-    const field = testOutputField(
-      {
-        list: comb,
-        nullable: false,
-      },
-      {
-        nonNullDefaults: {
-          output: true,
-        },
-      }
-    )
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableFalse)('%s ; nullable = false', (_, field) => {
+  it.each(OUTPUT_TYPES_NON_NULL_DEFAULTS_TRUE.nonNull)('%s ; nullable = false', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 
-  const testDataNullableTrue = getListCombinations().map((comb) => {
-    const field = testOutputField(
-      {
-        list: comb,
-        nullable: true,
-      },
-      {
-        nonNullDefaults: {
-          output: true,
-        },
-      }
-    )
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableTrue)('%s ; nullable = true', (_, field) => {
+  it.each(OUTPUT_TYPES_NON_NULL_DEFAULTS_TRUE.nullable)('%s ; nullable = true', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 })
 
 describe('input types ; nonNullDefaults = false ;', () => {
   test('nullable: false', () => {
-    const field = testInputField({
+    const field = testField('input', {
       nullable: false,
     })
 
@@ -274,14 +262,14 @@ describe('input types ; nonNullDefaults = false ;', () => {
   })
 
   test('nullable: true', () => {
-    const field = testInputField({
+    const field = testField('input', {
       nullable: true,
     })
 
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
   test('list: true ; nullable: true', () => {
-    const field = testInputField({
+    const field = testField('input', {
       list: true,
       nullable: true,
     })
@@ -290,7 +278,7 @@ describe('input types ; nonNullDefaults = false ;', () => {
   })
 
   test('list: true ; nullable: false', () => {
-    const field = testInputField({
+    const field = testField('input', {
       list: true,
       nullable: false,
     })
@@ -298,38 +286,19 @@ describe('input types ; nonNullDefaults = false ;', () => {
     expect(field).toMatchInlineSnapshot(`"[String!]"`)
   })
 
-  const testDataNullableFalse = getListCombinations().map((comb) => {
-    const field = testInputField({
-      list: comb,
-      nullable: false,
-    })
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableFalse)('%s ; nullable = false', (_, field) => {
+  it.each(INPUT_TYPES_NON_NULL_DEFAULTS_FALSE.nonNull)('%s ; nullable = false', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 
-  const testDataNullableTrue = getListCombinations().map((comb) => {
-    const field = testInputField({
-      list: comb,
-      nullable: true,
-    })
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableTrue)('%s ; nullable = true', (_, field) => {
+  it.each(INPUT_TYPES_NON_NULL_DEFAULTS_FALSE.nullable)('%s ; nullable = true', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 })
 
 describe('input types ; nonNullDefaults = true ;', () => {
   test('nullable: false', () => {
-    const field = testInputField(
+    const field = testField(
+      'input',
       {
         nullable: false,
       },
@@ -344,7 +313,8 @@ describe('input types ; nonNullDefaults = true ;', () => {
   })
 
   test('nullable: true', () => {
-    const field = testInputField(
+    const field = testField(
+      'input',
       {
         nullable: true,
       },
@@ -358,7 +328,8 @@ describe('input types ; nonNullDefaults = true ;', () => {
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
   test('list: true ; nullable: true', () => {
-    const field = testInputField(
+    const field = testField(
+      'input',
       {
         list: true,
         nullable: true,
@@ -374,7 +345,8 @@ describe('input types ; nonNullDefaults = true ;', () => {
   })
 
   test('list: true ; nullable: false', () => {
-    const field = testInputField(
+    const field = testField(
+      'input',
       {
         list: true,
         nullable: false,
@@ -389,52 +361,18 @@ describe('input types ; nonNullDefaults = true ;', () => {
     expect(field).toMatchInlineSnapshot(`"[String!]"`)
   })
 
-  const testDataNullableFalse = getListCombinations().map((comb) => {
-    const field = testInputField(
-      {
-        list: comb,
-        nullable: false,
-      },
-      {
-        nonNullDefaults: {
-          output: true,
-        },
-      }
-    )
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableFalse)('%s ; nullable = false', (_, field) => {
+  it.each(INPUT_TYPES_NON_NULL_DEFAULTS_TRUE.nonNull)('%s ; nullable = false', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 
-  const testDataNullableTrue = getListCombinations().map((comb) => {
-    const field = testInputField(
-      {
-        list: comb,
-        nullable: true,
-      },
-      {
-        nonNullDefaults: {
-          output: true,
-        },
-      }
-    )
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableTrue)('%s ; nullable = true', (_, field) => {
+  it.each(INPUT_TYPES_NON_NULL_DEFAULTS_TRUE.nullable)('%s ; nullable = true', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 })
 
 describe('arg def ; nonNullDefaults = false ;', () => {
   test('nullable: false', () => {
-    const field = testArg({
+    const field = testField('arg', {
       nullable: false,
     })
 
@@ -442,14 +380,14 @@ describe('arg def ; nonNullDefaults = false ;', () => {
   })
 
   test('nullable: true', () => {
-    const field = testArg({
+    const field = testField('arg', {
       nullable: true,
     })
 
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
   test('list: true ; nullable: true', () => {
-    const field = testArg({
+    const field = testField('arg', {
       list: true,
       nullable: true,
     })
@@ -458,7 +396,7 @@ describe('arg def ; nonNullDefaults = false ;', () => {
   })
 
   test('list: true ; nullable: false', () => {
-    const field = testArg({
+    const field = testField('arg', {
       list: true,
       nullable: false,
     })
@@ -466,38 +404,19 @@ describe('arg def ; nonNullDefaults = false ;', () => {
     expect(field).toMatchInlineSnapshot(`"[String!]"`)
   })
 
-  const testDataNullableFalse = getListCombinations().map((comb) => {
-    const field = testArg({
-      list: comb,
-      nullable: false,
-    })
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableFalse)('%s ; nullable = false', (_, field) => {
+  it.each(ARG_DEF_NON_NULL_DEFAULTS_FALSE.nonNull)('%s ; nullable = false', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 
-  const testDataNullableTrue = getListCombinations().map((comb) => {
-    const field = testArg({
-      list: comb,
-      nullable: true,
-    })
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableTrue)('%s ; nullable = true', (_, field) => {
+  it.each(ARG_DEF_NON_NULL_DEFAULTS_FALSE.nullable)('%s ; nullable = true', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 })
 
 describe('arg def ; nonNullDefaults = true ;', () => {
   test('nullable: false', () => {
-    const field = testArg(
+    const field = testField(
+      'arg',
       {
         nullable: false,
       },
@@ -512,7 +431,8 @@ describe('arg def ; nonNullDefaults = true ;', () => {
   })
 
   test('nullable: true', () => {
-    const field = testArg(
+    const field = testField(
+      'arg',
       {
         nullable: true,
       },
@@ -526,7 +446,8 @@ describe('arg def ; nonNullDefaults = true ;', () => {
     expect(field).toMatchInlineSnapshot(`"String"`)
   })
   test('list: true ; nullable: true', () => {
-    const field = testArg(
+    const field = testField(
+      'arg',
       {
         list: true,
         nullable: true,
@@ -542,7 +463,8 @@ describe('arg def ; nonNullDefaults = true ;', () => {
   })
 
   test('list: true ; nullable: false', () => {
-    const field = testArg(
+    const field = testField(
+      'arg',
       {
         list: true,
         nullable: false,
@@ -557,45 +479,131 @@ describe('arg def ; nonNullDefaults = true ;', () => {
     expect(field).toMatchInlineSnapshot(`"[String!]"`)
   })
 
-  const testDataNullableFalse = getListCombinations().map((comb) => {
-    const field = testArg(
-      {
-        list: comb,
-        nullable: false,
-      },
-      {
-        nonNullDefaults: {
-          output: true,
-        },
-      }
-    )
-    const label = `[${comb.join(',')}]`
-
-    return [label, field]
-  })
-
-  it.each(testDataNullableFalse)('%s ; nullable = false', (_, field) => {
+  it.each(ARG_DEF_NON_NULL_DEFAULTS_TRUE.nonNull)('%s ; nullable = false', (_, field) => {
     expect(field).toMatchSnapshot()
   })
 
-  const testDataNullableTrue = getListCombinations().map((comb) => {
-    const field = testArg(
-      {
-        list: comb,
-        nullable: true,
-      },
-      {
-        nonNullDefaults: {
-          output: true,
-        },
-      }
-    )
-    const label = `[${comb.join(',')}]`
+  it.each(ARG_DEF_NON_NULL_DEFAULTS_TRUE.nullable)('%s ; nullable = true', (_, field) => {
+    expect(field).toMatchSnapshot()
+  })
+})
 
-    return [label, field]
+describe('edge-cases', () => {
+  test('cannot use list: true and a wrapped type at the same time on an output type', () => {
+    expect(() =>
+      testField('output', {
+        type: list('String'),
+        list: true,
+      })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+    )
   })
 
-  it.each(testDataNullableTrue)('%s ; nullable = true', (_, field) => {
-    expect(field).toMatchSnapshot()
+  test('cannot use list: true and t.list at the same time on an output type', () => {
+    expect(() =>
+      testField('output', { list: true, useDotListShorthand: true })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+    )
+  })
+
+  test('cannot use nullable and a wrapped type at the same time on an output type', () => {
+    expect(() =>
+      testField('output', { type: list('String'), nullable: false })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used nullable: true and wrapped your type for foo. You should only do one or the other"`
+    )
+  })
+
+  test('cannot use list: true and a wrapped type at the same time on an input type', () => {
+    expect(() =>
+      testField('input', {
+        type: list('String'),
+        list: true,
+      })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+    )
+  })
+
+  test('cannot use list: true and t.list at the same time on an input type', () => {
+    expect(() =>
+      testField('output', {
+        list: true,
+        useDotListShorthand: true,
+      })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used list: true and wrapped your type for foo. You should only do one or the other"`
+    )
+  })
+
+  test('cannot use nullable and a wrapped type at the same time on an input type', () => {
+    expect(() =>
+      testField('input', { type: list('String'), nullable: false })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used nullable: true and wrapped your type for foo. You should only do one or the other"`
+    )
+  })
+
+  test('cannot use list: true and a wrapped arg type at the same time on an arg', () => {
+    expect(() =>
+      testField('arg', {
+        type: list('String'),
+        list: true,
+      })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used list: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
+    )
+  })
+
+  test('cannot use nullable and a wrapped arg type at the same time on an arg', () => {
+    expect(() =>
+      testField('arg', { type: list('String'), nullable: false })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used nullable: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
+    )
+  })
+
+  test('cannot use wrapped arg and list: true at the same time on an arg', () => {
+    expect(() =>
+      makeSchema({
+        types: [
+          queryType({
+            definition(t) {
+              t.string('foo', {
+                args: {
+                  id: list(stringArg({ list: true } as any)),
+                },
+              })
+            },
+          }),
+        ],
+        plugins: [nullableListPlugin()],
+      })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used list: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
+    )
+  })
+
+  test('cannot use wrapped arg and nullable: true at the same time on an arg', () => {
+    expect(() =>
+      makeSchema({
+        types: [
+          queryType({
+            definition(t) {
+              t.string('foo', {
+                args: {
+                  id: list(stringArg({ nullable: true } as any)),
+                },
+              })
+            },
+          }),
+        ],
+        plugins: [nullableListPlugin()],
+      })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"It looks like you used nullable: true and wrapped the type of the arg \\"id\\" of the field \\"foo\\" of the parent type \\"Query\\". You should only do one or the other"`
+    )
   })
 })
