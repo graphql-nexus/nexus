@@ -2782,7 +2782,71 @@ export interface NexusGenAbstractTypeMembers {
     | 'VariableDeclaration'
 }
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {
+  ArrayTypeNode: 'Node'
+  BindingPattern: 'Node'
+  CallSignatureDeclaration: 'Node'
+  ClassDeclaration: 'HasJSDoc' | 'Node'
+  ComputedPropertyName: 'Node'
+  ConditionalTypeNode: 'Node'
+  ConstructSignatureDeclaration: 'Node'
+  ConstructorDeclaration: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  ConstructorTypeNode: 'Node'
+  EnumDeclaration: 'HasJSDoc' | 'Node'
+  ExportAssignment: 'Node'
+  ExportDeclaration: 'Node'
+  FunctionDeclaration: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  FunctionTypeNode: 'Node'
+  GetAccessorDeclaration: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  Identifier: 'Node'
+  ImportDeclaration: 'Node'
+  ImportEqualsDeclaration: 'Node'
+  ImportTypeNode: 'Node'
+  IndexSignatureDeclaration: 'HasJSDoc' | 'Node'
+  IndexedAccessTypeNode: 'Node'
+  InferTypeNode: 'Node'
+  InterfaceDeclaration: 'HasJSDoc' | 'Node'
+  IntersectionTypeNode: 'Node'
+  JSDocAugmentsTag: 'JSDocTag'
+  JSDocClassTag: 'JSDocTag'
+  JSDocEnumTag: 'JSDocTag'
+  JSDocNamespaceDeclaration: 'Node'
+  JSDocReturnTag: 'JSDocTag'
+  JSDocTemplateTag: 'JSDocTag'
+  JSDocThisTag: 'JSDocTag'
+  JSDocTypeTag: 'JSDocTag'
+  JSDocUnknownTag: 'JSDocTag'
+  KeywordTypeNode: 'Node'
+  LiteralType: 'Node'
+  MappedTypeNode: 'Node'
+  MethodDeclaration: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  MissingDeclaration: 'Node'
+  ModuleDeclaration: 'HasJSDoc' | 'Node'
+  NamespaceDeclaration: 'HasJSDoc' | 'Node'
+  NamespaceExportDeclaration: 'Node'
+  NumericLiteral: 'Node'
+  OptionalTypeNode: 'Node'
+  ParameterDeclaration: 'HasJSDoc' | 'Node'
+  ParenthesizedType: 'Node'
+  PropertyDeclaration: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  PropertyLikeDeclaration: 'Node'
+  PropertySignature: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  QualifiedName: 'Node'
+  RestTypeNode: 'Node'
+  SetAccessorDeclaration: 'HasJSDoc' | 'MaybeOptional' | 'Node'
+  SourceFile: 'Node'
+  StringLiteral: 'Node'
+  StringLiteralLike: 'Node'
+  ThisTypeNode: 'Node'
+  TupleTypeNode: 'Node'
+  TypeAliasDeclaration: 'HasJSDoc' | 'Node'
+  TypeLiteral: 'Node'
+  TypeParameterDeclaration: 'Node'
+  TypeReference: 'Node'
+  UNKNOWN_NODE: 'Node'
+  UnionType: 'Node'
+  VariableDeclaration: 'Node'
+}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
@@ -2821,7 +2885,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames

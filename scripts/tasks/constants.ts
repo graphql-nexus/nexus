@@ -3,7 +3,7 @@ export const allExamples = [
   'star-wars',
   'kitchen-sink',
   'githunt-api',
-  // 'apollo-fullstack',
+  'apollo-fullstack',
   // 'zeit-typescript',
   'ghost',
 ]

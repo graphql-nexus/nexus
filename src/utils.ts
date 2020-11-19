@@ -54,7 +54,6 @@ import {
   NexusTypes,
   withNexusSymbol,
 } from './definitions/_types'
-import { PluginConfig } from './plugin'
 import { AllInputTypes } from './typegenTypeHelpers'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
@@ -456,21 +455,6 @@ export function venn<T>(xs: Iterable<T>, ys: Iterable<T>): [Set<T>, Set<T>, Set<
   })
 
   return [lefts, boths, rights]
-}
-
-/**
- * Validate that the data returned from a plugin from the `onInstall` hook is valid.
- */
-export function validateOnInstallHookResult(
-  pluginName: string,
-  hookResult: ReturnType<Exclude<PluginConfig['onInstall'], undefined>>
-): void {
-  if (!Array.isArray(hookResult?.types)) {
-    throw new Error(
-      `Plugin "${pluginName}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
-    )
-  }
-  // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
 }
 
 export const UNKNOWN_TYPE_SCALAR = decorateType(

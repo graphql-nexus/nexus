@@ -4,12 +4,14 @@ import {
   interfaceType,
   list,
   makeSchema,
-  NullabilityGuardConfig,
+  nullabilityGuardPluginCore,
   nullabilityGuardPlugin,
   objectType,
   queryField,
   unionType,
 } from '../../src'
+
+type NullabilityGuardConfig = nullabilityGuardPluginCore.NullabilityGuardConfig
 
 const NODE_ENV = process.env.NODE_ENV
 

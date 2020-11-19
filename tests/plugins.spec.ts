@@ -46,27 +46,6 @@ describe('runtime config validation', () => {
   })
 })
 
-describe('runtime onInstall hook handler', () => {
-  const whenGiven = (onInstall: any) => () =>
-    makeSchema({
-      outputs: false,
-      types: [],
-      plugins: [createPlugin({ name: 'x', onInstall })],
-    })
-
-  it('validates return value against shallow schema', () => {
-    expect(whenGiven(() => null)).toThrowErrorMatchingSnapshot()
-
-    expect(whenGiven(() => ({ types: null }))).toThrowErrorMatchingSnapshot()
-
-    expect(whenGiven(() => ({}))).toThrowErrorMatchingSnapshot()
-  })
-
-  it('does not validate types array members yet', () => {
-    expect(whenGiven(() => ({ types: [null, 1, 'bad'] }))).toThrowErrorMatchingSnapshot()
-  })
-})
-
 describe('a plugin may', () => {
   const whenGiven = (pluginConfig: PluginConfig) => () =>
     makeSchema({
@@ -106,15 +85,15 @@ describe('onInstall plugins', () => {
   })
 
   it('may return an empty array of types', () => {
-    expect(whenGiven({ onInstall: () => ({ types: [] }) }))
+    expect(whenGiven({ onInstall: () => {} }))
   })
 
   it('may contribute types', () => {
     expect(
       whenGiven({
-        onInstall: () => ({
-          types: [queryField],
-        }),
+        onInstall: (builder) => {
+          builder.addType(queryField)
+        },
       })
     ).toMatchSnapshot()
   })
@@ -122,9 +101,11 @@ describe('onInstall plugins', () => {
   it('has access to top-level types', () => {
     expect(
       whenGiven({
-        onInstall: (builder) => ({
-          types: builder.hasType('foo') ? [] : [queryField],
-        }),
+        onInstall: (builder) => {
+          if (!builder.hasType('foo')) {
+            builder.addType(queryField)
+          }
+        },
         appTypes: [fooObject],
       })
     ).toMatchSnapshot()
@@ -134,8 +115,8 @@ describe('onInstall plugins', () => {
     expect(
       whenGiven({
         onInstall(builder) {
-          return {
-            types: builder.hasType('Query') ? [queryField] : [],
+          if (builder.hasType('Query')) {
+            builder.addType(queryField)
           }
         },
       })
@@ -145,9 +126,11 @@ describe('onInstall plugins', () => {
   it('does not have access to inline types', () => {
     expect(
       whenGiven({
-        onInstall: (builder) => ({
-          types: builder.hasType('Inline') ? [queryField] : [],
-        }),
+        onInstall: (builder) => {
+          if (builder.hasType('Inline')) {
+            builder.addType(queryField)
+          }
+        },
         appTypes: [
           queryType({
             definition(t) {

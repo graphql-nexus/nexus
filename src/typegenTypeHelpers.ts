@@ -1,4 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
+import { NexusObjectTypeDef } from './definitions/objectType'
+import { NexusInterfaceTypeDef } from './definitions/interfaceType'
 
 declare global {
   interface NexusGen {}
@@ -8,6 +10,7 @@ declare global {
   interface NexusGenPluginSchemaConfig {}
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
+  interface NexusGenPluginArgConfig {}
 }
 
 export type AllInputTypes = GetGen<'allInputTypes', string>
@@ -132,7 +135,7 @@ export type GenTypesShapeKeys =
   | 'fieldTypes'
   | 'fieldTypeNames'
   | 'allTypes'
-  | 'inheritedFields'
+  | 'typeInterfaces'
   | 'objectNames'
   | 'inputNames'
   | 'enumNames'
@@ -273,3 +276,25 @@ export type Discriminate<
   : Required extends 'required'
   ? Type & { __typename: TypeName }
   : Type & { __typename?: TypeName }
+
+export type InterfaceFieldsFor<TypeName extends string> = {
+  [K in GetGen2<'typeInterfaces', TypeName, never>]: keyof GetGen2<'fieldTypeNames', K>
+}[GetGen2<'typeInterfaces', TypeName, never>]
+
+export type ModificationType<TypeName, FieldName> = TypeName extends string
+  ? FieldName extends string
+    ? GetGen2<
+        'abstractTypeMembers',
+        GetGen3<'fieldTypeNames', GetGen2<'typeInterfaces', TypeName, never>, FieldName>,
+        never
+      > extends infer U
+      ? U extends string
+        ? U | ConcreteModificationType<U>
+        : never
+      : never
+    : any
+  : any
+
+export type ConcreteModificationType<U extends string> = GetGen2<'objectNames', U, never> extends string
+  ? NexusObjectTypeDef<U>
+  : NexusInterfaceTypeDef<U>

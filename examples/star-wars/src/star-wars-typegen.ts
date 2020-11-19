@@ -143,7 +143,10 @@ export interface NexusGenAbstractTypeMembers {
   Character: 'Droid' | 'Human'
 }
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {
+  Droid: 'Character'
+  Human: 'Character'
+}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
@@ -177,7 +180,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames
