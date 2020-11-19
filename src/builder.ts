@@ -1138,8 +1138,7 @@ export class SchemaBuilder {
             interfaceFieldsMap[field].type = this.getOutputType(type, !nonNullDefault)
           }
           if (typeof args !== 'undefined') {
-            const fieldConfig = interfaceFieldsMap[field]?.extensions?.nexus
-              .fieldConfig as NexusFieldExtension
+            const fieldConfig = interfaceFieldsMap[field]?.extensions?.nexus as NexusFieldExtension
 
             interfaceFieldsMap[field].args = {
               ...interfaceFieldsMap[field].args,
