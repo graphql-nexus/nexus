@@ -131,7 +131,7 @@ export const nullableListPlugin = () => {
         return
       }
 
-      const nonNullDefault = builder.getConfigOption('nonNullDefaults').output
+      const nonNullDefault = builder.getConfigOption('nonNullDefaults').input
 
       field.type = decorateType(
         getNamedType(field.type) as GraphQLNamedInputType,
@@ -158,19 +158,19 @@ export const nullableListPlugin = () => {
       if (isNexusWrappingType(argConfig.value.type)) {
         if (list !== undefined) {
           throw new Error(
-            `It looks like you used list: true and wrapped the type of the arg "${argConfig.name}" in the field "${fieldConfig.name}" of the parent type "${parentTypeConfig.name}". You should only do one or the other`
+            `It looks like you used list: true and wrapped the type of the arg "${argConfig.name}" of the field "${fieldConfig.name}" of the parent type "${parentTypeConfig.name}". You should only do one or the other`
           )
         }
 
         if (nullable !== undefined) {
           throw new Error(
-            `It looks like you used nullable: true and wrapped the type of the arg "${argConfig.name}" in the field "${fieldConfig.name}" of the parent type "${parentTypeConfig.name}". You should only do one or the other`
+            `It looks like you used nullable: true and wrapped the type of the arg "${argConfig.name}" of the field "${fieldConfig.name}" of the parent type "${parentTypeConfig.name}". You should only do one or the other`
           )
         }
         return
       }
 
-      const nonNullDefault = builder.getConfigOption('nonNullDefaults').output
+      const nonNullDefault = builder.getConfigOption('nonNullDefaults').input
 
       arg.type = decorateType(
         getNamedType(arg.type) as GraphQLNamedInputType,
