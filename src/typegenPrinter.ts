@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import {
   getNamedType,
   GraphQLAbstractType,
@@ -22,21 +21,19 @@ import {
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
-import * as path from 'path'
 import { TypegenInfo } from './builder'
-import { NexusGraphQLSchema } from './definitions/_types'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
+import { NexusGraphQLSchema } from './definitions/_types'
 import { StringLike } from './plugin'
 import {
   eachObj,
   getOwnPackage,
   GroupedTypes,
   groupTypes,
-  isNodeModule,
   mapObj,
   mapValues,
   PrintedGenTypingImport,
-  relativePathTo,
+  resolveImportPath,
 } from './utils'
 
 const SpecifiedScalars = {
@@ -162,6 +159,7 @@ export class TypegenPrinter {
       rootTypings,
       dynamicFields: { dynamicInputFields, dynamicOutputFields },
     } = this.schema.extensions.nexus.config
+    const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
     const outputPath = this.typegenInfo.typegenFile
@@ -178,37 +176,19 @@ export class TypegenPrinter {
       }
     }
 
+    if (contextTypeImport) {
+      const importPath = resolveImportPath(contextTypeImport, 'context', outputPath)
+      importMap[importPath] = importMap[importPath] || new Set()
+      importMap[importPath].add(
+        contextTypeImport.alias
+          ? `${contextTypeImport.name} as ${contextTypeImport.alias}`
+          : contextTypeImport.name
+      )
+    }
+
     eachObj(rootTypings, (rootType, typeName) => {
       if (typeof rootType !== 'string') {
-        const rootTypePath = rootType.path
-
-        if (
-          typeof rootTypePath !== 'string' ||
-          (!path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))
-        ) {
-          throw new Error(
-            `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
-          )
-        }
-
-        if (path.isAbsolute(rootTypePath)) {
-          if (!fs.existsSync(rootTypePath)) {
-            throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
-          }
-        } else {
-          try {
-            require.resolve(rootTypePath)
-          } catch (e) {
-            throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
-          }
-        }
-
-        const importPath = path.isAbsolute(rootTypePath)
-          ? relativePathTo(rootTypePath, outputPath)
-              .replace(/(\.d)?\.ts/, '')
-              .replace(/\\+/g, '/')
-          : rootTypePath
-
+        const importPath = resolveImportPath(rootType, typeName, outputPath)
         importMap[importPath] = importMap[importPath] || new Set()
         importMap[importPath].add(rootType.alias ? `${rootType.name} as ${rootType.alias}` : rootType.name)
       }

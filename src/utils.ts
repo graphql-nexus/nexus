@@ -1,13 +1,10 @@
+import * as fs from 'fs'
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
-  GraphQLInputType,
   GraphQLInterfaceType,
-  GraphQLList,
   GraphQLNamedType,
-  GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLOutputType,
   GraphQLResolveInfo,
   GraphQLScalarType,
   GraphQLSchema,
@@ -26,23 +23,13 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import * as path from 'path'
+import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
-import { list } from './definitions/list'
-import { nonNull } from './definitions/nonNull'
-import { nullable } from './definitions/nullable'
 import {
   AllNexusArgsDefs,
-  AllNexusInputTypeDefs,
   AllNexusNamedArgsDefs,
-  AllNexusNamedInputTypeDefs,
-  AllNexusNamedOutputTypeDefs,
   AllNexusNamedTypeDefs,
-  AllNexusOutputTypeDefs,
   AllNexusTypeDefs,
-  isNexusListTypeDef,
-  isNexusNonNullTypeDef,
-  isNexusNullTypeDef,
   isNexusWrappingType,
 } from './definitions/wrapping'
 import {
@@ -50,6 +37,7 @@ import {
   NexusFeatures,
   NexusGraphQLSchema,
   NexusTypes,
+  TypingImport,
   withNexusSymbol,
 } from './definitions/_types'
 
@@ -166,7 +154,7 @@ export function eachObj<T>(obj: Record<string, T>, iter: (val: T, key: string, i
 export const isObject = (obj: any): boolean => obj !== null && typeof obj === 'object'
 
 export const assertAbsolutePath = (pathName: string, property: string) => {
-  if (!path.isAbsolute(pathName)) {
+  if (!Path.isAbsolute(pathName)) {
     throw new Error(`Expected path for ${property} to be an absolute path, saw ${pathName}`)
   }
   return pathName
@@ -234,13 +222,37 @@ export function isPromiseLike(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === 'function')
 }
 
-export function relativePathTo(absolutePath: string, outputPath: string): string {
-  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, '')
-  const relative = path.relative(path.dirname(outputPath), path.dirname(absolutePath))
-  if (relative.indexOf('.') !== 0) {
-    return `./${path.join(relative, filename)}`
-  }
-  return path.join(relative, filename)
+export const typeScriptFileExtension = /(\.d)?\.ts$/
+
+function makeRelativePathExplicitlyRelative(path: string) {
+  if (Path.isAbsolute(path)) return path
+  if (path.startsWith('./')) return path
+  return `./${path}`
+}
+
+function nixifyPathSlashes(path: string): string {
+  return path.replace(/\\+/g, '/')
+}
+
+/**
+ * Format a path so it is suitable to be used as a module import.
+ *
+ * - Implicitly relative is made explicitly relative
+ * - TypeScript file extension is stripped
+ * - Windows slashes converted into *nix slashes
+ *
+ * @remarks
+ *
+ * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
+ */
+export function formatPathForModuleimport(path: string) {
+  return nixifyPathSlashes(makeRelativePathExplicitlyRelative(path).replace(typeScriptFileExtension, ''))
+}
+
+export function relativePathTo(absolutePath: string, fromPath: string): string {
+  const filename = Path.basename(absolutePath)
+  const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
+  return formatPathForModuleimport(Path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -506,164 +518,33 @@ export function dump(x: any) {
   console.log(require('util').inspect(x, { depth: null }))
 }
 
-export function isNodeModule(path: string) {
-  return /^([A-z0-9@])/.test(path)
+function isNodeModule(path: string) {
+  // Avoid treating absolute windows paths as Node packages e.g. D:/a/b/c
+  return !Path.isAbsolute(path) && /^([A-z0-9@])/.test(path)
 }
 
-export type NexusWrapKind = 'NonNull' | 'Null' | 'List' | 'WrappedType'
+export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
+  const rootTypePath = rootType.path
 
-export function unwrapNexusDef(
-  typeDef: AllNexusTypeDefs | AllNexusArgsDefs | string
-): { namedType: AllNexusNamedTypeDefs | AllNexusArgsDefs | string; wrapping: NexusWrapKind[] } {
-  const wrapping: NexusWrapKind[] = []
-  let namedType = typeDef
-
-  while (isNexusWrappingType(namedType)) {
-    if (isNexusNonNullTypeDef(namedType)) {
-      wrapping.unshift('NonNull')
-    }
-
-    if (isNexusNullTypeDef(namedType)) {
-      wrapping.unshift('Null')
-    }
-
-    if (isNexusListTypeDef(namedType)) {
-      wrapping.unshift('List')
-    }
-
-    namedType = namedType.ofType
+  if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
+    throw new Error(
+      `Expected an absolute path or Node package for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+    )
   }
 
-  wrapping.unshift('WrappedType')
-
-  return { namedType, wrapping }
-}
-
-/**
- * Take a Nexus Wrapped Def, unwraps it, and rewraps it as a GraphQL wrapped type
- * The outputted GraphQL type also reflects the nullability defaults
- */
-export function rewrapAsGraphQLType(
-  nexusDef: AllNexusOutputTypeDefs | string,
-  baseType: GraphQLNamedType,
-  nonNullDefault: boolean
-): GraphQLOutputType
-export function rewrapAsGraphQLType(
-  nexusDef: AllNexusInputTypeDefs | string,
-  baseType: GraphQLNamedType,
-  nonNullDefault: boolean
-): GraphQLInputType
-export function rewrapAsGraphQLType(
-  nexusDef: AllNexusTypeDefs | string,
-  namedType: GraphQLNamedType,
-  nonNullDefault: boolean
-): GraphQLOutputType | GraphQLInputType {
-  const { wrapping } = unwrapNexusDef(nexusDef)
-  let finalType: GraphQLType = namedType
-
-  if (wrapping[0] !== 'WrappedType') {
-    throw new Error('Missing leading WrappedType. This should never happen, please create an issue.')
+  if (isNodeModule(rootTypePath)) {
+    try {
+      require.resolve(rootTypePath)
+    } catch (e) {
+      throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
+    }
+  } else if (!fs.existsSync(rootTypePath)) {
+    throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
   }
 
-  for (let i = 0; i < wrapping.length; i++) {
-    if (wrapping[i] === 'List' && wrapping[i + 1] === 'NonNull') {
-      finalType = GraphQLNonNull(GraphQLList(finalType))
-      i += 1
-      continue
-    }
+  const importPath = isNodeModule(rootTypePath) ? rootTypePath : relativePathTo(rootTypePath, outputPath)
 
-    if (wrapping[i] === 'List' && wrapping[i + 1] === 'Null') {
-      finalType = GraphQLList(finalType)
-      i += 1
-      continue
-    }
-
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'Null') {
-      i += 1
-      continue
-    }
-
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'NonNull') {
-      finalType = GraphQLNonNull(finalType)
-      i += 1
-      continue
-    }
-
-    if (wrapping[i] === 'List') {
-      finalType = nonNullDefault ? GraphQLNonNull(GraphQLList(finalType)) : GraphQLList(finalType)
-    }
-
-    if (wrapping[i] === 'WrappedType' && nonNullDefault) {
-      finalType = GraphQLNonNull(finalType)
-    }
-  }
-
-  return finalType
-}
-
-export function wrapAsNexusType(
-  baseType: AllNexusNamedOutputTypeDefs | string,
-  wrapping: NexusWrapKind[],
-  nonNullDefault: boolean
-): AllNexusOutputTypeDefs
-export function wrapAsNexusType(
-  baseType: AllNexusNamedInputTypeDefs | string,
-  wrapping: NexusWrapKind[],
-  nonNullDefault: boolean
-): AllNexusInputTypeDefs
-export function wrapAsNexusType(
-  baseType: AllNexusNamedTypeDefs | string,
-  wrapping: NexusWrapKind[],
-  nonNullDefault: boolean
-): AllNexusTypeDefs {
-  let finalType: any = baseType
-
-  if (wrapping[0] !== 'WrappedType') {
-    throw new Error('Missing leading WrappedType. This should never happen, please create an issue.')
-  }
-
-  for (let i = 0; i < wrapping.length; i++) {
-    if (wrapping[i] === 'List' && wrapping[i + 1] === 'NonNull') {
-      finalType = nonNull(list(finalType))
-      i += 1
-      continue
-    }
-
-    if (wrapping[i] === 'List' && wrapping[i + 1] === 'Null') {
-      finalType = nullable(list(finalType))
-      i += 1
-      continue
-    }
-
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'NonNull') {
-      finalType = nonNull(finalType)
-      i += 1
-      continue
-    }
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'Null') {
-      finalType = nullable(finalType)
-      i += 1
-      continue
-    }
-
-    if (wrapping[i] === 'List') {
-      finalType = nonNullDefault ? nonNull(list(finalType)) : list(finalType)
-    }
-
-    if (wrapping[i] === 'NonNull') {
-      finalType = nonNull(finalType)
-    }
-
-    if (wrapping[i] === 'Null') {
-      finalType = nullable(finalType)
-    }
-
-    if (wrapping[i] === 'WrappedType' && nonNullDefault) {
-      finalType = nonNull(finalType)
-    }
-  }
-
-  return finalType
+  return importPath
 }
 
 export function getNexusNamedArgDef(argDef: AllNexusArgsDefs | string): AllNexusNamedArgsDefs | string {

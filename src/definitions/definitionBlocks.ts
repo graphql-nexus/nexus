@@ -1,8 +1,13 @@
 import { GraphQLFieldResolver } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
-import { NexusWrapKind, wrapAsNexusType } from '../utils'
 import { ArgsRecord } from './args'
-import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, isNexusWrappingType } from './wrapping'
+import {
+  AllNexusInputTypeDefs,
+  AllNexusOutputTypeDefs,
+  isNexusWrappingType,
+  NexusWrapKind,
+  wrapAsNexusType,
+} from './wrapping'
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
