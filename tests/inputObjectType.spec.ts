@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { inputObjectType, list, makeSchema, objectType, queryField } from '../src/core'
+import { inputObjectType, makeSchema, objectType, queryField } from '../src/core'
 
 describe('inputObject', () => {
   it('builds creates an inputObject type', async () => {

@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { list, makeSchema, objectType, queryField } from '../src/core'
+import { makeSchema, objectType, queryField } from '../src/core'
 
 describe('objectType', () => {
   it('builds creates an object type', async () => {
