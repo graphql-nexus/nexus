@@ -4,6 +4,7 @@ const process = require('process')
 /** @typedef {import('ts-jest')} */
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
+  testPathIgnorePatterns: ['<rootDir>/docs'],
   setupFilesAfterEnv: ['<rootDir>/tests/_setup.ts'],
   preset: 'ts-jest',
   testEnvironment: 'node',

@@ -1,4 +1,3 @@
-import './__typegen'
 import {
   dynamicInputMethod,
   dynamicOutputMethod,
@@ -14,6 +13,7 @@ import {
   subscriptionType,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
+import './__typegen'
 
 export const query = queryType({
   definition(t) {
@@ -61,7 +61,7 @@ export const dom = dynamicOutputMethod({
 export const dim = dynamicInputMethod({
   name: 'title',
   factory: ({ typeDef: t }) => {
-    t.string('title', { nullable: true })
+    t.string('title')
   },
 })
 
@@ -76,7 +76,7 @@ export const PostSearchInput = inputObjectType({
   name: 'PostSearchInput',
   definition(t) {
     t.title()
-    t.string('body', { nullable: true })
+    t.string('body')
   },
 })
 

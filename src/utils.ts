@@ -26,6 +26,13 @@ import {
 import * as path from 'path'
 import { decorateType } from './definitions/decorateType'
 import {
+  AllNexusArgsDefs,
+  AllNexusNamedArgsDefs,
+  AllNexusNamedTypeDefs,
+  AllNexusTypeDefs,
+  isNexusWrappingType,
+} from './definitions/wrapping'
+import {
   MissingType,
   NexusFeatures,
   NexusGraphQLSchema,
@@ -33,7 +40,7 @@ import {
   TypingImport,
   withNexusSymbol,
 } from './definitions/_types'
-import { PluginConfig } from './plugin'
+import { AllInputTypes } from './typegenTypeHelpers'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
   return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]))
@@ -436,27 +443,12 @@ export function venn<T>(xs: Iterable<T>, ys: Iterable<T>): [Set<T>, Set<T>, Set<
   return [lefts, boths, rights]
 }
 
-/**
- * Validate that the data returned from a plugin from the `onInstall` hook is valid.
- */
-export function validateOnInstallHookResult(
-  pluginName: string,
-  hookResult: ReturnType<Exclude<PluginConfig['onInstall'], undefined>>
-): void {
-  if (!Array.isArray(hookResult?.types)) {
-    throw new Error(
-      `Plugin "${pluginName}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
-    )
-  }
-  // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
-}
-
 export const UNKNOWN_TYPE_SCALAR = decorateType(
   new GraphQLScalarType({
     name: 'NEXUS__UNKNOWN__TYPE',
     description: `
     This scalar should never make it into production. It is used as a placeholder for situations
-    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    where GraphQL Nexus encounters a missing type. We don't want to error immediately, otherwise
     the TypeScript definitions will not be updated.
   `,
     parseValue(value) {
@@ -533,6 +525,34 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
         .replace(/\\+/g, '/')
 
   return importPath
+}
+
+export function getNexusNamedArgDef(argDef: AllNexusArgsDefs | AllInputTypes): AllNexusNamedArgsDefs {
+  if (typeof argDef === 'string') {
+    return argDef
+  }
+
+  let namedType = argDef
+
+  while (isNexusWrappingType(namedType)) {
+    namedType = namedType.ofType
+  }
+
+  return namedType
+}
+
+export function getNexusNamedType(type: AllNexusTypeDefs | string): AllNexusNamedTypeDefs | string {
+  if (typeof type === 'string') {
+    return type
+  }
+
+  let namedType = type
+
+  while (isNexusWrappingType(namedType)) {
+    namedType = namedType.ofType
+  }
+
+  return namedType
 }
 
 /**

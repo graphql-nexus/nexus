@@ -1,10 +1,11 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
-import { BaseScalars } from './_types'
-import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
-import { ObjectDefinitionBuilder, objectType } from './objectType'
-import { AllNexusOutputTypeDefs } from './wrapping'
 import { IsEqual } from '../typeHelpersInternal'
+import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
+import { list } from './list'
+import { ObjectDefinitionBuilder, objectType } from './objectType'
+import { AllNexusOutputTypeDefs, isNexusListTypeDef } from './wrapping'
+import { BaseScalars } from './_types'
 
 export interface SubscriptionTypeConfigBase<FieldName extends string, Event = any> {
   resolve(
@@ -37,10 +38,8 @@ export interface SubscriptionTypeConfig<TypeName extends string, FieldName exten
     type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
   }
 
-export interface SubscriptionBuilderInternal extends ObjectDefinitionBuilder<'Subscription'> {}
-
 export class SubscriptionBuilder {
-  constructor(protected typeBuilder: SubscriptionBuilderInternal, protected isList = false) {}
+  constructor(protected typeBuilder: ObjectDefinitionBuilder, protected isList = false) {}
 
   get list() {
     if (this.isList) {
@@ -87,13 +86,13 @@ export class SubscriptionBuilder {
 
   protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
     if (this.isList) {
-      if (config.list) {
+      if (isNexusListTypeDef(config.type)) {
         this.typeBuilder.warn(
-          `It looks like you chained .list and set list for ${config.name}. ` +
+          `It looks like you chained .list and used list() for ${config.name}. ` +
             'You should only do one or the other'
         )
       } else {
-        config.list = true
+        config.type = list(config.type)
       }
     }
     return config

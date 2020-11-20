@@ -1,35 +1,15 @@
 import { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
-import { AllNexusInputTypeDefs } from './wrapping'
+import { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 
-export type ArgsRecord = Record<
-  string,
-  NexusArgDef<AllInputTypes> | AllInputTypes | AllNexusInputTypeDefs<string>
->
+export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
-export interface CommonArgConfig {
-  /**
-   * Whether the field is required, `required: true` = `nullable: false`
-   */
-  required?: boolean
-  /**
-   * Whether the field is nullable, `nullable: true` = `required: false`
-   */
-  nullable?: boolean
-  /**
-   * Whether the argument is a list or not.
-   *
-   * null = not a list
-   * true = list
-   * array = nested list, where true/false decides
-   * whether the list member can be nullable
-   */
-  list?: null | true | boolean[]
+export type CommonArgConfig = {
   /**
    * The description to annotate the GraphQL SDL
    */
   description?: string | null
-}
+} & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
   /**
@@ -72,7 +52,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg)
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg<T extends AllInputTypes>(options: { type: NexusArgConfigType<T> } & NexusArgConfig<T>) {
+export function arg<T extends AllInputTypes>(options: NexusArgConfig<T>) {
   if (!options.type) {
     throw new Error('You must provide a "type" for the arg()')
   }

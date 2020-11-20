@@ -23,7 +23,7 @@ export interface NexusGenScalars {
   ID: string
 }
 
-export interface NexusGenObjectTypes {
+export interface NexusGenObjects {
   Launch: t.Launch
   LaunchConnection: {
     // root type
@@ -48,20 +48,13 @@ export interface NexusGenObjectTypes {
   }
 }
 
-export interface NexusGenInterfaceTypes {}
+export interface NexusGenInterfaces {}
 
-export interface NexusGenUnionTypes {}
+export interface NexusGenUnions {}
 
-export type NexusGenRootTypes = NexusGenObjectTypes
+export type NexusGenRootTypes = NexusGenObjects
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  PatchSize: NexusGenEnums['PatchSize']
-  String: NexusGenScalars['String']
-  Int: NexusGenScalars['Int']
-  Float: NexusGenScalars['Float']
-  Boolean: NexusGenScalars['Boolean']
-  ID: NexusGenScalars['ID']
-}
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   Launch: {
@@ -204,25 +197,17 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {}
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {}
 
-export type NexusGenObjectNames =
-  | 'Launch'
-  | 'LaunchConnection'
-  | 'Mission'
-  | 'Mutation'
-  | 'Query'
-  | 'Rocket'
-  | 'TripUpdateResponse'
-  | 'User'
+export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = never
 
-export type NexusGenEnumNames = 'PatchSize'
+export type NexusGenEnumNames = keyof NexusGenEnums
 
 export type NexusGenInterfaceNames = never
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String'
+export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
 
@@ -246,7 +231,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames

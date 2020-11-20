@@ -32,26 +32,28 @@ As documented in the [API reference](/api/introduction) GraphQL Nexus provides a
 
 ```js
 import {
-  objectType,
-  interfaceType,
-  queryType,
-  stringArg,
+  arg,
   enumType,
   intArg,
-  arg,
+  interfaceType,
   makeSchema,
+  objectType,
+  queryType,
+  stringArg,
 } from '@nexus/schema'
 
 const Node = interfaceType({
   name: 'Node',
   definition(t) {
     t.id('id', { description: 'Unique identifier for the resource' })
-    t.resolveType(() => null)
   },
 })
 
 const Account = objectType({
   name: 'Account',
+  isTypeOf(source) {
+    return 'email' in source
+  },
   definition(t) {
     t.implements(Node) // or t.implements("Node")
     t.string('username')

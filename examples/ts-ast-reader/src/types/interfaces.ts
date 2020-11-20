@@ -1,10 +1,10 @@
+import { arg, interfaceType, list, nullable } from '@nexus/schema'
 import { JSDoc, SyntaxKind } from 'typescript'
-import { arg, interfaceType } from '@nexus/schema'
 import { allKnownNodes, syntaxKindFilter } from './utils'
 
 const syntaxKindArgs = {
-  skip: arg({ type: 'SyntaxKind', list: true }),
-  only: arg({ type: 'SyntaxKind', list: true }),
+  skip: arg({ type: list('SyntaxKind') }),
+  only: arg({ type: list('SyntaxKind') }),
 }
 
 export const MaybeOptional = interfaceType({
@@ -13,7 +13,7 @@ export const MaybeOptional = interfaceType({
     return o.kind as any
   },
   definition(t) {
-    t.field('questionToken', { type: 'Token', nullable: true })
+    t.field('questionToken', { type: nullable('Token') })
   },
 })
 
@@ -31,21 +31,20 @@ export const Node = interfaceType({
   definition(t) {
     t.int('pos')
     t.int('end')
-    t.string('nameText', {
-      nullable: true,
+    t.field('nameText', {
+      type: nullable('String'),
       resolve: (root) =>
         // @ts-ignore
         root.name ? root.name.escapedText : null,
     })
-    t.field('name', { type: 'DeclarationName', nullable: true })
-    t.field('typeName', { type: 'DeclarationName', nullable: true })
+    t.field('name', { type: nullable('DeclarationName') })
+    t.field('typeName', { type: nullable('DeclarationName') })
     t.field('kind', { type: 'SyntaxKind' })
     t.int('kindCode', { resolve: (o) => o.kind })
     t.field('flags', { type: 'NodeFlags' })
     // t.field('decorators', 'Decorator', {list: true, nullable: true})
-    t.list.field('modifiers', {
-      type: 'Token',
-      nullable: true,
+    t.field('modifiers', {
+      type: nullable(list('Token')),
       args: syntaxKindArgs,
       async resolve(root, args) {
         if (!root.modifiers) {
@@ -74,9 +73,8 @@ export const JSDocInterface = interfaceType({
     return 'UNKNOWN_NODE'
   },
   definition(t) {
-    t.list.field('jsDoc', {
-      type: 'JSDoc',
-      nullable: true,
+    t.field('jsDoc', {
+      type: nullable(list('JSDoc')),
       resolve(root) {
         if ('jsDoc' in root) {
           // https://github.com/Microsoft/TypeScript/issues/19856

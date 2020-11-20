@@ -26,6 +26,7 @@ export interface NexusGenObjects {
   Comment: {
     // root type
     content?: string | null // String
+    createdAt?: number | null // Float
     id?: number | null // Int
     postedBy?: NexusGenRootTypes['User'] | null // User
     repoName?: string | null // String
@@ -35,6 +36,7 @@ export interface NexusGenObjects {
     commentCount?: number | null // Int
     comments?: Array<NexusGenRootTypes['Comment'] | null> | null // [Comment]
     createdAt?: number | null // Float
+    hotScore?: number | null // Float
     id?: number | null // Int
     postedBy?: NexusGenRootTypes['User'] | null // User
     repository?: NexusGenRootTypes['Repository'] | null // Repository
@@ -223,7 +225,7 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {}
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
@@ -257,7 +259,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames

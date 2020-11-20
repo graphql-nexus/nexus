@@ -110,9 +110,14 @@ export interface NexusGenObjects {
     // root type
     id?: string | null // ID
   }
+  SomeNode: {
+    // root type
+    data?: NexusGenRootTypes['SomeNode'] | null // SomeNode
+  }
   TestObj: {
     // root type
     a?: NexusGenRootTypes['Bar'] | null // Bar
+    data?: NexusGenRootTypes['Node'] | null // Node
     item?: string | null // String
     ok?: boolean | null // Boolean
   }
@@ -136,7 +141,7 @@ export interface NexusGenObjects {
 export interface NexusGenInterfaces {
   Bar: core.Discriminate<'Foo', 'optional'> | core.Discriminate<'TestObj', 'optional'>
   Baz: core.Discriminate<'TestObj', 'optional'>
-  Node: core.Discriminate<'TestObj', 'optional'>
+  Node: core.Discriminate<'SomeNode', 'required'> | core.Discriminate<'TestObj', 'required'>
   UnusedInterface: UnusedInterfaceTypeDef
 }
 
@@ -215,10 +220,16 @@ export interface NexusGenFieldTypes {
     // field return type
     id: string | null // ID
   }
+  SomeNode: {
+    // field return type
+    data: NexusGenRootTypes['SomeNode'] | null // SomeNode
+    id: string | null // ID
+  }
   TestObj: {
     // field return type
     a: NexusGenRootTypes['Bar'] | null // Bar
     argsTest: boolean | null // Boolean
+    data: NexusGenRootTypes['Node'] | null // Node
     id: string // ID!
     item: string | null // String
     ok: boolean | null // Boolean
@@ -250,7 +261,8 @@ export interface NexusGenFieldTypes {
   }
   Node: {
     // field return type
-    id: string // ID!
+    data: NexusGenRootTypes['Node'] | null // Node
+    id: string | null // ID
   }
   UnusedInterface: {
     // field return type
@@ -325,10 +337,16 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     id: 'ID'
   }
+  SomeNode: {
+    // field return type name
+    data: 'SomeNode'
+    id: 'ID'
+  }
   TestObj: {
     // field return type name
     a: 'Bar'
     argsTest: 'Boolean'
+    data: 'Node'
     id: 'ID'
     item: 'String'
     ok: 'Boolean'
@@ -360,6 +378,7 @@ export interface NexusGenFieldTypeNames {
   }
   Node: {
     // field return type name
+    data: 'Node'
     id: 'ID'
   }
   UnusedInterface: {
@@ -469,10 +488,14 @@ export interface NexusGenAbstractTypeMembers {
   TestUnion: 'Foo'
   Bar: 'Foo' | 'TestObj'
   Baz: 'TestObj'
-  Node: 'TestObj'
+  Node: 'SomeNode' | 'TestObj'
 }
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {
+  Foo: 'Bar'
+  SomeNode: 'Node'
+  TestObj: 'Bar' | 'Baz' | 'Node'
+}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
@@ -488,7 +511,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenAbstractsUsingStrategyResolveType = 'Bar' | 'Baz' | 'Node' | 'TestUnion'
+export type NexusGenAbstractsUsingStrategyResolveType = 'Bar' | 'Baz' | 'TestUnion'
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {
@@ -506,7 +529,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames

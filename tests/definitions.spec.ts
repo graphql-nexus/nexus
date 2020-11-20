@@ -2,6 +2,8 @@
 import { GraphQLEnumType, GraphQLObjectType, printType } from 'graphql'
 import { TypeMap } from 'graphql/type/schema'
 import { enumType, extendInputType, extendType, idArg, inputObjectType, makeSchema, objectType } from '../src'
+import { list } from '../src/definitions/list'
+import { nonNull } from '../src/definitions/nonNull'
 import { PostObject, UserObject } from './__helpers'
 
 enum NativeColors {
@@ -136,7 +138,9 @@ describe('objectType', () => {
         t.string('email', {
           description: 'The email of the person whos account this is',
         })
-        t.string('nestedList', { list: [false, true] })
+        t.field('nestedList', {
+          type: list(nonNull(list('String'))),
+        })
       },
     })
     const typeMap = buildTypes<{ Account: GraphQLObjectType }>([Account])

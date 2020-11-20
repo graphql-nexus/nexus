@@ -134,7 +134,7 @@ export class TypegenPrinter {
         `  fieldTypes: NexusGenFieldTypes;`,
         `  fieldTypeNames: NexusGenFieldTypeNames;`,
         `  allTypes: NexusGenAllTypes;`,
-        `  inheritedFields: NexusGenInheritedFields;`,
+        `  typeInterfaces: NexusGenTypeInterfaces;`,
         `  objectNames: NexusGenObjectNames;`,
         `  inputNames: NexusGenInputNames;`,
         `  enumNames: NexusGenEnumNames;`,
@@ -273,8 +273,25 @@ export class TypegenPrinter {
   }
 
   printInheritedFieldMap() {
-    // TODO:
-    return 'export interface NexusGenInheritedFields {}'
+    const hasInterfaces: (GraphQLInterfaceType | GraphQLObjectType)[] = []
+    const withInterfaces = hasInterfaces
+      .concat(this.groupedTypes.object, this.groupedTypes.interface)
+      .map((o) => {
+        if (o.getInterfaces().length) {
+          return [o.name, o.getInterfaces().map((i) => i.name)]
+        }
+        return null
+      })
+      .filter((f) => f) as [string, string[]][]
+
+    return ['export interface NexusGenTypeInterfaces {']
+      .concat(
+        withInterfaces.map(([name, interfaces]) => {
+          return `  ${name}: ${interfaces.map((i) => JSON.stringify(i)).join(' | ')}`
+        })
+      )
+      .concat('}')
+      .join('\n')
   }
 
   printContext() {
@@ -779,6 +796,7 @@ export class TypegenPrinter {
     const pluginFieldExt: string[] = [
       `  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {`,
     ]
+    const pluginArgExt: string[] = [`  interface NexusGenPluginArgConfig {`]
     const pluginSchemaExt: string[] = [`  interface NexusGenPluginSchemaConfig {`]
     const pluginTypeExt: string[] = [`  interface NexusGenPluginTypeConfig<TypeName extends string> {`]
     const printInlineDefs: string[] = []
@@ -790,6 +808,9 @@ export class TypegenPrinter {
       if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(padLeft(this.printType(plugin.config.objectTypeDefTypes), '    '))
       }
+      if (plugin.config.argTypeDefTypes) {
+        pluginArgExt.push(padLeft(this.printType(plugin.config.argTypeDefTypes), '    '))
+      }
     })
     return [
       printInlineDefs.join('\n'),
@@ -799,6 +820,7 @@ export class TypegenPrinter {
           pluginTypeExt.concat('  }').join('\n'),
           pluginFieldExt.concat('  }').join('\n'),
           pluginSchemaExt.concat('  }').join('\n'),
+          pluginArgExt.concat('  }').join('\n'),
         ].join('\n'),
         '}',
       ].join('\n'),

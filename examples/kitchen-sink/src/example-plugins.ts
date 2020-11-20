@@ -1,4 +1,4 @@
-import { FieldResolver, interfaceType, plugin } from '@nexus/schema'
+import { plugin, interfaceType, FieldResolver, nonNull } from '@nexus/schema'
 
 export const logMutationTimePlugin = plugin({
   name: 'LogMutationTime',
@@ -32,8 +32,8 @@ export const NodePlugin = plugin({
         resolveFn = node
       }
       t.implements('Node')
-      t.id('id', {
-        nullable: false,
+      t.field('id', {
+        type: nonNull('ID'),
         resolve: resolveFn,
       })
     }
@@ -52,8 +52,8 @@ export const NodePlugin = plugin({
           throw new Error('__typename missing for resolving Node')
         },
         definition(t) {
-          t.id('id', {
-            nullable: false,
+          t.field('id', {
+            type: nonNull('ID'),
             resolve: () => {
               throw new Error('Abstract')
             },

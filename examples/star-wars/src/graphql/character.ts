@@ -1,4 +1,4 @@
-import { interfaceType, idArg } from '@nexus/schema'
+import { interfaceType, idArg, nonNull } from '@nexus/schema'
 import { getFriends } from '../data'
 
 export const Character = interfaceType({
@@ -19,7 +19,7 @@ export const Character = interfaceType({
       description: 'Which movies they appear in.',
       resolve: (o) => o.appears_in,
       args: {
-        id: idArg({ required: true }),
+        id: nonNull(idArg()),
       },
     })
   },

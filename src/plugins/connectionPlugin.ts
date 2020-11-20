@@ -1,8 +1,12 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
-import { ArgsRecord, intArg, stringArg } from '../definitions/args'
+import { arg, ArgsRecord } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
+import { list } from '../definitions/list'
+import { nonNull } from '../definitions/nonNull'
+import { nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
-import { AllNexusOutputTypeDefs } from '../definitions/wrapping'
+import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
+import { NonNullConfig } from '../definitions/_types'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
 import {
@@ -23,7 +27,6 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
-import { NonNullConfig } from '../definitions/_types'
 
 export interface ConnectionPluginConfig {
   /**
@@ -141,7 +144,12 @@ export type NodeValue<TypeName extends string = any, FieldName extends string = 
 >['node']
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
-  type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+  type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
+  /**
+   * Whether the connection field can be null
+   * @default (depends on whether nullability is configured in type or schema)
+   */
+  nullable?: boolean
   /**
    * Additional args to use for just this field
    */
@@ -257,43 +265,43 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
       nodes?: never
     }
 ) &
-  Pick<CommonFieldConfig, 'deprecation' | 'description' | 'nullable'> &
+  Pick<CommonFieldConfig, 'deprecation' | 'description'> &
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
 const ForwardPaginateArgs = {
-  first: intArg({
-    nullable: true,
+  first: arg({
+    type: 'Int',
     description: 'Returns the first n elements from the list.',
   }),
-  after: stringArg({
-    nullable: true,
+  after: arg({
+    type: 'String',
     description: 'Returns the elements in the list that come after the specified cursor',
   }),
 }
 
 const ForwardOnlyStrictArgs = {
   ...ForwardPaginateArgs,
-  first: intArg({
-    nullable: false,
+  first: arg({
+    type: nonNull('Int'),
     description: 'Returns the first n elements from the list.',
   }),
 }
 
 const BackwardPaginateArgs = {
-  last: intArg({
-    nullable: true,
+  last: arg({
+    type: 'Int',
     description: 'Returns the last n elements from the list.',
   }),
-  before: stringArg({
-    nullable: true,
+  before: arg({
+    type: 'String',
     description: 'Returns the elements in the list that come before the specified cursor',
   }),
 }
 
 const BackwardOnlyStrictArgs = {
   ...BackwardPaginateArgs,
-  last: intArg({
-    nullable: false,
+  last: arg({
+    type: nonNull('Int'),
     description: 'Returns the last n elements from the list.',
   }),
 }
@@ -391,7 +399,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             fieldName: FieldName, 
             config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> ${printedDynamicConfig}
           ): void`,
-          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage }) {
+          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage, builder }) {
             const [fieldName, fieldConfig] = factoryArgs as [string, ConnectionFieldConfig]
             const targetType = fieldConfig.type
 
@@ -412,18 +420,17 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: connectionName,
                   definition(t2) {
-                    t2.list.field('edges', {
-                      type: edgeName as any,
+                    t2.field('edges', {
+                      type: list(edgeName as any),
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
                     })
                     t2.field('pageInfo', {
-                      type: 'PageInfo' as any,
-                      nullable: false,
+                      type: nonNull('PageInfo' as any),
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
                     })
                     if (includeNodesField) {
-                      t2.list.field('nodes', {
-                        type: targetType,
+                      t2.field('nodes', {
+                        type: list(targetType),
                         description: `Flattened list of ${targetTypeName} type`,
                       })
                     }
@@ -450,11 +457,10 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: edgeName,
                   definition(t2) {
-                    t2.string('cursor', {
-                      nullable: false,
+                    t2.field('cursor', {
+                      type: nonNull('String'),
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
                     })
-
                     t2.field('node', {
                       type: targetType,
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
@@ -483,20 +489,20 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   description:
                     'PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo',
                   definition(t2) {
-                    t2.boolean('hasNextPage', {
-                      nullable: false,
+                    t2.field('hasNextPage', {
+                      type: nonNull('Boolean'),
                       description: `Used to indicate whether more edges exist following the set defined by the clients arguments.`,
                     })
-                    t2.boolean('hasPreviousPage', {
-                      nullable: false,
+                    t2.field('hasPreviousPage', {
+                      type: nonNull('Boolean'),
                       description: `Used to indicate whether more edges exist prior to the set defined by the clients arguments.`,
                     })
-                    t2.string('startCursor', {
-                      nullable: true,
+                    t2.field('startCursor', {
+                      type: 'String',
                       description: `The cursor corresponding to the first nodes in edges. Null if the connection is empty.`,
                     })
-                    t2.string('endCursor', {
-                      nullable: true,
+                    t2.field('endCursor', {
+                      type: 'String',
                       description: `The cursor corresponding to the last nodes in edges. Null if the connection is empty.`,
                     })
                   },
@@ -566,11 +572,19 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               resolveFn = makeResolveFn(pluginConfig, fieldConfig)
             }
 
+            const nonNullDefault =
+              fieldConfig.nonNullDefaults?.output ??
+              builder.getConfigOption('nonNullDefaults')?.output ??
+              false
+
+            const shouldBeNonNull =
+              fieldConfig.nullable !== undefined ? !fieldConfig.nullable : nonNullDefault
+
             // Add the field to the type.
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
-              type: connectionName as any,
+              type: shouldBeNonNull ? nonNull(connectionName as any) : nullable(connectionName as any),
               resolve(root, args: PaginationArgs, ctx, info) {
                 validateArgs(args, info)
                 return resolveFn(root, args, ctx, info)
@@ -579,9 +593,6 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
           },
         })
       )
-
-      // TODO: Deprecate this syntax
-      return { types: [] }
     },
   })
 }
@@ -715,7 +726,7 @@ export function makeResolveFn(
 
         return {
           nodes: resolvedNodeList,
-          // todo find typesafe way of doing this
+          // todo find type-safe way of doing this
           edges: resolvedEdgeList as EdgeLike[],
         }
       })
