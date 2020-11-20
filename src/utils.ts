@@ -23,7 +23,6 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import * as path from 'path'
 import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
 import {
@@ -156,7 +155,7 @@ export function eachObj<T>(obj: Record<string, T>, iter: (val: T, key: string, i
 export const isObject = (obj: any): boolean => obj !== null && typeof obj === 'object'
 
 export const assertAbsolutePath = (pathName: string, property: string) => {
-  if (!path.isAbsolute(pathName)) {
+  if (!Path.isAbsolute(pathName)) {
     throw new Error(`Expected path for ${property} to be an absolute path, saw ${pathName}`)
   }
   return pathName
@@ -252,9 +251,9 @@ export function formatPathForModuleimport(path: string) {
 }
 
 export function relativePathTo(absolutePath: string, fromPath: string): string {
-  const filename = path.basename(absolutePath)
-  const relative = path.relative(path.dirname(fromPath), path.dirname(absolutePath))
-  return formatPathForModuleimport(path.join(relative, filename))
+  const filename = Path.basename(absolutePath)
+  const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
+  return formatPathForModuleimport(Path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -521,15 +520,16 @@ export function dump(x: any) {
 }
 
 function isNodeModule(path: string) {
-  return /^([A-z0-9@])/.test(path)
+  // Avoid treating absolute windows paths as Node packages e.g. D:/a/b/c
+  return !Path.isAbsolute(path) && /^([A-z0-9@])/.test(path)
 }
 
 export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
   const rootTypePath = rootType.path
 
-  if (typeof rootTypePath !== 'string' || (!path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
+  if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
     throw new Error(
-      `Expected an absolute path for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+      `Expected an absolute path or Node package for the root typing path of the type ${typeName}, saw ${rootTypePath}`
     )
   }
 

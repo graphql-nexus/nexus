@@ -20,8 +20,8 @@ import {
   NexusObjectTypeExtension,
   NexusSchemaExtension,
 } from '../extensions'
-import { RequiredDeeply } from '../typeHelpersInternal'
 import * as AbstractTypes from '../typegenAbstractTypes'
+import { RequiredDeeply } from '../typeHelpersInternal'
 
 export { AbstractTypes }
 
