@@ -1,11 +1,10 @@
+import * as Path from 'path'
 import { BuilderConfigInput } from './builder'
 import { TypegenMetadataConfig } from './typegenMetadata'
-import { assertAbsolutePath, getOwnPackage } from './utils'
+import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
 
 /**
  * Normalizes the builder config into the config we need for typegen
- *
- * @param config {BuilderConfigInput}
  */
 export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadataConfig {
   const {
@@ -14,14 +13,27 @@ export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadat
     ...rest
   } = config
 
-  let typegenPath: string | false = false
-  let schemaPath: string | false = false
-  if (outputs && typeof outputs === 'object') {
-    if (typeof outputs.schema === 'string') {
-      schemaPath = assertAbsolutePath(outputs.schema, 'outputs.schema')
+  const defaultSDLFilePath = Path.join(process.cwd(), 'schema.graphql')
+
+  let typegenFilePath: string | null = null
+  let sdlFilePath: string | null = null
+
+  if (outputs === undefined) {
+    if (isProductionStage()) {
+      sdlFilePath = defaultSDLFilePath
     }
+  } else if (outputs === true) {
+    sdlFilePath = defaultSDLFilePath
+  } else if (typeof outputs === 'object') {
+    if (outputs.schema === true) {
+      sdlFilePath = defaultSDLFilePath
+    } else if (typeof outputs.schema === 'string') {
+      sdlFilePath = assertAbsolutePath(outputs.schema, 'outputs.schema')
+    } else if (outputs.schema === undefined && isProductionStage()) {
+    }
+    // handle typegen configuration
     if (typeof outputs.typegen === 'string') {
-      typegenPath = assertAbsolutePath(outputs.typegen, 'outputs.typegen')
+      typegenFilePath = assertAbsolutePath(outputs.typegen, 'outputs.typegen')
     }
   } else if (outputs !== false) {
     console.warn(
@@ -34,8 +46,8 @@ export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadat
     ...rest,
     nexusSchemaImportId: getOwnPackage().name,
     outputs: {
-      typegen: shouldGenerateArtifacts ? typegenPath : false,
-      schema: shouldGenerateArtifacts ? schemaPath : false,
+      typegen: shouldGenerateArtifacts ? typegenFilePath : null,
+      schema: shouldGenerateArtifacts ? sdlFilePath : null,
     },
   }
 }

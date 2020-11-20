@@ -178,13 +178,20 @@ export interface BuilderConfigInput {
          */
         typegen?: boolean | string
         /**
-         * GraphQL SDL generation settings. This file is not necessary but
+         * GraphQL SDL file generation toggle and location.
+         *
+         * Set to a string to enable and output to an absolute path.
+         * Set to true to enable at default path (schema.graphql in the current working directory)
+         * Set to false to disable
+         *
+         * Defaults to true in development and false otherwise.
+         *
+         * @remarks
+         *
+         * This file is not necessary but
          * may be nice for teams wishing to review SDL in pull-requests or
          * just generally transitioning from a schema-first workflow.
          *
-         * Defaults to false (disabled). Set to true to enable and emit into
-         * default path (current working directory). Set to a string to specify
-         * absolute path.
          */
         schema?: boolean | string
       }
@@ -1702,7 +1709,9 @@ export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {
 export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  if (typegenConfig.outputs.schema || typegenConfig.outputs.typegen) {
+  const sdl = typegenConfig.outputs.schema
+  const typegen = typegenConfig.outputs.typegen
+  if (sdl || typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
     const typegenPromise = new TypegenMetadata(typegenConfig).generateArtifacts(schema)
