@@ -1,8 +1,9 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
 import * as path from 'path'
 import { TypegenInfo } from './builder'
+import { RootTypingDef, TypingImport } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
-import { getOwnPackage, log, objValues, relativePathTo } from './utils'
+import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils'
 
 /**
  * Any common types / constants that would otherwise be circular-imported
@@ -73,7 +74,7 @@ export interface TypegenAutoConfigOptions {
    * Typing for the context, referencing a type defined in the aliased module
    * provided in sources e.g. `alias.Context`
    */
-  contextType?: string
+  contextType?: RootTypingDef
   /**
    * Types that should not be matched for a backing type,
    *
@@ -131,7 +132,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
 
     const forceImports = new Set(
       objValues(backingTypeMap)
-        .concat(contextType || '')
+        .concat(typeof contextType === 'string' ? contextType || '' : '')
         .map((t) => {
           const match = t.match(/^(\w+)\./)
           return match ? match[1] : null
@@ -187,7 +188,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
         const importPath = (path.isAbsolute(pathOrModule)
           ? relativePathTo(resolvedPath, outputPath)
           : pathOrModule
-        ).replace(/(\.d)?\.ts/, '')
+        ).replace(typeScriptFileExtension, '')
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
@@ -283,11 +284,21 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
         imports.push(`import ${glob ? '* as ' : ''}${alias} from "${safeImportPath}"`)
       })
 
+    let contextTypeImport: TypingImport | undefined
+    let contextTypeString: string | undefined
+    if (typeof contextType === 'string') {
+      contextTypeString = contextType
+    } else if (contextType) {
+      contextTypeString = contextType.alias ?? contextType.name
+      contextTypeImport = contextType
+    }
+
     const typegenInfo = {
       headers: headers || [TYPEGEN_HEADER],
       backingTypeMap,
       imports,
-      contextType,
+      contextType: contextTypeString,
+      contextTypeImport,
       nexusSchemaImportId: getOwnPackage().name,
     }
 

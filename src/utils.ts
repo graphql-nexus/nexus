@@ -1,3 +1,4 @@
+import * as fs from 'fs'
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -22,7 +23,7 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import * as path from 'path'
+import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
 import {
   AllNexusArgsDefs,
@@ -36,6 +37,7 @@ import {
   NexusFeatures,
   NexusGraphQLSchema,
   NexusTypes,
+  TypingImport,
   withNexusSymbol,
 } from './definitions/_types'
 import { AllInputTypes } from './typegenTypeHelpers'
@@ -153,7 +155,7 @@ export function eachObj<T>(obj: Record<string, T>, iter: (val: T, key: string, i
 export const isObject = (obj: any): boolean => obj !== null && typeof obj === 'object'
 
 export const assertAbsolutePath = (pathName: string, property: string) => {
-  if (!path.isAbsolute(pathName)) {
+  if (!Path.isAbsolute(pathName)) {
     throw new Error(`Expected path for ${property} to be an absolute path, saw ${pathName}`)
   }
   return pathName
@@ -221,13 +223,37 @@ export function isPromiseLike(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === 'function')
 }
 
-export function relativePathTo(absolutePath: string, outputPath: string): string {
-  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, '')
-  const relative = path.relative(path.dirname(outputPath), path.dirname(absolutePath))
-  if (relative.indexOf('.') !== 0) {
-    return `./${path.join(relative, filename)}`
-  }
-  return path.join(relative, filename)
+export const typeScriptFileExtension = /(\.d)?\.ts$/
+
+function makeRelativePathExplicitlyRelative(path: string) {
+  if (Path.isAbsolute(path)) return path
+  if (path.startsWith('./')) return path
+  return `./${path}`
+}
+
+function nixifyPathSlashes(path: string): string {
+  return path.replace(/\\+/g, '/')
+}
+
+/**
+ * Format a path so it is suitable to be used as a module import.
+ *
+ * - Implicitly relative is made explicitly relative
+ * - TypeScript file extension is stripped
+ * - Windows slashes converted into *nix slashes
+ *
+ * @remarks
+ *
+ * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
+ */
+export function formatPathForModuleimport(path: string) {
+  return nixifyPathSlashes(makeRelativePathExplicitlyRelative(path).replace(typeScriptFileExtension, ''))
+}
+
+export function relativePathTo(absolutePath: string, fromPath: string): string {
+  const filename = Path.basename(absolutePath)
+  const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
+  return formatPathForModuleimport(Path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -493,8 +519,33 @@ export function dump(x: any) {
   console.log(require('util').inspect(x, { depth: null }))
 }
 
-export function isNodeModule(path: string) {
-  return /^([A-z0-9@])/.test(path)
+function isNodeModule(path: string) {
+  // Avoid treating absolute windows paths as Node packages e.g. D:/a/b/c
+  return !Path.isAbsolute(path) && /^([A-z0-9@])/.test(path)
+}
+
+export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
+  const rootTypePath = rootType.path
+
+  if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
+    throw new Error(
+      `Expected an absolute path or Node package for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+    )
+  }
+
+  if (isNodeModule(rootTypePath)) {
+    try {
+      require.resolve(rootTypePath)
+    } catch (e) {
+      throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
+    }
+  } else if (!fs.existsSync(rootTypePath)) {
+    throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
+  }
+
+  const importPath = isNodeModule(rootTypePath) ? rootTypePath : relativePathTo(rootTypePath, outputPath)
+
+  return importPath
 }
 
 export function getNexusNamedArgDef(argDef: AllNexusArgsDefs | AllInputTypes): AllNexusNamedArgsDefs {

@@ -31,6 +31,7 @@ import {
   isInterfaceType,
   isLeafType,
   isNamedType,
+  isNullableType,
   isObjectType,
   isOutputType,
   isScalarType,
@@ -38,7 +39,6 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
-  isNullableType,
 } from 'graphql'
 import { arg, ArgsRecord, NexusArgDef } from './definitions/args'
 import {
@@ -52,11 +52,11 @@ import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitio
 import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import {
+  FieldModificationDef,
   Implemented,
   InterfaceDefinitionBlock,
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
-  FieldModificationDef,
 } from './definitions/interfaceType'
 import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
 import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
@@ -95,6 +95,7 @@ import {
   NexusGraphQLSchema,
   NonNullConfig,
   RootTypings,
+  TypingImport,
 } from './definitions/_types'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
 import { DynamicOutputPropertyDef } from './dynamicProperty'
@@ -280,9 +281,13 @@ export interface TypegenInfo {
    */
   backingTypeMap: { [K in GetGen<'objectNames'>]?: string }
   /**
-   * The type of the context for the resolvers
+   * The string type of the context for the resolvers
    */
   contextType?: string
+  /**
+   * Info about where to import the context from
+   */
+  contextTypeImport?: TypingImport
   /**
    * The path to the @nexus/schema package.
    *

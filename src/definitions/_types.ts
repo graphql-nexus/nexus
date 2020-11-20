@@ -20,8 +20,8 @@ import {
   NexusObjectTypeExtension,
   NexusSchemaExtension,
 } from '../extensions'
-import { RequiredDeeply } from '../typeHelpersInternal'
 import * as AbstractTypes from '../typegenAbstractTypes'
+import { RequiredDeeply } from '../typeHelpersInternal'
 
 export { AbstractTypes }
 
@@ -112,13 +112,13 @@ export interface AsyncIterator<T> {
   throw?(e?: any): Promise<IteratorResult<T>>
 }
 
-export type RootTypingDef = string | RootTypingImport
+export type RootTypingDef = string | TypingImport
 
-export type RootTypings = Record<string, string | RootTypingImport>
+export type RootTypings = Record<string, string | TypingImport>
 
-export interface RootTypingImport {
+export interface TypingImport {
   /**
-   * File path to import the type from.
+   * Node module, or absolute path to import the type from.
    */
   path: string
   /**
