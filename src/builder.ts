@@ -1757,7 +1757,7 @@ export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQL
  */
 generateSchema.withArtifacts = async (
   config: SchemaConfig,
-  typeFilePath: string | false = false
+  typeFilePath: string | null = null
 ): Promise<{
   schema: NexusGraphQLSchema
   schemaTypes: string
