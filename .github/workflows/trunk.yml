@@ -19,8 +19,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Test
-        # run: yarn -s test:ci
-        run: yarn -s jest backingtype
+        run: yarn -s test:ci
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '10.x'
         uses: codecov/codecov-action@v1
