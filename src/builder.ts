@@ -64,6 +64,7 @@ import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './defi
 import {
   AllNexusArgsDefs,
   AllNexusInputTypeDefs,
+  AllNexusNamedInputTypeDefs,
   AllNexusNamedTypeDefs,
   AllNexusOutputTypeDefs,
   isNexusArgDef,
@@ -126,6 +127,7 @@ import {
   invariantGuard,
   isObject,
   mapValues,
+  NexusWrapKind,
   objValues,
   rewrapAsGraphQLType,
   runAbstractTypeRuntimeChecks,
@@ -752,7 +754,11 @@ export class SchemaBuilder {
         interfaces[type.name] = type.value
       })
     const alreadyChecked: Record<string, boolean> = {}
-    function walkType(obj: NexusInterfaceTypeConfig<any>, path: string[], visited: Record<string, boolean>) {
+    const walkType = (
+      obj: NexusInterfaceTypeConfig<any>,
+      path: string[],
+      visited: Record<string, boolean>
+    ) => {
       if (alreadyChecked[obj.name]) {
         return
       }
@@ -768,18 +774,22 @@ export class SchemaBuilder {
           )
         }
       }
-      const definitionBlock = new InterfaceDefinitionBlock({
-        typeName: obj.name,
-        addInterfaces: (i) =>
-          i.forEach((config) => {
-            const name = typeof config === 'string' ? config : config.value.name
-            walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
-          }),
-        addModification: () => {},
-        addField: () => {},
-        addDynamicOutputMembers: () => {},
-        warn: () => {},
-      })
+
+      const definitionBlock = new InterfaceDefinitionBlock(
+        {
+          typeName: obj.name,
+          addInterfaces: (i) =>
+            i.forEach((config) => {
+              const name = typeof config === 'string' ? config : config.value.name
+              walkType(interfaces[name], [...path, obj.name], { ...visited, [obj.name]: true })
+            }),
+          addModification: () => {},
+          addField: () => {},
+          addDynamicOutputMembers: () => {},
+          warn: () => {},
+        },
+        this.getNonNullDefault(obj, 'output')
+      )
       obj.definition(definitionBlock)
       alreadyChecked[obj.name] = true
     }
@@ -858,12 +868,15 @@ export class SchemaBuilder {
 
   buildInputObjectType(config: NexusInputObjectTypeConfig<any>): GraphQLInputObjectType {
     const fields: NexusInputFieldDef[] = []
-    const definitionBlock = new InputDefinitionBlock({
-      typeName: config.name,
-      addField: (field) => fields.push(field),
-      addDynamicInputFields: (block, isList) => this.addDynamicInputFields(block, isList),
-      warn: consoleWarn,
-    })
+    const definitionBlock = new InputDefinitionBlock(
+      {
+        typeName: config.name,
+        addField: (field) => fields.push(field),
+        addDynamicInputFields: (block, wrapping) => this.addDynamicInputFields(block, wrapping),
+        warn: consoleWarn,
+      },
+      this.getNonNullDefault(config, 'input')
+    )
     config.definition(definitionBlock)
     this.onInputObjectDefinitionFns.forEach((fn) => {
       fn(definitionBlock, config)
@@ -890,14 +903,17 @@ export class SchemaBuilder {
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const modifications: Record<string, FieldModificationDef<any, any>> = {}
-    const definitionBlock = new ObjectDefinitionBlock({
-      typeName: config.name,
-      addField: (fieldDef) => fields.push(fieldDef),
-      addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      addModification: (modification) => (modifications[modification.field] = modification),
-      addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
-      warn: consoleWarn,
-    })
+    const definitionBlock = new ObjectDefinitionBlock(
+      {
+        typeName: config.name,
+        addField: (fieldDef) => fields.push(fieldDef),
+        addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
+        addModification: (modification) => (modifications[modification.field] = modification),
+        addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, wrapping, 'build'),
+        warn: consoleWarn,
+      },
+      this.getNonNullDefault(config, 'output')
+    )
     config.definition(definitionBlock)
     this.onObjectDefinitionFns.forEach((fn) => {
       fn(definitionBlock, config)
@@ -937,14 +953,17 @@ export class SchemaBuilder {
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const modifications: Record<string, FieldModificationDef<any, any>> = {}
-    const definitionBlock = new InterfaceDefinitionBlock({
-      typeName: config.name,
-      addField: (field) => fields.push(field),
-      addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
-      addModification: (modification) => (modifications[modification.field] = modification),
-      addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'build'),
-      warn: consoleWarn,
-    })
+    const definitionBlock = new InterfaceDefinitionBlock(
+      {
+        typeName: config.name,
+        addField: (field) => fields.push(field),
+        addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
+        addModification: (modification) => (modifications[modification.field] = modification),
+        addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, wrapping, 'build'),
+        warn: consoleWarn,
+      },
+      this.getNonNullDefault(config, 'output')
+    )
     config.definition(definitionBlock)
     const toExtend = this.typeExtendMap[config.name]
     if (toExtend) {
@@ -1186,13 +1205,10 @@ export class SchemaBuilder {
   }
 
   protected getNonNullDefault(
-    typeConfig:
-      | NexusGraphQLObjectTypeConfig
-      | NexusGraphQLInterfaceTypeConfig
-      | NexusGraphQLInputObjectTypeConfig,
+    nonNullDefaultConfig: { nonNullDefaults?: NonNullConfig } | undefined,
     kind: 'input' | 'output'
   ): boolean {
-    const { nonNullDefaults = {} } = typeConfig.extensions?.nexus?.config || {}
+    const { nonNullDefaults = {} } = nonNullDefaultConfig ?? {}
 
     return nonNullDefaults[kind] ?? this.config.nonNullDefaults[kind] ?? false
   }
@@ -1206,7 +1222,7 @@ export class SchemaBuilder {
       throw new Error(`Missing required "type" field for ${typeConfig.name}.${fieldConfig.name}`)
     }
     const fieldExtension = new NexusFieldExtension(fieldConfig)
-    const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
+    const nonNullDefault = this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'output')
     const builderFieldConfig: Omit<NexusGraphQLFieldConfig, 'resolve' | 'subscribe'> = {
       name: fieldConfig.name,
       type: this.getOutputType(fieldConfig.type, nonNullDefault),
@@ -1248,7 +1264,7 @@ export class SchemaBuilder {
     field: NexusInputFieldDef,
     typeConfig: NexusGraphQLInputObjectTypeConfig
   ): GraphQLInputFieldConfig {
-    const nonNullDefault = this.getNonNullDefault(typeConfig, 'output')
+    const nonNullDefault = this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'output')
 
     return {
       type: this.getInputType(field.type, nonNullDefault),
@@ -1263,7 +1279,9 @@ export class SchemaBuilder {
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {}
     Object.keys(args).forEach((argName) => {
-      const nonNullDefault = typeConfig ? this.getNonNullDefault(typeConfig, 'input') : false
+      const nonNullDefault = typeConfig
+        ? this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'input')
+        : false
       const argDef = normalizeArg(args[argName], nonNullDefault).value
       allArgs[argName] = {
         type: this.getInputType(argDef.type, nonNullDefault),
@@ -1380,24 +1398,30 @@ export class SchemaBuilder {
   }
 
   protected walkInputType<T extends NexusShapedInput>(obj: T) {
-    const definitionBlock = new InputDefinitionBlock({
-      typeName: obj.name,
-      addField: (f) => this.maybeTraverseInputFieldType(f),
-      addDynamicInputFields: (block, isList) => this.addDynamicInputFields(block, isList),
-      warn: () => {},
-    })
+    const definitionBlock = new InputDefinitionBlock(
+      {
+        typeName: obj.name,
+        addField: (f) => this.maybeTraverseInputFieldType(f),
+        addDynamicInputFields: (block, wrapping) => this.addDynamicInputFields(block, wrapping),
+        warn: () => {},
+      },
+      false
+    )
     obj.definition(definitionBlock)
     return obj
   }
 
-  addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean) {
+  addDynamicInputFields(block: InputDefinitionBlock<any>, wrapping: NexusWrapKind[]) {
     eachObj(this.dynamicInputFields, (val, methodName) => {
       if (typeof val === 'string') {
         return this.addDynamicScalar(methodName, val, block)
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
-        const config = isList ? [args[0], { list: isList, ...args[1] }] : args
+        const wrappedType =
+          args[1]?.type !== undefined ? wrapAsNexusType(args[1].type, wrapping, false) : undefined
+        const config = wrappedType !== undefined ? [args[0], { ...args[1], type: wrappedType }] : args
+
         return val.value.factory({
           args: config,
           typeDef: block,
@@ -1408,14 +1432,21 @@ export class SchemaBuilder {
     })
   }
 
-  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean, stage: 'walk' | 'build') {
+  addDynamicOutputMembers(
+    block: OutputDefinitionBlock<any>,
+    wrapping: NexusWrapKind[],
+    stage: 'walk' | 'build'
+  ) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === 'string') {
         return this.addDynamicScalar(methodName, val, block)
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
-        const config = isList ? [args[0], { list: isList, ...args[1] }] : args
+        const wrappedType =
+          args[1]?.type !== undefined ? wrapAsNexusType(args[1].type, wrapping, false) : undefined
+        const config = wrappedType !== undefined ? [args[0], { ...args[1], type: wrappedType }] : args
+
         return val.value.factory({
           args: config,
           typeDef: block,
@@ -1464,39 +1495,45 @@ export class SchemaBuilder {
   }
 
   protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
-    const definitionBlock = new ObjectDefinitionBlock({
-      typeName: obj.name,
-      addInterfaces: (i) => {
-        i.forEach((j) => {
-          if (typeof j !== 'string') {
-            this.addType(j)
-          }
-        })
+    const definitionBlock = new ObjectDefinitionBlock(
+      {
+        typeName: obj.name,
+        addInterfaces: (i) => {
+          i.forEach((j) => {
+            if (typeof j !== 'string') {
+              this.addType(j)
+            }
+          })
+        },
+        addField: (f) => this.maybeTraverseOutputFieldType(f),
+        addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, wrapping, 'walk'),
+        addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
+        warn: () => {},
       },
-      addField: (f) => this.maybeTraverseOutputFieldType(f),
-      addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
-      addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
-      warn: () => {},
-    })
+      false
+    )
     obj.definition(definitionBlock)
     return obj
   }
 
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
-    const definitionBlock = new InterfaceDefinitionBlock({
-      typeName: obj.name,
-      addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
-      addInterfaces: (i) => {
-        i.forEach((j) => {
-          if (typeof j !== 'string') {
-            this.addType(j)
-          }
-        })
+    const definitionBlock = new InterfaceDefinitionBlock(
+      {
+        typeName: obj.name,
+        addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
+        addInterfaces: (i) => {
+          i.forEach((j) => {
+            if (typeof j !== 'string') {
+              this.addType(j)
+            }
+          })
+        },
+        addField: (f) => this.maybeTraverseOutputFieldType(f),
+        addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, wrapping, 'walk'),
+        warn: () => {},
       },
-      addField: (f) => this.maybeTraverseOutputFieldType(f),
-      addDynamicOutputMembers: (block, isList) => this.addDynamicOutputMembers(block, isList, 'walk'),
-      warn: () => {},
-    })
+      false
+    )
     obj.definition(definitionBlock)
     return obj
   }
@@ -1767,7 +1804,7 @@ function normalizeArg(argVal: AllNexusArgsDefs, nonNullDefault: boolean): NexusA
 
   // unwrap an arg if it is
   if (isNexusWrappingType(argVal)) {
-    let { namedType, wrapping } = unwrapNexusDef(argVal, nonNullDefault)
+    let { namedType, wrapping } = unwrapNexusDef(argVal)
     let innerArgDef: undefined | NexusArgDef<any> = undefined
 
     // if what is wrapped is an arg def, get it's inner type
@@ -1784,7 +1821,11 @@ function normalizeArg(argVal: AllNexusArgsDefs, nonNullDefault: boolean): NexusA
     }
 
     // re-wrap the inner type wrapped with the outer wrapping
-    return arg({ ...innerArgDef?.value, type: wrapAsNexusType(namedType, wrapping) })
+    return arg({
+      ...innerArgDef?.value,
+      // TODO(flavian): fix typings below
+      type: wrapAsNexusType((namedType as unknown) as AllNexusNamedInputTypeDefs, wrapping, nonNullDefault),
+    })
   }
 
   return arg({ type: argVal })

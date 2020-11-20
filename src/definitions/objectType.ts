@@ -10,8 +10,8 @@ export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {
 }
 
 export class ObjectDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
-  constructor(protected typeBuilder: ObjectDefinitionBuilder) {
-    super(typeBuilder)
+  constructor(protected typeBuilder: ObjectDefinitionBuilder, protected nonNullDefault: boolean) {
+    super(typeBuilder, nonNullDefault)
   }
   /**
    * @param interfaceName

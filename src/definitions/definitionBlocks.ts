@@ -1,8 +1,8 @@
 import { GraphQLFieldResolver } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
+import { NexusWrapKind, wrapAsNexusType } from '../utils'
 import { ArgsRecord } from './args'
-import { list } from './list'
-import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, isNexusListTypeDef } from './wrapping'
+import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, isNexusWrappingType } from './wrapping'
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
@@ -71,14 +71,14 @@ export type FieldOutConfig<TypeName extends string, FieldName extends string> = 
 export interface OutputDefinitionBuilder {
   typeName: string
   addField(config: NexusOutputFieldDef): void
-  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean): void
+  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, wrapping: NexusWrapKind[]): void
   warn(msg: string): void
 }
 
 export interface InputDefinitionBuilder {
   typeName: string
   addField(config: NexusInputFieldDef): void
-  addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean): void
+  addDynamicInputFields(block: InputDefinitionBlock<any>, wrapping: NexusWrapKind[]): void
   warn(msg: string): void
 }
 
@@ -94,16 +94,40 @@ export interface OutputDefinitionBlock<TypeName extends string>
  */
 export class OutputDefinitionBlock<TypeName extends string> {
   readonly typeName: string
-  constructor(protected typeBuilder: OutputDefinitionBuilder, protected isList = false) {
+  constructor(
+    protected typeBuilder: OutputDefinitionBuilder,
+    protected nonNullDefault: boolean,
+    protected wrapping: NexusWrapKind[] = ['WrappedType']
+  ) {
     this.typeName = typeBuilder.typeName
-    this.typeBuilder.addDynamicOutputMembers(this, isList)
+    this.typeBuilder.addDynamicOutputMembers(this, this.wrapping)
   }
 
   get list() {
-    if (this.isList) {
-      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
-    }
-    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, true)
+    const [wrappedType, ...rest] = this.wrapping
+    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, this.nonNullDefault, [
+      wrappedType,
+      'List',
+      ...rest,
+    ])
+  }
+
+  get nonNull(): Omit<OutputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    const [wrappedType, ...rest] = this.wrapping
+    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, this.nonNullDefault, [
+      wrappedType,
+      'NonNull',
+      ...rest,
+    ])
+  }
+
+  get nullable(): Omit<OutputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    const [wrappedType, ...rest] = this.wrapping
+    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, this.nonNullDefault, [
+      wrappedType,
+      'Null',
+      ...rest,
+    ])
   }
 
   string<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
@@ -158,16 +182,16 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
-    if (this.isList) {
-      if (isNexusListTypeDef(config.type)) {
-        this.typeBuilder.warn(
-          `It looks like you chained .list and used list() for ${config.name}. ` +
-            'You should only do one or the other'
+    if (isNexusWrappingType(config.type)) {
+      if (this.wrapping.length > 1) {
+        throw new Error(
+          'Cannot use t.list|nonNull|nullable shorthands and list()|nonNull()|null() at the same time'
         )
-      } else {
-        config.type = list(config.type)
       }
+    } else {
+      config.type = wrapAsNexusType(config.type, this.wrapping, this.nonNullDefault)
     }
+
     return config
   }
 }
@@ -192,16 +216,40 @@ export interface InputDefinitionBlock<TypeName extends string> extends NexusGenC
 
 export class InputDefinitionBlock<TypeName extends string> {
   readonly typeName: string
-  constructor(protected typeBuilder: InputDefinitionBuilder, protected isList = false) {
+  constructor(
+    protected typeBuilder: InputDefinitionBuilder,
+    protected nonNullDefault: boolean,
+    protected wrapping: NexusWrapKind[] = ['WrappedType']
+  ) {
     this.typeName = typeBuilder.typeName
-    this.typeBuilder.addDynamicInputFields(this, isList)
+    this.typeBuilder.addDynamicInputFields(this, this.wrapping)
   }
 
-  get list() {
-    if (this.isList) {
-      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
-    }
-    return new InputDefinitionBlock<TypeName>(this.typeBuilder, true)
+  get list(): InputDefinitionBlock<TypeName> {
+    const [wrappedType, ...rest] = this.wrapping
+    return new InputDefinitionBlock<TypeName>(this.typeBuilder, this.nonNullDefault, [
+      wrappedType,
+      'List',
+      ...rest,
+    ])
+  }
+
+  get nonNull(): Omit<InputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    const [wrappedType, ...rest] = this.wrapping
+    return new InputDefinitionBlock<TypeName>(this.typeBuilder, this.nonNullDefault, [
+      wrappedType,
+      'NonNull',
+      ...rest,
+    ])
+  }
+
+  get nullable(): Omit<InputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    const [wrappedType, ...rest] = this.wrapping
+    return new InputDefinitionBlock<TypeName>(this.typeBuilder, this.nonNullDefault, [
+      wrappedType,
+      'Null',
+      ...rest,
+    ])
   }
 
   string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
@@ -247,16 +295,16 @@ export class InputDefinitionBlock<TypeName extends string> {
   }
 
   protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
-    if (this.isList) {
-      if (isNexusListTypeDef(config.type)) {
-        this.typeBuilder.warn(
-          `It looks like you chained .list and used list() for ${config.name}. ` +
-            'You should only do one or the other'
+    if (isNexusWrappingType(config.type)) {
+      if (this.wrapping.length > 1) {
+        throw new Error(
+          'Cannot use t.list|nonNull|nullable shorthands and list()|nonNull()|null() at the same time'
         )
-      } else {
-        config.type = list(config.type)
       }
+    } else {
+      config.type = wrapAsNexusType(config.type, this.wrapping, this.nonNullDefault)
     }
+
     return config
   }
 }

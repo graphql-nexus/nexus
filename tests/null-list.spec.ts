@@ -1,18 +1,16 @@
-import { GraphQLArgument, GraphQLInputType, GraphQLOutputType, GraphQLString } from 'graphql'
-import { list, makeSchema, nonNull, nullable } from '../src'
 import {
-  AllNexusArgsDefs,
-  AllNexusOutputTypeDefs,
-  arg,
-  inputObjectType,
-  objectType,
-  queryType,
-  stringArg,
-} from '../src/core'
+  GraphQLArgument,
+  GraphQLInputObjectType,
+  GraphQLInputType,
+  GraphQLOutputType,
+  GraphQLString,
+} from 'graphql'
+import { list, makeSchema, nonNull, nullable } from '../src'
+import { arg, inputObjectType, objectType, queryType, stringArg } from '../src/core'
 
 const WRAPPER_NAMES = ['list', 'nonNull', 'nullable']
 
-function getCombinations(arr: string[]): Array<string[]> {
+function getWrappings(arr: string[]): Array<string[]> {
   const output: Array<string[]> = []
 
   for (const elem1 of arr) {
@@ -30,57 +28,44 @@ function getCombinations(arr: string[]): Array<string[]> {
   return Object.values(output)
 }
 
-function getLabel(type: any, wraps: string[]) {
-  const endBrackets = wraps.length
+const WRAPPINGS = getWrappings(WRAPPER_NAMES)
+
+function getLabel(type: any, wrapping: string[]) {
+  const endBrackets = wrapping.length
   const typeName = typeof type === 'string' ? type : type.name
   // /!\ wraps is spread to prevent mutating the original
-  const wrappingLabel = [...wraps].reverse().join('(') + '(' + typeName + ')'.repeat(endBrackets)
+  const wrappingLabel = [...wrapping].reverse().join('(') + '(' + typeName + ')'.repeat(endBrackets)
 
   return wrappingLabel
 }
 
-const map: Record<string, any> = {
+const wrapperNameToWrapper: Record<string, any> = {
   nullable: (type: any) => nullable(type),
   nonNull: (type: any) => nonNull(type),
   list: (type: any) => list(type),
 }
 
-type GeneratedType = { type?: any; error?: Error; wraps: string[]; label: string }
-
-function genWrappedTypes(baseType: AllNexusOutputTypeDefs | string): Array<GeneratedType> {
-  const combinations = getCombinations(WRAPPER_NAMES)
-
-  return combinations.map((combination) => {
-    const label = getLabel(baseType, combination)
-
-    try {
-      return {
-        type: combination.reduce((acc, fnName) => {
-          return map[fnName](acc)
-        }, baseType),
-        wraps: combination,
-        label,
-      }
-    } catch (e) {
-      return {
-        error: e,
-        wraps: combination,
-        label,
-      }
-    }
-  })
+function wrapType(baseType: any, wrapping: string[]): any {
+  return wrapping.reduce((type, wrapperName) => {
+    return wrapperNameToWrapper[wrapperName](type)
+  }, baseType)
 }
 
-function testField(
-  type: AllNexusOutputTypeDefs | string,
-  params: { nonNullDefault: boolean }
-): GraphQLOutputType {
+function testOutputField(
+  baseType: string | object,
+  wrapping: string[],
+  params: { nonNullDefault: boolean; useChainingApi?: boolean }
+) {
   const schema = makeSchema({
     types: [
       queryType({
         definition(t) {
+          if (params.useChainingApi) {
+            t = getChainedT(t, wrapping)
+          }
+
           t.field('foo', {
-            type: type as any,
+            type: params.useChainingApi ? baseType : wrapType(baseType, wrapping),
           })
         },
       }),
@@ -94,17 +79,49 @@ function testField(
   return schema.getQueryType()!.getFields()['foo']!.type
 }
 
+function testInputField(
+  baseType: string | object,
+  wrapping: string[],
+  params: { nonNullDefault: boolean; useChainingApi?: boolean }
+) {
+  const schema = makeSchema({
+    types: [
+      inputObjectType({
+        name: 'Bar',
+        definition(t) {
+          if (params.useChainingApi) {
+            t = getChainedT(t, wrapping)
+          }
+
+          t.field('foo', {
+            type: params.useChainingApi ? baseType : wrapType(baseType, wrapping),
+          })
+        },
+      }),
+    ],
+    nonNullDefaults: {
+      input: params.nonNullDefault,
+    },
+    outputs: false,
+  })
+
+  return (schema.getType('Bar') as GraphQLInputObjectType).getFields()['foo']!.type
+}
+
 function testArg(
-  type: AllNexusArgsDefs,
+  type: string | object,
+  wrapping: string[],
   params: { nonNullDefault: boolean; wrappedInArg?: boolean }
 ): GraphQLArgument {
   const schema = makeSchema({
     types: [
       queryType({
         definition(t) {
+          const wrappedArgType = wrapType(type, wrapping)
+
           t.field('foo', {
             args: {
-              foo: params.wrappedInArg === true ? arg({ type: type as any }) : type,
+              foo: params.wrappedInArg === true ? arg({ type: wrappedArgType }) : wrappedArgType,
             },
             type: 'String',
           })
@@ -112,7 +129,7 @@ function testArg(
       }),
     ],
     nonNullDefaults: {
-      output: params.nonNullDefault,
+      input: params.nonNullDefault,
     },
     outputs: false,
   })
@@ -123,37 +140,57 @@ function testArg(
     ['foo']!.args.find((a) => a.name === 'foo')!
 }
 
+function getChainedT(t: any, wrapping: string[]) {
+  return wrapping.reduce((acc, wrapKind) => {
+    return acc[wrapKind]
+  }, t)
+}
+
 function getTestDataForOutputType(
-  baseType: any,
-  params: { nonNullDefault: boolean }
+  baseType: string | object,
+  params: { nonNullDefault: boolean; useChainingApi?: boolean }
 ): Array<[string, GraphQLOutputType | Error]> {
-  const wrappedTypes = genWrappedTypes(baseType)
+  return WRAPPINGS.map((wrapping) => {
+    const label = getLabel(baseType, wrapping)
+    try {
+      const outputType = testOutputField(baseType, wrapping, params)
 
-  return wrappedTypes.map((wrappedType) => {
-    if (wrappedType.error) {
-      return [wrappedType.label, wrappedType.error]
+      return [label, outputType]
+    } catch (e) {
+      return [label, e]
     }
-
-    const outputType = testField(wrappedType.type, params)
-
-    return [wrappedType.label, outputType]
   })
 }
 
 function getTestDataForInputType(
-  baseType: any,
+  baseType: string | object,
+  params: { nonNullDefault: boolean; useChainingApi?: boolean }
+): Array<[string, GraphQLInputType | Error]> {
+  return WRAPPINGS.map((wrapping) => {
+    const label = getLabel(baseType, wrapping)
+    try {
+      const outputType = testInputField(baseType, wrapping, params)
+
+      return [label, outputType]
+    } catch (e) {
+      return [label, e]
+    }
+  })
+}
+
+function getTestDataForArgType(
+  baseType: string | object,
   params: { nonNullDefault: boolean; wrappedInArg?: boolean }
 ): Array<[string, GraphQLInputType | Error]> {
-  const wrappedTypes = genWrappedTypes(baseType)
+  return WRAPPINGS.map((wrapping) => {
+    const label = getLabel(baseType, wrapping)
+    try {
+      const arg = testArg(baseType, wrapping, params)
 
-  return wrappedTypes.map((wrappedType) => {
-    if (wrappedType.error) {
-      return [wrappedType.label, wrappedType.error]
+      return [label, arg.type]
+    } catch (e) {
+      return [label, e]
     }
-
-    const arg = testArg(wrappedType.type, params)
-
-    return [wrappedType.label, arg.type]
   })
 }
 
@@ -197,19 +234,20 @@ describe('wrapping for output types; nonNullDefault = false;', () => {
   })
 })
 
-describe('wrapping for input types; nonNullDefault = false;', () => {
-  const stringReferenceTestData = getTestDataForInputType('String', { nonNullDefault: false })
-  const nexusTypeDefTestData = getTestDataForInputType(
-    inputObjectType({
+describe('wrapping for output types with chained API; nonNullDefault = true;', () => {
+  const stringReferenceTestData = getTestDataForOutputType('String', {
+    nonNullDefault: true,
+    useChainingApi: true,
+  })
+  const nexusTypeDefTestData = getTestDataForOutputType(
+    objectType({
       name: 'Foo',
       definition(t) {
         t.id('id')
       },
     }),
-    { nonNullDefault: false }
+    { nonNullDefault: true, useChainingApi: true }
   )
-  const wrappedArgDefTestData = getTestDataForInputType(stringArg(), { nonNullDefault: false })
-  const argDefTestData = getTestDataForInputType('String', { nonNullDefault: false, wrappedInArg: true })
 
   it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
     expect(typeOrError.toString()).toMatchSnapshot()
@@ -217,11 +255,27 @@ describe('wrapping for input types; nonNullDefault = false;', () => {
   it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
     expect(typeOrError.toString()).toMatchSnapshot()
   })
-  it.each(wrappedArgDefTestData)('wrapped arg def %s', (_, typeOrError) => {
+})
+
+describe('wrapping for output types with chained API; nonNullDefault = false;', () => {
+  const stringReferenceTestData = getTestDataForOutputType('String', {
+    nonNullDefault: true,
+    useChainingApi: true,
+  })
+  const nexusTypeDefTestData = getTestDataForOutputType(
+    objectType({
+      name: 'Foo',
+      definition(t) {
+        t.id('id')
+      },
+    }),
+    { nonNullDefault: false, useChainingApi: true }
+  )
+
+  it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
     expect(typeOrError.toString()).toMatchSnapshot()
   })
-
-  it.each(argDefTestData)('arg def %s', (_, typeOrError) => {
+  it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
     expect(typeOrError.toString()).toMatchSnapshot()
   })
 })
@@ -237,8 +291,122 @@ describe('wrapping for input types; nonNullDefault = true;', () => {
     }),
     { nonNullDefault: true }
   )
-  const wrappedArgDefTestData = getTestDataForInputType(stringArg(), { nonNullDefault: true })
-  const argDefTestData = getTestDataForInputType('String', { nonNullDefault: true, wrappedInArg: true })
+
+  it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+})
+
+describe('wrapping for input types; nonNullDefault = false;', () => {
+  const stringReferenceTestData = getTestDataForInputType('String', { nonNullDefault: false })
+  const nexusTypeDefTestData = getTestDataForInputType(
+    inputObjectType({
+      name: 'Foo',
+      definition(t) {
+        t.id('id')
+      },
+    }),
+    { nonNullDefault: false }
+  )
+
+  it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+})
+
+describe('wrapping for input types with chained API; nonNullDefault = true;', () => {
+  const stringReferenceTestData = getTestDataForInputType('String', {
+    nonNullDefault: true,
+    useChainingApi: true,
+  })
+  const nexusTypeDefTestData = getTestDataForInputType(
+    inputObjectType({
+      name: 'Foo',
+      definition(t) {
+        t.id('id')
+      },
+    }),
+    { nonNullDefault: true, useChainingApi: true }
+  )
+
+  it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+})
+
+describe('wrapping for input types with chained API; nonNullDefault = false;', () => {
+  const stringReferenceTestData = getTestDataForOutputType('String', {
+    nonNullDefault: true,
+    useChainingApi: true,
+  })
+  const nexusTypeDefTestData = getTestDataForOutputType(
+    inputObjectType({
+      name: 'Foo',
+      definition(t) {
+        t.id('id')
+      },
+    }),
+    { nonNullDefault: false, useChainingApi: true }
+  )
+
+  it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+})
+
+describe('wrapping for args; nonNullDefault = false;', () => {
+  const stringReferenceTestData = getTestDataForArgType('String', { nonNullDefault: false })
+  const nexusTypeDefTestData = getTestDataForArgType(
+    inputObjectType({
+      name: 'Foo',
+      definition(t) {
+        t.id('id')
+      },
+    }),
+    { nonNullDefault: false }
+  )
+  const wrappedArgDefTestData = getTestDataForArgType(stringArg(), { nonNullDefault: false })
+  const argDefTestData = getTestDataForArgType('String', { nonNullDefault: false, wrappedInArg: true })
+
+  it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(nexusTypeDefTestData)('nexus def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(wrappedArgDefTestData)('wrapped arg def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+  it.each(argDefTestData)('arg def %s', (_, typeOrError) => {
+    expect(typeOrError.toString()).toMatchSnapshot()
+  })
+})
+
+describe('wrapping for args; nonNullDefault = true;', () => {
+  const stringReferenceTestData = getTestDataForArgType('String', { nonNullDefault: true })
+  const nexusTypeDefTestData = getTestDataForArgType(
+    inputObjectType({
+      name: 'Foo',
+      definition(t) {
+        t.id('id')
+      },
+    }),
+    { nonNullDefault: true }
+  )
+  const wrappedArgDefTestData = getTestDataForArgType(stringArg(), { nonNullDefault: true })
+  const argDefTestData = getTestDataForArgType('String', { nonNullDefault: true, wrappedInArg: true })
 
   it.each(stringReferenceTestData)('string ref %s', (_, typeOrError) => {
     expect(typeOrError.toString()).toMatchSnapshot()
@@ -286,14 +454,14 @@ describe('edges cases', () => {
   test('cannot wrap at the same time an arg def and its type', () => {
     const wrappedArgDef = list(arg({ type: list('String') }))
 
-    expect(() => testArg(wrappedArgDef, { nonNullDefault: false })).toThrowErrorMatchingInlineSnapshot(
+    expect(() => testArg(wrappedArgDef, [], { nonNullDefault: false })).toThrowErrorMatchingInlineSnapshot(
       `"Cannot wrap arg() and \`type\` property in list() or nonNull() or nullable() at the same time"`
     )
   })
 
   test('wrapped arg def retains metadata description etc', () => {
     const wrappedArgDef = list(nonNull(stringArg({ description: 'Bonjour !', default: 'Au revoir!' })))
-    const graphqlArg = testArg(wrappedArgDef, { nonNullDefault: false })
+    const graphqlArg = testArg(wrappedArgDef, [], { nonNullDefault: false })
 
     expect(graphqlArg).toMatchInlineSnapshot(`
       Object {
@@ -305,5 +473,18 @@ describe('edges cases', () => {
         "type": "[String!]",
       }
     `)
+  })
+
+  test('cannot use chained API and wrappers at the same time', () => {
+    expect(() =>
+      testInputField(list('String'), ['list'], { nonNullDefault: false, useChainingApi: true })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Cannot use t.list|nonNull|nullable shorthands and list()|nonNull()|null() at the same time"`
+    )
+    expect(() =>
+      testOutputField(list('String'), ['list'], { nonNullDefault: false, useChainingApi: true })
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Cannot use t.list|nonNull|nullable shorthands and list()|nonNull()|null() at the same time"`
+    )
   })
 })
