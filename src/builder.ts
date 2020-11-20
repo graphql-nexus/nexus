@@ -81,6 +81,9 @@ import {
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
   isNexusWrappingType,
+  rewrapAsGraphQLType,
+  unwrapNexusDef,
+  wrapAsNexusType,
 } from './definitions/wrapping'
 import {
   MissingType,
@@ -127,11 +130,8 @@ import {
   isObject,
   mapValues,
   objValues,
-  rewrapAsGraphQLType,
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
-  unwrapNexusDef,
-  wrapAsNexusType,
 } from './utils'
 
 type NexusShapedOutput = {
