@@ -187,7 +187,6 @@ export class TypegenPrinter {
     }
 
     eachObj(rootTypings, (rootType, typeName) => {
-      console.log(rootType, typeName)
       if (typeof rootType !== 'string') {
         const importPath = resolveImportPath(rootType, typeName, outputPath)
         importMap[importPath] = importMap[importPath] || new Set()
@@ -195,7 +194,6 @@ export class TypegenPrinter {
       }
     })
     eachObj(importMap, (val, key) => {
-      console.log(key)
       imports.push(`import { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
     })
     eachObj(this.printImports, (val, key) => {
