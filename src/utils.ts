@@ -24,6 +24,7 @@ import {
   specifiedScalarTypes,
 } from 'graphql'
 import * as path from 'path'
+import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
 import {
   AllNexusArgsDefs,
@@ -223,13 +224,37 @@ export function isPromiseLike(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === 'function')
 }
 
-export function relativePathTo(absolutePath: string, outputPath: string): string {
-  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, '')
-  const relative = path.relative(path.dirname(outputPath), path.dirname(absolutePath))
-  if (relative.indexOf('.') !== 0) {
-    return `./${path.join(relative, filename)}`
-  }
-  return path.join(relative, filename)
+export const typeScriptFileExtension = /(\.d)?\.ts$/
+
+function makeRelativePathExplicitlyRelative(path: string) {
+  if (Path.isAbsolute(path)) return path
+  if (path.startsWith('./')) return path
+  return `./${path}`
+}
+
+function nixifyPathSlashes(path: string): string {
+  return path.replace(/\\+/g, '/')
+}
+
+/**
+ * Format a path so it is suitable to be used as a module import.
+ *
+ * - Implicitly relative is made explicitly relative
+ * - TypeScript file extension is stripped
+ * - Windows slashes converted into *nix slashes
+ *
+ * @remarks
+ *
+ * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
+ */
+export function formatPathForModuleimport(path: string) {
+  return nixifyPathSlashes(makeRelativePathExplicitlyRelative(path).replace(typeScriptFileExtension, ''))
+}
+
+export function relativePathTo(absolutePath: string, fromPath: string): string {
+  const filename = path.basename(absolutePath)
+  const relative = path.relative(path.dirname(fromPath), path.dirname(absolutePath))
+  return formatPathForModuleimport(path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -518,11 +543,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
     throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
   }
 
-  const importPath = isNodeModule(rootTypePath)
-    ? rootTypePath
-    : relativePathTo(rootTypePath, outputPath)
-        .replace(/(\.d)?\.ts/, '')
-        .replace(/\\+/g, '/')
+  const importPath = isNodeModule(rootTypePath) ? rootTypePath : relativePathTo(rootTypePath, outputPath)
 
   return importPath
 }

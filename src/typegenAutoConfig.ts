@@ -1,9 +1,9 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
 import * as path from 'path'
 import { TypegenInfo } from './builder'
-import { TYPEGEN_HEADER } from './lang'
-import { getOwnPackage, log, objValues, relativePathTo } from './utils'
 import { RootTypingDef, TypingImport } from './definitions/_types'
+import { TYPEGEN_HEADER } from './lang'
+import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils'
 
 /**
  * Any common types / constants that would otherwise be circular-imported
@@ -188,7 +188,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
         const importPath = (path.isAbsolute(pathOrModule)
           ? relativePathTo(resolvedPath, outputPath)
           : pathOrModule
-        ).replace(/(\.d)?\.ts/, '')
+        ).replace(typeScriptFileExtension, '')
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
           return console.warn(
