@@ -164,7 +164,7 @@ export function isNexusPlugin(obj: any): obj is NexusPlugin {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Plugin
 }
 
-export type NexusWrapKind = 'NonNull' | 'Null' | 'List' | 'WrappedType'
+export type NexusWrapKind = 'NonNull' | 'Null' | 'List' | 'WrappedDef'
 
 export function unwrapNexusDef(
   typeDef: AllNexusTypeDefs | AllNexusArgsDefs | string
@@ -188,7 +188,7 @@ export function unwrapNexusDef(
     namedType = namedType.ofType
   }
 
-  wrapping.unshift('WrappedType')
+  wrapping.unshift('WrappedDef')
 
   return { namedType, wrapping }
 }
@@ -215,7 +215,7 @@ export function rewrapAsGraphQLType(
   const { wrapping } = unwrapNexusDef(nexusDef)
   let finalType: GraphQLType = namedType
 
-  if (wrapping[0] !== 'WrappedType') {
+  if (wrapping[0] !== 'WrappedDef') {
     throw new Error('Missing leading WrappedType. This should never happen, please create an issue.')
   }
 
@@ -232,12 +232,12 @@ export function rewrapAsGraphQLType(
       continue
     }
 
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'Null') {
+    if (wrapping[i] === 'WrappedDef' && wrapping[i + 1] === 'Null') {
       i += 1
       continue
     }
 
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'NonNull') {
+    if (wrapping[i] === 'WrappedDef' && wrapping[i + 1] === 'NonNull') {
       finalType = GraphQLNonNull(finalType)
       i += 1
       continue
@@ -247,7 +247,7 @@ export function rewrapAsGraphQLType(
       finalType = nonNullDefault ? GraphQLNonNull(GraphQLList(finalType)) : GraphQLList(finalType)
     }
 
-    if (wrapping[i] === 'WrappedType' && nonNullDefault) {
+    if (wrapping[i] === 'WrappedDef' && nonNullDefault) {
       finalType = GraphQLNonNull(finalType)
     }
   }
@@ -272,7 +272,7 @@ export function wrapAsNexusType(
 ): AllNexusTypeDefs {
   let finalType: any = baseType
 
-  if (wrapping[0] !== 'WrappedType') {
+  if (wrapping[0] !== 'WrappedDef') {
     throw new Error('Missing leading WrappedType. This should never happen, please create an issue.')
   }
 
@@ -289,12 +289,12 @@ export function wrapAsNexusType(
       continue
     }
 
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'NonNull') {
+    if (wrapping[i] === 'WrappedDef' && wrapping[i + 1] === 'NonNull') {
       finalType = nonNull(finalType)
       i += 1
       continue
     }
-    if (wrapping[i] === 'WrappedType' && wrapping[i + 1] === 'Null') {
+    if (wrapping[i] === 'WrappedDef' && wrapping[i + 1] === 'Null') {
       finalType = nullable(finalType)
       i += 1
       continue
@@ -312,7 +312,7 @@ export function wrapAsNexusType(
       finalType = nullable(finalType)
     }
 
-    if (wrapping[i] === 'WrappedType' && nonNullDefault) {
+    if (wrapping[i] === 'WrappedDef' && nonNullDefault) {
       finalType = nonNull(finalType)
     }
   }

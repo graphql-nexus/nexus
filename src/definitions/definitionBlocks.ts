@@ -102,7 +102,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
   constructor(
     protected typeBuilder: OutputDefinitionBuilder,
     protected nonNullDefault: boolean,
-    protected wrapping: NexusWrapKind[] = ['WrappedType']
+    protected wrapping: NexusWrapKind[] = ['WrappedDef']
   ) {
     this.typeName = typeBuilder.typeName
     this.typeBuilder.addDynamicOutputMembers(this, this.wrapping)
@@ -224,7 +224,7 @@ export class InputDefinitionBlock<TypeName extends string> {
   constructor(
     protected typeBuilder: InputDefinitionBuilder,
     protected nonNullDefault: boolean,
-    protected wrapping: NexusWrapKind[] = ['WrappedType']
+    protected wrapping: NexusWrapKind[] = ['WrappedDef']
   ) {
     this.typeName = typeBuilder.typeName
     this.typeBuilder.addDynamicInputFields(this, this.wrapping)
