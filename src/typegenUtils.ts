@@ -1,4 +1,4 @@
-import * as Path from 'path'
+import * as path from 'path'
 import { BuilderConfigInput } from './builder'
 import { TypegenMetadataConfig } from './typegenMetadata'
 import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
@@ -13,7 +13,7 @@ export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadat
     ...rest
   } = config
 
-  const defaultSDLFilePath = Path.join(process.cwd(), 'schema.graphql')
+  const defaultSDLFilePath = path.join(process.cwd(), 'schema.graphql')
 
   let typegenFilePath: string | null = null
   let sdlFilePath: string | null = null
