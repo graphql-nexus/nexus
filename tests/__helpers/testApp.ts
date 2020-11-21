@@ -1,5 +1,4 @@
 /// <reference path="../_setup.ts" />
-import { writeFileSync } from 'fs'
 import { join, relative } from 'path'
 import { core } from '../../src'
 import { BuilderConfigInput } from '../../src/core'
@@ -47,16 +46,7 @@ export async function generateTypegen(settings: HookSettings) {
 }
 
 export function installGenerateTypegenHook(settings: HookSettings) {
-  let typegenPath: string | null = null
-  beforeAll(async () => {
-    const { typegenModulePath } = await generateTypegen(settings)
-
-    typegenPath = typegenModulePath
-  })
-
-  afterAll(() => {
-    writeFileSync(typegenPath!, '')
-  })
+  beforeAll(() => generateTypegen(settings))
 }
 
 type Settings = {
