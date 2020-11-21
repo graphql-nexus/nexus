@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import { core } from '@nexus/schema'
+import { core } from '../../src'
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -166,7 +166,10 @@ export interface NexusGenAbstractTypeMembers {
   Node: 'Post' | 'User'
 }
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {
+  Post: 'Node'
+  User: 'Node'
+}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
@@ -200,7 +203,7 @@ export interface NexusGenTypes {
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
   allTypes: NexusGenAllTypes
-  inheritedFields: NexusGenInheritedFields
+  typeInterfaces: NexusGenTypeInterfaces
   objectNames: NexusGenObjectNames
   inputNames: NexusGenInputNames
   enumNames: NexusGenEnumNames
@@ -226,4 +229,5 @@ declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
   interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginArgConfig {}
 }

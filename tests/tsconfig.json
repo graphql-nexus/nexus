@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "rootDir": "..",
+    "target": "ES2015",
+    "moduleResolution": "node"
+  },
+  "exclude": ["./typegen", "./integrations"]
+}
