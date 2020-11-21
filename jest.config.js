@@ -20,4 +20,5 @@ module.exports = {
     },
   },
   collectCoverageFrom: ['src/**/*'],
+  testSequencer: '<rootDir>/tests/__helpers/sequencer.js',
 }

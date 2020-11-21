@@ -10,8 +10,13 @@ describe('typegenPrinter', () => {
   let typegen: core.TypegenPrinter
   let metadata: core.TypegenMetadata
   beforeEach(async () => {
+    const writeFileSpy = jest.spyOn(TypegenMetadata.prototype, 'writeFile')
+
     const schema = makeSchema({
-      outputs: false,
+      outputs: {
+        typegen: path.join(__dirname, 'typegen/types.gen.ts'),
+        schema: path.join(__dirname, 'typegen/schema.gen.graphql'),
+      },
       shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
       // __typename put to true to prevent from erroring because of missing resolveType
@@ -27,6 +32,7 @@ describe('typegenPrinter', () => {
         return content.replace("'@nexus/schema'", `'../../src'`)
       },
     }) as core.NexusGraphQLSchema
+
     metadata = new TypegenMetadata({
       outputs: {
         typegen: path.join(__dirname, 'test-gen.ts'),
@@ -45,8 +51,14 @@ describe('typegenPrinter', () => {
         contextType: 't.TestContext',
       },
     })
-    // give time for artifact generation to complete
-    await new Promise((res) => setTimeout(res, 2000))
+
+    while (!writeFileSpy.mock.results.length) {
+      await new Promise((res) => setTimeout(res, 10))
+    }
+
+    // wait for artifact generation to complete
+    await writeFileSpy.mock.results[0].value
+
     const typegenInfo = await metadata.getTypegenInfo(schema)
     typegen = new TypegenPrinter(metadata.sortSchema(schema), {
       ...typegenInfo,
@@ -60,6 +72,10 @@ describe('typegenPrinter', () => {
         }
         return false
       })
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('builds the enum object type defs', () => {
