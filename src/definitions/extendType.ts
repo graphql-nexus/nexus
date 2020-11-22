@@ -32,5 +32,5 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject)
  * @see https://nexusjs.org/docs/api/extend-type
  */
 export function extendType<TypeName extends AllOutputTypesPossible>(config: NexusExtendTypeConfig<TypeName>) {
-  return new NexusExtendTypeDef(config.type, { ...config, name: config.type })
+  return new NexusExtendTypeDef(config.type, { ...config, name: config.type }) as NexusExtendTypeDef<any>
 }
