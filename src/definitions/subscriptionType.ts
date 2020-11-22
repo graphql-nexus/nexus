@@ -5,7 +5,7 @@ import { CommonOutputFieldConfig } from './definitionBlocks'
 import { objectType } from './objectType'
 import { AllNexusOutputTypeDefs } from './wrapping'
 
-export interface SubscriptionTypeConfigBase<FieldName extends string, Event> {
+export interface SubscriptionTypeConfigBase<FieldName extends string, Event = any> {
   resolve(
     root: Event,
     args: ArgsValue<'Subscription', FieldName>,

@@ -132,16 +132,16 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, 0, (int) => int - 1)
       },
-      resolve: (event) => {
-        return event
+      resolve: (event: number) => {
+        return [event]
       },
     })
     t.list.int('someInts', {
       subscribe() {
         return mockStream(10, 0, (int) => int + 1)
       },
-      resolve: (event) => {
-        return event
+      resolve: (event: number) => {
+        return [event]
       },
     })
     // singular
@@ -150,7 +150,7 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, 0, (int) => int - 1)
       },
-      resolve: (event) => {
+      resolve: (event: number) => {
         return event
       },
     })
@@ -158,7 +158,7 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, 0, (int) => int + 1)
       },
-      resolve: (event) => {
+      resolve: (event: number) => {
         return event
       },
     })
@@ -166,7 +166,7 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, '', (str) => str + '!')
       },
-      resolve: (event) => {
+      resolve: (event: string) => {
         return event
       },
     })
@@ -174,7 +174,7 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, 0.5, (f) => f)
       },
-      resolve: (event) => {
+      resolve: (event: number) => {
         return event
       },
     })
@@ -182,7 +182,7 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, true, (b) => b)
       },
-      resolve: (event) => {
+      resolve: (event: boolean) => {
         return event
       },
     })
@@ -190,7 +190,7 @@ export const Subscription = subscriptionType({
       subscribe() {
         return mockStream(10, 'abc', (id) => id)
       },
-      resolve: (event) => {
+      resolve: (event: string) => {
         return event
       },
     })
