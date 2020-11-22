@@ -29,7 +29,7 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject)
  * Adds new fields to an existing objectType in the schema. Useful when
  * splitting your schema across several domains.
  *
- * @see http://graphql-nexus.com/api/extendType
+ * @see https://nexusjs.org/docs/api/extend-type
  */
 export function extendType<TypeName extends AllOutputTypesPossible>(config: NexusExtendTypeConfig<TypeName>) {
   return new NexusExtendTypeDef(config.type, { ...config, name: config.type })
