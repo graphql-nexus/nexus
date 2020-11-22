@@ -17,7 +17,9 @@ describe('custom scalars', () => {
         queryType({
           definition(t) {
             // @ts-ignore
-            t.date('testDate', () => now)
+            t.date('testDate', {
+              resolve: () => now,
+            })
           },
         }),
       ],

@@ -1,16 +1,21 @@
 import { PluginBuilderLens } from './builder'
 import { InputDefinitionBlock, OutputDefinitionBlock } from './definitions/definitionBlocks'
 import { NexusTypes, withNexusSymbol } from './definitions/_types'
+import { NexusWrapKind } from './definitions/wrapping'
 
 export type OutputFactoryConfig<T> = {
+  /**
+   * The name of the type this field is being declared on
+   */
+  typeName: string
   stage: 'walk' | 'build'
   args: any[]
   builder: PluginBuilderLens
   typeDef: OutputDefinitionBlock<any>
   /**
-   * The name of the type this field is being declared on
+   * The list of chained wrapping calls leading up to this dynamic method
    */
-  typeName: string
+  wrapping?: NexusWrapKind[]
 }
 
 export type InputFactoryConfig<T> = {
@@ -21,6 +26,10 @@ export type InputFactoryConfig<T> = {
    * The name of the type this field is being declared on
    */
   typeName: string
+  /**
+   * The list of chained wrapping calls leading up to this dynamic method
+   */
+  wrapping?: NexusWrapKind[]
 }
 
 export interface BaseExtensionConfig<T extends string> {

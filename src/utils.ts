@@ -14,8 +14,6 @@ import {
   isEnumType,
   isInputObjectType,
   isInterfaceType,
-  isListType,
-  isNonNullType,
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
@@ -27,10 +25,11 @@ import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
 import {
   AllNexusArgsDefs,
-  AllNexusNamedArgsDefs,
   AllNexusNamedTypeDefs,
   AllNexusTypeDefs,
   isNexusWrappingType,
+  isNexusArgDef,
+  AllNexusNamedInputTypeDefs,
 } from './definitions/wrapping'
 import {
   MissingType,
@@ -307,30 +306,6 @@ export function printedGenTyping(config: PrintedGenTypingConfig) {
   return new PrintedGenTyping(config)
 }
 
-export function unwrapType(
-  type: GraphQLType
-): { type: GraphQLNamedType; isNonNull: boolean; list: boolean[] } {
-  let finalType = type
-  let isNonNull = false
-  const list = []
-  while (isWrappingType(finalType)) {
-    while (isListType(finalType)) {
-      finalType = finalType.ofType
-      if (isNonNullType(finalType)) {
-        finalType = finalType.ofType
-        list.unshift(true)
-      } else {
-        list.unshift(false)
-      }
-    }
-    if (isNonNullType(finalType)) {
-      isNonNull = true
-      finalType = finalType.ofType
-    }
-  }
-  return { type: finalType, isNonNull, list }
-}
-
 export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record<string, MissingType>) {
   const missingTypesNames = Object.keys(missingTypes)
   const schemaTypeMap = schema.getTypeMap()
@@ -547,31 +522,42 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
   return importPath
 }
 
-export function getNexusNamedArgDef(argDef: AllNexusArgsDefs | string): AllNexusNamedArgsDefs | string {
-  if (typeof argDef === 'string') {
-    return argDef
+/**
+ * Given the right hand side of an arg definition, returns the underlying "named type"
+ * for us to add to the builder
+ */
+export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusNamedInputTypeDefs | string {
+  let finalValue = argDef
+  if (typeof finalValue === 'string') {
+    return finalValue
   }
-
-  let namedType = argDef
-
-  while (isNexusWrappingType(namedType)) {
-    namedType = namedType.ofType
+  while (isNexusWrappingType(finalValue) || isWrappingType(finalValue) || isNexusArgDef(finalValue)) {
+    if (isNexusArgDef(finalValue)) {
+      finalValue = finalValue.value.type
+    } else if (isNexusWrappingType(finalValue)) {
+      finalValue = finalValue.ofNexusType
+    } else if (isWrappingType(finalValue)) {
+      finalValue = finalValue.ofType
+    }
   }
-
-  return namedType
+  return finalValue
 }
 
-export function getNexusNamedType(type: AllNexusTypeDefs | string): AllNexusNamedTypeDefs | string {
+export function getNexusNamedType(
+  type: AllNexusTypeDefs | GraphQLType | string
+): AllNexusNamedTypeDefs | GraphQLNamedType | string {
   if (typeof type === 'string') {
     return type
   }
-
   let namedType = type
-
-  while (isNexusWrappingType(namedType)) {
-    namedType = namedType.ofType
+  while (isNexusWrappingType(namedType) || isWrappingType(namedType)) {
+    if (isNexusWrappingType(namedType)) {
+      namedType = namedType.ofNexusType
+    }
+    if (isWrappingType(namedType)) {
+      namedType = namedType.ofType
+    }
   }
-
   return namedType
 }
 
@@ -603,5 +589,11 @@ export function raiseProgrammerError(error: Error) {
     throw error
   } else {
     console.error(error)
+  }
+}
+
+export class Unreachable extends Error {
+  constructor(val: never) {
+    super(`Unreachable case or branch, unexpected ${val}`)
   }
 }

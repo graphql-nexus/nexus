@@ -17,7 +17,8 @@ import {
   isScalarType,
   isSpecifiedScalarType,
 } from 'graphql'
-import { eachObj, GroupedTypes, groupTypes, isInterfaceField, objValues, unwrapType } from './utils'
+import { eachObj, GroupedTypes, groupTypes, isInterfaceField, objValues } from './utils'
+import { unwrapGraphQLDef, NexusFinalWrapKind } from './definitions/wrapping'
 
 export function convertSDL(sdl: string, commonjs: null | boolean = false, json = JSON) {
   try {
@@ -110,9 +111,24 @@ export class SDLConverter {
   }
 
   printField(source: 'input' | 'output', field: GraphQLField<any, any> | GraphQLInputField) {
-    const { list, type: fieldType, isNonNull } = unwrapType(field.type)
-    const prefix = list.length === 1 && list[0] === true ? `t.list.` : `t.`
-    return `    ${prefix}${this.printFieldMethod(source, field, fieldType, list, isNonNull)}`
+    const { namedType, wrapping } = unwrapGraphQLDef(field.type)
+    let prefix = 't.'
+
+    let typeString: string | undefined = undefined
+
+    if (wrapping.length > 2) {
+      typeString = this.addWrapping(namedType.name, wrapping)
+    } else {
+      wrapping.forEach((w) => {
+        if (w === 'List') {
+          prefix += `list.`
+        } else {
+          prefix += `nonNull.`
+        }
+      })
+    }
+
+    return `    ${prefix}${this.printFieldMethod(source, field, namedType, typeString)}`
   }
 
   printFieldMethod(
@@ -121,27 +137,18 @@ export class SDLConverter {
     type:
       | Exclude<GraphQLOutputType, GraphQLWrappingType>
       | Exclude<GraphQLInputObjectType, GraphQLWrappingType>,
-    list: boolean[],
-    isNonNull: boolean
+    typeString?: string
   ) {
     const objectMeta: Record<string, any> = {}
     let str = ''
-    if (isCommonScalar(type)) {
+    if (isCommonScalar(type) && !typeString) {
       str += `${type.name.toLowerCase()}("${field.name}"`
     } else {
-      objectMeta.type = type
+      objectMeta.type = typeString ?? type
       str += `field("${field.name}"`
     }
     if ('deprecationReason' in field && field.deprecationReason) {
       objectMeta.deprecation = field.deprecationReason
-    }
-    if (list.length > 1 || list[0] === false) {
-      objectMeta.list = list
-    }
-    if (!isNonNull && source === 'output') {
-      objectMeta.nullable = true
-    } else if (isNonNull && source === 'input') {
-      objectMeta.required = true
     }
     if (field.description) {
       objectMeta.description = field.description
@@ -177,9 +184,6 @@ export class SDLConverter {
     if (key === 'type') {
       return val
     }
-    if (key === 'list' || key === 'required') {
-      return Array.isArray(val) ? `[${val.join(', ')}]` : this.json.stringify(val)
-    }
     if (key === 'args') {
       let str = `{\n`
       ;(val as GraphQLArgument[]).forEach((arg) => {
@@ -193,8 +197,8 @@ export class SDLConverter {
 
   printArg(arg: GraphQLArgument) {
     const description = arg.description
-    const { list, isNonNull, type } = unwrapType(arg.type)
-    const isArg = !isCommonScalar(type)
+    const { namedType: type, wrapping } = unwrapGraphQLDef(arg.type)
+    const isArg = !isSpecifiedScalarType(type)
     let str = ''
     if (isArg) {
       this.usedImports.add('arg')
@@ -204,28 +208,36 @@ export class SDLConverter {
       str += `${type.toString().toLowerCase()}Arg(`
     }
     const metaToAdd = []
+    let wrappedType = type.name
+
     if (isArg) {
-      metaToAdd.push(`type: ${type.name}`)
+      metaToAdd.push(`type: ${this.addWrapping(wrappedType, wrapping)}`)
     }
     if (description) {
       metaToAdd.push(`description: ${JSON.stringify(description)}`)
     }
-    if (list.length) {
-      metaToAdd.push(list.length === 1 && list[0] === true ? `list: true` : `list: [${list.join(', ')}]`)
-    }
-    if (arg.defaultValue !== undefined) {
-      metaToAdd.push(`default: ${this.json.stringify(arg.defaultValue)}`)
-    }
-    if (isNonNull) {
-      metaToAdd.push('required: true')
-    }
     str +=
       metaToAdd.length > 1
-        ? `{\n          ${metaToAdd.join(',\n          ')}\n        }`
+        ? `{\n          ${metaToAdd.join(',\n          ')}\n        })`
         : metaToAdd.length
-        ? `{ ${metaToAdd[0]} }`
+        ? `{ ${metaToAdd[0]} })`
         : ''
-    return `${str}),`
+
+    return isArg ? str : this.addWrapping(str, wrapping)
+  }
+
+  addWrapping(toWrap: string, wrapping: NexusFinalWrapKind[]) {
+    let wrappedVal = toWrap
+    wrapping.forEach((w) => {
+      if (w === 'NonNull') {
+        this.usedImports.add('nonNull')
+        wrappedVal = `nonNull(${wrappedVal})`
+      } else if (w === 'List') {
+        this.usedImports.add('list')
+        wrappedVal = `list(${wrappedVal})`
+      }
+    })
+    return wrappedVal
   }
 
   printInterfaceTypes() {
@@ -244,7 +256,6 @@ export class SDLConverter {
       this.maybeDescription(type),
       `  definition(t) {`,
       this.printObjectFields(type),
-      `    t.resolveType(() => null)`,
       `  }`,
       `});`,
     ])

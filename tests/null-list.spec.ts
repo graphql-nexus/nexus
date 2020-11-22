@@ -30,11 +30,15 @@ function getWrappings(arr: string[]): Array<string[]> {
 
 const WRAPPINGS = getWrappings(WRAPPER_NAMES)
 
-function getLabel(type: any, wrapping: string[]) {
+function getLabel(type: any, wrapping: string[], isChaining = false) {
   const endBrackets = wrapping.length
   const typeName = typeof type === 'string' ? type : type.name
   // /!\ wraps is spread to prevent mutating the original
   const wrappingLabel = [...wrapping].reverse().join('(') + '(' + typeName + ')'.repeat(endBrackets)
+
+  if (isChaining) {
+    return `${[...wrapping].join('.')}.field({type: ${typeName}})`
+  }
 
   return wrappingLabel
 }
@@ -151,7 +155,7 @@ function getTestDataForOutputType(
   params: { nonNullDefault: boolean; useChainingApi?: boolean }
 ): Array<[string, GraphQLOutputType | Error]> {
   return WRAPPINGS.map((wrapping) => {
-    const label = getLabel(baseType, wrapping)
+    const label = getLabel(baseType, wrapping, params.useChainingApi)
     try {
       const outputType = testOutputField(baseType, wrapping, params)
 
@@ -167,7 +171,7 @@ function getTestDataForInputType(
   params: { nonNullDefault: boolean; useChainingApi?: boolean }
 ): Array<[string, GraphQLInputType | Error]> {
   return WRAPPINGS.map((wrapping) => {
-    const label = getLabel(baseType, wrapping)
+    const label = getLabel(baseType, wrapping, params.useChainingApi)
     try {
       const outputType = testInputField(baseType, wrapping, params)
 
@@ -424,41 +428,6 @@ describe('wrapping for args; nonNullDefault = true;', () => {
 })
 
 describe('edges cases', () => {
-  test('cannot wrap non nexus types', () => {
-    expect(() => list(GraphQLString as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a type not constructed by Nexus in a list(). Saw String"`
-    )
-    expect(() => nonNull(GraphQLString as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a type not constructed by Nexus in a nonNull(). Saw String"`
-    )
-    expect(() => nullable(GraphQLString as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a type not constructed by Nexus in a nullable(). Saw String"`
-    )
-  })
-
-  test('forbid nonNull(nonNull()), nullable(nullable()), nonNull(nullable()), nullable(nonNull())', () => {
-    expect(() => nullable(nullable('String') as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a nullable() in a nullable()"`
-    )
-    expect(() => nonNull(nonNull('String') as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a nonNull() in a nonNull()"`
-    )
-    expect(() => nullable(nonNull('String') as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a nonNull() in a nullable()"`
-    )
-    expect(() => nonNull(nullable('String') as any)).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap a nullable() in a nonNull()"`
-    )
-  })
-
-  test('cannot wrap at the same time an arg def and its type', () => {
-    const wrappedArgDef = list(arg({ type: list('String') }))
-
-    expect(() => testArg(wrappedArgDef, [], { nonNullDefault: false })).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot wrap arg() and \`type\` property in list() or nonNull() or nullable() at the same time"`
-    )
-  })
-
   test('wrapped arg def retains metadata description etc', () => {
     const wrappedArgDef = list(nonNull(stringArg({ description: 'Bonjour !', default: 'Au revoir!' })))
     const graphqlArg = testArg(wrappedArgDef, [], { nonNullDefault: false })
@@ -479,12 +448,12 @@ describe('edges cases', () => {
     expect(() =>
       testInputField(list('String'), ['list'], { nonNullDefault: false, useChainingApi: true })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot use t.list|nonNull|nullable shorthands and list()|nonNull()|null() at the same time"`
+      `"Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on Bar.foo)"`
     )
     expect(() =>
       testOutputField(list('String'), ['list'], { nonNullDefault: false, useChainingApi: true })
     ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot use t.list|nonNull|nullable shorthands and list()|nonNull()|null() at the same time"`
+      `"Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on Query.foo)"`
     )
   })
 })

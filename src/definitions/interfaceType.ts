@@ -61,11 +61,8 @@ export interface InterfaceDefinitionBuilder<TypeName extends string> extends Out
 }
 
 export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDefinitionBlock<TypeName> {
-  constructor(
-    protected typeBuilder: InterfaceDefinitionBuilder<TypeName>,
-    protected nonNullDefault: boolean
-  ) {
-    super(typeBuilder, nonNullDefault)
+  constructor(protected typeBuilder: InterfaceDefinitionBuilder<TypeName>) {
+    super(typeBuilder)
   }
   /**
    * @param interfaceName

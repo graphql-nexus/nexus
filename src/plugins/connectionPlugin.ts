@@ -1,11 +1,9 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
-import { arg, ArgsRecord } from '../definitions/args'
+import { arg, ArgsRecord, intArg } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
-import { list } from '../definitions/list'
 import { nonNull } from '../definitions/nonNull'
-import { nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
-import { AllNexusNamedOutputTypeDefs } from '../definitions/wrapping'
+import { AllNexusNamedOutputTypeDefs, applyNexusWrapping } from '../definitions/wrapping'
 import { NonNullConfig } from '../definitions/_types'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
@@ -27,6 +25,7 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
+import { nullable } from '../definitions/nullable'
 
 export interface ConnectionPluginConfig {
   /**
@@ -281,10 +280,7 @@ const ForwardPaginateArgs = {
 
 const ForwardOnlyStrictArgs = {
   ...ForwardPaginateArgs,
-  first: arg({
-    type: nonNull('Int'),
-    description: 'Returns the first n elements from the list.',
-  }),
+  first: nonNull(intArg({ description: 'Returns the first n elements from the list.' })),
 }
 
 const BackwardPaginateArgs = {
@@ -300,10 +296,7 @@ const BackwardPaginateArgs = {
 
 const BackwardOnlyStrictArgs = {
   ...BackwardPaginateArgs,
-  last: arg({
-    type: nonNull('Int'),
-    description: 'Returns the last n elements from the list.',
-  }),
+  last: nonNull(intArg({ description: 'Returns the last n elements from the list.' })),
 }
 
 function base64Encode(str: string) {
@@ -399,9 +392,13 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             fieldName: FieldName, 
             config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> ${printedDynamicConfig}
           ): void`,
-          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage, builder }) {
+          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage, builder, wrapping }) {
             const [fieldName, fieldConfig] = factoryArgs as [string, ConnectionFieldConfig]
             const targetType = fieldConfig.type
+
+            if (wrapping?.includes('List')) {
+              throw new Error(`Cannot chain .list with connectionField (on ${parentTypeName}.${fieldName})`)
+            }
 
             const { targetTypeName, connectionName, edgeName } = getTypeNames(
               fieldName,
@@ -420,17 +417,17 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: connectionName,
                   definition(t2) {
-                    t2.field('edges', {
-                      type: list(edgeName as any),
+                    t2.list.field('edges', {
+                      type: edgeName as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
                     })
-                    t2.field('pageInfo', {
-                      type: nonNull('PageInfo' as any),
+                    t2.nonNull.field('pageInfo', {
+                      type: 'PageInfo' as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
                     })
                     if (includeNodesField) {
-                      t2.field('nodes', {
-                        type: list(targetType),
+                      t2.list.field('nodes', {
+                        type: targetType,
                         description: `Flattened list of ${targetTypeName} type`,
                       })
                     }
@@ -457,8 +454,8 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: edgeName,
                   definition(t2) {
-                    t2.field('cursor', {
-                      type: nonNull('String'),
+                    t2.nonNull.field('cursor', {
+                      type: 'String',
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
                     })
                     t2.field('node', {
@@ -489,12 +486,12 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   description:
                     'PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo',
                   definition(t2) {
-                    t2.field('hasNextPage', {
-                      type: nonNull('Boolean'),
+                    t2.nonNull.field('hasNextPage', {
+                      type: 'Boolean',
                       description: `Used to indicate whether more edges exist following the set defined by the clients arguments.`,
                     })
-                    t2.field('hasPreviousPage', {
-                      type: nonNull('Boolean'),
+                    t2.nonNull.field('hasPreviousPage', {
+                      type: 'Boolean',
                       description: `Used to indicate whether more edges exist prior to the set defined by the clients arguments.`,
                     })
                     t2.field('startCursor', {
@@ -572,19 +569,25 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               resolveFn = makeResolveFn(pluginConfig, fieldConfig)
             }
 
-            const nonNullDefault =
-              fieldConfig.nonNullDefaults?.output ??
-              builder.getConfigOption('nonNullDefaults')?.output ??
-              false
+            let wrappedConnectionName = connectionName
+            if (wrapping) {
+              wrappedConnectionName = applyNexusWrapping(connectionName, wrapping)
+            }
 
-            const shouldBeNonNull =
-              fieldConfig.nullable !== undefined ? !fieldConfig.nullable : nonNullDefault
+            // TOOD(tim): Remove when we have the "declarativeWrapping" plugin
+            if (typeof fieldConfig.nullable === 'boolean') {
+              // @ts-ignore
+              wrappedConnectionName =
+                fieldConfig.nullable === false
+                  ? nonNull(wrappedConnectionName as any)
+                  : nullable(wrappedConnectionName as any)
+            }
 
             // Add the field to the type.
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
-              type: shouldBeNonNull ? nonNull(connectionName as any) : nullable(connectionName as any),
+              type: wrappedConnectionName as any,
               resolve(root, args: PaginationArgs, ctx, info) {
                 validateArgs(args, info)
                 return resolveFn(root, args, ctx, info)
