@@ -5,10 +5,7 @@ import { NexusTypes, withNexusSymbol } from './_types'
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName
-  definition(
-    // t: IsSubscriptionType<TypeName> extends true ? SubscriptionBuilder : OutputDefinitionBlock<TypeName>
-    t: OutputDefinitionBlock<TypeName>
-  ): void
+  definition(t: OutputDefinitionBlock<TypeName>): void
 }
 
 export class NexusExtendTypeDef<TypeName extends string> {

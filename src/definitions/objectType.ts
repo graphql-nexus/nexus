@@ -13,12 +13,14 @@ export class ObjectDefinitionBlock<TypeName extends string> extends OutputDefini
   constructor(protected typeBuilder: ObjectDefinitionBuilder, protected nonNullDefault: boolean) {
     super(typeBuilder, nonNullDefault)
   }
+
   /**
    * @param interfaceName
    */
   implements(...interfaceName: Array<Implemented>) {
     this.typeBuilder.addInterfaces(interfaceName)
   }
+
   /**
    * Modifies a field added via an interface
    */
@@ -72,4 +74,9 @@ export function queryType(config: Omit<NexusObjectTypeConfig<'Query'>, 'name'>) 
 
 export function mutationType(config: Omit<NexusObjectTypeConfig<'Mutation'>, 'name'>) {
   return objectType({ ...config, name: 'Mutation' })
+}
+
+// TODO(tim): Reimplement with types
+export function subscriptionType(config: Omit<NexusObjectTypeConfig<'Subscription'>, 'name'>) {
+  return objectType({ ...config, name: 'Subscription' })
 }
