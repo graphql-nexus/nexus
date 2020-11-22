@@ -4,11 +4,9 @@ import { SubscriptionTypeConfig } from './subscriptionType'
 /**
  * Add one field to the Subscription type
  */
-export function subscriptionField<FieldName extends string>(
+export function subscriptionField<FieldName extends string, Event>(
   fieldName: FieldName,
-  config:
-    | SubscriptionTypeConfig<'Subscription', FieldName>
-    | (() => SubscriptionTypeConfig<'Subscription', FieldName>)
+  config: SubscriptionTypeConfig<FieldName, Event> | (() => SubscriptionTypeConfig<FieldName, Event>)
 ) {
   return extendType({
     type: 'Subscription',

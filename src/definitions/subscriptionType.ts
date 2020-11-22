@@ -1,13 +1,11 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
 import { IsEqual } from '../typeHelpersInternal'
-import { CommonOutputFieldConfig, NexusOutputFieldDef } from './definitionBlocks'
-import { list } from './list'
-import { ObjectDefinitionBuilder, objectType } from './objectType'
-import { AllNexusOutputTypeDefs, isNexusListTypeDef } from './wrapping'
-import { BaseScalars } from './_types'
+import { CommonOutputFieldConfig } from './definitionBlocks'
+import { objectType } from './objectType'
+import { AllNexusOutputTypeDefs } from './wrapping'
 
-export interface SubscriptionTypeConfigBase<FieldName extends string, Event = any> {
+export interface SubscriptionTypeConfigBase<FieldName extends string, Event> {
   resolve(
     root: Event,
     args: ArgsValue<'Subscription', FieldName>,
@@ -16,7 +14,6 @@ export interface SubscriptionTypeConfigBase<FieldName extends string, Event = an
   ):
     | MaybePromise<ResultValue<'Subscription', FieldName>>
     | MaybePromiseDeep<ResultValue<'Subscription', FieldName>>
-
   subscribe(
     root: object,
     args: ArgsValue<'Subscription', FieldName>,
@@ -26,77 +23,28 @@ export interface SubscriptionTypeConfigBase<FieldName extends string, Event = an
 }
 
 // prettier-ignore
-export type FieldShorthandConfig<FieldName extends string> =
+export type SubscriptionScalarConfig<FieldName extends string, Event> =
     CommonOutputFieldConfig<'Subscription', FieldName>
-  & SubscriptionTypeConfigBase<FieldName>
+  & SubscriptionTypeConfigBase<FieldName, Event>
 
 // prettier-ignore
-export interface SubscriptionTypeConfig<TypeName extends string, FieldName extends string>
-  extends SubscriptionTypeConfigBase<FieldName>,
-          CommonOutputFieldConfig<'Subscription', FieldName>
+export interface SubscriptionTypeConfig<FieldName extends string, Event>
+  extends SubscriptionScalarConfig<FieldName, Event>
   {
     type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
   }
 
-export class SubscriptionBuilder {
-  constructor(protected typeBuilder: ObjectDefinitionBuilder, protected isList = false) {}
-
-  get list() {
-    if (this.isList) {
-      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
-    }
-    return new SubscriptionBuilder(this.typeBuilder, true)
-  }
-
-  string<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
-    this.fieldShorthand(fieldName, 'String', config)
-  }
-
-  int<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
-    this.fieldShorthand(fieldName, 'Int', config)
-  }
-
-  // prettier-ignore
-  boolean<FieldName extends string>(fieldName: FieldName, opts: FieldShorthandConfig<FieldName>) {
-    this.fieldShorthand(fieldName, 'Boolean', opts)
-  }
-
-  id<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
-    this.fieldShorthand(fieldName, 'ID', config)
-  }
-
-  float<FieldName extends string>(fieldName: FieldName, config: FieldShorthandConfig<FieldName>) {
-    this.fieldShorthand(fieldName, 'Float', config)
-  }
-
-  // prettier-ignore
-  field<FieldName extends string>(name: FieldName, fieldConfig: SubscriptionTypeConfig<'Subscription', FieldName>) {
-    this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
-  }
-
-  protected fieldShorthand(fieldName: string, typeName: BaseScalars, config: FieldShorthandConfig<any>) {
-    this.typeBuilder.addField(
-      this.decorateField({
-        name: fieldName,
-        type: typeName,
-        ...config,
-      } as any)
-    )
-  }
-
-  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
-    if (this.isList) {
-      if (isNexusListTypeDef(config.type)) {
-        this.typeBuilder.warn(
-          `It looks like you chained .list and used list() for ${config.name}. ` +
-            'You should only do one or the other'
-        )
-      } else {
-        config.type = list(config.type)
-      }
-    }
-    return config
-  }
+// prettier-ignore
+export interface SubscriptionBuilder {
+  list: SubscriptionBuilder
+  nonNull: Omit<SubscriptionBuilder, 'nonNull' | 'nullable'>
+  nullable: Omit<SubscriptionBuilder, 'nonNull' | 'nullable'>
+  string<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  int<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  boolean<FieldName extends string, Event>(fieldName: FieldName, opts: SubscriptionScalarConfig<FieldName, Event>): void
+  id<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  float<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  field<FieldName extends string, Event>(name: FieldName, fieldConfig: SubscriptionTypeConfig<FieldName, Event>): void
 }
 
 export type SubscriptionTypeParams = {
