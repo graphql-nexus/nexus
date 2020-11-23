@@ -90,7 +90,7 @@ describe('backingTypes', () => {
 describe('rootTypings', () => {
   it('can import enum via rootTyping', async () => {
     const metadata = new TypegenMetadata({
-      outputs: { typegen: false, schema: false },
+      outputs: { typegen: null, schema: null },
     })
     const schema = makeSchema({
       types: [
@@ -115,7 +115,7 @@ describe('rootTypings', () => {
 
   it('throws error if root typing path is not an absolute path', async () => {
     const metadata = new TypegenMetadata({
-      outputs: { typegen: false, schema: false },
+      outputs: { typegen: null, schema: null },
     })
     const someType = objectType({
       name: 'SomeType',
@@ -146,7 +146,7 @@ describe('rootTypings', () => {
 
   it('throws error if root typing path does not exist', async () => {
     const metadata = new TypegenMetadata({
-      outputs: { typegen: false, schema: false },
+      outputs: { typegen: null, schema: null },
     })
     const someType = objectType({
       name: 'SomeType',
