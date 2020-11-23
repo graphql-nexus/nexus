@@ -119,7 +119,7 @@ export class SDLConverter {
     if (wrapping.length > 2) {
       typeString = this.addWrapping(namedType.name, wrapping)
     } else {
-      wrapping.forEach((w) => {
+      ;[...wrapping].reverse().forEach((w) => {
         if (w === 'List') {
           prefix += `list.`
         } else {
