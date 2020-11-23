@@ -342,11 +342,11 @@ describe('wrapping for input types with chained API; nonNullDefault = true;', ()
 })
 
 describe('wrapping for input types with chained API; nonNullDefault = false;', () => {
-  const stringReferenceTestData = getTestDataForOutputType('String', {
+  const stringReferenceTestData = getTestDataForInputType('String', {
     nonNullDefault: true,
     useChainingApi: true,
   })
-  const nexusTypeDefTestData = getTestDataForOutputType(
+  const nexusTypeDefTestData = getTestDataForInputType(
     inputObjectType({
       name: 'Foo',
       definition(t) {

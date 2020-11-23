@@ -624,83 +624,83 @@ exports[`wrapping for args; nonNullDefault = true; wrapped arg def nullable(null
 
 exports[`wrapping for args; nonNullDefault = true; wrapped arg def nullable(nullable(nullable(String))) 1`] = `"String"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.field({type: Foo}) 1`] = `"[[Foo]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.list.field({type: Foo}) 1`] = `"[[[Foo]]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.nonNull.field({type: Foo}) 1`] = `"[[Foo!]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.list.nullable.field({type: Foo}) 1`] = `"[[Foo]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.list.field({type: Foo}) 1`] = `"[[Foo]!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nullable.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.list.field({type: Foo}) 1`] = `"[[Foo]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.list.field({type: Foo}) 1`] = `"[[Foo]]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.nonNull.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [Foo]! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.list.field({type: Foo}) 1`] = `"[[Foo]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.list.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nullable.field({type: Foo}) 1`] = `"Error: Expected [object Object] to be a valid output type, saw GraphQLInputObjectType"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.field({type: String}) 1`] = `"[String!]!"`;
 
