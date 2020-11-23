@@ -1,13 +1,6 @@
 import { GraphQLInputObjectType, GraphQLSchema } from 'graphql'
 import { makeSchema, queryType } from '../../src'
-import {
-  arg,
-  inputObjectType,
-  declarativeWrappingPlugin,
-  list,
-  SchemaConfig,
-  stringArg,
-} from '../../src/core'
+import { arg, inputObjectType, declarativeWrappingPlugin, SchemaConfig } from '../../src/core'
 
 type InputOutputFieldConfig = {
   nullable?: boolean
