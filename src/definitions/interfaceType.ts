@@ -81,7 +81,7 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
     this.typeBuilder.addModification({ ...modifications, field })
   }
 
-  /* istanbul ignore */
+  /* istanbul ignore next */
   protected resolveType() {
     throw new Error(messages.removedResolveType(this.typeBuilder.typeName))
   }

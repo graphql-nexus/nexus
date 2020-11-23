@@ -21,7 +21,7 @@ export class UnionDefinitionBlock {
     this.typeBuilder.addUnionMembers(unionMembers)
   }
 
-  /* istanbul ignore */
+  /* istanbul ignore next */
   protected resolveType() {
     throw new Error(messages.removedResolveType(this.typeBuilder.typeName))
   }
