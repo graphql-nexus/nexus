@@ -295,17 +295,11 @@ export function applyNexusWrapping(toWrap: any, wrapping: NexusWrapKind[]) {
  * to determine the proper list of wrapping to apply to the field
  */
 export function finalizeWrapping(
-  location: string,
   nonNullDefault: boolean,
   typeWrapping: NexusWrapKind[] | ReadonlyArray<NexusWrapKind>,
   chainWrapping?: NexusWrapKind[]
 ): NexusFinalWrapKind[] {
   let finalChain: NexusFinalWrapKind[] = []
-  if (typeWrapping.length && chainWrapping?.length) {
-    throw new Error(
-      `Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on ${location})`
-    )
-  }
   const allWrapping = typeWrapping.concat(chainWrapping ?? [])
   // Ensure the first item is wrapped, if we're not guarding
   if (nonNullDefault && (!allWrapping[0] || allWrapping[0] === 'List')) {

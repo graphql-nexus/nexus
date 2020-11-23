@@ -1,13 +1,6 @@
 import { GraphQLInputObjectType, GraphQLSchema } from 'graphql'
 import { makeSchema, queryType } from '../../src'
-import {
-  arg,
-  inputObjectType,
-  declarativeWrappingPlugin,
-  list,
-  SchemaConfig,
-  stringArg,
-} from '../../src/core'
+import { arg, inputObjectType, declarativeWrappingPlugin, SchemaConfig } from '../../src/core'
 
 type InputOutputFieldConfig = {
   nullable?: boolean
@@ -172,7 +165,7 @@ describe('output types ; nonNullDefaults = false ;', () => {
       nullable: false,
     })
 
-    expect(field).toMatchInlineSnapshot(`"[String]!"`)
+    expect(field).toMatchInlineSnapshot(`"[String!]!"`)
   })
 
   it.each(OUTPUT_TYPES_NON_NULL_DEFAULTS_FALSE.nonNull)('%s ; nullable = false', (_, field) => {
@@ -290,7 +283,7 @@ describe('input types ; nonNullDefaults = false ;', () => {
       nullable: false,
     })
 
-    expect(field).toMatchInlineSnapshot(`"[String]!"`)
+    expect(field).toMatchInlineSnapshot(`"[String!]!"`)
   })
 
   it.each(INPUT_TYPES_NON_NULL_DEFAULTS_FALSE.nonNull)('%s ; nullable = false', (_, field) => {
@@ -365,7 +358,7 @@ describe('input types ; nonNullDefaults = true ;', () => {
       }
     )
 
-    expect(field).toMatchInlineSnapshot(`"[String]!"`)
+    expect(field).toMatchInlineSnapshot(`"[String!]!"`)
   })
 
   it.each(INPUT_TYPES_NON_NULL_DEFAULTS_TRUE.nonNull)('%s ; nullable = false', (_, field) => {
@@ -425,7 +418,7 @@ describe('arg def ; nonNullDefaults = false ;', () => {
       nullable: false,
     })
 
-    expect(field).toMatchInlineSnapshot(`"[String]!"`)
+    expect(field).toMatchInlineSnapshot(`"[String!]!"`)
   })
 
   it.each(ARG_DEF_NON_NULL_DEFAULTS_FALSE.nonNull)('%s ; nullable = false', (_, field) => {
@@ -542,127 +535,5 @@ describe('arg def ; nonNullDefaults = true ;', () => {
 
   it.each(ARG_DEF_NON_NULL_DEFAULTS_TRUE.nullable)('%s ; nullable = true', (_, field) => {
     expect(field).toMatchSnapshot()
-  })
-})
-
-describe('edge-cases', () => {
-  test('cannot use list: true and a wrapped type at the same time on an output type', () => {
-    expect(() =>
-      testField('output', {
-        type: list('String'),
-        list: true,
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`list\` and wrapped the type of the field 'Query.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use list: true and t.list at the same time on an output type', () => {
-    expect(() =>
-      testField('output', { list: true, useDotListShorthand: true })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on Query.foo)"`
-    )
-  })
-
-  test('cannot use nullable and a wrapped type at the same time on an output type', () => {
-    expect(() =>
-      testField('output', { type: list('String'), nullable: false })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`nullable\` and wrapped the type of the field 'Query.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use list: true and a wrapped type at the same time on an input type', () => {
-    expect(() =>
-      testField('input', {
-        type: list('String'),
-        list: true,
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`list\` and wrapped the type of the field 'Foo.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use list: true and t.list at the same time on an input type', () => {
-    expect(() =>
-      testField('output', {
-        list: true,
-        useDotListShorthand: true,
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on Query.foo)"`
-    )
-  })
-
-  test('cannot use nullable and a wrapped type at the same time on an input type', () => {
-    expect(() =>
-      testField('input', { type: list('String'), nullable: false })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`nullable\` and wrapped the type of the field 'Foo.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use list: true and a wrapped arg type at the same time on an arg', () => {
-    expect(() =>
-      testField('arg', {
-        type: list('String'),
-        list: true,
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`list\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use nullable and a wrapped arg type at the same time on an arg', () => {
-    expect(() =>
-      testField('arg', { type: list('String'), nullable: false })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`nullable\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use wrapped arg and list: true at the same time on an arg', () => {
-    expect(() =>
-      makeSchema({
-        outputs: false,
-        types: [
-          queryType({
-            definition(t) {
-              t.string('foo', {
-                args: {
-                  id: list(stringArg({ list: true } as any)),
-                },
-              })
-            },
-          }),
-        ],
-        plugins: [declarativeWrappingPlugin()],
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`list\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
-    )
-  })
-
-  test('cannot use wrapped arg and nullable: true at the same time on an arg', () => {
-    expect(() =>
-      makeSchema({
-        outputs: false,
-        types: [
-          queryType({
-            definition(t) {
-              t.string('foo', {
-                args: {
-                  id: list(stringArg({ nullable: true } as any)),
-                },
-              })
-            },
-          }),
-        ],
-        plugins: [declarativeWrappingPlugin()],
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"[declarativeWrappingPlugin] It looks like you used \`nullable\` and wrapped the type of the arg 'id' of the field 'Query.foo'. You should only do one or the other"`
-    )
   })
 })

@@ -33,18 +33,18 @@ describe('wrapping', () => {
     it('adds nonNull around unguarded elements when nonNullDefaults = true', () => {
       const input = ['List', 'List', 'Null', 'List'] as const
       const output = ['NonNull', 'List', 'NonNull', 'List', 'List', 'NonNull'] as const
-      expect(finalizeWrapping('test', true, input)).toEqual(output)
+      expect(finalizeWrapping(true, input)).toEqual(output)
     })
     it('does not add nonNull around elements when nonNullDefaults = false', () => {
       const input = ['List', 'List', 'List'] as const
       const output = ['List', 'List', 'List'] as const
-      expect(finalizeWrapping('test', false, input)).toEqual(output)
+      expect(finalizeWrapping(false, input)).toEqual(output)
     })
 
     it('does not add nonNull around elements when nonNullDefaults = false', () => {
       const input = ['List', 'List', 'NonNull', 'List'] as const
       const output = ['List', 'List', 'NonNull', 'List'] as const
-      expect(finalizeWrapping('test', false, input)).toEqual(output)
+      expect(finalizeWrapping(false, input)).toEqual(output)
     })
   })
 })
