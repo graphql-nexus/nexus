@@ -523,7 +523,7 @@ describe('basic behavior', () => {
     expect(result.data?.users.nodes.length).toEqual(10)
   })
 
-  it('should respect nullability of connection field, w/ declarativeWrappingPlugin', async () => {
+  it('should respect nullability of connection field', async () => {
     const getConnectionFieldType = (schema: GraphQLSchema) =>
       schema.getQueryType()?.getFields()['users'].type.toString()
 
