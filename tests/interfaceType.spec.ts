@@ -164,7 +164,7 @@ describe('interfaceType', () => {
         ],
         outputs: false,
       },
-      false
+      null
     )
     expect(schemaTypes).toMatchSnapshot()
   })

@@ -11,8 +11,8 @@ export interface TypegenMetadataConfig
   extends Omit<BuilderConfigInput, 'outputs' | 'shouldGenerateArtifacts'> {
   nexusSchemaImportId?: string
   outputs: {
-    schema: false | string
-    typegen: false | string
+    schema: null | string
+    typegen: null | string
   }
 }
 
@@ -44,7 +44,7 @@ export class TypegenMetadata {
     }
   }
 
-  async generateArtifactContents(schema: NexusGraphQLSchema, typeFilePath: string | false) {
+  async generateArtifactContents(schema: NexusGraphQLSchema, typeFilePath: string | null) {
     const [schemaTypes, tsTypes] = await Promise.all([
       this.generateSchemaFile(schema),
       typeFilePath ? this.generateTypesFile(schema, typeFilePath) : '',

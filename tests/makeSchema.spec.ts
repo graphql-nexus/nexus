@@ -76,7 +76,7 @@ describe('makeSchema', () => {
             return printSchema(schema, { commentDescriptions: true })
           },
         },
-        false
+        null
       )
       expect(schemaTypes).toMatchSnapshot()
     })
