@@ -120,5 +120,6 @@ Below are some more usage examples of `nullable()`:
 | `nullable(list('String'))`           | `[String]`                             | `[String!]`                           |
 | `list(nullable('String'))`           | `[String]`                             | `[String]!`                           |
 | `nullable(list(nullable('String')))` | `[String]`                             | `[String]`                            |
-| `nullable(nonNull('String'))`        | `Error`                                | `Error`                               |
-| `nullable(nullable('String'))`       | `Error`                                | `Error`                               |
+| `nullable(nonNull('String'))`        | `String`                               | `String`                              |
+| `nonNull(nullable('String'))`        | `String!`                              | `String!`                             |
+| `nullable(nullable('String'))`       | `String`                               | `String`                              |
