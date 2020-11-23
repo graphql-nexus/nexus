@@ -1,40 +1,45 @@
+import {
+  GraphQLInputType,
+  GraphQLList,
+  GraphQLNamedType,
+  GraphQLNonNull,
+  GraphQLType,
+  isWrappingType,
+  isListType,
+  isNonNullType,
+} from 'graphql'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from '../dynamicMethod'
 import { DynamicOutputPropertyDef } from '../dynamicProperty'
 import { NexusPlugin } from '../plugin'
 import { AllInputTypes, GetGen } from '../typegenTypeHelpers'
-import { PrintedGenTyping, PrintedGenTypingImport } from '../utils'
-import { NexusArgDef } from './args'
+import { PrintedGenTyping, PrintedGenTypingImport, Unreachable } from '../utils'
+import { NexusArgDef, arg } from './args'
 import { NexusEnumTypeDef } from './enumType'
 import { NexusExtendInputTypeDef } from './extendInputType'
 import { NexusExtendTypeDef } from './extendType'
 import { NexusInputObjectTypeDef } from './inputObjectType'
 import { NexusInterfaceTypeDef } from './interfaceType'
-import { NexusListDef, list } from './list'
+import { list, NexusListDef } from './list'
 import { NexusNonNullDef, nonNull } from './nonNull'
-import { NexusNullDef } from './nullable'
+import { NexusNullDef, nullable } from './nullable'
 import { NexusObjectTypeDef } from './objectType'
 import { NexusScalarTypeDef } from './scalarType'
 import { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
-import {
-  GraphQLNamedType,
-  GraphQLOutputType,
-  GraphQLInputType,
-  GraphQLType,
-  GraphQLNonNull,
-  GraphQLList,
-} from 'graphql'
 
 export type AllNexusNamedInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>
+  | Exclude<GraphQLInputType, GraphQLList<any> | GraphQLNonNull<any>>
 
 export type AllNexusInputTypeDefs<T extends string = any> =
   | AllNexusNamedInputTypeDefs<T>
   | NexusListDef<any>
   | NexusNonNullDef<any>
   | NexusNullDef<any>
+  | GraphQLList<any>
+  | GraphQLNonNull<any>
 
 export type AllNexusNamedOutputTypeDefs =
   | NexusObjectTypeDef<any>
@@ -59,6 +64,7 @@ export type NexusListableTypes =
   | NexusListDef<NexusListableTypes>
   | NexusNonNullDef<NexusNonNullableTypes>
   | NexusNullDef<NexusNullableTypes>
+  | GraphQLType
 
 export type NexusNonNullableTypes = AllNamedTypeDefs | NexusListDef<NexusListableTypes> | NexusArgDef<any>
 
@@ -70,12 +76,14 @@ export type AllNexusNamedArgsDefs<T extends AllInputTypes = AllInputTypes> =
   | T
   | NexusArgDef<T>
   | AllNexusNamedInputTypeDefs<T>
+  | GraphQLInputType
 
 export type AllNexusArgsDefs =
   | AllNexusNamedArgsDefs
   | NexusListDef<any>
   | NexusNonNullDef<any>
   | NexusNullDef<any>
+  | GraphQLInputType
 
 const NamedTypeDefs = new Set([
   NexusTypes.Enum,
@@ -164,127 +172,158 @@ export function isNexusPlugin(obj: any): obj is NexusPlugin {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Plugin
 }
 
-type NexusWrapKind = { type: 'List'; nullable: boolean } | { type: 'NamedType'; nullable: boolean }
+export type NexusWrapKind = 'NonNull' | 'Null' | 'List'
+export type NexusFinalWrapKind = 'NonNull' | 'List'
 
-export function unwrapNexusDef(
-  typeDef: AllNexusTypeDefs | AllNexusArgsDefs | string,
-  nonNullDefault: boolean
-): { namedType: AllNexusNamedTypeDefs | AllNexusArgsDefs | string; wrapping: NexusWrapKind[] } {
-  const wrapping: NexusWrapKind[] = []
+export function unwrapGraphQLDef(
+  typeDef: GraphQLType
+): { namedType: GraphQLNamedType; wrapping: NexusFinalWrapKind[] } {
+  const wrapping: NexusFinalWrapKind[] = []
   let namedType = typeDef
-
-  const isNamedType = (obj: any): obj is AllNexusNamedTypeDefs | NexusArgDef<any> | string =>
-    isNexusNamedTypeDef(obj) || isNexusArgDef(obj) || typeof obj === 'string'
-
-  if (isNamedType(typeDef)) {
-    return { namedType: typeDef, wrapping: [{ type: 'NamedType', nullable: !nonNullDefault }] }
+  while (isWrappingType(namedType)) {
+    if (isListType(namedType)) {
+      wrapping.unshift('List')
+    } else if (isNonNullType(namedType)) {
+      wrapping.unshift('NonNull')
+    } else {
+      throw new Unreachable(namedType)
+    }
+    namedType = namedType.ofType
   }
-
-  while (isNexusWrappingType(namedType)) {
-    // nullable(list(Type))
-    if (isNexusNullTypeDef(namedType) && isNexusListTypeDef(namedType.ofType)) {
-      wrapping.unshift({ type: 'List', nullable: true })
-      namedType = namedType.ofType.ofType
-    }
-
-    // nullable(Type)
-    if (isNexusNullTypeDef(namedType) && isNamedType(namedType.ofType)) {
-      wrapping.unshift({ type: 'NamedType', nullable: true })
-      namedType = namedType.ofType
-      break
-    }
-
-    // nonNull(list(Type))
-    if (isNexusNonNullTypeDef(namedType) && isNexusListTypeDef(namedType.ofType)) {
-      wrapping.unshift({ type: 'List', nullable: false })
-      namedType = namedType.ofType.ofType
-    }
-
-    // nonNull(Type)
-    if (isNexusNonNullTypeDef(namedType) && isNamedType(namedType.ofType)) {
-      wrapping.unshift({ type: 'NamedType', nullable: false })
-      namedType = namedType.ofType
-      break
-    }
-
-    // list(...)
-    if (isNexusListTypeDef(namedType)) {
-      wrapping.unshift({ type: 'List', nullable: !nonNullDefault })
-      namedType = namedType.ofType
-    }
-
-    // Type
-    if (!isNexusWrappingType(namedType)) {
-      wrapping.unshift({ type: 'NamedType', nullable: !nonNullDefault })
-    }
-  }
-
   return { namedType, wrapping }
 }
 
 /**
- * Take a Nexus Wrapped Def, unwraps it, and rewraps it as a GraphQL wrapped type
- * The outputted GraphQL type also reflects the nullability defaults
+ * Unwraps any wrapped Nexus or GraphQL types,
+ * turning into a list of wrapping
  */
-export function rewrapAsGraphQLType(
-  nexusDef: AllNexusOutputTypeDefs | string,
-  baseType: GraphQLNamedType,
-  nonNullDefault: boolean
-): GraphQLOutputType
-export function rewrapAsGraphQLType(
-  nexusDef: AllNexusInputTypeDefs | string,
-  baseType: GraphQLNamedType,
-  nonNullDefault: boolean
-): GraphQLInputType
-export function rewrapAsGraphQLType(
-  nexusDef: AllNexusTypeDefs | string,
-  baseType: GraphQLNamedType,
-  nonNullDefault: boolean
-): GraphQLOutputType | GraphQLInputType {
-  const { wrapping } = unwrapNexusDef(nexusDef, nonNullDefault)
-
-  return wrapping.reduce<GraphQLType>((type, kind) => {
-    if (kind.type === 'NamedType' && kind.nullable === false) {
-      return GraphQLNonNull(type)
+export function unwrapNexusDef(
+  typeDef: AllNexusTypeDefs | AllNexusArgsDefs | GraphQLType | string
+): {
+  namedType: AllNexusNamedTypeDefs | AllNexusArgsDefs | GraphQLNamedType | string
+  wrapping: NexusWrapKind[]
+} {
+  const wrapping: NexusWrapKind[] = []
+  let namedType = typeDef
+  while (isNexusWrappingType(namedType) || isWrappingType(namedType)) {
+    if (isWrappingType(namedType)) {
+      if (isListType(namedType)) {
+        wrapping.unshift('List')
+      } else if (isNonNullType(namedType)) {
+        wrapping.unshift('NonNull')
+      } else {
+        throw new Unreachable(namedType)
+      }
+      namedType = namedType.ofType
+    } else {
+      if (isNexusNonNullTypeDef(namedType)) {
+        wrapping.unshift('NonNull')
+      }
+      if (isNexusNullTypeDef(namedType)) {
+        wrapping.unshift('Null')
+      }
+      if (isNexusListTypeDef(namedType)) {
+        wrapping.unshift('List')
+      }
+      namedType = namedType.ofNexusType
     }
-
-    if (kind.type === 'List' && kind.nullable === true) {
-      return GraphQLList(type)
-    }
-
-    if (kind.type === 'List' && kind.nullable === false) {
-      return GraphQLNonNull(GraphQLList(type))
-    }
-
-    return type
-  }, baseType)
+  }
+  return { namedType, wrapping }
 }
 
-export function wrapAsNexusType(
-  baseType: AllNexusNamedTypeDefs | string,
-  wrapping: NexusWrapKind[]
-): AllNexusOutputTypeDefs
-export function wrapAsNexusType(
-  baseType: AllNexusNamedTypeDefs | string,
-  wrapping: NexusWrapKind[]
-): AllNexusInputTypeDefs
-export function wrapAsNexusType(
-  baseType: AllNexusNamedTypeDefs | string,
-  wrapping: NexusWrapKind[]
-): AllNexusTypeDefs {
-  return wrapping.reduce<any>((type, kind) => {
-    if (kind.type === 'NamedType' && kind.nullable === false) {
-      return nonNull(type)
+/**
+ * Takes the named type, and applies any of the NexusFinalWrapKind
+ * to create a properly wrapped GraphQL type.
+ */
+export function rewrapAsGraphQLType(baseType: GraphQLNamedType, wrapping: NexusFinalWrapKind[]): GraphQLType {
+  let finalType: GraphQLType = baseType
+  wrapping.forEach((wrap) => {
+    if (wrap === 'List') {
+      finalType = GraphQLList(finalType)
+    } else if (wrap === 'NonNull') {
+      finalType = GraphQLNonNull(finalType)
+    } else {
+      throw new Unreachable(wrap)
     }
+  })
+  return finalType
+}
 
-    if (kind.type === 'List' && kind.nullable === true) {
-      return list(type)
+/**
+ * Apply the wrapping consistently to the arg `type`
+ *
+ * nonNull(list(stringArg())) -> arg({ type: nonNull(list('String')) })
+ */
+export function normalizeArgWrapping(argVal: AllNexusArgsDefs): NexusArgDef<AllInputTypes> {
+  if (isNexusArgDef(argVal)) {
+    return argVal
+  }
+  if (isNexusWrappingType(argVal)) {
+    let { namedType, wrapping } = unwrapNexusDef(argVal)
+    if (isNexusArgDef(namedType)) {
+      const config = namedType.value
+      return arg({ ...config, type: applyNexusWrapping(config.type, wrapping) })
     }
+    return arg({ type: applyNexusWrapping(namedType, wrapping) })
+  }
+  return arg({ type: argVal })
+}
 
-    if (kind.type === 'List' && kind.nullable === false) {
-      return nonNull(list(type))
+/**
+ * Applies the ['List', 'NonNull', 'Nullable']
+ * @param toWrap
+ * @param wrapping
+ */
+export function applyNexusWrapping(toWrap: any, wrapping: NexusWrapKind[]) {
+  let finalType = toWrap
+  wrapping.forEach((wrap) => {
+    if (wrap === 'List') {
+      finalType = list(finalType)
+    } else if (wrap === 'NonNull') {
+      finalType = nonNull(finalType)
+    } else if (wrap === 'Null') {
+      finalType = nullable(finalType)
+    } else {
+      throw new Unreachable(wrap)
     }
+  })
+  return finalType
+}
 
-    return type
-  }, baseType)
+/**
+ * Takes the "nonNullDefault" value, the chained wrapping, and the field wrapping,
+ * to determine the proper list of wrapping to apply to the field
+ */
+export function finalizeWrapping(
+  location: string,
+  nonNullDefault: boolean,
+  typeWrapping: NexusWrapKind[] | ReadonlyArray<NexusWrapKind>,
+  chainWrapping?: NexusWrapKind[]
+): NexusFinalWrapKind[] {
+  let finalChain: NexusFinalWrapKind[] = []
+  if (typeWrapping.length && chainWrapping?.length) {
+    throw new Error(
+      `Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on ${location})`
+    )
+  }
+  const allWrapping = typeWrapping.concat(chainWrapping ?? [])
+  // Ensure the first item is wrapped, if we're not guarding
+  if (nonNullDefault && (!allWrapping[0] || allWrapping[0] === 'List')) {
+    allWrapping.unshift('NonNull')
+  }
+  for (let i = 0; i < allWrapping.length; i++) {
+    const current = allWrapping[i]
+    const next = allWrapping[i + 1]
+    if (current === 'Null') {
+      continue
+    } else if (current === 'NonNull') {
+      finalChain.push('NonNull')
+    } else if (current === 'List') {
+      finalChain.push('List')
+      if (nonNullDefault && (next === 'List' || !next)) {
+        finalChain.push('NonNull')
+      }
+    }
+  }
+  return finalChain
 }

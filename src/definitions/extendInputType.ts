@@ -26,7 +26,7 @@ withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject)
  * Adds new fields to an existing inputObjectType in the schema. Useful when
  * splitting your schema across several domains.
  *
- * @see http://graphql-nexus.com/api/extendType
+ * @see https://nexusjs.org/docs/api/extend-type
  */
 export function extendInputType<TypeName extends GetGen<'inputNames', string>>(
   config: NexusExtendInputTypeConfig<TypeName>

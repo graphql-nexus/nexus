@@ -1,0 +1,51 @@
+---
+title: Declarative Wrapping (null/list)
+---
+
+## Declarative Wrapping
+
+The declarative wrapping plugin adds the pre 0.19 API of `list: true | boolean[]`, `nullable: boolean`, and `required: boolean`
+on field & argument definitions.
+
+To install, add the `declarativeWrapping` to the `makeSchema.plugins` array, along with any other plugins
+you'd like to include:
+
+```ts
+import { makeSchema, declarativeWrapping } from '@nexus/schema'
+
+const schema = makeSchema({
+  // ... types, etc,
+  plugins: [
+    // ... other plugins
+    declarativeWrapping(),
+  ],
+})
+```
+
+You can now use the object style APIs on any args & field definitions.
+
+```ts
+export const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.string('someNullField', {
+      nullable: true,
+    })
+    t.string('someRequiredField', {
+      nullable: false,
+      resolve: () => 'Some Field',
+    })
+    t.string('someList', {
+      list: true,
+      resolve: () => [],
+    })
+    t.string('someListOfLists', {
+      list: [true, true],
+      args: {
+        int: intArg({ required: true }),
+      },
+      resolve: () => [],
+    })
+  },
+})
+```

@@ -1,5 +1,5 @@
 ---
-title: list / nonNull / nullable
+title: list / nonNull
 codeStyle: true
 ---
 
@@ -33,13 +33,10 @@ Below are some usage examples of `list()`:
 
 | Example                            | GraphQL Type (nonNullDefaults = false) | GraphQL Type (nonNullDefaults = true) |
 | ---------------------------------- | -------------------------------------- | ------------------------------------- |
-| `nonNull('String')`                | `String!`                              | `String!`                             |
-| `nonNull(list('String'))`          | `[String]!`                            | `[String!]!`                          |
 | `list(nonNull('String'))`          | `[String!]`                            | `[String!]!`                          |
+| `list(list('String'))`             | `[[String]]`                           | `[[String!]!]!`                       |
+| `nonNull(list('String'))`          | `[String]!`                            | `[String!]!`                          |
 | `nonNull(list(nonNull('String')))` | `[String!]!`                           | `[String!]!`                          |
-| `nonNull(nonNull('String'))`       | `Error`                                | `Error`                               |
-| `nonNull(nullable('String'))`      | `Error`                                | `Error`                               |
-
 
 ## nonNull
 
@@ -69,21 +66,20 @@ In case `nonNullDefaults.output` or `nonNullDefaults.input` is `true`, `nonNull`
 
 Below are some more usage examples of `nonNull`:
 
-| Example                            | Produced GraphQL Type | nonNullDefaults   |
-| ---------------------------------- | --------------------- | ----------------- |
-| `nonNull('String')`                | `String!`             | `false`           |
-| `nonNull(list('String'))`          | `[String]!`           | `false`           |
-| `list(nonNull('String'))`          | `[String!]`           | `false`           |
-| `nonNull(list(nonNull('String')))` | `[String!]!`          | `false`           |
-| `nonNull(nonNull('String'))`       | `Error`               | `true` || `false` |
-| `nonNull(nullable('String'))`      | `Error`               | `true` || `false` |
-
+| Example                            | Produced GraphQL Type (nonNullDefaults = true) | Produced GraphQL Type (nonNullDefaults = false) |
+| ---------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| `nonNull('String')`                | `String!`                                      | `String!`                                       |
+| `nonNull(list('String'))`          | `[String]!`                                    | `[String]!`                                     |
+| `list(nonNull('String'))`          | `[String!]`                                    | `[String!]`                                     |
+| `nonNull(list(nonNull('String')))` | `[String!]!`                                   | `[String!]!`                                    |
+| `nonNull(nonNull('String'))`       | `String!`                                      | `String!`                                       |
+| `nonNull(nullable('String'))`      | `String!                                       | `String!                                        |
 
 ## nullable
 
 The `nullable()` helper is intended to be used when `nonNullDefaults.output` or `nonNullDefaults.input` is `true`.
 
-While input and output types are nullable by default, you can set them to be non-nullable by default thanks to the `nonNullDefaults` configuration.
+While input and output types are nullable by default, you can set them to be non-nullable globally, or per-type, thanks to the `nonNullDefaults` configuration.
 
 When types are non-nullable by default:
 
@@ -124,5 +120,6 @@ Below are some more usage examples of `nullable()`:
 | `nullable(list('String'))`           | `[String]`                             | `[String!]`                           |
 | `list(nullable('String'))`           | `[String]`                             | `[String]!`                           |
 | `nullable(list(nullable('String')))` | `[String]`                             | `[String]`                            |
-| `nullable(nonNull('String'))`        | `Error`                                | `Error`                               |
-| `nullable(nullable('String'))`       | `Error`                                | `Error`                                 |
+| `nullable(nonNull('String'))`        | `String`                               | `String`                              |
+| `nonNull(nullable('String'))`        | `String!`                              | `String!`                             |
+| `nullable(nullable('String'))`       | `String`                               | `String`                              |

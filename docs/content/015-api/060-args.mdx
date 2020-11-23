@@ -23,38 +23,6 @@ function requiredInt(opts: core.ScalarArgConfig<number>) {
 
 Common options available for `arg` include the following:
 
-**Required**
-
-Whether the argument is required or not.
-
-Format: `required?: boolean;`
-
-Note, when `required: true`, `nullable: false`
-
-&nbsp;
-
-**Nullable**
-
-Whether the argument is nullable or not.
-
-Format: `nullable?: boolean;`
-
-Note, when `nullable: true`, `required: false`
-
-&nbsp;
-
-**List**
-
-Whether the argument is a list or not.
-
-Format: `list?: null | true | boolean[];`
-
-null = not a list
-
-true = list
-
-array = nested list, where true/false decides whether the list member can be nullable
-
 &nbsp;
 
 **Description**
@@ -62,3 +30,11 @@ array = nested list, where true/false decides whether the list member can be nul
 The description to annotate the GraphQL SDL
 
 Format: `description?: string | null;`
+
+&nbsp;
+
+**Default**
+
+The default value for an argument
+
+Example: `intArg({ default: 1 })`

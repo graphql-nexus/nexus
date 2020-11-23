@@ -2,12 +2,12 @@ import { assertValidName } from 'graphql'
 import { AllOutputTypesPossible } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, withNexusSymbol } from './_types'
+import { IsSubscriptionType, SubscriptionBuilder } from './subscriptionType'
 
 export interface NexusExtendTypeConfig<TypeName extends string> {
   type: TypeName
   definition(
-    // t: IsSubscriptionType<TypeName> extends true ? SubscriptionBuilder : OutputDefinitionBlock<TypeName>
-    t: OutputDefinitionBlock<TypeName>
+    t: IsSubscriptionType<TypeName> extends true ? SubscriptionBuilder : OutputDefinitionBlock<TypeName>
   ): void
 }
 
@@ -29,8 +29,8 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject)
  * Adds new fields to an existing objectType in the schema. Useful when
  * splitting your schema across several domains.
  *
- * @see http://graphql-nexus.com/api/extendType
+ * @see https://nexusjs.org/docs/api/extend-type
  */
 export function extendType<TypeName extends AllOutputTypesPossible>(config: NexusExtendTypeConfig<TypeName>) {
-  return new NexusExtendTypeDef(config.type, { ...config, name: config.type })
+  return new NexusExtendTypeDef(config.type, { ...config, name: config.type }) as NexusExtendTypeDef<any>
 }

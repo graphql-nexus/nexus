@@ -1,5 +1,5 @@
 import { graphql } from 'graphql'
-import { list, makeSchema, objectType, queryField } from '../src/core'
+import { makeSchema, objectType, queryField } from '../src/core'
 
 describe('objectType', () => {
   it('builds creates an object type', async () => {
@@ -39,44 +39,5 @@ describe('objectType', () => {
         `
       )
     ).toMatchSnapshot()
-  })
-
-  it('throws when chaining .list twice', () => {
-    expect(() => {
-      makeSchema({
-        types: [
-          objectType({
-            name: 'throwingList',
-            definition(t) {
-              t.list.list.id('id')
-            },
-          }),
-        ],
-        outputs: false,
-        shouldGenerateArtifacts: false,
-      })
-    }).toThrowErrorMatchingSnapshot()
-  })
-
-  it('warns when specifying .list and list: true', () => {
-    const spy = jest.spyOn(console, 'warn').mockImplementation()
-    makeSchema({
-      outputs: false,
-
-      types: [
-        objectType({
-          name: 'throwingList',
-          definition(t) {
-            t.list.field('someField', {
-              type: list('Boolean'),
-            })
-          },
-        }),
-      ],
-      shouldGenerateArtifacts: false,
-    })
-    expect(spy.mock.calls[0]).toMatchSnapshot()
-    expect(spy).toBeCalledTimes(1)
-    spy.mockRestore()
   })
 })

@@ -1,5 +1,5 @@
 ---
-title: Connection
+title: Relay Connection
 ---
 
 ## Connection Plugin
@@ -47,7 +47,7 @@ You can use this with helpers provided via [graphql-relay-js](https://github.com
 ```ts
 import { connectionFromArray } from 'graphql-relay'
 
-export const usersQueryField = queryField(t => {
+export const usersQueryField = queryField((t) => {
   t.connectionField('users', {
     type: User,
     async resolve(root, args, ctx, info) {
@@ -122,7 +122,7 @@ query IncludeNodesFieldExample {
 The `queryField` or `mutationField` helpers may accept a function rather than a field name, which will be shorthand for the query builder:
 
 ```ts
-export const usersField = queryField(t => {
+export const usersField = queryField((t) => {
   t.connectionField('users', {
     type: Users,
     nodes(root, args, ctx, info) {

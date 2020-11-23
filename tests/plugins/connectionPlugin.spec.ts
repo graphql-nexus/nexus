@@ -82,12 +82,12 @@ const makeTestSchema = (
         },
       }),
     ],
-    plugins: [connectionPlugin(pluginConfig)],
     nonNullDefaults: {
       input: false,
       output: false,
     },
     ...makeSchemaConfig,
+    plugins: [connectionPlugin(pluginConfig), ...(makeSchemaConfig.plugins ?? [])],
   })
 
 beforeEach(() => {
@@ -530,18 +530,21 @@ describe('basic behavior', () => {
     const nullable = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: true,
       }
     )
     const nonNullable = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: false,
       }
     )
     const nullableWithDefaultTrue = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: true,
       },
       {
@@ -553,6 +556,7 @@ describe('basic behavior', () => {
     const nonNullWithDefaultTrue = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: false,
       },
       {

@@ -1,3 +1,4 @@
+import { isType } from 'graphql'
 import { AllNamedTypeDefs, isNexusStruct, NexusListableTypes } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 /**
@@ -12,9 +13,10 @@ export class NexusListDef<TypeName extends NexusListableTypes> {
   // Required field for TS to differentiate NonNull from Null from List
   private _isNexusListDef: boolean = true
 
-  constructor(readonly ofType: TypeName) {
-    if (!isNexusStruct(ofType) && typeof ofType !== 'string') {
-      throw new Error('Cannot wrap a type not constructed by Nexus in a list(). Saw ' + ofType)
+  constructor(readonly ofNexusType: TypeName) {
+    /* istanbul ignore if */
+    if (!isNexusStruct(ofNexusType) && !isType(ofNexusType) && typeof ofNexusType !== 'string') {
+      throw new Error('Cannot wrap unknown types in list(). Saw ' + ofNexusType)
     }
   }
 }

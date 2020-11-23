@@ -35,6 +35,13 @@ export interface NexusArgConfig<T extends AllInputTypes> extends NexusAsArgConfi
   type: NexusArgConfigType<T>
 }
 
+export interface NexusFinalArgConfig extends NexusArgConfig<any> {
+  configFor: 'arg'
+  argName: string
+  fieldName: string
+  parentType: string
+}
+
 export class NexusArgDef<TypeName extends AllInputTypes> {
   constructor(readonly name: string, protected config: NexusArgConfig<TypeName>) {}
   get value() {

@@ -1,9 +1,9 @@
 import { GraphQLFieldResolver } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
-import { list } from './list'
-import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, isNexusListTypeDef } from './wrapping'
+import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
 import { BaseScalars } from './_types'
+import { messages } from '../messages'
 
 export interface CommonFieldConfig {
   /**
@@ -39,7 +39,10 @@ export interface NexusOutputFieldConfig<TypeName extends string, FieldName exten
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string
+  configFor: 'outputField'
+  parentType: string
   subscribe?: GraphQLFieldResolver<any, any>
+  wrapping?: NexusWrapKind[]
 }
 
 // prettier-ignore
@@ -71,14 +74,14 @@ export type FieldOutConfig<TypeName extends string, FieldName extends string> = 
 export interface OutputDefinitionBuilder {
   typeName: string
   addField(config: NexusOutputFieldDef): void
-  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, isList: boolean): void
+  addDynamicOutputMembers(block: OutputDefinitionBlock<any>, wrapping?: NexusWrapKind[]): void
   warn(msg: string): void
 }
 
 export interface InputDefinitionBuilder {
   typeName: string
   addField(config: NexusInputFieldDef): void
-  addDynamicInputFields(block: InputDefinitionBlock<any>, isList: boolean): void
+  addDynamicInputFields(block: InputDefinitionBlock<any>, wrapping?: NexusWrapKind[]): void
   warn(msg: string): void
 }
 
@@ -90,20 +93,25 @@ export interface OutputDefinitionBlock<TypeName extends string>
 
 /**
  * The output definition block is passed to the "definition"
- * argument of the
+ * function property of the "objectType" / "interfaceType"
  */
 export class OutputDefinitionBlock<TypeName extends string> {
   readonly typeName: string
-  constructor(protected typeBuilder: OutputDefinitionBuilder, protected isList = false) {
+  constructor(protected typeBuilder: OutputDefinitionBuilder, protected wrapping?: NexusWrapKind[]) {
     this.typeName = typeBuilder.typeName
-    this.typeBuilder.addDynamicOutputMembers(this, isList)
+    this.typeBuilder.addDynamicOutputMembers(this, this.wrapping)
   }
 
   get list() {
-    if (this.isList) {
-      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
-    }
-    return new OutputDefinitionBlock<TypeName>(this.typeBuilder, true)
+    return this._wrapClass('List')
+  }
+
+  get nonNull(): Omit<OutputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    return this._wrapClass('NonNull')
+  }
+
+  get nullable(): Omit<OutputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    return this._wrapClass('Null')
   }
 
   string<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
@@ -127,12 +135,24 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   field<FieldName extends string>(name: FieldName, fieldConfig: FieldOutConfig<TypeName, FieldName>) {
-    // FIXME
-    // 1. FieldOutConfig<TypeName is constrained to any string subtype
-    // 2. NexusOutputFieldDef is constrained to be be a string
-    // 3. so `name` is not compatible
-    // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
-    this.typeBuilder.addField(this.decorateField({ name, ...fieldConfig } as any))
+    this.typeBuilder.addField({
+      name,
+      ...fieldConfig,
+      configFor: 'outputField',
+      wrapping: this.wrapping,
+      parentType: this.typeName,
+    } as any)
+  }
+
+  protected _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
+    const previousWrapping = this.wrapping?.[0]
+    if (
+      (kind === 'NonNull' || kind === 'Null') &&
+      (previousWrapping === 'NonNull' || previousWrapping === 'Null')
+    ) {
+      return new OutputDefinitionBlock(this.typeBuilder, this.wrapping || [])
+    }
+    return new OutputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
   protected addScalarField(
@@ -143,32 +163,22 @@ export class OutputDefinitionBlock<TypeName extends string> {
     let config: NexusOutputFieldDef = {
       name: fieldName,
       type: typeName,
+      parentType: this.typeName,
+      configFor: 'outputField',
     }
 
+    /* istanbul ignore if */
     if (typeof opts[0] === 'function') {
       config.resolve = opts[0] as any
-      console.warn(
-        `Since v0.18.0 Nexus no longer supports resolver shorthands like:\n\n    t.string("${fieldName}", () => ...).\n\nInstead please write:\n\n    t.string("${fieldName}", { resolve: () => ... })\n\nIn the next version of Nexus this will be a runtime error.`
-      )
+      console.warn(messages.removedFunctionShorthand(typeName, fieldName))
     } else {
       config = { ...config, ...opts[0] }
     }
 
-    this.typeBuilder.addField(this.decorateField(config))
-  }
-
-  protected decorateField(config: NexusOutputFieldDef): NexusOutputFieldDef {
-    if (this.isList) {
-      if (isNexusListTypeDef(config.type)) {
-        this.typeBuilder.warn(
-          `It looks like you chained .list and used list() for ${config.name}. ` +
-            'You should only do one or the other'
-        )
-      } else {
-        config.type = list(config.type)
-      }
-    }
-    return config
+    this.typeBuilder.addField({
+      ...config,
+      wrapping: this.wrapping,
+    })
   }
 }
 
@@ -185,23 +195,31 @@ export interface NexusInputFieldConfig<TypeName extends string, FieldName extend
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
+  configFor: 'inputField'
   name: string
+  wrapping?: NexusWrapKind[]
+  parentType: string
 }
 
 export interface InputDefinitionBlock<TypeName extends string> extends NexusGenCustomInputMethods<TypeName> {}
 
 export class InputDefinitionBlock<TypeName extends string> {
   readonly typeName: string
-  constructor(protected typeBuilder: InputDefinitionBuilder, protected isList = false) {
+  constructor(protected typeBuilder: InputDefinitionBuilder, protected wrapping?: NexusWrapKind[]) {
     this.typeName = typeBuilder.typeName
-    this.typeBuilder.addDynamicInputFields(this, isList)
+    this.typeBuilder.addDynamicInputFields(this, this.wrapping)
   }
 
   get list() {
-    if (this.isList) {
-      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
-    }
-    return new InputDefinitionBlock<TypeName>(this.typeBuilder, true)
+    return this._wrapClass('List')
+  }
+
+  get nonNull(): Omit<InputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    return this._wrapClass('NonNull')
+  }
+
+  get nullable(): Omit<InputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
+    return this._wrapClass('Null')
   }
 
   string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
@@ -228,35 +246,34 @@ export class InputDefinitionBlock<TypeName extends string> {
     fieldName: FieldName,
     fieldConfig: NexusInputFieldConfig<TypeName, FieldName>
   ) {
-    this.typeBuilder.addField(
-      this.decorateField({
-        name: fieldName,
-        ...fieldConfig,
-      })
-    )
+    this.typeBuilder.addField({
+      name: fieldName,
+      ...fieldConfig,
+      wrapping: this.wrapping,
+      parentType: this.typeName,
+      configFor: 'inputField',
+    })
+  }
+
+  protected _wrapClass(kind: NexusWrapKind) {
+    const previousWrapping = this.wrapping?.[0]
+    if (
+      (kind === 'NonNull' || kind === 'Null') &&
+      (previousWrapping === 'NonNull' || previousWrapping === 'Null')
+    ) {
+      return new InputDefinitionBlock(this.typeBuilder, this.wrapping || [])
+    }
+    return new InputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
   protected addScalarField(fieldName: string, typeName: BaseScalars, opts: ScalarInputFieldConfig<any> = {}) {
-    this.typeBuilder.addField(
-      this.decorateField({
-        name: fieldName,
-        type: typeName,
-        ...opts,
-      })
-    )
-  }
-
-  protected decorateField(config: NexusInputFieldDef): NexusInputFieldDef {
-    if (this.isList) {
-      if (isNexusListTypeDef(config.type)) {
-        this.typeBuilder.warn(
-          `It looks like you chained .list and used list() for ${config.name}. ` +
-            'You should only do one or the other'
-        )
-      } else {
-        config.type = list(config.type)
-      }
-    }
-    return config
+    this.typeBuilder.addField({
+      name: fieldName,
+      type: typeName,
+      ...opts,
+      wrapping: this.wrapping,
+      parentType: this.typeName,
+      configFor: 'inputField',
+    })
   }
 }

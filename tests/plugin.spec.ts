@@ -1,4 +1,4 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema, GraphQLList, isListType } from 'graphql'
+import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
 import {
   interfaceType,
   list,
@@ -294,7 +294,7 @@ describe('plugin', () => {
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
   })
 
-  it('has an onOutputFieldDefinition / onArgDefinition / onInputFieldDefinition option, which receives the field metadata, and can modify the field', async () => {
+  it('has an onAddOutputField / onAddInputField / onAddArg option, which receives the field metadata, and can modify the field', async () => {
     //
     const schema = makeSchema({
       outputs: false,
@@ -307,15 +307,15 @@ describe('plugin', () => {
         queryField('ok', {
           type: 'Boolean',
           // @ts-ignore
-          list: true,
+          listTest: true,
           args: {
             // @ts-ignore
-            filter: booleanArg({ list: true }),
+            filter: booleanArg({ listTest: true }),
             input: inputObjectType({
               name: 'SomeType',
               definition(t) {
                 // @ts-ignore
-                t.boolean('inputField', { list: true })
+                t.boolean('inputField', { listTest: true })
               },
             }),
           },
@@ -325,22 +325,22 @@ describe('plugin', () => {
       plugins: [
         plugin({
           name: 'Node',
-          onOutputFieldDefinition(field, config) {
+          onAddOutputField(field) {
             // @ts-ignore
-            if (config.list && !isListType(field.type)) {
-              field.type = new GraphQLList(field.type)
+            if (field.listTest) {
+              field.type = list(field.type)
             }
           },
-          onInputFieldDefinition(field, config) {
+          onAddInputField(field) {
             // @ts-ignore
-            if (config.list && !isListType(field.type)) {
-              field.type = new GraphQLList(field.type)
+            if (field.listTest) {
+              field.type = list(field.type)
             }
           },
-          onArgDefinition(arg, config) {
+          onAddArg(arg) {
             // @ts-ignore
-            if (config.list && !isListType(arg.type)) {
-              arg.type = new GraphQLList(arg.type)
+            if (arg.listTest) {
+              arg.type = list(arg.type)
             }
           },
         }),
