@@ -307,15 +307,15 @@ describe('plugin', () => {
         queryField('ok', {
           type: 'Boolean',
           // @ts-ignore
-          list: true,
+          listTest: true,
           args: {
             // @ts-ignore
-            filter: booleanArg({ list: true }),
+            filter: booleanArg({ listTest: true }),
             input: inputObjectType({
               name: 'SomeType',
               definition(t) {
                 // @ts-ignore
-                t.boolean('inputField', { list: true })
+                t.boolean('inputField', { listTest: true })
               },
             }),
           },
@@ -327,19 +327,19 @@ describe('plugin', () => {
           name: 'Node',
           onAddOutputField(field) {
             // @ts-ignore
-            if (field.list) {
+            if (field.listTest) {
               field.type = list(field.type)
             }
           },
           onAddInputField(field) {
             // @ts-ignore
-            if (field.list) {
+            if (field.listTest) {
               field.type = list(field.type)
             }
           },
           onAddArg(arg) {
             // @ts-ignore
-            if (arg.list) {
+            if (arg.listTest) {
               arg.type = list(arg.type)
             }
           },

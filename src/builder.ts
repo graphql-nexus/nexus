@@ -458,6 +458,9 @@ export class SchemaBuilder {
    */
   protected _schemaExtension?: NexusSchemaExtension
 
+  // TODO: remove @ 1.0
+  private hasDeclarativeWrappingPlugin: boolean
+
   protected config: BuilderConfig
 
   get schemaExtension() {
@@ -474,6 +477,9 @@ export class SchemaBuilder {
      * This array of plugin is used to keep retro-co
      */
     this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
+    this.hasDeclarativeWrappingPlugin = Boolean(
+      this.plugins.find((f) => f.config.name === 'declarativeWrapping')
+    )
     this.builderLens = Object.freeze({
       hasType: this.hasType,
       addType: this.addType,
@@ -1313,6 +1319,7 @@ export class SchemaBuilder {
         parentType: typeConfig.name,
         configFor: 'arg',
       }
+      this.warnOnDeclarativeWrapping(finalArgDef)
       this.onAddArgFns.forEach((onArgDef) => {
         const result = onArgDef(finalArgDef)
         if (result != null) {
@@ -1335,6 +1342,19 @@ export class SchemaBuilder {
       }
     })
     return allArgs
+  }
+
+  private warnOnDeclarativeWrapping(def: NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef) {
+    if (!this.hasDeclarativeWrappingPlugin) {
+      if ('list' in def || 'nullable' in def || (def.configFor === 'arg' && 'required' in def)) {
+        const d = def as NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef
+        let location =
+          d.configFor === 'arg'
+            ? `'${d.parentType}.${d.fieldName}' field's '${d.argName}' argument`
+            : `'${d.parentType}.${d.type}' field`
+        throw new Error(messages.removedDeclarativeWrapping(location))
+      }
+    }
   }
 
   protected getInterface(name: string | NexusInterfaceTypeDef<any>): GraphQLInterfaceType {
