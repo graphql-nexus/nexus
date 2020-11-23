@@ -8,7 +8,7 @@ export class NexusNonNullDef<TypeName extends NexusNonNullableTypes> {
   private _isNexusNonNullDef: boolean = true
 
   constructor(readonly ofNexusType: TypeName) {
-    if (!isNexusStruct(ofNexusType) && !isType(ofNexusType) && typeof ofNexusType !== 'string') {
+    if (typeof ofNexusType !== 'string' && !isNexusStruct(ofNexusType) && !isType(ofNexusType)) {
       throw new Error('Cannot wrap unknown types in a nonNull(). Saw ' + ofNexusType)
     }
   }

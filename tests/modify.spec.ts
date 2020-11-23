@@ -1,14 +1,14 @@
 import { graphql } from 'graphql'
 import {
+  generateSchema,
   idArg,
   interfaceType,
   makeSchema,
   NexusGraphQLSchema,
+  nonNull,
   objectType,
   queryField,
   stringArg,
-  nonNull,
-  generateSchema,
 } from '../src/core'
 
 describe('modify', () => {
@@ -29,6 +29,7 @@ describe('modify', () => {
             t.field('subNode', {
               type: 'Node',
             })
+            t.string('requiredInSubtype')
           },
           resolveType: (o) => o.__typename,
         }),
@@ -42,6 +43,9 @@ describe('modify', () => {
             })
             t.field('subNode', {
               type: 'User',
+            })
+            t.modify('requiredInSubtype', {
+              type: nonNull('String'),
             })
           },
         }),
@@ -184,6 +188,47 @@ describe('modify', () => {
     expect(result.data?.user.fields.find((f: { name: string }) => f.name === 'subNode').type.name).toEqual(
       'User'
     )
+  })
+
+  it('can modify nullability of an abstract type field inherited from an interface', async () => {
+    const result = await graphql(
+      schema,
+      `
+        {
+          node: __type(name: "Node") {
+            fields {
+              name
+              description
+              type {
+                name
+              }
+            }
+          }
+          user: __type(name: "User") {
+            fields {
+              name
+              description
+              type {
+                kind
+                ofType {
+                  name
+                }
+              }
+            }
+          }
+        }
+      `
+    )
+
+    expect(
+      result.data?.node.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.name
+    ).toEqual('String')
+    expect(
+      result.data?.user.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.kind
+    ).toEqual('NON_NULL')
+    expect(
+      result.data?.user.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.ofType.name
+    ).toEqual('String')
   })
 
   describe('interfaces implementing interfaces', () => {

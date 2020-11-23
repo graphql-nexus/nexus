@@ -84,6 +84,9 @@ import {
   finalizeWrapping,
   AllNexusNamedInputTypeDefs,
   AllNexusNamedOutputTypeDefs,
+  AllNexusArgsDefs,
+  isNexusWrappingType,
+  NexusFinalWrapKind,
 } from './definitions/wrapping'
 import {
   MissingType,
@@ -1184,11 +1187,21 @@ export class SchemaBuilder {
             ...rest,
           }
           if (typeof type !== 'undefined') {
-            const { wrapping } = unwrapGraphQLDef(config.fields[field].type)
-            interfaceFieldsMap[field].type = rewrapAsGraphQLType(
-              this.getOrBuildType(type),
-              wrapping
-            ) as GraphQLOutputType
+            let interfaceReplacement: GraphQLOutputType
+            if (isNexusWrappingType(type)) {
+              const { wrapping, namedType } = unwrapNexusDef(type)
+              interfaceReplacement = rewrapAsGraphQLType(
+                this.getOrBuildType(namedType as any),
+                wrapping as NexusFinalWrapKind[]
+              ) as GraphQLOutputType
+            } else {
+              const { wrapping } = unwrapGraphQLDef(config.fields[field].type)
+              interfaceReplacement = rewrapAsGraphQLType(
+                this.getOutputType(type),
+                wrapping
+              ) as GraphQLOutputType
+            }
+            interfaceFieldsMap[field].type = interfaceReplacement
           }
           if (typeof args !== 'undefined') {
             interfaceFieldsMap[field].args = {
@@ -1460,6 +1473,8 @@ export class SchemaBuilder {
         console.warn('Unknown kind of type def to build. It will be ignored. The type def was: %j', type)
       }
     }
+
+    debugger
     return this.missingType(type, fromObject)
   }
 
@@ -1565,7 +1580,7 @@ export class SchemaBuilder {
       },
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'walk', wrapping),
-      addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
+      addModification: (o) => this.maybeTraverseModification(o),
       warn: () => {},
     })
     obj.definition(definitionBlock)
@@ -1575,7 +1590,7 @@ export class SchemaBuilder {
   protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
-      addModification: (o) => (o.type && typeof o.type !== 'string' ? this.addType(o.type) : null),
+      addModification: (o) => this.maybeTraverseModification(o),
       addInterfaces: (i) => {
         i.forEach((j) => {
           if (typeof j !== 'string') {
@@ -1591,6 +1606,19 @@ export class SchemaBuilder {
     return obj
   }
 
+  protected maybeTraverseModification(mod: FieldModificationDef<any, any>) {
+    const { type, args } = mod
+    if (type) {
+      const namedFieldType = getNexusNamedType(mod.type)
+      if (typeof namedFieldType !== 'string') {
+        this.addType(namedFieldType)
+      }
+    }
+    if (args) {
+      this.traverseArgs(args)
+    }
+  }
+
   protected maybeTraverseOutputFieldType(type: NexusOutputFieldDef) {
     const { args, type: fieldType } = type
     const namedFieldType = getNexusNamedType(fieldType)
@@ -1598,19 +1626,22 @@ export class SchemaBuilder {
       this.addType(namedFieldType)
     }
     if (args) {
-      eachObj(args, (val) => {
-        const namedArgType = getArgNamedType(val)
-        if (typeof namedArgType !== 'string') {
-          this.addType(namedArgType)
-        }
-      })
+      this.traverseArgs(args)
     }
+  }
+
+  private traverseArgs(args: Record<string, AllNexusArgsDefs>) {
+    eachObj(args, (val) => {
+      const namedArgType = getArgNamedType(val)
+      if (typeof namedArgType !== 'string') {
+        this.addType(namedArgType)
+      }
+    })
   }
 
   protected maybeTraverseInputFieldType(type: NexusInputFieldDef) {
     const { type: fieldType } = type
     const namedFieldType = getNexusNamedType(fieldType)
-
     if (typeof namedFieldType !== 'string') {
       this.addType(namedFieldType)
     }
