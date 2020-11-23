@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { SchemaConfig, declarativeWrappingPlugin } from '../../src/core'
+import { SchemaConfig } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
