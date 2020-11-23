@@ -39,6 +39,8 @@ export interface NexusOutputFieldConfig<TypeName extends string, FieldName exten
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string
+  configFor: 'outputField'
+  parentType: string
   subscribe?: GraphQLFieldResolver<any, any>
   wrapping?: NexusWrapKind[]
 }
@@ -133,12 +135,13 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   field<FieldName extends string>(name: FieldName, fieldConfig: FieldOutConfig<TypeName, FieldName>) {
-    // FIXME
-    // 1. FieldOutConfig<TypeName is constrained to any string subtype
-    // 2. NexusOutputFieldDef is constrained to be be a string
-    // 3. so `name` is not compatible
-    // 4. and changing FieldOutConfig to FieldOutConfig<string breaks types in other places
-    this.typeBuilder.addField({ name, ...fieldConfig, wrapping: this.wrapping } as any)
+    this.typeBuilder.addField({
+      name,
+      ...fieldConfig,
+      configFor: 'outputField',
+      wrapping: this.wrapping,
+      parentType: this.typeName,
+    } as any)
   }
 
   protected _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
@@ -153,6 +156,8 @@ export class OutputDefinitionBlock<TypeName extends string> {
     let config: NexusOutputFieldDef = {
       name: fieldName,
       type: typeName,
+      parentType: this.typeName,
+      configFor: 'outputField',
     }
 
     if (typeof opts[0] === 'function') {
@@ -182,8 +187,10 @@ export interface NexusInputFieldConfig<TypeName extends string, FieldName extend
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
+  configFor: 'inputField'
   name: string
   wrapping?: NexusWrapKind[]
+  parentType: string
 }
 
 export interface InputDefinitionBlock<TypeName extends string> extends NexusGenCustomInputMethods<TypeName> {}
@@ -235,6 +242,8 @@ export class InputDefinitionBlock<TypeName extends string> {
       name: fieldName,
       ...fieldConfig,
       wrapping: this.wrapping,
+      parentType: this.typeName,
+      configFor: 'inputField',
     })
   }
 
@@ -248,6 +257,8 @@ export class InputDefinitionBlock<TypeName extends string> {
       type: typeName,
       ...opts,
       wrapping: this.wrapping,
+      parentType: this.typeName,
+      configFor: 'inputField',
     })
   }
 }

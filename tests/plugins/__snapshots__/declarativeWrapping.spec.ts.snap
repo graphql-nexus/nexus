@@ -1,0 +1,337 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`arg def ; nonNullDefaults = false ; [false,false,false] ; nullable = false 1`] = `"[[[String]]]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,false,false] ; nullable = true 1`] = `"[[[String]]]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,false,true] ; nullable = false 1`] = `"[[[String]]!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,false,true] ; nullable = true 1`] = `"[[[String]]!]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,false] ; nullable = false 1`] = `"[[String]]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,false] ; nullable = true 1`] = `"[[String]]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,true,false] ; nullable = false 1`] = `"[[[String]!]]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,true,false] ; nullable = true 1`] = `"[[[String]!]]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,true,true] ; nullable = false 1`] = `"[[[String]!]!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,true,true] ; nullable = true 1`] = `"[[[String]!]!]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,true] ; nullable = false 1`] = `"[[String]!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false,true] ; nullable = true 1`] = `"[[String]!]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false] ; nullable = false 1`] = `"[String]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [false] ; nullable = true 1`] = `"[String]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,false,false] ; nullable = false 1`] = `"[[[String!]]]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,false,false] ; nullable = true 1`] = `"[[[String!]]]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,false,true] ; nullable = false 1`] = `"[[[String!]]!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,false,true] ; nullable = true 1`] = `"[[[String!]]!]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,false] ; nullable = false 1`] = `"[[String!]]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,false] ; nullable = true 1`] = `"[[String!]]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,true,false] ; nullable = false 1`] = `"[[[String!]!]]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,true,false] ; nullable = true 1`] = `"[[[String!]!]]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,true,true] ; nullable = false 1`] = `"[[[String!]!]!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,true,true] ; nullable = true 1`] = `"[[[String!]!]!]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,true] ; nullable = false 1`] = `"[[String!]!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true,true] ; nullable = true 1`] = `"[[String!]!]"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true] ; nullable = false 1`] = `"[String!]!"`;
+
+exports[`arg def ; nonNullDefaults = false ; [true] ; nullable = true 1`] = `"[String!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,false,false] ; nullable = false 1`] = `"[[[String]]]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,false,false] ; nullable = true 1`] = `"[[[String]]]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,false,true] ; nullable = false 1`] = `"[[[String]]!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,false,true] ; nullable = true 1`] = `"[[[String]]!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,false] ; nullable = false 1`] = `"[[String]]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,false] ; nullable = true 1`] = `"[[String]]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,true,false] ; nullable = false 1`] = `"[[[String]!]]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,true,false] ; nullable = true 1`] = `"[[[String]!]]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,true,true] ; nullable = false 1`] = `"[[[String]!]!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,true,true] ; nullable = true 1`] = `"[[[String]!]!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,true] ; nullable = false 1`] = `"[[String]!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false,true] ; nullable = true 1`] = `"[[String]!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false] ; nullable = false 1`] = `"[String]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [false] ; nullable = true 1`] = `"[String]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,false,false] ; nullable = false 1`] = `"[[[String!]]]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,false,false] ; nullable = true 1`] = `"[[[String!]]]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,false,true] ; nullable = false 1`] = `"[[[String!]]!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,false,true] ; nullable = true 1`] = `"[[[String!]]!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,false] ; nullable = false 1`] = `"[[String!]]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,false] ; nullable = true 1`] = `"[[String!]]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,true,false] ; nullable = false 1`] = `"[[[String!]!]]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,true,false] ; nullable = true 1`] = `"[[[String!]!]]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,true,true] ; nullable = false 1`] = `"[[[String!]!]!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,true,true] ; nullable = true 1`] = `"[[[String!]!]!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,true] ; nullable = false 1`] = `"[[String!]!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true,true] ; nullable = true 1`] = `"[[String!]!]"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true] ; nullable = false 1`] = `"[String!]!"`;
+
+exports[`arg def ; nonNullDefaults = true ; [true] ; nullable = true 1`] = `"[String!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,false,false] ; nullable = false 1`] = `"[[[String]]]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,false,false] ; nullable = true 1`] = `"[[[String]]]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,false,true] ; nullable = false 1`] = `"[[[String]]!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,false,true] ; nullable = true 1`] = `"[[[String]]!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,false] ; nullable = false 1`] = `"[[String]]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,false] ; nullable = true 1`] = `"[[String]]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,true,false] ; nullable = false 1`] = `"[[[String]!]]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,true,false] ; nullable = true 1`] = `"[[[String]!]]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,true,true] ; nullable = false 1`] = `"[[[String]!]!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,true,true] ; nullable = true 1`] = `"[[[String]!]!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,true] ; nullable = false 1`] = `"[[String]!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false,true] ; nullable = true 1`] = `"[[String]!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [false] ; nullable = false 1`] = `"[String]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [false] ; nullable = true 1`] = `"[String]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,false,false] ; nullable = false 1`] = `"[[[String!]]]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,false,false] ; nullable = true 1`] = `"[[[String!]]]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,false,true] ; nullable = false 1`] = `"[[[String!]]!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,false,true] ; nullable = true 1`] = `"[[[String!]]!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,false] ; nullable = false 1`] = `"[[String!]]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,false] ; nullable = true 1`] = `"[[String!]]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,true,false] ; nullable = false 1`] = `"[[[String!]!]]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,true,false] ; nullable = true 1`] = `"[[[String!]!]]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,true,true] ; nullable = false 1`] = `"[[[String!]!]!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,true,true] ; nullable = true 1`] = `"[[[String!]!]!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,true] ; nullable = false 1`] = `"[[String!]!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true,true] ; nullable = true 1`] = `"[[String!]!]"`;
+
+exports[`input types ; nonNullDefaults = false ; [true] ; nullable = false 1`] = `"[String!]!"`;
+
+exports[`input types ; nonNullDefaults = false ; [true] ; nullable = true 1`] = `"[String!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,false,false] ; nullable = false 1`] = `"[[[String]]]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,false,false] ; nullable = true 1`] = `"[[[String]]]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,false,true] ; nullable = false 1`] = `"[[[String]]!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,false,true] ; nullable = true 1`] = `"[[[String]]!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,false] ; nullable = false 1`] = `"[[String]]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,false] ; nullable = true 1`] = `"[[String]]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,true,false] ; nullable = false 1`] = `"[[[String]!]]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,true,false] ; nullable = true 1`] = `"[[[String]!]]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,true,true] ; nullable = false 1`] = `"[[[String]!]!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,true,true] ; nullable = true 1`] = `"[[[String]!]!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,true] ; nullable = false 1`] = `"[[String]!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false,true] ; nullable = true 1`] = `"[[String]!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [false] ; nullable = false 1`] = `"[String]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [false] ; nullable = true 1`] = `"[String]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,false,false] ; nullable = false 1`] = `"[[[String!]]]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,false,false] ; nullable = true 1`] = `"[[[String!]]]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,false,true] ; nullable = false 1`] = `"[[[String!]]!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,false,true] ; nullable = true 1`] = `"[[[String!]]!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,false] ; nullable = false 1`] = `"[[String!]]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,false] ; nullable = true 1`] = `"[[String!]]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,true,false] ; nullable = false 1`] = `"[[[String!]!]]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,true,false] ; nullable = true 1`] = `"[[[String!]!]]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,true,true] ; nullable = false 1`] = `"[[[String!]!]!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,true,true] ; nullable = true 1`] = `"[[[String!]!]!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,true] ; nullable = false 1`] = `"[[String!]!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true,true] ; nullable = true 1`] = `"[[String!]!]"`;
+
+exports[`input types ; nonNullDefaults = true ; [true] ; nullable = false 1`] = `"[String!]!"`;
+
+exports[`input types ; nonNullDefaults = true ; [true] ; nullable = true 1`] = `"[String!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,false,false] ; nullable = false 1`] = `"[[[String]]]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,false,false] ; nullable = true 1`] = `"[[[String]]]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,false,true] ; nullable = false 1`] = `"[[[String]]!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,false,true] ; nullable = true 1`] = `"[[[String]]!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,false] ; nullable = false 1`] = `"[[String]]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,false] ; nullable = true 1`] = `"[[String]]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,true,false] ; nullable = false 1`] = `"[[[String]!]]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,true,false] ; nullable = true 1`] = `"[[[String]!]]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,true,true] ; nullable = false 1`] = `"[[[String]!]!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,true,true] ; nullable = true 1`] = `"[[[String]!]!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,true] ; nullable = false 1`] = `"[[String]!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false,true] ; nullable = true 1`] = `"[[String]!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [false] ; nullable = false 1`] = `"[String]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [false] ; nullable = true 1`] = `"[String]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,false,false] ; nullable = false 1`] = `"[[[String!]]]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,false,false] ; nullable = true 1`] = `"[[[String!]]]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,false,true] ; nullable = false 1`] = `"[[[String!]]!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,false,true] ; nullable = true 1`] = `"[[[String!]]!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,false] ; nullable = false 1`] = `"[[String!]]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,false] ; nullable = true 1`] = `"[[String!]]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,true,false] ; nullable = false 1`] = `"[[[String!]!]]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,true,false] ; nullable = true 1`] = `"[[[String!]!]]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,true,true] ; nullable = false 1`] = `"[[[String!]!]!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,true,true] ; nullable = true 1`] = `"[[[String!]!]!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,true] ; nullable = false 1`] = `"[[String!]!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true,true] ; nullable = true 1`] = `"[[String!]!]"`;
+
+exports[`output types ; nonNullDefaults = false ; [true] ; nullable = false 1`] = `"[String!]!"`;
+
+exports[`output types ; nonNullDefaults = false ; [true] ; nullable = true 1`] = `"[String!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,false,false] ; nullable = false 1`] = `"[[[String]]]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,false,false] ; nullable = true 1`] = `"[[[String]]]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,false,true] ; nullable = false 1`] = `"[[[String]]!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,false,true] ; nullable = true 1`] = `"[[[String]]!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,false] ; nullable = false 1`] = `"[[String]]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,false] ; nullable = true 1`] = `"[[String]]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,true,false] ; nullable = false 1`] = `"[[[String]!]]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,true,false] ; nullable = true 1`] = `"[[[String]!]]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,true,true] ; nullable = false 1`] = `"[[[String]!]!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,true,true] ; nullable = true 1`] = `"[[[String]!]!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,true] ; nullable = false 1`] = `"[[String]!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false,true] ; nullable = true 1`] = `"[[String]!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [false] ; nullable = false 1`] = `"[String]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [false] ; nullable = true 1`] = `"[String]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,false,false] ; nullable = false 1`] = `"[[[String!]]]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,false,false] ; nullable = true 1`] = `"[[[String!]]]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,false,true] ; nullable = false 1`] = `"[[[String!]]!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,false,true] ; nullable = true 1`] = `"[[[String!]]!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,false] ; nullable = false 1`] = `"[[String!]]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,false] ; nullable = true 1`] = `"[[String!]]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,true,false] ; nullable = false 1`] = `"[[[String!]!]]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,true,false] ; nullable = true 1`] = `"[[[String!]!]]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,true,true] ; nullable = false 1`] = `"[[[String!]!]!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,true,true] ; nullable = true 1`] = `"[[[String!]!]!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,true] ; nullable = false 1`] = `"[[String!]!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true,true] ; nullable = true 1`] = `"[[String!]!]"`;
+
+exports[`output types ; nonNullDefaults = true ; [true] ; nullable = false 1`] = `"[String!]!"`;
+
+exports[`output types ; nonNullDefaults = true ; [true] ; nullable = true 1`] = `"[String!]"`;

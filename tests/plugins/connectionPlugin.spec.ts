@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { SchemaConfig } from '../../src/core'
+import { SchemaConfig, declarativeWrappingPlugin } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -82,12 +82,12 @@ const makeTestSchema = (
         },
       }),
     ],
-    plugins: [connectionPlugin(pluginConfig)],
     nonNullDefaults: {
       input: false,
       output: false,
     },
     ...makeSchemaConfig,
+    plugins: [connectionPlugin(pluginConfig), ...(makeSchemaConfig.plugins ?? [])],
   })
 
 beforeEach(() => {
@@ -523,42 +523,54 @@ describe('basic behavior', () => {
     expect(result.data?.users.nodes.length).toEqual(10)
   })
 
-  it('should respect nullability of connection field', async () => {
+  it('should respect nullability of connection field, w/ declarativeWrappingPlugin', async () => {
     const getConnectionFieldType = (schema: GraphQLSchema) =>
       schema.getQueryType()?.getFields()['users'].type.toString()
 
     const nullable = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: true,
+      },
+      {
+        plugins: [declarativeWrappingPlugin()],
       }
     )
     const nonNullable = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: false,
+      },
+      {
+        plugins: [declarativeWrappingPlugin()],
       }
     )
     const nullableWithDefaultTrue = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: true,
       },
       {
         nonNullDefaults: {
           output: true,
         },
+        plugins: [declarativeWrappingPlugin()],
       }
     )
     const nonNullWithDefaultTrue = makeTestSchema(
       {},
       {
+        // @ts-ignore
         nullable: false,
       },
       {
         nonNullDefaults: {
           output: true,
         },
+        plugins: [declarativeWrappingPlugin()],
       }
     )
 

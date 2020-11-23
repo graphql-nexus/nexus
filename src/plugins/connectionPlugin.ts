@@ -25,7 +25,6 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
-import { nullable } from '../definitions/nullable'
 
 export interface ConnectionPluginConfig {
   /**
@@ -144,11 +143,6 @@ export type NodeValue<TypeName extends string = any, FieldName extends string = 
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
   type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
-  /**
-   * Whether the connection field can be null
-   * @default (depends on whether nullability is configured in type or schema)
-   */
-  nullable?: boolean
   /**
    * Additional args to use for just this field
    */
@@ -572,15 +566,6 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             let wrappedConnectionName = connectionName
             if (wrapping) {
               wrappedConnectionName = applyNexusWrapping(connectionName, wrapping)
-            }
-
-            // TOOD(tim): Remove when we have the "declarativeWrapping" plugin
-            if (typeof fieldConfig.nullable === 'boolean') {
-              // @ts-ignore
-              wrappedConnectionName =
-                fieldConfig.nullable === false
-                  ? nonNull(wrappedConnectionName as any)
-                  : nullable(wrappedConnectionName as any)
             }
 
             // Add the field to the type.

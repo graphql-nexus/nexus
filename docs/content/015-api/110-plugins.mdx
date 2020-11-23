@@ -14,10 +14,10 @@ Nexus ships with a plugin API which allows you to define your own abstractions w
 
 We also ship with several plugins out of the box, and will have more in the near future:
 
-- [Connection Plugin](/pluginss/connection)
-- [Field Authorize Plugin](/pluginss/field-authorize)
-- [Nullability Guard Plugin](/pluginss/nullability-guard)
-- [Query Complexity Plugin](/pluginss/query-complexity)
+- [Connection Plugin](/plugins/connection)
+- [Field Authorize Plugin](/plugins/field-authorize)
+- [Nullability Guard Plugin](/plugins/nullability-guard)
+- [Query Complexity Plugin](/plugins/query-complexity)
 
 ### Defining a sample plugin:
 
@@ -69,7 +69,7 @@ plugin({
 ### onAfterBuild(schema)
 
 The "onAfterBuild" hook is provided the schema, and is useful to validate contract of the schema
-with the expectations of the plugin. The [nullabilityGuard](/pluginss/nullability-guard)
+with the expectations of the plugin. The [nullabilityGuard](/plugins/nullability-guard)
 
 ```ts
 plugin({
@@ -145,6 +145,21 @@ const LogMutationTimePlugin = plugin({
   },
 })
 ```
+
+### onAddOutputField
+
+Called when the `.addField` is called internally in the builder, before constructing the field.
+See the "declarativeWrapping" plugin for an example use.
+
+### onAddInputField
+
+Called when the `.addField` is called internally in the builder, before constructing the field.
+See the "declarativeWrapping" plugin for an example use.
+
+### onAddArg
+
+Called just before a Nexus arg is constructed into an GraphQLArgumentConfig.
+See the "declarativeWrapping" plugin for an example use.
 
 ### onMissingType
 

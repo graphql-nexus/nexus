@@ -40,7 +40,7 @@ import {
   printSchema,
   GraphQLList,
 } from 'graphql'
-import { ArgsRecord } from './definitions/args'
+import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
@@ -440,17 +440,17 @@ export class SchemaBuilder {
   /**
    * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
    */
-  protected onArgDefinitionFns: Exclude<PluginConfig['onArgDefinition'], undefined>[] = []
+  protected onAddArgFns: Exclude<PluginConfig['onAddArg'], undefined>[] = []
 
   /**
    * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
    */
-  protected onOutputFieldDefinitionFns: Exclude<PluginConfig['onOutputFieldDefinition'], undefined>[] = []
+  protected onAddOutputFieldFns: Exclude<PluginConfig['onAddOutputField'], undefined>[] = []
 
   /**
    * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
    */
-  protected onInputFieldDefinitionFns: Exclude<PluginConfig['onInputFieldDefinition'], undefined>[] = []
+  protected onAddInputFieldFns: Exclude<PluginConfig['onAddInputField'], undefined>[] = []
 
   /**
    * The `schemaExtension` is created just after the types are walked,
@@ -733,14 +733,14 @@ export class SchemaBuilder {
       if (pluginConfig.onObjectDefinition) {
         this.onObjectDefinitionFns.push(pluginConfig.onObjectDefinition)
       }
-      if (pluginConfig.onOutputFieldDefinition) {
-        this.onOutputFieldDefinitionFns.push(pluginConfig.onOutputFieldDefinition)
+      if (pluginConfig.onAddOutputField) {
+        this.onAddOutputFieldFns.push(pluginConfig.onAddOutputField)
       }
-      if (pluginConfig.onInputFieldDefinition) {
-        this.onInputFieldDefinitionFns.push(pluginConfig.onInputFieldDefinition)
+      if (pluginConfig.onAddInputField) {
+        this.onAddInputFieldFns.push(pluginConfig.onAddInputField)
       }
-      if (pluginConfig.onArgDefinition) {
-        this.onArgDefinitionFns.push(pluginConfig.onArgDefinition)
+      if (pluginConfig.onAddArg) {
+        this.onAddArgFns.push(pluginConfig.onAddArg)
       }
       if (pluginConfig.onInputObjectDefinition) {
         this.onInputObjectDefinitionFns.push(pluginConfig.onInputObjectDefinition)
@@ -879,7 +879,7 @@ export class SchemaBuilder {
     const fields: NexusInputFieldDef[] = []
     const definitionBlock = new InputDefinitionBlock({
       typeName: config.name,
-      addField: (field) => fields.push(field),
+      addField: (field) => fields.push(this.addInputField(field)),
       addDynamicInputFields: (block, wrapping) => this.addDynamicInputFields(block, wrapping),
       warn: consoleWarn,
     })
@@ -911,7 +911,7 @@ export class SchemaBuilder {
     const modifications: Record<string, FieldModificationDef<any, any>> = {}
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: config.name,
-      addField: (fieldDef) => fields.push(fieldDef),
+      addField: (fieldDef) => fields.push(this.addOutputField(fieldDef)),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addModification: (modification) => (modifications[modification.field] = modification),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'build', wrapping),
@@ -958,7 +958,7 @@ export class SchemaBuilder {
     const modifications: Record<string, FieldModificationDef<any, any>> = {}
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: config.name,
-      addField: (field) => fields.push(field),
+      addField: (field) => fields.push(this.addOutputField(field)),
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addModification: (modification) => (modifications[modification.field] = modification),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'build', wrapping),
@@ -993,7 +993,27 @@ export class SchemaBuilder {
     return this.finalize(new GraphQLInterfaceType(interfaceTypeConfig))
   }
 
-  buildEnumType(config: EnumTypeConfig<any>) {
+  private addOutputField(field: NexusOutputFieldDef): NexusOutputFieldDef {
+    this.onAddOutputFieldFns.forEach((fn) => {
+      const result = fn(field)
+      if (result) {
+        field = result
+      }
+    })
+    return field
+  }
+
+  private addInputField(field: NexusInputFieldDef): NexusInputFieldDef {
+    this.onAddInputFieldFns.forEach((fn) => {
+      const result = fn(field)
+      if (result) {
+        field = result
+      }
+    })
+    return field
+  }
+
+  private buildEnumType(config: EnumTypeConfig<any>) {
     const { members } = config
     const values: GraphQLEnumValueConfigMap = {}
     if (Array.isArray(members)) {
@@ -1039,7 +1059,7 @@ export class SchemaBuilder {
     )
   }
 
-  buildUnionType(config: NexusUnionTypeConfig<any>) {
+  private buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined
     let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
 
@@ -1062,7 +1082,7 @@ export class SchemaBuilder {
     )
   }
 
-  buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
+  private buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
@@ -1175,14 +1195,6 @@ export class SchemaBuilder {
   ) {
     fields.forEach((field) => {
       intoObject[field.name] = this.buildOutputField(field, typeConfig)
-      if (this.onOutputFieldDefinitionFns.length) {
-        this.onOutputFieldDefinitionFns.forEach((o) => {
-          const result = o(intoObject[field.name], field)
-          if (result != null) {
-            intoObject[field.name] = result
-          }
-        })
-      }
     })
     return intoObject
   }
@@ -1194,14 +1206,6 @@ export class SchemaBuilder {
     const fieldMap: GraphQLInputFieldConfigMap = {}
     fields.forEach((field) => {
       fieldMap[field.name] = this.buildInputObjectField(field, typeConfig)
-      if (this.onInputFieldDefinitionFns.length) {
-        this.onInputFieldDefinitionFns.forEach((inputField) => {
-          const result = inputField(fieldMap[field.name], field)
-          if (result != null) {
-            fieldMap[field.name] = result
-          }
-        })
-      }
     })
     return fieldMap
   }
@@ -1302,8 +1306,20 @@ export class SchemaBuilder {
     const allArgs: GraphQLFieldConfigArgumentMap = {}
     Object.keys(args).forEach((argName) => {
       const nonNullDefault = this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'input')
-      const argDef = normalizeArgWrapping(args[argName]).value
-      const { namedType, wrapping } = unwrapNexusDef(argDef.type)
+      let finalArgDef: NexusFinalArgConfig = {
+        ...normalizeArgWrapping(args[argName]).value,
+        fieldName,
+        argName,
+        parentType: typeConfig.name,
+        configFor: 'arg',
+      }
+      this.onAddArgFns.forEach((onArgDef) => {
+        const result = onArgDef(finalArgDef)
+        if (result != null) {
+          finalArgDef = result
+        }
+      })
+      const { namedType, wrapping } = unwrapNexusDef(finalArgDef.type)
       const finalWrap = finalizeWrapping(
         `${typeConfig.name}.${fieldName} arg ${argName}`,
         nonNullDefault,
@@ -1314,15 +1330,9 @@ export class SchemaBuilder {
           this.getInputType(namedType as PossibleInputType),
           finalWrap
         ) as GraphQLInputType,
-        description: argDef.description,
-        defaultValue: argDef.default,
+        description: finalArgDef.description,
+        defaultValue: finalArgDef.default,
       }
-      this.onArgDefinitionFns.forEach((onArgDef) => {
-        const result = onArgDef(allArgs[argName], argDef)
-        if (result != null) {
-          allArgs[argName] = result
-        }
-      })
     })
     return allArgs
   }
