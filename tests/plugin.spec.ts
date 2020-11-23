@@ -1,4 +1,4 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema, GraphQLList, isListType } from 'graphql'
+import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
 import {
   interfaceType,
   list,
