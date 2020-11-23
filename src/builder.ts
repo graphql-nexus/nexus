@@ -1473,8 +1473,6 @@ export class SchemaBuilder {
         console.warn('Unknown kind of type def to build. It will be ignored. The type def was: %j', type)
       }
     }
-
-    debugger
     return this.missingType(type, fromObject)
   }
 
