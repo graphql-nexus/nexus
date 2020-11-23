@@ -14,7 +14,7 @@ and the list() / nonNull() type wrapping functions. If you would like to increme
 existing API, it is now supported via the declarativeWrappingPlugin. Add this to your plugins array in your makeSchema config.
 
 makeSchema({
-  plugins: [declarativePluginApi(), ...]
+  plugins: [declarativeWrappingPlugin(), ...]
 })
 `,
   /* istanbul ignore next */

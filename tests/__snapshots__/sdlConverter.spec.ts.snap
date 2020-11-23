@@ -15,7 +15,7 @@ exports[`SDLConverter printObjectTypes 1`] = `
 "export const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
-    t.list.nonNull.string(\\"someList\\", {
+    t.nonNull.list.string(\\"someList\\", {
       args: {
         items: nonNull(list(stringArg())
       },
@@ -87,7 +87,7 @@ exports[`convertSDL 1`] = `
 export const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
-    t.list.nonNull.string(\\"someList\\", {
+    t.nonNull.list.string(\\"someList\\", {
       args: {
         items: nonNull(list(stringArg())
       },
@@ -207,7 +207,7 @@ exports[`convertSDL as commonjs 1`] = `
 const Mutation = objectType({
   name: \\"Mutation\\",
   definition(t) {
-    t.list.nonNull.string(\\"someList\\", {
+    t.nonNull.list.string(\\"someList\\", {
       args: {
         items: nonNull(list(stringArg())
       },
