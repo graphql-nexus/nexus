@@ -112,6 +112,7 @@ function maybeWrapType(
       }
     }
   }
+  /* istanbul ignore if */
   if (field.required != null && field.nullable != null) {
     let errorSuffix =
       field.configFor === 'arg'

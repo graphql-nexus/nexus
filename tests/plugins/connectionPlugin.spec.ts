@@ -532,9 +532,6 @@ describe('basic behavior', () => {
       {
         // @ts-ignore
         nullable: true,
-      },
-      {
-        plugins: [declarativeWrappingPlugin()],
       }
     )
     const nonNullable = makeTestSchema(
@@ -542,9 +539,6 @@ describe('basic behavior', () => {
       {
         // @ts-ignore
         nullable: false,
-      },
-      {
-        plugins: [declarativeWrappingPlugin()],
       }
     )
     const nullableWithDefaultTrue = makeTestSchema(
@@ -557,7 +551,6 @@ describe('basic behavior', () => {
         nonNullDefaults: {
           output: true,
         },
-        plugins: [declarativeWrappingPlugin()],
       }
     )
     const nonNullWithDefaultTrue = makeTestSchema(
@@ -570,7 +563,6 @@ describe('basic behavior', () => {
         nonNullDefaults: {
           output: true,
         },
-        plugins: [declarativeWrappingPlugin()],
       }
     )
 

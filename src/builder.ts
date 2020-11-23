@@ -1346,6 +1346,7 @@ export class SchemaBuilder {
 
   private warnOnDeclarativeWrapping(def: NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef) {
     if (!this.hasDeclarativeWrappingPlugin) {
+      /* istanbul ignore if */
       if ('list' in def || 'nullable' in def || (def.configFor === 'arg' && 'required' in def)) {
         const d = def as NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef
         let location =
@@ -1544,6 +1545,7 @@ export class SchemaBuilder {
         type: typeName,
       }
 
+      /* istanbul ignore if */
       if (typeof opts === 'function') {
         console.warn(messages.removedFunctionShorthand(block.typeName, fieldName))
         // @ts-ignore

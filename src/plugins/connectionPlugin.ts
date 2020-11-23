@@ -3,7 +3,11 @@ import { arg, ArgsRecord, intArg } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { nonNull } from '../definitions/nonNull'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
-import { AllNexusNamedOutputTypeDefs, applyNexusWrapping } from '../definitions/wrapping'
+import {
+  AllNexusNamedOutputTypeDefs,
+  applyNexusWrapping,
+  AllNexusOutputTypeDefs,
+} from '../definitions/wrapping'
 import { NonNullConfig } from '../definitions/_types'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
@@ -25,6 +29,7 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
+import { nullable } from '../definitions/nullable'
 
 export interface ConnectionPluginConfig {
   /**
@@ -143,6 +148,11 @@ export type NodeValue<TypeName extends string = any, FieldName extends string = 
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
   type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
+  /**
+   * Whether the connection field can be null
+   * @default (depends on whether nullability is configured in type or schema)
+   */
+  nullable?: boolean
   /**
    * Additional args to use for just this field
    */
@@ -390,10 +400,10 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             const [fieldName, fieldConfig] = factoryArgs as [string, ConnectionFieldConfig]
             const targetType = fieldConfig.type
 
+            /* istanbul ignore if */
             if (wrapping?.includes('List')) {
               throw new Error(`Cannot chain .list with connectionField (on ${parentTypeName}.${fieldName})`)
             }
-
             const { targetTypeName, connectionName, edgeName } = getTypeNames(
               fieldName,
               parentTypeName,
@@ -563,11 +573,21 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               resolveFn = makeResolveFn(pluginConfig, fieldConfig)
             }
 
-            let wrappedConnectionName = connectionName
+            let wrappedConnectionName: AllNexusOutputTypeDefs | string = connectionName
             if (wrapping) {
+              if (typeof fieldConfig.nullable === 'boolean') {
+                throw new Error(
+                  '[connectionPlugin]: You cannot chain .null/.nonNull and also set the nullable in the connectionField definition.'
+                )
+              }
               wrappedConnectionName = applyNexusWrapping(connectionName, wrapping)
+            } else {
+              if (fieldConfig.nullable === true) {
+                wrappedConnectionName = nullable(wrappedConnectionName as any)
+              } else if (fieldConfig.nullable === false) {
+                wrappedConnectionName = nonNull(wrappedConnectionName as any)
+              }
             }
-
             // Add the field to the type.
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),

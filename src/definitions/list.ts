@@ -14,6 +14,7 @@ export class NexusListDef<TypeName extends NexusListableTypes> {
   private _isNexusListDef: boolean = true
 
   constructor(readonly ofNexusType: TypeName) {
+    /* istanbul ignore if */
     if (!isNexusStruct(ofNexusType) && !isType(ofNexusType) && typeof ofNexusType !== 'string') {
       throw new Error('Cannot wrap unknown types in list(). Saw ' + ofNexusType)
     }

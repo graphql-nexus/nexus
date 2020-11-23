@@ -638,7 +638,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; nexu
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.list.field({type: Foo}) 1`] = `"[[Foo]!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nonNull.nullable.field({type: Foo}) 1`] = `"[Foo!]"`;
 
@@ -646,7 +646,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; nexu
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.list.field({type: Foo}) 1`] = `"[[Foo]]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo]"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def list.nullable.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
@@ -660,19 +660,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; nexu
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.list.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [Foo]! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
@@ -686,19 +686,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; nexu
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.list.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; nexus def nullable.nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
@@ -716,7 +716,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; stri
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nonNull.list.field({type: String}) 1`] = `"[[String!]!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"[String!]!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nonNull.nullable.field({type: String}) 1`] = `"[String!]!"`;
 
@@ -724,7 +724,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; stri
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nullable.list.field({type: String}) 1`] = `"[[String!]]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String]!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref list.nullable.nullable.field({type: String}) 1`] = `"[String]!"`;
 
@@ -738,19 +738,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; stri
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.list.nullable.field({type: String}) 1`] = `"[String]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"Error: Expected [String!]! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nullable.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nonNull.nullable.nullable.field({type: String}) 1`] = `"String!"`;
 
@@ -764,19 +764,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = false; stri
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.list.nullable.field({type: String}) 1`] = `"[String]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nullable.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = false; string ref nullable.nullable.nullable.field({type: String}) 1`] = `"String"`;
 
@@ -794,7 +794,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; nexus
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nonNull.list.field({type: Foo}) 1`] = `"[[Foo!]!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nonNull.nullable.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
@@ -802,7 +802,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; nexus
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nullable.list.field({type: Foo}) 1`] = `"[[Foo!]]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo!]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo]!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def list.nullable.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
@@ -816,19 +816,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; nexus
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.list.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [Foo!]! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nullable.list.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nonNull.nullable.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
@@ -842,19 +842,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; nexus
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.list.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo!]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nullable.list.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; nexus def nullable.nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
@@ -872,7 +872,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; strin
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nonNull.list.field({type: String}) 1`] = `"[[String!]!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"[String!]!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nonNull.nullable.field({type: String}) 1`] = `"[String!]!"`;
 
@@ -880,7 +880,7 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; strin
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nullable.list.field({type: String}) 1`] = `"[[String!]]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String]!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref list.nullable.nullable.field({type: String}) 1`] = `"[String]!"`;
 
@@ -894,19 +894,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; strin
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.list.nullable.field({type: String}) 1`] = `"[String]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"Error: Expected [String!]! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nullable.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nonNull.nullable.nullable.field({type: String}) 1`] = `"String!"`;
 
@@ -920,19 +920,19 @@ exports[`wrapping for input types with chained API; nonNullDefault = true; strin
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.list.nullable.field({type: String}) 1`] = `"[String]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nullable.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for input types with chained API; nonNullDefault = true; string ref nullable.nullable.nullable.field({type: String}) 1`] = `"String"`;
 
@@ -1262,7 +1262,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; nex
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nonNull.list.field({type: Foo}) 1`] = `"[[Foo]!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nonNull.nullable.field({type: Foo}) 1`] = `"[Foo!]"`;
 
@@ -1270,7 +1270,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; nex
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nullable.list.field({type: Foo}) 1`] = `"[[Foo]]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo!]"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo]"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def list.nullable.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
@@ -1284,19 +1284,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; nex
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.list.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [Foo]! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nullable.list.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nonNull.nullable.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
@@ -1310,19 +1310,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; nex
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.list.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nullable.list.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; nexus def nullable.nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
@@ -1340,7 +1340,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; str
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nonNull.list.field({type: String}) 1`] = `"[[String!]!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"[String!]!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nonNull.nullable.field({type: String}) 1`] = `"[String!]!"`;
 
@@ -1348,7 +1348,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; str
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nullable.list.field({type: String}) 1`] = `"[[String!]]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String]!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref list.nullable.nullable.field({type: String}) 1`] = `"[String]!"`;
 
@@ -1362,19 +1362,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; str
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.list.nullable.field({type: String}) 1`] = `"[String]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"Error: Expected [String!]! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nullable.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nonNull.nullable.nullable.field({type: String}) 1`] = `"String!"`;
 
@@ -1388,19 +1388,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = false; str
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.list.nullable.field({type: String}) 1`] = `"[String]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nullable.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = false; string ref nullable.nullable.nullable.field({type: String}) 1`] = `"String"`;
 
@@ -1418,7 +1418,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; nexu
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nonNull.list.field({type: Foo}) 1`] = `"[[Foo!]!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nonNull.nonNull.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nonNull.nullable.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
@@ -1426,7 +1426,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; nexu
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nullable.list.field({type: Foo}) 1`] = `"[[Foo!]]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo!]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nullable.nonNull.field({type: Foo}) 1`] = `"[Foo]!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def list.nullable.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
@@ -1440,19 +1440,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; nexu
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.list.nullable.field({type: Foo}) 1`] = `"[Foo]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"Error: Expected [Foo!]! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.list.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nullable.list.field({type: Foo}) 1`] = `"[Foo!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nonNull.nullable.nullable.field({type: Foo}) 1`] = `"Foo!"`;
 
@@ -1466,19 +1466,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; nexu
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.list.nullable.field({type: Foo}) 1`] = `"[Foo]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo!]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.list.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Error: Expected Foo! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nonNull.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nullable.list.field({type: Foo}) 1`] = `"[Foo!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nullable.nonNull.field({type: Foo}) 1`] = `"Foo"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; nexus def nullable.nullable.nullable.field({type: Foo}) 1`] = `"Foo"`;
 
@@ -1496,7 +1496,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; stri
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nonNull.list.field({type: String}) 1`] = `"[[String!]!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nonNull.nonNull.field({type: String}) 1`] = `"[String!]!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nonNull.nullable.field({type: String}) 1`] = `"[String!]!"`;
 
@@ -1504,7 +1504,7 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; stri
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nullable.list.field({type: String}) 1`] = `"[[String!]]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nullable.nonNull.field({type: String}) 1`] = `"[String]!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref list.nullable.nullable.field({type: String}) 1`] = `"[String]!"`;
 
@@ -1518,19 +1518,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; stri
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.list.nullable.field({type: String}) 1`] = `"[String]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"Error: Expected [String!]! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nonNull.field({type: String}) 1`] = `"String!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nullable.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nullable.list.field({type: String}) 1`] = `"[String!]!"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nonNull.nullable.nullable.field({type: String}) 1`] = `"String!"`;
 
@@ -1544,19 +1544,19 @@ exports[`wrapping for output types with chained API; nonNullDefault = true; stri
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.list.nullable.field({type: String}) 1`] = `"[String]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"Error: Expected String! to be a GraphQL nullable type."`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.nonNull.field({type: String}) 1`] = `"String"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nonNull.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nullable.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nullable.list.field({type: String}) 1`] = `"[String!]"`;
 
-exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String!"`;
+exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nullable.nonNull.field({type: String}) 1`] = `"String"`;
 
 exports[`wrapping for output types with chained API; nonNullDefault = true; string ref nullable.nullable.nullable.field({type: String}) 1`] = `"String"`;
 

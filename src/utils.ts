@@ -593,6 +593,7 @@ export function raiseProgrammerError(error: Error) {
 }
 
 export class Unreachable extends Error {
+  /* istanbul ignore next */
   constructor(val: never) {
     super(`Unreachable case or branch, unexpected ${val}`)
   }

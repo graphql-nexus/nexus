@@ -145,6 +145,13 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   protected _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
+    const previousWrapping = this.wrapping?.[0]
+    if (
+      (kind === 'NonNull' || kind === 'Null') &&
+      (previousWrapping === 'NonNull' || previousWrapping === 'Null')
+    ) {
+      return new OutputDefinitionBlock(this.typeBuilder, this.wrapping || [])
+    }
     return new OutputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
@@ -160,6 +167,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
       configFor: 'outputField',
     }
 
+    /* istanbul ignore if */
     if (typeof opts[0] === 'function') {
       config.resolve = opts[0] as any
       console.warn(messages.removedFunctionShorthand(typeName, fieldName))
@@ -248,6 +256,13 @@ export class InputDefinitionBlock<TypeName extends string> {
   }
 
   protected _wrapClass(kind: NexusWrapKind) {
+    const previousWrapping = this.wrapping?.[0]
+    if (
+      (kind === 'NonNull' || kind === 'Null') &&
+      (previousWrapping === 'NonNull' || previousWrapping === 'Null')
+    ) {
+      return new InputDefinitionBlock(this.typeBuilder, this.wrapping || [])
+    }
     return new InputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
