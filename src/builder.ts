@@ -1078,6 +1078,7 @@ export class SchemaBuilder {
 
     config.definition(
       new UnionDefinitionBlock({
+        typeName: config.name,
         addUnionMembers: (unionMembers) => (members = unionMembers),
       })
     )
@@ -1243,12 +1244,7 @@ export class SchemaBuilder {
     const fieldExtension = new NexusFieldExtension(fieldConfig)
     const nonNullDefault = this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'output')
     const { namedType, wrapping } = unwrapNexusDef(fieldConfig.type)
-    const finalWrap = finalizeWrapping(
-      `${typeConfig.name}.${fieldConfig.name}`,
-      nonNullDefault,
-      wrapping,
-      fieldConfig.wrapping
-    )
+    const finalWrap = finalizeWrapping(nonNullDefault, wrapping, fieldConfig.wrapping)
     const builderFieldConfig: Omit<NexusGraphQLFieldConfig, 'resolve' | 'subscribe'> = {
       name: fieldConfig.name,
       type: rewrapAsGraphQLType(
@@ -1295,12 +1291,7 @@ export class SchemaBuilder {
   ): GraphQLInputFieldConfig {
     const nonNullDefault = this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'input')
     const { namedType, wrapping } = unwrapNexusDef(fieldConfig.type)
-    const finalWrap = finalizeWrapping(
-      `${typeConfig.name}.${fieldConfig.name}`,
-      nonNullDefault,
-      wrapping,
-      fieldConfig.wrapping
-    )
+    const finalWrap = finalizeWrapping(nonNullDefault, wrapping, fieldConfig.wrapping)
     return {
       type: rewrapAsGraphQLType(
         this.getInputType(namedType as PossibleInputType),
@@ -1334,11 +1325,7 @@ export class SchemaBuilder {
         }
       })
       const { namedType, wrapping } = unwrapNexusDef(finalArgDef.type)
-      const finalWrap = finalizeWrapping(
-        `${typeConfig.name}.${fieldName} arg ${argName}`,
-        nonNullDefault,
-        wrapping
-      )
+      const finalWrap = finalizeWrapping(nonNullDefault, wrapping)
       allArgs[argName] = {
         type: rewrapAsGraphQLType(
           this.getInputType(namedType as PossibleInputType),

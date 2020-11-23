@@ -3,6 +3,7 @@ import { GetGen, InterfaceFieldsFor, FieldResolver, ModificationType } from '../
 import { AbstractTypes, NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { ArgsRecord } from './args'
+import { messages } from '../messages'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
@@ -78,6 +79,11 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
     modifications: FieldModification<TypeName, FieldName>
   ) {
     this.typeBuilder.addModification({ ...modifications, field })
+  }
+
+  /* istanbul ignore */
+  protected resolveType() {
+    throw new Error(messages.removedResolveType(this.typeBuilder.typeName))
   }
 }
 

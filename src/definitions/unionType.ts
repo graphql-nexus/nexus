@@ -2,8 +2,10 @@ import { assertValidName } from 'graphql'
 import { GetGen } from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 import { NexusObjectTypeDef } from './objectType'
+import { messages } from '../messages'
 
 export interface UnionDefinitionBuilder {
+  typeName: string
   addUnionMembers(members: UnionMembers): void
 }
 
@@ -17,6 +19,11 @@ export class UnionDefinitionBlock {
    */
   members(...unionMembers: UnionMembers) {
     this.typeBuilder.addUnionMembers(unionMembers)
+  }
+
+  /* istanbul ignore */
+  protected resolveType() {
+    throw new Error(messages.removedResolveType(this.typeBuilder.typeName))
   }
 }
 

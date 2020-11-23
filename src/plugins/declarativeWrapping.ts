@@ -102,6 +102,9 @@ function maybeWrapType(
 
   let type = field.type
   if (field.list === true) {
+    if (field.nullable === false || field.required === true) {
+      type = nonNull(type)
+    }
     type = list(type)
   } else if (Array.isArray(field.list)) {
     for (const isNonNull of field.list) {

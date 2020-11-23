@@ -1,11 +1,18 @@
 export const messages = {
+  removedResolveType: (location: string) => `\
+The .resolveType used in the ${location} has been removed in favor of a more robust approach to handling abstract types.
+
+Visit https://nexusjs.org/docs/guides/abstract-types for an explanation and upgrade info.
+
+Visit https://github.com/graphql-nexus/schema/issues/188 for the original motivation for the change.
+`,
   removedDeclarativeWrapping: (location: string) => `\
 The list/nullable/required object properies used in the ${location} have been removed in favor of better chaining APIs 
 and the list() / nonNull() type wrapping functions. If you would like to incrementally migrate, or prefer the 
 existing API, it is now supported via the declarativeWrappingPlugin. Add this to your plugins array in your makeSchema config.
 
 makeSchema({
-  plugins: [declarativePluginApi, ...]
+  plugins: [declarativePluginApi(), ...]
 })
 `,
   removedFunctionShorthand: (typeName: string, fieldName: string) =>

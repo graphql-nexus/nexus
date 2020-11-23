@@ -437,17 +437,4 @@ describe('edges cases', () => {
       }
     `)
   })
-
-  test('cannot use chained API and wrappers at the same time', () => {
-    expect(() =>
-      testInputField(list('String'), ['list'], { nonNullDefault: false, useChainingApi: true })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on Bar.foo)"`
-    )
-    expect(() =>
-      testOutputField(list('String'), ['list'], { nonNullDefault: false, useChainingApi: true })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot use t.list / nonNull chaining and list() / nonNull() type wrapping the same time (on Query.foo)"`
-    )
-  })
 })
