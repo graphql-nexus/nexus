@@ -726,9 +726,7 @@ schema.mutationType({
       type: 'Post',
       args: {
         title: stringArg(),
-        content: stringArg({
-          nullable: true,
-        }),
+        content: nullable(stringArg()),
       },
       resolve: (parent, { title, content }, ctx) => {
         return ctx.prisma.posts.createPost({ title, content })
@@ -736,8 +734,7 @@ schema.mutationType({
     })
 
     t.field('publish', {
-      type: 'Post',
-      nullable: true,
+      type: nullable('Post'),
       args: {
         id: idArg(),
       },

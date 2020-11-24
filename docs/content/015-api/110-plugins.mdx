@@ -100,8 +100,7 @@ export const NodePlugin = plugin({
         resolveFn = node
       }
       t.implements('Node')
-      t.id('id', {
-        nullable: false,
+      t.nonNull.id('id', {
         resolve: resolveFn,
       })
     }

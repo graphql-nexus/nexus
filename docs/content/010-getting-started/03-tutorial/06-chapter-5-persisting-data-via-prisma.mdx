@@ -212,7 +212,7 @@ Let's now replace all our previous in-memory db interactions with calls to the P
 
 // ...
 
-schema.extendType({
+extendType({
   type: 'Query',
   definition(t) {
     t.list.field('drafts', {
@@ -232,14 +232,14 @@ schema.extendType({
   },
 });
 
-schema.extendType({
+extendType({
   type: 'Mutation',
   definition(t) {
     t.field('createDraft', {
       type: 'Post',
       args: {
-        title: stringArg({ required: true }),
-        body: stringArg({ required: true }),
+        title: nonNull(stringArg()),
+        body: nonNull(stringArg()),
       },
       resolve(_root, args, ctx) {
         const draft = {
@@ -258,7 +258,7 @@ schema.extendType({
     t.field('publish', {
       type: 'Post',
       args: {
-        draftId: intArg({ required: true }),
+        draftId: nonNull(intArg()),
       },
       resolve(_root, args, ctx) {
 -       let postToPublish = ctx.db.posts.find((p) => p.id === args.draftId)
@@ -316,8 +316,8 @@ schema.extendType({
     t.field('createDraft', {
       type: 'Post',
       args: {
-        title: stringArg({ required: true }),
-        body: stringArg({ required: true }),
+        title: nonNull(stringArg()),
+        body: nonNull(stringArg()),
       },
       resolve(_root, args, ctx) {
         const draft = {
@@ -332,11 +332,13 @@ schema.extendType({
     t.field('publish', {
       type: 'Post',
       args: {
-        draftId: intArg({ required: true }),
+        draftId: nonNull(intArg()),
       },
       resolve(_root, args, ctx) {
         return ctx.db.post.update({
-          where: { id: args.draftId },
+          where: {
+            id: args.draftId
+          },
           data: {
             published: true,
           },

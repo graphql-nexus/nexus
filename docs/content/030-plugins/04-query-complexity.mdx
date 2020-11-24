@@ -80,10 +80,9 @@ And you can use it like so:
 
 ```ts
 export const users = queryField('users', {
-  type: 'User',
-  list: true,
+  type: list('User'),
   args: {
-    count: intArg({ nullable: false }),
+    count: nonNull(intArg()),
   },
   // This will calculate the complexity based on the count and child complexity.
   // This is useful to prevent clients from querying mass amount of data.
