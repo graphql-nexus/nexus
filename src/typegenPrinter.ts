@@ -224,11 +224,18 @@ export class TypegenPrinter {
       .concat(
         mapObj(dynamicInputFields, (val, key) => {
           if (typeof val === 'string') {
-            return `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
-              val
-            )};`
+            const baseType = this.schema.getType(val)
+            return this.prependDoc(
+              `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
+                val
+              )};`,
+              baseType?.description
+            )
           }
-          return `    ${key}${val.value.typeDefinition || `(...args: any): void`}`
+          return this.prependDoc(
+            `    ${key}${val.value.typeDefinition || `(...args: any): void`}`,
+            val.value.typeDescription
+          )
         })
       )
       .concat([`  }`, `}`])
@@ -245,15 +252,37 @@ export class TypegenPrinter {
       .concat(
         mapObj(dynamicOutputFields, (val, key) => {
           if (typeof val === 'string') {
-            return `    ${key}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
-              val
-            )};`
+            const baseType = this.schema.getType(val)
+            return this.prependDoc(
+              `    ${key}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+                val
+              )};`,
+              baseType?.description
+            )
           }
-          return `    ${key}${val.value.typeDefinition || `(...args: any): void`}`
+          return this.prependDoc(
+            `    ${key}${val.value.typeDefinition || `(...args: any): void`}`,
+            val.value.typeDescription
+          )
         })
       )
       .concat([`  }`, `}`])
       .join('\n')
+  }
+
+  prependDoc(typeDef: string, typeDescription?: string | null) {
+    let outStr = ''
+    if (typeDescription) {
+      let parts = typeDescription.split('\n').map((f) => f.trimLeft())
+      if (parts[0] === '') {
+        parts = parts.slice(1)
+      }
+      if (parts[parts.length - 1] === '') {
+        parts = parts.slice(0, -1)
+      }
+      outStr = ['    /**', ...parts.map((p) => `     *${p ? ` ${p}` : ''}`), '     */'].join('\n') + '\n'
+    }
+    return `${outStr}${typeDef}`
   }
 
   printDynamicOutputPropertyDefinitions() {
@@ -265,7 +294,10 @@ export class TypegenPrinter {
     return [`declare global {`, `  interface NexusGenCustomOutputProperties<TypeName extends string> {`]
       .concat(
         mapObj(dynamicOutputProperties, (val, key) => {
-          return `    ${key}${val.value.typeDefinition || `: any`}`
+          return this.prependDoc(
+            `    ${key}${val.value.typeDefinition || `: any`}`,
+            val.value.typeDescription
+          )
         })
       )
       .concat([`  }`, `}`])

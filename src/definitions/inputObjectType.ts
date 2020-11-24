@@ -26,7 +26,7 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
 }
 
 export class NexusInputObjectTypeDef<TypeName extends string> {
-  constructor(readonly name: TypeName, protected config: NexusInputObjectTypeConfig<string>) {
+  constructor(readonly name: TypeName, protected config: NexusInputObjectTypeConfig<any>) {
     assertValidName(name)
   }
   get value() {

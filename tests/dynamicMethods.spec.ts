@@ -91,6 +91,7 @@ describe('dynamicOutputProperty', () => {
         }),
         dynamicOutputProperty({
           name: 'model',
+          typeDescription: 'Chains model fields',
           factory({ typeDef }) {
             return {
               timestamps() {

@@ -43,6 +43,11 @@ export interface BaseExtensionConfig<T extends string> {
    * signature for the type
    */
   typeDefinition?: string
+  /**
+   * Description inserted above the typeDefinition for the field, will be formatted
+   * as JSDOC by Nexus
+   */
+  typeDescription?: string
 }
 
 export interface DynamicOutputMethodConfig<T extends string> extends BaseExtensionConfig<T> {
