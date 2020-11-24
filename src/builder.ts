@@ -486,7 +486,7 @@ export class SchemaBuilder {
      */
     this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
 
-    //
+    // TODO(tim): In 1.0 change to declarativeWrappingPlugin({ disable: true })
     if (!this.plugins.find((f) => f.config.name === 'declarativeWrapping')) {
       this.plugins.push(declarativeWrappingPlugin({ shouldWarn: true }))
     }
