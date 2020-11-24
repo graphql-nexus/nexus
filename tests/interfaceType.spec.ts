@@ -1,6 +1,7 @@
 import { graphql } from 'graphql'
 import path from 'path'
-import { generateSchema, interfaceType, makeSchema, objectType, queryField } from '../src/core'
+import { DateTimeResolver } from 'graphql-scalars'
+import { generateSchema, interfaceType, makeSchema, objectType, queryField, asNexusMethod } from '../src/core'
 
 describe('interfaceType', () => {
   it('can be implemented by object types', async () => {
@@ -10,8 +11,11 @@ describe('interfaceType', () => {
           name: 'Node',
           definition(t) {
             t.id('id')
+            // @ts-ignore
+            t.dateTime('createdAt')
           },
         }),
+        asNexusMethod(DateTimeResolver, 'dateTime'),
         objectType({
           name: 'User',
           isTypeOf(data) {
