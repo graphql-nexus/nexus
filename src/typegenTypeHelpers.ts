@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLAbstractType } from 'graphql'
 import { NexusObjectTypeDef } from './definitions/objectType'
 import { NexusInterfaceTypeDef } from './definitions/interfaceType'
 
@@ -78,7 +78,8 @@ export interface AbstractTypeResolver<TypeName extends string> {
   (
     source: RootValue<TypeName>,
     context: GetGen<'context'>,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
+    abstractType: GraphQLAbstractType
   ): MaybePromise<AbstractResolveReturn<TypeName> | null>
 }
 

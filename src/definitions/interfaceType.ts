@@ -1,5 +1,11 @@
 import { assertValidName } from 'graphql'
-import { GetGen, InterfaceFieldsFor, FieldResolver, ModificationType } from '../typegenTypeHelpers'
+import {
+  GetGen,
+  InterfaceFieldsFor,
+  FieldResolver,
+  ModificationType,
+  AbstractTypeResolver,
+} from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { ArgsRecord } from './args'
@@ -57,6 +63,8 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
+  // TODO(tim): Remove before 1.0
+  setLegacyResolveType(fn: AbstractTypeResolver<TypeName>): void
   addInterfaces(toAdd: Implemented[]): void
   addModification(toAdd: FieldModificationDef<TypeName, any>): void
 }
@@ -82,8 +90,9 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
   }
 
   /* istanbul ignore next */
-  protected resolveType() {
-    throw new Error(messages.removedResolveType(this.typeBuilder.typeName))
+  protected resolveType(fn: AbstractTypeResolver<TypeName>) {
+    console.error(new Error(messages.removedResolveType(this.typeBuilder.typeName)))
+    this.typeBuilder.setLegacyResolveType(fn)
   }
 }
 

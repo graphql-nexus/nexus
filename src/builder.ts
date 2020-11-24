@@ -138,6 +138,7 @@ import {
   UNKNOWN_TYPE_SCALAR,
   getArgNamedType,
 } from './utils'
+import { declarativeWrappingPlugin } from './plugins'
 
 type NexusShapedOutput = {
   name: string
@@ -468,9 +469,6 @@ export class SchemaBuilder {
    */
   protected _schemaExtension?: NexusSchemaExtension
 
-  // TODO: remove @ 1.0
-  private hasDeclarativeWrappingPlugin: boolean
-
   protected config: BuilderConfig
 
   get schemaExtension() {
@@ -484,12 +482,15 @@ export class SchemaBuilder {
   constructor(config: BuilderConfigInput) {
     this.config = setConfigDefaults(config)
     /**
-     * This array of plugin is used to keep retro-co
+     * This array of plugin is used to keep retro-compatibility w/ older versions of nexus
      */
     this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
-    this.hasDeclarativeWrappingPlugin = Boolean(
-      this.plugins.find((f) => f.config.name === 'declarativeWrapping')
-    )
+
+    // TODO(tim): In 1.0 change to declarativeWrappingPlugin({ disable: true })
+    if (!this.plugins.find((f) => f.config.name === 'declarativeWrapping')) {
+      this.plugins.push(declarativeWrappingPlugin({ shouldWarn: true }))
+    }
+
     this.builderLens = Object.freeze({
       hasType: this.hasType,
       addType: this.addType,
@@ -814,6 +815,7 @@ export class SchemaBuilder {
         addField: () => {},
         addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'walk', wrapping),
         warn: () => {},
+        setLegacyResolveType() {},
       })
       obj.definition(definitionBlock)
       alreadyChecked[obj.name] = true
@@ -978,6 +980,7 @@ export class SchemaBuilder {
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addModification: (modification) => (modifications[modification.field] = modification),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'build', wrapping),
+      setLegacyResolveType: (fn) => (resolveType = fn),
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
@@ -1083,6 +1086,7 @@ export class SchemaBuilder {
       new UnionDefinitionBlock({
         typeName: config.name,
         addUnionMembers: (unionMembers) => (members = unionMembers),
+        setLegacyResolveType: (fn) => (resolveType = fn),
       })
     )
 
@@ -1330,7 +1334,6 @@ export class SchemaBuilder {
         parentType: typeConfig.name,
         configFor: 'arg',
       }
-      this.warnOnDeclarativeWrapping(finalArgDef)
       this.onAddArgFns.forEach((onArgDef) => {
         const result = onArgDef(finalArgDef)
         if (result != null) {
@@ -1349,20 +1352,6 @@ export class SchemaBuilder {
       }
     })
     return allArgs
-  }
-
-  private warnOnDeclarativeWrapping(def: NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef) {
-    if (!this.hasDeclarativeWrappingPlugin) {
-      /* istanbul ignore if */
-      if ('list' in def || 'nullable' in def || (def.configFor === 'arg' && 'required' in def)) {
-        const d = def as NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef
-        let location =
-          d.configFor === 'arg'
-            ? `'${d.parentType}.${d.fieldName}' field's '${d.argName}' argument`
-            : `'${d.parentType}.${d.type}' field`
-        throw new Error(messages.removedDeclarativeWrapping(location))
-      }
-    }
   }
 
   protected getInterface(name: string | NexusInterfaceTypeDef<any>): GraphQLInterfaceType {
@@ -1599,6 +1588,7 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'walk', wrapping),
       warn: () => {},
+      setLegacyResolveType: () => {},
     })
     obj.definition(definitionBlock)
     return obj
@@ -1754,8 +1744,8 @@ export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {
     features: {
       abstractTypeRuntimeChecks: true,
       abstractTypeStrategies: {
-        isTypeOf: true,
-        resolveType: false,
+        isTypeOf: false,
+        resolveType: true,
         __typename: false,
       },
     },

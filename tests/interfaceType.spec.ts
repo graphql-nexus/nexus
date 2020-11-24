@@ -14,6 +14,7 @@ describe('interfaceType', () => {
             // @ts-ignore
             t.dateTime('createdAt')
           },
+          resolveType: () => null,
         }),
         asNexusMethod(DateTimeResolver, 'dateTime'),
         objectType({
@@ -99,6 +100,12 @@ describe('interfaceType', () => {
         typegen: false,
       },
       shouldGenerateArtifacts: false,
+      features: {
+        abstractTypeStrategies: {
+          resolveType: false,
+          isTypeOf: true,
+        },
+      },
     })
     expect(
       await graphql(

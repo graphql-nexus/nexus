@@ -621,6 +621,7 @@ function nonConnectionFieldProps(fieldConfig: ConnectionFieldConfig) {
     type,
     validateArgs,
     strictArgs,
+    nullable,
     ...rest
   } = fieldConfig
   return rest
