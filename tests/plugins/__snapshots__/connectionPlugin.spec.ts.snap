@@ -420,6 +420,20 @@ exports[`field level configuration can inherit the additional args from the main
 }"
 `;
 
+exports[`field level configuration prints the types associated with the connection plugin correctly 1`] = `
+"
+    /**
+     * Adds a Relay-style connection to the type, with numerous options for configuration
+     *
+     * @see https://nexusjs.org/docs/plugins/connection
+     */
+    connectionField<FieldName extends string>(
+      fieldName: FieldName,
+      config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName>
+    ): void
+  "
+`;
+
 exports[`global plugin configuration allows disabling backward pagination 1`] = `
 "type Query {
   users(

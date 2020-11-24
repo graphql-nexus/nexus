@@ -6,16 +6,36 @@
 import { core } from '../../../src'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
+    /**
+     * No-Op scalar for testing purposes only
+     */
+    myCustomScalar<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.ScalarInputFieldConfig<core.GetGen3<'inputTypes', TypeName, FieldName>>
+    ): void // "MyCustomScalar";
     title(...args: any): void
   }
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
+    /**
+     * No-Op scalar for testing purposes only
+     */
+    myCustomScalar<FieldName extends string>(
+      fieldName: FieldName,
+      ...opts: core.ScalarOutSpread<TypeName, FieldName>
+    ): void // "MyCustomScalar";
+    /**
+     * Title of the page, optionally escaped
+     */
     title(options: { escape: boolean }): void
   }
 }
 declare global {
   interface NexusGenCustomOutputProperties<TypeName extends string> {
+    /**
+     * adds a body (weirdly, as a getter)
+     */
     body: any
   }
 }
@@ -40,6 +60,7 @@ export interface NexusGenScalars {
   Float: number
   Boolean: boolean
   ID: string
+  MyCustomScalar: any
 }
 
 export interface NexusGenObjects {
@@ -92,6 +113,7 @@ export interface NexusGenFieldTypes {
   }
   Query: {
     // field return type
+    customScalar: NexusGenScalars['MyCustomScalar'] | null // MyCustomScalar
     foo: string | null // String
     searchPosts: Array<NexusGenRootTypes['Post'] | null> | null // [Post]
     user: NexusGenRootTypes['User'] | null // User
@@ -138,6 +160,7 @@ export interface NexusGenFieldTypeNames {
   }
   Query: {
     // field return type name
+    customScalar: 'MyCustomScalar'
     foo: 'String'
     searchPosts: 'Post'
     user: 'User'

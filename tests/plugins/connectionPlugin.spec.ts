@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { SchemaConfig } from '../../src/core'
+import { SchemaConfig, generateSchema } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -801,5 +801,32 @@ describe('field level configuration', () => {
       },
     })
     expect(printSchema(schema)).toMatchSnapshot()
+  })
+
+  it('prints the types associated with the connection plugin correctly', async () => {
+    const { tsTypes } = await generateSchema.withArtifacts(
+      {
+        outputs: false,
+        types: [
+          objectType({
+            name: 'Query',
+            definition(t) {
+              // @ts-ignore
+              t.connectionField('users', {
+                type: User,
+                nodes(root: any, args: any, ctx: any, info: any) {
+                  return userNodes
+                },
+              })
+            },
+          }),
+        ],
+        plugins: [connectionPlugin()],
+      },
+      '/dev/null'
+    )
+
+    const regExp = /interface NexusGenCustomOutputMethods(?:.*) {((.|\n)*?)}/
+    expect(regExp.exec(tsTypes)?.[1]).toMatchSnapshot()
   })
 })

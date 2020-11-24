@@ -11,13 +11,22 @@ import {
   queryType,
   stringArg,
   subscriptionType,
+  asNexusMethod,
+  scalarType,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
 import './__typegen'
 
+export const scalar = scalarType({
+  name: 'MyCustomScalar',
+  description: 'No-Op scalar for testing purposes only',
+  asNexusMethod: 'myCustomScalar',
+})
+
 export const query = queryType({
   definition(t) {
     t.string('foo', { resolve: () => 'bar' })
+    t.myCustomScalar('customScalar')
   },
 })
 
@@ -53,6 +62,7 @@ export const i2 = objectType({
 export const dom = dynamicOutputMethod({
   name: 'title',
   typeDefinition: '(options: { escape: boolean }): void',
+  typeDescription: 'Title of the page, optionally escaped',
   factory: ({ typeDef: t }) => {
     t.string('title')
   },
@@ -67,6 +77,7 @@ export const dim = dynamicInputMethod({
 
 export const dop = dynamicOutputProperty({
   name: 'body',
+  typeDescription: 'adds a body (weirdly, as a getter)',
   factory: ({ typeDef: t }) => {
     t.string('body')
   },

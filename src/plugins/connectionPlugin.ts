@@ -392,10 +392,15 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       b.addType(
         dynamicOutputMethod({
           name: nexusFieldName,
+          typeDescription: `
+            Adds a Relay-style connection to the type, with numerous options for configuration
+
+            @see https://nexusjs.org/docs/plugins/connection
+          `,
           typeDefinition: `<FieldName extends string>(
-            fieldName: FieldName, 
-            config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> ${printedDynamicConfig}
-          ): void`,
+      fieldName: FieldName,
+      config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName>${printedDynamicConfig}
+    ): void`,
           factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage, builder, wrapping }) {
             const [fieldName, fieldConfig] = factoryArgs as [string, ConnectionFieldConfig]
             const targetType = fieldConfig.type

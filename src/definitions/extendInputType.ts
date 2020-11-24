@@ -9,10 +9,7 @@ export interface NexusExtendInputTypeConfig<TypeName extends string> {
 }
 
 export class NexusExtendInputTypeDef<TypeName extends string> {
-  constructor(
-    readonly name: TypeName,
-    protected config: NexusExtendInputTypeConfig<string> & { name: string }
-  ) {
+  constructor(readonly name: TypeName, protected config: NexusExtendInputTypeConfig<any> & { name: string }) {
     assertValidName(name)
   }
   get value() {
