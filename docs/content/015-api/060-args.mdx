@@ -15,7 +15,7 @@ Defines an argument that can be used in any object or interface type. Args can b
 import { intArg, core } from '@nexus/schema'
 
 function requiredInt(opts: core.ScalarArgConfig<number>) {
-  return intArg({ ...opts, required: true })
+  return nonNull(intArg({ ...opts }))
 }
 ```
 

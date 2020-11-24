@@ -241,9 +241,8 @@ As before we will take the collocation approach.
 export const PostMutation = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('createDraft', {
+    t.nonNull.field('createDraft', {
       type: 'Post',
-      nullable: false,
       resolve(_root, args, ctx) {
         ctx.db.posts.push(/*...*/)
         return // ...
@@ -282,12 +281,11 @@ import { extendType, stringArg } from '@nexus/schema'
 export const PostMutation = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('createDraft', {
+    t.nonNull.field('createDraft', {
       type: 'Post',
-      nullable: false,
 +      args: {                                        // 1
-+        title: stringArg({ required: true }),        // 2
-+        body: stringArg({ required: true }),         // 2
++        title: nonNull(stringArg()),                 // 2
++        body: nonNull(stringArg()),                  // 2
 +      },
       resolve(_root, args, ctx) {
 +        const draft = {
@@ -317,12 +315,11 @@ import { extendType, stringArg } from '@nexus/schema'
 export const PostMutation = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('createDraft', {
+    t.nonNull.field('createDraft', {
       type: 'Post',
-      nullable: false,
       args: {                                        // 1
-        title: stringArg({ required: true }),        // 2
-        body: stringArg({ required: true }),         // 2
+        title: nonNull(stringArg()),                 // 2
+        body: nonNull(stringArg()),                  // 2
       },
       resolve(_root, args, ctx) {
         const draft = {
@@ -351,7 +348,7 @@ Mutation {
 ```
 
 1. Add an `args` property to the field definition to define its args. Keys are arg names and values are type specifications.
-2. Use the Nexus helpers for defining an arg type. There is one such helper for every GraphQL scalar such as `intArg` and `booleanArg`. If you want to reference a type like some InputObject then use `arg({ type: "..." })`.
+2. Use the Nexus helpers for defining an arg type. There is one such helper for every GraphQL scalar such as `intArg` and `booleanArg`. If you want to reference a type like some InputObject then use `arg({ type: "..." })`. You can use the helpers `nonNull` and `nullable` to adjust the nullability type of the arg. You can use the functional helper `list` to turn the arg into a list type too.
 3. In our resolver, access the args we specified above and pass them through to our custom logic. If you hover over the `args` parameter you'll see that Nexus has properly typed them including the fact that they cannot be undefined.
 
 ## Model the domain: Part 2
@@ -374,7 +371,7 @@ export const PostMutation = extendType({
 +    t.field('publish', {
 +      type: 'Post',
 +      args: {
-+        draftId: intArg({ required: true }),
++        draftId: nonNull(intArg()),
 +      },
 +      resolve(_root, args, ctx) {
 +        let draftToPublish = ctx.db.posts.find(p => p.id === args.draftId)
@@ -408,7 +405,7 @@ export const PostMutation = extendType({
     t.field('publish', {
       type: 'Post',
       args: {
-        draftId: intArg({ required: true }),
+        draftId: nonNull(intArg()),
       },
       resolve(_root, args, ctx) {
         let draftToPublish = ctx.db.posts.find(p => p.id === args.draftId)

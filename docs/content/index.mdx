@@ -77,10 +77,10 @@ const Query = queryType({
         status: arg({ type: 'StatusEnum' }),
       },
     })
-    t.list.field('accountsById', {
-      type: Account, // or "Account"
+    t.field('accountsById', {
+      type: list(Account), // or "Account"
       args: {
-        ids: intArg({ list: true }),
+        ids: list(intArg()),
       },
     })
   },

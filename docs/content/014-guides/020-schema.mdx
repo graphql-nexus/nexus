@@ -128,15 +128,17 @@ type Beta {
 
 ##### Lists and nullability
 
+The following demonstration assumes the Nexus nullability defaults.
+
 ```ts
 objectType({
   name: 'Alpha',
   definition(t) {
-    t.id('a', { nullable: true })
+    t.id('a')
     t.list.id('b')
-    t.list.id('c', { nullable: true })
-    t.list.id('c', { list: [false] })
-    t.list.id('c', { list: [false], nullable: true })
+    t.nullable.list.id('c')
+    t.list.nullable.id('d')
+    t.nullable.list.nullable.id('e')
   },
 })
 ```
@@ -146,8 +148,8 @@ type Alpha {
   a: ID
   b: [ID!]!
   c: [ID!]
-  c: [ID]!
-  c: [ID]
+  d: [ID]!
+  e: [ID]
 }
 ```
 
@@ -191,13 +193,11 @@ queryType({
         return Math.random() > 0.1 : 'Zeta' : 'Yolo'
       }
     })
-    t.list.field('alphas', {
-      type: 'Alpha',
+    t.field('alphas', {
+      type: list('Alpha'),
       args: {
-        except: schema.arg({
-          list: true,
-          type: "Alpha",
-          required: true,
+        except: arg({
+          type: list(nonNull("Alpha")),
         })
       },
       resolve(_root, args) {
@@ -400,14 +400,11 @@ type Query {
 ```ts
 queryType({
   definition(t) {
-    t.string('echo', {
+    t.field('echo', {
+      type: nonNull('String'),
       args: {
-        message: schema.arg({
-          type: 'String',
-          nullable: false,
-        }),
+        message: nullable(stringArg()),
       },
-      nullable: false,
       resolve(_root, args) {
         return args.message
       },
@@ -431,7 +428,7 @@ It is possible to use type and input/field layers together. This provides flexib
 
 
 ```ts
-schema.queryType({
+queryType({
   // flip the global defaults
   nonNullDefaults: {
     input: true,
@@ -442,13 +439,9 @@ schema.queryType({
     // nullability config ... Except the following,
     // which effectively reverts back to what the global
     // defaults are:
-    t.string('echo', {
-      nullable: false,
+    t.nonNull.string('echo', {
       args: {
-        message: schema.arg({
-          type: 'String',
-          nullable: false,
-        }),
+        message: nonNull(stringArg()),
       },
       resolve(_root, args) {
         return args.message
@@ -475,14 +468,12 @@ When an arg has a default you might think that then it should be nullable to the
 ```ts
 queryType({
   definition(t) {
-    t.string('echo', {
+    t.nonNull.string('echo', {
       args: {
-        message: schema.arg({
-          type: 'String',
+        message: stringArg({
           default: 'nil via default',
         }),
       },
-      nullable: false,
       resolve(_root, args) {
         const fallback = 'nil via client null'
         return args.message ?? fallback
@@ -566,7 +557,7 @@ query({
   definition(t) {
     t.user({
       args: {
-        id: schema.arg({ type: 'ID', required: true }),
+        id: nonNull(idArg()),
       },
       resolve(_, { id }, { db }) {
         return db.fetchUser({ where: { id } })

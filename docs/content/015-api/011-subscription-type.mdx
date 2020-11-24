@@ -48,13 +48,14 @@ const schema = makeSchema({
           type: 'User',
           args: {
             data: arg({
-              required: true,
-              type: inputObjectType({
-                name: 'CreateOneUserInput',
-                definition(t) {
-                  t.string('email', { required: true })
-                },
-              }),
+              type: nonNull(
+                inputObjectType({
+                  name: 'CreateOneUserInput',
+                  definition(t) {
+                    t.nonNull.string('email')
+                  },
+                })
+              ),
             }),
           },
           async resolve(_, args) {
