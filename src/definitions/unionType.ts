@@ -1,5 +1,5 @@
 import { assertValidName } from 'graphql'
-import { GetGen } from '../typegenTypeHelpers'
+import { GetGen, AbstractTypeResolver } from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 import { NexusObjectTypeDef } from './objectType'
 import { messages } from '../messages'
@@ -7,6 +7,8 @@ import { messages } from '../messages'
 export interface UnionDefinitionBuilder {
   typeName: string
   addUnionMembers(members: UnionMembers): void
+  // TODO(tim): Remove before 1.0
+  setLegacyResolveType(fn: AbstractTypeResolver<any>): void
 }
 
 export type UnionMembers = Array<GetGen<'objectNames'> | NexusObjectTypeDef<any>>
@@ -22,8 +24,9 @@ export class UnionDefinitionBlock {
   }
 
   /* istanbul ignore next */
-  protected resolveType() {
-    throw new Error(messages.removedResolveType(this.typeBuilder.typeName))
+  protected resolveType(fn: AbstractTypeResolver<any>) {
+    console.error(new Error(messages.removedResolveType(this.typeBuilder.typeName)))
+    this.typeBuilder.setLegacyResolveType(fn)
   }
 }
 

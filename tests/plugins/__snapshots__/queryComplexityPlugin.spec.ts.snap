@@ -83,8 +83,8 @@ export type NexusGenAbstractsUsingStrategyResolveType = never;
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {
-    isTypeOf: true
-    resolveType: false
+    isTypeOf: false
+    resolveType: true
     __typename: false
   }
 }

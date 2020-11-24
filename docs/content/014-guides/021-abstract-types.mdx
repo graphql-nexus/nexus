@@ -187,7 +187,7 @@ const Query = queryType({
         pattern: stringArg(),
       },
       resolve(root, args, ctx) {
-        return ctx.db.search(args.pattern).map(result => {
+        return ctx.db.search(args.pattern).map((result) => {
           const __typename = result.album
             ? 'Song'
             : result.rating
@@ -224,7 +224,7 @@ const Query = queryType({
         pattern: stringArg(),
       },
       resolve(root, args, ctx) {
-        return ctx.db.search(args.pattern).map(result => {
+        return ctx.db.search(args.pattern).map((result) => {
           return {
             ...result,
             __typename: result.typeName,
@@ -261,7 +261,7 @@ Like with the Centralized strategy Nexus leverages TypeScript to ensure your imp
          },
          resolve(root, args, ctx) {
            // Nexus requires __typename here
-           return ctx.db.search(args.pattern).map(result => {
+           return ctx.db.search(args.pattern).map((result) => {
              return {
                ...result,
                __typename: result.typeName,
@@ -329,7 +329,7 @@ Like with the Centralized and DMF strategies Nexus leverages TypeScript to ensur
 
 #### Configuration
 
-Nexus enables you to pick the strategy you want to use. By default only the Modular strategy is enabled. You can pick your strategies in the `makeSchema` configuration.
+Nexus enables you to pick the strategy you want to use. By default only the Centralized strategy is enabled. You can pick your strategies in the `makeSchema` configuration.
 
 ```ts
 import { makeSchema } from '@nexus/schema'
@@ -337,8 +337,8 @@ import { makeSchema } from '@nexus/schema'
 makeSchema({
   features: {
     abstractTypeStrategies: {
-      isTypeOf: true, // default
-      resolveType: false, // default
+      resolveType: true, // default
+      isTypeOf: false, // default
       __typename: false, // default
     },
   },
@@ -356,7 +356,7 @@ import { makeSchema } from '@nexus/schema'
 makeSchema({
   features: {
     abstractTypeStrategies: {
-      resolveType: true,
+      isTypeOf: true,
     },
   },
   //...
@@ -368,8 +368,8 @@ The resolved settings would be:
 ```ts
 {
   abstractTypeStrategies: {
-    resolveType: true,
-    isTypeOf: false, // The `true` default when no config is given is NOT inherited here
+    resolveType: false, // The `true` default when no config is given is NOT inherited here
+    isTypeOf: true,
     __typename: false,
   }
 }
@@ -380,8 +380,8 @@ _Not_:
 ```ts
 {
   abstractTypeStrategies: {
-    resolveType: true,
-    isTypeOf: true, // <-- NOT what actually happens
+    resolveType: true,  // <-- NOT what actually happens
+    isTypeOf: true,
     __typename: false,
   }
 }
@@ -393,8 +393,8 @@ There is no right or wrong strategy to use. Use the one that you and/or your tea
 
 | Questions                                                                             | If affirmative, then maybe                                                                                                 |
 | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Is my schema large? Do I have many collaborators?                                     | Modular (DMF, IsTypeOf)                                                                                                    |
 | Is my schema simple? Do I develop alone?                                              | Centralized (ResolveType)                                                                                                  |
+| Is my schema large? Do I have many collaborators?                                     | Modular (DMF, IsTypeOf)                                                                                                    |
 | Do I keep a discriminant property in the databse already?                             | DMF: implement `__typename` in your model layer if you have one                                                            |
 | Do I have objects that are part of multiple unions types and/or implement interfaces? | DMF or IsTypeOf to avoid repeated logic across multiple `resolveType` implementations required by the ResolveType strategy |
 
@@ -464,7 +464,7 @@ queryType({
         pattern: stringArg(),
       },
       resolve(_, args, ctx) {
-        return ctx.db.search(args.pattern).map(result => {
+        return ctx.db.search(args.pattern).map((result) => {
           return {
             ...result,
             __typename: 'Photo', // <-- OPTIONAL b/c resolveType present (below)
@@ -524,7 +524,7 @@ queryType({
         pattern: stringArg(),
       },
       resolve(_, args, ctx) {
-        return ctx.db.search(args.pattern).map(result => {
+        return ctx.db.search(args.pattern).map((result) => {
           return {
             ...result,
             __typename: 'Photo', // <-- REQUIRED b/c resolveType not present

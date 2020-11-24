@@ -194,9 +194,9 @@ export type NexusFeaturesInput = {
    * @default
    *
    * {
-   *    isTypeOf: true,
-   *    resolveType: false,
+   *    resolveType: true,
    *    __typename: false
+   *    isTypeOf: false,
    * }
    */
   abstractTypeStrategies?: {
