@@ -4,7 +4,7 @@ export const messages = {
 The .resolveType used in the ${location} has been moved to a property on the type definition object, 
 as part of of a more robust approach to handling abstract types.
 
-Visit https://nexusjs.org/docs/guides/abstract-types for an explanation and upgrade info.
+Visit https://nxs.li/guides/abstract-types for an explanation and upgrade info.
 
 Visit https://github.com/graphql-nexus/schema/issues/188 for the original motivation for the change.
 `,
