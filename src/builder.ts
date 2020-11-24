@@ -809,7 +809,7 @@ export class SchemaBuilder {
           }),
         addModification: () => {},
         addField: () => {},
-        addDynamicOutputMembers: () => {},
+        addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'walk', wrapping),
         warn: () => {},
       })
       obj.definition(definitionBlock)
