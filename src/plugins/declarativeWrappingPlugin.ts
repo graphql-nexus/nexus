@@ -132,9 +132,9 @@ export const declarativeWrappingPlugin = (config: DeclarativeWrappingPluginConfi
         throw new Error(messages.removedDeclarativeWrapping(location, used))
       } else {
         if (hasWarned) {
-          console.error(new Error(messages.removedDeclarativeWrappingShort(location, used)))
+          console.warn(new Error(messages.removedDeclarativeWrappingShort(location, used)))
         } else {
-          console.error(new Error(messages.removedDeclarativeWrapping(location, used)))
+          console.warn(new Error(messages.removedDeclarativeWrapping(location, used)))
         }
       }
     }
