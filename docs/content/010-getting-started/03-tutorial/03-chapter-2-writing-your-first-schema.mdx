@@ -149,15 +149,15 @@ We'll start by letting API clients read the drafts of your blog.
 <block>
 
 ```ts
-// api/graphql/Post.ts      // 1
+// api/graphql/Post.ts                   // 1
 
 import { objectType, extendType } from '@nexus/schema'
 
 export const PostQuery = extendType({
-  type: 'Query',            // 2
+  type: 'Query',                         // 2
   definition(t) {
     t.nonNull.list.field('drafts', {     // 3, 4, 5
-      type: 'Post',         // 6, 7
+      type: 'Post',                      // 6, 7
     })
   },
 })
