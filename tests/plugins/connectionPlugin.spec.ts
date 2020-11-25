@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { generateSchema, SchemaConfig } from '../../src/core'
+import { generateSchema, SchemaConfig, scalarType } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -900,5 +900,54 @@ describe('field level configuration', () => {
     })
 
     expect(result.data?.users.edges.map((e) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  })
+
+  it('#515 - custom non-string cursor type', async () => {
+    const { schema } = await generateSchema.withArtifacts({
+      outputs: false,
+      types: [
+        scalarType({
+          name: 'UUID',
+        }),
+        scalarType({
+          name: 'UUID4',
+        }),
+        objectType({
+          name: 'Query',
+          definition(t) {
+            // @ts-ignore
+            t.connectionField('pluginLevel', {
+              type: User,
+            })
+            // @ts-ignore
+            t.connectionField('fieldLevel', {
+              type: User,
+              cursorType: nonNull('UUID'),
+            })
+            // @ts-ignore
+            t.connectionField('fieldLevel2', {
+              type: User,
+              cursorType: 'UUID4',
+            })
+          },
+        }),
+      ],
+      plugins: [
+        connectionPlugin({
+          extendEdge: {
+            delta: {
+              type: 'Int',
+            },
+          },
+          cursorType: 'UUID',
+        }),
+      ],
+      nonNullDefaults: {
+        input: true,
+        output: true,
+      },
+    })
+
+    expect(printSchema(schema)).toMatchSnapshot()
   })
 })

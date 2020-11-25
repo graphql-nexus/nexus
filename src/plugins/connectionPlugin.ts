@@ -1,7 +1,7 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo, defaultFieldResolver } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
-import { nonNull } from '../definitions/nonNull'
+import { nonNull, NexusNonNullDef } from '../definitions/nonNull'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import {
   AllNexusNamedOutputTypeDefs,
@@ -141,7 +141,10 @@ export interface ConnectionPluginConfig {
   /**
    * Allows specifying a custom cursor type, as the name of a scalar
    */
-  cursorType?: GetGen<'scalarNames'> | NexusNullDef<GetGen<'scalarNames'>>
+  cursorType?:
+    | GetGen<'scalarNames'>
+    | NexusNullDef<GetGen<'scalarNames'>>
+    | NexusNonNullDef<GetGen<'scalarNames'>>
 }
 
 // Extract the node value from the connection for a given field.
@@ -369,7 +372,6 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
         extendEdge: pluginExtendEdge,
         includeNodesField = false,
         nexusFieldName = 'connectionField',
-        cursorType,
       } = pluginConfig
 
       // If to add fields to every connection, we require the resolver be defined on the
@@ -449,7 +451,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
                         t2.field(extensionFieldName, {
                           ...extensionFieldConfig,
-                          resolve: (fieldConfig as any)[extensionFieldName],
+                          resolve: (fieldConfig as any)[extensionFieldName] ?? defaultFieldResolver,
                         })
                       })
                     }
@@ -481,7 +483,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       eachObj(pluginExtendEdge, (val, key) => {
                         t2.field(key, {
                           ...val,
-                          resolve: (fieldConfig.edgeFields as any)[key] ?? defaultFieldResolver,
+                          resolve: (fieldConfig as any).edgeFields?.[key] ?? defaultFieldResolver,
                         })
                       })
                     }
@@ -932,7 +934,7 @@ const isConnectionFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
 }
 
 const isEdgeFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
-  if (fieldConfig.extendEdge) {
+  if (fieldConfig.extendEdge || fieldConfig.cursorType) {
     return true
   }
   return false
