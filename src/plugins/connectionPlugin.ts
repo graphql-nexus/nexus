@@ -1,4 +1,4 @@
-import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
+import { GraphQLFieldResolver, GraphQLResolveInfo, defaultFieldResolver } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { nonNull } from '../definitions/nonNull'
@@ -29,7 +29,7 @@ import {
   pathToArray,
   printedGenTypingImport,
 } from '../utils'
-import { nullable } from '../definitions/nullable'
+import { nullable, NexusNullDef } from '../definitions/nullable'
 
 export interface ConnectionPluginConfig {
   /**
@@ -138,6 +138,10 @@ export interface ConnectionPluginConfig {
    * created globally by this config / connection field.
    */
   nonNullDefaults?: NonNullConfig
+  /**
+   * Allows specifying a custom cursor type, as the name of a scalar
+   */
+  cursorType?: GetGen<'scalarNames'> | NexusNullDef<GetGen<'scalarNames'>>
 }
 
 // Extract the node value from the connection for a given field.
@@ -223,6 +227,14 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * for this connection
    */
   nonNullDefaults?: NonNullConfig
+  /**
+   * Allows specifying a custom cursor type, as the name of a scalar
+   */
+  cursorType?: GetGen<'scalarNames'> | NexusNullDef<GetGen<'scalarNames'>>
+  /**
+   * Defined if you have extended the connectionPlugin globally
+   */
+  edgeFields?: unknown
 } & (
   | {
       /**
@@ -357,6 +369,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
         extendEdge: pluginExtendEdge,
         includeNodesField = false,
         nexusFieldName = 'connectionField',
+        cursorType,
       } = pluginConfig
 
       // If to add fields to every connection, we require the resolver be defined on the
@@ -455,8 +468,8 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: edgeName,
                   definition(t2) {
-                    t2.nonNull.field('cursor', {
-                      type: 'String',
+                    t2.field('cursor', {
+                      type: cursorType ?? nonNull('String'),
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
                     })
                     t2.field('node', {
@@ -466,7 +479,10 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
 
                     if (pluginExtendEdge) {
                       eachObj(pluginExtendEdge, (val, key) => {
-                        t2.field(key, val)
+                        t2.field(key, {
+                          ...val,
+                          resolve: (fieldConfig.edgeFields as any)[key] ?? defaultFieldResolver,
+                        })
                       })
                     }
 
@@ -512,6 +528,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               disableForwardPagination,
               validateArgs = defaultValidateArgs,
               strictArgs = true,
+              cursorType,
             } = {
               ...pluginConfig,
               ...fieldConfig,

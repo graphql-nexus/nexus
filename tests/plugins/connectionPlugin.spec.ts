@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { SchemaConfig, generateSchema } from '../../src/core'
+import { generateSchema, SchemaConfig } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -855,5 +855,50 @@ describe('field level configuration', () => {
     })
 
     expect(printSchema(schema)).toMatchSnapshot()
+  })
+
+  it('#450 can extend connection edge with custom field', async () => {
+    const schema = makeSchema({
+      outputs: false,
+      types: [
+        objectType({
+          name: 'Query',
+          definition(t) {
+            // @ts-ignore
+            t.connectionField('users', {
+              type: User,
+              nodes(root: any, args: any, ctx: any, info: any) {
+                return userNodes
+              },
+              edgeFields: {
+                delta: (root) => {
+                  return root.node.id.split(':')[1]
+                },
+              },
+            })
+          },
+        }),
+      ],
+      plugins: [
+        connectionPlugin({
+          extendEdge: {
+            delta: {
+              type: 'Int',
+            },
+          },
+        }),
+      ],
+      nonNullDefaults: {
+        input: true,
+        output: true,
+      },
+    })
+
+    const result = await execute({
+      schema,
+      document: parse(`{ users(first: 10) { edges { delta } } }`),
+    })
+
+    expect(result.data?.users.edges.map((e) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 })
