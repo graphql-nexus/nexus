@@ -1,5 +1,5 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
-import { arg, ArgsRecord, intArg } from '../definitions/args'
+import { ArgsRecord, intArg, stringArg } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { nonNull } from '../definitions/nonNull'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
@@ -272,14 +272,10 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
 const ForwardPaginateArgs = {
-  first: arg({
-    type: 'Int',
-    description: 'Returns the first n elements from the list.',
-  }),
-  after: arg({
-    type: 'String',
-    description: 'Returns the elements in the list that come after the specified cursor',
-  }),
+  first: nullable(intArg({ description: 'Returns the first n elements from the list.' })),
+  after: nullable(
+    stringArg({ description: 'Returns the elements in the list that come after the specified cursor' })
+  ),
 }
 
 const ForwardOnlyStrictArgs = {
@@ -288,14 +284,10 @@ const ForwardOnlyStrictArgs = {
 }
 
 const BackwardPaginateArgs = {
-  last: arg({
-    type: 'Int',
-    description: 'Returns the last n elements from the list.',
-  }),
-  before: arg({
-    type: 'String',
-    description: 'Returns the elements in the list that come before the specified cursor',
-  }),
+  last: nullable(intArg({ description: 'Returns the last n elements from the list.' })),
+  before: nullable(
+    stringArg({ description: 'Returns the elements in the list that come before the specified cursor' })
+  ),
 }
 
 const BackwardOnlyStrictArgs = {
@@ -503,11 +495,11 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       type: 'Boolean',
                       description: `Used to indicate whether more edges exist prior to the set defined by the clients arguments.`,
                     })
-                    t2.field('startCursor', {
+                    t2.nullable.field('startCursor', {
                       type: 'String',
                       description: `The cursor corresponding to the first nodes in edges. Null if the connection is empty.`,
                     })
-                    t2.field('endCursor', {
+                    t2.nullable.field('endCursor', {
                       type: 'String',
                       description: `The cursor corresponding to the last nodes in edges. Null if the connection is empty.`,
                     })

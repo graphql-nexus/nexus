@@ -829,4 +829,31 @@ describe('field level configuration', () => {
     const regExp = /interface NexusGenCustomOutputMethods(?:.*) {((.|\n)*?)}/
     expect(regExp.exec(tsTypes)?.[1]).toMatchSnapshot()
   })
+
+  it('#670 should explicitly state nullability for connectionPlugin args & fields', async () => {
+    const { schema } = await generateSchema.withArtifacts({
+      outputs: false,
+      types: [
+        objectType({
+          name: 'Query',
+          definition(t) {
+            // @ts-ignore
+            t.connectionField('users', {
+              type: User,
+              nodes(root: any, args: any, ctx: any, info: any) {
+                return userNodes
+              },
+            })
+          },
+        }),
+      ],
+      plugins: [connectionPlugin()],
+      nonNullDefaults: {
+        input: true,
+        output: true,
+      },
+    })
+
+    expect(printSchema(schema)).toMatchSnapshot()
+  })
 })
