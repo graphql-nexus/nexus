@@ -963,4 +963,25 @@ describe('field level configuration', () => {
 
     expect(printSchema(schema)).toMatchSnapshot()
   })
+
+  it('#479 allows a promise to be returned from pageInfoFromNodes', async () => {
+    const schema = makeTestSchema({
+      async pageInfoFromNodes() {
+        return {
+          hasNextPage: true,
+          hasPreviousPage: false,
+        }
+      },
+    })
+
+    const result = await executeOk({
+      schema,
+      document: UsersFirst,
+      variableValues: {
+        first: 1,
+      },
+    })
+    expect(result.data?.users.pageInfo.hasNextPage).toEqual(true)
+    expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(false)
+  })
 })

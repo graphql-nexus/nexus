@@ -91,7 +91,7 @@ export interface ConnectionPluginConfig {
     args: PaginationArgs,
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
-  ) => { hasNextPage: boolean; hasPreviousPage: boolean }
+  ) => MaybePromise<{ hasNextPage: boolean; hasPreviousPage: boolean }>
   /**
    * Conversion from a cursor string into an opaque token. Defaults to base64Encode(string)
    */
@@ -203,7 +203,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     args: ArgsValue<TypeName, FieldName>,
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
-  ) => { hasNextPage: boolean; hasPreviousPage: boolean }
+  ) => MaybePromise<{ hasNextPage: boolean; hasPreviousPage: boolean }>
   /**
    * Whether the field allows for backward pagination
    */
@@ -786,6 +786,11 @@ export function makeResolveFn(
             hasNextPage: false,
             hasPreviousPage: false,
           }
+
+      if (isPromiseLike(basePageInfo)) {
+        basePageInfo = await basePageInfo
+      }
+
       return {
         ...basePageInfo,
         startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
