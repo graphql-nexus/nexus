@@ -744,12 +744,12 @@ exports[`global plugin configuration can include a "nodes" field, with an array 
 
 exports[`global plugin configuration logs error if the extendConnection resolver is not specified 1`] = `
 Array [
-  [Error: Nexus Connection Plugin: Missing totalCount resolver property for Query.users],
+  [Error: Nexus Connection Plugin: Missing totalCount resolver property for Query.users. Set requireResolver to "false" on the field config if you do not need a resolver.],
 ]
 `;
 
 exports[`global plugin configuration logs error if the extendEdge resolver is not specified 1`] = `
 Array [
-  [Error: Nexus Connection Plugin: Missing edgeFields.totalCount resolver property for Query.users],
+  [Error: Nexus Connection Plugin: Missing edgeFields.totalCount resolver property for Query.users. Set requireResolver to "false" on the edge field config if you do not need a resolver.],
 ]
 `;

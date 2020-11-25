@@ -647,6 +647,19 @@ describe('global plugin configuration', () => {
     expect(spy).toBeCalledTimes(1)
   })
 
+  it('skips error if the extendEdge resolver is not specified and requireResolver is set to false', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation()
+    makeTestSchema({
+      extendEdge: {
+        totalCount: {
+          type: 'Int',
+          requireResolver: false,
+        },
+      },
+    })
+    expect(spy).toBeCalledTimes(0)
+  })
+
   it('can configure additional fields for the edge globally', () => {
     const schema = makeTestSchema(
       {

@@ -20,15 +20,7 @@ import {
   ResultValue,
   RootValue,
 } from '../typegenTypeHelpers'
-import {
-  eachObj,
-  getOwnPackage,
-  isObject,
-  isPromiseLike,
-  mapObj,
-  pathToArray,
-  printedGenTypingImport,
-} from '../utils'
+import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
 import { nullable, NexusNullDef } from '../definitions/nullable'
 
 export interface ConnectionPluginConfig {
@@ -111,12 +103,32 @@ export interface ConnectionPluginConfig {
   /**
    * Extend *all* edges to include additional fields, beyond cursor and node
    */
-  extendEdge?: Record<string, Omit<FieldOutConfig<any, any>, 'resolve'>>
+  extendEdge?: Record<
+    string,
+    Omit<FieldOutConfig<any, any>, 'resolve'> & {
+      /**
+       * Set requireResolver to false if you have already resolved this information during the resolve
+       * of the edges in the parent resolve method
+       * @default true
+       */
+      requireResolver?: boolean
+    }
+  >
   /**
    * Any additional fields to make available to the connection type,
    * beyond edges, pageInfo
    */
-  extendConnection?: Record<string, Omit<FieldOutConfig<any, any>, 'resolve'>>
+  extendConnection?: Record<
+    string,
+    Omit<FieldOutConfig<any, any>, 'resolve'> & {
+      /**
+       * Set requireResolver to false if you have already resolved this information during the resolve
+       * of the edges in the parent resolve method
+       * @default true
+       */
+      requireResolver?: boolean
+    }
+  >
   /**
    * Prefix for the Connection / Edge type
    */
@@ -375,17 +387,24 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       } = pluginConfig
 
       // If to add fields to every connection, we require the resolver be defined on the
-      // field definition.
+      // field definition, unless fromResolve: true is passed in the config
       if (pluginExtendConnection) {
         eachObj(pluginExtendConnection, (val, key) => {
-          dynamicConfig.push(`${key}: core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`)
+          dynamicConfig.push(
+            `${key}${
+              val.requireResolver ? ':' : '?:'
+            } core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`
+          )
         })
       }
 
       if (pluginExtendEdge) {
         const edgeFields = mapObj(
           pluginExtendEdge,
-          (val, key) => `${key}: connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, "${key}">`
+          (val, key) =>
+            `${key}${
+              val.requireResolver ? ':' : '?:'
+            } connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, "${key}">`
         )
         dynamicConfig.push(`edgeFields: { ${edgeFields.join(', ')} }`)
       }
@@ -957,17 +976,19 @@ const assertCorrectConfig = (
     )
   }
   eachObj(pluginConfig.extendConnection || {}, (val, key) => {
-    if (typeof fieldConfig[key] !== 'function') {
+    if (typeof fieldConfig[key] !== 'function' && val.requireResolver !== false) {
       console.error(
-        new Error(`Nexus Connection Plugin: Missing ${key} resolver property for ${typeName}.${fieldName}`)
+        new Error(
+          `Nexus Connection Plugin: Missing ${key} resolver property for ${typeName}.${fieldName}. Set requireResolver to "false" on the field config if you do not need a resolver.`
+        )
       )
     }
   })
   eachObj(pluginConfig.extendEdge || {}, (val, key) => {
-    if (!isObject(fieldConfig.edgeFields) || typeof fieldConfig.edgeFields[key] !== 'function') {
+    if (typeof fieldConfig.edgeFields?.[key] !== 'function' && val.requireResolver !== false) {
       console.error(
         new Error(
-          `Nexus Connection Plugin: Missing edgeFields.${key} resolver property for ${typeName}.${fieldName}`
+          `Nexus Connection Plugin: Missing edgeFields.${key} resolver property for ${typeName}.${fieldName}. Set requireResolver to "false" on the edge field config if you do not need a resolver.`
         )
       )
     }
