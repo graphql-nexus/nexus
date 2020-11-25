@@ -884,7 +884,7 @@ describe('field level configuration', () => {
                 return userNodes
               },
               edgeFields: {
-                delta: (root) => {
+                delta: (root: any) => {
                   return root.node.id.split(':')[1]
                 },
               },
@@ -912,7 +912,7 @@ describe('field level configuration', () => {
       document: parse(`{ users(first: 10) { edges { delta } } }`),
     })
 
-    expect(result.data?.users.edges.map((e) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    expect(result.data?.users.edges.map((e: any) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 
   it('#515 - custom non-string cursor type', async () => {

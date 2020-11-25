@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import { core } from '../../../src'
+import { core, connectionPluginCore } from '../../../src'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     /**
@@ -29,6 +29,17 @@ declare global {
      * Title of the page, optionally escaped
      */
     title(options: { escape: boolean }): void
+    /**
+     * Adds a Relay-style connection to the type, with numerous options for configuration
+     *
+     * @see https://nexusjs.org/docs/plugins/connection
+     */
+    connectionField<FieldName extends string>(
+      fieldName: FieldName,
+      config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> & {
+        edgeFields: { delta: connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, 'delta'> }
+      }
+    ): void
   }
 }
 declare global {
@@ -73,10 +84,27 @@ export interface NexusGenObjects {
     // root type
     hello?: string | null // String
   }
+  PageInfo: {
+    // root type
+    endCursor?: string | null // String
+    hasNextPage: boolean // Boolean!
+    hasPreviousPage: boolean // Boolean!
+    startCursor?: string | null // String
+  }
   Post: {
     // root type
     body?: string | null // String
     title?: string | null // String
+  }
+  PostConnection: {
+    // root type
+    edges?: Array<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
+    pageInfo: NexusGenRootTypes['PageInfo'] // PageInfo!
+  }
+  PostEdge: {
+    // root type
+    cursor: string // String!
+    node?: NexusGenRootTypes['Post'] | null // Post
   }
   Query: {}
   Subscription: {}
@@ -106,10 +134,28 @@ export interface NexusGenFieldTypes {
     // field return type
     hello: string | null // String
   }
+  PageInfo: {
+    // field return type
+    endCursor: string | null // String
+    hasNextPage: boolean // Boolean!
+    hasPreviousPage: boolean // Boolean!
+    startCursor: string | null // String
+  }
   Post: {
     // field return type
     body: string | null // String
     title: string | null // String
+  }
+  PostConnection: {
+    // field return type
+    edges: Array<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
+    pageInfo: NexusGenRootTypes['PageInfo'] // PageInfo!
+  }
+  PostEdge: {
+    // field return type
+    cursor: string // String!
+    delta: number | null // Int
+    node: NexusGenRootTypes['Post'] | null // Post
   }
   Query: {
     // field return type
@@ -133,6 +179,7 @@ export interface NexusGenFieldTypes {
     // field return type
     firstName: string | null // String
     lastName: string | null // String
+    posts: NexusGenRootTypes['PostConnection'] | null // PostConnection
   }
   I: {
     // field return type
@@ -153,10 +200,28 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     hello: 'String'
   }
+  PageInfo: {
+    // field return type name
+    endCursor: 'String'
+    hasNextPage: 'Boolean'
+    hasPreviousPage: 'Boolean'
+    startCursor: 'String'
+  }
   Post: {
     // field return type name
     body: 'String'
     title: 'String'
+  }
+  PostConnection: {
+    // field return type name
+    edges: 'PostEdge'
+    pageInfo: 'PageInfo'
+  }
+  PostEdge: {
+    // field return type name
+    cursor: 'String'
+    delta: 'Int'
+    node: 'Post'
   }
   Query: {
     // field return type name
@@ -180,6 +245,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     firstName: 'String'
     lastName: 'String'
+    posts: 'PostConnection'
   }
   I: {
     // field return type name
@@ -203,6 +269,15 @@ export interface NexusGenArgTypes {
     user: {
       // args
       id?: string | null // ID
+    }
+  }
+  User: {
+    posts: {
+      // args
+      after?: string | null // String
+      before?: string | null // String
+      first?: number | null // Int
+      last?: number | null // Int
     }
   }
 }
