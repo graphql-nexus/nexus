@@ -298,26 +298,26 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   Pick<CommonFieldConfig, 'deprecation' | 'description'> &
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
-const ForwardPaginateArgs = {
+export const ForwardPaginateArgs = {
   first: nullable(intArg({ description: 'Returns the first n elements from the list.' })),
   after: nullable(
     stringArg({ description: 'Returns the elements in the list that come after the specified cursor' })
   ),
 }
 
-const ForwardOnlyStrictArgs = {
+export const ForwardOnlyStrictArgs = {
   ...ForwardPaginateArgs,
   first: nonNull(intArg({ description: 'Returns the first n elements from the list.' })),
 }
 
-const BackwardPaginateArgs = {
+export const BackwardPaginateArgs = {
   last: nullable(intArg({ description: 'Returns the last n elements from the list.' })),
   before: nullable(
     stringArg({ description: 'Returns the elements in the list that come before the specified cursor' })
   ),
 }
 
-const BackwardOnlyStrictArgs = {
+export const BackwardOnlyStrictArgs = {
   ...BackwardPaginateArgs,
   last: nonNull(intArg({ description: 'Returns the last n elements from the list.' })),
 }
@@ -356,7 +356,7 @@ export type PageInfoFieldResolver<
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<TypeName, FieldName>['pageInfo'][EdgeField]>
 
-type EdgeLike = { cursor: string | PromiseLike<string>; node: any }
+export type EdgeLike = { cursor: string | PromiseLike<string>; node: any }
 
 export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig) => {
   const pluginConfig: ConnectionPluginConfig = { ...connectionPluginConfig }
