@@ -58,3 +58,21 @@ jobs:
         run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
       - name: Example Typecheck
         run: yarn --cwd=examples/${{ matrix.example }} tsc
+
+  release-canary:
+    needs: [test, test-examples]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Release Canary
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          yarn -s dripip preview --json > result.json
+          jq '.' < result.json
