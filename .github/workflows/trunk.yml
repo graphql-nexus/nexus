@@ -15,7 +15,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Install GraphQL@14.x
-        run: yarn add graphql@14.2.0
+        run: yarn add graphql@^14.5.8
       - name: Test
         run: yarn -s test:ci
 
