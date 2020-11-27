@@ -15,7 +15,7 @@ jobs:
       - name: Install GraphQL@14.x
         run: yarn add graphql@^14.5.8
       - name: Test
-        run: yarn -s test:ci
+        run: yarn -s test:ci --testPathIgnorePatterns v15
 
   test:
     strategy:
