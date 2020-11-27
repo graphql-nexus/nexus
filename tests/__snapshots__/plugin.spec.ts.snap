@@ -25,38 +25,38 @@ Array [
 `;
 
 exports[`plugin has an onAddOutputField / onAddInputField / onAddArg option, which receives the field metadata, and can modify the field 1`] = `
-"input SomeType {
-  inputField: [Boolean]
+"type Query {
+  ok(filter: [Boolean], input: SomeType): [Boolean]
 }
 
-type Query {
-  ok(filter: [Boolean], input: SomeType): [Boolean]
+input SomeType {
+  inputField: [Boolean]
 }
 "
 `;
 
 exports[`plugin has an onMissingType, which will be called in order when we encounter a missing type 1`] = `
-"type User {
-  id: ID
+"type ConnectionInfo {
+  hasNextPage: Boolean
+  hasPrevPage: Boolean
 }
 
 type Query {
   users: UserConnection
 }
 
+type User {
+  id: ID
+}
+
 type UserConnection {
-  edges: [UserEdge]
   connectionInfo: ConnectionInfo
+  edges: [UserEdge]
 }
 
 type UserEdge {
   cursor: String
   node: User
-}
-
-type ConnectionInfo {
-  hasNextPage: Boolean
-  hasPrevPage: Boolean
 }
 "
 `;

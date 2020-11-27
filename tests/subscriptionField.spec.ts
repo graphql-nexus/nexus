@@ -1,4 +1,4 @@
-import * as GQL from 'graphql'
+import { lexicographicSortSchema, printSchema } from 'graphql'
 import { makeSchema, subscriptionField } from '../src/core'
 import { mockStream, subscribe, take } from './__helpers'
 
@@ -16,7 +16,7 @@ it('defines a field on the mutation type as shorthand', async () => {
     outputs: false,
   })
 
-  expect(GQL.printSchema(schema)).toMatchInlineSnapshot(`
+  expect(printSchema(lexicographicSortSchema(schema))).toMatchInlineSnapshot(`
     "type Query {
       ok: Boolean!
     }
@@ -71,7 +71,7 @@ it('can be defined as a thunk', async () => {
     outputs: false,
   })
 
-  expect(GQL.printSchema(schema)).toMatchInlineSnapshot(`
+  expect(printSchema(lexicographicSortSchema(schema))).toMatchInlineSnapshot(`
     "type Query {
       ok: Boolean!
     }

@@ -22,6 +22,7 @@ export const scalar = scalarType({
   name: 'MyCustomScalar',
   description: 'No-Op scalar for testing purposes only',
   asNexusMethod: 'myCustomScalar',
+  serialize() {},
 })
 
 export const query = queryType({

@@ -1,7 +1,7 @@
 import { graphql } from 'graphql'
-import path from 'path'
 import { DateTimeResolver } from 'graphql-scalars'
-import { generateSchema, interfaceType, makeSchema, objectType, queryField, asNexusMethod } from '../src/core'
+import path from 'path'
+import { asNexusMethod, interfaceType, makeSchema, objectType, queryField } from '../src/core'
 
 describe('interfaceType', () => {
   it('can be implemented by object types', async () => {
@@ -140,45 +140,7 @@ describe('interfaceType', () => {
       })
     ).toThrowErrorMatchingSnapshot()
   })
-  it('deduplicates interfaces implementing interfaces', async () => {
-    const { schemaTypes } = await generateSchema.withArtifacts(
-      {
-        types: [
-          interfaceType({
-            name: 'Node',
-            resolveType() {
-              return null
-            },
-            definition(t) {
-              t.id('id')
-            },
-          }),
-          interfaceType({
-            name: 'Node2',
-            resolveType() {
-              return null
-            },
-            definition(t) {
-              t.implements('Node')
-              t.id('id2')
-            },
-          }),
-          objectType({
-            name: 'Foo',
-            isTypeOf() {
-              return true
-            },
-            definition(t) {
-              t.implements('Node2', 'Node')
-            },
-          }),
-        ],
-        outputs: false,
-      },
-      null
-    )
-    expect(schemaTypes).toMatchSnapshot()
-  })
+
   it('detects circular dependencies', async () => {
     expect(() =>
       makeSchema({

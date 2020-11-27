@@ -3,6 +3,7 @@ import {
   GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
   GraphQLNamedType,
   GraphQLObjectType,
   GraphQLResolveInfo,
@@ -597,4 +598,22 @@ export class Unreachable extends Error {
   constructor(val: never) {
     super(`Unreachable case or branch, unexpected ${val}`)
   }
+}
+
+export function graphql15InterfaceConfig<T extends GraphQLInterfaceTypeConfig<any, any>>(
+  config: T
+): T & { interfaces: GraphQLInterfaceType[] } {
+  return {
+    ...config,
+    interfaces: [],
+  }
+}
+
+export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
+  type: T & { getInterfaces?: () => GraphQLInterfaceType[] }
+): T & { getInterfaces(): GraphQLInterfaceType[] } {
+  if (typeof type.getInterfaces !== 'function') {
+    type.getInterfaces = () => []
+  }
+  return type as T & { getInterfaces(): GraphQLInterfaceType[] }
 }
