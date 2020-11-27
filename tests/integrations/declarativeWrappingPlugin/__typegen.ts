@@ -151,6 +151,7 @@ declare global {
      */
     required?: boolean
   }
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {}
   interface NexusGenPluginSchemaConfig {}
   interface NexusGenPluginArgConfig {
     /**
