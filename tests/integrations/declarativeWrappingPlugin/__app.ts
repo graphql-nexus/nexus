@@ -1,4 +1,4 @@
-import { objectType, queryField, intArg } from '../../../src'
+import { objectType, queryField, intArg, inputObjectType } from '../../../src'
 import './__typegen'
 
 const DeclarativeWrappingOutput = objectType({
@@ -6,6 +6,14 @@ const DeclarativeWrappingOutput = objectType({
   definition(t) {
     t.string('someNullField', {
       nullable: true,
+      args: {
+        input: inputObjectType({
+          name: 'InlineInputType',
+          definition(t) {
+            t.int('abc', { required: true })
+          },
+        }).asArg(),
+      },
     })
     t.string('someRequiredField', {
       nullable: false,

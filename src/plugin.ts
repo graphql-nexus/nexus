@@ -62,9 +62,13 @@ export interface PluginConfig {
    */
   description?: string
   /**
-   * Any type definitions we want to add to the field definitions
+   * Any type definitions we want to add to output field definitions
    */
   fieldDefTypes?: StringLike | StringLike[]
+  /**
+   * Any type definitions we want to add to input field definitions
+   */
+  inputFieldDefTypes?: StringLike | StringLike[]
   /**
    * Any type definitions we want to add to the type definition option
    */
@@ -251,6 +255,7 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
   const validOptionalProps = [
     'description',
     'fieldDefTypes',
+    'inputFieldDefTypes',
     'objectTypeDefTypes',
     'argTypeDefTypes',
     ...optionalPropFns,

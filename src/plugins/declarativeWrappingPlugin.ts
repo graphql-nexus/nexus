@@ -71,6 +71,7 @@ export const declarativeWrappingPlugin = (config: DeclarativeWrappingPluginConfi
     name: 'declarativeWrapping',
     fieldDefTypes: config.disable ? undefined : DeclarativeWrapping,
     argTypeDefTypes: config.disable ? undefined : DeclarativeWrapping,
+    inputFieldDefTypes: config.disable ? undefined : DeclarativeWrapping,
     description: 'Provides a declarative nullable/list API, available by default pre-0.19',
     onAddOutputField(field) {
       return {

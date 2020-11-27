@@ -171,6 +171,8 @@ declare global {
      */
     authorize?: FieldAuthorizeResolver<TypeName, FieldName>
   }
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {
+  }
   interface NexusGenPluginSchemaConfig {
   }
   interface NexusGenPluginArgConfig {

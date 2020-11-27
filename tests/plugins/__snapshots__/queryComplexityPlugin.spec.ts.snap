@@ -126,6 +126,8 @@ declare global {
      */
     complexity?: QueryComplexity<TypeName, FieldName>
   }
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {
+  }
   interface NexusGenPluginSchemaConfig {
   }
   interface NexusGenPluginArgConfig {

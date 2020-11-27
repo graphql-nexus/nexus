@@ -11,7 +11,7 @@ declare global {
      */
     myCustomScalar<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.ScalarInputFieldConfig<core.GetGen3<'inputTypes', TypeName, FieldName>>
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void // "MyCustomScalar";
     title(...args: any): void
   }
@@ -273,6 +273,7 @@ export interface NexusGenTypes {
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {}
   interface NexusGenPluginSchemaConfig {}
   interface NexusGenPluginArgConfig {}
 }
