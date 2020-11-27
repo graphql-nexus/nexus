@@ -227,7 +227,7 @@ export class TypegenPrinter {
           if (typeof val === 'string') {
             const baseType = this.schema.getType(val)
             return this.prependDoc(
-              `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
+              `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // ${JSON.stringify(
                 val
               )};`,
               baseType?.description
@@ -832,6 +832,9 @@ export class TypegenPrinter {
     const pluginFieldExt: string[] = [
       `  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {`,
     ]
+    const pluginInputFieldExt: string[] = [
+      `  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {`,
+    ]
     const pluginArgExt: string[] = [`  interface NexusGenPluginArgConfig {`]
     const pluginSchemaExt: string[] = [`  interface NexusGenPluginSchemaConfig {`]
     const pluginTypeExt: string[] = [`  interface NexusGenPluginTypeConfig<TypeName extends string> {`]
@@ -840,6 +843,9 @@ export class TypegenPrinter {
     plugins.forEach((plugin) => {
       if (plugin.config.fieldDefTypes) {
         pluginFieldExt.push(padLeft(this.printType(plugin.config.fieldDefTypes), '    '))
+      }
+      if (plugin.config.inputFieldDefTypes) {
+        pluginInputFieldExt.push(padLeft(this.printType(plugin.config.inputFieldDefTypes), '    '))
       }
       if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(padLeft(this.printType(plugin.config.objectTypeDefTypes), '    '))
@@ -855,6 +861,7 @@ export class TypegenPrinter {
         [
           pluginTypeExt.concat('  }').join('\n'),
           pluginFieldExt.concat('  }').join('\n'),
+          pluginInputFieldExt.concat('  }').join('\n'),
           pluginSchemaExt.concat('  }').join('\n'),
           pluginArgExt.concat('  }').join('\n'),
         ].join('\n'),

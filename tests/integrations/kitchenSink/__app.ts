@@ -12,6 +12,8 @@ import {
   stringArg,
   subscriptionType,
   scalarType,
+  connectionPlugin,
+  declarativeWrappingPlugin,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
 import './__typegen'
@@ -105,6 +107,20 @@ export const User = objectType({
   definition(t) {
     t.string('firstName')
     t.string('lastName')
+    t.connectionField('posts', {
+      type: Post,
+      nodes() {
+        return mockData.posts
+      },
+      edgeFields: {
+        delta(root, args, ctx) {
+          if (root.cursor) {
+            // Cursor should be defined here
+          }
+          return Object.keys(root.node ?? {}).length
+        },
+      },
+    })
   },
   rootTyping: `{ firstName: string, lastName: string }`,
 })
@@ -207,3 +223,14 @@ export const Subscription = subscriptionType({
     })
   },
 })
+
+export const plugins = [
+  declarativeWrappingPlugin({ disable: true }),
+  connectionPlugin({
+    extendEdge: {
+      delta: {
+        type: 'Int',
+      },
+    },
+  }),
+]

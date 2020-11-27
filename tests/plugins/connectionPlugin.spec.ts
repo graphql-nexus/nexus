@@ -11,7 +11,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { SchemaConfig, generateSchema } from '../../src/core'
+import { generateSchema, SchemaConfig, scalarType } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -648,6 +648,19 @@ describe('global plugin configuration', () => {
     expect(spy).toBeCalledTimes(1)
   })
 
+  it('skips error if the extendEdge resolver is not specified and requireResolver is set to false', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation()
+    makeTestSchema({
+      extendEdge: {
+        totalCount: {
+          type: 'Int',
+          requireResolver: false,
+        },
+      },
+    })
+    expect(spy).toBeCalledTimes(0)
+  })
+
   it('can configure additional fields for the edge globally', () => {
     const schema = makeTestSchema(
       {
@@ -856,5 +869,120 @@ describe('field level configuration', () => {
     })
 
     expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+  })
+
+  it('#450 can extend connection edge with custom field', async () => {
+    const schema = makeSchema({
+      outputs: false,
+      types: [
+        objectType({
+          name: 'Query',
+          definition(t) {
+            // @ts-ignore
+            t.connectionField('users', {
+              type: User,
+              nodes(root: any, args: any, ctx: any, info: any) {
+                return userNodes
+              },
+              edgeFields: {
+                delta: (root: any) => {
+                  return root.node.id.split(':')[1]
+                },
+              },
+            })
+          },
+        }),
+      ],
+      plugins: [
+        connectionPlugin({
+          extendEdge: {
+            delta: {
+              type: 'Int',
+            },
+          },
+        }),
+      ],
+      nonNullDefaults: {
+        input: true,
+        output: true,
+      },
+    })
+
+    const result = await execute({
+      schema,
+      document: parse(`{ users(first: 10) { edges { delta } } }`),
+    })
+
+    expect(result.data?.users.edges.map((e: any) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  })
+
+  it('#515 - custom non-string cursor type', async () => {
+    const { schema } = await generateSchema.withArtifacts({
+      outputs: false,
+      types: [
+        scalarType({
+          name: 'UUID',
+        }),
+        scalarType({
+          name: 'UUID4',
+        }),
+        objectType({
+          name: 'Query',
+          definition(t) {
+            // @ts-ignore
+            t.connectionField('pluginLevel', {
+              type: User,
+            })
+            // @ts-ignore
+            t.connectionField('fieldLevel', {
+              type: User,
+              cursorType: nonNull('UUID'),
+            })
+            // @ts-ignore
+            t.connectionField('fieldLevel2', {
+              type: User,
+              cursorType: 'UUID4',
+            })
+          },
+        }),
+      ],
+      plugins: [
+        connectionPlugin({
+          extendEdge: {
+            delta: {
+              type: 'Int',
+            },
+          },
+          cursorType: 'UUID',
+        }),
+      ],
+      nonNullDefaults: {
+        input: true,
+        output: true,
+      },
+    })
+
+    expect(printSchema(schema)).toMatchSnapshot()
+  })
+
+  it('#479 allows a promise to be returned from pageInfoFromNodes', async () => {
+    const schema = makeTestSchema({
+      async pageInfoFromNodes() {
+        return {
+          hasNextPage: true,
+          hasPreviousPage: false,
+        }
+      },
+    })
+
+    const result = await executeOk({
+      schema,
+      document: UsersFirst,
+      variableValues: {
+        first: 1,
+      },
+    })
+    expect(result.data?.users.pageInfo.hasNextPage).toEqual(true)
+    expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(false)
   })
 })

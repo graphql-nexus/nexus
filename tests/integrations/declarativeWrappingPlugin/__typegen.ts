@@ -7,7 +7,12 @@ declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface NexusGenInputs {}
+export interface NexusGenInputs {
+  InlineInputType: {
+    // input type
+    abc: number // Int!
+  }
+}
 
 export interface NexusGenEnums {}
 
@@ -66,6 +71,10 @@ export interface NexusGenArgTypes {
       // args
       int: number // Int!
     }
+    someNullField: {
+      // args
+      input?: NexusGenInputs['InlineInputType'] | null // InlineInputType
+    }
   }
 }
 
@@ -75,7 +84,7 @@ export interface NexusGenTypeInterfaces {}
 
 export type NexusGenObjectNames = keyof NexusGenObjects
 
-export type NexusGenInputNames = never
+export type NexusGenInputNames = keyof NexusGenInputs
 
 export type NexusGenEnumNames = never
 
@@ -130,6 +139,28 @@ export interface NexusGenTypes {
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
+    /**
+     * Whether the type can be null
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    nullable?: boolean
+    /**
+     * Whether the type is list of values, or just a single value.
+     * If list is true, we assume the type is a list. If list is an array,
+     * we'll assume that it's a list with the depth. The boolean indicates whether
+     * the type is required (non-null), where true = nonNull, false = nullable.
+     * @see declarativeWrappingPlugin
+     */
+    list?: true | boolean[]
+    /**
+     * Whether the type should be non null, `required: true` = `nullable: false`
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    required?: boolean
+  }
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {
     /**
      * Whether the type can be null
      * @default (depends on whether nullability is configured in type or schema)

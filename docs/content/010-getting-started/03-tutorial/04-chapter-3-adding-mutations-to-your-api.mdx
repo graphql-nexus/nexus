@@ -343,7 +343,7 @@ export const PostMutation = extendType({
 ```ts
 Mutation {
 -  createDraft: Post
-+  createDraft(title: String!, body: String!): Post
++  createDraft(title: String!, body: String!): Post!
 }
 ```
 
@@ -429,7 +429,7 @@ export const PostMutation = extendType({
 
 ```ts
 type Mutation {
-  createDraft(body: String!, title: String!): Post
+  createDraft(body: String!, title: String!): Post!
 +  publish(draftId: Int!): Post
 }
 ```
@@ -496,8 +496,8 @@ export const PostQuery = extendType({
 
 ```ts
 type Query {
-  drafts: [Post!]
-+  posts: [Post!]
+  drafts: [Post]!
++  posts: [Post]
 }
 ```
 
