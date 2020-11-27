@@ -1,6 +1,6 @@
 import { GraphQLNamedType } from 'graphql'
 import { DynamicFieldDefs, SchemaConfig } from './builder'
-import { RootTypings } from './definitions/_types'
+import { RootTypingDef, RootTypings } from './definitions/_types'
 import { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import { NexusInterfaceTypeConfig } from './definitions/interfaceType'
@@ -77,4 +77,11 @@ export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> 
  */
 export class NexusSchemaExtension {
   constructor(readonly config: NexusSchemaExtensionConfig) {}
+}
+
+export type NexusScalarExtensions = {
+  nexus: {
+    asNexusMethod?: string
+    rootTyping?: RootTypingDef
+  }
 }

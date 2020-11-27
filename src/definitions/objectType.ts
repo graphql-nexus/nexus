@@ -1,4 +1,4 @@
-import { assertValidName } from 'graphql'
+import { assertValidName, GraphQLObjectTypeExtensions } from 'graphql'
 import { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, NonNullConfig, Omit, RootTypingDef, withNexusSymbol } from './_types'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
@@ -48,6 +48,10 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    * Root type information for this type
    */
   rootTyping?: RootTypingDef
+  /**
+   * Custom extensions, as supported in graphql-js
+   */
+  extensions?: GraphQLObjectTypeExtensions
 } & AbstractTypes.MaybeTypeDefConfigFieldIsTypeOf<TypeName> &
   NexusGenPluginTypeConfig<TypeName>
 

@@ -1,4 +1,4 @@
-import { assertValidName } from 'graphql'
+import { assertValidName, GraphQLInputObjectTypeExtensions } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
@@ -23,6 +23,10 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
    * on nullability.
    */
   nonNullDefaults?: NonNullConfig
+  /**
+   * Custom extensions, as supported in graphql-js
+   */
+  extensions?: GraphQLInputObjectTypeExtensions
 }
 
 export class NexusInputObjectTypeDef<TypeName extends string> {
