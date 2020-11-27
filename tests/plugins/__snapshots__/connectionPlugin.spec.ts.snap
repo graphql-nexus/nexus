@@ -232,77 +232,15 @@ type PageInfo {
 `;
 
 exports[`field level configuration #515 - custom non-string cursor type 1`] = `
-"scalar UUID
-
-scalar UUID4
-
-type Query {
-  pluginLevel(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
-    after: String
-
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
-    before: String
-  ): UserConnection!
-  fieldLevel(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
-    after: String
-
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
-    before: String
-  ): QueryFieldLevel_Connection!
-  fieldLevel2(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
-    after: String
-
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
-    before: String
-  ): QueryFieldLevel2_Connection!
-}
-
-type UserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
-  edges: [UserEdge!]!
-
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
-  pageInfo: PageInfo!
-}
-
-type UserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
-  cursor: UUID!
-
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User!
-  delta: Int!
-}
-
-\\"\\"\\"
+"\\"\\"\\"
 PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
 \\"\\"\\"
 type PageInfo {
+  \\"\\"\\"
+  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
+  \\"\\"\\"
+  endCursor: String
+
   \\"\\"\\"
   Used to indicate whether more edges exist following the set defined by the clients arguments.
   \\"\\"\\"
@@ -317,11 +255,48 @@ type PageInfo {
   The cursor corresponding to the first nodes in edges. Null if the connection is empty.
   \\"\\"\\"
   startCursor: String
+}
 
-  \\"\\"\\"
-  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
-  \\"\\"\\"
-  endCursor: String
+type Query {
+  fieldLevel(
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
+  ): QueryFieldLevel_Connection!
+  fieldLevel2(
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
+  ): QueryFieldLevel2_Connection!
+  pluginLevel(
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
+  ): UserConnection!
 }
 
 type QueryFieldLevel_Connection {
@@ -339,10 +314,10 @@ type QueryFieldLevel_Connection {
 type QueryFieldLevel_Edge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: UUID!
+  delta: Int!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User!
-  delta: Int!
 }
 
 type QueryFieldLevel2_Connection {
@@ -360,16 +335,41 @@ type QueryFieldLevel2_Connection {
 type QueryFieldLevel2_Edge {
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: UUID4!
+  delta: Int!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User!
-  delta: Int!
 }
 
 type User {
   id: ID!
   name: String!
 }
+
+type UserConnection {
+  \\"\\"\\"
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  \\"\\"\\"
+  edges: [UserEdge!]!
+
+  \\"\\"\\"
+  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  \\"\\"\\"
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  cursor: UUID!
+  delta: Int!
+
+  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  node: User!
+}
+
+scalar UUID
+
+scalar UUID4
 "
 `;
 

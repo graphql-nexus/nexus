@@ -922,9 +922,11 @@ describe('field level configuration', () => {
       types: [
         scalarType({
           name: 'UUID',
+          serialize() {},
         }),
         scalarType({
           name: 'UUID4',
+          serialize() {},
         }),
         objectType({
           name: 'Query',
@@ -962,7 +964,7 @@ describe('field level configuration', () => {
       },
     })
 
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('#479 allows a promise to be returned from pageInfoFromNodes', async () => {
