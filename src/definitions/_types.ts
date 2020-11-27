@@ -165,7 +165,7 @@ export type NexusGraphQLInputObjectTypeConfig = WithExt<
 export type NexusGraphQLInterfaceTypeConfig = WithExt<
   GraphQLInterfaceTypeConfig<any, any>,
   NexusInterfaceTypeExtension
->
+> & { interfaces: () => GraphQLInterfaceType[] }
 
 export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
   extensions: { nexus: NexusSchemaExtension }

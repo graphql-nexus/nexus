@@ -141,6 +141,10 @@ describe('interfaceType', () => {
     ).toThrowErrorMatchingSnapshot()
   })
   it('deduplicates interfaces implementing interfaces', async () => {
+    if (require('graphql/package.json').version.startsWith('14')) {
+      return
+    }
+
     const { schemaTypes } = await generateSchema.withArtifacts(
       {
         types: [

@@ -232,6 +232,10 @@ describe('modify', () => {
   })
 
   describe('interfaces implementing interfaces', () => {
+    if (require('graphql/package.json').version.startsWith('14')) {
+      return
+    }
+
     let schemaTypes: string
     beforeAll(async () => {
       // Example schema courtesy of ivan explaining interfaces implementing interfaces to me
