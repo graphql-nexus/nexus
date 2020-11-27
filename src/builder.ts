@@ -687,7 +687,7 @@ export class SchemaBuilder {
               name: key,
             },
             schemaConfig: this.config,
-            parentTypeConfig: rest as any,
+            parentTypeConfig: rest as any, // TODO(tim): remove as any when we drop support for 14.x
             schemaExtension: this.schemaExtension,
           },
           resolve
@@ -1283,7 +1283,7 @@ export class SchemaBuilder {
         {
           builder: this.builderLens,
           fieldConfig: builderFieldConfig,
-          parentTypeConfig: typeConfig as any,
+          parentTypeConfig: typeConfig as any, // TODO(tim): remove as any when we drop support for 14.x
           schemaConfig: this.config,
           schemaExtension: this.schemaExtension,
         },
