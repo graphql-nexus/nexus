@@ -232,20 +232,50 @@ type PageInfo {
 `;
 
 exports[`field level configuration #670 should explicitly state nullability for connectionPlugin args & fields 1`] = `
-"type Query {
-  users(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
+"\\"\\"\\"
+PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"
+  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
+  \\"\\"\\"
+  endCursor: String
 
+  \\"\\"\\"
+  Used to indicate whether more edges exist following the set defined by the clients arguments.
+  \\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"
+  Used to indicate whether more edges exist prior to the set defined by the clients arguments.
+  \\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"
+  The cursor corresponding to the first nodes in edges. Null if the connection is empty.
+  \\"\\"\\"
+  startCursor: String
+}
+
+type Query {
+  users(
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
 
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
   ): UserConnection!
+}
+
+type User {
+  id: ID!
+  name: String!
 }
 
 type UserConnection {
@@ -266,36 +296,6 @@ type UserEdge {
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User!
-}
-
-\\"\\"\\"
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-\\"\\"\\"
-type PageInfo {
-  \\"\\"\\"
-  Used to indicate whether more edges exist following the set defined by the clients arguments.
-  \\"\\"\\"
-  hasNextPage: Boolean!
-
-  \\"\\"\\"
-  Used to indicate whether more edges exist prior to the set defined by the clients arguments.
-  \\"\\"\\"
-  hasPreviousPage: Boolean!
-
-  \\"\\"\\"
-  The cursor corresponding to the first nodes in edges. Null if the connection is empty.
-  \\"\\"\\"
-  startCursor: String
-
-  \\"\\"\\"
-  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
-  \\"\\"\\"
-  endCursor: String
-}
-
-type User {
-  id: ID!
-  name: String!
 }
 "
 `;
@@ -341,33 +341,86 @@ exports[`field level configuration can configure the edge per-instance 2`] = `
 `;
 
 exports[`field level configuration can define a schema with multiple plugins, and separate them by typePrefix 1`] = `
-"type Query {
-  users(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
+"type AnalyticsUserConnection {
+  averageCount: Int
 
+  \\"\\"\\"
+  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  \\"\\"\\"
+  edges: [AnalyticsUserEdge]
+
+  \\"\\"\\"
+  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  \\"\\"\\"
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+type AnalyticsUserEdge {
+  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  cursor: String!
+
+  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  node: User
+}
+
+\\"\\"\\"
+PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"
+  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
+  \\"\\"\\"
+  endCursor: String
+
+  \\"\\"\\"
+  Used to indicate whether more edges exist following the set defined by the clients arguments.
+  \\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"
+  Used to indicate whether more edges exist prior to the set defined by the clients arguments.
+  \\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"
+  The cursor corresponding to the first nodes in edges. Null if the connection is empty.
+  \\"\\"\\"
+  startCursor: String
+}
+
+type Query {
+  users(
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
 
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
   ): UserConnection
   userStats(
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
 
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
   ): AnalyticsUserConnection
+}
+
+type User {
+  id: ID
+  name: String
 }
 
 type UserConnection {
@@ -388,58 +441,6 @@ type UserEdge {
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
-}
-
-\\"\\"\\"
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-\\"\\"\\"
-type PageInfo {
-  \\"\\"\\"
-  Used to indicate whether more edges exist following the set defined by the clients arguments.
-  \\"\\"\\"
-  hasNextPage: Boolean!
-
-  \\"\\"\\"
-  Used to indicate whether more edges exist prior to the set defined by the clients arguments.
-  \\"\\"\\"
-  hasPreviousPage: Boolean!
-
-  \\"\\"\\"
-  The cursor corresponding to the first nodes in edges. Null if the connection is empty.
-  \\"\\"\\"
-  startCursor: String
-
-  \\"\\"\\"
-  The cursor corresponding to the last nodes in edges. Null if the connection is empty.
-  \\"\\"\\"
-  endCursor: String
-}
-
-type AnalyticsUserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
-  edges: [AnalyticsUserEdge]
-
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
-  pageInfo: PageInfo!
-  totalCount: Int
-  averageCount: Int
-}
-
-type AnalyticsUserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
-  cursor: String!
-
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User
-}
-
-type User {
-  id: ID
-  name: String
 }
 "
 `;

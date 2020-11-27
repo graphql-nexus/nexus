@@ -1,4 +1,4 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema } from 'graphql'
+import { buildSchema, graphql, GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
 import {
   interfaceType,
   list,
@@ -175,7 +175,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('composes the onCreateFieldResolve fns', async () => {
@@ -346,7 +346,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('has a plugin.completeValue fn which is used to efficiently complete a value which is possibly a promise', async () => {

@@ -2,16 +2,20 @@
 
 exports[`inputObject builds creates an inputObject type 1`] = `
 Object {
-  "errors": Array [
-    [GraphQLError: Unknown argument "input" on field "Query.user".],
-  ],
+  "data": Object {
+    "user": Object {
+      "id": "User:1",
+    },
+  },
 }
 `;
 
 exports[`inputObject has asArg for using one-off inputObjects inline 1`] = `
 Object {
-  "errors": Array [
-    [GraphQLError: Unknown argument "input" on field "Query.user".],
-  ],
+  "data": Object {
+    "user": Object {
+      "id": "User:1",
+    },
+  },
 }
 `;

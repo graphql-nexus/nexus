@@ -4,6 +4,7 @@ import {
   GraphQLError,
   GraphQLFieldResolver,
   GraphQLSchema,
+  lexicographicSortSchema,
   parse,
   printSchema,
   printType,
@@ -800,7 +801,7 @@ describe('field level configuration', () => {
         output: false,
       },
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('prints the types associated with the connection plugin correctly', async () => {
@@ -854,6 +855,6 @@ describe('field level configuration', () => {
       },
     })
 
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 })

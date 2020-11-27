@@ -11,7 +11,6 @@ import {
   queryType,
   stringArg,
   subscriptionType,
-  asNexusMethod,
   scalarType,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
@@ -21,6 +20,7 @@ export const scalar = scalarType({
   name: 'MyCustomScalar',
   description: 'No-Op scalar for testing purposes only',
   asNexusMethod: 'myCustomScalar',
+  serialize() {},
 })
 
 export const query = queryType({
