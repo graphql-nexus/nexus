@@ -28,7 +28,7 @@ import { StringLike } from './plugin'
 import {
   eachObj,
   getOwnPackage,
-  graphql14InterfaceType,
+  graphql15InterfaceType,
   GroupedTypes,
   groupTypes,
   mapObj,
@@ -311,7 +311,7 @@ export class TypegenPrinter {
       | GraphQLObjectType
     )[] = []
     const withInterfaces = hasInterfaces
-      .concat(this.groupedTypes.object, this.groupedTypes.interface.map(graphql14InterfaceType))
+      .concat(this.groupedTypes.object, this.groupedTypes.interface.map(graphql15InterfaceType))
       .map((o) => {
         if (o.getInterfaces().length) {
           return [o.name, o.getInterfaces().map((i) => i.name)]

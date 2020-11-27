@@ -600,7 +600,7 @@ export class Unreachable extends Error {
   }
 }
 
-export function graphql14InterfaceConfig<T extends GraphQLInterfaceTypeConfig<any, any>>(
+export function graphql15InterfaceConfig<T extends GraphQLInterfaceTypeConfig<any, any>>(
   config: T
 ): T & { interfaces: GraphQLInterfaceType[] } {
   return {
@@ -609,7 +609,7 @@ export function graphql14InterfaceConfig<T extends GraphQLInterfaceTypeConfig<an
   }
 }
 
-export function graphql14InterfaceType<T extends GraphQLInterfaceType>(
+export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
   type: T & { getInterfaces?: () => GraphQLInterfaceType[] }
 ): T & { getInterfaces(): GraphQLInterfaceType[] } {
   if (typeof type.getInterfaces !== 'function') {

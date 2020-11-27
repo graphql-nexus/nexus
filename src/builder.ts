@@ -138,8 +138,8 @@ import {
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   getArgNamedType,
-  graphql14InterfaceType,
-  graphql14InterfaceConfig,
+  graphql15InterfaceType,
+  graphql15InterfaceConfig,
 } from './utils'
 import { declarativeWrappingPlugin } from './plugins'
 
@@ -605,7 +605,7 @@ export class SchemaBuilder {
           interfaces: () => config.interfaces.map((t) => this.getInterface(t.name)),
         })
       } else if (isInterfaceType(typeDef)) {
-        const config = graphql14InterfaceConfig(typeDef.toConfig())
+        const config = graphql15InterfaceConfig(typeDef.toConfig())
         finalTypeDef = new GraphQLInterfaceType({
           ...config,
           fields: () => this.rebuildNamedOutputFields(config),
@@ -1172,7 +1172,7 @@ export class SchemaBuilder {
     const list: GraphQLInterfaceType[] = []
     interfaces.forEach((i) => {
       const type = this.getInterface(i)
-      list.push(type, ...graphql14InterfaceType(type).getInterfaces())
+      list.push(type, ...graphql15InterfaceType(type).getInterfaces())
     })
     return Array.from(new Set(list))
   }
