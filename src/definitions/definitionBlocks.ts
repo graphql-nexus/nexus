@@ -24,6 +24,13 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
   args?: ArgsRecord
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
+export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
+  /**
+   * The default value for the field, if any
+   */
+  default?: GetGen3<'inputTypes', TypeName, FieldName>
+} & NexusGenPluginFieldConfig<TypeName, FieldName>
+
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
   /**
@@ -182,15 +189,8 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 }
 
-export interface ScalarInputFieldConfig<T> extends CommonFieldConfig {
-  /**
-   * The default value for the field, if any
-   */
-  default?: T
-}
-
 export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string>
-  extends ScalarInputFieldConfig<GetGen3<'inputTypes', TypeName, FieldName>> {
+  extends CommonInputFieldConfig<TypeName, FieldName> {
   type: AllInputTypes | AllNexusInputTypeDefs<string>
 }
 
@@ -222,23 +222,26 @@ export class InputDefinitionBlock<TypeName extends string> {
     return this._wrapClass('Null')
   }
 
-  string(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
+  string<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
     this.addScalarField(fieldName, 'String', opts)
   }
 
-  int(fieldName: string, opts?: ScalarInputFieldConfig<number>) {
+  int<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
     this.addScalarField(fieldName, 'Int', opts)
   }
 
-  boolean(fieldName: string, opts?: ScalarInputFieldConfig<boolean>) {
+  boolean<FieldName extends string>(
+    fieldName: FieldName,
+    opts?: CommonInputFieldConfig<TypeName, FieldName>
+  ) {
     this.addScalarField(fieldName, 'Boolean', opts)
   }
 
-  id(fieldName: string, opts?: ScalarInputFieldConfig<string>) {
+  id<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
     this.addScalarField(fieldName, 'ID', opts)
   }
 
-  float(fieldName: string, opts?: ScalarInputFieldConfig<number>) {
+  float<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
     this.addScalarField(fieldName, 'Float', opts)
   }
 
@@ -266,7 +269,11 @@ export class InputDefinitionBlock<TypeName extends string> {
     return new InputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
-  protected addScalarField(fieldName: string, typeName: BaseScalars, opts: ScalarInputFieldConfig<any> = {}) {
+  protected addScalarField(
+    fieldName: string,
+    typeName: BaseScalars,
+    opts: CommonInputFieldConfig<any, any> = {}
+  ) {
     this.typeBuilder.addField({
       name: fieldName,
       type: typeName,
