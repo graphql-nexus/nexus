@@ -80,6 +80,7 @@ describe('scalarType', () => {
             path: 'graphql',
             name: 'GraphQLScalar',
           },
+          serialize() {},
         }),
       ],
       outputs: false,
