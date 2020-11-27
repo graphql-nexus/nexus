@@ -31,6 +31,15 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
   default?: GetGen3<'inputTypes', TypeName, FieldName>
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
+/**
+ * Deprecated, prefer core.CommonInputFieldConfig
+ *
+ * TODO(tim): Remove at 1.0
+ */
+export interface ScalarInputFieldConfig<T> extends CommonInputFieldConfig<any, any> {
+  default?: T
+}
+
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
   /**
