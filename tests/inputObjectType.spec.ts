@@ -34,6 +34,9 @@ describe('inputObject', () => {
         }),
         queryField('user', {
           type: 'User',
+          args: {
+            input: 'InputObj',
+          },
           resolve: () => ({
             id: `User:1`,
           }),
@@ -42,18 +45,17 @@ describe('inputObject', () => {
       outputs: false,
       shouldGenerateArtifacts: false,
     })
-    expect(
-      await graphql(
-        schema,
-        `
-          {
-            user(input: { boolInput: true, floatInput: 123.4, intInput: 1 }) {
-              id
-            }
+    const result = await graphql(
+      schema,
+      `
+        {
+          user(input: { boolInput: true, floatInput: 123.4, intInput: 1 }) {
+            id
           }
-        `
-      )
-    ).toMatchSnapshot()
+        }
+      `
+    )
+    expect(result).toMatchSnapshot()
   })
   it('has asArg for using one-off inputObjects inline', async () => {
     const schema = makeSchema({
@@ -61,23 +63,22 @@ describe('inputObject', () => {
         objectType({
           name: 'User',
           definition(t) {
-            t.id('id', {
-              args: {
-                input: inputObjectType({
-                  name: 'InputObj',
-                  definition(t) {
-                    t.id('idInput')
-                    t.boolean('boolInput')
-                    t.float('floatInput')
-                    t.int('intInput')
-                  },
-                }).asArg({ default: { idInput: 1 } }),
-              },
-            })
+            t.id('id')
           },
         }),
         queryField('user', {
           type: 'User',
+          args: {
+            input: inputObjectType({
+              name: 'InputObj',
+              definition(t) {
+                t.id('idInput')
+                t.boolean('boolInput')
+                t.float('floatInput')
+                t.int('intInput')
+              },
+            }).asArg({ default: { idInput: 1 } }),
+          },
           resolve: () => ({
             id: `User:1`,
           }),
@@ -86,17 +87,16 @@ describe('inputObject', () => {
       outputs: false,
       shouldGenerateArtifacts: false,
     })
-    expect(
-      await graphql(
-        schema,
-        `
-          {
-            user(input: { boolInput: true, floatInput: 123.4, intInput: 1 }) {
-              id
-            }
+    const result = await graphql(
+      schema,
+      `
+        {
+          user(input: { boolInput: true, floatInput: 123.4, intInput: 1 }) {
+            id
           }
-        `
-      )
-    ).toMatchSnapshot()
+        }
+      `
+    )
+    expect(result).toMatchSnapshot()
   })
 })

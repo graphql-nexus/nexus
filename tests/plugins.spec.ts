@@ -1,4 +1,4 @@
-import { printSchema } from 'graphql'
+import { lexicographicSortSchema, printSchema } from 'graphql'
 import { createPlugin, makeSchema, objectType, PluginConfig, queryType } from '../src'
 import { extendType, inputObjectType, NexusAcceptedTypeDef } from '../src/core'
 
@@ -72,11 +72,13 @@ describe('onInstall plugins', () => {
     const xPluginConfig = plugin || { onInstall }
 
     return printSchema(
-      makeSchema({
-        outputs: false,
-        types: appTypes || [],
-        plugins: [createPlugin({ name: 'x', ...xPluginConfig })],
-      })
+      lexicographicSortSchema(
+        makeSchema({
+          outputs: false,
+          types: appTypes || [],
+          plugins: [createPlugin({ name: 'x', ...xPluginConfig })],
+        })
+      )
     )
   }
 

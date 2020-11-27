@@ -4,6 +4,7 @@ import {
   GraphQLError,
   GraphQLFieldResolver,
   GraphQLSchema,
+  lexicographicSortSchema,
   parse,
   printSchema,
   printType,
@@ -813,7 +814,7 @@ describe('field level configuration', () => {
         output: false,
       },
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('prints the types associated with the connection plugin correctly', async () => {
@@ -867,7 +868,7 @@ describe('field level configuration', () => {
       },
     })
 
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('#450 can extend connection edge with custom field', async () => {
@@ -921,9 +922,11 @@ describe('field level configuration', () => {
       types: [
         scalarType({
           name: 'UUID',
+          serialize() {},
         }),
         scalarType({
           name: 'UUID4',
+          serialize() {},
         }),
         objectType({
           name: 'Query',
@@ -961,7 +964,7 @@ describe('field level configuration', () => {
       },
     })
 
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('#479 allows a promise to be returned from pageInfoFromNodes', async () => {

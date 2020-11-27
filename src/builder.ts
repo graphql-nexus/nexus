@@ -40,6 +40,7 @@ import {
   printSchema,
   GraphQLList,
   GraphQLSchemaExtensions,
+  GraphQLInterfaceTypeConfig,
 } from 'graphql'
 import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
@@ -139,6 +140,8 @@ import {
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
   getArgNamedType,
+  graphql15InterfaceType,
+  graphql15InterfaceConfig,
 } from './utils'
 import { declarativeWrappingPlugin } from './plugins'
 
@@ -608,12 +611,12 @@ export class SchemaBuilder {
           interfaces: () => config.interfaces.map((t) => this.getInterface(t.name)),
         })
       } else if (isInterfaceType(typeDef)) {
-        const config = typeDef.toConfig()
+        const config = graphql15InterfaceConfig(typeDef.toConfig())
         finalTypeDef = new GraphQLInterfaceType({
           ...config,
           fields: () => this.rebuildNamedOutputFields(config),
           interfaces: () => config.interfaces.map((t) => this.getInterface(t.name)),
-        })
+        } as GraphQLInterfaceTypeConfig<any, any>)
       } else if (isUnionType(typeDef)) {
         const config = typeDef.toConfig()
         finalTypeDef = new GraphQLUnionType({
@@ -691,7 +694,7 @@ export class SchemaBuilder {
               name: key,
             },
             schemaConfig: this.config,
-            parentTypeConfig: rest,
+            parentTypeConfig: rest as any, // TODO(tim): remove as any when we drop support for 14.x
             schemaExtension: this.schemaExtension,
           },
           resolve
@@ -1199,7 +1202,7 @@ export class SchemaBuilder {
     const list: GraphQLInterfaceType[] = []
     interfaces.forEach((i) => {
       const type = this.getInterface(i)
-      list.push(type, ...type.getInterfaces())
+      list.push(type, ...graphql15InterfaceType(type).getInterfaces())
     })
     return Array.from(new Set(list))
   }
@@ -1311,7 +1314,7 @@ export class SchemaBuilder {
         {
           builder: this.builderLens,
           fieldConfig: builderFieldConfig,
-          parentTypeConfig: typeConfig,
+          parentTypeConfig: typeConfig as any, // TODO(tim): remove as any when we drop support for 14.x
           schemaConfig: this.config,
           schemaExtension: this.schemaExtension,
         },

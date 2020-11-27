@@ -1,4 +1,4 @@
-import { GraphQLFieldResolver, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
+import { GraphQLFieldResolver, GraphQLInterfaceType, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
 import { PluginBuilderLens, SchemaConfig } from './builder'
 import {
   Maybe,
@@ -36,7 +36,9 @@ export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
    */
   parentTypeConfig: (
     | Omit<NexusGraphQLObjectTypeConfig, 'fields' | 'extensions'>
-    | Omit<NexusGraphQLInterfaceTypeConfig, 'fields' | 'extensions'>
+    | (Omit<NexusGraphQLInterfaceTypeConfig, 'fields' | 'extensions'> & {
+        interfaces: GraphQLInterfaceType[]
+      })
   ) & {
     extensions?: Maybe<{ nexus?: { config: TypeExt } }>
   }
