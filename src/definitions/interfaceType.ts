@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLInterfaceTypeExtensions } from 'graphql'
+import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
 import {
   GetGen,
   InterfaceFieldsFor,
@@ -63,7 +63,7 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLInterfaceTypeExtensions
+  extensions?: GraphQLInterfaceTypeConfig<any, any>['extensions']
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {

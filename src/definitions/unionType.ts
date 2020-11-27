@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLUnionTypeExtensions } from 'graphql'
+import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
 import { GetGen, AbstractTypeResolver } from '../typegenTypeHelpers'
 import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 import { NexusObjectTypeDef } from './objectType'
@@ -55,7 +55,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLUnionTypeExtensions
+  extensions?: GraphQLUnionTypeConfig<any, any>['extensions']
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {

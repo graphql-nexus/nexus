@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLEnumTypeExtensions, GraphQLEnumValueExtensions } from 'graphql'
+import { assertValidName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 
 type TypeScriptEnumLike = {
@@ -26,7 +26,7 @@ export interface EnumMemberInfo {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLEnumValueExtensions
+  extensions?: GraphQLEnumValueConfig['extensions']
 }
 
 export interface EnumTypeConfig<TypeName extends string> {
@@ -49,7 +49,7 @@ export interface EnumTypeConfig<TypeName extends string> {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLEnumTypeExtensions
+  extensions?: GraphQLEnumTypeConfig['extensions']
 }
 
 export class NexusEnumTypeDef<TypeName extends string> {

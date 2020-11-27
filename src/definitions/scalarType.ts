@@ -1,9 +1,4 @@
-import {
-  assertValidName,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig,
-  GraphQLScalarTypeExtensions,
-} from 'graphql'
+import { assertValidName, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 import { decorateType } from './decorateType'
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 
@@ -29,7 +24,7 @@ export interface ScalarConfig {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLScalarTypeExtensions
+  extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 }
 
 export interface NexusScalarTypeConfig<T extends string> extends ScalarBase, ScalarConfig {

@@ -1,4 +1,4 @@
-import { GraphQLFieldExtensions, GraphQLFieldResolver, GraphQLInputFieldExtensions } from 'graphql'
+import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLInputFieldConfig } from 'graphql'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
 import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
@@ -25,7 +25,7 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLFieldExtensions<any, any>
+  extensions?: GraphQLFieldConfig<any, any>['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
 export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
@@ -36,7 +36,7 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLInputFieldExtensions
+  extensions?: GraphQLInputFieldConfig['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
 /**

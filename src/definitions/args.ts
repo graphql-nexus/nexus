@@ -1,4 +1,4 @@
-import { GraphQLScalarTypeExtensions } from 'graphql'
+import { GraphQLScalarTypeConfig } from 'graphql'
 import { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
 import { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
@@ -13,7 +13,7 @@ export type CommonArgConfig = {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLScalarTypeExtensions
+  extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 } & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {

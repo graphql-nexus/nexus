@@ -39,8 +39,8 @@ import {
   isWrappingType,
   printSchema,
   GraphQLList,
-  GraphQLSchemaExtensions,
   GraphQLInterfaceTypeConfig,
+  GraphQLSchemaConfig,
 } from 'graphql'
 import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
@@ -291,7 +291,7 @@ export type SchemaConfig = BuilderConfigInput & {
   /**
    * Custom extensions, as supported in graphql-js
    */
-  extensions?: GraphQLSchemaExtensions
+  extensions?: GraphQLSchemaConfig['extensions']
 } & NexusGenPluginSchemaConfig
 
 export interface TypegenInfo {
