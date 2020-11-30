@@ -23,7 +23,7 @@ const config = {
     // ],
     links: [
       { name: 'Docs', link: '../docs' },
-      { name: 'Playground', link: '../playground' },
+      { name: 'Playground', link: 'https://nxs.li/playground' },
       { name: 'SDL Converter', link: '../converter' },
       { name: 'Examples', link: '../docs/getting-started/examples' },
     ],
