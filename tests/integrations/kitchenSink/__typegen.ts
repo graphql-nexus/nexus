@@ -167,6 +167,7 @@ export interface NexusGenFieldTypes {
   Subscription: {
     // field return type
     someBoolean: boolean | null // Boolean
+    someBooleanFromExtend: boolean | null // Boolean
     someField: number | null // Int
     someFields: Array<number | null> | null // [Int]
     someFloat: number | null // Float
@@ -233,6 +234,7 @@ export interface NexusGenFieldTypeNames {
   Subscription: {
     // field return type name
     someBoolean: 'Boolean'
+    someBooleanFromExtend: 'Boolean'
     someField: 'Int'
     someFields: 'Int'
     someFloat: 'Float'

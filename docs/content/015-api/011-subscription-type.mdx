@@ -16,92 +16,9 @@ A subscription type configuration field is like an object type with the followin
 1. It has a `subscribe` field. You should return an async iterator here. This is called once for each subscription a client sends.
 2. The `root` param of the `resolve` field is called for each promise returned by the async iterator setup. The resolver is responsible for transforming the shape of data returned by your subscription stream into types that conform to your GraphQL schema.
 
-Here is a runnable example using Apollo Server and Apollo PubSub with Express.
+Check out this [runnable code sandbox](https://codesandbox.io/s/nexus-example-subscriptiontype-cnenk?file=/src/main.ts).
 
-```ts
-import { ApolloServer, PubSub } from 'apollo-server-express'
-import express from 'express'
-import * as HTTP from 'http'
-import * as path from 'path'
-import {
-  arg,
-  inputObjectType,
-  makeSchema,
-  mutationType,
-  objectType,
-  subscriptionType,
-} from '@nexus/schema'
-
-const pubsub = new PubSub()
-
-const schema = makeSchema({
-  shouldExitAfterGenerateArtifacts:
-    process.env.NEXUS_SHOULD_EXIT_AFTER_GENERATE_ARTIFACTS === 'true',
-  outputs: {
-    typegen: path.join(__dirname, 'node_modules/@types/nexus-typegen/index.d.ts'),
-    schema: path.join(__dirname, './api.graphql'),
-  },
-  types: [
-    mutationType({
-      definition(t) {
-        t.field('createOneUser', {
-          type: 'User',
-          args: {
-            data: arg({
-              type: nonNull(
-                inputObjectType({
-                  name: 'CreateOneUserInput',
-                  definition(t) {
-                    t.nonNull.string('email')
-                  },
-                })
-              ),
-            }),
-          },
-          async resolve(_, args) {
-            const data = args.data
-            await pubsub.publish('user_added', { data })
-            return data
-          },
-        })
-      },
-    }),
-    subscriptionType({
-      definition(t) {
-        t.field('createOneUser', {
-          type: 'User',
-          subscribe() {
-            return pubsub.asyncIterator('user_added')
-          },
-          async resolve(userPromise) {
-            const user = await userPromise.data
-            return user
-          },
-        })
-      },
-    }),
-    objectType({
-      name: 'User',
-      definition(t) {
-        t.string('email')
-      },
-    }),
-  ],
-})
-
-const apollo = new ApolloServer({ schema })
-const app = express()
-const http = HTTP.createServer(app)
-
-apollo.applyMiddleware({ app })
-apollo.installSubscriptionHandlers(http)
-
-http.listen(4000, () => {
-  console.log(`🚀 GraphQL service ready at http://localhost:4000/graphql`)
-})
-```
-
-Here is a runnable example with a minimalistic schema.
+Here is another runnable example with a minimalistic schema.
 
 ```ts
 import { ApolloServer } from 'apollo-server-express'
