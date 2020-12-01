@@ -1,13 +1,15 @@
+import { MDXProvider } from '@mdx-js/react'
 import { RouterProps } from '@reach/router'
 import * as React from 'react'
-import styled, { ThemeProvider } from 'styled-components'
-import { useLayoutQuery } from '../hooks/useLayoutQuery'
-import Header from './header'
-import Footer from './footer'
-import { MDXProvider } from '@mdx-js/react'
+import { stickWhenNeeded } from '../utils/stickWhenNeeded'
+import styled from 'styled-components'
 import customMdx from '../components/customMdx'
+import { useLayoutQuery } from '../hooks/useLayoutQuery'
+import Footer from './footer'
+import Header from './header'
 import './layout.css'
 import Sidebar from './sidebar'
+import TOC from './toc'
 // import { StickyContainer } from 'react-sticky';
 
 // interface ThemeProps {
@@ -18,9 +20,15 @@ import Sidebar from './sidebar'
 //   colorPrimary: '#663399',
 // }
 
-type LayoutProps = React.ReactNode & RouterProps
+interface LayoutContentProps {
+  toc: any
+  tocDepth?: number
+  slug?: string
+}
 
-const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
+type LayoutProps = React.ReactNode & RouterProps & LayoutContentProps
+
+const Layout: React.FunctionComponent<LayoutProps> = ({ children, toc, tocDepth }) => {
   const { site } = useLayoutQuery()
   const { header, footer } = site.siteMetadata
 
@@ -73,6 +81,22 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
     }
   `
 
+  const TOCWrapper = styled.div`
+    width: 300px;
+    height: fit-content;
+    @media (min-width: 0px) and (max-width: 1024px) {
+      display: none;
+    }
+
+    &.fixed {
+      position: sticky;
+    }
+  `
+
+  React.useEffect(() => {
+    stickWhenNeeded('#toc-holder')
+  })
+
   return (
     // <ThemeProvider theme={theme}>
     <MDXProvider components={customMdx}>
@@ -84,6 +108,11 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children }) => {
         <Content>
           <MaxWidth>{children}</MaxWidth>
         </Content>
+        <TOCWrapper id="toc-holder">
+          {toc && toc.items && toc.items.length > 0 && (
+            <TOC headings={toc.items} tocDepth={tocDepth} location={location} />
+          )}
+        </TOCWrapper>
       </Wrapper>
       <Footer footerProps={footer} />
     </MDXProvider>
