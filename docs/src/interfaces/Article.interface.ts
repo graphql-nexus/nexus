@@ -13,6 +13,7 @@ export interface ArticleFrontmatter {
   duration?: string
   experimental?: boolean
   toc?: boolean
+  tocDepth?: number
   hidePage?: boolean
   codeStyle?: boolean
 }

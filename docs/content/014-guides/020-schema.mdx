@@ -1,5 +1,6 @@
 ---
 title: 'Schema'
+tocDepth: 2
 ---
 
 ## Overview
@@ -309,7 +310,7 @@ When you make an input nullable then Nexus will alter its TypeScript type inside
 
 If an arg has been given a default value, then it will be used when the client passes nothing, but since clients can still pass explicit `null`, resolvers must still handle nullability. If this surprises you then you may be interested in [#485](https://github.com/graphql-nexus/nexus/issues/485).
 
-#### Example: Default nullability settings
+### Example: Default nullability settings
 
 
 
@@ -336,7 +337,7 @@ type Query {
 
 
 
-#### Example: Nullability flipped at global level
+### Example: Nullability flipped at global level
 
 ```ts
 makeSchema({
@@ -368,7 +369,7 @@ type Query {
 }
 ```
 
-#### Example: Nullability flipped at type level
+### Example: Nullability flipped at type level
 
 ```ts
 queryType({
@@ -395,7 +396,7 @@ type Query {
 }
 ```
 
-#### Example: Nullability flipped at input and field level
+### Example: Nullability flipped at input and field level
 
 ```ts
 queryType({
@@ -421,7 +422,7 @@ type Query {
 
 
 
-#### Example: Mixing levels
+### Example: Mixing levels
 
 It is possible to use type and input/field layers together. This provides flexibility to optimize for local sections of your API that have different characteristics. For example here, a type deviates from the global default for all but but one field and its input.
 
@@ -459,7 +460,7 @@ type Query {
 
 
 
-#### Example: Args that have default values
+### Example: Args that have default values
 
 When an arg has a default you might think that then it should be nullable to the client but non-nullable within your resolver logic. However it turns out that if the client passes an _explicit_ `null` then that is considered an actual value, and hence is not subject to being assigned the default value. Thus, and then, the resolver still can observe null from the client. If you are curious about seeing this change and/or become configurable then please refer to [#485](https://github.com/graphql-nexus/nexus/issues/485).
 
@@ -646,7 +647,7 @@ object({
 
 ## Backing types in Nexus
 
-#### Inferred types
+### Inferred types
 
 When you first begin creating your schema, you may have objects without backing types setup. In these cases Nexus infers that the backing type is an exact match of the GraphQL type. Take this schema for example:
 
@@ -689,7 +690,7 @@ queryType({                            // |
 
 This may suffice well enough for some time, but most apps will eventually see their GraphQL and backing types diverge. Once this happens, you can tell Nexus about it using the `rootTyping` object type config property.
 
-#### `rootTyping` property
+### `rootTyping` property
 
 ```ts
 export interface MyDBUser {
@@ -738,7 +739,7 @@ Nexus does not care about where `MyDBUser` is defined. So long as it is defined 
 
 The `rootTyping` property is statically typed as a union of all the valid possible types your app makes available. Thus, your IDE will/should give you autocompletion here.
 
-#### Third-party types
+### Third-party types
 
 If you would like to use types from a third party package, you can just re-export them in your own app. Here's the above example re-visited using some third party typings:
 
