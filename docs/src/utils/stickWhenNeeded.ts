@@ -25,6 +25,9 @@ export const stickWhenNeeded = (id: string) => {
       var isScrollingDown = scrollTop > lastScrollTop
       var isWindowLarger = windowHeight > sidebarHeight
 
+      // Hack: gradually increase the height of the container as we scroll down
+      $sidebar.css('height', `calc(100vh - ${Math.max(0, sidebarTop - scrollTop)}px)`)
+
       if (
         (isWindowLarger && scrollTop > initialSidebarTop) ||
         (!isWindowLarger && scrollTop > initialSidebarTop + heightDelta)

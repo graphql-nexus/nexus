@@ -82,14 +82,20 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children, toc, tocDepth 
   `
 
   const TOCContainer = styled.div`
+    position: sticky;
+    top: 0;
+    padding-bottom: 5px;
     width: 280px;
-    height: fit-content;
+    // 150px === size of the header
+    height: calc(100vh - 150px);
+    overflow: scroll;
+
     @media (min-width: 0px) and (max-width: 1024px) {
       display: none;
     }
 
     &.fixed {
-      position: sticky;
+      height: 100vh !important;
     }
   `
 
