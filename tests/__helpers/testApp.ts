@@ -11,11 +11,12 @@ type HookSettings = {
 }
 
 export async function generateTypegen(settings: HookSettings) {
-  const rootDir = settings.rootDir
+  const projectDir = settings.rootDir
 
-  const typegenModulePath = join(rootDir, '__typegen.ts')
-  const entrypointModulePath = join(rootDir, '__app.ts')
-  const importPath = relative(rootDir, join(__dirname, '..', '..', 'src')).replace(/\\/g, '/')
+  const typegenModulePath = join(projectDir, '__typegen.ts')
+  const sdlFilePath = join(projectDir, '__schema.graphql')
+  const entrypointModulePath = join(projectDir, '__app.ts')
+  const importPath = relative(projectDir, join(__dirname, '..', '..', 'src')).replace(/\\/g, '/')
 
   const entrypoint = require(entrypointModulePath)
   const { plugins, ...types } = entrypoint
@@ -24,7 +25,7 @@ export async function generateTypegen(settings: HookSettings) {
     types: types,
     outputs: {
       typegen: typegenModulePath,
-      schema: false,
+      schema: sdlFilePath,
     },
     shouldGenerateArtifacts: true,
     plugins: plugins || [],

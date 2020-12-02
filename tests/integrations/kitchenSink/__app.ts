@@ -13,6 +13,7 @@ import {
   queryType,
   scalarType,
   stringArg,
+  subscriptionField,
   subscriptionType,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
@@ -154,7 +155,7 @@ export const Mutation = mutationType({
 export const Subscription2 = extendType({
   type: 'Subscription',
   definition(t) {
-    t.boolean('someBooleanFromExtend', {
+    t.boolean('someBooleanFromExtendType', {
       subscribe() {
         return mockStream(10, true, (b) => b)
       },
@@ -163,6 +164,17 @@ export const Subscription2 = extendType({
       },
     })
   },
+})
+
+export const Subscription3 = subscriptionField((t) => {
+  t.boolean('someBooleanFromSubscriptionField', {
+    subscribe() {
+      return mockStream(10, true, (b) => b)
+    },
+    resolve: (event: boolean) => {
+      return event
+    },
+  })
 })
 
 export const Subscription = subscriptionType({
