@@ -1,5 +1,6 @@
 ---
 title: API
+tocDepth: 2
 ---
 
 ## `t.model`
@@ -366,7 +367,7 @@ Only available within GraphQL `Query` and `Mutation` definitions.
 
 There are 8 kinds of operations (reflecting a subset of [Prisma Client](https://github.com/prisma/prisma-client-js)'s capabilities). An _operation publisher_ is the combination of some operation kind and a particular Prisma model. Thus the number of operation publishers on `t.crud` is `Prisma model count × operation kind count`. So for example if you defined 20 Prisma models then you would see 160 operation publishers on `t.crud`.
 
-#### Example
+### Example
 
 ```prisma
 model User {
@@ -1314,7 +1315,7 @@ See [filtering option](#filtering) example. Differences are: operation semantics
 
 ## Options
 
-#### `alias`
+### `alias`
 
 ```
 undefined | String
@@ -2442,7 +2443,7 @@ type User {
 
 ## Batch Filtering
 
-#### Where Does it Appear?
+### Where Does it Appear?
 
 ```graphql
 query {
@@ -2465,7 +2466,7 @@ type M {
 # Nested InputObjects from t.crud.upsert<M>
 ```
 
-#### What Structure Does it Have?
+### What Structure Does it Have?
 
 ```graphql
 input M_WhereInput {
@@ -2576,7 +2577,7 @@ Refer to String like filter. We are considering a [dedicated `ID` filter type fo
 
 TODO
 
-## S_FieldUpdateOperationsInput
+#### S_FieldUpdateOperationsInput
 
 This allows you to update the values of certain fields atomically. You can disable this behavior by setting `atomicOperations` to `false` in plugin settings.
 
@@ -2606,7 +2607,7 @@ input S_FieldUpdateOperationsInput {
 
 ## GraphQL Schema Contributions Legend
 
-#### How to read
+### How to read
 
 Throughout this document you will see abbreviations used in GraphQL SDL syntax to signify how Nexus Prisma plugin contributes to the shape of your GraphQL schema. Each single capital letter is an abbreviation for one of the following things. When multiple capital letters are adjacent it means they combine the below. 
 

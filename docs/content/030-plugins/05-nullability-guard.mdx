@@ -8,7 +8,7 @@ This plugin helps us guard against non-null values crashing our queries in produ
 
 > The `nullabilityGuardPlugin` by default only guards when `process.env.NODE_ENV === 'production'`. This is intended so you see/catch these errors in development and do not use it except as a last resort. If you want to change this, set the `shouldGuard` config option.
 
-#### Example
+### Example
 
 ```ts
 import { nullabilityGuardPlugin } from '@nexus/schema'
@@ -35,7 +35,7 @@ const guardPlugin = nullabilityGuardPlugin({
 })
 ```
 
-### Null Guard Algorithm
+## Null Guard Algorithm
 
 - If a field is nullable:
   - If the field is non-list, do not guard
