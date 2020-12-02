@@ -59,6 +59,11 @@ export const i2 = objectType({
   name: 'OfI2',
   definition(t) {
     t.implements('I')
+    t.modify('hello', {
+      extensions: {
+        extensionAdditionFromModifyMethod: true,
+      },
+    })
   },
 })
 
