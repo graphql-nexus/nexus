@@ -81,8 +81,8 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children, toc, tocDepth 
     }
   `
 
-  const TOCWrapper = styled.div`
-    width: 300px;
+  const TOCContainer = styled.div`
+    width: 280px;
     height: fit-content;
     @media (min-width: 0px) and (max-width: 1024px) {
       display: none;
@@ -94,7 +94,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children, toc, tocDepth 
   `
 
   React.useEffect(() => {
-    stickWhenNeeded('#toc-holder')
+    stickWhenNeeded('#toc-container')
   })
 
   return (
@@ -108,11 +108,11 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children, toc, tocDepth 
         <Content>
           <MaxWidth>{children}</MaxWidth>
         </Content>
-        <TOCWrapper id="toc-holder">
+        <TOCContainer id="toc-container">
           {toc && toc.items && toc.items.length > 0 && (
             <TOC headings={toc.items} tocDepth={tocDepth} location={location} />
           )}
-        </TOCWrapper>
+        </TOCContainer>
       </Wrapper>
       <Footer footerProps={footer} />
     </MDXProvider>

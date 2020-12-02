@@ -8,6 +8,8 @@ import SEO from '../components/seo'
 import { graphql } from 'gatsby'
 import MDXRenderer from 'gatsby-plugin-mdx/mdx-renderer'
 
+const DEFAULT_TOC_DEPTH = 3
+
 interface LayoutContentProps {
   toc: any
   tocDepth?: number
@@ -23,7 +25,7 @@ const ArticleLayout = ({ data, ...props }: ArticleLayoutProps) => {
   const {
     mdx: {
       fields: { slug, modSlug },
-      frontmatter: { title, metaTitle, metaDescription, toc, codeStyle },
+      frontmatter: { title, metaTitle, metaDescription, toc, tocDepth, codeStyle },
       body,
       parent,
       tableOfContents,
@@ -35,7 +37,7 @@ const ArticleLayout = ({ data, ...props }: ArticleLayoutProps) => {
 
   // TODO: Do not hardcode tocDepth here. Get it from the mdx headers or default to 1 or 2
   return (
-    <Layout {...props} toc={toc || toc == null ? tableOfContents : []} tocDepth={2}>
+    <Layout {...props} toc={toc || toc == null ? tableOfContents : []} tocDepth={tocDepth ?? DEFAULT_TOC_DEPTH}>
       <SEO title={metaTitle || title} description={metaDescription || title} />
       <section className="top-section">
         <TopSection codeStyle={codeStyle} title={title} slug={modSlug} />
@@ -72,6 +74,7 @@ export const query = graphql`
         metaTitle
         metaDescription
         toc
+        tocDepth
         codeStyle
       }
     }
