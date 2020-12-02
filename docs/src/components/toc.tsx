@@ -68,7 +68,7 @@ const TOC = ({ headings, tocDepth }: any) => {
     return (
       <TOCList>
         {headings &&
-          headings.map((heading: any, index: number) => (heading.url === undefined ? console.log(heading) : false) || (
+          headings.map((heading: any, index: number) => (
             <li key={index}>
               <a
                 href={heading.url?.replace(/inlinecode/g, '')}
