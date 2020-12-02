@@ -116,7 +116,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children, toc, tocDepth 
         </Content>
         <TOCContainer id="toc-container">
           {toc && toc.items && toc.items.length > 0 && (
-            <TOC headings={toc.items} tocDepth={tocDepth} location={location} />
+            <TOC headings={toc.items} tocDepth={tocDepth} />
           )}
         </TOCContainer>
       </Wrapper>
