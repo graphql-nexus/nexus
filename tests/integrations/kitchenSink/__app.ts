@@ -1,4 +1,6 @@
 import {
+  connectionPlugin,
+  declarativeWrappingPlugin,
   dynamicInputMethod,
   dynamicOutputMethod,
   dynamicOutputProperty,
@@ -9,11 +11,10 @@ import {
   mutationType,
   objectType,
   queryType,
-  stringArg,
-  subscriptionType,
   scalarType,
-  connectionPlugin,
-  declarativeWrappingPlugin,
+  stringArg,
+  subscriptionField,
+  subscriptionType,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
 import './__typegen'
@@ -149,6 +150,31 @@ export const Mutation = mutationType({
       resolve: (_root) => ({ firstName: '', lastName: '' }),
     })
   },
+})
+
+export const Subscription2 = extendType({
+  type: 'Subscription',
+  definition(t) {
+    t.boolean('someBooleanFromExtendType', {
+      subscribe() {
+        return mockStream(10, true, (b) => b)
+      },
+      resolve: (event: boolean) => {
+        return event
+      },
+    })
+  },
+})
+
+export const Subscription3 = subscriptionField((t) => {
+  t.boolean('someBooleanFromSubscriptionField', {
+    subscribe() {
+      return mockStream(10, true, (b) => b)
+    },
+    resolve: (event: boolean) => {
+      return event
+    },
+  })
 })
 
 export const Subscription = subscriptionType({
