@@ -4,7 +4,7 @@ title: Next.js Users
 
 ## Nexus in a Next.js Project
 
-> [Here is a Codesandbox](https://codesandbox.io/s/nexus-example-nextjs-b7055) for the example that we'll build incrementally in this article.
+> **Note:** [Here is a Codesandbox](https://codesandbox.io/s/nexus-example-nextjs-b7055) for the example that we'll build incrementally in this article.
 
 Next.js comes with a feature called [API Routes](https://nextjs.org/docs/api-routes/introduction). With API Routes, we can easily create dedicated endpoints to use in our Next.js applications. These endpoints can then be deployed as serverless functions.
 
@@ -14,20 +14,20 @@ In this guide, we'll see how to work with Next.js API Routes to serve a Nexus Gr
 
 Let's start by creating a new Next.js application. If you already have a Next.js app, you can ignore this step.
 
-```bash
+```bash-symbol
 npm init next-app
 # Provide a name for your app
 ```
 
 After installation, we need to opt-in to use TypeScript. To do this, let's install `typescript` and `@types/react` and `@types/node`.
 
-```bash
+```bash-symbol
 npm i -D typescript @types/react @types/node
 ```
 
 To finish out the TypeScript setup, run the app in development mode. This will populate the `tsconfig,json` file.
 
-```bash
+```bash-symbol
 npm run dev
 ```
 
@@ -37,7 +37,7 @@ With the Next.js project in place, we now need to install the other dependencies
 
 In addition to Nexus, we'll need a server to run the GraphQL API. Nexus works with a range of GraphQL servers. We'll use Apollo Server and opt for the `apollo-server-micro` variety as it is well-suited to serverless environments.
 
-```bash
+```bash-symbol
 npm i @nexus/schema apollo-server-micro
 ```
 
@@ -49,7 +49,7 @@ If we wanted to approximate a REST API or otherwise use JSON data endpoints, we 
 
 Create a file under `pages/api` called `graphql.ts`.
 
-```bash
+```bash-symbol
 touch pages/api/graphql.ts
 ```
 
@@ -92,7 +92,11 @@ export default server.createHandler({
 
 Now if we navigate to http://localhost:3000/api/graphql, we should see the GraphQL Playground and we should be able to make a query for the 'hello world!' message.
 
-![graphql playground with the hello world message](/assets/next-nexus-1.png)
+```graphql
+{
+  hello
+}
+```
 
 ## Create a Schema
 
@@ -102,15 +106,15 @@ It's best to keep all the parts of your schema in a separate directory. Most oft
 
 Create a diretory called `schema` at the project root.
 
-```bash
-
+```bash-symbol
+mkdir schema
 ```
 
 Let's start by creating a schema to retrieve some data with the `queryType`.
 
 In the `schema` directory, create a file called `Query.ts`.
 
-```bash
+```bash-symbol
 touch schema/Query.ts
 ```
 
@@ -162,7 +166,7 @@ export const Query = queryType({
 
 Let's now create an index file in the `schema` directory which will be responsible for importing all the types in the directory and exporting a constructed schema using `makeSchema`.
 
-```bash
+```bash-symbol
 touch schema/index.ts
 ```
 
@@ -191,7 +195,7 @@ Now in the `graphql.ts` for our API route, we can simply pull in the constructed
     // pages/api/graphql.ts
 -   import { makeSchema, queryType } from '@nexus/schema'
     import { ApolloServer } from 'apollo-server-micro'
-    import schema from '../../schema'
++   import schema from '../../schema'
 
 -   const Query = queryType({
 -     definition(t) {
@@ -254,8 +258,6 @@ If we head back over to `localhost:3000/api/graphql`, we can see results for our
 }
 ```
 
-![graphql playground showing a list of front end frameworks from a graphql query](/assets/next-nexus-2.png)
-
 ## Call the GraphQL API from the Front End
 
 In a Next.js app, we have several options for producing our pages:
@@ -270,13 +272,13 @@ If we would like to use server-side rendering, we can use a library like `graphq
 
 Start by intalling the `graphql-request` library.
 
-```bash
+```bash-symbol
 npm i graphql-request
 ```
 
 Create a function called `getServerSideProps` and make a call to our GraphQL API. The returned data can be supplied in the returned object which will make it available as a `prop` in the function that produces the page. Next.js will take care of treating this page as a server-side rendered page.
 
-Replace the code in `pages/index.tsx` with the following.
+Rename the module `pages/index.js` to `pages/index.tsx` and replace with the following.
 
 ```ts
 // pages/index.tsx
@@ -305,7 +307,7 @@ export default function Home({ frameworks }) {
   return (
     <div>
       <ul>
-        {frameworks.map((f) => (
+        {frameworks.map(f => (
           <li key={f.id}>{f.name}</li>
         ))}
       </ul>
@@ -316,9 +318,7 @@ export default function Home({ frameworks }) {
 
 When the page renders, we'll see a list of the frameworks.
 
-![a next.js page rendered with a list of frameworks](/assets/next-nexus-3.png)
-
-**Note:** Using `graphql-request` to make a server-side call for data from our GraphQL API is good for initially fetching the data but it won't do much for us if we want to have client-side GraphQL features such as caching. If we want additional features like those provided by Apollo Client, it won't work to mix the data retrieved in the `getServerSideProps` function with data managed on the client by Apollo.
+> **Note:** Using `graphql-request` to make a server-side call for data from our GraphQL API is good for initially fetching the data but it won't do much for us if we want to have client-side GraphQL features such as caching. If we want additional features like those provided by Apollo Client, it won't work to mix the data retrieved in the `getServerSideProps` function with data managed on the client by Apollo.
 
 ## SDL and Type Generation
 
@@ -387,31 +387,31 @@ Finally we will setup our build script to run Nexus typegen before Next.js tries
 <tab>
 
 ```diff ts
-  {
-    "name": "my-app",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-      "dev": "next dev",
-+     "build:nexus-typegen": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' --transpile-only schema",
-+     "build": "npm run build:nexus-typegen && next build",
--     "build": "next build",
-      "start": "next start"
-    },
-    "dependencies": {
-      "@nexus/schema": "^0.19.2",
-      "apollo-server-micro": "^2.19.0",
-      "graphql-request": "^3.3.0",
-      "next": "10.0.3",
-      "react": "17.0.1",
-      "react-dom": "17.0.1"
-    },
-    "devDependencies": {
-      "@types/node": "^14.14.10",
-      "@types/react": "^17.0.0",
-      "typescript": "^4.1.2"
-    }
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
++   "build:nexus-typegen": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' --transpile-only schema",
++   "build": "npm run build:nexus-typegen && next build",
+-   "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@nexus/schema": "^0.19.2",
+    "apollo-server-micro": "^2.19.0",
+    "graphql-request": "^3.3.0",
+    "next": "10.0.3",
+    "react": "17.0.1",
+    "react-dom": "17.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.10",
+    "@types/react": "^17.0.0",
+    "typescript": "^4.1.2"
   }
+}
 ```
 
 </tab>
