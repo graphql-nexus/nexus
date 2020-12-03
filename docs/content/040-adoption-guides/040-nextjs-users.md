@@ -1,32 +1,26 @@
 ---
-title: Nexus With Next.js
+title: Next.js Users
 ---
 
 ## Nexus in a Next.js Project
 
 Next.js comes with a feature called [API Routes](https://nextjs.org/docs/api-routes/introduction). With API Routes, we can easily create dedicated endpoints to use in our Next.js applications. These endpoints can then be deployed as serverless functions.
 
-In this guide, we'll see how to work with Next.js API Routes to serve a Nexus Schema GraphQL API and then consume it from the front end.
+In this guide, we'll see how to work with Next.js API Routes to serve a Nexus GraphQL API and then consume it from the front end.
 
 ## Getting Started
 
 Let's start by creating a new Next.js application. If you already have a Next.js app, you can ignore this step.
 
 ```bash
-npx create-next-app
+npm init next-app
 # Provide a name for your app
 ```
 
-After installation, we need to opt-in to use TypeScript. To do this, let's create a `tsconfig.json` file at the project root. Next.js will take care of populating this file for us.
+After installation, we need to opt-in to use TypeScript. To do this, let's install `typescript` and `@types/react` and `@types/node`.
 
 ```bash
-touch tsconfig.json
-```
-
-Next, install `typescript` and `@types/react`.
-
-```bash
-npm i -D typescript @types/react
+npm i -D typescript @types/react @types/node
 ```
 
 To finish out the TypeScript setup, run the app in development mode. This will populate the `tsconfig,json` file.
@@ -39,7 +33,7 @@ For more information on using TypeScript in Next.js, check out [the docs](https:
 
 With the Next.js project in place, we now need to install the other dependencies we'll need.
 
-In addition to Nexus Schema, we'll need a server to run the GraphQL API. Nexus Schema works with a range of GraphQL servers. We'll use Apollo Server and opt for the `apollo-server-micro` variety as it is well-suited to serverless environments.
+In addition to Nexus, we'll need a server to run the GraphQL API. Nexus works with a range of GraphQL servers. We'll use Apollo Server and opt for the `apollo-server-micro` variety as it is well-suited to serverless environments.
 
 ```bash
 npm i @nexus/schema apollo-server-micro
@@ -54,8 +48,7 @@ If we wanted to approximate a REST API or otherwise use JSON data endpoints, we 
 Create a file under `pages/api` called `graphql.ts`.
 
 ```bash
-cd pages/api
-touch graphql.ts
+touch pages/api/graphql.ts
 ```
 
 Next.js API routes typically export `handler` function that approximates an express endpoint. The function has `NextApiRequest` and `NextApiResponse` parameters which are used to read information about the incoming request and respond appropriately.
@@ -95,7 +88,7 @@ export default server.createHandler({
 })
 ```
 
-Now if we navigate to `localhost:3000/api/graphql`, we should see the GraphQL Playground and we should be able to make a query for the 'hello world!' message.
+Now if we navigate to http://localhost:3000/api/graphql, we should see the GraphQL Playground and we should be able to make a query for the 'hello world!' message.
 
 ![graphql playground with the hello world message](/assets/next-nexus-1.png)
 
@@ -108,16 +101,15 @@ It's best to keep all the parts of your schema in a separate directory. Most oft
 Create a diretory called `schema` at the project root.
 
 ```bash
-mkdir schema
+
 ```
 
 Let's start by creating a schema to retrieve some data with the `queryType`.
 
-in the `schema` directory, create a file called `Query.ts`.
+In the `schema` directory, create a file called `Query.ts`.
 
 ```bash
-cd schema
-touch Query.ts
+touch schema/Query.ts
 ```
 
 At the very least, this file should export a `queryType` that can be used in our schema.
@@ -166,11 +158,10 @@ export const Query = queryType({
 })
 ```
 
-Let's now create a barrel file in the `schema` directory which will be responsible for importing all the types in the directory and exporting a constructed schema using `makeSchema`.
+Let's now create an index file in the `schema` directory which will be responsible for importing all the types in the directory and exporting a constructed schema using `makeSchema`.
 
 ```bash
-cd schema
-touch index.ts
+touch schema/index.ts
 ```
 
 In the `index.ts` file, bring in `makeSchema` as well as the types we just created in `Query.ts`.
@@ -179,22 +170,59 @@ In the `index.ts` file, bring in `makeSchema` as well as the types we just creat
 // schema/index.ts
 
 import { makeSchema } from '@nexus/schema'
-import { Framework, Query } from './Query'
+import * as QueryTypes from './Query'
 
 const schema = makeSchema({
-  types: [Framework, Query],
+  types: [QueryTypes],
 })
 
 export default schema
 ```
 
-Now in the `graphql.ts` for our API route, we can simple pull in the constructed schema and serve it with Apollo Server.
+Now in the `graphql.ts` for our API route, we can simply pull in the constructed schema and serve it with Apollo Server.
+
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```ts diff
+    // pages/api/graphql.ts
+-   import { makeSchema, queryType } from '@nexus/schema'
+    import { ApolloServer } from 'apollo-server-micro'
+    import schema from '../../schema'
+
+-   const Query = queryType({
+-     definition(t) {
+-       t.string('hello', { resolve: () => 'hello world!' })
+-     },
+-   })
+-
+-   const schema = makeSchema({
+-     types: [Query],
+-   })
+
+    const server = new ApolloServer({
+      schema,
+    })
+
+    export const config = {
+      api: {
+        bodyParser: false,
+      },
+    }
+
+    export default server.createHandler({
+      path: '/api/graphql',
+    })
+```
+
+</tab>
+<tab>
 
 ```ts
 // pages/api/graphql.ts
-
 import { ApolloServer } from 'apollo-server-micro'
-import schema from './../../schema'
+import schema from '../../schema'
 
 const server = new ApolloServer({
   schema,
@@ -211,7 +239,18 @@ export default server.createHandler({
 })
 ```
 
+</tab>
+</TabbedContent>
+
 If we head back over to `localhost:3000/api/graphql`, we can see results for our call for `frameworks`.
+
+```graphql
+{
+  frameworks {
+    id
+  }
+}
+```
 
 ![graphql playground showing a list of front end frameworks from a graphql query](/assets/next-nexus-2.png)
 
@@ -234,6 +273,8 @@ npm i graphql-request
 ```
 
 Create a function called `getServerSideProps` and make a call to our GraphQL API. The returned data can be supplied in the returned object which will make it available as a `prop` in the function that produces the page. Next.js will take care of treating this page as a server-side rendered page.
+
+Replace the code in `pages/index.tsx` with the following.
 
 ```ts
 // pages/index.tsx
@@ -282,12 +323,12 @@ When the page renders, we'll see a list of the frameworks.
 A GraphQL SDL file and Nexus typings can automatically be generated by configuring the `outputs` option in `makeSchema`. In a typical project, we can tell Nexus where to place these files by using `__dirname` to define a path. That might looks something like this:
 
 ```ts
-const schema = makeSchema({
-  // ...
+makeSchema({
   outputs: {
-    schema: `${__dirname}/generated/schema.graphql`,
-    typegen: `${__dirname}/generated/types.ts`,
+    schema: path.join(__dirname, '/generated/schema.graphql'),
+    typegen: path.join(__dirname, '/generated/types.ts'),
   },
+  // ...
 })
 ```
 
@@ -297,29 +338,46 @@ The solution is to use `path.join` and `process.cwd` together to describe where 
 
 In the `schema/index.ts` file, configure `makeSchema` to output the generated SDL and typings using `path.join` and `process.cwd`.
 
+<TabbedContent tabs={['Diff', 'Code']}>
+<tab>
+
 ```ts diff
-import { makeSchema } from '@nexus/schema';
-import { Framework, Query } from './Query';
-+import path from 'path';
+import { makeSchema } from '@nexus/schema'
+import * as QueryTypes from './Query'
++import path from 'path'
 
 const schema = makeSchema({
-  types: [Framework, Query],
+  types: [QueryTypes],
 +  outputs: {
-+    typegen: path.join(
-+      process.cwd(),
-+      'generated',
-+      'nexus-typegen.ts'
-+    ),
-+    schema: path.join(
-+      process.cwd(),
-+      'generated',
-+      'schema.graphql'
-+    )
++    typegen: path.join(process.cwd(), 'generated/nexus-typegen.ts'),
++    schema: path.join(process.cwd(), 'generated/schema.graphql'),
   }
-});
+})
 
 export default schema;
 ```
+
+</tab>
+<tab>
+
+```ts diff
+import { makeSchema } from '@nexus/schema'
+import * as QueryTypes from './Query'
+import path from 'path'
+
+const schema = makeSchema({
+  types: [QueryTypes],
+  outputs: {
+    typegen: path.join(process.cwd(), 'generated', 'nexus-typegen.ts'),
+    schema: path.join(process.cwd(), 'generated', 'schema.graphql'),
+  },
+})
+
+export default schema
+```
+
+</tab>
+</TabbedContent>
 
 ## Additional Resources
 
