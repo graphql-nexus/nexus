@@ -18,12 +18,15 @@ import {
   GraphQLInputType,
   GraphQLInt,
   GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
+  GraphQLList,
   GraphQLNamedType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,
+  GraphQLSchemaConfig,
   GraphQLString,
   GraphQLType,
   GraphQLUnionType,
@@ -38,9 +41,6 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
-  GraphQLList,
-  GraphQLInterfaceTypeConfig,
-  GraphQLSchemaConfig,
 } from 'graphql'
 import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
@@ -64,7 +64,11 @@ import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from
 import { NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
+  AllNexusArgsDefs,
+  AllNexusNamedInputTypeDefs,
+  AllNexusNamedOutputTypeDefs,
   AllNexusNamedTypeDefs,
+  finalizeWrapping,
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
   isNexusDynamicOutputProperty,
@@ -78,17 +82,13 @@ import {
   isNexusPlugin,
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
+  isNexusWrappingType,
+  NexusFinalWrapKind,
   NexusWrapKind,
   normalizeArgWrapping,
   rewrapAsGraphQLType,
-  unwrapNexusDef,
   unwrapGraphQLDef,
-  finalizeWrapping,
-  AllNexusNamedInputTypeDefs,
-  AllNexusNamedOutputTypeDefs,
-  AllNexusArgsDefs,
-  isNexusWrappingType,
-  NexusFinalWrapKind,
+  unwrapNexusDef,
 } from './definitions/wrapping'
 import {
   MissingType,
@@ -120,6 +120,7 @@ import {
   NexusPlugin,
   PluginConfig,
 } from './plugin'
+import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
 import { TypegenAutoConfigOptions } from './typegenAutoConfig'
 import { TypegenFormatFn } from './typegenFormatPrettier'
@@ -132,18 +133,17 @@ import {
   casesHandled,
   consoleWarn,
   eachObj,
+  getArgNamedType,
   getNexusNamedType,
+  graphql15InterfaceConfig,
+  graphql15InterfaceType,
   invariantGuard,
   isObject,
   mapValues,
   objValues,
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
-  getArgNamedType,
-  graphql15InterfaceType,
-  graphql15InterfaceConfig,
 } from './utils'
-import { declarativeWrappingPlugin } from './plugins'
 
 type NexusShapedOutput = {
   name: string
@@ -289,7 +289,7 @@ export type SchemaConfig = BuilderConfigInput & {
    */
   shouldExitAfterGenerateArtifacts?: boolean
   /**
-   * Custom extensions, as supported in graphql-js
+   * Custom extensions, as [supported in graphql-js](https://github.com/graphql/graphql-js/blob/master/src/type/__tests__/extensions-test.js)
    */
   extensions?: GraphQLSchemaConfig['extensions']
 } & NexusGenPluginSchemaConfig

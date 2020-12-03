@@ -1,4 +1,4 @@
-import { graphql } from 'graphql'
+import { graphql, GraphQLObjectType } from 'graphql'
 import { DateTimeResolver } from 'graphql-scalars'
 import path from 'path'
 import { asNexusMethod, interfaceType, makeSchema, objectType, queryField } from '../src/core'
@@ -195,4 +195,50 @@ describe('interfaceType', () => {
     expect(spy).toBeCalledTimes(1)
     spy.mockRestore()
   })
+})
+
+it('extensions are inherited and deeply merged by field modifications', () => {
+  const schema = makeSchema({
+    types: [
+      interfaceType({
+        name: 'SomeInterface',
+        resolveType() {
+          return 'B'
+        },
+        definition(t) {
+          t.string('foo', {
+            extensions: {
+              deeply: {
+                foo1: true,
+              },
+            },
+          })
+        },
+      }),
+      objectType({
+        name: 'A',
+        definition(t) {
+          t.implements('SomeInterface')
+          t.modify('foo', {
+            extensions: {
+              deeply: {
+                foo2: true,
+              },
+            },
+          })
+        },
+      }),
+    ],
+    outputs: false,
+    shouldGenerateArtifacts: false,
+  })
+  const A = schema.getType('A') as GraphQLObjectType
+  expect(A.getFields().foo.extensions).toMatchInlineSnapshot(`
+    Object {
+      "deeply": Object {
+        "foo1": true,
+        "foo2": true,
+      },
+    }
+  `)
 })

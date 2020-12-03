@@ -44,7 +44,11 @@ export const I = interfaceType({
     return 'OfI'
   },
   definition(t) {
-    t.string('hello')
+    t.string('hello', {
+      extensions: {
+        extensionAdditionFromFieldConfig: true,
+      },
+    })
   },
 })
 
@@ -57,6 +61,9 @@ export const i = objectType({
 
 export const i2 = objectType({
   name: 'OfI2',
+  extensions: {
+    extensionAdditionFromTypeConfig: true,
+  },
   definition(t) {
     t.implements('I')
     t.modify('hello', {
