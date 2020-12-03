@@ -8,7 +8,15 @@ import SEO from '../components/seo'
 import { graphql } from 'gatsby'
 import MDXRenderer from 'gatsby-plugin-mdx/mdx-renderer'
 
-type ArticleLayoutProps = ArticleQueryData & RouterProps
+const DEFAULT_TOC_DEPTH = 3
+
+interface LayoutContentProps {
+  toc: any
+  tocDepth?: number
+  slug?: string
+}
+
+type ArticleLayoutProps = ArticleQueryData & RouterProps & LayoutContentProps
 
 const ArticleLayout = ({ data, ...props }: ArticleLayoutProps) => {
   if (!data) {
@@ -17,7 +25,7 @@ const ArticleLayout = ({ data, ...props }: ArticleLayoutProps) => {
   const {
     mdx: {
       fields: { slug, modSlug },
-      frontmatter: { title, metaTitle, metaDescription, toc, codeStyle },
+      frontmatter: { title, metaTitle, metaDescription, toc, tocDepth, codeStyle },
       body,
       parent,
       tableOfContents,
@@ -27,16 +35,12 @@ const ArticleLayout = ({ data, ...props }: ArticleLayoutProps) => {
     },
   } = data
 
+  // TODO: Do not hardcode tocDepth here. Get it from the mdx headers or default to 1 or 2
   return (
-    <Layout {...props}>
+    <Layout {...props} toc={toc || toc == null ? tableOfContents : []} tocDepth={tocDepth ?? DEFAULT_TOC_DEPTH}>
       <SEO title={metaTitle || title} description={metaDescription || title} />
       <section className="top-section">
-        <TopSection
-          codeStyle={codeStyle}
-          title={title}
-          slug={modSlug}
-          toc={toc || toc == null ? tableOfContents : []}
-        />
+        <TopSection codeStyle={codeStyle} title={title} slug={modSlug} />
       </section>
       <MDXRenderer>{body}</MDXRenderer>
       <PageBottom editDocsPath={`${docsLocation}/${parent.relativePath}`} pageUrl={slug} />
@@ -70,6 +74,7 @@ export const query = graphql`
         metaTitle
         metaDescription
         toc
+        tocDepth
         codeStyle
       }
     }

@@ -24,7 +24,7 @@ const HeaderWrapper = styled.div`
   justify-content: center;
 
   .container {
-    width: 1110px;
+    width: 1390px;
   }
 
   @media (min-width: 0px) and (max-width: 1024px) {
@@ -162,6 +162,7 @@ const MenuMobileBtn = styled.a`
 const NonMobileMenu = styled.div`
   display: flex;
   width: 50%;
+  margin-right: 280px;
   @media (min-width: 0px) and (max-width: 768px) {
     display: none;
   }

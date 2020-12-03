@@ -33,17 +33,11 @@ const MainTitle = styled.h1`
   }
 `
 
-const TopSection = ({ title, slug, toc, codeStyle }: any) => {
+const TopSection = ({ title, slug, codeStyle }: any) => {
   return (
     <TopSectionWrapper>
       <ParentTitle slug={slug} />
       <MainTitle className={`${codeStyle ? 'inline-code': ''}`}>{title}</MainTitle>
-      {toc.items && (
-        <div className="tech-switch-block">
-          <hr />
-        </div>
-      )}
-      {toc && toc.items && toc.items.length > 0 && <TOC headings={toc.items} />}
     </TopSectionWrapper>
   )
 }
