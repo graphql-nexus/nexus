@@ -77,17 +77,18 @@ Finally, we'll import this file and pass it down to `makeSchema`
 
 ```ts
 // api/schema.ts
- import { join } from 'path'
-+ import * as typeDefs from './graphql'
+import { makeSchema } from '@nexus/schema'
+import { join } from 'path'
++ import * as type from './graphql'
 
- const schema = makeSchema({
+const schema = makeSchema({
 -  types: []
-+  types: typeDefs,
-   outputs: {
-     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
-     schema: join(__dirname, '..', 'schema.graphql')
-   }
- })
++  types,
+  outputs: {
+    typegen: join(__dirname, '../nexus-typegen.ts'),
+    schema: join(__dirname, '../schema.graphql')
+  }
+})
 ```
 
 </tab>
@@ -96,15 +97,16 @@ Finally, we'll import this file and pass it down to `makeSchema`
 
 ```ts
 // api/schema.ts
+import { makeSchema } from '@nexus/schema'
 import { join } from 'path'
-import * as typeDefs from './graphql'
+import * as types from './graphql'
 
-const schema = makeSchema({
-  types: typeDefs,
+export const schema = makeSchema({
+  types,
   outputs: {
-     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
-     schema: join(__dirname, '..', 'schema.graphql')
-  }
+    typegen: join(__dirname, '../nexus-typegen.ts'),
+    schema: join(__dirname, '../schema.graphql'),
+  },
 })
 ```
 
@@ -151,7 +153,7 @@ We'll start by letting API clients read the drafts of your blog.
 ```ts
 // api/graphql/Post.ts                   // 1
 
-import { objectType, extendType } from '@nexus/schema'
+import { extendType } from '@nexus/schema'
 
 export const PostQuery = extendType({
   type: 'Query',                         // 2

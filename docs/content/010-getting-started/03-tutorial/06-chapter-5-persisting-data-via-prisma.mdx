@@ -40,46 +40,43 @@ Now that you know a bit about Prisma, let's get going! Do the following:
 like so:
 
 ```bash-symbol
-npm add @prisma/client
-```
-
-```bash-symbol
-npm add --save-dev @prisma/cli
+npm add @prisma/client && npm add --save-dev @prisma/cli
 ```
 
 ```bash-symbol
 npx prisma init
 ```
 
-```prisma
-// prisma/schema.prisma
-
-datasource postgres {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-```
-
-```
-# prisma/.env
-DATABASE_URL="<postgres_connection_url>"
-```
-
 Almost done, but we still need to setup a Postgres database for our app to connect to. There are a ton of ways to do this so we're just going to show the most straight forward cross-platform way we know how. First, make sure you have [docker installed](https://docs.docker.com/get-docker/). Then, simply run this command:
 
 ```bash-symbol
-docker run --detach --publish 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres postgres:10.12
+docker run --detach --publish 5432:5432 -e POSTGRES_PASSWORD=postgres --name nexus-tutorial-postgres postgres:10
 ```
 
-That's it. You now have a Postgres server running. You can connect to it at a URL like:
-
-```markdown
-postgresql://postgres:postgres@localhost:5432/myapp
-```
+That's it. You now have a Postgres server running.
 
 If you prefer setting up your local Postgres another way go for it. If our suggest approach doesn't work for you, then checkout a few other approaches listed on the [Nexus recipes page](https://www.nexusjs.org/#/references/recipes?id=setting-up-postgresql).
 
 Finally, in the `prisma/.env` file you've created before, replace `<postgres_connection_url>` with your actual database URL.
+
+<TabbedContent tabs={['Diff', 'Code']}>
+<tab>
+
+```diff
+-DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
++DATABASE_URL="postgresql://postgres:postgres@localhost:5432/myapp"
+```
+
+</tab>
+<tab>
+
+```diff
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/myapp"
+```
+
+
+</tab>
+</TabbedContent>
 
 <!-- **TODO: find a way to make sure their connection url is working**
 Confirm things are setup correctly by ...
@@ -91,9 +88,43 @@ It is now time to replace our in-memory data with actual tables in our database.
 
 In chapters 2 and 3 we already began to model our blog domain with the GraphQL type `Post`. We can base our models on that prior work, resulting in a Prisma Schema like so:
 
+<TabbedContent tabs={['Diff', 'Code']}>
+<tab>
+
+```groovy diff
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
++model Post {
++  id        Int     @id @default(autoincrement())
++  title     String
++  body      String
++  published Boolean
++}
+```
+
+</tab>
+<tab>
+
 ```groovy
 // prisma/schema.prisma
-// ...
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
 
 model Post {
   id        Int     @id @default(autoincrement())
@@ -103,6 +134,9 @@ model Post {
 }
 ```
 
+</tab>
+</TabbedContent>
+
 With our database schema specified, we're now ready to proceed to our first database migration! To do that, we'll use the Prisma CLI.
 
 Generate our migration files...
@@ -110,6 +144,8 @@ Generate our migration files...
 ```bash-symbold
 npx prisma migrate save --experimental
 ```
+
+You'll be asked to create the database (use the default) and give a name to the migration (call it "init").
 
 Then, apply the migration...
 
@@ -147,7 +183,6 @@ export const db = new PrismaClient()
 ```
 
 </tab>
-
 <tab>
 
 ```ts
@@ -164,22 +199,26 @@ export const db = new PrismaClient()
 Then, update your `Context` type so that it uses the PrismaClient
 
 <TabbedContent tabs={['Diff', 'Code']}>
-
 <tab>
 
 ```ts
 // api/context.ts
--import { Db } from "./db";
+-import { Db, db } from "./db";
 +import { PrismaClient } from '@prisma/client'
 
 export interface Context {
 -  db: Db;
 +  db: PrismaClient
 }
+export function createContext(): Context {
+  return {
+-   db,
++   db: new PrismaClient(),
+  }
+}
 ```
 
 </tab>
-
 <tab>
 
 ```ts
@@ -189,10 +228,15 @@ import { PrismaClient } from '@prisma/client'
 export interface Context {
   db: PrismaClient
 }
+
+export function createContext(): Context {
+  return {
+    db: new PrismaClient(),
+  }
+}
 ```
 
 </tab>
-
 </TabbedContent>
 
 Finally, generate the PrismaClient using the Prisma CLI
@@ -204,15 +248,13 @@ npx prisma generate
 Let's now replace all our previous in-memory db interactions with calls to the Prisma Client
 
 <TabbedContent tabs={['Diff', 'Code']}>
-
 <tab>
 
 ```ts
 // api/graphql/Post.ts
-
 // ...
 
-extendType({
+export const PostQuery = extendType({
   type: 'Query',
   definition(t) {
     t.list.field('drafts', {
@@ -230,9 +272,9 @@ extendType({
       },
     })
   },
-});
+})
 
-extendType({
+export const PostMutation = extendType({
   type: 'Mutation',
   definition(t) {
     t.field('createDraft', {
@@ -284,15 +326,13 @@ extendType({
 ```
 
 </tab>
-
 <tab>
 
 ```ts
 // api/graphql/Post.ts
-
 // ...
 
-schema.extendType({
+export const PostQuery = extendType({
   type: 'Query',
   definition(t) {
     t.list.field('drafts', {
@@ -310,7 +350,7 @@ schema.extendType({
   },
 })
 
-schema.extendType({
+export const PostMutation = extendType({
   type: 'Mutation',
   definition(t) {
     t.field('createDraft', {
@@ -349,7 +389,6 @@ schema.extendType({
 })
 ```
 </tab>
-
 </TabbedContent>
 
 ## Try it out
