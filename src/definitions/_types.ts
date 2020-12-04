@@ -108,7 +108,13 @@ export interface TypingImport {
   path: string
   /** The name of a type being exported from the package/module (specified in path) that you want to use. */
   name: string
-  /** The name you want the imported type to be referenced as in the typegen. */
+  /**
+   * The name you want the imported type to be referenced as in the typegen.
+   *
+   * This is useful when there is already a typegen import whose name would conflict with this type name.
+   *
+   * Default :: By default no import alias will be used.
+   */
   alias?: string
 }
 
