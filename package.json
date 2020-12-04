@@ -91,6 +91,7 @@
     "jest-watch-typeahead": "^0.6.1",
     "lint-staged": "^7.3.0",
     "prettier": "^2.0.5",
+    "prettier-plugin-jsdoc": "^0.2.5",
     "sort-package-json": "^1.22.1",
     "ts-jest": "^26.4.4",
     "ts-morph": "^8.2.0",

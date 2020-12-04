@@ -2000,6 +2000,11 @@ commander@^2.12.1, commander@^2.14.1, commander@^2.9.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.0.tgz#d58bb2b5c1ee8f87b0d340027e9e94e222c5a422"
   integrity sha512-7j2y+40w61zy6YC2iRNpUe/NwhNyoXrYpHMrSunaMG64nRnaf96zO/KMQR4OyN/UnE5KLyEBnKHd4aG3rskjpQ==
 
+comment-parser@^0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-0.7.6.tgz#0e743a53c8e646c899a1323db31f6cd337b10f12"
+  integrity sha512-GKNxVA7/iuTnAqGADlTWX4tkhzxZKXp5fLJqKTlQLHkE65XDUKutZ3BHaJC5IGcper2tT3QRD1xr4o3jNpgXXg==
+
 common-tags@^1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/common-tags/-/common-tags-1.8.0.tgz#8e3153e542d4a39e9b10554434afaaf98956a937"
@@ -4757,6 +4762,11 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
+linguist-languages@^7.11.1:
+  version "7.12.1"
+  resolved "https://registry.yarnpkg.com/linguist-languages/-/linguist-languages-7.12.1.tgz#bf4928f25953ce3e00369cf956ac4d016923d55f"
+  integrity sha512-+2CmUIeNOvJ7MWn6MY5h7mpDcw62MjKjXKC1wH0zLYnDQnn/0/+j3LcWO0v4+M9Vh/yqbt0codmlA7Z82bDnLA==
+
 lint-staged@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-7.3.0.tgz#90ff33e5ca61ed3dbac35b6f6502dbefdc0db58d"
@@ -5790,6 +5800,14 @@ prepend-http@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
   integrity sha1-6SQ0v6XqjBn0HN/UAddBo8gZ2Jc=
+
+prettier-plugin-jsdoc@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-jsdoc/-/prettier-plugin-jsdoc-0.2.5.tgz#ad4eb1885c879f7a22db7cf53d0c1861344aadec"
+  integrity sha512-C4l3V2rk7Ppoc4SO0cwnKazZy596iRE9j5VvsJo43LxK2T08B1YFruugtsfLgtbGNGviWIl7btN7uNjFsAo0Qw==
+  dependencies:
+    comment-parser "^0.7.6"
+    linguist-languages "^7.11.1"
 
 prettier@^1.16.0:
   version "1.19.1"
