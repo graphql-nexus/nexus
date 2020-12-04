@@ -88,9 +88,19 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    * The description for this object type.
    *
    * Various GraphQL tools will make use of this information but it has zero runtime impact. The value given
-   * here will also be included in the generated GraphQL SDL file.
+   * here will also be included as heredocs in the generated GraphQL SDL file.
    *
    * Default :: By default there will be no description
+   *
+   * @example
+   *   'Little description to help you along!'
+   *
+   *   // GraphQL SDL
+   *   // -----------
+   *   // """Little description to help you along!"""
+   *   // type YOUR_TYPE_NAME {
+   *   //   # ...
+   *   // }
    */
   description?: string | null
   /**
