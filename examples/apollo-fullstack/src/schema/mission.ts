@@ -1,4 +1,4 @@
-import { objectType, enumType, arg, nullable } from '@nexus/schema'
+import { objectType, enumType, arg, nullable } from 'nexus'
 
 export const Mission = objectType({
   name: 'Mission',

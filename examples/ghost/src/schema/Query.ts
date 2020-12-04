@@ -1,4 +1,4 @@
-import { idArg, nonNull, queryType } from '@nexus/schema'
+import { idArg, nonNull, queryType } from 'nexus'
 import { Post } from './Post'
 import { User } from './User'
 

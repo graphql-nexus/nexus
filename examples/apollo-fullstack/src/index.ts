@@ -1,5 +1,5 @@
 // @ts-check
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { ApolloServer } from 'apollo-server'
 import { Request } from 'express'
 import isEmail from 'isemail'

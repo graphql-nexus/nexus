@@ -69,7 +69,7 @@ jobs:
       - name: Example Install
         run: yarn --cwd=examples/${{ matrix.example }} --frozen-lockfile
       - name: Example Use Link
-        run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
+        run: yarn --cwd=examples/${{ matrix.example }} link nexus
       - name: Example Typecheck
         run: yarn --cwd=examples/${{ matrix.example }} tsc
 

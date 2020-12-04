@@ -62,9 +62,9 @@ export class SDLConverter {
 
   printUsedImports() {
     if (this.commonjs) {
-      return `const { ${Array.from(this.usedImports).join(', ')} } = require('@nexus/schema');`
+      return `const { ${Array.from(this.usedImports).join(', ')} } = require('nexus');`
     }
-    return `import { ${Array.from(this.usedImports).join(', ')} } from '@nexus/schema';`
+    return `import { ${Array.from(this.usedImports).join(', ')} } from 'nexus';`
   }
 
   printObjectTypes() {

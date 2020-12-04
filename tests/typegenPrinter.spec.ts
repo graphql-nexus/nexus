@@ -29,7 +29,7 @@ describe('typegenPrinter', () => {
         const prettierConfigPath = require.resolve('../.prettierrc')
         const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
 
-        return content.replace("'@nexus/schema'", `'../../src'`)
+        return content.replace("'nexus'", `'../../src'`)
       },
     }) as core.NexusGraphQLSchema
 

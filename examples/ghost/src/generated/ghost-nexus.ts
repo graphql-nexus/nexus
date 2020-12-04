@@ -5,8 +5,8 @@
 
 import * as ctx from '../data-sources/Context'
 import * as db from './ghost-db-types'
-import { FieldAuthorizeResolver } from '@nexus/schema/dist/plugins/fieldAuthorizePlugin'
-import { core } from '@nexus/schema'
+import { FieldAuthorizeResolver } from 'nexus/dist/plugins/fieldAuthorizePlugin'
+import { core } from 'nexus'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(

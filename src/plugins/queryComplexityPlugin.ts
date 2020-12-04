@@ -4,7 +4,7 @@ import { plugin } from '../plugin'
 import { printedGenTyping, printedGenTypingImport } from '../utils'
 
 const QueryComplexityImport = printedGenTypingImport({
-  module: '@nexus/schema/dist/plugins/queryComplexityPlugin',
+  module: 'nexus/dist/plugins/queryComplexityPlugin',
   bindings: ['QueryComplexity'],
 })
 

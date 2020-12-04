@@ -4,11 +4,11 @@
     "start": "nodemon src/index.js"
   },
   "dependencies": {
-    "@nexus/schema": "^0.16.0",
     "apollo-server": "^2.18.1",
     "githunt-api": "peggyrayzis/GitHunt-API",
     "graphql": "^14.5.8",
-    "graphql-tools": "^4.0.7"
+    "graphql-tools": "^4.0.7",
+    "nexus": "^0.16.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.6",

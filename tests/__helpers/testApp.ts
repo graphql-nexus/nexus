@@ -33,7 +33,7 @@ export async function generateTypegen(settings: HookSettings) {
       const prettierConfigPath = require.resolve('../../.prettierrc')
       const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
 
-      return content.replace("'@nexus/schema'", `'${importPath}'`)
+      return content.replace("'nexus'", `'${importPath}'`)
     },
     features: {
       abstractTypeStrategies: {

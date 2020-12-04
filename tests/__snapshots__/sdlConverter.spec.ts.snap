@@ -82,7 +82,7 @@ export const User = objectType({
 `;
 
 exports[`convertSDL 1`] = `
-"import { objectType, stringArg, list, nonNull, arg, interfaceType, inputObjectType, unionType, enumType, scalarType } from '@nexus/schema';
+"import { objectType, stringArg, list, nonNull, arg, interfaceType, inputObjectType, unionType, enumType, scalarType } from 'nexus';
 
 export const Mutation = objectType({
   name: \\"Mutation\\",
@@ -202,7 +202,7 @@ export const UUID = scalarType({
 `;
 
 exports[`convertSDL as commonjs 1`] = `
-"const { objectType, stringArg, list, nonNull, arg, interfaceType, inputObjectType, unionType, enumType, scalarType } = require('@nexus/schema');
+"const { objectType, stringArg, list, nonNull, arg, interfaceType, inputObjectType, unionType, enumType, scalarType } = require('nexus');
 
 const Mutation = objectType({
   name: \\"Mutation\\",

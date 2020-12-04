@@ -1,4 +1,4 @@
-import { nonNull, objectType, stringArg } from '@nexus/schema'
+import { nonNull, objectType, stringArg } from 'nexus'
 import ts from 'typescript'
 import fs from 'fs-extra'
 
