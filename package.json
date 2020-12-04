@@ -24,7 +24,8 @@
     "dist-esm",
     "LICENSE.md",
     "README.md",
-    "yarn.lock"
+    "yarn.lock",
+    "scripts/rename-notice.js"
   ],
   "main": "dist",
   "module": "dist-esm",
@@ -38,6 +39,7 @@
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && yarn gulp run-examples",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts' 'examples/*/src/**.ts'",
+    "postinstall": "node scripts/rename-notice.js",
     "link-examples": "yarn && yarn gulp link-examples",
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn build",
