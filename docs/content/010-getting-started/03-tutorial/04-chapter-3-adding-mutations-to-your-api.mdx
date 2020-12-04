@@ -116,7 +116,7 @@ Finally, let's configure Nexus to know the type of our GraphQL context by adjust
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 import * as types from './graphql'
 
@@ -144,7 +144,7 @@ export const schema = makeSchema({
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 import * as types from './graphql'
 
@@ -285,8 +285,8 @@ Let's revise our implementation with GraphQL arguments.
 
 
 ```ts
-import { objectType, extendType, stringArg } from '@nexus/schema'
-+import { objectType, extendType, stringArg, nonNull } from '@nexus/schema'
+import { objectType, extendType, stringArg } from 'nexus'
++import { objectType, extendType, stringArg, nonNull } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -320,7 +320,7 @@ export const PostMutation = extendType({
 
 
 ```ts
-import { objectType, extendType, stringArg, nonNull } from '@nexus/schema'
+import { objectType, extendType, stringArg, nonNull } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -371,8 +371,8 @@ Before we wrap this chapter let's flush out our schema a bit more. We'll add a `
 
 ```ts
 // api/graphql/Post.ts
--import { objectType, extendType, stringArg, nonNull } from '@nexus/schema'
-+import { objectType, extendType, stringArg, nonNull, intArg } from '@nexus/schema'
+-import { objectType, extendType, stringArg, nonNull } from 'nexus'
++import { objectType, extendType, stringArg, nonNull, intArg } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -405,7 +405,7 @@ export const PostMutation = extendType({
 
 ```ts
 // api/graphql/Post.ts
-import { objectType, extendType, stringArg, nonNull, intArg } from '@nexus/schema'
+import { objectType, extendType, stringArg, nonNull, intArg } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -455,7 +455,7 @@ Then, we'll let API clients read these published posts.
 
 ```ts
 // api/graphql/Post.ts
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 
 export const PostQuery = extendType({
   type: 'Query',
@@ -479,7 +479,7 @@ export const PostQuery = extendType({
 
 ```ts
 // api/graphql/Post.ts
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 
 export const PostQuery = extendType({
   type: 'Query',

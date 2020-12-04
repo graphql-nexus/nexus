@@ -10,7 +10,7 @@ codeStyle: true
 Types (including arguments) can be passed into the `list()` function to wrap them in a list type.
 
 ```ts
-import { queryType, stringArg, list } from '@nexus/schema'
+import { queryType, stringArg, list } from 'nexus'
 
 queryType({
   definition(t) {
@@ -45,7 +45,7 @@ Below are some usage examples of `list()`:
 Types (including arguments) can be passed into the `nonNull()` function to mark them as non-null.
 
 ```ts
-import { queryType, stringArg, nonNull } from '@nexus/schema'
+import { queryType, stringArg, nonNull } from 'nexus'
 
 queryType({
   definition(t) {
@@ -89,7 +89,7 @@ When types are non-nullable by default:
 To revert the non-nullability, we can use the `nullable()` helper to mark Types and Arguments as nullable.
 
 ```ts
-import { queryType, stringArg, nonNull } from '@nexus/schema'
+import { queryType, stringArg, nonNull } from 'nexus'
 
 queryType({
   nonNullDefaults: {

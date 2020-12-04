@@ -25,7 +25,7 @@ import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
 import * as HTTP from 'http'
 import * as path from 'path'
-import { makeSchema, subscriptionType } from '@nexus/schema'
+import { makeSchema, subscriptionType } from 'nexus'
 
 const schema = makeSchema({
   shouldExitAfterGenerateArtifacts:

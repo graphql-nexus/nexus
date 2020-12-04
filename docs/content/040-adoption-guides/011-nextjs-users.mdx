@@ -38,7 +38,7 @@ With the Next.js project in place, we now need to install the other dependencies
 In addition to Nexus, we'll need a server to run the GraphQL API. Nexus works with a range of GraphQL servers. We'll use Apollo Server and opt for the `apollo-server-micro` variety as it is well-suited to serverless environments.
 
 ```bash-symbol
-npm i @nexus/schema apollo-server-micro
+npm i nexus apollo-server-micro
 ```
 
 ## Create an API Route
@@ -62,7 +62,7 @@ Populate the `graphql.ts` file with a simple schema and server. Then, expose the
 ```ts
 // pages/api/graphql.ts
 
-import { makeSchema, queryType } from '@nexus/schema'
+import { makeSchema, queryType } from 'nexus'
 import { ApolloServer } from 'apollo-server-micro'
 
 const Query = queryType({
@@ -125,7 +125,7 @@ Let's create and export a `Query` constant, as well as a `Framework` object type
 ```ts
 // schema/Query.ts
 
-import { objectType, queryType } from '@nexus/schema'
+import { objectType, queryType } from 'nexus'
 
 export const Framework = objectType({
   name: 'Framework',
@@ -175,7 +175,7 @@ In the `index.ts` file, bring in `makeSchema` as well as the types we just creat
 ```ts
 // schema/index.ts
 
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import * as QueryTypes from './Query'
 
 const schema = makeSchema({
@@ -193,7 +193,7 @@ Now in the `graphql.ts` for our API route, we can simply pull in the constructed
 
 ```ts diff
     // pages/api/graphql.ts
--   import { makeSchema, queryType } from '@nexus/schema'
+-   import { makeSchema, queryType } from 'nexus'
     import { ApolloServer } from 'apollo-server-micro'
 +   import schema from '../../schema'
 
@@ -344,7 +344,7 @@ In the `schema/index.ts` file, configure `makeSchema` to output the generated SD
 <tab>
 
 ```ts diff
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import * as QueryTypes from './Query'
 +import path from 'path'
 
@@ -363,7 +363,7 @@ export default schema;
 <tab>
 
 ```ts diff
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import * as QueryTypes from './Query'
 import path from 'path'
 
@@ -399,7 +399,7 @@ Finally we will setup our build script to run Nexus typegen before Next.js tries
     "start": "next start"
   },
   "dependencies": {
-    "@nexus/schema": "^0.19.2",
+    "nexus": "^0.19.2",
     "apollo-server-micro": "^2.19.0",
     "graphql-request": "^3.3.0",
     "next": "10.0.3",
@@ -429,7 +429,7 @@ Finally we will setup our build script to run Nexus typegen before Next.js tries
     "start": "next start"
   },
   "dependencies": {
-    "@nexus/schema": "^0.19.2",
+    "nexus": "^0.19.2",
     "apollo-server-micro": "^2.19.0",
     "graphql-request": "^3.3.0",
     "next": "10.0.3",

@@ -332,7 +332,7 @@ Like with the Centralized and DMF strategies Nexus leverages TypeScript to ensur
 Nexus enables you to pick the strategy you want to use. By default only the Centralized strategy is enabled. You can pick your strategies in the `makeSchema` configuration.
 
 ```ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 
 makeSchema({
   features: {
@@ -351,7 +351,7 @@ Nexus enables enabling/disabling strategies because having them all enabled at c
 When you customize the strategy settings all strategies become disabled except for those that you opt into. For example in the following:
 
 ```ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 
 makeSchema({
   features: {
