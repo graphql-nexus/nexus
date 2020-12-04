@@ -1,4 +1,4 @@
-import { decorateType } from '@nexus/schema'
+import { decorateType } from 'nexus'
 import { GraphQLDate } from 'graphql-scalars'
 
 export const GQLDate = decorateType(GraphQLDate, {

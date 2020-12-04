@@ -1,4 +1,4 @@
-import { core, list, nullable } from '@nexus/schema'
+import { core, list, nullable } from 'nexus'
 
 export function withTypeArguments(t: core.OutputDefinitionBlock<any>) {
   t.list.field('typeArguments', { type: nullable('Node') })

@@ -1,7 +1,7 @@
 // @ts-check
 const { ApolloServer } = require('apollo-server')
 const path = require('path')
-const { makeSchema } = require('@nexus/schema')
+const { makeSchema } = require('nexus')
 const types = require('./schema')
 
 const schema = makeSchema({

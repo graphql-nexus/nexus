@@ -10,7 +10,7 @@ Often times you want to split up subscription fields into different domains of y
 Like `queryField` and `mutationField` except that like `subscriptionType` the `subscribe` field is required on the type configuration. Refer to [`subscriptionType`](/api/subscription-type) docs for details
 
 ```ts
-import { subscriptionField } from '@nexus/schema'
+import { subscriptionField } from 'nexus'
 
 export const SubscriptionField = subscriptionField('truths', {
   type: 'Boolean',

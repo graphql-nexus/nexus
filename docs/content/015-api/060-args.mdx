@@ -12,7 +12,7 @@ codeStyle: true
 Defines an argument that can be used in any object or interface type. Args can be reused in multiple locations, and it can be convenient to create your own wrappers around arguments.
 
 ```ts
-import { intArg, core } from '@nexus/schema'
+import { intArg, core } from 'nexus'
 
 function requiredInt(opts: core.ScalarArgConfig<number>) {
   return nonNull(intArg({ ...opts }))

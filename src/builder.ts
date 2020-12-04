@@ -311,14 +311,14 @@ export interface TypegenInfo {
    */
   contextTypeImport?: TypingImport
   /**
-   * The path to the @nexus/schema package.
+   * The path to the nexus package.
    *
-   * @default '@nexus/schema'
+   * @default 'nexus'
    *
    * @remarks
    *
-   * This setting is particularly useful when @nexus/schema is being wrapped by
-   * another library/framework such that @nexus/schema is not expected to be a
+   * This setting is particularly useful when nexus is being wrapped by
+   * another library/framework such that nexus is not expected to be a
    * direct dependency at the application level.
    */
   nexusSchemaImportId?: string

@@ -105,7 +105,7 @@ export interface Context {
 }
 ```
 
-Finally, add the following configuration to the `makeSchema` function of `@nexus/schema` in `api/app.ts`
+Finally, add the following configuration to the `makeSchema` function of `nexus` in `api/app.ts`
 
 <TabbedContent tabs={['Diff', 'Code']}>
 
@@ -276,7 +276,7 @@ Let's revise our implementation with GraphQL arguments.
 
 
 ```ts
-import { extendType, stringArg } from '@nexus/schema'
+import { extendType, stringArg } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -310,7 +310,7 @@ export const PostMutation = extendType({
 
 
 ```ts
-import { extendType, stringArg } from '@nexus/schema'
+import { extendType, stringArg } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -362,7 +362,7 @@ Before we wrap this chapter let's flush out our schema a bit more. We'll add a `
 ```ts
 // api/graphql/Post.ts
 
-import { extendType, intArg, stringArg } from '@nexus/schema'
+import { extendType, intArg, stringArg } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -396,7 +396,7 @@ export const PostMutation = extendType({
 ```ts
 // api/graphql/Post.ts
 
-import { extendType, intArg, stringArg } from '@nexus/schema'
+import { extendType, intArg, stringArg } from 'nexus'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -447,7 +447,7 @@ Then, we'll let API clients read these published posts.
 ```ts
 // api/graphql/Post.ts
 
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 
 export const PostQuery = extendType({
   type: 'Query',
@@ -472,7 +472,7 @@ export const PostQuery = extendType({
 ```ts
 // api/graphql/Post.ts
 
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 
 export const PostQuery = extendType({
   type: 'Query',

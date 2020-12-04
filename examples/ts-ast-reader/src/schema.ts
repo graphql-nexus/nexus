@@ -1,4 +1,4 @@
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { GraphQLNamedType, isObjectType } from 'graphql'
 import path from 'path'
 import * as types from './types'

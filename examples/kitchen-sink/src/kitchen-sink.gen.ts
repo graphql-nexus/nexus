@@ -4,9 +4,9 @@
  */
 
 import { UnusedInterfaceTypeDef } from './kitchen-sink-definitions'
-import { core, connectionPluginCore } from '@nexus/schema'
-import { QueryComplexity } from '@nexus/schema/dist/plugins/queryComplexityPlugin'
-import { FieldAuthorizeResolver } from '@nexus/schema/dist/plugins/fieldAuthorizePlugin'
+import { core, connectionPluginCore } from 'nexus'
+import { QueryComplexity } from 'nexus/dist/plugins/queryComplexityPlugin'
+import { FieldAuthorizeResolver } from 'nexus/dist/plugins/fieldAuthorizePlugin'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     date<FieldName extends string>(

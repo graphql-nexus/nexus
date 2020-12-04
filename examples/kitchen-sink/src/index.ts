@@ -5,7 +5,7 @@ import {
   makeSchema,
   nullabilityGuardPlugin,
   queryComplexityPlugin,
-} from '@nexus/schema'
+} from 'nexus'
 import { ApolloServer } from 'apollo-server'
 import { separateOperations } from 'graphql'
 import { fieldExtensionsEstimator, getComplexity, simpleEstimator } from 'graphql-query-complexity'

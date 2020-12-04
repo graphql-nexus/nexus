@@ -1,4 +1,4 @@
-import { nonNull, objectType } from '@nexus/schema'
+import { nonNull, objectType } from 'nexus'
 
 export const User = objectType({
   name: 'User',

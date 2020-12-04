@@ -1,4 +1,4 @@
-import { makeSchema } from "@nexus/schema"
+import { makeSchema } from "nexus"
 import * as User from "./User"
 
 export const schema = makeSchema({

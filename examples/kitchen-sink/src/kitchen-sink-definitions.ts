@@ -15,7 +15,7 @@ import {
   queryField,
   scalarType,
   unionType,
-} from '@nexus/schema'
+} from 'nexus'
 import { connectionFromArray } from 'graphql-relay'
 import _ from 'lodash'
 

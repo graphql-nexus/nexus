@@ -4,22 +4,22 @@ title: Nexus Framework Users
 
 ## Hello Nexus Framework User!
 
-If you are a `nexus` (Nexus Framework) user we strongly encourage you to migrate to `@nexus/schema` (Nexus Schema). For more detail about why and how this came about please see [this announcement](https://github.com/prisma-labs/graphql-framework-experiment/issues/1432). The following guide is written to help you transition from the framework back to the library.
+If you are a `nexus` (Nexus Framework) user we strongly encourage you to migrate to `nexus` (Nexus Schema). For more detail about why and how this came about please see [this announcement](https://github.com/prisma-labs/graphql-framework-experiment/issues/1432). The following guide is written to help you transition from the framework back to the library.
 
 Note that there is a [separate migration guide](https://nxs.li/unframework/plugin/prisma/migrate) detailing how to go from the Prisma plugin for Nexus Framework to the Prisma plugin for Nexus schema.
 
 ## Bundled Dependencies
 
-You will need to install `@nexus/schema` and `graphql` yourself. While you're at it, uninstall `nexus` too.
+You will need to install `nexus` and `graphql` yourself. While you're at it, uninstall `nexus` too.
 
 ```tsx
 npm uninstall nexus
-npm install @nexus/schema graphql
+npm install nexus graphql
 ```
 
 ## JavaScript Support
 
-If you had been using TypeScript before only because Nexus Framework forced you to, then know that you can use JavaScript with `@nexus/schema` if you want. The rest of this guide will assume that you want to continue using TypeScript. Ignore or adapt instructions as needed if you are a JS user.
+If you had been using TypeScript before only because Nexus Framework forced you to, then know that you can use JavaScript with `nexus` if you want. The rest of this guide will assume that you want to continue using TypeScript. Ignore or adapt instructions as needed if you are a JS user.
 
 ## Managed TypeScript
 
@@ -71,7 +71,7 @@ Now you will need to do something like this:
 ```tsx
 // ./User.ts
 
-import { objectType } from '@nexus/schema'
+import { objectType } from 'nexus'
 
 export const User = objectType(...)
 ```
@@ -79,7 +79,7 @@ export const User = objectType(...)
 ```tsx
 // ./index.ts
 
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { User } from './User'
 
 const schema = makeSchema({
@@ -129,7 +129,7 @@ Here is an example of approach A to managing reflection:
    ```tsx
    // src/schema.ts
 
-   export { makeSchema } from '@nexus/schema'
+   export { makeSchema } from 'nexus'
    import * as types from './graphql'
 
    export const schema = makeSchema({
@@ -145,7 +145,7 @@ Here is an example of approach B to managing reflection:
 2. When configuring `makeSchema` make sure to enable process exit when requested via an environment variable.
 
    ```tsx
-   import { makeSchema } from '@nexus/schema'
+   import { makeSchema } from 'nexus'
 
    export const schema = makeSchema({
      shouldExitAfterGenerateArtifacts: Boolean(process.env.NEXUS_SHOULD_EXIT_AFTER_REFLECTION),
@@ -230,7 +230,7 @@ Nexus framework comes bundled with Apollo Server and runs it for you. You will n
 
    ```tsx
    import { ApolloServer } from 'apollo-server-express'
-   import { makeSchema, objectType } from '@nexus/schema'
+   import { makeSchema, objectType } from 'nexus'
    import createExpress from 'express'
 
    const schema = makeSchema({
@@ -271,7 +271,7 @@ Following from example in the _HTTP Server_ section, here is an example with a s
 ```tsx
 import * as Http from 'http'
 import { ApolloServer } from 'apollo-server-express'
-import { makeSchema, subscriptionType } from '@nexus/schema'
+import { makeSchema, subscriptionType } from 'nexus'
 import createExpress from 'express'
 
 /**
@@ -368,7 +368,7 @@ Nexus Framework has some builtin logging functionality. You can approximate it a
 4. You still need to make this type safe. See _"Context API Type Discovery"_ section for more detail. What follows is just a code example without explanation.
 
    ```tsx
-   import * as Nexus from '@nexus/schema'
+   import * as Nexus from 'nexus'
    import * as Floggy from 'floggy'
 
    export type Context = {
@@ -397,7 +397,7 @@ You need to explicitly setup all custom scalars yourself. To match what Nexus Fr
 2. Setup the `Json` and `DateTime` scalars
 
    ```tsx
-   import { makeSchema } from '@nexus/schema'
+   import { makeSchema } from 'nexus'
    import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
 
    const jsonScalar = asNexusMethod(JSONObjectResolver, 'json')
@@ -448,7 +448,7 @@ export type Context = {
 ```tsx
 // 2
 
-import * as Nexus from '@nexus/schema'
+import * as Nexus from 'nexus'
 import * as Path from 'path'
 
 Nexus.makeSchema({
@@ -501,7 +501,7 @@ export type Foo = {
 ```tsx
 // 2
 
-import * as Nexus from '@nexus/schema'
+import * as Nexus from 'nexus'
 import * as Path from 'path'
 
 Nexus.makeSchema({

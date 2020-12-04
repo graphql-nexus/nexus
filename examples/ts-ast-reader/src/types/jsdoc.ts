@@ -1,4 +1,4 @@
-import { interfaceType, objectType, blocks, nullable } from '@nexus/schema'
+import { interfaceType, objectType, blocks, nullable } from 'nexus'
 import ts from 'typescript'
 
 export const JSDoc = objectType({
