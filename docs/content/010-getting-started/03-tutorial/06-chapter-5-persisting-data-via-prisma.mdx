@@ -204,6 +204,7 @@ Then, update your `Context` type so that it uses the PrismaClient created in `./
 ```ts
 // api/context.ts
 import { db } from "./db";
++import { PrismaClient } from "@prisma/client"
 
 export interface Context {
 -  db: Db
@@ -222,6 +223,7 @@ export function createContext(): Context {
 ```ts
 // api/context.ts
 import { db } from "./db";
+import { PrismaClient } from "@prisma/client"
 
 export interface Context {
   db: PrismaClient
