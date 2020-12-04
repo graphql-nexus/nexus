@@ -10,5 +10,5 @@ ${ansi.yellow(ansi.bold("WARNING: '@nexus/schema' will be renamed to 'nexus' on 
 ${ansi.yellow(ansi.bold("WARNING: '@nexus/schema' will be renamed to 'nexus' on December 14th."))}
 
 0.20.x will be the last versions published on the '@nexus/schema' package.
-Future updates will be published to 'nexus@1.0.0'.
+Starting December 14th, future updates will be published to 'nexus@^1.0.0'.
 `)
