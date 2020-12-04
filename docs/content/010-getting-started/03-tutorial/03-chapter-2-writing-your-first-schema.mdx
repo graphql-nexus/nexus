@@ -77,7 +77,7 @@ Finally, we'll import this file and pass it down to `makeSchema`
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 + import * as type from './graphql'
 
@@ -97,7 +97,7 @@ const schema = makeSchema({
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 import * as types from './graphql'
 
