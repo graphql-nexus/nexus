@@ -126,10 +126,10 @@ You may notice that there's also now a new `schema.graphql` file at your project
 
 ```graphql
 type Post {
-  id: Int
-  title: String
   body: String
+  id: Int
   published: Boolean
+  title: String
 }
 ```
 
@@ -171,7 +171,7 @@ export const PostQuery = extendType({
 
 ```graphql
 type Query {
-  drafts: [Post!]!
+  drafts: [Post]!
 }
 ```
 
