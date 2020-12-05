@@ -1,5 +1,6 @@
 import {
   execute,
+  executeSync,
   ExecutionArgs,
   GraphQLError,
   GraphQLFieldResolver,
@@ -986,5 +987,18 @@ describe('field level configuration', () => {
     })
     expect(result.data?.users.pageInfo.hasNextPage).toEqual(true)
     expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(false)
+  })
+
+  it('does not pay the cost of async unless there is an async call', () => {
+    const schema = makeTestSchema()
+
+    const result = executeSync({
+      schema,
+      document: UsersFirst,
+      variableValues: {
+        first: 1,
+      },
+    })
+    expect(result).toMatchSnapshot()
   })
 })

@@ -22,6 +22,7 @@ import {
 } from '../typegenTypeHelpers'
 import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
 import { nullable, NexusNullDef } from '../definitions/nullable'
+import { MaybePromiseLike } from '../typeHelpersInternal'
 
 export interface ConnectionPluginConfig {
   /**
@@ -37,8 +38,7 @@ export interface ConnectionPluginConfig {
    */
   includeNodesField?: boolean
   /**
-   * Any args to include by default on all connection fields,
-   * in addition to the ones in the spec.
+   * Any args to include by default on all connection fields, in addition to the ones in the spec.
    *
    * @default null
    */
@@ -58,14 +58,14 @@ export interface ConnectionPluginConfig {
   /**
    * Custom logic to validate the arguments.
    *
-   * Defaults to requiring that either a `first` or `last` is provided, and
-   * that after / before must be paired with `first` or `last`, respectively.
+   * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
+   * with `first` or `last`, respectively.
    */
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
   /**
-   * If disableForwardPagination or disableBackwardPagination are set to true,
-   * we require the `first` or `last` field as needed. Defaults to true,
-   * setting this to false will disable this behavior and make the field nullable.
+   * If disableForwardPagination or disableBackwardPagination are set to true, we require the `first` or
+   * `last` field as needed. Defaults to true, setting this to false will disable this behavior and make the
+   * field nullable.
    */
   strictArgs?: boolean
   /**
@@ -73,7 +73,7 @@ export interface ConnectionPluginConfig {
    *
    * Default is `cursor:${index}`
    *
-   * @default "field"
+   * @default field
    */
   cursorFromNode?: (
     node: any,
@@ -83,8 +83,8 @@ export interface ConnectionPluginConfig {
     forCursor: { index: number; nodes: any[] }
   ) => string | Promise<string>
   /**
-   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
-   * when customizing the behavior of `cursorFromNode`
+   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed when
+   * customizing the behavior of `cursorFromNode`
    */
   pageInfoFromNodes?: (
     allNodes: any[],
@@ -92,67 +92,56 @@ export interface ConnectionPluginConfig {
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
   ) => MaybePromise<{ hasNextPage: boolean; hasPreviousPage: boolean }>
-  /**
-   * Conversion from a cursor string into an opaque token. Defaults to base64Encode(string)
-   */
+  /** Conversion from a cursor string into an opaque token. Defaults to base64Encode(string) */
   encodeCursor?: (value: string) => string
-  /**
-   * Conversion from an opaque token into a cursor string. Defaults to base64Decode(string)
-   */
+  /** Conversion from an opaque token into a cursor string. Defaults to base64Decode(string) */
   decodeCursor?: (cursor: string) => string
-  /**
-   * Extend *all* edges to include additional fields, beyond cursor and node
-   */
+  /** Extend *all* edges to include additional fields, beyond cursor and node */
   extendEdge?: Record<
     string,
     Omit<FieldOutConfig<any, any>, 'resolve'> & {
       /**
-       * Set requireResolver to false if you have already resolved this information during the resolve
-       * of the edges in the parent resolve method
+       * Set requireResolver to false if you have already resolved this information during the resolve of the
+       * edges in the parent resolve method
+       *
        * @default true
        */
       requireResolver?: boolean
     }
   >
-  /**
-   * Any additional fields to make available to the connection type,
-   * beyond edges, pageInfo
-   */
+  /** Any additional fields to make available to the connection type, beyond edges, pageInfo */
   extendConnection?: Record<
     string,
     Omit<FieldOutConfig<any, any>, 'resolve'> & {
       /**
-       * Set requireResolver to false if you have already resolved this information during the resolve
-       * of the edges in the parent resolve method
+       * Set requireResolver to false if you have already resolved this information during the resolve of the
+       * edges in the parent resolve method
+       *
        * @default true
        */
       requireResolver?: boolean
     }
   >
-  /**
-   * Prefix for the Connection / Edge type
-   */
+  /** Prefix for the Connection / Edge type */
   typePrefix?: string
   /**
    * The path to the @nexus/schema package. Needed for typegen.
    *
    * @default '@nexus/schema'
-   *
    * @remarks
+   *  This setting is particularly useful when @nexus/schema is being wrapped by
+   * another
    *
-   * This setting is particularly useful when @nexus/schema is being wrapped by
-   * another library/framework such that @nexus/schema is not expected to be a
+   *     library/framework such that @nexus/schema is not expected to be a
    * direct dependency at the application level.
    */
   nexusSchemaImportId?: string
   /**
-   * Configures the default "nonNullDefaults" settings for any connection types
-   * created globally by this config / connection field.
+   * Configures the default "nonNullDefaults" settings for any connection types created globally by this
+   * config / connection field.
    */
   nonNullDefaults?: NonNullConfig
-  /**
-   * Allows specifying a custom cursor type, as the name of a scalar
-   */
+  /** Allows specifying a custom cursor type, as the name of a scalar */
   cursorType?:
     | GetGen<'scalarNames'>
     | NexusNullDef<GetGen<'scalarNames'>>
@@ -169,12 +158,11 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
   /**
    * Whether the connection field can be null
+   *
    * @default (depends on whether nullability is configured in type or schema)
    */
   nullable?: boolean
-  /**
-   * Additional args to use for just this field
-   */
+  /** Additional args to use for just this field */
   additionalArgs?: ArgsRecord
   /**
    * Whether to inherit "additional args" if they exist on the plugin definition
@@ -185,7 +173,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   /**
    * Approach we use to transform a node into a cursor.
    *
-   * @default "nodeField"
+   * @default nodeField
    */
   cursorFromNode?: (
     node: NodeValue<TypeName, FieldName>,
@@ -195,8 +183,8 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     forCursor: { index: number; nodes: NodeValue<TypeName, FieldName>[] }
   ) => string | Promise<string>
   /**
-   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
-   * when customizing the behavior of `cursorFromNode`
+   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed when
+   * customizing the behavior of `cursorFromNode`
    */
   pageInfoFromNodes?: (
     nodes: NodeValue<TypeName, FieldName>[],
@@ -204,62 +192,50 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
   ) => MaybePromise<{ hasNextPage: boolean; hasPreviousPage: boolean }>
-  /**
-   * Whether the field allows for backward pagination
-   */
+  /** Whether the field allows for backward pagination */
   disableForwardPagination?: boolean
-  /**
-   * Whether the field allows for backward pagination
-   */
+  /** Whether the field allows for backward pagination */
   disableBackwardPagination?: boolean
   /**
-   * If disableForwardPagination or disableBackwardPagination are set to true,
-   * we require the `first` or `last` field as needed. Defaults to true,
-   * setting this to false will disable this behavior and make the field nullable.
+   * If disableForwardPagination or disableBackwardPagination are set to true, we require the `first` or
+   * `last` field as needed. Defaults to true, setting this to false will disable this behavior and make the
+   * field nullable.
    */
   strictArgs?: boolean
   /**
    * Custom logic to validate the arguments.
    *
-   * Defaults to requiring that either a `first` or `last` is provided, and
-   * that after / before must be paired with `first` or `last`, respectively.
+   * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
+   * with `first` or `last`, respectively.
    */
   validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
   /**
-   * Dynamically adds additional fields to the current "connection" when it is defined.
-   * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
-   * so as not to conflict with any non-extended connections.
+   * Dynamically adds additional fields to the current "connection" when it is defined. This will cause the
+   * resulting type to be prefix'ed with the name of the type/field it is branched off of, so as not to
+   * conflict with any non-extended connections.
    */
   extendConnection?: (def: ObjectDefinitionBlock<FieldTypeName<TypeName, FieldName>>) => void
   /**
-   * Dynamically adds additional fields to the connection "edge" when it is defined.
-   * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
-   * so as not to conflict with any non-extended connections.
+   * Dynamically adds additional fields to the connection "edge" when it is defined. This will cause the
+   * resulting type to be prefix'ed with the name of the type/field it is branched off of, so as not to
+   * conflict with any non-extended connections.
    */
   extendEdge?: (
     def: ObjectDefinitionBlock<FieldTypeName<FieldTypeName<TypeName, FieldName>, 'edges'>>
   ) => void
-  /**
-   * Configures the default "nonNullDefaults" for connection type generated
-   * for this connection
-   */
+  /** Configures the default "nonNullDefaults" for connection type generated for this connection */
   nonNullDefaults?: NonNullConfig
-  /**
-   * Allows specifying a custom cursor type, as the name of a scalar
-   */
+  /** Allows specifying a custom cursor type, as the name of a scalar */
   cursorType?:
     | GetGen<'scalarNames'>
     | NexusNullDef<GetGen<'scalarNames'>>
     | NexusNonNullDef<GetGen<'scalarNames'>>
-  /**
-   * Defined if you have extended the connectionPlugin globally
-   */
+  /** Defined if you have extended the connectionPlugin globally */
   edgeFields?: unknown
 } & (
   | {
       /**
-       * Nodes should resolve to an Array, with a length of one greater than the direction you
-       * are paginating.
+       * Nodes should resolve to an Array, with a length of one greater than the direction you are paginating.
        *
        * For example, if you're paginating forward, and assuming an Array with length 20:
        *
@@ -267,9 +243,9 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
        *
        * (last: 2) - [{id: 18}, {id: 19}, {id: 20}] - note {id: 18} is extra
        *
-       * We will then slice the array in the direction we're iterating, and if there are more
-       * than "N" results, we will assume there's a next page. If you set `assumeExactNodeCount: true`
-       * in the config, we will assume that a next page exists if the length >= the node count.
+       * We will then slice the array in the direction we're iterating, and if there are more than "N"
+       * results, we will assume there's a next page. If you set `assumeExactNodeCount: true` in the config,
+       * we will assume that a next page exists if the length >= the node count.
        */
       nodes: (
         root: RootValue<TypeName>,
@@ -283,11 +259,11 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     }
   | {
       /**
-       * Implement the full resolve, including `edges` and `pageInfo`. Useful for more complex
-       * pagination cases, where you may want to use utilities from other libraries like
-       * GraphQL Relay JS, and only use Nexus for the construction and type-safety:
+       * Implement the full resolve, including `edges` and `pageInfo`. Useful in more complex pagination
+       * cases, or if you want to use utilities from other libraries like GraphQL Relay JS, and only use
+       * Nexus for the construction and type-safety:
        *
-       * https://github.com/graphql/graphql-relay-js
+       * Https://github.com/graphql/graphql-relay-js
        */
       resolve: (
         root: RootValue<TypeName>,
@@ -698,19 +674,24 @@ export function makeResolveFn(
 
     // Local variable to cache the execution of fetching the nodes,
     // which is needed for all fields.
-    let cachedNodes: Promise<Array<any>>
-    let cachedEdges: Promise<{
-      edges: Array<EdgeLike | null>
+    let cachedNodes: MaybePromiseLike<Array<any>>
+    let cachedEdges: MaybePromiseLike<{
+      edges: EdgeLike[]
       nodes: any[]
     }>
+    let hasPromise = false
 
     // Get all the nodes, before any pagination slicing
     const resolveAllNodes = () => {
       if (cachedNodes !== undefined) {
         return cachedNodes
       }
-      cachedNodes = Promise.resolve(nodesResolve(root, formattedArgs, ctx, info) || null)
-      return cachedNodes.then((allNodes) => (allNodes ? Array.from(allNodes) : allNodes))
+
+      cachedNodes = completeValue(nodesResolve(root, formattedArgs, ctx, info) ?? null, (allNodes) => {
+        return allNodes ? Array.from(allNodes) : allNodes
+      })
+
+      return cachedNodes
     }
 
     const resolveEdgesAndNodes = () => {
@@ -718,7 +699,7 @@ export function makeResolveFn(
         return cachedEdges
       }
 
-      cachedEdges = resolveAllNodes().then((allNodes) => {
+      cachedEdges = completeValue(resolveAllNodes(), (allNodes) => {
         if (!allNodes) {
           const arrPath = JSON.stringify(pathToArray(info.path))
           console.warn(
@@ -729,7 +710,6 @@ export function makeResolveFn(
 
         const resolvedEdgeList: MaybePromise<EdgeLike>[] = []
         const resolvedNodeList: any[] = []
-        let hasPromise = false
 
         iterateNodes(allNodes, args, (maybeNode, i) => {
           if (isPromiseLike(maybeNode)) {
@@ -783,32 +763,32 @@ export function makeResolveFn(
       return cachedEdges
     }
 
-    const resolvePageInfo = async () => {
-      const [allNodes, { edges }] = await Promise.all([resolveAllNodes(), resolveEdgesAndNodes()])
-      let basePageInfo = allNodes
-        ? pageInfoFromNodes(allNodes, args, ctx, info)
-        : {
-            hasNextPage: false,
-            hasPreviousPage: false,
-          }
-
-      if (isPromiseLike(basePageInfo)) {
-        basePageInfo = await basePageInfo
-      }
-
-      return {
-        ...basePageInfo,
-        startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
-        endCursor: edges?.[edges.length - 1]?.cursor ?? null,
-      }
+    const resolvePageInfo = () => {
+      return completeValue(resolveAllNodes(), (allNodes) =>
+        completeValue(resolveEdgesAndNodes(), ({ edges }) =>
+          completeValue(
+            allNodes
+              ? pageInfoFromNodes(allNodes, args, ctx, info)
+              : {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                },
+            (basePageInfo) => ({
+              ...basePageInfo,
+              startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
+              endCursor: edges?.[edges.length - 1]?.cursor ?? null,
+            })
+          )
+        )
+      )
     }
 
     return {
       get nodes() {
-        return resolveEdgesAndNodes().then((o) => o.nodes)
+        return completeValue(resolveEdgesAndNodes(), (o) => o.nodes)
       },
       get edges() {
-        return resolveEdgesAndNodes().then((o) => o.edges)
+        return completeValue(resolveEdgesAndNodes(), (o) => o.edges)
       },
       get pageInfo() {
         return resolvePageInfo()
@@ -867,9 +847,7 @@ function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
   throw new Error('Unreachable')
 }
 
-/**
- * A sensible default for determining "previous page".
- */
+/** A sensible default for determining "previous page". */
 function defaultHasPreviousPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
