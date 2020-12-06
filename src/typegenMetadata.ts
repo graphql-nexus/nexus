@@ -17,17 +17,13 @@ export interface TypegenMetadataConfig
 }
 
 /**
- * Passed into the SchemaBuilder, this keeps track of any necessary
- * field / type metadata we need to be aware of when building the
- * generated types and/or SDL artifact, including but not limited to:
+ * Passed into the SchemaBuilder, this keeps track of any necessary field / type metadata we need to be aware
+ * of when building the generated types and/or SDL artifact, including but not limited to:
  */
 export class TypegenMetadata {
   constructor(protected config: TypegenMetadataConfig) {}
 
-  /**
-   * Generates the artifacts of the build based on what we
-   * know about the schema and how it was defined.
-   */
+  /** Generates the artifacts of the build based on what we know about the schema and how it was defined. */
   async generateArtifacts(schema: NexusGraphQLSchema) {
     const sortedSchema = this.sortSchema(schema)
     if (this.config.outputs.schema || this.config.outputs.typegen) {
@@ -106,9 +102,7 @@ export class TypegenMetadata {
     }
   }
 
-  /**
-   * Generates the schema, adding any directives as necessary
-   */
+  /** Generates the schema, adding any directives as necessary */
   generateSchemaFile(schema: GraphQLSchema): string {
     let printedSchema = this.config.customPrintSchemaFn
       ? this.config.customPrintSchemaFn(schema)
@@ -116,9 +110,7 @@ export class TypegenMetadata {
     return [SDL_HEADER, printedSchema].join('\n\n')
   }
 
-  /**
-   * Generates the type definitions
-   */
+  /** Generates the type definitions */
   async generateTypesFile(schema: NexusGraphQLSchema, typegenFile: string): Promise<string> {
     return new TypegenPrinter(schema, {
       ...(await this.getTypegenInfo(schema)),

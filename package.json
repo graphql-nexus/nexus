@@ -38,6 +38,7 @@
     "dev:test": "jest --watch",
     "examples": "yarn link-examples && yarn gulp run-examples",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts' 'examples/*/src/**.ts'",
+    "format:ci": "prettier --check 'src/**/*.ts' 'tests/**/*.ts' 'examples/*/src/**.ts'",
     "link-examples": "yarn && yarn gulp link-examples",
     "lint": "tslint -p tsconfig.json",
     "prepublish": "yarn clean && yarn build",

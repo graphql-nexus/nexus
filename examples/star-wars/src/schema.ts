@@ -2,10 +2,7 @@ import { makeSchema, nullabilityGuardPlugin } from '@nexus/schema'
 import * as path from 'path'
 import * as allTypes from './graphql'
 
-/**
- * Finally, we construct our schema (whose starting query type is the query
- * type we defined above) and export it.
- */
+/** Finally, we construct our schema (whose starting query type is the query type we defined above) and export it. */
 export const schema = makeSchema({
   types: allTypes,
   outputs: {
