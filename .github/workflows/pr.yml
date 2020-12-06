@@ -29,7 +29,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile && yarn format:ci
+        run: yarn --frozen-lockfile
+      - name: Check Prettier
+        if: matrix.os != 'windows-latest'
+        run: yarn format:ci
       - name: Test
         run: yarn -s test:ci
       - name: Upload coverage to Codecov
