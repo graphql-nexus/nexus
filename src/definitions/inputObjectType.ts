@@ -24,13 +24,16 @@ export class NexusInputObjectTypeDef<TypeName extends string> {
   get value() {
     return this.config
   }
-  // FIXME
-  // Instead of `any` we want to pass the name of this type...
-  // so that the correct `cfg.default` type can be looked up
-  // from the typegen.
-  asArg(cfg?: NexusAsArgConfig<any>): NexusArgDef<any> {
-    // FIXME
-    return arg({ ...cfg, type: this } as any)
+  /**
+   * Shorthand for wrapping the current InputObject in an "arg", useful if you need to add a description.
+   *
+   * @example
+   *   inputObject(config).asArg({
+   *     description: 'Define sort the current field',
+   *   })
+   */
+  asArg(cfg?: NexusAsArgConfig<TypeName>): NexusArgDef<any> {
+    return arg({ ...cfg, type: this })
   }
 }
 withNexusSymbol(NexusInputObjectTypeDef, NexusTypes.InputObject)

@@ -1,4 +1,5 @@
 import { assertValidName } from 'graphql'
+import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 
 type TypeScriptEnumLike = {
@@ -19,7 +20,7 @@ export interface EnumMemberInfo {
   deprecation?: string // | DeprecationInfo;
 }
 
-export interface EnumTypeConfig<TypeName extends string> {
+export interface NexusEnumTypeConfig<TypeName extends string> {
   name: TypeName
   /** The description to annotate the GraphQL SDL */
   description?: string | null
@@ -33,15 +34,26 @@ export interface EnumTypeConfig<TypeName extends string> {
 }
 
 export class NexusEnumTypeDef<TypeName extends string> {
-  constructor(readonly name: TypeName, protected config: EnumTypeConfig<string>) {
+  constructor(readonly name: TypeName, protected config: NexusEnumTypeConfig<string>) {
     assertValidName(name)
   }
   get value() {
     return this.config
   }
+  /**
+   * Wraps the current enum as an argument, useful if you're defining the enumType inline for an individual field.
+   *
+   * @example
+   *   args: {
+   *     sort: enumType(config).asArg({ default: 'someValue' })
+   *   }
+   */
+  asArg(cfg?: NexusAsArgConfig<TypeName>): NexusArgDef<any> {
+    return arg({ ...cfg, type: this })
+  }
 }
 withNexusSymbol(NexusEnumTypeDef, NexusTypes.Enum)
 
-export function enumType<TypeName extends string>(config: EnumTypeConfig<TypeName>) {
+export function enumType<TypeName extends string>(config: NexusEnumTypeConfig<TypeName>) {
   return new NexusEnumTypeDef(config.name, config)
 }
