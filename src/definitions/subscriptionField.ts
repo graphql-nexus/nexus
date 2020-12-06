@@ -14,9 +14,7 @@ export function subscriptionField<FieldName extends string, Event>(
   config: SubscriptionFieldConfig<FieldName, Event>
 ): NexusExtendTypeDef<'Subscription'>
 
-/**
- * Add one field to the Subscription type
- */
+/** Add one field to the Subscription type */
 export function subscriptionField(...args: any[]) {
   return extendType({
     type: 'Subscription',

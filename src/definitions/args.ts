@@ -5,33 +5,24 @@ import { NexusTypes, withNexusSymbol } from './_types'
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
 export type CommonArgConfig = {
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
 } & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
-  /**
-   * Configure the default for the object
-   */
+  /** Configure the default for the object */
   default?: T
 }
 
 export type NexusArgConfigType<T extends AllInputTypes> = T | AllNexusInputTypeDefs<T>
 
 export interface NexusAsArgConfig<T extends AllInputTypes> extends CommonArgConfig {
-  /**
-   * Configure the default for the object
-   */
+  /** Configure the default for the object */
   default?: GetGen2<'allTypes', T> // TODO: Make this type-safe somehow
 }
 
 export interface NexusArgConfig<T extends AllInputTypes> extends NexusAsArgConfig<T> {
-  /**
-   * The type of the argument, either the string name of the type,
-   * or the concrete Nexus type definition
-   */
+  /** The type of the argument, either the string name of the type, or the concrete Nexus type definition */
   type: NexusArgConfigType<T>
 }
 

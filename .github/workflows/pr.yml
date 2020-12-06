@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: 12.x
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile && yarn format:ci
       - name: Install GraphQL@14.x
         run: yarn add graphql@^14.5.8
       - name: Test
@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile && yarn format:ci
       - name: Test
         run: yarn -s test:ci
       - name: Upload coverage to Codecov
@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile && yarn format:ci
       - name: Link
         run: yarn link
       - name: Example Install
