@@ -50,9 +50,15 @@ export interface NexusGenInputs {
     body?: string | null // String
     title?: string | null // String
   }
+  Something: {
+    // input type
+    id: number // Int!
+  }
 }
 
-export interface NexusGenEnums {}
+export interface NexusGenEnums {
+  UserStatus: 'active' | 'pending'
+}
 
 export interface NexusGenScalars {
   String: string
@@ -108,7 +114,7 @@ export interface NexusGenUnions {}
 
 export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects
 
-export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   Mutation: {
@@ -262,6 +268,7 @@ export interface NexusGenArgTypes {
     user: {
       // args
       id?: string | null // ID
+      status: NexusGenEnums['UserStatus'] | null // UserStatus
     }
   }
   User: {
@@ -288,7 +295,7 @@ export type NexusGenObjectNames = keyof NexusGenObjects
 
 export type NexusGenInputNames = keyof NexusGenInputs
 
-export type NexusGenEnumNames = never
+export type NexusGenEnumNames = keyof NexusGenEnums
 
 export type NexusGenInterfaceNames = keyof NexusGenInterfaces
 
@@ -312,6 +319,7 @@ export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
   rootTypes: NexusGenRootTypes
+  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames

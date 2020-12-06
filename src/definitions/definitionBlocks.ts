@@ -189,7 +189,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
 
 export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string>
   extends CommonInputFieldConfig<TypeName, FieldName> {
-  type: AllInputTypes | AllNexusInputTypeDefs<string>
+  type: AllInputTypes | AllNexusInputTypeDefs
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {

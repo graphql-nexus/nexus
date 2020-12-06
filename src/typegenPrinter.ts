@@ -131,6 +131,7 @@ export class TypegenPrinter {
         `  context: ${this.printContext()};`,
         `  inputTypes: NexusGenInputs;`,
         `  rootTypes: NexusGenRootTypes;`,
+        `  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
         `  fieldTypeNames: NexusGenFieldTypeNames;`,
@@ -423,6 +424,17 @@ export class TypegenPrinter {
       .concat(`  abstractTypeStrategies: ${unionProps}`)
       .concat('}')
       .join('\n')
+  }
+
+  buildEnumTypeMembersMap() {
+    const enumMap: TypeMapping = {}
+    this.groupedTypes.enum.forEach((e) => {
+      enumMap[e.name] = e
+        .getValues()
+        .map((val) => JSON.stringify(val.name))
+        .join(' | ')
+    })
+    return enumMap
   }
 
   buildEnumTypeMap() {
