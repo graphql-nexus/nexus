@@ -9,24 +9,16 @@ export interface ScalarBase
   > {}
 
 export interface ScalarConfig {
-  /**
-   * Any deprecation info for this scalar type
-   */
+  /** Any deprecation info for this scalar type */
   deprecation?: string // | DeprecationInfo;
-  /**
-   * Adds this type as a method on the Object/Interface definition blocks
-   */
+  /** Adds this type as a method on the Object/Interface definition blocks */
   asNexusMethod?: string
-  /**
-   * Root type information for this type
-   */
+  /** Root type information for this type */
   rootTyping?: RootTypingDef
 }
 
 export interface NexusScalarTypeConfig<T extends string> extends ScalarBase, ScalarConfig {
-  /**
-   * The name of the scalar type
-   */
+  /** The name of the scalar type */
   name: T
 }
 

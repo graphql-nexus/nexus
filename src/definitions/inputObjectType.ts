@@ -4,23 +4,15 @@ import { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
 
 export interface NexusInputObjectTypeConfig<TypeName extends string> {
-  /**
-   * Name of the input object type
-   */
+  /** Name of the input object type */
   name: TypeName
-  /**
-   * Definition block for the input type
-   */
+  /** Definition block for the input type */
   definition(t: InputDefinitionBlock<TypeName>): void
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
   /**
-   * Configures the nullability for the type, check the
-   * documentation's "Getting Started" section to learn
-   * more about GraphQL Nexus's assumptions and configuration
-   * on nullability.
+   * Configures the nullability for the type, check the documentation's "Getting Started" section to learn
+   * more about GraphQL Nexus's assumptions and configuration on nullability.
    */
   nonNullDefaults?: NonNullConfig
 }

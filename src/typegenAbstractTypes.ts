@@ -13,9 +13,8 @@ import { ConditionalKeys, ConditionalPick, ValueOf } from './typeHelpersInternal
  * Returns a union of all the type names of the members of an abstract type
  *
  * @example
- *
- * union D = A | B | C
- * PossibleTypeNames<'D> // 'A' | 'B' | 'C'
+ *   union D = A | B | C
+ *   PossibleTypeNames<'D> // 'A' | 'B' | 'C'
  */
 export type PossibleTypeNames<AbstractTypeName extends string> = ValueOf<
   ConditionalPick<GetGen<'abstractTypeMembers'>, AbstractTypeName>
@@ -24,8 +23,8 @@ export type PossibleTypeNames<AbstractTypeName extends string> = ValueOf<
  * Returns a union of all the members of an abstract type
  *
  * @example
- * union D = A | B | C
- * PossibleTypes<'D> // A | B | C
+ *   union D = A | B | C
+ *   PossibleTypes<'D> // A | B | C
  */
 export type PossibleTypes<AbstractTypeName extends string> = RootValue<PossibleTypeNames<AbstractTypeName>>
 
@@ -33,27 +32,23 @@ export type PossibleTypes<AbstractTypeName extends string> = RootValue<PossibleT
  * Returns a union of all the abstract type names where TypeName is used
  *
  * @example
- * union D = A | B
- * union E = A
- * AbstractTypeNames<'A'> // 'D' | 'E'
+ *   union D = A | B
+ *   union E = A
+ *   AbstractTypeNames<'A'> // 'D' | 'E'
  */
 export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
   GetGen<'abstractTypeMembers'>,
   TypeName
 >
 
-/**
- * Returns whether all the abstract type names where TypeName is used have implemented `resolveType`
- */
+/** Returns whether all the abstract type names where TypeName is used have implemented `resolveType` */
 export type IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName extends string> = AbstractTypeNames<
   TypeName
 > extends GetGen<'abstractsUsingStrategyResolveType'>
   ? true
   : false
 
-/**
- * Returns whether all the members of an abstract type have implemented `isTypeOf`
- */
+/** Returns whether all the members of an abstract type have implemented `isTypeOf` */
 export type IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
   'abstractTypeMembers',
   AbstractTypeName
@@ -71,8 +66,7 @@ export type IsTypeOfHandler<TypeName extends string> = (
  * Get an object with the `isTypeOf` field if applicable for the given object Type.
  *
  * @remarks
- *
- * Intersect the result of this with other things to build up the final options for a type def.
+ *  Intersect the result of this with other things to build up the final options for a type def.
  */
 // prettier-ignore
 export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
@@ -90,8 +84,7 @@ IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false // is isTy
  * Get an object with the `resolveType` field if applicable for the given abstract Type.
  *
  * @remarks
- *
- * Intersect the result of this with other things to build up the final options for a type def.
+ *  Intersect the result of this with other things to build up the final options for a type def.
  */
 export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> = IsFeatureEnabled2<
   'abstractTypeStrategies',
@@ -101,26 +94,23 @@ export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> = IsFeat
   : IsStrategyIsTypeOfImplementedInAllMembers<TypeName> extends true
   ? {
       /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
+       * Optionally provide a custom type resolver function. If one is not provided, the default
+       * implementation will call `isTypeOf` on each implementing Object type.
        */
       resolveType?: AbstractTypeResolver<TypeName>
     } // Make resolveType optional when __typename strategy is enabled
   : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
   ? {
       /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
+       * Optionally provide a custom type resolver function. If one is not provided, the default
+       * implementation will call `isTypeOf` on each implementing Object type.
        */
       resolveType?: AbstractTypeResolver<TypeName>
     }
   : {
       /**
-       * Optionally provide a custom type resolver function. If one is not provided,
-       * the default implementation will call `isTypeOf` on each implementing
-       * Object type.
+       * Optionally provide a custom type resolver function. If one is not provided, the default
+       * implementation will call `isTypeOf` on each implementing Object type.
        */
       resolveType: AbstractTypeResolver<TypeName>
     }
