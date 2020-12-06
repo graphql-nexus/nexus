@@ -235,7 +235,9 @@ export function rewrapAsGraphQLType(baseType: GraphQLNamedType, wrapping: NexusF
     if (wrap === 'List') {
       finalType = GraphQLList(finalType)
     } else if (wrap === 'NonNull') {
-      finalType = GraphQLNonNull(finalType)
+      if (!isNonNullType(finalType)) {
+        finalType = GraphQLNonNull(finalType)
+      }
     } else {
       throw new Unreachable(wrap)
     }
