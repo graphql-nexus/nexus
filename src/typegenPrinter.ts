@@ -131,6 +131,7 @@ export class TypegenPrinter {
         `  context: ${this.printContext()};`,
         `  inputTypes: NexusGenInputs;`,
         `  rootTypes: NexusGenRootTypes;`,
+        `  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
         `  fieldTypeNames: NexusGenFieldTypeNames;`,

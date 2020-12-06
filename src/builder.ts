@@ -48,7 +48,7 @@ import {
   NexusOutputFieldDef,
   OutputDefinitionBlock,
 } from './definitions/definitionBlocks'
-import { EnumTypeConfig } from './definitions/enumType'
+import { NexusEnumTypeConfig } from './definitions/enumType'
 import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitions/extendInputType'
 import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
@@ -555,6 +555,7 @@ export class SchemaBuilder {
     }
     if (isSchema(types)) {
       this.addTypes(types.getTypeMap())
+      return
     }
     if (isNexusPlugin(types)) {
       if (!this.plugins?.includes(types)) {
@@ -949,7 +950,7 @@ export class SchemaBuilder {
     return field
   }
 
-  private buildEnumType(config: EnumTypeConfig<any>) {
+  private buildEnumType(config: NexusEnumTypeConfig<any>) {
     const { members } = config
     const values: GraphQLEnumValueConfigMap = {}
     if (Array.isArray(members)) {

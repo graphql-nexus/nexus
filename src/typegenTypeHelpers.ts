@@ -122,6 +122,7 @@ export type GenTypesShapeKeys =
   | 'context'
   | 'inputTypes'
   | 'rootTypes'
+  | 'inputTypeShapes'
   | 'argTypes'
   | 'fieldTypes'
   | 'fieldTypeNames'

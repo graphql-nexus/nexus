@@ -242,8 +242,8 @@ export type NexusGenAbstractsUsingStrategyResolveType = never
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {
-    isTypeOf: true
-    resolveType: false
+    isTypeOf: false
+    resolveType: true
     __typename: false
   }
 }
@@ -252,6 +252,7 @@ export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
   rootTypes: NexusGenRootTypes
+  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars
   argTypes: NexusGenArgTypes
   fieldTypes: NexusGenFieldTypes
   fieldTypeNames: NexusGenFieldTypeNames
@@ -281,5 +282,7 @@ export interface NexusGenTypes {
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {}
   interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginArgConfig {}
 }

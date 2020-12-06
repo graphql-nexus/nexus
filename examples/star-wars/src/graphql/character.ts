@@ -12,7 +12,7 @@ export const Character = interfaceType({
     t.list.field('friends', {
       type: 'Character',
       description: 'The friends of the character, or an empty list if they have none.',
-      resolve: (character) => getFriends(character),
+      resolve: (character) => Promise.all(getFriends(character)),
     })
     t.list.field('appearsIn', {
       type: 'Episode',

@@ -86,7 +86,11 @@ type Query {
   customScalar: MyCustomScalar
   foo: String
   searchPosts(input: PostSearchInput): [Post]
-  user(id: ID): User
+  user(id: ID, status: UserStatus = ACTIVE): User
+}
+
+input Something {
+  id: Int!
 }
 
 type Subscription {
@@ -126,4 +130,9 @@ type User {
     """
     last: Int
   ): PostConnection
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
 }
