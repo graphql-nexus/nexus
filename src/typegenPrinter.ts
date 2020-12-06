@@ -426,17 +426,6 @@ export class TypegenPrinter {
       .join('\n')
   }
 
-  buildEnumTypeMembersMap() {
-    const enumMap: TypeMapping = {}
-    this.groupedTypes.enum.forEach((e) => {
-      enumMap[e.name] = e
-        .getValues()
-        .map((val) => JSON.stringify(val.name))
-        .join(' | ')
-    })
-    return enumMap
-  }
-
   buildEnumTypeMap() {
     const enumMap: TypeMapping = {}
     this.groupedTypes.enum.forEach((e) => {
