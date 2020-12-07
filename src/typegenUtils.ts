@@ -3,9 +3,7 @@ import { BuilderConfigInput } from './builder'
 import { TypegenMetadataConfig } from './typegenMetadata'
 import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
 
-/**
- * Normalizes the builder config into the config we need for typegen
- */
+/** Normalizes the builder config into the config we need for typegen */
 export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadataConfig {
   const {
     outputs,

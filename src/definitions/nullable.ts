@@ -16,9 +16,7 @@ export class NexusNullDef<TypeName extends NexusNullableTypes> {
 
 withNexusSymbol(NexusNullDef, NexusTypes.Null)
 
-/**
- * null()
- */
+/** Null() */
 export function nullable<TypeName extends NexusNullableTypes>(type: TypeName) {
   if (isNexusNonNullTypeDef(type)) {
     return new NexusNullDef(type.ofNexusType)

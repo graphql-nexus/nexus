@@ -1,9 +1,11 @@
 import {
+  arg,
   connectionPlugin,
   declarativeWrappingPlugin,
   dynamicInputMethod,
   dynamicOutputMethod,
   dynamicOutputProperty,
+  enumType,
   extendType,
   idArg,
   inputObjectType,
@@ -44,7 +46,11 @@ export const I = interfaceType({
     return 'OfI'
   },
   definition(t) {
-    t.string('hello')
+    t.string('hello', {
+      extensions: {
+        extensionAdditionFromFieldConfig: true,
+      },
+    })
   },
 })
 
@@ -57,8 +63,16 @@ export const i = objectType({
 
 export const i2 = objectType({
   name: 'OfI2',
+  extensions: {
+    extensionAdditionFromTypeConfig: true,
+  },
   definition(t) {
     t.implements('I')
+    t.modify('hello', {
+      extensions: {
+        extensionAdditionFromModifyMethod: true,
+      },
+    })
   },
 })
 
@@ -92,6 +106,16 @@ export const PostSearchInput = inputObjectType({
     t.title()
     t.string('body')
   },
+})
+
+export const someArg = arg({
+  type: inputObjectType({
+    name: 'Something',
+    definition(t) {
+      t.nonNull.int('id')
+    },
+  }),
+  default: { id: 1 },
 })
 
 export const Post = objectType({
@@ -136,7 +160,16 @@ export const Query = extendType({
     })
     t.field('user', {
       type: 'User',
-      args: { id: idArg() },
+      args: {
+        id: idArg(),
+        status: enumType({
+          name: 'UserStatus',
+          members: [
+            { name: 'ACTIVE', value: 'active' },
+            { name: 'PENDING', value: 'pending' },
+          ],
+        }).asArg({ default: 'active' }),
+      },
       resolve: () => mockData.user,
     })
   },

@@ -193,10 +193,7 @@ export function unwrapGraphQLDef(
   return { namedType, wrapping }
 }
 
-/**
- * Unwraps any wrapped Nexus or GraphQL types,
- * turning into a list of wrapping
- */
+/** Unwraps any wrapped Nexus or GraphQL types, turning into a list of wrapping */
 export function unwrapNexusDef(
   typeDef: AllNexusTypeDefs | AllNexusArgsDefs | GraphQLType | string
 ): {
@@ -231,17 +228,16 @@ export function unwrapNexusDef(
   return { namedType, wrapping }
 }
 
-/**
- * Takes the named type, and applies any of the NexusFinalWrapKind
- * to create a properly wrapped GraphQL type.
- */
+/** Takes the named type, and applies any of the NexusFinalWrapKind to create a properly wrapped GraphQL type. */
 export function rewrapAsGraphQLType(baseType: GraphQLNamedType, wrapping: NexusFinalWrapKind[]): GraphQLType {
   let finalType: GraphQLType = baseType
   wrapping.forEach((wrap) => {
     if (wrap === 'List') {
       finalType = GraphQLList(finalType)
     } else if (wrap === 'NonNull') {
-      finalType = GraphQLNonNull(finalType)
+      if (!isNonNullType(finalType)) {
+        finalType = GraphQLNonNull(finalType)
+      }
     } else {
       throw new Unreachable(wrap)
     }
@@ -252,7 +248,7 @@ export function rewrapAsGraphQLType(baseType: GraphQLNamedType, wrapping: NexusF
 /**
  * Apply the wrapping consistently to the arg `type`
  *
- * nonNull(list(stringArg())) -> arg({ type: nonNull(list('String')) })
+ * NonNull(list(stringArg())) -> arg({ type: nonNull(list('String')) })
  */
 export function normalizeArgWrapping(argVal: AllNexusArgsDefs): NexusArgDef<AllInputTypes> {
   if (isNexusArgDef(argVal)) {
@@ -271,6 +267,7 @@ export function normalizeArgWrapping(argVal: AllNexusArgsDefs): NexusArgDef<AllI
 
 /**
  * Applies the ['List', 'NonNull', 'Nullable']
+ *
  * @param toWrap
  * @param wrapping
  */
@@ -291,8 +288,8 @@ export function applyNexusWrapping(toWrap: any, wrapping: NexusWrapKind[]) {
 }
 
 /**
- * Takes the "nonNullDefault" value, the chained wrapping, and the field wrapping,
- * to determine the proper list of wrapping to apply to the field
+ * Takes the "nonNullDefault" value, the chained wrapping, and the field wrapping, to determine the proper
+ * list of wrapping to apply to the field
  */
 export function finalizeWrapping(
   nonNullDefault: boolean,

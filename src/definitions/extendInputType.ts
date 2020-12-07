@@ -20,8 +20,8 @@ export class NexusExtendInputTypeDef<TypeName extends string> {
 withNexusSymbol(NexusExtendInputTypeDef, NexusTypes.ExtendInputObject)
 
 /**
- * Adds new fields to an existing inputObjectType in the schema. Useful when
- * splitting your schema across several domains.
+ * Adds new fields to an existing inputObjectType in the schema. Useful when splitting your schema across
+ * several domains.
  *
  * @see https://nexusjs.org/docs/api/extend-type
  */
