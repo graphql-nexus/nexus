@@ -605,6 +605,7 @@ exports[`field level configuration can define additional args for the connection
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
@@ -629,6 +630,7 @@ exports[`field level configuration can inherit the additional args from the main
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
@@ -655,6 +657,7 @@ exports[`global plugin configuration allows disabling backward pagination 1`] = 
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
@@ -667,6 +670,7 @@ exports[`global plugin configuration allows disabling backward pagination w/ str
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
@@ -679,6 +683,7 @@ exports[`global plugin configuration allows disabling forward pagination 1`] = `
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
@@ -691,6 +696,7 @@ exports[`global plugin configuration allows disabling forward pagination w/ stri
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
@@ -738,6 +744,7 @@ exports[`global plugin configuration can define additional args for all connecti
     \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
     before: String
   ): UserConnection
+  ok(ok: Boolean): Boolean
 }"
 `;
 
