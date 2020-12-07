@@ -1,4 +1,4 @@
-import { assertValidName } from 'graphql'
+import { assertValidName, GraphQLObjectType } from 'graphql'
 import { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
@@ -129,6 +129,12 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   }
    */
   rootTyping?: RootTypingDef
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
+  extensions?: GraphQLObjectType['extensions']
   /**
    * Define the fields of your object type.
    *

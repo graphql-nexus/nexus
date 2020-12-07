@@ -1,6 +1,6 @@
-import { GraphQLNamedType } from 'graphql'
+import { defaultFieldResolver, GraphQLNamedType } from 'graphql'
 import { DynamicFieldDefs, SchemaConfig } from './builder'
-import { RootTypings } from './definitions/_types'
+import { RootTypingDef, RootTypings } from './definitions/_types'
 import { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import { NexusInterfaceTypeConfig } from './definitions/interfaceType'
@@ -24,7 +24,11 @@ export class NexusFieldExtension<TypeName extends string = any, FieldName extend
   constructor(config: NexusOutputFieldConfig<TypeName, FieldName>) {
     const { resolve, ...rest } = config
     this.config = rest
-    this.hasDefinedResolver = Boolean(resolve)
+    this.hasDefinedResolver = Boolean(resolve && resolve !== defaultFieldResolver)
+  }
+  /** Called when there are modifications on the interface fields */
+  modify(modifications: Partial<NexusOutputFieldConfig<any, any>>) {
+    return new NexusFieldExtension({ ...this.config, ...modifications })
   }
 }
 
@@ -66,4 +70,11 @@ export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> 
  */
 export class NexusSchemaExtension {
   constructor(readonly config: NexusSchemaExtensionConfig) {}
+}
+
+export type NexusScalarExtensions = {
+  nexus: {
+    asNexusMethod?: string
+    rootTyping?: RootTypingDef
+  }
 }

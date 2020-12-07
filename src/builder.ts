@@ -18,12 +18,15 @@ import {
   GraphQLInputType,
   GraphQLInt,
   GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
+  GraphQLList,
   GraphQLNamedType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,
+  GraphQLSchemaConfig,
   GraphQLString,
   GraphQLType,
   GraphQLUnionType,
@@ -38,13 +41,12 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
-  GraphQLList,
-  GraphQLInterfaceTypeConfig,
 } from 'graphql'
 import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
+  NexusOutputFieldConfig,
   NexusOutputFieldDef,
   OutputDefinitionBlock,
 } from './definitions/definitionBlocks'
@@ -60,10 +62,14 @@ import {
   NexusInterfaceTypeDef,
 } from './definitions/interfaceType'
 import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
-import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
+import { NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
+  AllNexusArgsDefs,
+  AllNexusNamedInputTypeDefs,
+  AllNexusNamedOutputTypeDefs,
   AllNexusNamedTypeDefs,
+  finalizeWrapping,
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
   isNexusDynamicOutputProperty,
@@ -77,17 +83,13 @@ import {
   isNexusPlugin,
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
+  isNexusWrappingType,
+  NexusFinalWrapKind,
   NexusWrapKind,
   normalizeArgWrapping,
   rewrapAsGraphQLType,
-  unwrapNexusDef,
   unwrapGraphQLDef,
-  finalizeWrapping,
-  AllNexusNamedInputTypeDefs,
-  AllNexusNamedOutputTypeDefs,
-  AllNexusArgsDefs,
-  isNexusWrappingType,
-  NexusFinalWrapKind,
+  unwrapNexusDef,
 } from './definitions/wrapping'
 import {
   MissingType,
@@ -108,6 +110,7 @@ import {
   NexusInputObjectTypeExtension,
   NexusInterfaceTypeExtension,
   NexusObjectTypeExtension,
+  NexusScalarExtensions,
   NexusSchemaExtension,
 } from './extensions'
 import { messages } from './messages'
@@ -118,6 +121,7 @@ import {
   NexusPlugin,
   PluginConfig,
 } from './plugin'
+import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
 import { TypegenAutoConfigOptions } from './typegenAutoConfig'
 import { TypegenFormatFn } from './typegenFormatPrettier'
@@ -130,18 +134,17 @@ import {
   casesHandled,
   consoleWarn,
   eachObj,
+  getArgNamedType,
   getNexusNamedType,
+  graphql15InterfaceConfig,
+  graphql15InterfaceType,
   invariantGuard,
   isObject,
   mapValues,
   objValues,
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
-  getArgNamedType,
-  graphql15InterfaceType,
-  graphql15InterfaceConfig,
 } from './utils'
-import { declarativeWrappingPlugin } from './plugins'
 
 type NexusShapedOutput = {
   name: string
@@ -260,6 +263,11 @@ export type SchemaConfig = BuilderConfigInput & {
    * @default false
    */
   shouldExitAfterGenerateArtifacts?: boolean
+  /**
+   * Custom extensions, as [supported in
+   * graphql-js](https://github.com/graphql/graphql-js/blob/master/src/type/__tests__/extensions-test.js)
+   */
+  extensions?: GraphQLSchemaConfig['extensions']
 } & NexusGenPluginSchemaConfig
 
 export interface TypegenInfo {
@@ -497,7 +505,7 @@ export class SchemaBuilder {
       const scalarDef = typeDef as GraphQLScalarType & {
         extensions?: NexusScalarExtensions
       }
-      if (scalarDef.extensions && scalarDef.extensions.nexus) {
+      if (scalarDef.extensions?.nexus) {
         const { asNexusMethod, rootTyping } = scalarDef.extensions.nexus
         if (asNexusMethod) {
           this.dynamicInputFields[asNexusMethod] = scalarDef.name
@@ -835,6 +843,7 @@ export class SchemaBuilder {
       fields: () => this.buildInputObjectFields(fields, inputObjectTypeConfig),
       description: config.description,
       extensions: {
+        ...config.extensions,
         nexus: new NexusInputObjectTypeExtension(config),
       },
     }
@@ -879,6 +888,7 @@ export class SchemaBuilder {
         ),
       isTypeOf: (config as any).isTypeOf,
       extensions: {
+        ...config.extensions,
         nexus: new NexusObjectTypeExtension(config),
       },
     }
@@ -924,6 +934,7 @@ export class SchemaBuilder {
           this.buildInterfaceFields(interfaceTypeConfig, interfaces, modifications)
         ),
       extensions: {
+        ...config.extensions,
         nexus: new NexusInterfaceTypeExtension(config),
       },
     }
@@ -962,6 +973,10 @@ export class SchemaBuilder {
             value: typeof m.value === 'undefined' ? m.name : m.value,
             deprecationReason: m.deprecation,
             description: m.description,
+            extensions: {
+              ...m.extensions,
+              nexus: m.extensions?.nexus ?? {},
+            },
           }
         }
       })
@@ -992,6 +1007,10 @@ export class SchemaBuilder {
         name: config.name,
         values: values,
         description: config.description,
+        extensions: {
+          ...config.extensions,
+          nexus: config.extensions?.nexus ?? {},
+        },
       })
     )
   }
@@ -1017,6 +1036,10 @@ export class SchemaBuilder {
         resolveType,
         description: config.description,
         types: () => this.buildUnionMembers(config.name, members),
+        extensions: {
+          ...config.extensions,
+          nexus: config.extensions?.nexus ?? {},
+        },
       })
     )
   }
@@ -1025,7 +1048,15 @@ export class SchemaBuilder {
     if (config.rootTyping) {
       this.rootTypings[config.name] = config.rootTyping
     }
-    return this.finalize(new GraphQLScalarType(config))
+    return this.finalize(
+      new GraphQLScalarType({
+        ...config,
+        extensions: {
+          ...config.extensions,
+          nexus: config.extensions?.nexus ?? {},
+        },
+      })
+    )
   }
 
   protected finalize<T extends GraphQLNamedType>(type: T): T {
@@ -1101,12 +1132,22 @@ export class SchemaBuilder {
     interfaces.forEach((i) => {
       const config = this.getInterface(i).toConfig()
       Object.keys(config.fields).forEach((field) => {
-        interfaceFieldsMap[field] = config.fields[field]
+        const interfaceField = config.fields[field]
+        interfaceFieldsMap[field] = interfaceField
         if (modifications[field]) {
-          const { type, field: _field, args, ...rest } = modifications[field]
+          // TODO(tim): Refactor this whole mess
+          const { type, field: _field, args, extensions, ...rest } = modifications[field]
+          const extensionConfig: NexusOutputFieldConfig<any, any> = extensions?.nexus?.config ?? {}
           interfaceFieldsMap[field] = {
             ...interfaceFieldsMap[field],
             ...rest,
+            extensions: {
+              ...interfaceField.extensions,
+              ...extensions,
+              nexus:
+                interfaceField.extensions?.nexus?.modify(extensionConfig) ??
+                new NexusFieldExtension(extensionConfig),
+            },
           }
           if (typeof type !== 'undefined') {
             let interfaceReplacement: GraphQLOutputType
@@ -1190,6 +1231,7 @@ export class SchemaBuilder {
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
       extensions: {
+        ...fieldConfig.extensions,
         nexus: fieldExtension,
       },
     }
@@ -1234,6 +1276,10 @@ export class SchemaBuilder {
       ) as GraphQLInputType,
       defaultValue: fieldConfig.default,
       description: fieldConfig.description,
+      extensions: {
+        ...fieldConfig.extensions,
+        nexus: fieldConfig.extensions?.nexus ?? {},
+      },
     }
   }
 
@@ -1267,6 +1313,10 @@ export class SchemaBuilder {
         ) as GraphQLInputType,
         description: finalArgDef.description,
         defaultValue: finalArgDef.default,
+        extensions: {
+          ...finalArgDef.extensions,
+          nexus: finalArgDef.extensions?.nexus ?? {},
+        },
       }
     })
     return allArgs
@@ -1641,6 +1691,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
     subscription: Subscription,
     types: objValues(typeMap),
     extensions: {
+      ...config.extensions,
       nexus: schemaExtension,
     },
   }) as NexusGraphQLSchema

@@ -15,6 +15,12 @@ export interface ScalarConfig {
   asNexusMethod?: string
   /** Root type information for this type */
   rootTyping?: RootTypingDef
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
+  extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 }
 
 export interface NexusScalarTypeConfig<T extends string> extends ScalarBase, ScalarConfig {
@@ -32,13 +38,6 @@ export class NexusScalarTypeDef<TypeName extends string> {
 }
 
 withNexusSymbol(NexusScalarTypeDef, NexusTypes.Scalar)
-
-export type NexusScalarExtensions = {
-  nexus: {
-    asNexusMethod?: string
-    rootTyping?: RootTypingDef
-  }
-}
 
 export function scalarType<TypeName extends string>(options: NexusScalarTypeConfig<TypeName>) {
   return new NexusScalarTypeDef(options.name, options)

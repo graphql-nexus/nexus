@@ -1,3 +1,4 @@
+import { GraphQLScalarTypeConfig } from 'graphql'
 import { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
 import { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
@@ -7,6 +8,12 @@ export type ArgsRecord = Record<string, AllNexusArgsDefs>
 export type CommonArgConfig = {
   /** The description to annotate the GraphQL SDL */
   description?: string | null
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
+  extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 } & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
