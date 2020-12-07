@@ -26,10 +26,10 @@ Testing non-trivial resolvers in isolation is likely to be a good investment in 
 
 During this tutorial, you'll use the [Jest testing framework](https://jestjs.io/) to test your API. This is not mandatory but we do recommend it. Still, in general, outside this tutorial, if you prefer another testing framework, feel free to use it.
 
-First, install `jest` and accompanying tools
+First, install `jest` and accompanying tools.
 
 ```bash-symbol
-npm add --save-dev jest @types/jest ts-jest graphql-request
+npm add --save-dev jest @types/jest ts-jest graphql-request get-port
 ```
 
 Then, configure jest and npm scripts in your `package.json`
@@ -40,9 +40,9 @@ Then, configure jest and npm scripts in your `package.json`
 
 ```json
 "scripts": {
-  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "dev": "ts-node-dev --transpile-only --no-notify api/app",
   "build": "tsc",
-+  "generate": "ts-node-dev api/schema.ts",
++  "generate": "ts-node --transpile-only api/schema",
 +  "test": "npm run generate && jest"
 },
 +"jest": {
@@ -62,9 +62,9 @@ Then, configure jest and npm scripts in your `package.json`
 
 ```json
 "scripts": {
-  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "dev": "ts-node-dev --transpile-only --no-notify api/app",
   "build": "tsc",
-  "generate": "ts-node-dev api/schema.ts",
+  "generate": "ts-node --transpile-only api/schema",
   "test": "npm run generate && jest"
 },
 "jest": {
@@ -103,7 +103,6 @@ touch tests/__helpers.ts
 <!-- prettier-ignore -->
 ```ts
 // tests/__helpers.ts                                            // 1
-import { PrismaClient } from "@prisma/client";
 import { ServerInfo } from "apollo-server";
 import getPort, { makeRange } from "get-port";
 import { GraphQLClient } from "graphql-request";
@@ -166,6 +165,17 @@ Alright, now you will test your `publish` mutation. Because we want to start fro
 
 ```ts
 // api/db.ts
+export interface Post {
+  id: number
+  title: string
+  body: string
+  published: boolean
+}
+
+export interface Db {
+  posts: Post[]
+}
+
 export const db = {
 - posts: [{ id: 1, title: 'Nexus', body: '...', published: false }],
 + posts: []
@@ -178,9 +188,21 @@ export const db = {
 
 ```ts
 // api/db.ts
-export const db = {
-  posts: []
+export interface Post {
+  id: number
+  title: string
+  body: string
+  published: boolean
 }
+
+export interface Db {
+  posts: Post[]
+}
+
+export const db: Db = {
+  posts: [],
+}
+
 ```
 
 </tab>
@@ -199,7 +221,7 @@ const ctx = createTestContext()
 
 it('ensures that a draft can be created and published', async () => {
   // Create a new draft
-  const draftResult = await ctx.client.request(`               # 1
+  const draftResult = await ctx.client.request(`            # 1
     mutation {
       createDraft(title: "Nexus", body: "...") {            # 2
         id

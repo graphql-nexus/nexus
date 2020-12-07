@@ -58,12 +58,12 @@ interface TypegenInfoWithFile extends TypegenInfo {
  * We track and output a few main things:
  *
  * 1. "root" types, or the values that fill the first
- *    argument for a given object type
+ *     argument for a given object type
  *
  * 2. "arg" types, the values that are arguments to output fields.
  *
  * 3. "return" types, the values returned from the resolvers... usually
- *    just list/nullable variations on the "root" types for other types
+ *     just list/nullable variations on the "root" types for other types
  *
  * 4. The names of all types, grouped by type.
  *
@@ -131,6 +131,7 @@ export class TypegenPrinter {
         `  context: ${this.printContext()};`,
         `  inputTypes: NexusGenInputs;`,
         `  rootTypes: NexusGenRootTypes;`,
+        `  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
         `  fieldTypeNames: NexusGenFieldTypeNames;`,

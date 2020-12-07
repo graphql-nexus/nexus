@@ -11,11 +11,12 @@ type HookSettings = {
 }
 
 export async function generateTypegen(settings: HookSettings) {
-  const rootDir = settings.rootDir
+  const projectDir = settings.rootDir
 
-  const typegenModulePath = join(rootDir, '__typegen.ts')
-  const entrypointModulePath = join(rootDir, '__app.ts')
-  const importPath = relative(rootDir, join(__dirname, '..', '..', 'src')).replace(/\\/g, '/')
+  const typegenModulePath = join(projectDir, '__typegen.ts')
+  const sdlFilePath = join(projectDir, '__schema.graphql')
+  const entrypointModulePath = join(projectDir, '__app.ts')
+  const importPath = relative(projectDir, join(__dirname, '..', '..', 'src')).replace(/\\/g, '/')
 
   const entrypoint = require(entrypointModulePath)
   const { plugins, ...types } = entrypoint
@@ -24,7 +25,7 @@ export async function generateTypegen(settings: HookSettings) {
     types: types,
     outputs: {
       typegen: typegenModulePath,
-      schema: false,
+      schema: sdlFilePath,
     },
     shouldGenerateArtifacts: true,
     plugins: plugins || [],
@@ -58,13 +59,11 @@ type Settings = {
 /**
  * Test that the given app can be built by TypeScript without any type errors.
  *
- * - Nexus generateSchema will be run before TypeScript to ensure typegen is present.
- * - By default looks for an `__app.ts` entrypoint
- * - All entrypoint exports are expected to be Nexus type definitions
- * - Except the optional export name "plugins" which is treated as an array of plugins for makeSchema
- * - Outputs a `__typegen.ts` typegen module
- * - You must import the typegen module into your entrypoint module
- * - If you provide a `tsconfig.json` file in the root dir it will be used.
+ * - Nexus generateSchema will be run before TypeScript to ensure typegen is present. - By default looks for
+ * an `__app.ts` entrypoint - All entrypoint exports are expected to be Nexus type definitions - Except the
+ * optional export name "plugins" which is treated as an array of plugins for makeSchema - Outputs a
+ * `__typegen.ts` typegen module - You must import the typegen module into your entrypoint module - If you
+ * provide a `tsconfig.json` file in the root dir it will be used.
  */
 export function testApp(settings: Settings & HookSettings) {
   const name = settings?.name ?? 'app'

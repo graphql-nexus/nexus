@@ -34,11 +34,11 @@ export const User = objectType({
 
 You can change the name of this field by specifying the `nexusFieldName` in the plugin config.
 
-#### Usage
+## Usage
 
 There are two main ways to use the connection field, with a `nodes` property, or a `resolve` property:
 
-##### With `resolve`
+### With `resolve`
 
 If you have custom logic you'd like to provide in resolving the connection, we allow you to instead specify a `resolve` field, which will make not assumptions about how the `edges`, `cursor`, or `pageInfo` are defined.
 
@@ -57,7 +57,7 @@ export const usersQueryField = queryField((t) => {
 })
 ```
 
-##### With `nodes`
+### With `nodes`
 
 When providing a `nodes` property, we make some assumptions about the structure of the connection. We only
 require you return a list of rows to resolve based on the connection, and then we will automatically infer the `hasNextPage`, `hasPreviousPage`, and `cursor` values for you.
@@ -93,7 +93,7 @@ t.connectionField('usersConnectionNodes', {
 })
 ```
 
-##### Including a `nodes` field:
+### Including a `nodes` field:
 
 If you want to include a `nodes` field, which includes the nodes of the connection flattened into an array similar to how GitHub does in their [GraphQL API](https://developer.github.com/v4/), set `includeNodesField` to `true`
 
@@ -117,7 +117,7 @@ query IncludeNodesFieldExample {
 }
 ```
 
-##### Top level connection field
+### Top level connection field
 
 The `queryField` or `mutationField` helpers may accept a function rather than a field name, which will be shorthand for the query builder:
 
@@ -134,9 +134,9 @@ export const usersField = queryField((t) => {
 
 There are properties on the plugin to help configure this including, `cursorFromNode`, which allows you to customize how the cursor is created, or `pageInfoFromNodes` to customize how `hasNextPage` or `hasPreviousPage` are set.
 
-#### Pagination Arguments
+## Pagination Arguments
 
-##### Modifying arguments
+### Modifying arguments
 
 You may specify `additionalArgs` on either the plugin or the field config, to add additional arguments to the connection:
 
@@ -157,7 +157,7 @@ t.connectionField('userConnectionAdditionalArgs', {
 
 If you have specified args on the field, they will overwrite any custom args defined on the plugin config, unless `inheritAdditionalArgs` is set to true.
 
-##### Disabling forward/backward pagination
+### Disabling forward/backward pagination
 
 By default we assume that the cursor can paginate in both directions. This is not always something every
 API needs or supports, so to turn them off, you can set `disableForwardPagination`, or `disableBackwardPagination` to
@@ -166,7 +166,7 @@ true on either the `paginationConfig`, or on the `fieldConfig`.
 When we disable the forward or backward pagination args, by default we set the remaining `first` or `last` to required.
 If you do not want this to happen, specify `strictArgs: false` in the plugin or field config.
 
-##### Argument validation
+### Argument validation
 
 By default, the connection field validates that a `first` or a `last` must be provided, and not both. If you wish to provide your own validation, supply a `validateArgs` property to either the `connectionPlugin` config, or to the field configuration directly.
 
@@ -187,11 +187,11 @@ t.connectionField('users', {
 })
 ```
 
-#### Extending Connection / Edge types
+## Extending Connection / Edge types
 
 There are two ways to extend the connection type, one is by providing `extendConnection` on the `connectionPlugin` configuration, the other is to add an `extendConnection` or `extendEdge` definition block on the field config.
 
-##### Globally
+### Globally
 
 ```ts
 connectionPlugin({
@@ -211,7 +211,7 @@ t.connectionField('users', {
 })
 ```
 
-##### One-off / per-field
+### One-off / per-field
 
 ```ts
 t.connectionField('users', {
@@ -225,7 +225,7 @@ t.connectionField('users', {
 
 The field-level customization approach will result in a custom connection type specific to that type/field, e.g. `QueryUsers_Connection`, since the modification is specific to the individual field.
 
-#### Multiple Connection Types
+### Multiple Connection Types
 
 You can create multiple field connection types with varying defaults, available under different connections builder methods. A `typePrefix` property should be supplied to configure the name
 

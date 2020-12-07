@@ -19,6 +19,7 @@ export function queryField(...args: any[]) {
       if (typeof args[0] === 'function') {
         return args[0](t)
       }
+
       const [fieldName, config] = args as [string, QueryFieldConfig<any>]
       const finalConfig = typeof config === 'function' ? config() : config
       t.field(fieldName, finalConfig)

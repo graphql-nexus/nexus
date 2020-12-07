@@ -49,7 +49,28 @@ Now to expose it in our GraphQL context there is two things we need to do:
 1. Pass the `db` object to our GraphQL server context
 1. Let Nexus know what the type of our context is
 
-Let's first pass our in-memory database to our GraphQL server
+We'll begin by creating a new module to hold out context types and constructor.
+
+```bash-symbol
+touch api/context.ts
+```
+
+```ts
+// api/context.ts
+import { Db, db } from './db'
+
+export interface Context {
+  db: Db
+}
+
+export function createContext(): Context {
+  return {
+    db
+  }
+}
+```
+
+Then we'll pass our in-memory database to our GraphQL server
 
 <TabbedContent tabs={['Diff', 'Code']}>
 
@@ -58,14 +79,12 @@ Let's first pass our in-memory database to our GraphQL server
 ```ts
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
++import { createContext } from './context'
 import { schema } from './schema'
-+import { db } from './db'
 
 export const server = new ApolloServer({
   schema,
-+  context: () => ({
-+    db
-+  })
++  context: createContext
 })
 ```
 
@@ -76,14 +95,12 @@ export const server = new ApolloServer({
 ```ts
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
+import { createContext } from './context'
 import { schema } from './schema'
-import { db } from './db'
 
 export const server = new ApolloServer({
   schema,
-  context: () => ({
-    db
-  })
+  context: createContext
 })
 ```
 
@@ -91,21 +108,7 @@ export const server = new ApolloServer({
 
 </TabbedContent>
 
-> **Note** For those familiar with GraphQL, you might be grimacing that we’re attaching static things to the context, instead of using export/import.
-> This is a matter of convenience. Feel free to take a purer approach in your apps if you prefer.
-
-Then, let's configure Nexus to know the type of our GraphQL context. We'll create an `api/context.ts` file for that
-
-```ts
-// api/context.ts
-import { Db } from './db'
-
-export interface Context {
-  db: Db
-}
-```
-
-Finally, add the following configuration to the `makeSchema` function of `@nexus/schema` in `api/app.ts`
+Finally, let's configure Nexus to know the type of our GraphQL context by adjusting the configuration of the `makeSchema` in our `api/app.ts`.
 
 <TabbedContent tabs={['Diff', 'Code']}>
 
@@ -113,10 +116,12 @@ Finally, add the following configuration to the `makeSchema` function of `@nexus
 
 ```ts
 // api/schema.ts
+import { makeSchema } from '@nexus/schema'
 import { join } from 'path'
+import * as types from './graphql'
 
 export const schema = makeSchema({
-  types: [],
+  types,
   outputs: {
     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
     schema: join(__dirname, '..', 'schema.graphql')
@@ -124,7 +129,7 @@ export const schema = makeSchema({
 +  typegenAutoConfig: {
 +    sources: [
 +      {
-+        source: require.resolve("./context"), // 1
++        source: join(__dirname, "./context.ts"),        // 1
 +        alias: "ContextModule",                         // 2
 +      },
 +    ],
@@ -139,10 +144,12 @@ export const schema = makeSchema({
 
 ```ts
 // api/schema.ts
+import { makeSchema } from '@nexus/schema'
 import { join } from 'path'
+import * as types from './graphql'
 
 export const schema = makeSchema({
-  types: [],
+  types,
   outputs: {
     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
     schema: join(__dirname, '..', 'schema.graphql')
@@ -150,7 +157,7 @@ export const schema = makeSchema({
   typegenAutoConfig: {
     sources: [
       {
-        source: require.resolve("./context"), // 1
+        source: join(__dirname, "./context.ts"),        // 1
         alias: "ContextModule",                         // 2
       },
     ],
@@ -178,7 +185,8 @@ Now let's use this data to re-implement the `Query.drafts` resolver from the pre
 ```ts
 // api/graphql/Post.ts
 
-export const PostQuery = queryType({
+export const PostQuery = extendType({
+  type: 'Query',
   definition(t) {
     t.list.field('drafts', {
       type: 'Post',
@@ -199,7 +207,8 @@ export const PostQuery = queryType({
 ```ts
 // api/graphql/Post.ts
 
-export const PostQuery = queryType({
+export const PostQuery = extendType({
+  type: 'Query',
   definition(t) {
     t.list.field('drafts', {
       type: 'Post',
@@ -276,7 +285,8 @@ Let's revise our implementation with GraphQL arguments.
 
 
 ```ts
-import { extendType, stringArg } from '@nexus/schema'
+import { objectType, extendType, stringArg } from '@nexus/schema'
++import { objectType, extendType, stringArg, nonNull } from '@nexus/schema'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -310,7 +320,7 @@ export const PostMutation = extendType({
 
 
 ```ts
-import { extendType, stringArg } from '@nexus/schema'
+import { objectType, extendType, stringArg, nonNull } from '@nexus/schema'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -361,8 +371,8 @@ Before we wrap this chapter let's flush out our schema a bit more. We'll add a `
 
 ```ts
 // api/graphql/Post.ts
-
-import { extendType, intArg, stringArg } from '@nexus/schema'
+-import { objectType, extendType, stringArg, nonNull } from '@nexus/schema'
++import { objectType, extendType, stringArg, nonNull, intArg } from '@nexus/schema'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -395,8 +405,7 @@ export const PostMutation = extendType({
 
 ```ts
 // api/graphql/Post.ts
-
-import { extendType, intArg, stringArg } from '@nexus/schema'
+import { objectType, extendType, stringArg, nonNull, intArg } from '@nexus/schema'
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -446,7 +455,6 @@ Then, we'll let API clients read these published posts.
 
 ```ts
 // api/graphql/Post.ts
-
 import { extendType } from '@nexus/schema'
 
 export const PostQuery = extendType({
@@ -471,7 +479,6 @@ export const PostQuery = extendType({
 
 ```ts
 // api/graphql/Post.ts
-
 import { extendType } from '@nexus/schema'
 
 export const PostQuery = extendType({
@@ -494,7 +501,7 @@ export const PostQuery = extendType({
 
 <tab>
 
-```ts
+```graphql
 type Query {
   drafts: [Post]!
 +  posts: [Post]

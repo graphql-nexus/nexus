@@ -32,7 +32,6 @@ npm add --save-dev pg @types/pg nanoid
 Then, head to your `tests/__helpers.ts` file to add the following imports and code
 
 <TabbedContent tabs={['Diff', 'Code']}>
-
 <tab>
 
 ```ts
@@ -138,7 +137,6 @@ function graphqlTestContext() {
 ```
 
 </tab>
-
 <tab>
 
 ```ts
@@ -244,7 +242,6 @@ function prismaTestContext() {
 ```
 
 </tab>
-
 </TabbedContent>
 
 The `prismaTestContext` is in charge of a couple of things:
@@ -272,7 +269,7 @@ it('ensures that a draft can be created and published', async () => {
   // ...
 
   // Publish the previously created draft
-  const publishResult = await ctx.client.send(
+  const publishResult = await ctx.client.request(
     `
     mutation publishDraft($draftId: Int!) {
       publish(draftId: $draftId) {
@@ -302,6 +299,25 @@ it('ensures that a draft can be created and published', async () => {
 
 + expect(persistedData).toMatchInlineSnapshot()
 })
+```
+
+Before running your tests update the jest script with the `--forceExit` flag as there is currently a bug keeping just from existing normally after tests have completed.
+
+
+```json diff
+  "scripts": {
+    "dev": "ts-node-dev --transpile-only --no-notify api/app",
+    "build": "tsc",
+    "generate": "ts-node --transpile-only api/schema",
+-   "test": "npm run generate && jest"
++   "test": "npm run generate && jest --forceExit"
+  },
+```
+
+Now run your tests
+
+```bash-symbol
+npm run test
 ```
 
 The new snapshot should look like the following. It proves that our database did persist that data and that we have exactly one item in it.
