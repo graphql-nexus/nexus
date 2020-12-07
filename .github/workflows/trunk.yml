@@ -94,3 +94,6 @@ jobs:
           jq '.' < result.json || true
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
