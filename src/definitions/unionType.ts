@@ -44,7 +44,11 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
   deprecation?: string // | DeprecationInfo;
   /** Root type information for this type */
   rootTyping?: RootTypingDef
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLUnionTypeConfig<any, any>['extensions']
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 

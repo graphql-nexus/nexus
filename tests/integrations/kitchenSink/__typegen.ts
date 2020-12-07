@@ -75,7 +75,10 @@ export interface NexusGenObjects {
     // root type
     hello?: string | null // String
   }
-  OfI2: {}
+  OfI2: {
+    // root type
+    hello?: string | null // String
+  }
   PageInfo: {
     // root type
     endCursor?: string | null // String

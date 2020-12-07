@@ -236,8 +236,22 @@ it('extensions are inherited and deeply merged by field modifications', () => {
   expect(A.getFields().foo.extensions).toMatchInlineSnapshot(`
     Object {
       "deeply": Object {
-        "foo1": true,
         "foo2": true,
+      },
+      "nexus": NexusFieldExtension {
+        "config": Object {
+          "configFor": "outputField",
+          "extensions": Object {
+            "deeply": Object {
+              "foo1": true,
+            },
+          },
+          "name": "foo",
+          "parentType": "SomeInterface",
+          "type": "String",
+          "wrapping": undefined,
+        },
+        "hasDefinedResolver": false,
       },
     }
   `)

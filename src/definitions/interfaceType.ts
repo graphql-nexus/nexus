@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLInterfaceTypeConfig, GraphQLSchemaExtensions } from 'graphql'
+import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
 import { messages } from '../messages'
 import {
   AbstractTypeResolver,
@@ -22,10 +22,11 @@ export interface FieldModification<TypeName extends string, FieldName extends st
   /** You are allowed to add non-required args when modifying a field */
   args?: ArgsRecord
   /**
-   * Custom extensions, as [supported in
-   * graphql-js](https://github.com/graphql/graphql-js/blob/master/src/type/__tests__/extensions-test.js)
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
    */
-  extensions?: GraphQLSchemaExtensions
+  extensions?: GraphQLInterfaceTypeConfig<any, any>['extensions']
 }
 
 export interface FieldModificationDef<TypeName extends string, FieldName extends string>
@@ -53,7 +54,11 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
   description?: string | null
   /** Root type information for this type */
   rootTyping?: RootTypingDef
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLInterfaceTypeConfig<any, any>['extensions']
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 

@@ -46,6 +46,7 @@ import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
+  NexusOutputFieldConfig,
   NexusOutputFieldDef,
   OutputDefinitionBlock,
 } from './definitions/definitionBlocks'
@@ -1131,12 +1132,22 @@ export class SchemaBuilder {
     interfaces.forEach((i) => {
       const config = this.getInterface(i).toConfig()
       Object.keys(config.fields).forEach((field) => {
-        interfaceFieldsMap[field] = config.fields[field]
+        const interfaceField = config.fields[field]
+        interfaceFieldsMap[field] = interfaceField
         if (modifications[field]) {
-          const { type, field: _field, args, ...rest } = modifications[field]
+          // TODO(tim): Refactor this whole mess
+          const { type, field: _field, args, extensions, ...rest } = modifications[field]
+          const extensionConfig: NexusOutputFieldConfig<any, any> = extensions?.nexus?.config ?? {}
           interfaceFieldsMap[field] = {
             ...interfaceFieldsMap[field],
             ...rest,
+            extensions: {
+              ...interfaceField.extensions,
+              ...extensions,
+              nexus:
+                interfaceField.extensions?.nexus?.modify(extensionConfig) ??
+                new NexusFieldExtension(extensionConfig),
+            },
           }
           if (typeof type !== 'undefined') {
             let interfaceReplacement: GraphQLOutputType

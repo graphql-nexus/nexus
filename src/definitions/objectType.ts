@@ -132,12 +132,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
   /**
    * Custom extensions, as supported in graphql-js
    *
-   * @example
-   *   extensions: {
-   *     sqlPlugin: {
-   *       tableName: 'SomeTable'
-   *     }
-   *   }
+   * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLObjectType['extensions']
   /**

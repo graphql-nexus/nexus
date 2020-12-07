@@ -8,7 +8,11 @@ export type ArgsRecord = Record<string, AllNexusArgsDefs>
 export type CommonArgConfig = {
   /** The description to annotate the GraphQL SDL */
   description?: string | null
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 } & NexusGenPluginArgConfig
 

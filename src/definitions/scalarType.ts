@@ -15,7 +15,11 @@ export interface ScalarConfig {
   asNexusMethod?: string
   /** Root type information for this type */
   rootTyping?: RootTypingDef
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 }
 

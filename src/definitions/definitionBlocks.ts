@@ -18,14 +18,22 @@ export interface CommonFieldConfig {
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
   /** Arguments for the field */
   args?: ArgsRecord
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLFieldConfig<any, any>['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
 export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
   /** The default value for the field, if any */
   default?: GetGen3<'inputTypes', TypeName, FieldName>
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLInputFieldConfig['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 

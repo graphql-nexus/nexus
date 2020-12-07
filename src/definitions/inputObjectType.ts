@@ -15,7 +15,11 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
    * more about GraphQL Nexus's assumptions and configuration on nullability.
    */
   nonNullDefaults?: NonNullConfig
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLInputObjectTypeConfig['extensions']
 }
 

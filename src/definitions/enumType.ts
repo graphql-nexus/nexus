@@ -18,7 +18,11 @@ export interface EnumMemberInfo {
    * field/enum types and as a comment on input fields.
    */
   deprecation?: string // | DeprecationInfo;
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLEnumValueConfig['extensions']
 }
 
@@ -33,7 +37,11 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
     | Array<string | EnumMemberInfo>
     | Record<string, string | number | object | boolean>
     | TypeScriptEnumLike
-  /** Custom extensions, as supported in graphql-js */
+  /**
+   * Custom extensions, as supported in graphql-js
+   *
+   * @see https://github.com/graphql/graphql-js/issues/1527
+   */
   extensions?: GraphQLEnumTypeConfig['extensions']
 }
 
