@@ -253,9 +253,9 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     | NexusNullDef<GetGen<'scalarNames'>>
     | NexusNonNullDef<GetGen<'scalarNames'>>
   /**
-   * Defined automatically if you have
+   * Defined automatically if you have extended the connectionPlugin globally
    *
-   * NOTE: This is added to the types by the runtime
+   * If you wish to set "requireResolver" to false on the edge field definition in the connection plugin
    */
   edgeFields?: unknown
 } & (
