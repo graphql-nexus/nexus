@@ -113,7 +113,8 @@ export interface ConnectionPluginConfig {
    * Any additional fields to make available to the connection type, beyond edges / pageInfo / nodes.
    *
    * Any fields defined extended on the Connection type will automatically receive the args from the
-   * connection. If the field also defines args, they will be merged with the args of the connection, with the
+   * connection. If the field also defines args, they will be merged with the args of the connection, with
+   * the extension's field args taking precedence if there is a conflict.
    */
   extendConnection?: Record<
     string,
