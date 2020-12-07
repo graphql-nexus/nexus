@@ -1120,6 +1120,7 @@ describe('connectionPlugin extensions', () => {
         },
         {
           edgeFields: {
+            // @ts-ignore
             delta(root, args, ctx) {
               expect(args).toEqual({
                 first: 1,
