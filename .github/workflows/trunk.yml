@@ -5,78 +5,79 @@ on:
     branches: [develop]
 
 jobs:
-  # graphql-14:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: 12.x
-  #     - name: Install Dependencies
-  #       run: yarn --frozen-lockfile
-  #     - name: Install GraphQL@14.x
-  #       run: yarn add graphql@^14.5.8
-  #     - name: Test
-  #       run: yarn -s test:ci --testPathIgnorePatterns v15
+  graphql-14:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Install GraphQL@14.x
+        run: yarn add graphql@^14.5.8
+      - name: Test
+        run: yarn -s test:ci --testPathIgnorePatterns v15
 
-  # test:
-  #   strategy:
-  #     matrix:
-  #       node-version: [10.x, 12.x]
-  #       os: [macos-latest, ubuntu-latest, windows-latest]
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #     - name: Install Dependencies
-  #       run: yarn --frozen-lockfile
-  #     - name: Check Prettier
-  #       if: matrix.os != 'windows-latest'
-  #       run: yarn format:ci
-  #     - name: Test
-  #       run: yarn -s test:ci
-  #     - name: Upload coverage to Codecov
-  #       if: matrix.os == 'ubuntu-latest' && matrix.node-version == '10.x'
-  #       uses: codecov/codecov-action@v1
-  #       with:
-  #         directory: ./coverage
+  test:
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Check Prettier
+        if: matrix.os != 'windows-latest'
+        run: yarn format:ci
+      - name: Test
+        run: yarn -s test:ci
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '10.x'
+        uses: codecov/codecov-action@v1
+        with:
+          directory: ./coverage
 
-  # test-examples:
-  #   strategy:
-  #     matrix:
-  #       example:
-  #         - apollo-fullstack
-  #         - kitchen-sink
-  #         - ts-ast-reader
-  #         # - ghost
-  #         # - githunt-api requires node 8
-  #         # - star-wars requires special commands
-  #         # rm examples/star-wars/src/star-wars-typegen.ts
-  #         # rm examples/star-wars/star-wars-schema.graphql
-  #         # node examples/star-wars/dist/schema.js
-  #         # git diff --exit-code
-  #       node-version: [10.x]
-  #       os: [macos-latest]
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #     - name: Install Dependencies
-  #       run: yarn --frozen-lockfile && yarn format:ci
-  #     - name: Link
-  #       run: yarn link
-  #     - name: Example Install
-  #       run: yarn --cwd=examples/${{ matrix.example }} --frozen-lockfile
-  #     - name: Example Use Link
-  #       run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
-  #     - name: Example Typecheck
-  #       run: yarn --cwd=examples/${{ matrix.example }} tsc
+  test-examples:
+    strategy:
+      matrix:
+        example:
+          - apollo-fullstack
+          - kitchen-sink
+          - ts-ast-reader
+          # - ghost
+          # - githunt-api requires node 8
+          # - star-wars requires special commands
+          # rm examples/star-wars/src/star-wars-typegen.ts
+          # rm examples/star-wars/star-wars-schema.graphql
+          # node examples/star-wars/dist/schema.js
+          # git diff --exit-code
+        node-version: [10.x]
+        os: [macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile && yarn format:ci
+      - name: Link
+        run: yarn link
+      - name: Example Install
+        run: yarn --cwd=examples/${{ matrix.example }} --frozen-lockfile
+      - name: Example Use Link
+        run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
+      - name: Example Typecheck
+        run: yarn --cwd=examples/${{ matrix.example }} tsc
 
   release-canary:
+    needs: [test, test-examples]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -90,10 +91,5 @@ jobs:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          yarn -s dripip preview --json > result.json || true
-          jq '.' < result.json || true
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        env:
-          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          yarn -s dripip preview --json > result.json
+          jq '.' < result.json
