@@ -15,6 +15,7 @@ import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/obje
 import { NexusSchemaExtension } from './extensions'
 import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
 import { NexusFinalArgConfig } from './definitions/args'
+import { UnwrapPromise } from './typeHelpersInternal'
 
 export { PluginBuilderLens }
 
@@ -118,22 +119,38 @@ export interface PluginConfig {
   // onPrint?: (visitor: Visitor<ASTKindToNode>) => void;
 }
 
+export function completeValue<T, R>(
+  valOrPromise: PromiseLike<T> | T,
+  onSuccess: (completedVal: T) => R
+): R | UnwrapPromise<R> | PromiseLike<UnwrapPromise<R>> | PromiseLike<UnwrapPromise<R>>
+
+export function completeValue<T, R, E>(
+  valOrPromise: PromiseLike<T> | T,
+  onSuccess: (completedVal: T) => R,
+  onError: (err: any) => R
+): R | UnwrapPromise<R> | PromiseLike<UnwrapPromise<R>> | PromiseLike<UnwrapPromise<R>>
+
 /**
  * Helper for allowing plugins to fulfill the return of the `next` resolver, without paying the cost of the
  * Promise if not required.
  */
-export function completeValue<T, R = T>(
+export function completeValue<T, R>(
   valOrPromise: PromiseLike<T> | T,
   onSuccess: (completedVal: T) => R,
-  onError?: (errVal: any) => T
+  onError?: (errVal: any) => R
 ) {
   if (isPromiseLike(valOrPromise)) {
-    return valOrPromise.then((completedValue) => {
-      return onSuccess(completedValue)
-    }, onError)
+    return valOrPromise.then(onSuccess, onError)
   }
   // No need to handle onError, this should just be a try/catch inside the `onSuccess` block
-  return onSuccess(valOrPromise)
+  const result = onSuccess(valOrPromise)
+
+  // If the result of the synchronous call is a promise, we want to unwrap it, for
+  // the return value types consistency
+  if (isPromiseLike(result)) {
+    return result.then((o) => o)
+  }
+  return result
 }
 
 export type MiddlewareFn = (

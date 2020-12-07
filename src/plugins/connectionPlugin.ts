@@ -22,6 +22,7 @@ import {
 } from '../typegenTypeHelpers'
 import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
 import { nullable, NexusNullDef } from '../definitions/nullable'
+import { MaybePromiseLike } from '../typeHelpersInternal'
 
 export interface ConnectionPluginConfig {
   /**
@@ -255,8 +256,8 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     }
   | {
       /**
-       * Implement the full resolve, including `edges` and `pageInfo`. Useful for more complex pagination
-       * cases, where you may want to use utilities from other libraries like GraphQL Relay JS, and only use
+       * Implement the full resolve, including `edges` and `pageInfo`. Useful in more complex pagination
+       * cases, or if you want to use utilities from other libraries like GraphQL Relay JS, and only use
        * Nexus for the construction and type-safety:
        *
        * Https://github.com/graphql/graphql-relay-js
@@ -670,19 +671,24 @@ export function makeResolveFn(
 
     // Local variable to cache the execution of fetching the nodes,
     // which is needed for all fields.
-    let cachedNodes: Promise<Array<any>>
-    let cachedEdges: Promise<{
-      edges: Array<EdgeLike | null>
+    let cachedNodes: MaybePromiseLike<Array<any>>
+    let cachedEdges: MaybePromiseLike<{
+      edges: EdgeLike[]
       nodes: any[]
     }>
+    let hasPromise = false
 
     // Get all the nodes, before any pagination slicing
     const resolveAllNodes = () => {
       if (cachedNodes !== undefined) {
         return cachedNodes
       }
-      cachedNodes = Promise.resolve(nodesResolve(root, formattedArgs, ctx, info) || null)
-      return cachedNodes.then((allNodes) => (allNodes ? Array.from(allNodes) : allNodes))
+
+      cachedNodes = completeValue(nodesResolve(root, formattedArgs, ctx, info) ?? null, (allNodes) => {
+        return allNodes ? Array.from(allNodes) : allNodes
+      })
+
+      return cachedNodes
     }
 
     const resolveEdgesAndNodes = () => {
@@ -690,7 +696,7 @@ export function makeResolveFn(
         return cachedEdges
       }
 
-      cachedEdges = resolveAllNodes().then((allNodes) => {
+      cachedEdges = completeValue(resolveAllNodes(), (allNodes) => {
         if (!allNodes) {
           const arrPath = JSON.stringify(pathToArray(info.path))
           console.warn(
@@ -701,7 +707,6 @@ export function makeResolveFn(
 
         const resolvedEdgeList: MaybePromise<EdgeLike>[] = []
         const resolvedNodeList: any[] = []
-        let hasPromise = false
 
         iterateNodes(allNodes, args, (maybeNode, i) => {
           if (isPromiseLike(maybeNode)) {
@@ -755,32 +760,32 @@ export function makeResolveFn(
       return cachedEdges
     }
 
-    const resolvePageInfo = async () => {
-      const [allNodes, { edges }] = await Promise.all([resolveAllNodes(), resolveEdgesAndNodes()])
-      let basePageInfo = allNodes
-        ? pageInfoFromNodes(allNodes, args, ctx, info)
-        : {
-            hasNextPage: false,
-            hasPreviousPage: false,
-          }
-
-      if (isPromiseLike(basePageInfo)) {
-        basePageInfo = await basePageInfo
-      }
-
-      return {
-        ...basePageInfo,
-        startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
-        endCursor: edges?.[edges.length - 1]?.cursor ?? null,
-      }
+    const resolvePageInfo = () => {
+      return completeValue(resolveAllNodes(), (allNodes) =>
+        completeValue(resolveEdgesAndNodes(), ({ edges }) =>
+          completeValue(
+            allNodes
+              ? pageInfoFromNodes(allNodes, args, ctx, info)
+              : {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                },
+            (basePageInfo) => ({
+              ...basePageInfo,
+              startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
+              endCursor: edges?.[edges.length - 1]?.cursor ?? null,
+            })
+          )
+        )
+      )
     }
 
     return {
       get nodes() {
-        return resolveEdgesAndNodes().then((o) => o.nodes)
+        return completeValue(resolveEdgesAndNodes(), (o) => o.nodes)
       },
       get edges() {
-        return resolveEdgesAndNodes().then((o) => o.edges)
+        return completeValue(resolveEdgesAndNodes(), (o) => o.edges)
       },
       get pageInfo() {
         return resolvePageInfo()
