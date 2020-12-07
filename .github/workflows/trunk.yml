@@ -85,12 +85,12 @@ jobs:
       - uses: actions/setup-node@v1
       - name: Install Dependencies
         run: yarn --frozen-lockfile
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3        
       - name: Release Canary
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          yarn -s dripip preview --json > result.json
-          jq '.' < result.json
+          yarn -s dripip preview --json > result.json || true
+          jq '.' < result.json || true
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
