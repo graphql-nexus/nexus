@@ -1,0 +1,449 @@
+---
+title: 'Source Types'
+---
+
+## Source Types in principle
+
+As you begin to implement a schema for the first time you will notice something that may not have been obvious at first. The data that the client sees in the data graph is _not_ the same data flowing through the internal resolvers used to fulfill that graph. The client sees the API types but the API author deals with something else, _source types_.
+
+To understand the concept better, let's assume the following GraphQL query:
+
+```graphql
+{
+  user {
+    fullName
+  }
+}
+```
+
+Here is an example of resolution for that query as it would be seen roughly from a GraphQL type _only_ point of view.
+
+![](/assets/source-type-diagram-1.png)
+
+When a field's type is an object, then the field's resolver returns a source type. Concretely this might for example be a plain JavaScript object containing node/row/document data from a database call. This source type data is in turn passed down to all the object type's own field resolvers.
+
+Here is the above diagram updated to include source types now.
+
+![](/assets/source-type-diagram-2.png)
+
+Here is a step-by-step breakdown of what is going on (follow the diagram annotation numbers):
+
+1. Client sends a query
+2. The field resolver for `Query.user` runs. Remember `Query` fields (along with `Subscription`, `Mutation`) are _entrypoints_.
+3. Within this resolver, the database client fetches a user from the database. The resolver returns this data. Keep in mind that at this point, this data _may_ be completely different than what the GraphQL API will resolve at the end.
+4. Resolution continues since the type of `Query.user` field is an object, not a scalar. As such its own fields need resolving. The fields that get resolved are limited to those selected by the client, in this case: `fullName`. This field resolver run. Its `source` argument is the user model data fetched in step 3. _This is the source type data for the GraphQL `User` object_.
+
+   ```ts
+   t.field('...', {
+     resolve(source, args, ctx, info) {
+       //    ^------------------------------- Here
+     },
+   }
+   ```
+
+Hopefully you can see how the GraphQL types seen by the client are distinct from the source types flowing through the resolvers. Below, you can find a code sample of how the implementation of this schema might look like.
+
+<details>
+<summary>See code implementation</summary>
+
+```ts
+import { queryType, objectType } from '@nexus/schema'
+
+export const Query = queryType({
+  definition(t) {
+    t.user({
+      args: {
+        id: nonNull(idArg()),
+      },
+      resolve(_, { id }, { db }) {
+        return db.fetchUser({ where: { id } })
+      },
+    })
+  },
+})
+
+export interface UserSourceType {
+  firstname: string
+  lastname: string
+}
+
+export const User = objectType({
+  name: 'User',
+  rootTyping: {
+    path: __filename,
+    name: 'UserSourceType'
+  },
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        return user.firstname + user.lastname
+      },
+    })
+  },
+})
+```
+
+</details>
+
+## Source Types in Nexus
+
+In Nexus, a source type can expressed as an `interface`, a `class`, a `type` alias or an `enum`.
+
+Below are examples of valid source types:
+
+```ts
+export interface UserEntity {
+  id: string
+  name: string
+}
+
+export class Post {
+  id: string
+  title: string
+}
+
+export type CommentModel = {
+  id: string
+  body: string
+}
+
+export enum Color {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+There are many ways you can configure your source types depending on your use-cases. We'll go over each of the available options.
+
+### By default
+
+When you first begin creating your schema, you may have objects without source types setup. In these cases Nexus infers that the source type is an exact match of the GraphQL type. Take this schema for example:
+
+<!-- prettier-ignore -->
+```ts
+// Nexus infers the source type of:
+//
+// { fullName: string, age: number } ---> |
+//                                        |
+object({                               // |
+  name: 'User',                        // |
+  definition(t) {                      // |
+    t.string('fullName', {             // |
+      resolve(user) {                  // |
+//            ^-------------------------- | 
+        return user.fullName           // |
+      },                               // |
+    })                                 // |
+    t.int('age', {                     // |
+      resolve(user) {                  // |
+//            ^-------------------------- |
+        return user.age                // |
+      },                               // |
+    })                                 // |
+  },                                   // |
+})                                     // |
+                                       // |
+queryType({                            // |
+  definition(t) {                      // |
+    t.list.field('users', {            // |
+      type: 'User',                    // |
+      resolve() {                      // |
+        return [/**/]                  // |
+//               ^----------------------- |
+      },
+    })
+  },
+})
+```
+
+This may suffice well enough for some time, but most apps will eventually see their GraphQL and source types diverge. Once this happens, you can tell Nexus about it using one of the solutions explained below.
+
+### Globally configure source types
+
+Configuring your source types globally is the recommended way in most cases. Typically, your source types will come from your database model types (also called entities), or will be generated by your ORM.
+
+When that's the case, you can configure Nexus to automatically map your source types to your GraphQL Object types based on their name.
+
+This is all done in the `typegenAutoConfig` option of `makeSchema`.
+
+#### Exact name matching
+
+By default, Nexus will automatically map the source type `User` to a GraphQL Object type also named `User`. Let's see how that works:
+
+```ts
+// ./db.ts
+
+export interface User {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type which will be extracted by Nexus
+  firstName: string
+  lastName: string
+}
+
+export interface Post {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type which will be extracted by Nexus
+// ...
+}
+
+export interface Comment {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type which will be extracted by Nexus
+// ...
+}
+
+// ./schema.ts
+import { makeSchema, objectType, queryType } from '@nexus/schema'
+import * as path from 'path'
+
+const User = objectType({
+  name: 'User',
+  //      ^---------------------- Name of your GraphQL Object type which will be matched against the name of your source types
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        //      ^------------------------ as: User
+        return user.firstName + ' ' + user.lastName
+      }
+    })
+  }
+})
+
+const Query = queryType({
+  definition(t) {
+    t.list.field('users', {
+      type: User,
+      resolve(_parent, args, ctx) {
+        //                       ^------- return as: User[]
+        // ...
+      }
+    })
+  }
+})
+
+const schema = makeSchema({
+  types: [User, Query],
+  typegenAutoConfig: {
+    sources: [{
+      source: path.join(__dirname, 'db.ts'),
+      //       ^----------------------------- Path to the file containing your source types
+      alias: 'db'
+      //      ^------------------------------ Arbitrary unique name used as alias for Nexus to import your source types. eg: import * as <alias> from <source>
+      //                                      Make sure to use unique names if you have multiple sources
+    }]
+  }
+})
+```
+
+In the example above, since the source type `interface User` matches the name of the `User` GraphQL Object type, Nexus will use the `interface User` as source type for the `User` GraphQL Object type.
+
+#### Different names following a convention
+
+It is however possible that your source types don't exactly match the name of your GraphQL Object type but follow a convention.
+
+For instance:
+
+- source type `class UserModel {}` -> GraphQL Object type `User`
+- source type `class PostModel {}` -> GraphQL Object type `Post`
+- source type `class CommentModel {}` -> GraphQL Object type `Comment`
+
+In that case, you can configure your `source` to teach Nexus about your convention using regexes:
+
+```ts
+//db.ts
+
+export class UserModel {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type which will be extracted by Nexus
+  firstName: string
+  lastName: string
+}
+
+export class PostModel {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type which will be extracted by Nexus
+// ...
+}
+
+export class CommentModel {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type which will be extracted by Nexus
+// ...
+}
+
+// schema.ts
+import { makeSchema, objectType, queryType } from '@nexus/schema'
+import * as path from 'path'
+
+const User = objectType({
+  name: 'User',
+  //      ^---------------------- Name of your GraphQL Object type which will be matched against the name of your source types
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        //      ^------------------------ as: UserModel
+        return user.firstName + ' ' + user.lastName
+      }
+    })
+  }
+})
+
+const Query = queryType({
+  definition(t) {
+    t.list.field('users', {
+      type: User,
+      resolve(_parent, args, ctx) {
+        //                       ^------- return as: UserModel[]
+        // ...
+      }
+    })
+  }
+})
+
+const schema = makeSchema({
+  types: [User, Query],
+  typegenAutoConfig: {
+    sources: [{
+      source: path.join(__dirname, 'db.ts'),
+      //       ^----------------------------- Path to the file containing your source types
+      alias: 'db',
+      //      ^------------------------------ Name used as alias for Nexus to import your source types. eg: import * as <name> from <path>
+      typeMatch(type, defaultRegex) {
+      //         ^--------^---------------- GraphQL Named type to match against your source types
+      //                  |---------------- Default regex used to match your GraphQL types against your source types
+        return new RegExp(`(?:interface|type|class|enum)\\s+(${type.name}Model)\\W`, 'g')
+      //            ^---------------------- New regex which will match `UserModel` with `User`, etc..
+      },
+    }]
+  }
+})
+```
+
+You can also use multiple regexes to map your source types by returning an array of regexes:
+
+```ts
+const schema = makeSchema({
+  typegenAutoConfig: {
+    sources: [{
+      source: path.join(__dirname, 'db.ts'),
+      alias: 'db',
+      typeMatch(type, defaultRegex) {
+        return [
+          defaultRegex,
+          //    ^---------------- Pass in the default Regex to keep the default behavior
+          new RegExp(`(?:interface|type|class|enum)\\s+(${type.name}Model)\\W`, 'g'),
+          // new RegExp(...), -> Add more regexes if you have even more convention
+        ]
+      },
+    }]
+  }
+})
+```
+
+#### Completely different names
+
+If you happen to have source types names that can't be matched against your GraphQL Object type names using a RegEx, there are two solutions.
+
+The first solution is especially useful when most of your types _can be matched using a RegEx_ but you only have a couple of types that can't. In that case, the `backingTypesMap` can help you.
+
+When provided, it will be used for the source types rather than the auto-resolve mechanism of `sources`. It's also useful as an override for one-off cases or for scalar source types.
+
+```ts
+//db.ts
+
+export class SomeRandomName {
+// ^-------------^---------- Export your source type (required)
+//               |---------- Name of your source type that you'll use for the manual mapping
+// ...
+}
+
+// schema.ts
+import { makeSchema, objectType } from '@nexus/schema'
+import * as path from 'path'
+
+const User = objectType({
+  name: 'User',
+  //      ^---------------------- Name of your GraphQL Object type which will be matched against the name of your source types
+  definition(t) {
+    // ...
+  }
+})
+
+const schema = makeSchema({
+  typegenAutoConfig: {
+    sources: [{
+      source: path.join(__dirname, 'db.ts'),
+      //       ^----------------------------- Path to the file containing your source types
+      alias: 'db',
+      //      ^------------------------------ Name used as alias for Nexus to import your source types. eg: import * as <name> from <path>
+    }],
+    backingTypesMap: {
+      User: 'db.SomeRandomName'
+    // ^-----^------^------------------------ GraphQL type name
+    //       |------|------------------------ Source name where the source types is defined. The source name is the `alias` of the source.
+    //              |------------------------ Source type name to use for the `User` GraphQL type name
+    }
+  }
+})
+```
+
+However, if _none of your source type names can match your GraphQL Object type names_ using a RegEx, we suggest you to use the [local source types configuration](#locally-configure-backing-types).
+
+### Locally configure source types
+
+We typically see two use-cases for using the local configuration of source types:
+
+- When your source type names can't be matched against your GraphQL Object type names
+- When you simply prefer keeping your source types next to your Object type definition
+
+To do so, you can use the `rootTyping` property as explained below:
+
+```ts
+import { objectType, queryType } from '@nexus/schema'
+
+export interface MyDBUser {
+  // |           ^-------------------- Create your source type
+  // ^-------------------------------- Export your source type (required)
+  firstName: string
+  lastName: string
+  birthDate: number
+}
+
+export const User = objectType({
+  name: 'User',
+  rootTyping: {
+    path: __filename,
+    //         ^---------------------- Tell Nexus where the source type is.
+    name: 'MyDBUser'
+    //         ^---------------------- Tell Nexus the name of the source type.
+  },
+  definition(t) {
+    t.string('fullName', {
+      resolve(user) {
+        //    ^----------------------- as: MyDBUser
+        return user.firstName + ' ' + user.fullName
+      },
+    })
+    t.int('age', {
+      resolve(user) {
+        //    ^------------------------ as: MyDBUser
+        return yearsSinceUnixTimestamp(user.birthDate)
+      },
+    })
+  },
+})
+
+export const Query = queryType({
+  definition(t) {
+    t.list.field('users', {
+      type: 'User',
+      resolve(_source, args, ctx) {
+        //                     ^------- return as: MyDBUser[]
+        return ctx.db.user.getMany()
+      },
+    })
+  },
+})
+```
+
