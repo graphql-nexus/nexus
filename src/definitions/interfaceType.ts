@@ -15,17 +15,11 @@ export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
 export interface FieldModification<TypeName extends string, FieldName extends string> {
   type?: ModificationType<TypeName, FieldName>
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
-  /**
-   * The resolve method we should be resolving the field with
-   */
+  /** The resolve method we should be resolving the field with */
   resolve?: FieldResolver<TypeName, FieldName>
-  /**
-   * You are allowed to add non-required args when modifying a field
-   */
+  /** You are allowed to add non-required args when modifying a field */
   args?: ArgsRecord
 }
 
@@ -46,19 +40,13 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
 
   definition(t: InterfaceDefinitionBlock<TypeName>): void
   /**
-   * Configures the nullability for the type, check the
-   * documentation's "Getting Started" section to learn
-   * more about GraphQL Nexus's assumptions and configuration
-   * on nullability.
+   * Configures the nullability for the type, check the documentation's "Getting Started" section to learn
+   * more about GraphQL Nexus's assumptions and configuration on nullability.
    */
   nonNullDefaults?: NonNullConfig
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
-  /**
-   * Root type information for this type
-   */
+  /** Root type information for this type */
   rootTyping?: RootTypingDef
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
@@ -73,15 +61,11 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
   constructor(protected typeBuilder: InterfaceDefinitionBuilder<TypeName>) {
     super(typeBuilder)
   }
-  /**
-   * @param interfaceName
-   */
+  /** @param interfaceName */
   implements(...interfaceName: Array<Implemented>) {
     this.typeBuilder.addInterfaces(interfaceName)
   }
-  /**
-   * Modifies a field added via an interface
-   */
+  /** Modifies a field added via an interface */
   modify<FieldName extends Extract<InterfaceFieldsFor<TypeName>, string>>(
     field: FieldName,
     modifications: FieldModification<TypeName, FieldName>
@@ -109,6 +93,7 @@ withNexusSymbol(NexusInterfaceTypeDef, NexusTypes.Interface)
 
 /**
  * Defines a GraphQLInterfaceType
+ *
  * @param config
  */
 export function interfaceType<TypeName extends string>(config: NexusInterfaceTypeConfig<TypeName>) {
