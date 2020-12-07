@@ -130,7 +130,10 @@ export const User = objectType({
           if (root.cursor) {
             // Cursor should be defined here
           }
-          return Object.keys(root.node ?? {}).length
+          if (args.format === 'ms') {
+            return '5ms'
+          }
+          return '0.005s'
         },
       },
     })
@@ -276,7 +279,10 @@ export const plugins = [
   connectionPlugin({
     extendEdge: {
       delta: {
-        type: 'Int',
+        type: 'String',
+        args: {
+          format: 'String',
+        },
       },
     },
   }),

@@ -152,10 +152,10 @@ export interface ConnectionPluginConfig {
 }
 
 // Extract the node value from the connection for a given field.
-export type NodeValue<TypeName extends string = any, FieldName extends string = any> = Exclude<
-  Exclude<Exclude<ResultValue<TypeName, FieldName>, null | undefined>['edges'], null | undefined>[number],
-  null | undefined
->['node']
+export type NodeValue<TypeName extends string = any, FieldName extends string = any> = ResultValue<
+  EdgeTypeLookup<TypeName, FieldName>,
+  'node'
+>
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
   type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
@@ -338,12 +338,17 @@ function base64Decode(str: string) {
   return Buffer.from(str, 'base64').toString('utf8')
 }
 
+export type EdgeTypeLookup<TypeName extends string, FieldName extends string> = FieldTypeName<
+  FieldTypeName<TypeName, FieldName>,
+  'edges'
+>
+
 export type EdgeFieldResolver<TypeName extends string, FieldName extends string, EdgeField extends string> = (
-  root: RootValue<FieldTypeName<FieldTypeName<TypeName, FieldName>, 'edges'>>,
-  args: ArgsValue<TypeName, FieldName>,
+  root: RootValue<EdgeTypeLookup<TypeName, FieldName>>,
+  args: ArgsValue<TypeName, FieldName> & ArgsValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<TypeName, FieldName>['edges'][EdgeField]>
+) => MaybePromise<ResultValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>>
 
 export type ConnectionNodesResolver<TypeName extends string, FieldName extends string> = (
   root: RootValue<TypeName>,
