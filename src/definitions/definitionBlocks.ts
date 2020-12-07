@@ -149,7 +149,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
     } as any)
   }
 
-  protected _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
+  private _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
     const previousWrapping = this.wrapping?.[0]
     if (
       (kind === 'NonNull' || kind === 'Null') &&
@@ -160,30 +160,24 @@ export class OutputDefinitionBlock<TypeName extends string> {
     return new OutputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
-  protected addScalarField(
-    fieldName: string,
+  private addScalarField<FieldName extends string>(
+    fieldName: FieldName,
     typeName: BaseScalars,
     opts: [] | ScalarOutSpread<TypeName, any>
   ) {
-    let config: NexusOutputFieldDef = {
-      name: fieldName,
+    let fieldConfig: FieldOutConfig<any, any> = {
       type: typeName,
-      parentType: this.typeName,
-      configFor: 'outputField',
     }
 
     /* istanbul ignore if */
     if (typeof opts[0] === 'function') {
-      config.resolve = opts[0] as any
+      fieldConfig.resolve = opts[0] as any
       console.warn(messages.removedFunctionShorthand(typeName, fieldName))
     } else {
-      config = { ...config, ...opts[0] }
+      fieldConfig = { ...fieldConfig, ...opts[0] }
     }
 
-    this.typeBuilder.addField({
-      ...config,
-      wrapping: this.wrapping,
-    })
+    this.field(fieldName, fieldConfig as any)
   }
 }
 
@@ -221,26 +215,26 @@ export class InputDefinitionBlock<TypeName extends string> {
   }
 
   string<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'String', opts)
+    this.field(fieldName, { ...opts, type: 'String' })
   }
 
   int<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Int', opts)
+    this.field(fieldName, { ...opts, type: 'Int' })
   }
 
   boolean<FieldName extends string>(
     fieldName: FieldName,
     opts?: CommonInputFieldConfig<TypeName, FieldName>
   ) {
-    this.addScalarField(fieldName, 'Boolean', opts)
+    this.field(fieldName, { ...opts, type: 'Boolean' })
   }
 
   id<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'ID', opts)
+    this.field(fieldName, { ...opts, type: 'ID' })
   }
 
   float<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Float', opts)
+    this.field(fieldName, { ...opts, type: 'Float' })
   }
 
   field<FieldName extends string>(
@@ -256,7 +250,7 @@ export class InputDefinitionBlock<TypeName extends string> {
     })
   }
 
-  protected _wrapClass(kind: NexusWrapKind) {
+  private _wrapClass(kind: NexusWrapKind) {
     const previousWrapping = this.wrapping?.[0]
     if (
       (kind === 'NonNull' || kind === 'Null') &&
@@ -265,20 +259,5 @@ export class InputDefinitionBlock<TypeName extends string> {
       return new InputDefinitionBlock(this.typeBuilder, this.wrapping || [])
     }
     return new InputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
-  }
-
-  protected addScalarField(
-    fieldName: string,
-    typeName: BaseScalars,
-    opts: CommonInputFieldConfig<any, any> = {}
-  ) {
-    this.typeBuilder.addField({
-      name: fieldName,
-      type: typeName,
-      ...opts,
-      wrapping: this.wrapping,
-      parentType: this.typeName,
-      configFor: 'inputField',
-    })
   }
 }

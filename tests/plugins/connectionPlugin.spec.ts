@@ -27,9 +27,36 @@ const User = objectType({
   },
 })
 
+const CountFieldBody = `
+  count(round: $round)
+  edges {
+    cursor
+    node { id } 
+  }
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+`
+const DeltaFieldBody = `
+  edges {
+    delta(format: $format)
+    cursor
+    node { id } 
+  }
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+`
+
 const UsersFieldBody = `
   nodes { id }
-  edges { 
+  edges {
     cursor
     node { id } 
   }
@@ -48,6 +75,18 @@ const UsersLastBefore = parse(
 const UsersFirst = parse(`query UsersFieldFirst($first: Int!) { users(first: $first) { ${UsersFieldBody} } }`)
 const UsersFirstAfter = parse(
   `query UsersFieldFirstAfter($first: Int!, $after: String!) { users(first: $first, after: $after) { ${UsersFieldBody} } }`
+)
+const CountFirst = parse(
+  `query CountField($first: Int!, $after: String, $round: Int, $ok: Boolean!) {
+    ok(ok: $ok)
+    users(first: $first, after: $after) { ${CountFieldBody} } 
+  }`
+)
+const DeltaFirst = parse(
+  `query DeltaField($first: Int!, $after: String, $format: String, $ok: Boolean!) {
+    ok(ok: $ok)
+    users(first: $first, after: $after) { ${DeltaFieldBody} } 
+  }`
 )
 
 const executeOk = async (args: ExecutionArgs) => {
@@ -79,6 +118,11 @@ const makeTestSchema = (
               return userNodes
             },
             ...fieldConfig,
+          })
+          t.boolean('ok', {
+            args: {
+              ok: 'Boolean',
+            },
           })
         },
       }),
@@ -986,5 +1030,151 @@ describe('field level configuration', () => {
     })
     expect(result.data?.users.pageInfo.hasNextPage).toEqual(true)
     expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(false)
+  })
+})
+
+describe('connectionPlugin extensions', () => {
+  describe('should receive the connection args when extending', () => {
+    test('the connection type on the schema', async () => {
+      const schema = makeTestSchema(
+        {
+          extendConnection: {
+            count: {
+              type: 'Int',
+              args: {
+                round: 'Int',
+              },
+            },
+          },
+        },
+        {
+          // @ts-ignore
+          count(root, args, ctx) {
+            expect(args).toEqual({
+              first: 1,
+              after: 'Y3Vyc29yOjA=',
+              round: 100,
+            })
+            return 100
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: CountFirst,
+        variableValues: {
+          first: 1,
+          after: 'Y3Vyc29yOjA=',
+          round: 100,
+          ok: true,
+        },
+      })
+    })
+
+    test('the connection type on the field', async () => {
+      expect.assertions(2)
+      const schema = makeTestSchema(
+        {},
+        {
+          extendConnection(t) {
+            t.int('count', {
+              args: {
+                round: 'Int',
+              },
+              resolve(root, args, ctx) {
+                expect(args).toEqual({
+                  first: 1,
+                  after: 'Y3Vyc29yOjA=',
+                  round: 100,
+                })
+                return 100
+              },
+            })
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: CountFirst,
+        variableValues: {
+          first: 1,
+          after: 'Y3Vyc29yOjA=',
+          round: 100,
+          ok: true,
+        },
+      })
+    })
+
+    test('the edge type on the schema', async () => {
+      expect.assertions(2)
+      const schema = makeTestSchema(
+        {
+          extendEdge: {
+            delta: {
+              type: 'String',
+              args: {
+                format: 'String',
+              },
+            },
+          },
+        },
+        {
+          edgeFields: {
+            delta(root, args, ctx) {
+              expect(args).toEqual({
+                first: 1,
+                after: 'Y3Vyc29yOjA=',
+                format: 'ms',
+              })
+              return '5ms'
+            },
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: DeltaFirst,
+        variableValues: {
+          first: 1,
+          after: 'Y3Vyc29yOjA=',
+          format: 'ms',
+          ok: true,
+        },
+      })
+    })
+
+    test('the edge type on the field', async () => {
+      expect.assertions(2)
+      const schema = makeTestSchema(
+        {},
+        {
+          extendEdge(t) {
+            t.string('delta', {
+              args: {
+                format: 'String',
+              },
+              resolve(root, args, ctx) {
+                expect(args).toEqual({
+                  first: 1,
+                  after: 'Y3Vyc29yOjA=',
+                  format: 'ms',
+                })
+                return '5ms'
+              },
+            })
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: DeltaFirst,
+        variableValues: {
+          first: 1,
+          after: 'Y3Vyc29yOjA=',
+          format: 'ms',
+          ok: true,
+        },
+      })
+    })
   })
 })
