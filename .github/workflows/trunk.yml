@@ -77,7 +77,6 @@ jobs:
   #       run: yarn --cwd=examples/${{ matrix.example }} tsc
 
   release-canary:
-    needs: [test, test-examples]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
