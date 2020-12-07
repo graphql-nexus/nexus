@@ -6,36 +6,26 @@ import { BaseScalars } from './_types'
 import { messages } from '../messages'
 
 export interface CommonFieldConfig {
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
   /**
-   * Info about a field deprecation. Formatted as a string and provided with the
-   * deprecated directive on field/enum types and as a comment on input fields.
+   * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
+   * field/enum types and as a comment on input fields.
    */
   deprecation?: string // | DeprecationInfo;
 }
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
-  /**
-   * Arguments for the field
-   */
+  /** Arguments for the field */
   args?: ArgsRecord
-  /**
-   * Custom extensions, as supported in graphql-js
-   */
+  /** Custom extensions, as supported in graphql-js */
   extensions?: GraphQLFieldConfig<any, any>['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
 export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
-  /**
-   * The default value for the field, if any
-   */
+  /** The default value for the field, if any */
   default?: GetGen3<'inputTypes', TypeName, FieldName>
-  /**
-   * Custom extensions, as supported in graphql-js
-   */
+  /** Custom extensions, as supported in graphql-js */
   extensions?: GraphQLInputFieldConfig['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
@@ -50,9 +40,7 @@ export interface ScalarInputFieldConfig<T> extends CommonInputFieldConfig<any, a
 
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
-  /**
-   * Resolve method for the field
-   */
+  /** Resolve method for the field */
   resolve?: FieldResolver<TypeName, FieldName>
 }
 
@@ -115,10 +103,7 @@ export interface OutputDefinitionBlock<TypeName extends string>
                NexusGenCustomOutputProperties<TypeName>
        {}
 
-/**
- * The output definition block is passed to the "definition"
- * function property of the "objectType" / "interfaceType"
- */
+/** The output definition block is passed to the "definition" function property of the "objectType" / "interfaceType" */
 export class OutputDefinitionBlock<TypeName extends string> {
   readonly typeName: string
   constructor(protected typeBuilder: OutputDefinitionBuilder, protected wrapping?: NexusWrapKind[]) {
@@ -208,7 +193,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
 
 export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string>
   extends CommonInputFieldConfig<TypeName, FieldName> {
-  type: AllInputTypes | AllNexusInputTypeDefs<string>
+  type: AllInputTypes | AllNexusInputTypeDefs
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {

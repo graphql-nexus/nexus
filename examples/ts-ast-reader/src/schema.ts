@@ -41,8 +41,8 @@ export const schema = makeSchema({
 })
 
 /**
- * When the type is a "Node", we want to first look for types with
- * the name `Node`, e.g. TypeReferenceNode vs TypeReference
+ * When the type is a "Node", we want to first look for types with the name `Node`, e.g. TypeReferenceNode vs
+ * TypeReference
  */
 function tsTypeMatch(type: GraphQLNamedType, defaultMatch: RegExp) {
   if (isNodeType(type)) {

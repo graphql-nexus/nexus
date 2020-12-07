@@ -16,8 +16,8 @@ export type UnionMembers = Array<GetGen<'objectNames'> | NexusObjectTypeDef<any>
 export class UnionDefinitionBlock {
   constructor(protected typeBuilder: UnionDefinitionBuilder) {}
   /**
-   * All ObjectType names that should be part of the union, either
-   * as string names or as references to the `objectType()` return value
+   * All ObjectType names that should be part of the union, either as string names or as references to the
+   * `objectType()` return value
    */
   members(...unionMembers: UnionMembers) {
     this.typeBuilder.addUnionMembers(unionMembers)
@@ -31,30 +31,20 @@ export class UnionDefinitionBlock {
 }
 
 export type NexusUnionTypeConfig<TypeName extends string> = {
-  /**
-   * The name of the union type
-   */
+  /** The name of the union type */
   name: TypeName
-  /**
-   * Builds the definition for the union
-   */
+  /** Builds the definition for the union */
   definition(t: UnionDefinitionBlock): void
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
   /**
-   * Info about a field deprecation. Formatted as a string and provided with the
-   * deprecated directive on field/enum types and as a comment on input fields.
+   * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
+   * field/enum types and as a comment on input fields.
    */
   deprecation?: string // | DeprecationInfo;
-  /**
-   * Root type information for this type
-   */
+  /** Root type information for this type */
   rootTyping?: RootTypingDef
-  /**
-   * Custom extensions, as supported in graphql-js
-   */
+  /** Custom extensions, as supported in graphql-js */
   extensions?: GraphQLUnionTypeConfig<any, any>['extensions']
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
@@ -71,6 +61,7 @@ withNexusSymbol(NexusUnionTypeDef, NexusTypes.Union)
 
 /**
  * Defines a new `GraphQLUnionType`
+ *
  * @param config
  */
 export function unionType<TypeName extends string>(config: NexusUnionTypeConfig<TypeName>) {

@@ -4,28 +4,18 @@ import { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
 
 export interface NexusInputObjectTypeConfig<TypeName extends string> {
-  /**
-   * Name of the input object type
-   */
+  /** Name of the input object type */
   name: TypeName
-  /**
-   * Definition block for the input type
-   */
+  /** Definition block for the input type */
   definition(t: InputDefinitionBlock<TypeName>): void
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
   /**
-   * Configures the nullability for the type, check the
-   * documentation's "Getting Started" section to learn
-   * more about GraphQL Nexus's assumptions and configuration
-   * on nullability.
+   * Configures the nullability for the type, check the documentation's "Getting Started" section to learn
+   * more about GraphQL Nexus's assumptions and configuration on nullability.
    */
   nonNullDefaults?: NonNullConfig
-  /**
-   * Custom extensions, as supported in graphql-js
-   */
+  /** Custom extensions, as supported in graphql-js */
   extensions?: GraphQLInputObjectTypeConfig['extensions']
 }
 
@@ -36,13 +26,16 @@ export class NexusInputObjectTypeDef<TypeName extends string> {
   get value() {
     return this.config
   }
-  // FIXME
-  // Instead of `any` we want to pass the name of this type...
-  // so that the correct `cfg.default` type can be looked up
-  // from the typegen.
-  asArg(cfg?: NexusAsArgConfig<any>): NexusArgDef<any> {
-    // FIXME
-    return arg({ ...cfg, type: this } as any)
+  /**
+   * Shorthand for wrapping the current InputObject in an "arg", useful if you need to add a description.
+   *
+   * @example
+   *   inputObject(config).asArg({
+   *     description: 'Define sort the current field',
+   *   })
+   */
+  asArg(cfg?: NexusAsArgConfig<TypeName>): NexusArgDef<any> {
+    return arg({ ...cfg, type: this })
   }
 }
 withNexusSymbol(NexusInputObjectTypeDef, NexusTypes.InputObject)

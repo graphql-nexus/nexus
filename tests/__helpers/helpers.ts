@@ -1,9 +1,7 @@
 import * as GQL from 'graphql'
 import { inputObjectType, objectType } from '../../src'
 
-/**
- * Used in testing, creates a generic "User" object
- */
+/** Used in testing, creates a generic "User" object */
 export const UserObject = objectType({
   name: 'User',
   definition(t) {
@@ -34,9 +32,7 @@ export const restoreEnvBeforeEach = () => {
   })
 }
 
-/**
- * Subscription helpers
- */
+/** Subscription helpers */
 
 export function subscribe(
   schema: GQL.GraphQLSchema,

@@ -1,9 +1,11 @@
 import {
+  arg,
   connectionPlugin,
   declarativeWrappingPlugin,
   dynamicInputMethod,
   dynamicOutputMethod,
   dynamicOutputProperty,
+  enumType,
   extendType,
   idArg,
   inputObjectType,
@@ -106,6 +108,16 @@ export const PostSearchInput = inputObjectType({
   },
 })
 
+export const someArg = arg({
+  type: inputObjectType({
+    name: 'Something',
+    definition(t) {
+      t.nonNull.int('id')
+    },
+  }),
+  default: { id: 1 },
+})
+
 export const Post = objectType({
   name: 'Post',
   definition(t) {
@@ -148,7 +160,16 @@ export const Query = extendType({
     })
     t.field('user', {
       type: 'User',
-      args: { id: idArg() },
+      args: {
+        id: idArg(),
+        status: enumType({
+          name: 'UserStatus',
+          members: [
+            { name: 'ACTIVE', value: 'active' },
+            { name: 'PENDING', value: 'pending' },
+          ],
+        }).asArg({ default: 'active' }),
+      },
       resolve: () => mockData.user,
     })
   },

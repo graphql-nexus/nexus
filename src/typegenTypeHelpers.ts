@@ -18,10 +18,7 @@ export type AllInputTypes = GetGen<'allInputTypes', string>
 
 export type AllOutputTypes = GetGen<'allOutputTypes', string>
 
-/**
- * This type captures all output types defined in the app
- * as well as core GraphQL spec objects.
- */
+/** This type captures all output types defined in the app as well as core GraphQL spec objects. */
 export type AllOutputTypesPossible = AllOutputTypes | 'Query' | 'Mutation' | 'Subscription'
 
 export type FieldType<TypeName extends string, FieldName extends string> = GetGen3<
@@ -33,9 +30,8 @@ export type FieldType<TypeName extends string, FieldName extends string> = GetGe
 export type MaybePromise<T> = PromiseLike<T> | T
 
 /**
- * Because the GraphQL field execution algorithm automatically
- * resolves promises at any level of the tree, we use this
- * to help signify that.
+ * Because the GraphQL field execution algorithm automatically resolves promises at any level of the tree, we
+ * use this to help signify that.
  */
 export type MaybePromiseDeep<T> = Date extends T
   ? MaybePromise<T>
@@ -61,19 +57,16 @@ export type MaybePromiseDeep<T> = Date extends T
   : MaybePromise<T>
 
 /**
- * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety
- * and autocomplete on an abstract type resolver (interface or union) outside of the Nexus
- * configuration
+ * The NexusAbstractTypeResolver type can be used if you want to preserve type-safety and autocomplete on an
+ * abstract type resolver (interface or union) outside of the Nexus configuration
  *
  * @example
- * ```
- * const mediaType: AbstractTypeResolver<'MediaType'> = (root, ctx, info) => {
- *   if (ctx.user.isLoggedIn()) {
- *     return ctx.user.getItems()
+ *   const mediaType: AbstractTypeResolver<'MediaType'> = (root, ctx, info) => {
+ *     if (ctx.user.isLoggedIn()) {
+ *       return ctx.user.getItems()
+ *     }
+ *     return null
  *   }
- *   return null
- * }
- * ```
  */
 export interface AbstractTypeResolver<TypeName extends string> {
   (
@@ -85,18 +78,16 @@ export interface AbstractTypeResolver<TypeName extends string> {
 }
 
 /**
- * The FieldResolver type can be used when you want to preserve type-safety
- * and autocomplete on a resolver outside of the Nexus definition block
+ * The FieldResolver type can be used when you want to preserve type-safety and autocomplete on a resolver
+ * outside of the Nexus definition block
  *
  * @example
- * ```
- * const userItems: FieldResolver<'User', 'items'> = (root, args, ctx, info) => {
- *   if (ctx.user.isLoggedIn()) {
- *     return ctx.user.getItems()
+ *   const userItems: FieldResolver<'User', 'items'> = (root, args, ctx, info) => {
+ *     if (ctx.user.isLoggedIn()) {
+ *       return ctx.user.getItems()
+ *     }
+ *     return null
  *   }
- *   return null
- * }
- * ```
  */
 export type FieldResolver<TypeName extends string, FieldName extends string> = (
   root: RootValue<TypeName>,
@@ -126,13 +117,12 @@ export type SubFieldResolver<
 
 export type AbstractResolveReturn<TypeName extends string> = GetGen2<'abstractTypeMembers', TypeName, any>
 
-/**
- * Generated type helpers:
- */
+/** Generated type helpers: */
 export type GenTypesShapeKeys =
   | 'context'
   | 'inputTypes'
   | 'rootTypes'
+  | 'inputTypeShapes'
   | 'argTypes'
   | 'fieldTypes'
   | 'fieldTypeNames'
@@ -153,9 +143,7 @@ export type GenTypesShapeKeys =
   | 'abstractsUsingStrategyResolveType'
   | 'features'
 
-/**
- * Helpers for handling the generated schema
- */
+/** Helpers for handling the generated schema */
 export type GenTypesShape = Record<GenTypesShapeKeys, any>
 
 export type GetGen<K extends GenTypesShapeKeys, Fallback = any> = NexusGen extends infer GenTypes

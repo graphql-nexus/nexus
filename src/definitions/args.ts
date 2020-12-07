@@ -6,36 +6,43 @@ import { NexusTypes, withNexusSymbol } from './_types'
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
 export type CommonArgConfig = {
-  /**
-   * The description to annotate the GraphQL SDL
-   */
+  /** The description to annotate the GraphQL SDL */
   description?: string | null
-  /**
-   * Custom extensions, as supported in graphql-js
-   */
+  /** Custom extensions, as supported in graphql-js */
   extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
 } & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
   /**
    * Configure the default for the object
+   *
+   * @example
+   *   intArg({ default: 42 })
    */
   default?: T
 }
 
-export type NexusArgConfigType<T extends AllInputTypes> = T | AllNexusInputTypeDefs<T>
+export type NexusArgConfigType<T extends string> = T | AllNexusInputTypeDefs<T>
 
-export interface NexusAsArgConfig<T extends AllInputTypes> extends CommonArgConfig {
+export interface NexusAsArgConfig<T extends string> extends CommonArgConfig {
   /**
-   * Configure the default for the object
+   * Sets the default value for this argument, should match the type of the argument
+   *
+   * @example
+   *   intArg({ default: 42 })
    */
-  default?: GetGen2<'allTypes', T> // TODO: Make this type-safe somehow
+  default?: GetGen2<'inputTypeShapes', T>
 }
 
-export interface NexusArgConfig<T extends AllInputTypes> extends NexusAsArgConfig<T> {
+export interface NexusArgConfig<T extends string> extends NexusAsArgConfig<T> {
   /**
-   * The type of the argument, either the string name of the type,
-   * or the concrete Nexus type definition
+   * The type of the argument, either the string name of the type, or the concrete Nexus type definition
+   *
+   * @example
+   *   arg({ type: 'User' })
+   *
+   * @example
+   *   arg({ type: UserType })
    */
   type: NexusArgConfigType<T>
 }
@@ -48,7 +55,7 @@ export interface NexusFinalArgConfig extends NexusArgConfig<any> {
 }
 
 export class NexusArgDef<TypeName extends AllInputTypes> {
-  constructor(readonly name: string, protected config: NexusArgConfig<TypeName>) {}
+  constructor(readonly name: TypeName, protected config: NexusArgConfig<any>) {}
   get value() {
     return this.config
   }
@@ -64,7 +71,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg)
  *
  * @see https://graphql.github.io/learn/schema/#arguments
  */
-export function arg<T extends AllInputTypes>(options: NexusArgConfig<T>) {
+export function arg<T extends string>(options: NexusArgConfig<T>) {
   if (!options.type) {
     throw new Error('You must provide a "type" for the arg()')
   }
