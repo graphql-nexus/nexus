@@ -52,7 +52,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    */
   name: TypeName
   /**
-   * [Nexus Nullability Guide](https://nxs.li/guides/nullability)
+   * [Nullability Guide](https://nxs.li/guides/nullability)
    *
    * Configures the default nullability for fields and arguments in this object.
    *
@@ -104,7 +104,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    */
   description?: string | null
   /**
-   * [Nexus Backing Types Guide](https://nxs.li/guides/backing-types)
+   * [Source Types Guide](https://nxs.li/guides/backing-types)
    *
    * Specify the backing type for this object type.
    *
@@ -182,7 +182,7 @@ export class NexusObjectTypeDef<TypeName extends string> {
 withNexusSymbol(NexusObjectTypeDef, NexusTypes.Object)
 
 /**
- * [Nexus Docs](https://nxs.li/docs/api/object-type) | [GraphQL.org
+ * [API Docs](https://nxs.li/docs/api/object-type) | [GraphQL.org
  * Docs](https://graphql.org/learn/schema/#object-types-and-fields) | [GraphQL 2018
  * Spec](https://spec.graphql.org/June2018/#sec-Objects)
  *
