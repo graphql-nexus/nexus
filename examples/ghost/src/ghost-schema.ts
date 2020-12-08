@@ -10,12 +10,7 @@ export const schema = makeSchema({
   },
   plugins: [fieldAuthorizePlugin()],
   typegenAutoConfig: {
-    contextType: 'ctx.Context',
     sources: [
-      {
-        alias: 'ctx',
-        source: path.join(__dirname, 'data-sources', 'Context.ts'),
-      },
       {
         alias: 'db',
         source: path.join(__dirname, 'generated', 'ghost-db-types.ts'),
@@ -25,6 +20,10 @@ export const schema = makeSchema({
     backingTypeMap: {
       Date: 'Date',
     },
+  },
+  contextType: {
+    path: path.join(__dirname, 'data-sources', 'Context.ts'),
+    name: 'Context',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
 })

@@ -65,10 +65,3 @@ export interface Utils {
   }): T[]
   createStore(): {}
 }
-
-export interface Context {
-  dataSources: {
-    userAPI: UserApi
-    launchAPI: LaunchApi
-  }
-}

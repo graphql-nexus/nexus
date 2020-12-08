@@ -115,6 +115,7 @@ export interface NexusGenObjects {
   SomeNode: {
     // root type
     data?: NexusGenRootTypes['SomeNode'] | null // SomeNode
+    id?: string | null // ID
   }
   TestObj: {
     // root type
