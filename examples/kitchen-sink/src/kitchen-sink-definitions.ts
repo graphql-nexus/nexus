@@ -83,7 +83,7 @@ export const UnusedInterface = interfaceType({
   definition(t) {
     t.boolean('ok')
   },
-  rootTyping: { name: 'UnusedInterfaceTypeDef', path: __filename },
+  rootTyping: { module: __filename, export: 'UnusedInterfaceTypeDef' },
 })
 
 export const Baz = interfaceType({

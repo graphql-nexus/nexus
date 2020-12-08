@@ -5,8 +5,10 @@ import fs from 'fs-extra'
 import _ from 'lodash'
 import Knex from 'knex'
 
+const config = require('../config.development.json')
+
 const knex = Knex({
-  ...require('../config.development.json').database,
+  ...config.database,
 })
 
 const GENERATED_DIR = path.join(__dirname, '..', 'src', 'generated')
@@ -14,7 +16,10 @@ const OUT_TYPES = path.join(GENERATED_DIR, 'ghost-db-types.ts')
 const OUT_TABLES = path.join(GENERATED_DIR, 'ghost-db-tables.ts')
 
 async function generateTypes() {
-  const rows = await knex.select('*').from('information_schema.tables').where('table_schema', 'ghost_nexus')
+  const rows = await knex
+    .select('*')
+    .from('information_schema.tables')
+    .where('table_schema', config.database.connection.database)
   const tableNames = _.map(rows, 'TABLE_NAME').sort()
   const connectionString = dbConnectionString()
   await knex.destroy()

@@ -148,7 +148,8 @@ exports[`typegenPrinter should print the full output 1`] = `
  * Do not make changes to this file directly
  */
 
-import * as t from \\"./__helpers/index\\"
+
+import { TestContext } from \\"./tests/__helpers/index\\"
 import { core } from \\"@nexus/schema\\"
 
 
@@ -340,7 +341,7 @@ export type NexusGenFeaturesConfig = {
 }
 
 export interface NexusGenTypes {
-  context: t.TestContext;
+  context: TestContext;
   inputTypes: NexusGenInputs;
   rootTypes: NexusGenRootTypes;
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;
