@@ -111,32 +111,37 @@ export class TypegenMetadata {
   }
 
   /** Generates the type definitions */
-  async generateTypesFile(schema: NexusGraphQLSchema, typegenFile: string): Promise<string> {
+  async generateTypesFile(schema: NexusGraphQLSchema, typegenPath: string): Promise<string> {
+    const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
+
     return new TypegenPrinter(schema, {
-      ...(await this.getTypegenInfo(schema)),
-      typegenFile,
+      ...typegenInfo,
+      typegenPath,
     }).print()
   }
 
-  async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {
+  async getTypegenInfo(schema: GraphQLSchema, typegenPath?: string): Promise<TypegenInfo> {
     if (this.config.typegenConfig) {
       if (this.config.typegenAutoConfig) {
         console.warn(
           `Only one of typegenConfig and typegenAutoConfig should be specified, ignoring typegenConfig`
         )
       }
-      return this.config.typegenConfig(schema, this.config.outputs.typegen || '')
+      return this.config.typegenConfig(schema, typegenPath || this.config.outputs.typegen || '')
     }
 
     if (this.config.typegenAutoConfig) {
-      return typegenAutoConfig(this.config.typegenAutoConfig)(schema, this.config.outputs.typegen || '')
+      return typegenAutoConfig(this.config.typegenAutoConfig, this.config.contextType)(
+        schema,
+        typegenPath || this.config.outputs.typegen || ''
+      )
     }
 
     return {
       nexusSchemaImportId: this.config.nexusSchemaImportId,
       headers: [TYPEGEN_HEADER],
       imports: [],
-      contextType: 'any',
+      contextTypeImport: this.config.contextType,
       backingTypeMap: {},
     }
   }

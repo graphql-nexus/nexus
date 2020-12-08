@@ -51,7 +51,7 @@ type TypeMapping = Record<string, string>
 type RootTypeMapping = Record<string, string | Record<string, [string, string]>>
 
 interface TypegenInfoWithFile extends TypegenInfo {
-  typegenFile: string
+  typegenPath: string
 }
 
 /**
@@ -164,7 +164,7 @@ export class TypegenPrinter {
     const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
-    const outputPath = this.typegenInfo.typegenFile
+    const outputPath = this.typegenInfo.typegenPath
     const nexusSchemaImportId = this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name
 
     if (!this.printImports[nexusSchemaImportId]) {
@@ -332,7 +332,7 @@ export class TypegenPrinter {
   }
 
   printContext() {
-    return this.typegenInfo.contextType || '{}'
+    return this.typegenInfo.contextTypeImport?.alias || this.typegenInfo.contextTypeImport?.name || 'any'
   }
 
   buildResolveSourceTypeMap() {

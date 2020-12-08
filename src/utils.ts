@@ -236,14 +236,14 @@ function nixifyPathSlashes(path: string): string {
  *
  * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
  */
-export function formatPathForModuleimport(path: string) {
+export function formatPathForModuleImport(path: string) {
   return nixifyPathSlashes(makeRelativePathExplicitlyRelative(path).replace(typeScriptFileExtension, ''))
 }
 
 export function relativePathTo(absolutePath: string, fromPath: string): string {
   const filename = Path.basename(absolutePath)
   const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
-  return formatPathForModuleimport(Path.join(relative, filename))
+  return formatPathForModuleImport(Path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -504,9 +504,15 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
     throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
   }
 
-  const importPath = isNodeModule(rootTypePath) ? rootTypePath : relativePathTo(rootTypePath, outputPath)
+  if (isNodeModule(rootTypePath)) {
+    return rootTypePath
+  }
 
-  return importPath
+  if (Path.isAbsolute(rootTypePath)) {
+    return relativePathTo(rootTypePath, outputPath)
+  }
+
+  return rootTypePath
 }
 
 /** Given the right hand side of an arg definition, returns the underlying "named type" for us to add to the builder */

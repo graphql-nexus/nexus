@@ -59,7 +59,10 @@ describe('backingTypes', () => {
             source: path.join(__dirname, '_types.ts'),
           },
         ],
-        contextType: 't.TestContext',
+      },
+      contextType: {
+        path: path.join(__dirname, '_types.ts'),
+        name: 'TestContext',
       },
     })
   })
@@ -69,7 +72,7 @@ describe('backingTypes', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
@@ -80,7 +83,7 @@ describe('backingTypes', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
@@ -108,7 +111,7 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
     expect(typegen.print()).toMatchSnapshot()
   })
@@ -136,7 +139,7 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
@@ -167,7 +170,7 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     try {
