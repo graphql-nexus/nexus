@@ -80,7 +80,12 @@ function graphqlTestContext() {
   return {
     async before() {
       const port = await getPort({ port: makeRange(4000, 6000) });
+
       serverInstance = await server.listen({ port });
++     // Close the Prisma Client connection when the Apollo Server is closed
++     serverInstance.server.on("close", async () => {
++       db.$disconnect() 
++     });
 
       return new GraphQLClient(`http://localhost:${port}`);
     },
@@ -149,6 +154,7 @@ import { GraphQLClient } from "graphql-request";
 import { nanoid } from "nanoid";
 import { join } from "path";
 import { Client } from "pg";
+import { db } from "../api/db";
 import { server } from "../api/server";
 
 type TestContext = {
@@ -185,7 +191,12 @@ function graphqlTestContext() {
   return {
     async before() {
       const port = await getPort({ port: makeRange(4000, 6000) });
+      
       serverInstance = await server.listen({ port });
+      // Close the Prisma Client connection when the Apollo Server is closed
+      serverInstance.server.on("close", async () => {
+        db.$disconnect() 
+      });
 
       return new GraphQLClient(`http://localhost:${port}`);
     },
@@ -299,19 +310,6 @@ it('ensures that a draft can be created and published', async () => {
 
 + expect(persistedData).toMatchInlineSnapshot()
 })
-```
-
-Before running your tests update the jest script with the `--forceExit` flag as there is currently a bug keeping just from existing normally after tests have completed.
-
-
-```json diff
-  "scripts": {
-    "dev": "ts-node-dev --transpile-only --no-notify api/app",
-    "build": "tsc",
-    "generate": "ts-node --transpile-only api/schema",
--   "test": "npm run generate && jest"
-+   "test": "npm run generate && jest --forceExit"
-  },
 ```
 
 Now run your tests

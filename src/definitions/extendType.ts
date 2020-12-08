@@ -44,7 +44,7 @@ export class NexusExtendTypeDef<TypeName extends string> {
 withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject)
 
 /**
- * [Nexus Docs](https://nxs.li/docs/api/extend-type)
+ * [API Docs](https://nxs.li/docs/api/extend-type)
  *
  * Add new fields to an existing objectType.
  *

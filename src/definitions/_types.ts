@@ -64,7 +64,7 @@ export interface DeprecationInfo {
 }
 
 /**
- * [Nexus Nullability Guide](https://nxs.li/guides/nullability)
+ * [Nullability Guide](https://nxs.li/guides/nullability)
  *
  * Configures the default nullability for fields and arguments.
  */
