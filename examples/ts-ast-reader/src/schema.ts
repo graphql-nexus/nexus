@@ -23,11 +23,14 @@ export const schema = makeSchema({
         onlyTypes: [],
       },
     ],
-    contextType: 't.ContextType',
     backingTypeMap: {
       Token: 'ts.Token<any>',
     },
     // debug: true,
+  },
+  contextType: {
+    module: path.join(__dirname, './types/context.ts'),
+    export: 'ContextType',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
   nonNullDefaults: {

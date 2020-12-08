@@ -242,6 +242,13 @@ export interface BuilderConfigInput {
   customPrintSchemaFn?: typeof printSchema
   /** Customize and toggle on or off various features of Nexus. */
   features?: NexusFeaturesInput
+  /**
+   * Path to the module where your context type is exported
+   *
+   * @example
+   *   contextType: { module: path.join(__dirname, 'context.ts'), export: 'MyContextType' }
+   */
+  contextType?: TypingImport
 }
 
 export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
@@ -277,10 +284,8 @@ export interface TypegenInfo {
   imports: string[]
   /** A map of all GraphQL types and what TypeScript types they should be represented by. */
   backingTypeMap: { [K in GetGen<'objectNames'>]?: string }
-  /** The string type of the context for the resolvers */
-  contextType?: string
   /** Info about where to import the context from */
-  contextTypeImport?: TypingImport
+  contextTypeImport: TypingImport | undefined
   /**
    * The path to the @nexus/schema package for typegen.
    *

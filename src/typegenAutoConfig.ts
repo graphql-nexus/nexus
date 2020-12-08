@@ -1,7 +1,7 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
 import * as path from 'path'
 import { TypegenInfo } from './builder'
-import { RootTypingDef, TypingImport } from './definitions/_types'
+import { TypingImport } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
 import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils'
 
@@ -61,13 +61,6 @@ export interface TypegenAutoConfigOptions {
    */
   sources: TypegenConfigSourceModule[]
   /**
-   * Typing for the context, referencing a type defined in the aliased module provided in sources e.g. `alias.Context`
-   *
-   * @example
-   *   contextType: 't.Context'
-   */
-  contextType?: RootTypingDef
-  /**
    * Types that should not be matched for a backing type,
    *
    * By default this is set to ['Query', 'Mutation', 'Subscription']
@@ -97,11 +90,10 @@ export interface TypegenAutoConfigOptions {
  *
  * @param options
  */
-export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
+export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType: TypingImport | undefined) {
   return async (schema: GraphQLSchema, outputPath: string): Promise<TypegenInfo> => {
     const {
       headers,
-      contextType,
       skipTypes = ['Query', 'Mutation', 'Subscription'],
       backingTypeMap: _backingTypeMap,
       debug,
@@ -272,21 +264,11 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions) {
         imports.push(`import ${glob ? '* as ' : ''}${alias} from "${safeImportPath}"`)
       })
 
-    let contextTypeImport: TypingImport | undefined
-    let contextTypeString: string | undefined
-    if (typeof contextType === 'string') {
-      contextTypeString = contextType
-    } else if (contextType) {
-      contextTypeString = contextType.alias ?? contextType.name
-      contextTypeImport = contextType
-    }
-
     const typegenInfo = {
       headers: headers || [TYPEGEN_HEADER],
       backingTypeMap,
       imports,
-      contextType: contextTypeString,
-      contextTypeImport,
+      contextTypeImport: contextType,
       nexusSchemaImportId: getOwnPackage().name,
     }
 
