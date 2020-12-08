@@ -22,11 +22,14 @@ export const schema = makeSchema({
   typegenAutoConfig: {
     sources: [
       {
-        source: path.join(__dirname.replace(/\/dist$/, '/src'), './types/backingTypes.ts'),
+        source: path.join(__dirname, 'types', 'backingTypes.ts'),
         alias: 'swapi',
       },
     ],
-    contextType: 'swapi.ContextType',
+  },
+  contextType: {
+    module: path.join(__dirname, 'types', 'context.ts'),
+    export: 'ContextType',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
   features: {

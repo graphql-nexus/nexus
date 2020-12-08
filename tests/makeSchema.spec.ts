@@ -1,8 +1,17 @@
 import { printSchema } from 'graphql'
 import os from 'os'
 import path from 'path'
+import { objectType } from '../src'
 import { generateSchema, makeSchema } from '../src/builder'
 import { queryField } from '../src/definitions/queryField'
+
+export type Test = {
+  id: string
+}
+
+export type Context = {
+  foo: string
+}
 
 describe('makeSchema', () => {
   describe('shouldExitAfterGenerateArtifacts', () => {
@@ -94,18 +103,52 @@ describe('makeSchema', () => {
             }),
           ],
           shouldGenerateArtifacts: true,
-          typegenAutoConfig: {
-            sources: [],
-            contextType: {
-              path: 'graphql',
-              name: 'GraphQLInputFieldConfigMap',
-            },
+          contextType: {
+            module: 'graphql',
+            export: 'GraphQLInputFieldConfigMap',
           },
         },
         path.normalize(`/dev/null/file.ts`)
       )
       expect(tsTypes).toContain(`import { GraphQLInputFieldConfigMap } from "graphql"`)
       expect(tsTypes).toContain(`context: GraphQLInputFieldConfigMap`)
+    })
+
+    it('does not clash with sources', async () => {
+      const { tsTypes } = await generateSchema.withArtifacts(
+        {
+          outputs: false,
+          types: [
+            queryField('ok', {
+              description: 'Example boolean field',
+              type: 'Boolean',
+            }),
+            objectType({
+              name: 'Test',
+              definition(t) {
+                t.id('id')
+              },
+            }),
+          ],
+          shouldGenerateArtifacts: true,
+          typegenAutoConfig: {
+            sources: [
+              {
+                source: __filename,
+                alias: 'thisFile',
+              },
+            ],
+          },
+          contextType: {
+            module: __filename,
+            export: 'Context',
+          },
+        },
+        path.join(__dirname, 'nexus.ts')
+      )
+
+      expect(tsTypes).toContain(`import * as thisFile from "./makeSchema.spec"`)
+      expect(tsTypes).toContain(`import { Context } from "./makeSchema.spec"`)
     })
   })
 })

@@ -48,7 +48,10 @@ describe('typegenPrinter', () => {
             source: path.join(__dirname, '__helpers/index.ts'),
           },
         ],
-        contextType: 't.TestContext',
+      },
+      contextType: {
+        module: path.join(__dirname, '__helpers/index.ts'),
+        export: 'TestContext',
       },
     })
 
@@ -62,7 +65,7 @@ describe('typegenPrinter', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     typegen = new TypegenPrinter(metadata.sortSchema(schema), {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
     jest
       .spyOn(typegen, 'hasResolver')

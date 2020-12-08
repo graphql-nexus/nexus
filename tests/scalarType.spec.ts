@@ -77,8 +77,8 @@ describe('scalarType', () => {
         scalarType({
           name: 'TestScalar',
           rootTyping: {
-            path: 'graphql',
-            name: 'GraphQLScalar',
+            module: 'graphql',
+            export: 'GraphQLScalar',
           },
           serialize() {},
         }),
