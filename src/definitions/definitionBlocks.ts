@@ -48,12 +48,137 @@ export interface ScalarInputFieldConfig<T> extends CommonInputFieldConfig<any, a
 
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
-  /** Resolve method for the field */
+  /**
+   * [GraphQL.org Docs](https://graphql.org/learn/execution/#root-fields-resolvers)
+   *
+   * The actual implementation for this field.
+   *
+   * Every field has a resolver and they are the basis for resolving queries at runtime. You do not need to
+   * explicitly implement every resolver however. If the [source typing](https://nxs.li/guides/backing-types) includes:
+   *
+   * 1. A field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...then the default resolver will be available, whose behaviour is to simply return that field from the
+   * received source type.
+   *
+   * @param source TODO
+   * @param args TODO
+   * @param context TODO
+   * @param info TODO
+   */
   resolve?: FieldResolver<TypeName, FieldName>
 }
 
 export interface NexusOutputFieldConfig<TypeName extends string, FieldName extends string>
   extends OutputScalarConfig<TypeName, FieldName> {
+  /**
+   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Types)
+   *
+   * The type that this field should be.
+   *
+   * Object type fields may be typed as scalars or other output types in your schema, often object types. They
+   * may also use type modifiers like list and non-null types.
+   *
+   * Types may be expressed in one of three ways:
+   *
+   * 1. As string literals matching the name of another type. Thanks to [Nexus' reflection
+   * system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. This is the idiomatic
+   * approach in Nexus because it avoids excessive importing and circular references.
+   *
+   * 2. As references to other enums or object type definitions.
+   *
+   * 3. As the result from calling scalar helpers like id() or string().
+   *
+   * You may also use type modifier helpers like list() and nonNull() which in turn accept one of the three
+   * methods listed above.
+   *
+   * Note that both type modifier and scalar helpers are available as chainable shorthands which you can see
+   * in the examples below.
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('location', {
+   *         // reference the friend type via typegen
+   *         type: 'Location',
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('location', {
+   *         // reference the friend type via type def reference
+   *         type: Location,
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('friends', {
+   *         // create a non-null list of non-null friends
+   *         // using typegen type referencing
+   *         type: nonNull(list(nonNull('Friend'))),
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       // create a non-null list of non-null friends
+   *       // using chaining API and typegen type referencing
+   *       t.nonNull.list.nonNull.field('friends', {
+   *         type: 'Friend',
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('friends', {
+   *         // create a non-null list of non-null friends
+   *         // using type def referencing
+   *         type: nonNull(list(nonNull(Friend))),
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('id', {
+   *         // Refer to builtin scalars by string reference
+   *         type: 'ID',
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('id', {
+   *         // Refer to builtin scalars by functional helpers
+   *         type: id(),
+   *       })
+   *     },
+   *   })
+   */
   type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
 }
 
@@ -260,8 +385,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *     resolver, and more. See jsdoc on each field within for details.
    *
    * This parameter is optional if no resolver is required. No resolver is required if the [source
-   *     typing](https://nxs.li/guides/backing-types) includes a field whose name matches this one and whose
-   *     type is compatable. The default resolver behaviour will be to simply return that field from the
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
    *     received source type.
    */
   boolean<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
@@ -295,8 +427,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *     resolver, and more. See jsdoc on each field within for details.
    *
    * This parameter is optional if no resolver is required. No resolver is required if the [source
-   *     typing](https://nxs.li/guides/backing-types) includes a field whose name matches this one and whose
-   *     type is compatable. The default resolver behaviour will be to simply return that field from the
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
    *     received source type.
    */
   string<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
@@ -331,8 +470,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *     resolver, and more. See jsdoc on each field within for details.
    *
    * This parameter is optional if no resolver is required. No resolver is required if the [source
-   *     typing](https://nxs.li/guides/backing-types) includes a field whose name matches this one and whose
-   *     type is compatable. The default resolver behaviour will be to simply return that field from the
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
    *     received source type.
    */
   id<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
@@ -365,8 +511,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *     resolver, and more. See jsdoc on each field within for details.
    *
    * This parameter is optional if no resolver is required. No resolver is required if the [source
-   *     typing](https://nxs.li/guides/backing-types) includes a field whose name matches this one and whose
-   *     type is compatable. The default resolver behaviour will be to simply return that field from the
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
    *     received source type.
    */
   int<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
@@ -400,8 +553,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *     resolver, and more. See jsdoc on each field within for details.
    *
    * This parameter is optional if no resolver is required. No resolver is required if the [source
-   *     typing](https://nxs.li/guides/backing-types) includes a field whose name matches this one and whose
-   *     type is compatable. The default resolver behaviour will be to simply return that field from the
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
    *     received source type.
    */
   float<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
