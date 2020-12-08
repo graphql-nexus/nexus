@@ -65,10 +65,30 @@ export interface OutputScalarConfig<TypeName extends string, FieldName extends s
    * ...then the default resolver will be available, whose behaviour is to simply return that field from the
    * received source type.
    *
-   * @param source TODO
-   * @param args TODO
-   * @param context TODO
-   * @param info TODO
+   * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL object that this
+   *     field belongs to, unless this is a root
+   *     field (any field on a [root
+   *     operation type](https://spec.graphql.org/June2018/#sec-Root-Operation-Types): Query, Mutation,
+   *     Subscription), in which case there is no source data and this will be undefined.
+   * @param args If you have defined arguments on this field then this parameter will contain any arguments
+   *     passed by the client. If you specified default values for any arguments and the client did not explicitly
+   *     pass _any_ value (including null) for those arguments then you will see the defaults here.
+   *
+   * Note that thanks to [Nexus' reflection system](https://nxs.li/guides/reflection) this parameter's type
+   *     will always be type safe.
+   * @param context The context data for this request.
+   *
+   * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
+   *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
+   *     It is often used to store information like the current user making the request. Nexus is not responsible
+   *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
+   *     [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+   *
+   * Note that the type here will be whatever you have specified for "contextType" in your makeSchema configuration.
+   * @param info The GraphQL resolve info.
+   *
+   * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+   *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
    */
   resolve?: FieldResolver<TypeName, FieldName>
 }
