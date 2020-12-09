@@ -118,14 +118,14 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *
    * @example
    *   {
-   *   path: 'some-package',
-   *   name: 'User',
+   *   module: 'some-package',
+   *   export: 'User',
    *   }
    *
    * @example
    *   {
-   *   path: `${__dirname}/some/module.ts`,
-   *   name: 'User',
+   *   module: `${__dirname}/some/module.ts`,
+   *   export: 'User',
    *   }
    */
   rootTyping?: RootTypingDef
