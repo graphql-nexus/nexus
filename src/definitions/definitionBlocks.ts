@@ -1,9 +1,9 @@
 import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLInputFieldConfig } from 'graphql'
+import { messages } from '../messages'
 import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
 import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
 import { BaseScalars } from './_types'
-import { messages } from '../messages'
 
 export interface CommonFieldConfig {
   /** The description to annotate the GraphQL SDL */
@@ -48,12 +48,157 @@ export interface ScalarInputFieldConfig<T> extends CommonInputFieldConfig<any, a
 
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
-  /** Resolve method for the field */
+  /**
+   * [GraphQL.org Docs](https://graphql.org/learn/execution/#root-fields-resolvers)
+   *
+   * The actual implementation for this field.
+   *
+   * Every field has a resolver and they are the basis for resolving queries at runtime. You do not need to
+   * explicitly implement every resolver however. If the [source typing](https://nxs.li/guides/backing-types) includes:
+   *
+   * 1. A field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...then the default resolver will be available, whose behaviour is to simply return that field from the
+   * received source type.
+   *
+   * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL object that this
+   *     field belongs to, unless this is a root
+   *     field (any field on a [root
+   *     operation type](https://spec.graphql.org/June2018/#sec-Root-Operation-Types): Query, Mutation,
+   *     Subscription), in which case there is no source data and this will be undefined.
+   * @param args If you have defined arguments on this field then this parameter will contain any arguments
+   *     passed by the client. If you specified default values for any arguments and the client did not explicitly
+   *     pass _any_ value (including null) for those arguments then you will see the defaults here.
+   *
+   * Note that thanks to [Nexus' reflection system](https://nxs.li/guides/reflection) this parameter's type
+   *     will always be type safe.
+   * @param context The context data for this request.
+   *
+   * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
+   *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
+   *     It is often used to store information like the current user making the request. Nexus is not responsible
+   *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
+   *     [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+   *
+   * Note that the type here will be whatever you have specified for "contextType" in your makeSchema configuration.
+   * @param info The GraphQL resolve info.
+   *
+   * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+   *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+   */
   resolve?: FieldResolver<TypeName, FieldName>
 }
 
 export interface NexusOutputFieldConfig<TypeName extends string, FieldName extends string>
   extends OutputScalarConfig<TypeName, FieldName> {
+  /**
+   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Types)
+   *
+   * The type that this field should be.
+   *
+   * Object type fields may be typed as scalars or other output types in your schema, often object types. They
+   * may also use type modifiers like list and non-null types.
+   *
+   * Types may be expressed in one of three ways:
+   *
+   * 1. As string literals matching the name of another type. Thanks to [Nexus' reflection
+   * system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. This is the idiomatic
+   * approach in Nexus because it avoids excessive importing and circular references.
+   *
+   * 2. As references to other enums or object type definitions.
+   *
+   * 3. As the result from calling scalar helpers like id() or string().
+   *
+   * You may also use type modifier helpers like list() and nonNull() which in turn accept one of the three
+   * methods listed above.
+   *
+   * Note that both type modifier and scalar helpers are available as chainable shorthands which you can see
+   * in the examples below.
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('location', {
+   *         // reference the friend type via typegen
+   *         type: 'Location',
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('location', {
+   *         // reference the friend type via type def reference
+   *         type: Location,
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('friends', {
+   *         // create a non-null list of non-null friends
+   *         // using typegen type referencing
+   *         type: nonNull(list(nonNull('Friend'))),
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       // create a non-null list of non-null friends
+   *       // using chaining API and typegen type referencing
+   *       t.nonNull.list.nonNull.field('friends', {
+   *         type: 'Friend',
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('friends', {
+   *         // create a non-null list of non-null friends
+   *         // using type def referencing
+   *         type: nonNull(list(nonNull(Friend))),
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('id', {
+   *         // Refer to builtin scalars by string reference
+   *         type: 'ID',
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('id', {
+   *         // Refer to builtin scalars by functional helpers
+   *         type: id(),
+   *       })
+   *     },
+   *   })
+   */
   type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
 }
 
@@ -113,55 +258,372 @@ export interface OutputDefinitionBlock<TypeName extends string>
 
 /** The output definition block is passed to the "definition" function property of the "objectType" / "interfaceType" */
 export class OutputDefinitionBlock<TypeName extends string> {
+  /** The name of the enclosing object type. */
   readonly typeName: string
+
   constructor(protected typeBuilder: OutputDefinitionBuilder, protected wrapping?: NexusWrapKind[]) {
     this.typeName = typeBuilder.typeName
     this.typeBuilder.addDynamicOutputMembers(this, this.wrapping)
   }
 
+  /**
+   * [API Docs](https://nxs.li/docs/api/list) | [GraphQL 2018
+   * Spec](https://spec.graphql.org/June2018/#sec-Type-System.List)
+   *
+   * Chain this property to wrap the right-hand-side type (the field type, another list, nonNull, etc.) with a
+   * List type.
+   *
+   * Chains are read backwards, right to left, like function composition. In other words the thing on the left
+   * wraps the thing on the right.
+   *
+   * This is a shorthand equivalent to:
+   *
+   * `t.field('...', { type: list('...') })`
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.list.nonNull.string('aliases')
+   *     },
+   *   })
+   *
+   *   // GraphQL SDL
+   *   // -----------
+   *   //
+   *   // type User {
+   *   //   aliases: [String!]
+   *   // }
+   */
   get list() {
     return this._wrapClass('List')
   }
 
+  /**
+   * [API Docs](https://nxs.li/docs/api/nonNull) | [Nexus Nullability
+   * Guide](https://nexusjs.org/docs/guides/nullability) | [GraphQL 2018
+   * Spec](https://spec.graphql.org/June2018/#sec-Type-System.Non-Null)
+   *
+   * Chain this property to wrap the right-hand-side type (the field type or a list) with a Non-Null type.
+   *
+   * In Nexus output types are nullable by default so this is useful to configure a field differently. Note if
+   * you find yourself using this most of the time then what you probably what is to change the
+   * nonNullDefaults configuration either gloally in your makeSchema config or at the type definition level
+   * in one of your type configs to be false for outputs.
+   *
+   * Chains are read backwards, right to left, like function composition. In other words the thing on the left
+   * wraps the thing on the right.
+   *
+   * This is a shorthand equivalent to:
+   *
+   * `t.field('...', { type: nonNull('...') })`
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.nonNull.list.string('aliases')
+   *     },
+   *   })
+   *
+   *   // GraphQL SDL
+   *   // -----------
+   *   //
+   *   // type User {
+   *   //   aliases: [String]!
+   *   // }
+   */
   get nonNull(): Omit<OutputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
     return this._wrapClass('NonNull')
   }
 
+  /**
+   * [API Docs](https://nxs.li/docs/api/null) | [Nexus Nullability
+   * Guide](https://nexusjs.org/docs/guides/nullability) | [GraphQL 2018
+   * Spec](https://spec.graphql.org/June2018/#sec-Type-System.Non-Null)
+   *
+   * Chain this property to _unwrap_ the right-hand-side type (the field type or a list) of a Non-Null type.
+   *
+   * In Nexus output types are nullable by default so this is only useful when you have changed your
+   * nonNullDefaults configuration either gloally in your makeSchema config or at the type definition level
+   * in one of your type configs to be false for outputs.
+   *
+   * Chains are read backwards, right to left, like function composition. In other words the thing on the left
+   * wraps the thing on the right.
+   *
+   * This is a shorthand equivalent to:
+   *
+   * `t.field('...', { type: nullable('...') })`
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     nonNullDefaults: {
+   *       outputs: true,
+   *     },
+   *     definition(t) {
+   *       t.id('id')
+   *       t.nullable.string('bio')
+   *     },
+   *   })
+   *
+   *   // GraphQL SDL
+   *   // -----------
+   *   //
+   *   // type User {
+   *   //   id: ID!
+   *   //   bio: String
+   *   // }
+   */
   get nullable(): Omit<OutputDefinitionBlock<TypeName>, 'nonNull' | 'nullable'> {
     return this._wrapClass('Null')
   }
 
-  string<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'String', opts)
+  /**
+   * [GraphQL 2018 spec](https://spec.graphql.org/June2018/#sec-Boolean)
+   *
+   * Define a field whose type is Boolean.
+   *
+   * Boolean types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing true or false.
+   * They are represented in JavaScript using the [boolean primitive
+   * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
+   *
+   * This is a shorthand equivalent to:
+   *
+   * ` t.field('...', { type: boolean() }) `
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.boolean('active')
+   *     },
+   *   })
+   *
+   * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   * @param config The configuration for things like the field's type, its description, its arguments, its
+   *     resolver, and more. See jsdoc on each field within for details.
+   *
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
+   *     received source type.
+   */
+  boolean<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
+    this.addScalarField(name, 'Boolean', config)
   }
 
-  int<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Int', opts)
+  /**
+   * [GraphQL 2018 spec](https://spec.graphql.org/June2018/#sec-String)
+   *
+   * Define a field whose type is String.
+   *
+   * String types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing UTF-8 (aka.
+   * unicode) character sequences. It is most often used to represent free-form human-readable text. They are
+   * represented in JavaScript using the [string priimtive
+   * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * This is a shorthand, equivalent to:
+   *
+   * ` t.field('...', { type: string() }) `
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.string('bio')
+   *     },
+   *   })
+   *
+   * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   * @param config The configuration for things like the field's type, its description, its arguments, its
+   *     resolver, and more. See jsdoc on each field within for details.
+   *
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
+   *     received source type.
+   */
+  string<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
+    this.addScalarField(name, 'String', config)
   }
 
-  boolean<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Boolean', opts)
+  /**
+   * [GraphQL 2018 spec](https://spec.graphql.org/June2018/#sec-ID)
+   *
+   * Define a field whose type is ID.
+   *
+   * ID types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing unique identifiers
+   * often used to refetch an object or as the key for a cache. It is serialized in the same way as the
+   * [String](https://spec.graphql.org/June2018/#sec-String) type but unlike String not intended to be
+   * human-readable. They are represented in JavaScript using the [string priimtive
+   * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * This is a shorthand, equivalent to:
+   *
+   * ` t.field('...', { type: id() }) `
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.id('id')
+   *     },
+   *   })
+   *
+   * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   * @param config The configuration for things like the field's type, its description, its arguments, its
+   *     resolver, and more. See jsdoc on each field within for details.
+   *
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
+   *     received source type.
+   */
+  id<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
+    this.addScalarField(name, 'ID', config)
   }
 
-  id<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'ID', opts)
+  /**
+   * [GraphQL 2018 spec](https://spec.graphql.org/June2018/#sec-Int)
+   *
+   * Define a field whose type is Int.
+   *
+   * Int types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing a signed 32-bit
+   * numeric non-fractional value. They are represented in JavaScript using the [number primitive
+   * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number).
+   *
+   * This is a shorthand equivalent to:
+   *
+   * ` t.field('...', { type: int() }) `
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.int('age')
+   *     },
+   *   })
+   *
+   * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   * @param config The configuration for things like the field's type, its description, its arguments, its
+   *     resolver, and more. See jsdoc on each field within for details.
+   *
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
+   *     received source type.
+   */
+  int<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
+    this.addScalarField(name, 'Int', config)
   }
 
-  float<FieldName extends string>(fieldName: FieldName, ...opts: ScalarOutSpread<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Float', opts)
+  /**
+   * [GraphQL 2018 spec](https://spec.graphql.org/June2018/#sec-Float)
+   *
+   * Define a field whose type is Float.
+   *
+   * Float types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing signed
+   * double‐precision fractional values as specified by IEEE 754. They are represented in JavaScript using
+   * the [number primitive
+   * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number).
+   *
+   * This is a shorthand, equivalent to:
+   *
+   * ` t.field('...', { type: float() }) `
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.float('height')
+   *     },
+   *   })
+   *
+   * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   * @param config The configuration for things like the field's type, its description, its arguments, its
+   *     resolver, and more. See jsdoc on each field within for details.
+   *
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
+   *
+   * 1. Has a field whose name matches this one
+   *
+   * 2. And whose type is compatable
+   *
+   * 3. And is a scalar
+   *
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field from the
+   *     received source type.
+   */
+  float<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
+    this.addScalarField(name, 'Float', config)
   }
 
-  field<FieldName extends string>(name: FieldName, fieldConfig: FieldOutConfig<TypeName, FieldName>) {
+  /**
+   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Language.Fields)
+   *
+   * Define a field on this object.
+   *
+   * A field describes one discrete piece of information available to request within a [selection
+   * set](https://spec.graphql.org/June2018/#sec-Selection-Sets). They are in fact most of what any selection
+   * set will contain. Fields can be typed as scalars (marking the terminal point of a branch of a selection
+   * set) or as other object types in your schema thus allowing you to model relationships between things.
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field('id', {
+   *         type: id(),
+   *         description: 'The unique identification number for this user',
+   *       })
+   *     },
+   *   })
+   *
+   * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   * @param config The configuration for things like the field's type, its description, its arguments,
+   *     its resolver, and more. See jsdoc on each field within for details.
+   */
+  field<FieldName extends string>(name: FieldName, config: FieldOutConfig<TypeName, FieldName>) {
     this.typeBuilder.addField({
       name,
-      ...fieldConfig,
+      ...config,
       configFor: 'outputField',
       wrapping: this.wrapping,
       parentType: this.typeName,
     } as any)
   }
 
-  protected _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
+  private _wrapClass(kind: NexusWrapKind): OutputDefinitionBlock<TypeName> {
     const previousWrapping = this.wrapping?.[0]
     if (
       (kind === 'NonNull' || kind === 'Null') &&
@@ -172,30 +634,24 @@ export class OutputDefinitionBlock<TypeName extends string> {
     return new OutputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
   }
 
-  protected addScalarField(
-    fieldName: string,
+  private addScalarField<FieldName extends string>(
+    fieldName: FieldName,
     typeName: BaseScalars,
     opts: [] | ScalarOutSpread<TypeName, any>
   ) {
-    let config: NexusOutputFieldDef = {
-      name: fieldName,
+    let fieldConfig: FieldOutConfig<any, any> = {
       type: typeName,
-      parentType: this.typeName,
-      configFor: 'outputField',
     }
 
     /* istanbul ignore if */
     if (typeof opts[0] === 'function') {
-      config.resolve = opts[0] as any
+      fieldConfig.resolve = opts[0] as any
       console.warn(messages.removedFunctionShorthand(typeName, fieldName))
     } else {
-      config = { ...config, ...opts[0] }
+      fieldConfig = { ...fieldConfig, ...opts[0] }
     }
 
-    this.typeBuilder.addField({
-      ...config,
-      wrapping: this.wrapping,
-    })
+    this.field(fieldName, fieldConfig as any)
   }
 }
 
@@ -233,26 +689,26 @@ export class InputDefinitionBlock<TypeName extends string> {
   }
 
   string<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'String', opts)
+    this.field(fieldName, { ...opts, type: 'String' })
   }
 
   int<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Int', opts)
+    this.field(fieldName, { ...opts, type: 'Int' })
   }
 
   boolean<FieldName extends string>(
     fieldName: FieldName,
     opts?: CommonInputFieldConfig<TypeName, FieldName>
   ) {
-    this.addScalarField(fieldName, 'Boolean', opts)
+    this.field(fieldName, { ...opts, type: 'Boolean' })
   }
 
   id<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'ID', opts)
+    this.field(fieldName, { ...opts, type: 'ID' })
   }
 
   float<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.addScalarField(fieldName, 'Float', opts)
+    this.field(fieldName, { ...opts, type: 'Float' })
   }
 
   field<FieldName extends string>(
@@ -268,7 +724,7 @@ export class InputDefinitionBlock<TypeName extends string> {
     })
   }
 
-  protected _wrapClass(kind: NexusWrapKind) {
+  private _wrapClass(kind: NexusWrapKind) {
     const previousWrapping = this.wrapping?.[0]
     if (
       (kind === 'NonNull' || kind === 'Null') &&
@@ -277,20 +733,5 @@ export class InputDefinitionBlock<TypeName extends string> {
       return new InputDefinitionBlock(this.typeBuilder, this.wrapping || [])
     }
     return new InputDefinitionBlock(this.typeBuilder, [kind].concat(this.wrapping || []))
-  }
-
-  protected addScalarField(
-    fieldName: string,
-    typeName: BaseScalars,
-    opts: CommonInputFieldConfig<any, any> = {}
-  ) {
-    this.typeBuilder.addField({
-      name: fieldName,
-      type: typeName,
-      ...opts,
-      wrapping: this.wrapping,
-      parentType: this.typeName,
-      configFor: 'inputField',
-    })
   }
 }

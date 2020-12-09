@@ -85,7 +85,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v1
       - name: Install Dependencies
-        run: yarn --frozen-lockfile && yarn format:ci
+        run: yarn --frozen-lockfile
       - name: Release Canary
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}

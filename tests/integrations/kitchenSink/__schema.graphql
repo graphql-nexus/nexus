@@ -69,7 +69,7 @@ type PostEdge {
   https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
   """
   cursor: String!
-  delta: Int
+  delta(format: String): String
 
   """
   https://facebook.github.io/relay/graphql/connections.htm#sec-Node

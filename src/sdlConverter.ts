@@ -247,12 +247,17 @@ export class SDLConverter {
   }
 
   printInterfaceType(type: GraphQLInterfaceType): string {
+    const implementing: string[] =
+      // @ts-ignore
+      typeof type.getInterfaces === 'function' ? type.getInterfaces().map((i) => i.name) : []
+    const implementsInterfaces = implementing.length > 0 ? `    t.implements(${implementing.join(', ')})` : ''
     this.exports.add(type.name)
     return this.printBlock([
       `${this.export}${type.name} = interfaceType({`,
       `  name: "${type.name}",`,
       this.maybeDescription(type),
       `  definition(t) {`,
+      implementsInterfaces,
       this.printObjectFields(type),
       `  }`,
       `});`,

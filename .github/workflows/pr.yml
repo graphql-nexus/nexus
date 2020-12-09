@@ -73,3 +73,15 @@ jobs:
         run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
       - name: Example Typecheck
         run: yarn --cwd=examples/${{ matrix.example }} tsc
+
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Prettier
+        run: yarn format:ci

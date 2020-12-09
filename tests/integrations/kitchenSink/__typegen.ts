@@ -149,7 +149,7 @@ export interface NexusGenFieldTypes {
   PostEdge: {
     // field return type
     cursor: string // String!
-    delta: number | null // Int
+    delta: string | null // String
     node: NexusGenRootTypes['Post'] | null // Post
   }
   Query: {
@@ -217,7 +217,7 @@ export interface NexusGenFieldTypeNames {
   PostEdge: {
     // field return type name
     cursor: 'String'
-    delta: 'Int'
+    delta: 'String'
     node: 'Post'
   }
   Query: {
@@ -258,6 +258,12 @@ export interface NexusGenArgTypes {
       // args
       firstName?: string | null // String
       lastName?: string | null // String
+    }
+  }
+  PostEdge: {
+    delta: {
+      // args
+      format?: string | null // String
     }
   }
   Query: {
