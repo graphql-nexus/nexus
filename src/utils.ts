@@ -452,7 +452,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
     },
   }),
   {
-    rootTyping: 'never',
+    sourceType: 'never',
   }
 )
 

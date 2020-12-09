@@ -100,7 +100,7 @@ import {
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLSchema,
   NonNullConfig,
-  RootTypings,
+  SourceTypings,
   TypingImport,
 } from './definitions/_types'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
@@ -123,7 +123,7 @@ import {
 } from './plugin'
 import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
-import { TypegenAutoConfigOptions } from './typegenAutoConfig'
+import { SourceTypesConfigOptions } from './typegenAutoConfig'
 import { TypegenFormatFn } from './typegenFormatPrettier'
 import { TypegenMetadata } from './typegenMetadata'
 import { AbstractTypeResolver, GetGen } from './typegenTypeHelpers'
@@ -209,14 +209,8 @@ export interface BuilderConfigInput {
    * process.env.NODE_ENV === "development"
    */
   shouldGenerateArtifacts?: boolean
-  /**
-   * Automatically configure type resolution for the TypeScript representations of the associated types.
-   *
-   * Alias for typegenConfig: typegenAutoConfig(options)
-   */
-  typegenAutoConfig?: TypegenAutoConfigOptions
-  /** A configuration function for advanced cases where more control over the `TypegenInfo` is needed. */
-  typegenConfig?: (schema: GraphQLSchema, outputPath: string) => TypegenInfo | PromiseLike<TypegenInfo>
+  /** Register the Source Types */
+  sourceTypes?: SourceTypesConfigOptions
   /**
    * Adjust the Prettier options used while running prettier over the generated output.
    *
@@ -280,10 +274,10 @@ export type SchemaConfig = BuilderConfigInput & {
 export interface TypegenInfo {
   /** Headers attached to the generate type output */
   headers: string[]
-  /** All imports for the backing types / context */
+  /** All imports for the source types / context */
   imports: string[]
   /** A map of all GraphQL types and what TypeScript types they should be represented by. */
-  backingTypeMap: { [K in GetGen<'objectNames'>]?: string }
+  sourceTypeMap: { [K in GetGen<'objectNames'>]?: string }
   /** Info about where to import the context from */
   contextTypeImport: TypingImport | undefined
   /**
@@ -362,7 +356,7 @@ export class SchemaBuilder {
   protected typesToWalk: TypeToWalk[] = []
 
   /** Root type mapping information annotated on the type definitions */
-  protected rootTypings: RootTypings = {}
+  protected rootTypings: SourceTypings = {}
 
   /** Array of missing types */
   protected missingTypes: Record<string, MissingType> = {}
@@ -503,15 +497,15 @@ export class SchemaBuilder {
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
       this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name
       this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name
-      if (typeDef.value.rootTyping) {
-        this.rootTypings[typeDef.name] = typeDef.value.rootTyping
+      if (typeDef.value.sourceType) {
+        this.rootTypings[typeDef.name] = typeDef.value.sourceType
       }
     } else if (isScalarType(typeDef)) {
       const scalarDef = typeDef as GraphQLScalarType & {
         extensions?: NexusScalarExtensions
       }
       if (scalarDef.extensions?.nexus) {
-        const { asNexusMethod, rootTyping } = scalarDef.extensions.nexus
+        const { asNexusMethod, sourceType: rootTyping } = scalarDef.extensions.nexus
         if (asNexusMethod) {
           this.dynamicInputFields[asNexusMethod] = scalarDef.name
           this.dynamicOutputFields[asNexusMethod] = typeDef.name
@@ -878,8 +872,8 @@ export class SchemaBuilder {
       })
     }
     this.typeExtendMap[config.name] = null
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
@@ -924,8 +918,8 @@ export class SchemaBuilder {
       })
     }
 
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     const interfaceTypeConfig: NexusGraphQLInterfaceTypeConfig = {
       name,
@@ -1004,8 +998,8 @@ export class SchemaBuilder {
     if (!Object.keys(values).length) {
       throw new Error(`GraphQL Nexus: Enum ${config.name} must have at least one member`)
     }
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLEnumType({
@@ -1032,8 +1026,8 @@ export class SchemaBuilder {
       })
     )
 
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLUnionType({
@@ -1050,8 +1044,8 @@ export class SchemaBuilder {
   }
 
   private buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLScalarType({

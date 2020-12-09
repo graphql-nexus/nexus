@@ -376,10 +376,7 @@ Nexus Framework has some builtin logging functionality. You can approximate it a
    }
 
    Nexus.makeSchema({
-     typegenAutoConfig: {
-       sources: [{ source: __filename, alias: 'ContextModule' }]
-       contextType: 'ContextModule.Context',
-     },
+     contextType: { source: __filename, alias: 'ContextModule' },
      ...
    })
    ```
@@ -452,12 +449,9 @@ import * as Nexus from '@nexus/schema'
 import * as Path from 'path'
 
 Nexus.makeSchema({
-  typegenAutoconfig: {
-    sources: [{
-      source: Path.join(__dirname, './path/to/contextModule'),
-      alias: 'ContextModule'
-    }],
-    contextType: 'ContextModule.Context',
+  contextType: {
+    source: Path.join(__dirname, './path/to/contextModule'),
+    alias: 'ContextModule'
   },
   ...
 })
@@ -482,10 +476,10 @@ In Nexus Framework backing types worked like this:
 
 Nexus Schema does not have this functionality. There are a few things you can do instead.
 
-- Approach A: If you have a set of exported Backing types whose names match your GraphQL objects then you can set their modules as `sources` in `typegenAutoconfig` and Nexus Schema will take care of the rest.
-- Approach B: If you have a set of Backing types whose names having a differing pattern than your GraphQL objects then supply a Regular Expression to the `typeMatch` property in `typegenAutoconfig`. You can for example map `BackingUser -> User` , `BackingPost -> Post` and so on.
-- Approach C: If you have a one-off mismatch then supply an arbitrary mapping to the `backingTypeMap` property of `typegenAutoconfig`.
-- Approach D: If you want to colocate a type mapping like how it was in Nexus Framework then use the `rootTyping` field on Nexus Schema type defs. Unlike framework it accepts an object with a `path` to a module and `name` of the type to look for being exported from that module.
+- Approach A: If you have a set of exported Backing types whose names match your GraphQL objects then you can set their `modules` in `sourceTypes` and Nexus Schema will take care of the rest.
+- Approach B: If you have a set of Backing types whose names having a differing pattern than your GraphQL objects then supply a Regular Expression to the `typeMatch` property in `sourceTypes`. You can for example map `BackingUser -> User` , `BackingPost -> Post` and so on.
+- Approach C: If you have a one-off mismatch then supply an arbitrary mapping to the `mapping` property of `sourceTypes`.
+- Approach D: If you want to colocate a type mapping like how it was in Nexus Framework then use the `sourceType` field on Nexus Schema type defs. Unlike framework it accepts an object with a `path` to a module and `name` of the type to look for being exported from that module.
 
 Here is an example using approach A:
 
@@ -505,9 +499,9 @@ import * as Nexus from '@nexus/schema'
 import * as Path from 'path'
 
 Nexus.makeSchema({
-  typegenAutoconfig: {
-    sources: [{
-      source: Path.join(__dirname, 'path/to/someModule'),
+  sourceTypes: {
+    modules: [{
+      module: Path.join(__dirname, 'path/to/someModule'),
       alias: 'SomeAlias'
     }],
   },

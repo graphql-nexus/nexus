@@ -9,21 +9,21 @@ export const schema = makeSchema({
     schema: path.join(__dirname, '../ts-ast-reader-schema.graphql'),
     typegen: path.join(__dirname, 'ts-ast-reader-typegen.ts'),
   },
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
         alias: 'ts',
-        source: 'typescript',
+        module: 'typescript',
         glob: false,
         typeMatch: tsTypeMatch,
       },
       {
         alias: 't',
-        source: path.join(__dirname, './types/index.ts'),
+        module: path.join(__dirname, './types/index.ts'),
         onlyTypes: [],
       },
     ],
-    backingTypeMap: {
+    mapping: {
       Token: 'ts.Token<any>',
     },
     // debug: true,

@@ -9,9 +9,12 @@ const prisma = new PrismaClient()
 const apollo = new ApolloServer({
   context: () => ({ prisma }),
   schema: makeSchema({
-    typegenAutoConfig: {
-      contextType: '{ prisma: PrismaClient.PrismaClient }',
-      sources: [{ source: '.prisma/client', alias: 'PrismaClient' }],
+    sourceTypes: {
+      modules: [{ module: '.prisma/client', alias: 'PrismaClient' }],
+    },
+    contextType: {
+      module: path.join(__dirname, 'context.ts'),
+      export: 'Context',
     },
     outputs: {
       typegen: path.join(

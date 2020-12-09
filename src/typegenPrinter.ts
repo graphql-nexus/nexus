@@ -431,9 +431,9 @@ export class TypegenPrinter {
   buildEnumTypeMap() {
     const enumMap: TypeMapping = {}
     this.groupedTypes.enum.forEach((e) => {
-      const backingType = this.resolveBackingType(e.name)
-      if (backingType) {
-        enumMap[e.name] = backingType
+      const sourceType = this.resolveSourceType(e.name)
+      if (sourceType) {
+        enumMap[e.name] = sourceType
       } else {
         const values = e.getValues().map((val) => JSON.stringify(val.value))
         enumMap[e.name] = values.join(' | ')
@@ -460,9 +460,9 @@ export class TypegenPrinter {
         scalarMap[e.name] = SpecifiedScalars[e.name as SpecifiedScalarNames]
         return
       }
-      const backingType = this.resolveBackingType(e.name)
-      if (backingType) {
-        scalarMap[e.name] = backingType
+      const sourceType = this.resolveSourceType(e.name)
+      if (sourceType) {
+        scalarMap[e.name] = sourceType
       } else {
         scalarMap[e.name] = 'any'
       }
@@ -516,7 +516,7 @@ export class TypegenPrinter {
   buildRootTypeMap(hasFields: Array<GraphQLInterfaceType | GraphQLObjectType | GraphQLUnionType>) {
     const rootTypeMap: RootTypeMapping = {}
     hasFields.forEach((type) => {
-      const rootTyping = this.resolveBackingType(type.name)
+      const rootTyping = this.resolveSourceType(type.name)
       if (rootTyping) {
         rootTypeMap[type.name] = rootTyping
         return
@@ -552,12 +552,12 @@ export class TypegenPrinter {
     return rootTypeMap
   }
 
-  resolveBackingType(typeName: string): string | undefined {
+  resolveSourceType(typeName: string): string | undefined {
     const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
     if (rootTyping) {
       return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
-    return (this.typegenInfo.backingTypeMap as any)[typeName]
+    return (this.typegenInfo.sourceTypeMap as any)[typeName]
   }
 
   hasResolver(

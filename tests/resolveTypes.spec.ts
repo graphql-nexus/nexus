@@ -12,7 +12,7 @@ describe('custom scalars', () => {
           parseValue: (value) => new Date(value),
           parseLiteral: (ast) => (ast.kind === 'IntValue' ? new Date(ast.value) : null),
           asNexusMethod: 'date',
-          rootTyping: 'Date',
+          sourceType: 'Date',
         }),
         queryType({
           definition(t) {

@@ -126,14 +126,9 @@ export const schema = makeSchema({
     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
     schema: join(__dirname, '..', 'schema.graphql')
   },
-+  typegenAutoConfig: {
-+    sources: [
-+      {
-+        source: join(__dirname, "./context.ts"),        // 1
-+        alias: "ContextModule",                         // 2
-+      },
-+    ],
-+    contextType: "ContextModule.Context",               // 3
++  contextType: {                                    // 1
++    module: join(__dirname, "./context.ts"),        // 2
++    alias: "ContextModule",                         // 3
 +  },
 })
 ```
@@ -154,14 +149,9 @@ export const schema = makeSchema({
     typegen: join(__dirname, '..', 'nexus-typegen.ts'),
     schema: join(__dirname, '..', 'schema.graphql')
   },
-  typegenAutoConfig: {
-    sources: [
-      {
-        source: join(__dirname, "./context.ts"),        // 1
-        alias: "ContextModule",                         // 2
-      },
-    ],
-    contextType: "ContextModule.Context",               // 3
+  contextType: {                                    // 1
+    module: join(__dirname, "./context.ts"),        // 2
+    alias: "ContextModule",                         // 3
   },
 })
 ```
@@ -170,9 +160,9 @@ export const schema = makeSchema({
 
 </TabbedContent>
 
-1. Behind the scenes Nexus will parse the `context.ts` file to extract the available types.
-1. These types become available under the umbrella of our `ContextModule` alias.
-1. We can then use that alias to refer to any type defined in this file. Here, our context type is named `Context`, so we refer to it as `ContextModule.Context`.
+1. Option to set the context type
+1. Path to the module where the context type is exported
+1. Name of the export in that module
 
 ## Use the context
 
