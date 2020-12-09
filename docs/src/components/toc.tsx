@@ -39,13 +39,9 @@ const TOCList = styled.ul`
 
     // third level headings
     ul > li > ul > li {
-      list-style: circle inside;
+      list-style: circle outside;
       color: #718096;
-
-      &:before {
-        content: '';
-        margin-left: -0.5rem;
-      }
+      margin-left: 5px;
     }
 
     a {

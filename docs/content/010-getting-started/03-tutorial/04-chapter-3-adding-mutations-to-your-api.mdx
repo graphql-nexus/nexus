@@ -49,7 +49,7 @@ Now to expose it in our GraphQL context there is two things we need to do:
 1. Pass the `db` object to our GraphQL server context
 1. Let Nexus know what the type of our context is
 
-We'll begin by creating a new module to hold out context types and constructor.
+We'll begin by creating a new module to hold out the context and its type.
 
 ```bash-symbol
 touch api/context.ts
@@ -63,10 +63,8 @@ export interface Context {
   db: Db
 }
 
-export function createContext(): Context {
-  return {
-    db
-  }
+export const context = {
+  db
 }
 ```
 
@@ -79,12 +77,12 @@ Then we'll pass our in-memory database to our GraphQL server
 ```ts
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
-+import { createContext } from './context'
++import { context } from './context'
 import { schema } from './schema'
 
 export const server = new ApolloServer({
   schema,
-+  context: createContext
++  context 
 })
 ```
 
@@ -95,18 +93,22 @@ export const server = new ApolloServer({
 ```ts
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
-import { createContext } from './context'
+import { context } from './context'
 import { schema } from './schema'
 
 export const server = new ApolloServer({
   schema,
-  context: createContext
+  context
 })
 ```
 
 </tab>
 
 </TabbedContent>
+
+The context passed to Apollo Server can either be a function or a plain JavaScript object. For this tutorial, we've used an Object for simplicity. We would need to use a function when we need to perform some calculation or get some data from an external source based on the request and then pass that derived data on to the context for all our resolvers to use. 
+
+For example, if a user is logged in to your application, it would be useful to have the information regarding the user available to all the resolvers and this information would have to be retrieved from your database or an external service. The code responsible for that database or service call would be placed in the function which is passed to Apollo Server as the context.
 
 Finally, let's configure Nexus to know the type of our GraphQL context by adjusting the configuration of the `makeSchema` in our `api/app.ts`.
 
