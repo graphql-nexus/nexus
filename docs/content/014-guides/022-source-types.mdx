@@ -175,7 +175,7 @@ Configuring your Source Types globally is the recommended way in most cases. Typ
 
 When that's the case, you can configure Nexus to automatically map your Source Types to your GraphQL Object types based on their name.
 
-This is all done in the `typegenAutoConfig` option of `makeSchema`.
+This is all done in the `sourceTypes` option of `makeSchema`.
 
 #### Exact Matching Strategy
 
@@ -236,9 +236,9 @@ const Query = queryType({
 
 const schema = makeSchema({
   types: [User, Query],
-  typegenAutoConfig: {
-    sources: [{
-      source: path.join(__dirname, 'db.ts'),
+  sourceTypes: {
+    modules: [{
+      module: path.join(__dirname, 'db.ts'),
       //       ^---------------------- Path to the file containing your Source Types
       alias: 'db'
       //      ^----- Arbitrary unique name used as alias to import your Source Types.
@@ -324,9 +324,9 @@ const Query = queryType({
 
 const schema = makeSchema({
   types: [User, Query],
-  typegenAutoConfig: {
-    sources: [{
-      source: path.join(__dirname, 'db.ts'),
+  sourceTypes: {
+    modules: [{
+      module: path.join(__dirname, 'db.ts'),
       //       ^----------------------------- Path to the file containing your Source Types
       alias: 'db',
       //      ^------------------------------ Name used as alias for Nexus to import your Source Types. eg: import * as <name> from <path>
@@ -349,9 +349,9 @@ In this case, each regex will be run against your source code in the order in wh
 
 ```ts
 const schema = makeSchema({
-  typegenAutoConfig: {
-    sources: [{
-      source: path.join(__dirname, 'db.ts'),
+  sourceTypes: {
+    modules: [{
+      module: path.join(__dirname, 'db.ts'),
       alias: 'db',
       typeMatch(type, defaultRegex) {
         return [
@@ -396,9 +396,9 @@ const User = objectType({
 })
 
 const schema = makeSchema({
-  typegenAutoConfig: {
-    sources: [{
-      source: path.join(__dirname, 'db.ts'),
+  sourceTypes: {
+    modules: [{
+      module: path.join(__dirname, 'db.ts'),
       //       ^---------------- Path to the file containing your Source Types
       alias: 'db',
       //      ^----------------- Name used as alias for Nexus to import your Source Types.
@@ -420,7 +420,7 @@ However, if _none of your Source Types names can match your GraphQL Object type 
 
 Nexus will not output any errors if your Source Types aren't found.
 
-That being said, if you happen to have some Source Types that are not picked up by Nexus, you can enable the `debug` flag in the `typegenAutoConfig` configuration.
+That being said, if you happen to have some Source Types that are not picked up by Nexus, you can enable the `debug` flag in the `sourceTypes` configuration.
 
 Nexus will output debug logs, giving your detailed information about which Source Types were found, which were not, and why.
 
@@ -429,7 +429,7 @@ import { makeSchema } from '@nexus/schema'
 
 const schema = makeSchema({
   // ...
-  typegenAutoConfig: {
+  sourceTypes: {
     // ...
     debug: true
   }

@@ -121,17 +121,14 @@ export class TypegenMetadata {
   }
 
   async getTypegenInfo(schema: GraphQLSchema, typegenPath?: string): Promise<TypegenInfo> {
-    if (this.config.typegenConfig) {
-      if (this.config.typegenAutoConfig) {
-        console.warn(
-          `Only one of typegenConfig and typegenAutoConfig should be specified, ignoring typegenConfig`
-        )
-      }
-      return this.config.typegenConfig(schema, typegenPath || this.config.outputs.typegen || '')
+    if ('typegenConfig' in this.config) {
+      throw new Error(
+        'Error: typegenConfig was removed from the API. Please open an issue if you were using it.'
+      )
     }
 
-    if (this.config.typegenAutoConfig) {
-      return typegenAutoConfig(this.config.typegenAutoConfig, this.config.contextType)(
+    if (this.config.sourceTypes) {
+      return typegenAutoConfig(this.config.sourceTypes, this.config.contextType)(
         schema,
         typegenPath || this.config.outputs.typegen || ''
       )
@@ -142,7 +139,7 @@ export class TypegenMetadata {
       headers: [TYPEGEN_HEADER],
       imports: [],
       contextTypeImport: this.config.contextType,
-      backingTypeMap: {},
+      sourceTypeMap: {},
     }
   }
 }

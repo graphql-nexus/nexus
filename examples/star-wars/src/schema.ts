@@ -19,10 +19,10 @@ export const schema = makeSchema({
       },
     }),
   ],
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
-        source: path.join(__dirname, 'types', 'backingTypes.ts'),
+        module: path.join(__dirname, 'types', 'backingTypes.ts'),
         alias: 'swapi',
       },
     ],

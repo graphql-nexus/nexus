@@ -14,13 +14,13 @@ export const SCALAR_TYPES = {
   Boolean: 'boolean',
 }
 
-export interface TypegenConfigSourceModule {
+export interface SourceTypeModule {
   /**
    * The module for where to look for the types. This uses the node resolution algorithm via require.resolve,
    * so if this lives in node_modules, you can just provide the module name otherwise you should provide the
    * absolute path to the file.
    */
-  source: string
+  module: string
   /**
    * When we import the module, we use `import * as ____` to prevent conflicts. This alias should be a name
    * that doesn't conflict with any other types, usually a short lowercase name.
@@ -47,21 +47,21 @@ export interface TypegenConfigSourceModule {
   glob?: false
 }
 
-export interface TypegenAutoConfigOptions {
+export interface SourceTypesConfigOptions {
   /** Any headers to prefix on the generated type file */
   headers?: string[]
   /**
-   * Array of TypegenConfigSourceModule's to look in and match the type names against.
+   * Array of SourceTypeModule's to look in and match the type names against.
    *
    * @example
-   *   sources: [
-   *     { source: 'typescript', alias: 'ts' },
-   *     { source: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   *   modules: [
+   *     { module: 'typescript', alias: 'ts' },
+   *     { module: path.join(__dirname, '../sourceTypes'), alias: 'b' },
    *   ]
    */
-  sources: TypegenConfigSourceModule[]
+  modules: SourceTypeModule[]
   /**
-   * Types that should not be matched for a backing type,
+   * Types that should not be matched for a source type,
    *
    * By default this is set to ['Query', 'Mutation', 'Subscription']
    *
@@ -75,10 +75,10 @@ export interface TypegenAutoConfigOptions {
    */
   debug?: boolean
   /**
-   * If provided this will be used for the backing types rather than the auto-resolve mechanism above. Useful
-   * as an override for one-off cases, or for scalar backing types.
+   * If provided this will be used for the source types rather than the auto-resolve mechanism above. Useful
+   * as an override for one-off cases, or for scalar source types.
    */
-  backingTypeMap?: Record<string, string>
+  mapping?: Record<string, string>
 }
 
 /**
@@ -90,12 +90,12 @@ export interface TypegenAutoConfigOptions {
  *
  * @param options
  */
-export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType: TypingImport | undefined) {
+export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType: TypingImport | undefined) {
   return async (schema: GraphQLSchema, outputPath: string): Promise<TypegenInfo> => {
     const {
       headers,
       skipTypes = ['Query', 'Mutation', 'Subscription'],
-      backingTypeMap: _backingTypeMap,
+      mapping: _sourceTypeMap,
       debug,
     } = options
 
@@ -105,13 +105,13 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType
     const allImportsMap: Record<string, string> = {}
     const importsMap: Record<string, [string, boolean]> = {}
 
-    const backingTypeMap: Record<string, string> = {
+    const sourceTypeMap: Record<string, string> = {
       ...SCALAR_TYPES,
-      ..._backingTypeMap,
+      ..._sourceTypeMap,
     }
 
     const forceImports = new Set(
-      objValues(backingTypeMap)
+      objValues(sourceTypeMap)
         .concat(typeof contextType === 'string' ? contextType || '' : '')
         .map((t) => {
           const match = t.match(/^(\w+)\./)
@@ -131,7 +131,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType
     })
 
     const typeSources = await Promise.all(
-      options.sources.map(async (source) => {
+      options.modules.map(async (source) => {
         // Keeping all of this in here so if we don't have any sources
         // e.g. in the Playground, it doesn't break things.
 
@@ -140,7 +140,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType
         const fs = require('fs') as typeof import('fs')
         const util = require('util') as typeof import('util')
         const readFile = util.promisify(fs.readFile)
-        const { source: pathOrModule, glob = true, onlyTypes, alias, typeMatch } = source
+        const { module: pathOrModule, glob = true, onlyTypes, alias, typeMatch } = source
         if (path.isAbsolute(pathOrModule) && path.extname(pathOrModule) !== '.ts') {
           return console.warn(
             `Nexus Schema Typegen: Expected module ${pathOrModule} to be an absolute path to a TypeScript module, skipping.`
@@ -205,7 +205,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType
       if (typesToIgnoreRegex.some((r) => r.test(typeName))) {
         return
       }
-      if (backingTypeMap[typeName]) {
+      if (sourceTypeMap[typeName]) {
         return
       }
       if (builtinScalars.has(typeName)) {
@@ -240,7 +240,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType
               log(`Matched type - ${typeName} in "${importPath}" - ${alias}.${matched[1]}`)
             }
             importsMap[alias] = [importPath, glob]
-            backingTypeMap[typeName] = `${alias}.${matched[1]}`
+            sourceTypeMap[typeName] = `${alias}.${matched[1]}`
           } else {
             if (debug) {
               log(`No match for ${typeName} in "${importPath}" using ${typeRegex}`)
@@ -266,7 +266,7 @@ export function typegenAutoConfig(options: TypegenAutoConfigOptions, contextType
 
     const typegenInfo = {
       headers: headers || [TYPEGEN_HEADER],
-      backingTypeMap,
+      sourceTypeMap,
       imports,
       contextTypeImport: contextType,
       nexusSchemaImportId: getOwnPackage().name,

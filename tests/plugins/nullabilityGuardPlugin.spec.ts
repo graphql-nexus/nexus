@@ -69,7 +69,7 @@ const types = [
         },
       })
     },
-    rootTyping: '{ id: string }',
+    sourceType: '{ id: string }',
   }),
   objectType({
     name: 'Account',
@@ -77,7 +77,7 @@ const types = [
       t.id('id')
       t.string('displayName')
     },
-    rootTyping: '{ id: string }',
+    sourceType: '{ id: string }',
   }),
   queryField('objType', {
     type: 'SomeObjectType' as any,

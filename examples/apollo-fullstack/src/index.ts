@@ -17,10 +17,10 @@ const schema = makeSchema({
     schema: path.join(__dirname, '../fullstack-schema.graphql'),
     typegen: path.join(__dirname, 'fullstack-typegen.ts'),
   },
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
-        source: path.join(__dirname, 'typeDefs.ts'),
+        module: path.join(__dirname, 'typeDefs.ts'),
         alias: 't',
       },
     ],

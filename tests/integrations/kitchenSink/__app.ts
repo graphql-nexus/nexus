@@ -150,7 +150,7 @@ export const User = objectType({
       },
     })
   },
-  rootTyping: `{ firstName: string, lastName: string }`,
+  sourceType: `{ firstName: string, lastName: string }`,
 })
 
 export const Query = extendType({

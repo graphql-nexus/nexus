@@ -99,9 +99,9 @@ export interface AsyncIterator<T> {
   throw?(e?: any): Promise<IteratorResult<T>>
 }
 
-export type RootTypingDef = string | TypingImport
+export type SourceTypingDef = string | TypingImport
 
-export type RootTypings = Record<string, string | TypingImport>
+export type SourceTypings = Record<string, string | TypingImport>
 
 export interface TypingImport {
   /** An absolute path to a module in your project or the name of a package installed in your project. */
