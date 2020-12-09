@@ -129,10 +129,34 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   }
    */
   rootTyping?: RootTypingDef
+
   /**
-   * Custom extensions, as supported in graphql-js
+   * Data that will be added to the field-level [extensions field on the graphql-js type def
+   * instances](https://github.com/graphql/graphql-js/issues/1527) resulting from makeSchema. Useful for some
+   * graphql-js based tools like [join-monster](https://github.com/join-monster/join-monster) which rely on
+   * looking for special data here.
    *
-   * @see https://github.com/graphql/graphql-js/issues/1527
+   * @example
+   *   // taken from: https://github.com/graphql-nexus/schema/issues/683#issuecomment-735711640
+   *
+   *   const User = objectType({
+   *     name: 'User',
+   *     extensions: {
+   *       joinMonster: {
+   *         sqlTable: 'USERS',
+   *         uniqueKey: 'USER_ID',
+   *       },
+   *     },
+   *     definition(t) {
+   *       t.id('id', {
+   *         extensions: {
+   *           joinMonster: {
+   *             sqlColumn: 'USER_ID',
+   *           },
+   *         },
+   *       })
+   *     },
+   *   })
    */
   extensions?: GraphQLObjectType['extensions']
   /**

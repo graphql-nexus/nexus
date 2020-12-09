@@ -16,12 +16,35 @@ export interface CommonFieldConfig {
 }
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
-  /** Arguments for the field */
+  /** Arguments for this field. */
   args?: ArgsRecord
   /**
-   * Custom extensions, as supported in graphql-js
+   * Data that will be added to the field-level [extensions field on the graphql-js type def
+   * instances](https://github.com/graphql/graphql-js/issues/1527) resulting from makeSchema. Useful for some
+   * graphql-js based tools like [join-monster](https://github.com/join-monster/join-monster) which rely on
+   * looking for special data here.
    *
-   * @see https://github.com/graphql/graphql-js/issues/1527
+   * @example
+   *   // taken from: https://github.com/graphql-nexus/schema/issues/683#issuecomment-735711640
+   *
+   *   const User = objectType({
+   *     name: 'User',
+   *     extensions: {
+   *       joinMonster: {
+   *         sqlTable: 'USERS',
+   *         uniqueKey: 'USER_ID',
+   *       },
+   *     },
+   *     definition(t) {
+   *       t.id('id', {
+   *         extensions: {
+   *           joinMonster: {
+   *             sqlColumn: 'USER_ID',
+   *           },
+   *         },
+   *       })
+   *     },
+   *   })
    */
   extensions?: GraphQLFieldConfig<any, any>['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
@@ -30,9 +53,9 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
   /** The default value for the field, if any */
   default?: GetGen3<'inputTypes', TypeName, FieldName>
   /**
-   * Custom extensions, as supported in graphql-js
-   *
-   * @see https://github.com/graphql/graphql-js/issues/1527
+   * Data that will be added to the field-level [extensions field on the graphql-js type def
+   * instances](https://github.com/graphql/graphql-js/issues/1527) resulting from makeSchema. Useful for some
+   * graphql-js based tools which rely on looking for special data here.
    */
   extensions?: GraphQLInputFieldConfig['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
@@ -64,6 +87,18 @@ export interface OutputScalarConfig<TypeName extends string, FieldName extends s
    *
    * ...then the default resolver will be available, whose behaviour is to simply return that field from the
    * received source type.
+   *
+   * @example
+   *   export const Query = queryType({
+   *     definition(t) {
+   *       t.list.field('posts', {
+   *         type: 'Post',
+   *         resolve(_, __, ctx) {
+   *           return ctx.db.post.findMany({ where: { published: true } })
+   *         },
+   *       })
+   *     },
+   *   })
    *
    * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL object that this
    *     field belongs to, unless this is a root

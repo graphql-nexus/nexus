@@ -68,15 +68,53 @@ export type IsTypeOfHandler<TypeName extends string> = (
  */
 // prettier-ignore
 export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
-IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false // is isTypeOf strategy disabled ?
-? {} // then hide isTypeOf property entirely
-: IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true // is resolveType implemented in all abstract types where TypeName is a member?
-  ? { isTypeOf?: IsTypeOfHandler<TypeName> } // then make isTypeOf optional
-  : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true // is __typename strategy is enabled?
-    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // then make isTypeOf optional
-    : AbstractTypeNames<TypeName> extends never  // is TypeName not part of any abstract type?
-    ? { isTypeOf?: IsTypeOfHandler<TypeName> } // then make isTypeOf optional
-    : { isTypeOf: IsTypeOfHandler<TypeName> } // otherwise, make it required
+  // is isTypeOf strategy disabled ?
+  IsFeatureEnabled2<'abstractTypeStrategies', 'isTypeOf'> extends false
+  // then hide isTypeOf property entirely
+  ? {}
+  // is TypeName not part of any abstract type?
+  : AbstractTypeNames<TypeName> extends never
+  // then make isTypeOf optional
+  ? {
+      /** C */
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  // is resolveType implemented in all abstract types where TypeName is a member?
+  : IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName> extends true
+  // then make isTypeOf optional
+  ? {
+      /**
+       * [Abstract Types guide](https://nxs.li/guides/abstract-types)
+       *
+       * Implement the [modular strategy](https://nxs.li/guides/abstract-types/modular-strategy).
+       *
+       * Either you have implemented the [centralized strategy
+       * (resolveType)](https://nxs.li/guides/abstract-types/centralized-strategy) in all abstract
+       * types that this type shows up in or this type does not show up in any abstract types. Either
+       * way, and therefore, implementing this ***will do nothing***.
+       * 
+       */
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  // is __typename strategy is enabled?
+  : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
+  // then make isTypeOf optional
+  ? {
+      /** B */
+      isTypeOf?: IsTypeOfHandler<TypeName>
+    }
+  // otherwise, make it required
+  : {
+      /**
+       * [Abstract Types guide](https://nxs.li/guides/abstract-types)
+       *
+       * Implement the [modular strategy](https://nxs.li/guides/abstract-types/modular-strategy).
+       *
+       * You must implement this because your type shows up in one or more abstract types that do
+       * not implement the [centralized strategy](https://nxs.li/guides/abstract-types/centralized-strategy).
+       */
+      isTypeOf: IsTypeOfHandler<TypeName>
+    }
 
 /**
  * Get an object with the `resolveType` field if applicable for the given abstract Type.
