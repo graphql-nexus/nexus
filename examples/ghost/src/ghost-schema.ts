@@ -9,15 +9,15 @@ export const schema = makeSchema({
     typegen: path.join(__dirname, 'generated', 'ghost-nexus.ts'),
   },
   plugins: [fieldAuthorizePlugin()],
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
+        module: path.join(__dirname, 'generated', 'ghost-db-types.ts'),
         alias: 'db',
-        source: path.join(__dirname, 'generated', 'ghost-db-types.ts'),
         typeMatch: (type) => new RegExp(`(?:interface)\\s+(${type.name}s)\\W`),
       },
     ],
-    backingTypeMap: {
+    mapping: {
       Date: 'Date',
     },
   },
