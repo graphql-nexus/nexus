@@ -449,9 +449,9 @@ export interface MyDBUser {
 export const User = objectType({
   name: 'User',
   rootTyping: {
-    module: __filename,
+    path: __filename,
     //         ^---------------------- Tell Nexus where the source type is.
-    export: 'MyDBUser'
+    name: 'MyDBUser'
     //         ^---------------------- Tell Nexus the name of the exported source type.
   },
   definition(t) {
