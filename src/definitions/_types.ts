@@ -104,10 +104,10 @@ export type RootTypingDef = string | TypingImport
 export type RootTypings = Record<string, string | TypingImport>
 
 export interface TypingImport {
-  /** The name of a package installed in your project or absolute path to a module in your project. */
-  path: string
-  /** The name of a type being exported from the package/module (specified in path) that you want to use. */
-  name: string
+  /** An absolute path to a module in your project or the name of a package installed in your project. */
+  module: string
+  /** The name of a type exported from the module/package (specified in `module`) that you want to use. */
+  export: string
   /**
    * The name you want the imported type to be referenced as in the typegen.
    *

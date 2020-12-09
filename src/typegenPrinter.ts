@@ -183,8 +183,8 @@ export class TypegenPrinter {
       importMap[importPath] = importMap[importPath] || new Set()
       importMap[importPath].add(
         contextTypeImport.alias
-          ? `${contextTypeImport.name} as ${contextTypeImport.alias}`
-          : contextTypeImport.name
+          ? `${contextTypeImport.export} as ${contextTypeImport.alias}`
+          : contextTypeImport.export
       )
     }
 
@@ -192,7 +192,9 @@ export class TypegenPrinter {
       if (typeof rootType !== 'string') {
         const importPath = resolveImportPath(rootType, typeName, outputPath)
         importMap[importPath] = importMap[importPath] || new Set()
-        importMap[importPath].add(rootType.alias ? `${rootType.name} as ${rootType.alias}` : rootType.name)
+        importMap[importPath].add(
+          rootType.alias ? `${rootType.export} as ${rootType.alias}` : rootType.export
+        )
       }
     })
     eachObj(importMap, (val, key) => {
@@ -332,7 +334,7 @@ export class TypegenPrinter {
   }
 
   printContext() {
-    return this.typegenInfo.contextTypeImport?.alias || this.typegenInfo.contextTypeImport?.name || 'any'
+    return this.typegenInfo.contextTypeImport?.alias || this.typegenInfo.contextTypeImport?.export || 'any'
   }
 
   buildResolveSourceTypeMap() {
@@ -553,7 +555,7 @@ export class TypegenPrinter {
   resolveBackingType(typeName: string): string | undefined {
     const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
     if (rootTyping) {
-      return typeof rootTyping === 'string' ? rootTyping : rootTyping.name
+      return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
     return (this.typegenInfo.backingTypeMap as any)[typeName]
   }

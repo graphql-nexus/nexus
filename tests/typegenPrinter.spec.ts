@@ -50,8 +50,8 @@ describe('typegenPrinter', () => {
         ],
       },
       contextType: {
-        path: path.join(__dirname, '__helpers/index.ts'),
-        name: 'TestContext',
+        module: path.join(__dirname, '__helpers/index.ts'),
+        export: 'TestContext',
       },
     })
 

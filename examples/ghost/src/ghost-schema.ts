@@ -22,8 +22,8 @@ export const schema = makeSchema({
     },
   },
   contextType: {
-    path: path.join(__dirname, 'data-sources', 'Context.ts'),
-    name: 'Context',
+    module: path.join(__dirname, 'data-sources', 'Context.ts'),
+    export: 'Context',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
 })

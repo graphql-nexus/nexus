@@ -486,7 +486,7 @@ function isNodeModule(path: string) {
 }
 
 export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
-  const rootTypePath = rootType.path
+  const rootTypePath = rootType.module
 
   if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
     throw new Error(

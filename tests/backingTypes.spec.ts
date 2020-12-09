@@ -61,8 +61,8 @@ describe('backingTypes', () => {
         ],
       },
       contextType: {
-        path: path.join(__dirname, '_types.ts'),
-        name: 'TestContext',
+        module: path.join(__dirname, '_types.ts'),
+        export: 'TestContext',
       },
     })
   })
@@ -101,8 +101,8 @@ describe('rootTypings', () => {
           name: 'TestEnumType',
           members: TestEnum,
           rootTyping: {
-            path: __filename,
-            name: 'TestEnum',
+            module: __filename,
+            export: 'TestEnum',
           },
         }),
       ],
@@ -123,8 +123,8 @@ describe('rootTypings', () => {
     const someType = objectType({
       name: 'SomeType',
       rootTyping: {
-        name: 'invalid',
-        path: './fzeffezpokm',
+        export: 'invalid',
+        module: './fzeffezpokm',
       },
       definition(t) {
         t.id('id')
@@ -154,8 +154,8 @@ describe('rootTypings', () => {
     const someType = objectType({
       name: 'SomeType',
       rootTyping: {
-        name: 'invalid',
-        path: __dirname + '/invalid_path.ts',
+        export: 'invalid',
+        module: __dirname + '/invalid_path.ts',
       },
       definition(t) {
         t.id('id')

@@ -104,8 +104,8 @@ describe('makeSchema', () => {
           ],
           shouldGenerateArtifacts: true,
           contextType: {
-            path: 'graphql',
-            name: 'GraphQLInputFieldConfigMap',
+            module: 'graphql',
+            export: 'GraphQLInputFieldConfigMap',
           },
         },
         path.normalize(`/dev/null/file.ts`)
@@ -140,8 +140,8 @@ describe('makeSchema', () => {
             ],
           },
           contextType: {
-            path: __filename,
-            name: 'Context',
+            module: __filename,
+            export: 'Context',
           },
         },
         path.join(__dirname, 'nexus.ts')

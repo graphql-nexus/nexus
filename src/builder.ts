@@ -246,7 +246,7 @@ export interface BuilderConfigInput {
    * Path to the module where your context type is exported
    *
    * @example
-   *   contextType: { path: path.join(__dirname, 'context.ts'), name: 'MyContextType' }
+   *   contextType: { module: path.join(__dirname, 'context.ts'), export: 'MyContextType' }
    */
   contextType?: TypingImport
 }
