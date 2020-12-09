@@ -26,17 +26,27 @@ Here is the above diagram updated to include Source Types now.
 
 ![](/assets/source-type-diagram-2.png)
 
-Here is a step-by-step breakdown of what is going on (follow the diagram annotation numbers):
+Here is a step-by-step breakdown of what is going on:
 
 1. Client sends a query
-2. The field resolver for `Query.user` runs. Remember `Query` fields (along with `Subscription`, `Mutation`) are _entrypoints_.
+2. The field resolver for `Query.user` runs. Remember `Query` fields (along with `Subscription`, `Mutation`) are _entrypoints_, also known as _root fields_ because they are on [_Root Types_](https://graphql.org/learn/execution/#root-fields-resolvers).
 3. Within this resolver, the database client fetches a user from the database. The resolver returns this data. Keep in mind that at this point, this data _may_ be completely different than what the GraphQL API will resolve at the end.
+   ```ts
+   // Field of `Query` type
+   t.field('user', {
+     resolve(source, args, ctx, info) {
+       //                            ^---- as: User (Source Type)
+       return { firstname: 'Foo', lastname: 'Bar' } // fake db record
+     }
+   })
+   ```
 4. Resolution continues since the type of `Query.user` field is an object, not a scalar. As such its own fields need resolving. The fields that get resolved are limited to those selected by the client, in this case: `fullName`. This field resolver run. Its `source` argument is the user model data fetched in step 3. _This is the Source Type data for the GraphQL `User` object_.
 
    ```ts
-   t.field('...', {
+   // Field of `User` type
+   t.field('fullName', {
      resolve(source, args, ctx, info) {
-       //    ^------------------------------- Here
+       //     ^------------------------------- as: User (Source Type)
      },
    }
    ```
@@ -75,8 +85,8 @@ export const User = objectType({
   },
   definition(t) {
     t.string('fullName', {
-      resolve(user) {
-        return user.firstname + user.lastname
+      resolve(source) {
+        return source.firstname + source.lastname
       },
     })
   },
