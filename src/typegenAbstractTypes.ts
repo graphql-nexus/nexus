@@ -5,7 +5,7 @@ import {
   GetGen2,
   IsFeatureEnabled2,
   MaybePromise,
-  RootValue,
+  SourceValue,
 } from './typegenTypeHelpers'
 import { ConditionalKeys, ConditionalPick, ValueOf } from './typeHelpersInternal'
 
@@ -26,7 +26,7 @@ export type PossibleTypeNames<AbstractTypeName extends string> = ValueOf<
  *   union D = A | B | C
  *   PossibleTypes<'D> // A | B | C
  */
-export type PossibleTypes<AbstractTypeName extends string> = RootValue<PossibleTypeNames<AbstractTypeName>>
+export type PossibleTypes<AbstractTypeName extends string> = SourceValue<PossibleTypeNames<AbstractTypeName>>
 
 /**
  * Returns a union of all the abstract type names where TypeName is used

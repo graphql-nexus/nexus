@@ -1,5 +1,5 @@
 import { GraphQLField } from 'graphql'
-import { ArgsValue, GetGen, RootValue } from '../core'
+import { ArgsValue, GetGen, SourceValue } from '../core'
 import { plugin } from '../plugin'
 import { printedGenTyping, printedGenTypingImport } from '../utils'
 
@@ -21,8 +21,8 @@ const fieldDefTypes = printedGenTyping({
 })
 
 export type QueryComplexityEstimatorArgs<TypeName extends string, FieldName extends string> = {
-  type: RootValue<TypeName>
-  field: GraphQLField<RootValue<TypeName>, GetGen<'context'>, ArgsValue<TypeName, FieldName>>
+  type: SourceValue<TypeName>
+  field: GraphQLField<SourceValue<TypeName>, GetGen<'context'>, ArgsValue<TypeName, FieldName>>
   args: ArgsValue<TypeName, FieldName>
   childComplexity: number
 }

@@ -1,12 +1,13 @@
-import { GraphQLFieldResolver, GraphQLResolveInfo, defaultFieldResolver } from 'graphql'
+import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
 import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
-import { nonNull, NexusNonNullDef } from '../definitions/nonNull'
+import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
+import { NexusNullDef, nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import {
   AllNexusNamedOutputTypeDefs,
-  applyNexusWrapping,
   AllNexusOutputTypeDefs,
+  applyNexusWrapping,
 } from '../definitions/wrapping'
 import { NonNullConfig } from '../definitions/_types'
 import { dynamicOutputMethod } from '../dynamicMethod'
@@ -18,11 +19,10 @@ import {
   MaybePromise,
   MaybePromiseDeep,
   ResultValue,
-  RootValue,
+  SourceValue,
 } from '../typegenTypeHelpers'
-import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
-import { nullable, NexusNullDef } from '../definitions/nullable'
 import { MaybePromiseLike } from '../typeHelpersInternal'
+import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
 
 export interface ConnectionPluginConfig {
   /**
@@ -275,7 +275,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
        * we will assume that a next page exists if the length >= the node count.
        */
       nodes: (
-        root: RootValue<TypeName>,
+        root: SourceValue<TypeName>,
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<'context'>,
         info: GraphQLResolveInfo
@@ -293,7 +293,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
        * Https://github.com/graphql/graphql-relay-js
        */
       resolve: (
-        root: RootValue<TypeName>,
+        root: SourceValue<TypeName>,
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<'context'>,
         info: GraphQLResolveInfo
@@ -344,14 +344,14 @@ export type EdgeTypeLookup<TypeName extends string, FieldName extends string> = 
 >
 
 export type EdgeFieldResolver<TypeName extends string, FieldName extends string, EdgeField extends string> = (
-  root: RootValue<EdgeTypeLookup<TypeName, FieldName>>,
+  root: SourceValue<EdgeTypeLookup<TypeName, FieldName>>,
   args: ArgsValue<TypeName, FieldName> & ArgsValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>>
 
 export type ConnectionNodesResolver<TypeName extends string, FieldName extends string> = (
-  root: RootValue<TypeName>,
+  root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
@@ -363,7 +363,7 @@ export type PageInfoFieldResolver<
   FieldName extends string,
   EdgeField extends string
 > = (
-  root: RootValue<TypeName>,
+  root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo

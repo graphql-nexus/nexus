@@ -1,6 +1,6 @@
-import { GraphQLResolveInfo, GraphQLAbstractType } from 'graphql'
-import { NexusObjectTypeDef } from './definitions/objectType'
+import { GraphQLAbstractType, GraphQLResolveInfo } from 'graphql'
 import { NexusInterfaceTypeDef } from './definitions/interfaceType'
+import { NexusObjectTypeDef } from './definitions/objectType'
 
 declare global {
   interface NexusGen {}
@@ -70,7 +70,7 @@ export type MaybePromiseDeep<T> = Date extends T
  */
 export interface AbstractTypeResolver<TypeName extends string> {
   (
-    source: RootValue<TypeName>,
+    source: SourceValue<TypeName>,
     context: GetGen<'context'>,
     info: GraphQLResolveInfo,
     abstractType: GraphQLAbstractType
@@ -90,9 +90,40 @@ export interface AbstractTypeResolver<TypeName extends string> {
  *   }
  */
 export type FieldResolver<TypeName extends string, FieldName extends string> = (
-  root: RootValue<TypeName>,
+  /**
+   * The [source data](https://nxs.li/guides/source-types) for the GraphQL object that this field belongs to,
+   * unless this is a root field (any field on a [root operation
+   * type](https://spec.graphql.org/June2018/#sec-Root-Operation-Types): Query, Mutation, Subscription), in
+   * which case there is no source data and this will be undefined.
+   */
+  source: SourceValue<TypeName>,
+  /**
+   * If you have defined arguments on this field then this parameter will contain any arguments passed by the
+   * client. If you specified default values for any arguments and the client did not explicitly pass _any_
+   * value (including null) for those arguments then you will see the defaults here.
+   *
+   * Note that thanks to [Nexus' reflection system](https://nxs.li/guides/reflection) this parameter's type
+   *     will always be type safe.
+   */
   args: ArgsValue<TypeName, FieldName>,
+  /**
+   * The context data for this request.
+   *
+   * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
+   *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
+   *     It is often used to store information like the current user making the request. Nexus is not responsible
+   *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
+   * [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+   *
+   * Note that the type here will be whatever you have specified for "contextType" in your makeSchema configuration.
+   */
   context: GetGen<'context'>,
+  /**
+   * The GraphQL resolve info.
+   *
+   * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+   * document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+   */
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<TypeName, FieldName>> | MaybePromiseDeep<ResultValue<TypeName, FieldName>>
 
@@ -107,7 +138,7 @@ export type SubFieldResolver<
   FieldName extends string,
   SubFieldName extends string
 > = (
-  root: RootValue<TypeName>,
+  root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
@@ -206,7 +237,7 @@ export type HasGen3<
     : false
   : false
 
-export type RootValue<TypeName extends string> = GetGen2<'rootTypes', TypeName>
+export type SourceValue<TypeName extends string> = GetGen2<'rootTypes', TypeName>
 
 export type RootValueField<TypeName extends string, FieldName extends string> = GetGen3<
   'rootTypes',
@@ -258,7 +289,7 @@ export type IsFeatureEnabled2<PathPart1 extends string, PathPart2 extends string
 export type Discriminate<
   TypeName extends string,
   Required extends 'required' | 'optional',
-  Type = RootValue<TypeName>
+  Type = SourceValue<TypeName>
 > = Type extends { __typename: TypeName }
   ? Type
   : Type extends { __typename?: TypeName }
