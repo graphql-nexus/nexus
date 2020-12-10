@@ -17,7 +17,8 @@ export interface CommonFieldConfig {
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
   /**
-   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Language.Arguments)
+   * [GraphQL.org Docs](https://graphql.github.io/learn/schema/#arguments) | [GraphQL 2018
+   * Spec](https://spec.graphql.org/June2018/#sec-Language.Arguments)
    *
    * Define arguments for this field.
    *
@@ -47,12 +48,14 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
    *       t.field('createDraft', {
    *         type: 'Post',
    *         args: {
-   *           title: stringArg({
+   *           title: arg({
+   *             type: 'String',
    *             default: 'Untitled',
    *             description: 'The title of this draft post.',
    *           }),
    *           body: nonNull(
-   *             stringArg({
+   *             arg({
+   *               type: 'String',
    *               description: 'The content of this draft post.',
    *             })
    *           ),
@@ -185,13 +188,13 @@ export interface NexusOutputFieldConfig<TypeName extends string, FieldName exten
    *
    * Types may be expressed in one of three ways:
    *
-   * 1. As string literals matching the name of another type. Thanks to [Nexus' reflection
+   * 1. As string literals matching the name of a builtin scalar.
+   *
+   * 2. As string literals matching the name of another type. Thanks to [Nexus' reflection
    * system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. This is the idiomatic
    * approach in Nexus because it avoids excessive importing and circular references.
    *
-   * 2. As references to other enums or object type definitions.
-   *
-   * 3. As the result from calling scalar helpers like id() or string().
+   * 3. As references to other enums or object type definitions.
    *
    * You may also use type modifier helpers like list() and nonNull() which in turn accept one of the three
    * methods listed above.
@@ -264,17 +267,6 @@ export interface NexusOutputFieldConfig<TypeName extends string, FieldName exten
    *       t.field('id', {
    *         // Refer to builtin scalars by string reference
    *         type: 'ID',
-   *       })
-   *     },
-   *   })
-   *
-   * @example
-   *   objectType({
-   *     name: 'User',
-   *     definition(t) {
-   *       t.field('id', {
-   *         // Refer to builtin scalars by functional helpers
-   *         type: id(),
    *       })
    *     },
    *   })
@@ -768,12 +760,15 @@ export class InputDefinitionBlock<TypeName extends string> {
     return this._wrapClass('Null')
   }
 
-  string<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.field(fieldName, { ...opts, type: 'String' })
+  string<FieldName extends string>(
+    fieldName: FieldName,
+    config?: CommonInputFieldConfig<TypeName, FieldName>
+  ) {
+    this.field(fieldName, { ...config, type: 'String' })
   }
 
-  int<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.field(fieldName, { ...opts, type: 'Int' })
+  int<FieldName extends string>(fieldName: FieldName, config?: CommonInputFieldConfig<TypeName, FieldName>) {
+    this.field(fieldName, { ...config, type: 'Int' })
   }
 
   boolean<FieldName extends string>(
@@ -783,12 +778,15 @@ export class InputDefinitionBlock<TypeName extends string> {
     this.field(fieldName, { ...opts, type: 'Boolean' })
   }
 
-  id<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.field(fieldName, { ...opts, type: 'ID' })
+  id<FieldName extends string>(fieldName: FieldName, config?: CommonInputFieldConfig<TypeName, FieldName>) {
+    this.field(fieldName, { ...config, type: 'ID' })
   }
 
-  float<FieldName extends string>(fieldName: FieldName, opts?: CommonInputFieldConfig<TypeName, FieldName>) {
-    this.field(fieldName, { ...opts, type: 'Float' })
+  float<FieldName extends string>(
+    fieldName: FieldName,
+    config?: CommonInputFieldConfig<TypeName, FieldName>
+  ) {
+    this.field(fieldName, { ...config, type: 'Float' })
   }
 
   field<FieldName extends string>(
