@@ -7,7 +7,7 @@ import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.

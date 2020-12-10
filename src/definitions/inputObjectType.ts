@@ -9,7 +9,7 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
   /** Definition block for the input type */
   definition(t: InputDefinitionBlock<TypeName>): void
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /**
    * Configures the nullability for the type, check the documentation's "Getting Started" section to learn
    * more about GraphQL Nexus's assumptions and configuration on nullability.

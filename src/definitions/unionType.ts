@@ -1,8 +1,8 @@
 import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
-import { GetGen, AbstractTypeResolver } from '../typegenTypeHelpers'
-import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
-import { NexusObjectTypeDef } from './objectType'
 import { messages } from '../messages'
+import { AbstractTypeResolver, GetGen } from '../typegenTypeHelpers'
+import { NexusObjectTypeDef } from './objectType'
+import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
 
 export interface UnionDefinitionBuilder {
   typeName: string
@@ -36,7 +36,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
   /** Builds the definition for the union */
   definition(t: UnionDefinitionBlock): void
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.

@@ -102,7 +102,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   //   # ...
    *   // }
    */
-  description?: string | null
+  description?: string
   /**
    * [Source Types Guide](https://nxs.li/guides/backing-types)
    *

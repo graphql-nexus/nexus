@@ -39,7 +39,7 @@ export type CommonArgConfig = {
    *   //   ): [Int]
    *   // }
    */
-  description?: string | null
+  description?: string
   /**
    * Custom extensions, as supported in graphql-js
    *
