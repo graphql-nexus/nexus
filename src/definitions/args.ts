@@ -6,7 +6,39 @@ import { NexusTypes, withNexusSymbol } from './_types'
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
 export type CommonArgConfig = {
-  /** The description to annotate the GraphQL SDL */
+  /**
+   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Descriptions)
+   *
+   * The description for this argument.
+   *
+   * Various GraphQL tools will make use of this information but it has zero runtime impact. The value given
+   * here will also be included as heredocs in the generated GraphQL SDL file.
+   *
+   * Default :: By default there will be no description
+   *
+   * @example
+   *   export const Query = queryType({
+   *     definition(t) {
+   *       t.list.int('connectionCount', {
+   *         args: {
+   *           lastSeconds: intArg({
+   *             description: 'Limit count to this number of past seconds from now.',
+   *           }),
+   *         },
+   *       })
+   *     },
+   *   })
+   *
+   *   // GraphQL SDL
+   *   // -----------
+   *   //
+   *   // type Query {
+   *   //   connectionCount(
+   *   //   """Limit count to this number of past seconds from now."""
+   *   //    lastSeconds: Int
+   *   //   ): [Int]
+   *   // }
+   */
   description?: string | null
   /**
    * Custom extensions, as supported in graphql-js

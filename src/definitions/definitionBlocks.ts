@@ -16,7 +16,52 @@ export interface CommonFieldConfig {
 }
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
-  /** Arguments for this field. */
+  /**
+   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Language.Arguments)
+   *
+   * Define arguments for this field.
+   *
+   * All fields in GraphQL can have arguments defined for them. Nexus provides a number of helpers for
+   * defining arguments. All builtin GraphQL scalar types have helpers named "{scalarName}Arg" such as
+   * "stringArg" and "intArg". You can also use type modifier helpers "[list](https://nxs.li/docs/api/list)"
+   * "[nullable](https://nxs.li/docs/api/nullable)" and "[nonNull](https://nxs.li/docs/api/nonNull)". For
+   * details about nonNull/nullable refer to the [nullability guide](https://nxs.li/guides/nullability).
+   *
+   * @example
+   *   export const Mutation = mutationType({
+   *     definition(t) {
+   *       t.field('createDraft', {
+   *         type: 'Post',
+   *         args: {
+   *           title: nonNull(stringArg()),
+   *           body: nonNull(stringArg()),
+   *         },
+   *         // ...
+   *       })
+   *     },
+   *   })
+   *
+   * @example
+   *   export const Mutation = mutationType({
+   *     definition(t) {
+   *       t.field('createDraft', {
+   *         type: 'Post',
+   *         args: {
+   *           title: stringArg({
+   *             default: 'Untitled',
+   *             description: 'The title of this draft post.',
+   *           }),
+   *           body: nonNull(
+   *             stringArg({
+   *               description: 'The content of this draft post.',
+   *             })
+   *           ),
+   *         },
+   *         // ...
+   *       })
+   *     },
+   *   })
+   */
   args?: ArgsRecord
   /**
    * Data that will be added to the field-level [extensions field on the graphql-js type def
