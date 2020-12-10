@@ -2,7 +2,7 @@ import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
 import { messages } from '../messages'
 import { AbstractTypeResolver, GetGen } from '../typegenTypeHelpers'
 import { NexusObjectTypeDef } from './objectType'
-import { AbstractTypes, NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
+import { AbstractTypes, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface UnionDefinitionBuilder {
   typeName: string
@@ -42,8 +42,8 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
    * field/enum types and as a comment on input fields.
    */
   deprecation?: string // | DeprecationInfo;
-  /** Root type information for this type */
-  rootTyping?: RootTypingDef
+  /** Source type information for this type */
+  sourceType?: SourceTypingDef
   /**
    * Custom extensions, as supported in graphql-js
    *

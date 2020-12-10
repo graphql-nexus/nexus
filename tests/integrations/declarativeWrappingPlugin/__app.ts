@@ -31,7 +31,7 @@ const DeclarativeWrappingOutput = objectType({
       resolve: () => [],
     })
   },
-  rootTyping: '{name: "Test"}',
+  sourceType: '{name: "Test"}',
 })
 
 export const someField = queryField('someField', {

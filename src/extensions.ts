@@ -1,6 +1,6 @@
 import { defaultFieldResolver, GraphQLNamedType } from 'graphql'
 import { DynamicFieldDefs, SchemaConfig } from './builder'
-import { RootTypingDef, RootTypings } from './definitions/_types'
+import { SourceTypingDef, SourceTypings } from './definitions/_types'
 import { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import { NexusInterfaceTypeConfig } from './definitions/interfaceType'
@@ -61,7 +61,7 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
 
 export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
   dynamicFields: DynamicFieldDefs
-  rootTypings: RootTypings
+  rootTypings: SourceTypings
 }
 
 /**
@@ -75,6 +75,6 @@ export class NexusSchemaExtension {
 export type NexusScalarExtensions = {
   nexus: {
     asNexusMethod?: string
-    rootTyping?: RootTypingDef
+    sourceType?: SourceTypingDef
   }
 }

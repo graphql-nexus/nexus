@@ -2,7 +2,7 @@ import { assertValidName, GraphQLObjectType } from 'graphql'
 import { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
-import { AbstractTypes, NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
+import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void
@@ -106,11 +106,11 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
   /**
    * [Source Types Guide](https://nxs.li/guides/backing-types)
    *
-   * Specify the backing type for this object type.
+   * Specify the Source Type for this object type.
    *
    * You can give a literal TypeScript type written as a string or give the location of a module that exports a type.
    *
-   * Default :: By default the backing type of this object will be whatever you configured in makeSchema, if
+   * Default :: By default the source type of this object will be whatever you configured in makeSchema, if
    * anything, otherwise simply 1:1 with how you have defined this object type.
    *
    * @example
@@ -128,8 +128,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   export: 'User',
    *   }
    */
-  rootTyping?: RootTypingDef
-
+  sourceType?: SourceTypingDef
   /**
    * Data that will be added to the field-level [extensions field on the graphql-js type def
    * instances](https://github.com/graphql/graphql-js/issues/1527) resulting from makeSchema. Useful for some

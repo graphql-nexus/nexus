@@ -1,6 +1,6 @@
 import { assertValidName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
-import { NexusTypes, RootTypingDef, withNexusSymbol } from './_types'
+import { NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 type TypeScriptEnumLike = {
   [key: number]: string
@@ -29,9 +29,9 @@ export interface EnumMemberInfo {
 export interface NexusEnumTypeConfig<TypeName extends string> {
   name: TypeName
   /** The description to annotate the GraphQL SDL */
-  description?: string
-  /** Root type information for this type */
-  rootTyping?: RootTypingDef
+  description?: string | null
+  /** Source type information for this type */
+  sourceType?: SourceTypingDef
   /** All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum */
   members:
     | Array<string | EnumMemberInfo>

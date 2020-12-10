@@ -43,7 +43,7 @@ function getSchemaWithConstEnums() {
   })
 }
 
-describe('backingTypes', () => {
+describe('sourceTypes', () => {
   let metadata: core.TypegenMetadata
 
   beforeEach(async () => {
@@ -52,11 +52,11 @@ describe('backingTypes', () => {
         typegen: path.join(__dirname, 'test-gen.ts'),
         schema: path.join(__dirname, 'test-gen.graphql'),
       },
-      typegenAutoConfig: {
-        sources: [
+      sourceTypes: {
+        modules: [
           {
+            module: path.join(__dirname, '_types.ts'),
             alias: 't',
-            source: path.join(__dirname, '_types.ts'),
           },
         ],
       },
@@ -67,7 +67,7 @@ describe('backingTypes', () => {
     })
   })
 
-  it('can match backing types to regular enums', async () => {
+  it('can match source types to regular enums', async () => {
     const schema = getSchemaWithNormalEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
@@ -78,7 +78,7 @@ describe('backingTypes', () => {
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 
-  it('can match backing types for const enums', async () => {
+  it('can match source types for const enums', async () => {
     const schema = getSchemaWithConstEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
@@ -90,8 +90,8 @@ describe('backingTypes', () => {
   })
 })
 
-describe('rootTypings', () => {
-  it('can import enum via rootTyping', async () => {
+describe('sourceTypings', () => {
+  it('can import enum via sourceType', async () => {
     const metadata = new TypegenMetadata({
       outputs: { typegen: null, schema: null },
     })
@@ -100,7 +100,7 @@ describe('rootTypings', () => {
         enumType({
           name: 'TestEnumType',
           members: TestEnum,
-          rootTyping: {
+          sourceType: {
             module: __filename,
             export: 'TestEnum',
           },
@@ -122,7 +122,7 @@ describe('rootTypings', () => {
     })
     const someType = objectType({
       name: 'SomeType',
-      rootTyping: {
+      sourceType: {
         export: 'invalid',
         module: './fzeffezpokm',
       },
@@ -153,7 +153,7 @@ describe('rootTypings', () => {
     })
     const someType = objectType({
       name: 'SomeType',
-      rootTyping: {
+      sourceType: {
         export: 'invalid',
         module: __dirname + '/invalid_path.ts',
       },

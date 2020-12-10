@@ -9,7 +9,7 @@ import {
 } from '../typegenTypeHelpers'
 import { ArgsRecord } from './args'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import { AbstractTypes, NexusTypes, NonNullConfig, RootTypingDef, withNexusSymbol } from './_types'
+import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
@@ -51,9 +51,9 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    */
   nonNullDefaults?: NonNullConfig
   /** The description to annotate the GraphQL SDL */
-  description?: string
-  /** Root type information for this type */
-  rootTyping?: RootTypingDef
+  description?: string | null
+  /** Source type information for this type */
+  sourceType?: SourceTypingDef
   /**
    * Custom extensions, as supported in graphql-js
    *
