@@ -12,7 +12,7 @@ export interface EnumMemberInfo {
   /** The internal representation of the enum */
   value?: string | number | object | boolean
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
@@ -29,7 +29,7 @@ export interface EnumMemberInfo {
 export interface NexusEnumTypeConfig<TypeName extends string> {
   name: TypeName
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /** Root type information for this type */
   rootTyping?: RootTypingDef
   /** All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum */
