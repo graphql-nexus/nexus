@@ -12,7 +12,7 @@ describe('unionType', () => {
           definition(t) {
             t.string('message', { resolve: (root) => `This user ${root.id} was deleted` })
           },
-          rootTyping: `{ id: number; deletedAt: Date }`,
+          sourceType: `{ id: number; deletedAt: Date }`,
         }),
         objectType({
           name: 'User',
@@ -20,7 +20,7 @@ describe('unionType', () => {
             t.int('id')
             t.string('name')
           },
-          rootTyping: `{ id: number; name: string; deletedAt?: null }`,
+          sourceType: `{ id: number; name: string; deletedAt?: null }`,
         }),
         unionType({
           name: 'UserOrError',

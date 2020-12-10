@@ -131,10 +131,10 @@ describe('makeSchema', () => {
             }),
           ],
           shouldGenerateArtifacts: true,
-          typegenAutoConfig: {
-            sources: [
+          sourceTypes: {
+            modules: [
               {
-                source: __filename,
+                module: __filename,
                 alias: 'thisFile',
               },
             ],

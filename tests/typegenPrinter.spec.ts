@@ -38,16 +38,16 @@ describe('typegenPrinter', () => {
         typegen: path.join(__dirname, 'test-gen.ts'),
         schema: path.join(__dirname, 'test-gen.graphql'),
       },
-      typegenAutoConfig: {
-        backingTypeMap: {
-          UUID: 'string',
-        },
-        sources: [
+      sourceTypes: {
+        modules: [
           {
+            module: path.join(__dirname, '__helpers/index.ts'),
             alias: 't',
-            source: path.join(__dirname, '__helpers/index.ts'),
           },
         ],
+        mapping: {
+          UUID: 'string',
+        },
       },
       contextType: {
         module: path.join(__dirname, '__helpers/index.ts'),

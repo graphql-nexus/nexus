@@ -47,7 +47,7 @@ describe('dynamicInputMethod', () => {
     makeSchema({
       types: [
         decorateType(GraphQLDateTime, {
-          rootTyping: 'Date',
+          sourceType: 'Date',
         }),
         inputObjectType({
           name: 'SomeInput',
@@ -79,7 +79,7 @@ describe('dynamicOutputProperty', () => {
     makeSchema({
       types: [
         decorateType(GraphQLDateTime, {
-          rootTyping: 'Date',
+          sourceType: 'Date',
         }),
         objectType({
           name: 'DynamicPropObject',
