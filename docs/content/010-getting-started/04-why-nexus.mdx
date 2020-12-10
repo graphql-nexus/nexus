@@ -85,6 +85,8 @@ There are numerous benefits to taking a code-first approach with Nexus:
 
 - [Schema and resolver co-location](#schema-and-resolver-co-location)
 - [SDL and type generation](#automatic-type-and-schema-definition-language-generation)
+- [Fast feedback loop](#fast-feedback-loop)
+- [Reduce repetition](#reduce-repetition)
 - [No need for extra tooling](#no-need-for-extra-tooling)
 
 ## Schema and Resolver Co-location
@@ -112,6 +114,113 @@ const schema = makeSchema({
   },
 })
 ```
+
+## Fast Feedback Loop
+
+Thanks to the automatically generated TypeScript types Nexus is able to integrate seamlessly into your editor and provides a fast feedback loop.
+
+Whenever `makeSchema` generates the TypeScript types your editor receives instant feedback on whether your implementation fullfills the schema requirements (even if you are not a TypeScript user). This allows you spot issues early on, such as:
+
+- Nullability checks
+- A resolver is missing
+- A model type doesn't fulfill the schema type
+
+By having the server restart on file changes this feedback is given almost instantly as changes are made.
+
+## Reduce repetition
+
+A downside of the schema-first approach is the need to repeat yourself in schema definition language and in code.
+
+### Defining enums
+
+When defining an enum using the schema-first approach, the enum must first be defined in the schema definition languange:
+
+```graphql
+enum UserRole {
+  ADMIN
+  EDITOR
+  PUBLISHER
+}
+```
+
+This has to be repeated in the implementation:
+
+```ts
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  PUBLISHER = 'PUBLISHER',
+}
+```
+
+Keeping both of these in sync is tedious and error phrone, especially when files are not co-located together.
+
+Refactoring the above to Nexus would look like this:
+
+```ts
+import { enumType } from '@nexus/schema'
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  PUBLISHER = 'PUBLISHER',
+}
+
+export const UserRoleEnum = enumType({
+  name: 'UserRole',
+  members: UserRole,
+})
+```
+
+The enum values are only defined once: in the model.
+
+### Implementing Interfaces
+
+Interfaces are a standard feature of GraphQL. When using the schema-first approach, interfaces require a lot of repetition:
+
+```graphql
+interface Node {
+  id: ID!
+}
+
+type Post implements Node {
+  id: ID!
+  title: String!
+  body: String!
+}
+```
+
+The above example shows a `Node` interface and a `Post` interface implementing it.
+
+The schema definition languange requires that the `Post` type repeats all the fields from the `Node` interface, as a schema becomes bigger and more interfaces and types are added this quickly becomes tedious.
+
+With Nexus the repetitive work is kept to a bare minimum:
+
+```ts
+import { interfaceType } from '@nexus/schema'
+
+const Node = interfaceType({
+  name: 'Node',
+  definition(t) {
+    t.id('id', { description: 'GUID for a resource' })
+  },
+})
+
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.implements('Node')
+    t.string('title')
+    t.string('body')
+  },
+})
+```
+
+### Build your own abstraction
+
+Enums and Interfaces are built-in building blocks of Nexus, but it doesn't stop here.
+
+Thanks to Nexus' rich [plugin system](/api/plugins) it is possible to build more complex abstractions to improve code re-use, an example of this is the official [connection plugin](/plugins/connection) to help build [relay style pagination](https://relay.dev/graphql/connections.htm).
 
 ## No Need for Extra Tooling
 
