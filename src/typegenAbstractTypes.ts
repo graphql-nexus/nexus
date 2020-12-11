@@ -380,23 +380,32 @@ export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> = IsFeat
   : IsStrategyIsTypeOfImplementedInAllMembers<TypeName> extends true
   ? {
       /**
+       * [Abstract Types Guide](https://nxs.li/guides/abstract-types)
+       *
        * Optionally provide a custom type resolver function. If one is not provided, the default
-       * implementation will call `isTypeOf` on each implementing Object type.
+       * implementation will first look for __typename, then fallback to calling `isTypeOf` on each
+       * implementing Object type.
        */
       resolveType?: AbstractTypeResolver<TypeName>
     } // Make resolveType optional when __typename strategy is enabled
   : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
   ? {
       /**
+       * [Abstract Types Guide](https://nxs.li/guides/abstract-types)
+       *
        * Optionally provide a custom type resolver function. If one is not provided, the default
-       * implementation will call `isTypeOf` on each implementing Object type.
+       * implementation will first look for __typename, then fallback to calling `isTypeOf` on each
+       * implementing Object type.
        */
       resolveType?: AbstractTypeResolver<TypeName>
     }
   : {
       /**
+       * [Abstract Types Guide](https://nxs.li/guides/abstract-types)
+       *
        * Optionally provide a custom type resolver function. If one is not provided, the default
-       * implementation will call `isTypeOf` on each implementing Object type.
+       * implementation will first look for __typename, then fallback to calling `isTypeOf` on each
+       * implementing Object type.
        */
       resolveType: AbstractTypeResolver<TypeName>
     }

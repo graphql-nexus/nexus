@@ -64,9 +64,57 @@ export class NexusUnionTypeDef<TypeName extends string> {
 withNexusSymbol(NexusUnionTypeDef, NexusTypes.Union)
 
 /**
- * Defines a new `GraphQLUnionType`
+ * [API Docs](https://nxs.li/docs/api/union-type) | [Abstract Types
+ * Guide](https://nxs.li/guides/abstract-types) | [2018 GraphQL Spec](https://spec.graphql.org/June2018/#sec-Unions)
  *
- * @param config
+ * Defines a Union type.
+ *
+ * Union types are one of the two abstract type in GraphQL. They let you express polymorphic fields where
+ * members types can be totally different.
+ *
+ * @example
+ *   export const Media = unionType({
+ *     name: 'SearchResult',
+ *     resolveType(source) {
+ *       return 'director' in source ? 'Movie' : 'Song'
+ *     },
+ *     definition(t) {
+ *       t.members('Movie', 'Song')
+ *     },
+ *   })
+ *
+ *   export const Movie = objectType({
+ *     name: 'Movie',
+ *     definition(t) {
+ *       t.string('url')
+ *       t.string('director')
+ *     },
+ *   })
+ *
+ *   export const Song = objectType({
+ *     name: 'Song',
+ *     definition(t) {
+ *       t.string('url')
+ *       t.string('album')
+ *     },
+ *   })
+ *
+ *   // GraphQL SDL
+ *   // -----------
+ *   //
+ *   // union SearchResult = Movie | Song
+ *   //
+ *   // type Movie {
+ *   //   director: String
+ *   //   url: String
+ *   // }
+ *   //
+ *   // type Song {
+ *   //   album: String
+ *   //   url: String
+ *   // }
+ *
+ * @param config Specify your union's name, its members, and more. See each config property's jsDoc for more detail.
  */
 export function unionType<TypeName extends string>(config: NexusUnionTypeConfig<TypeName>) {
   return new NexusUnionTypeDef(config.name, config)
