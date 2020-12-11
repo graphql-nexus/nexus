@@ -6,8 +6,10 @@ import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './
 import { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
+  //todo
   /** The description to annotate the GraphQL SDL */
   description?: string
+  //todo
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
@@ -372,7 +374,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   /**
-   * [API Docs](https://nxs.li/docs/api/nonNull) | [Nexus Nullability
+   * [API Docs](https://nxs.li/docs/api/nonNull) | [Nullability
    * Guide](https://nexusjs.org/docs/guides/nullability) | [GraphQL 2018
    * Spec](https://spec.graphql.org/June2018/#sec-Type-System.Non-Null)
    *
@@ -410,7 +412,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 
   /**
-   * [API Docs](https://nxs.li/docs/api/null) | [Nexus Nullability
+   * [API Docs](https://nxs.li/docs/api/null) | [Nullability
    * Guide](https://nexusjs.org/docs/guides/nullability) | [GraphQL 2018
    * Spec](https://spec.graphql.org/June2018/#sec-Type-System.Non-Null)
    *
