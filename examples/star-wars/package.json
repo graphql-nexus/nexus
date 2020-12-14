@@ -5,10 +5,10 @@
     "start": "ts-node-dev --ignore-watch star-wars-typegen.ts --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
-    "@nexus/schema": "^0.16.0",
     "apollo-server": "^2.18.1",
     "graphql": "^15.3.0",
     "graphql-tools": "^4.0.7",
+    "nexus": "^0.0.0-pr.699.1.5377df5",
     "ts-node-dev": "^1.0.0-pre.30"
   },
   "devDependencies": {

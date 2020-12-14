@@ -1,4 +1,4 @@
-import { idArg, list, nonNull, nullable, objectType, stringArg } from '@nexus/schema'
+import { idArg, list, nonNull, nullable, objectType, stringArg } from 'nexus'
 
 export const Mutation = objectType({
   name: 'Mutation',

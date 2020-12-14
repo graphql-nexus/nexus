@@ -1,4 +1,4 @@
-import { list, objectType } from '@nexus/schema'
+import { list, objectType } from 'nexus'
 import dedent from 'dedent'
 
 export const Launch = objectType({

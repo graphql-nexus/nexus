@@ -1,4 +1,4 @@
-import { list, nullable, objectType } from '@nexus/schema'
+import { list, nullable, objectType } from 'nexus'
 import { nodeType } from './mixins'
 
 export const UNKNOWN_NODE = objectType({

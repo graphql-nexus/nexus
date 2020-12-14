@@ -1,4 +1,4 @@
-import { nullable, objectType } from '@nexus/schema'
+import { nullable, objectType } from 'nexus'
 
 export const Rocket = objectType({
   name: 'Rocket',
