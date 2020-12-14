@@ -4,9 +4,9 @@ title: Nexus Framework Users
 
 ## Hello Nexus Framework User!
 
-If you are a `nexus` (Nexus Framework) user we strongly encourage you to migrate to `nexus` (Nexus Schema). For more detail about why and how this came about please see [this announcement](https://github.com/prisma-labs/graphql-framework-experiment/issues/1432). The following guide is written to help you transition from the framework back to the library.
+If you are a `nexus` (Nexus Framework) user we strongly encourage you to migrate to `nexus` (Nexus). For more detail about why and how this came about please see [this announcement](https://github.com/prisma-labs/graphql-framework-experiment/issues/1432). The following guide is written to help you transition from the framework back to the library.
 
-Note that there is a [separate migration guide](https://nxs.li/unframework/plugin/prisma/migrate) detailing how to go from the Prisma plugin for Nexus Framework to the Prisma plugin for Nexus schema.
+Note that there is a [separate migration guide](https://nxs.li/unframework/plugin/prisma/migrate) detailing how to go from the Prisma plugin for Nexus Framework to the Prisma plugin for Nexus.
 
 ## Bundled Dependencies
 
@@ -33,9 +33,9 @@ You will need to manage the TypeScript toolchain yourself.
 
 2. The following applies to VSCode but something like it might apply to other editors as well. You must also make sure your editor is set to use the local version of TypeScript rather than the one the editor ships with. Summon the command pallet `command+shift+p` and then enter and select `typescript: select TypeScript Version...`. Then select `Workspace Version`.
 3. Ensure your tsconfig settings are correct.
-   1. If you are outputting Nexus Schema typegen to `node_modules/@types/<something>/index.d.ts` like Nexus Framework did then you must ensure that the [`compilerOptions.typeRoots`](https://www.typescriptlang.org/tsconfig#typeRoots) and [`compilerOptions.types`](https://www.typescriptlang.org/tsconfig#types) fields are correctly set or not set at all. If `typeRoots` is set then ensure that where you output Nexus Schema's typegen is listed. If `types` is set then ensure that the parent directory where you output Nexus Schema's typegen is listed.
+   1. If you are outputting Nexus typegen to `node_modules/@types/<something>/index.d.ts` like Nexus Framework did then you must ensure that the [`compilerOptions.typeRoots`](https://www.typescriptlang.org/tsconfig#typeRoots) and [`compilerOptions.types`](https://www.typescriptlang.org/tsconfig#types) fields are correctly set or not set at all. If `typeRoots` is set then ensure that where you output Nexus's typegen is listed. If `types` is set then ensure that the parent directory where you output Nexus's typegen is listed.
    2. If you are using Apollo Server then you must enable `skipLibCheck: true` in `compilerOptions`.
-   3. Enable `strict` mode in `compilerOptions` to benefit most of all from Nexus Schema's typings.
+   3. Enable `strict` mode in `compilerOptions` to benefit most of all from Nexus's typings.
 
 ## Development Mode
 
@@ -56,7 +56,7 @@ The following applies to VSCode but it might apply to other editors as well: You
 
 ## Nexus Module Discovery & Singleton Schema Builder
 
-You will need to export Nexus Schema type definition values and import them into where you run your `makeSchema`. The exact module layout you use does not matter.
+You will need to export Nexus type definition values and import them into where you run your `makeSchema`. The exact module layout you use does not matter.
 
 In framework you could do this:
 
@@ -90,7 +90,7 @@ const schema = makeSchema({
 
 ## Fully Abstracted Reflection System
 
-You need to run Nexus Schema reflection yourself explicitly. You need to do this before running `tsc` to build your app. Otherwise `tsc` will fail due to type errors because of the missing typings files.
+You need to run Nexus reflection yourself explicitly. You need to do this before running `tsc` to build your app. Otherwise `tsc` will fail due to type errors because of the missing typings files.
 
 There are two primary ways you can go about this.
 
@@ -101,11 +101,11 @@ Approach A might be simpler if your project can accommodate it. The primary requ
 
 Approach A is simpler in that it reduces the surface area of your codebase where you need to think about eager code running during reflection (which in turn is run before build and tests). On the other hand you may already be thinking about this if you are trying to develop testable code. Use whichever approach works best for you.
 
-Regardless of which choice you go with, you also need to ensure that `NODE_ENV=production` is set. If you forget to do this then Nexus Schema will (by default) run reflection. This would significantly slow down your application boot time, something you don't want in serverless environments, for example.
+Regardless of which choice you go with, you also need to ensure that `NODE_ENV=production` is set. If you forget to do this then Nexus will (by default) run reflection. This would significantly slow down your application boot time, something you don't want in serverless environments, for example.
 
 Here is an example of approach A to managing reflection:
 
-1. Layout your Nexus Schema type defs amongst modules under a parent dir such that each module contains a part of your GraphQL schema. Put shared parts of your GraphQL schema into `shared.ts`. Re-export all type defs in `index.ts`.
+1. Layout your Nexus type defs amongst modules under a parent dir such that each module contains a part of your GraphQL schema. Put shared parts of your GraphQL schema into `shared.ts`. Re-export all type defs in `index.ts`.
 
    ```json
    /src
@@ -137,7 +137,7 @@ Here is an example of approach A to managing reflection:
    })
    ```
 
-4. Now you can run Nexus Schema reflection by running this subset of your app e.g. `ts-node --transpile-only src/schema`. You will probably want to capture this via a new npm script called e.g. `nexus:reflect`.
+4. Now you can run Nexus reflection by running this subset of your app e.g. `ts-node --transpile-only src/schema`. You will probably want to capture this via a new npm script called e.g. `nexus:reflect`.
 
 Here is an example of approach B to managing reflection:
 
@@ -152,13 +152,13 @@ Here is an example of approach B to managing reflection:
    })
    ```
 
-3. Now you can run Nexus Schema reflection by running your app with that environment variable set e.g. `NEXUS_SHOULD_EXIT_AFTER_REFLECTION=true ts-node src`. You will probably want to capture this via a new script called e.g. `nexus:reflect`.
+3. Now you can run Nexus reflection by running your app with that environment variable set e.g. `NEXUS_SHOULD_EXIT_AFTER_REFLECTION=true ts-node src`. You will probably want to capture this via a new script called e.g. `nexus:reflect`.
 
 ## Integrated Build Step With Bundling
 
 You will need to handle the build yourself. This involves a few things:
 
-1. Run Nexus Schema reflection yourself
+1. Run Nexus reflection yourself
 
    This has been explained in the _Fully Abstracted Reflection System_ section.
 
@@ -168,7 +168,7 @@ You will need to handle the build yourself. This involves a few things:
 
 3. Optional: Run a bundler yourself
 
-   This is probably something you don't need to do. Nexus Framework took a packages-bundled approach to dependencies and this mean a large package size that bloated deployments necessitating techniques like tree-shaking (e.g. TypeScript dependency is over 50mb). This problem generally goes away when using the Nexus Schema library directly. However bundling for serverless deployments can still be desirable especially if your non-development dependencies are heavy and not fully used at runtime. If you were relying on Nexus Framework bundling here are some tools you can try out yourself:
+   This is probably something you don't need to do. Nexus Framework took a packages-bundled approach to dependencies and this mean a large package size that bloated deployments necessitating techniques like tree-shaking (e.g. TypeScript dependency is over 50mb). This problem generally goes away when using the Nexus library directly. However bundling for serverless deployments can still be desirable especially if your non-development dependencies are heavy and not fully used at runtime. If you were relying on Nexus Framework bundling here are some tools you can try out yourself:
 
    - [`spack`](https://swc-project.github.io/docs/usage-spack-cli)
    - [`esbuild`](https://github.com/evanw/esbuild)
@@ -428,7 +428,7 @@ schema.objectType({
 To achieve the same level of type safety you now need to do the following.
 
 1. Define and export a static context type
-2. Configure Nexus Schema to use it
+2. Configure Nexus to use it
 3. Attach your data to the context. How to do this depends on the GraphQL server abstraction you are using usually. The example below uses Apollo Server.
 
 Example:
@@ -472,14 +472,14 @@ const server = new ApolloServer({
 In Nexus Framework backing types worked like this:
 
 1. Export a type from any module in your app
-2. Its name appears as an option among the string literal union populating the `rootTyping` field of Nexus Schema object type definitions.
+2. Its name appears as an option among the string literal union populating the `rootTyping` field of Nexus object type definitions.
 
-Nexus Schema does not have this functionality. There are a few things you can do instead.
+Nexus does not have this functionality. There are a few things you can do instead.
 
-- Approach A: If you have a set of exported Backing types whose names match your GraphQL objects then you can set their `modules` in `sourceTypes` and Nexus Schema will take care of the rest.
+- Approach A: If you have a set of exported Backing types whose names match your GraphQL objects then you can set their `modules` in `sourceTypes` and Nexus will take care of the rest.
 - Approach B: If you have a set of Backing types whose names having a differing pattern than your GraphQL objects then supply a Regular Expression to the `typeMatch` property in `sourceTypes`. You can for example map `BackingUser -> User` , `BackingPost -> Post` and so on.
 - Approach C: If you have a one-off mismatch then supply an arbitrary mapping to the `mapping` property of `sourceTypes`.
-- Approach D: If you want to colocate a type mapping like how it was in Nexus Framework then use the `sourceType` field on Nexus Schema type defs. Unlike framework it accepts an object with a `path` to a module and `name` of the type to look for being exported from that module.
+- Approach D: If you want to colocate a type mapping like how it was in Nexus Framework then use the `sourceType` field on Nexus type defs. Unlike framework it accepts an object with a `path` to a module and `name` of the type to look for being exported from that module.
 
 Here is an example using approach A:
 
@@ -558,7 +558,7 @@ In Nexus Framework there was a testing module for system testing your app. You n
     ```
 
 3.  Setup your project to be able to soundly run one-off tests
-    In order to run your test suite you typically need your app to be type checking. Given the Nexus Schema reflection system, this means that we need to run the app before running the tests. To setup your project for running reflection see the section _Fully Abstracted Reflection System_.
+    In order to run your test suite you typically need your app to be type checking. Given the Nexus reflection system, this means that we need to run the app before running the tests. To setup your project for running reflection see the section _Fully Abstracted Reflection System_.
 
     Here is an example of how this might look in your project:
 
@@ -572,11 +572,11 @@ In Nexus Framework there was a testing module for system testing your app. You n
     ```
 
 4.  Understand your TDD workflow option e.g. `jest --watch`
-    In this case you need Nexus Schema reflection to be running after every change to the source code. But this also typically triggers a new test run. That test run could be faster than reflection, leading to temporary type errors that don't matter to you. You don't want these type errors to block your TDD flow otherwise you get a 🐔🥚problem. To solve this you configure ts-jest to warn instead failing on type errors. The workflow then goes like this: 1. You start your test framework in watch mode 2. You edit your source code 3. Your source code under test runs. This in turn is running Nexus schema reflection. 4. Type errors from your initial test results should be ignored. Run the test suite again (e.g. in `jest` watch mode hit `enter`). Now it is running with the complete set of types and you can trust the test results.
+    In this case you need Nexus reflection to be running after every change to the source code. But this also typically triggers a new test run. That test run could be faster than reflection, leading to temporary type errors that don't matter to you. You don't want these type errors to block your TDD flow otherwise you get a 🐔🥚problem. To solve this you configure ts-jest to warn instead failing on type errors. The workflow then goes like this: 1. You start your test framework in watch mode 2. You edit your source code 3. Your source code under test runs. This in turn is running Nexus reflection. 4. Type errors from your initial test results should be ignored. Run the test suite again (e.g. in `jest` watch mode hit `enter`). Now it is running with the complete set of types and you can trust the test results.
 
     There are some caveats here:
 
-    1. Your tests need be importing the whole of your nexus schema modules and `makeSchema` code. Otherwise reflection will result in partially generated types that may other kinds of type errors you don't care about (for example a GraphQL string-literal-based object type reference becomes invalid).
+    1. Your tests need be importing the whole of your nexus modules and `makeSchema` code. Otherwise reflection will result in partially generated types that may other kinds of type errors you don't care about (for example a GraphQL string-literal-based object type reference becomes invalid).
     2. And yes, every test run following change(s) potentially requiring two runs is not ideal
 
     Here is the revised jest configuration you'll need.
@@ -714,7 +714,7 @@ settings.data.server.port // 4000
 
 ## Other Differences
 
-Some differences between Nexus Framework and Nexus Schema and cannot be easily approximated. The follow gathers these differences for your convenience.
+Some differences between Nexus Framework and Nexus and cannot be easily approximated. The follow gathers these differences for your convenience.
 
 1. CLI
 2. Framework Plugins

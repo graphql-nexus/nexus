@@ -26,8 +26,6 @@ You might be (rightfully) wondering: "Wait, how am I supposed to benefit from Ne
 
 Just remember the following though. You should _always_ have your `npm run dev` script running when you're working on your project _even_ when you're not intending to use your server (e.g. access the GraphQL Playground). If you forget to run `npm run dev` then you will not, for example, get the static typing experience that you expect in your resolvers.
 
-> There are plans to run Nexus Reflection as a separate process integrated into your IDE. You can learn more about and track the feature here ([#949](https://github.com/graphql-nexus/nexus/issues/949)) *TODO CHANGE LINK TO A NEXUS SCHEMA ISSUE?*
-
 ## Model the domain
 
 Let's get started with our blog schema by modeling some key entities in the domain. We'll begin with the concept of a `Post`. A post will represent a page in your blog. When not published, we'll call it a _draft_.

@@ -1,4 +1,4 @@
-# Nexus Schema
+# Nexus
 
 ![trunk](https://github.com/graphql-nexus/schema/workflows/trunk/badge.svg)
 [![npm version](https://badge.fury.io/js/%40nexus%2Fschema.svg)](https://badge.fury.io/js/%40nexus%2Fschema)
@@ -8,10 +8,10 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 ## Installation
 
 ```
-npm install @nexus/schema graphql
+npm install nexus graphql
 ```
 
-Note you must also add `graphql`. Nexus Schema pins to it as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/).
+Note you must also add `graphql`. Nexus pins to it as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/).
 
 ## Features
 
@@ -33,7 +33,7 @@ Note you must also add `graphql`. Nexus Schema pins to it as a [peer dependency]
 ## Example
 
 ```ts
-import { queryType, stringArg, makeSchema } from '@nexus/schema'
+import { queryType, stringArg, makeSchema } from 'nexus'
 import { GraphQLServer } from 'graphql-yoga'
 
 const Query = queryType({
@@ -70,7 +70,7 @@ More examples can be found in the [`/examples`](./examples) directory:
 
 ## Documentation
 
-You can find the docs for Nexus Schema [here](http://nexusjs.org/).
+You can find the docs for Nexus [here](http://nexusjs.org/).
 
 ## Migrate from SDL
 
