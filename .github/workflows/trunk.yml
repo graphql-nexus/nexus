@@ -2,7 +2,7 @@ name: trunk
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
 
 jobs:
   graphql-14:
