@@ -16,7 +16,7 @@
     "graphql-subscriptions": "^1.0.0",
     "graphql-tools": "^4.0.7",
     "lodash": "^4.17.15",
-    "nexus": "^0.16.0",
+    "nexus": "^0.0.0-pr.699.1.5377df5",
     "subscriptions-transport-ws": "^0.9.15",
     "ts-node": "^8.5.4",
     "typescript": "^3.9"

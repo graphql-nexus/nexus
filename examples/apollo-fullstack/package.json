@@ -25,7 +25,7 @@
     "graphql": "^15.3.0",
     "graphql-tools": "^4.0.7",
     "isemail": "^3.2.0",
-    "nexus": "0.14.0",
+    "nexus": "^0.0.0-pr.699.1.5377df5",
     "sequelize": "^5.21.2",
     "sqlite3": "^4.1.0"
   },
