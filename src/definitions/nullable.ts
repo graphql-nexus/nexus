@@ -22,9 +22,8 @@ withNexusSymbol(NexusNullDef, NexusTypes.Null)
  *
  * Remove the Non-Null wrapper from a type, if present.
  *
- * In Nexus input postition types are non-null by default so this is useful to modify them (until you've
- * changed the default). On the other hand output postition types are nullable by default so this has no use
- * for them (until you've changed the default).
+ * In Nexus input and output position types are nullable by default so this has ***no use*** until you've
+ * changed the non-null defaults for one or both positions.
  *
  * If you find yourself using this a large majority of the time then consider changing your nullability defaults.
  *
@@ -32,6 +31,7 @@ withNexusSymbol(NexusNullDef, NexusTypes.Null)
  *   objectType({
  *     name: 'User',
  *     nonNullDefaults: {
+ *       inputs: true,
  *       outputs: true,
  *     },
  *     definition(t) {
