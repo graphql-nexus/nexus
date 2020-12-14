@@ -1,6 +1,6 @@
 {
   "name": "@nexus/schema",
-  "version": "0.0.0-dripip",
+  "version": "0.20.1",
   "description": "Scalable, strongly typed GraphQL schema development",
   "keywords": [
     "graphql",
