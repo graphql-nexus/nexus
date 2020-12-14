@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SDLConverter printInterfaceTypes 1`] = `
+"export const Employee = interfaceType({
+  name: \\"Employee\\",
+  definition(t) {
+    t.implements(Person)
+    t.nonNull.string(\\"name\\")
+    t.nonNull.int(\\"salary\\")
+  }
+});
+export const Person = interfaceType({
+  name: \\"Person\\",
+  definition(t) {
+    t.nonNull.string(\\"name\\")
+  }
+});"
+`;

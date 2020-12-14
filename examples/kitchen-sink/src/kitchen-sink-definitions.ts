@@ -83,7 +83,7 @@ export const UnusedInterface = interfaceType({
   definition(t) {
     t.boolean('ok')
   },
-  rootTyping: { name: 'UnusedInterfaceTypeDef', path: __filename },
+  sourceType: { module: __filename, export: 'UnusedInterfaceTypeDef' },
 })
 
 export const Baz = interfaceType({
@@ -395,7 +395,7 @@ export const DateScalar = scalarType({
   parseValue: (value) => new Date(value),
   parseLiteral: (ast) => (ast.kind === 'IntValue' ? new Date(ast.value) : null),
   asNexusMethod: 'date',
-  rootTyping: 'Date',
+  sourceType: 'Date',
 })
 
 export const Node = interfaceType({

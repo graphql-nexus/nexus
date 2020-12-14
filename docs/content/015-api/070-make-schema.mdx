@@ -47,15 +47,15 @@ export const schema = makeSchema({
 })
 ```
 
-## shouldGenerateArtifacts, outputs, typegenAutoConfig
+## shouldGenerateArtifacts, outputs, sourceTypes
 
 The `shouldGenerateArtifacts` is a boolean value which determines whether artifact files (graphql and TypeScript) are emitted when the code for `makeSchema`
 
 `outputs` is an object which specifies the absolute path for where the emitted files are generated.
 If you do not wish to generate one of these types
 
-`typegenAutoConfig` is an object which gives nexus more information about how to properly generate the
-type definition file. An example of the `sources` is provided below:
+`sourceTypes` is an object which gives nexus more information about how to properly generate the
+type definition file. An example of the usage is provided below:
 
 ```ts
 makeSchema({
@@ -66,27 +66,25 @@ makeSchema({
     schema: path.join(__dirname, 'generated/schema.gen.graphql'),
     typegen: path.join(__dirname, 'generated/nexusTypes.gen.ts'),
   },
-  typegenAutoConfig: {
+  sourceTypes: {
     headers: [
       'import { ConnectionFieldOpts } from "@packages/api-graphql/src/extensions/connectionType"',
     ],
-    sources: [
+    modules: [
       // Automatically finds any interface/type/class named similarly to the and infers it
       // the "source" type of that resolver.
       {
-        source: '@packages/types/src/db.ts',
+        module: '@packages/types/src/db.ts',
         alias: 'dbt',
-        typeMatch: (name) => new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, 'g'),
-      },
-      // We also need to import this source in order to provide it as the `contextType` below.
-      {
-        source: '@packages/data-context/src/DataContext.ts',
-        alias: 'ctx',
+        typeMatch: name => new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, 'g'),
       },
     ],
-    // Typing from the source
-    contextType: 'ctx.DataContext',
-    backingTypeMap: {
+    // Typing for the GraphQL context
+    contextType: {
+      module: '@packages/data-context/src/DataContext.ts',
+      alias: 'ctx',
+    },
+    mapping: {
       Date: 'Date',
       DateTime: 'Date',
       UUID: 'string',
@@ -144,63 +142,57 @@ Optional, allows you to override the `printSchema` when outputting the generated
 ```ts
 makeSchema({
   // ...
-  customPrintSchemaFn: (schema) => {
+  customPrintSchemaFn: schema => {
     return printSchema(schema, { commentDescriptions: true })
   },
 })
 ```
 
-#### Footnotes: Annotated config option for typegenAutoConfig:
+#### Footnotes: Annotated config option for sourceTypes:
 
 ```ts
-export interface TypegenAutoConfigOptions {
-  /**
-   * Any headers to prefix on the generated type file
-   */
+export interface SourceTypesConfigOptions {
+  /** Any headers to prefix on the generated type file */
   headers?: string[]
   /**
-   * Array of files to match for a type
+   * Array of SourceTypeModule's to look in and match the type names against.
    *
-   *   sources: [
-   *     { source: 'typescript', alias: 'ts' },
-   *     { source: path.join(__dirname, '../backingTypes'), alias: 'b' },
+   * @example
+   *   modules: [
+   *     { module: 'typescript', alias: 'ts' },
+   *     { module: path.join(__dirname, '../sourceTypes'), alias: 'b' },
    *   ]
    */
-  sources: TypegenConfigSourceModule[]
+  modules: SourceTypeModule[]
   /**
-   * Typing for the context, referencing a type defined in the aliased module
-   * provided in sources e.g. 'alias.Context'
-   */
-  contextType?: string
-  /**
-   * Types that should not be matched for a backing type,
+   * Types that should not be matched for a source type,
    *
    * By default this is set to ['Query', 'Mutation', 'Subscription']
    *
+   * @example
    *   skipTypes: ['Query', 'Mutation', /(.*?)Edge/, /(.*?)Connection/]
    */
   skipTypes?: (string | RegExp)[]
   /**
-   * If debug is set to true, this will log out info about all types
-   * found, skipped, etc. for the type generation files.
+   * If debug is set to true, this will log out info about all types found, skipped, etc. for the type
+   * generation files. @default false
    */
   debug?: boolean
   /**
-   * If provided this will be used for the backing types rather than the auto-resolve
-   * mechanism above. Useful as an override for one-off cases, or for scalar
-   * backing types.
+   * If provided this will be used for the source types rather than the auto-resolve mechanism above. Useful
+   * as an override for one-off cases, or for scalar source types.
    */
-  backingTypeMap?: Record<string, string>
+  mapping?: Record<string, string>
 }
 
-export interface TypegenConfigSourceModule {
+export interface SourceTypeModule {
   /**
    * The module for where to look for the types.
    * This uses the node resolution algorithm via require.resolve,
    * so if this lives in node_modules, you can just provide the module name
    * otherwise you should provide the absolute path to the file.
    */
-  source: string
+  module: string
   /**
    * When we import the module, we use 'import * as ____' to prevent
    * conflicts. This alias should be a name that doesn't conflict with any other

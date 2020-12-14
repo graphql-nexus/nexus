@@ -1,9 +1,9 @@
 import { GraphQLNamedType } from 'graphql'
-import { RootTypingDef } from './_types'
+import { SourceTypingDef } from './_types'
 
 export interface TypeExtensionConfig {
   asNexusMethod?: string
-  rootTyping?: RootTypingDef
+  sourceType?: SourceTypingDef
 }
 
 export type NexusTypeExtensions = {
@@ -15,7 +15,7 @@ export function decorateType<T extends GraphQLNamedType>(type: T, config: TypeEx
     ...type.extensions,
     nexus: {
       asNexusMethod: config.asNexusMethod,
-      rootTyping: config.rootTyping,
+      sourceType: config.sourceType,
     },
   }
   return type as any

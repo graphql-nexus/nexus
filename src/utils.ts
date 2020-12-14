@@ -47,15 +47,11 @@ export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => 
 
 // ----------------------------
 
-/**
- *
- * Copied from graphql-js:
- *
- */
+/** Copied from graphql-js: */
 
 /**
- * Given an invalid input string and a list of valid options, returns a filtered
- * list of valid options sorted based on their similarity with the input.
+ * Given an invalid input string and a list of valid options, returns a filtered list of valid options sorted
+ * based on their similarity with the input.
  */
 export function suggestionList(input: string = '', options: string[] = []): string[] {
   var optionsByDistance = Object.create(null)
@@ -78,14 +74,12 @@ export function suggestionList(input: string = '', options: string[] = []): stri
 /**
  * Computes the lexical distance between strings A and B.
  *
- * The "distance" between two strings is given by counting the minimum number
- * of edits needed to transform string A into string B. An edit can be an
- * insertion, deletion, or substitution of a single character, or a swap of two
- * adjacent characters.
+ * The "distance" between two strings is given by counting the minimum number of edits needed to transform
+ * string A into string B. An edit can be an insertion, deletion, or substitution of a single character, or a
+ * swap of two adjacent characters.
  *
- * Includes a custom alteration from Damerau-Levenshtein to treat case changes
- * as a single edit which helps identify mis-cased values with an edit distance
- * of 1.
+ * Includes a custom alteration from Damerau-Levenshtein to treat case changes as a single edit which helps
+ * identify mis-cased values with an edit distance of 1.
  *
  * This distance can be useful for detecting typos in input or sorting
  */
@@ -237,22 +231,19 @@ function nixifyPathSlashes(path: string): string {
 /**
  * Format a path so it is suitable to be used as a module import.
  *
- * - Implicitly relative is made explicitly relative
- * - TypeScript file extension is stripped
- * - Windows slashes converted into *nix slashes
- *
- * @remarks
+ * - Implicitly relative is made explicitly relative - TypeScript file extension is stripped - Windows slashes
+ * converted into *nix slashes
  *
  * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
  */
-export function formatPathForModuleimport(path: string) {
+export function formatPathForModuleImport(path: string) {
   return nixifyPathSlashes(makeRelativePathExplicitlyRelative(path).replace(typeScriptFileExtension, ''))
 }
 
 export function relativePathTo(absolutePath: string, fromPath: string): string {
   const filename = Path.basename(absolutePath)
   const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
-  return formatPathForModuleimport(Path.join(relative, filename))
+  return formatPathForModuleImport(Path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -419,12 +410,12 @@ export function log(msg: string) {
 }
 
 /**
- * Calculate the venn diagram between two iterables based on reference equality
- * checks. The returned tripple contains items thusly:
+ * Calculate the venn diagram between two iterables based on reference equality checks. The returned tripple
+ * contains items thusly:
  *
- *    * items only in arg 1 --> first tripple slot
- *    * items in args 1 & 2 --> second tripple slot
- *    * items only in arg 2 --> third tripple slot
+ *     * items only in arg 1 --> first tripple slot
+ *     * items in args 1 & 2 --> second tripple slot
+ *     * items only in arg 2 --> third tripple slot
  */
 export function venn<T>(xs: Iterable<T>, ys: Iterable<T>): [Set<T>, Set<T>, Set<T>] {
   const lefts: Set<T> = new Set(xs)
@@ -461,7 +452,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
     },
   }),
   {
-    rootTyping: 'never',
+    sourceType: 'never',
   }
 )
 
@@ -479,17 +470,12 @@ export function getOwnPackage(): { name: string } {
   return require('../package.json')
 }
 
-/**
- * Use this to make assertion at end of if-else chain that all members of a
- * union have been accounted for.
- */
+/** Use this to make assertion at end of if-else chain that all members of a union have been accounted for. */
 export function casesHandled(x: never): never {
   throw new Error(`A case was not handled for value: ${x}`)
 }
 
-/**
- * Quickly log objects
- */
+/** Quickly log objects */
 export function dump(x: any) {
   console.log(require('util').inspect(x, { depth: null }))
 }
@@ -500,7 +486,7 @@ function isNodeModule(path: string) {
 }
 
 export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
-  const rootTypePath = rootType.path
+  const rootTypePath = rootType.module
 
   if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
     throw new Error(
@@ -518,15 +504,18 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
     throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
   }
 
-  const importPath = isNodeModule(rootTypePath) ? rootTypePath : relativePathTo(rootTypePath, outputPath)
+  if (isNodeModule(rootTypePath)) {
+    return rootTypePath
+  }
 
-  return importPath
+  if (Path.isAbsolute(rootTypePath)) {
+    return relativePathTo(rootTypePath, outputPath)
+  }
+
+  return rootTypePath
 }
 
-/**
- * Given the right hand side of an arg definition, returns the underlying "named type"
- * for us to add to the builder
- */
+/** Given the right hand side of an arg definition, returns the underlying "named type" for us to add to the builder */
 export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusNamedInputTypeDefs | string {
   let finalValue = argDef
   if (typeof finalValue === 'string') {
@@ -562,9 +551,7 @@ export function getNexusNamedType(
   return namedType
 }
 
-/**
- * Assertion utility with nexus-aware feedback for users.
- */
+/** Assertion utility with nexus-aware feedback for users. */
 export function invariantGuard(val: any) {
   /* istanbul ignore next */
   if (Boolean(val) === false) {
@@ -575,16 +562,12 @@ export function invariantGuard(val: any) {
   }
 }
 
-/**
- * Is the current stage production? If NODE_ENV envar is set to "production" or "prod" then yes it is.
- */
+/** Is the current stage production? If NODE_ENV envar is set to "production" or "prod" then yes it is. */
 export function isProductionStage() {
   return process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod'
 }
 
-/**
- * Throw a programmer error in production but only log it in development.
- */
+/** Throw a programmer error in production but only log it in development. */
 export function raiseProgrammerError(error: Error) {
   if (isProductionStage()) {
     throw error

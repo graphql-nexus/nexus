@@ -1,6 +1,6 @@
-import { GraphQLNamedType } from 'graphql'
+import { defaultFieldResolver, GraphQLNamedType } from 'graphql'
 import { DynamicFieldDefs, SchemaConfig } from './builder'
-import { RootTypings } from './definitions/_types'
+import { SourceTypingDef, SourceTypings } from './definitions/_types'
 import { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import { NexusInterfaceTypeConfig } from './definitions/interfaceType'
@@ -16,26 +16,23 @@ export type NexusGraphQLNamedType = GraphQLNamedType & {
 
 export type NexusTypeExtensions = NexusObjectTypeExtension | NexusInterfaceTypeExtension
 
-/**
- * Container object living on `fieldDefinition.extensions.nexus`
- */
+/** Container object living on `fieldDefinition.extensions.nexus` */
 export class NexusFieldExtension<TypeName extends string = any, FieldName extends string = any> {
   readonly config: Omit<NexusOutputFieldConfig<TypeName, FieldName>, 'resolve'>
-  /**
-   * Whether the user has provided a custom "resolve" function,
-   * or whether we're using GraphQL's defaultResolver
-   */
+  /** Whether the user has provided a custom "resolve" function, or whether we're using GraphQL's defaultResolver */
   readonly hasDefinedResolver: boolean
   constructor(config: NexusOutputFieldConfig<TypeName, FieldName>) {
     const { resolve, ...rest } = config
     this.config = rest
-    this.hasDefinedResolver = Boolean(resolve)
+    this.hasDefinedResolver = Boolean(resolve && resolve !== defaultFieldResolver)
+  }
+  /** Called when there are modifications on the interface fields */
+  modify(modifications: Partial<NexusOutputFieldConfig<any, any>>) {
+    return new NexusFieldExtension({ ...this.config, ...modifications })
   }
 }
 
-/**
- * Container object living on `inputObjectType.extensions.nexus`
- */
+/** Container object living on `inputObjectType.extensions.nexus` */
 export class NexusInputObjectTypeExtension<TypeName extends string = any> {
   readonly config: Omit<NexusInputObjectTypeConfig<TypeName>, 'definition'>
   constructor(config: NexusInputObjectTypeConfig<TypeName>) {
@@ -44,9 +41,7 @@ export class NexusInputObjectTypeExtension<TypeName extends string = any> {
   }
 }
 
-/**
- * Container object living on `objectType.extensions.nexus`
- */
+/** Container object living on `objectType.extensions.nexus` */
 export class NexusObjectTypeExtension<TypeName extends string = any> {
   readonly config: Omit<NexusObjectTypeConfig<TypeName>, 'definition' | 'isTypeOf'>
   constructor(config: NexusObjectTypeConfig<TypeName>) {
@@ -55,9 +50,7 @@ export class NexusObjectTypeExtension<TypeName extends string = any> {
   }
 }
 
-/**
- * Container object living on `interfaceType.extensions.nexus`
- */
+/** Container object living on `interfaceType.extensions.nexus` */
 export class NexusInterfaceTypeExtension<TypeName extends string = any> {
   readonly config: Omit<NexusInterfaceTypeConfig<TypeName>, 'definition' | 'resolveType'>
   constructor(config: NexusInterfaceTypeConfig<TypeName>) {
@@ -68,13 +61,20 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
 
 export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
   dynamicFields: DynamicFieldDefs
-  rootTypings: RootTypings
+  rootTypings: SourceTypings
 }
 
 /**
- * Container object living on `schema.extensions.nexus`. Keeps track
- * of metadata from the builder so we can use it when we
+ * Container object living on `schema.extensions.nexus`. Keeps track of metadata from the builder so we can
+ * use it when we
  */
 export class NexusSchemaExtension {
   constructor(readonly config: NexusSchemaExtensionConfig) {}
+}
+
+export type NexusScalarExtensions = {
+  nexus: {
+    asNexusMethod?: string
+    sourceType?: SourceTypingDef
+  }
 }

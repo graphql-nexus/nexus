@@ -18,12 +18,15 @@ import {
   GraphQLInputType,
   GraphQLInt,
   GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
+  GraphQLList,
   GraphQLNamedType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,
+  GraphQLSchemaConfig,
   GraphQLString,
   GraphQLType,
   GraphQLUnionType,
@@ -38,17 +41,16 @@ import {
   isUnionType,
   isWrappingType,
   printSchema,
-  GraphQLList,
-  GraphQLInterfaceTypeConfig,
 } from 'graphql'
 import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
+  NexusOutputFieldConfig,
   NexusOutputFieldDef,
   OutputDefinitionBlock,
 } from './definitions/definitionBlocks'
-import { EnumTypeConfig } from './definitions/enumType'
+import { NexusEnumTypeConfig } from './definitions/enumType'
 import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitions/extendInputType'
 import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
 import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
@@ -60,10 +62,14 @@ import {
   NexusInterfaceTypeDef,
 } from './definitions/interfaceType'
 import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
-import { NexusScalarExtensions, NexusScalarTypeConfig } from './definitions/scalarType'
+import { NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
+  AllNexusArgsDefs,
+  AllNexusNamedInputTypeDefs,
+  AllNexusNamedOutputTypeDefs,
   AllNexusNamedTypeDefs,
+  finalizeWrapping,
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
   isNexusDynamicOutputProperty,
@@ -77,17 +83,13 @@ import {
   isNexusPlugin,
   isNexusScalarTypeDef,
   isNexusUnionTypeDef,
+  isNexusWrappingType,
+  NexusFinalWrapKind,
   NexusWrapKind,
   normalizeArgWrapping,
   rewrapAsGraphQLType,
-  unwrapNexusDef,
   unwrapGraphQLDef,
-  finalizeWrapping,
-  AllNexusNamedInputTypeDefs,
-  AllNexusNamedOutputTypeDefs,
-  AllNexusArgsDefs,
-  isNexusWrappingType,
-  NexusFinalWrapKind,
+  unwrapNexusDef,
 } from './definitions/wrapping'
 import {
   MissingType,
@@ -98,7 +100,7 @@ import {
   NexusGraphQLObjectTypeConfig,
   NexusGraphQLSchema,
   NonNullConfig,
-  RootTypings,
+  SourceTypings,
   TypingImport,
 } from './definitions/_types'
 import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
@@ -108,6 +110,7 @@ import {
   NexusInputObjectTypeExtension,
   NexusInterfaceTypeExtension,
   NexusObjectTypeExtension,
+  NexusScalarExtensions,
   NexusSchemaExtension,
 } from './extensions'
 import { messages } from './messages'
@@ -118,8 +121,9 @@ import {
   NexusPlugin,
   PluginConfig,
 } from './plugin'
+import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
-import { TypegenAutoConfigOptions } from './typegenAutoConfig'
+import { SourceTypesConfigOptions } from './typegenAutoConfig'
 import { TypegenFormatFn } from './typegenFormatPrettier'
 import { TypegenMetadata } from './typegenMetadata'
 import { AbstractTypeResolver, GetGen } from './typegenTypeHelpers'
@@ -130,18 +134,17 @@ import {
   casesHandled,
   consoleWarn,
   eachObj,
+  getArgNamedType,
   getNexusNamedType,
+  graphql15InterfaceConfig,
+  graphql15InterfaceType,
   invariantGuard,
   isObject,
   mapValues,
   objValues,
   runAbstractTypeRuntimeChecks,
   UNKNOWN_TYPE_SCALAR,
-  getArgNamedType,
-  graphql15InterfaceType,
-  graphql15InterfaceConfig,
 } from './utils'
-import { declarativeWrappingPlugin } from './plugins'
 
 type NexusShapedOutput = {
   name: string
@@ -170,100 +173,76 @@ type PossibleInputType = string | AllNexusNamedInputTypeDefs | GraphQLType
 
 export interface BuilderConfigInput {
   /**
-   * Generated artifact settings. Set to false to disable all.
-   * Set to true to enable all and use default paths. Leave
-   * undefined for default behaviour of each artifact.
+   * Generated artifact settings. Set to false to disable all. Set to true to enable all and use default
+   * paths. Leave undefined for default behaviour of each artifact.
    */
   outputs?:
     | boolean
     | {
         /**
-         * TypeScript declaration file generation settings. This file
-         * contains types reflected off your source code. It is how
-         * Nexus imbues dynamic code with static guarantees.
+         * TypeScript declaration file generation settings. This file contains types reflected off your source
+         * code. It is how Nexus imbues dynamic code with static guarantees.
          *
-         * Defaults to being enabled when `process.env.NODE_ENV !== "production"`.
-         * Set to true to enable and emit into default path (see below).
-         * Set to false to disable. Set to a string to specify absolute path.
+         * Defaults to being enabled when `process.env.NODE_ENV !== "production"`. Set to true to enable and
+         * emit into default path (see below). Set to false to disable. Set to a string to specify absolute path.
          *
-         * The default path is node_modules/@types/nexus-typegen/index.d.ts.
-         * This is chosen because TypeScript will pick it up without
-         * any configuration needed by you. For more details about the @types
-         * system refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types
+         * The default path is node_modules/@types/nexus-typegen/index.d.ts. This is chosen because TypeScript
+         * will pick it up without any configuration needed by you. For more details about the @types system
+         * refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types
          */
         typegen?: boolean | string
         /**
          * GraphQL SDL file generation toggle and location.
          *
-         * Set to a string to enable and output to an absolute path.
-         * Set to true to enable at default path (schema.graphql in the current working directory)
-         * Set to false to disable
+         * Set to a string to enable and output to an absolute path. Set to true to enable at default path
+         * (schema.graphql in the current working directory) Set to false to disable
          *
          * Defaults to true in development and false otherwise.
          *
-         * @remarks
-         *
-         * This file is not necessary but
-         * may be nice for teams wishing to review SDL in pull-requests or
-         * just generally transitioning from a schema-first workflow.
-         *
+         * This file is not necessary but may be nice for teams wishing to review SDL in pull-requests or just
+         * generally transitioning from a schema-first workflow.
          */
         schema?: boolean | string
       }
   /**
-   * Whether the schema & types are generated when the server
-   * starts. Default is !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+   * Whether the schema & types are generated when the server starts. Default is !process.env.NODE_ENV ||
+   * process.env.NODE_ENV === "development"
    */
   shouldGenerateArtifacts?: boolean
+  /** Register the Source Types */
+  sourceTypes?: SourceTypesConfigOptions
   /**
-   * Automatically configure type resolution for the TypeScript
-   * representations of the associated types.
+   * Adjust the Prettier options used while running prettier over the generated output.
    *
-   * Alias for typegenConfig: typegenAutoConfig(options)
-   */
-  typegenAutoConfig?: TypegenAutoConfigOptions
-  /**
-   * A configuration function for advanced cases where
-   * more control over the `TypegenInfo` is needed.
-   */
-  typegenConfig?: (schema: GraphQLSchema, outputPath: string) => TypegenInfo | PromiseLike<TypegenInfo>
-  /**
-   * Adjust the Prettier options used while running prettier over
-   * the generated output.
+   * Can be an absolute path to a Prettier config file like .prettierrc or package.json with "prettier" field,
+   * or an object of Prettier options.
    *
-   * Can be an absolute path to a Prettier config file like
-   * .prettierrc or package.json with "prettier" field, or an object
-   * of Prettier options.
-   *
-   * If provided, you must have prettier available as an importable dep
-   * in your project.
-   *
+   * If provided, you must have prettier available as an importable dep in your project.
    */
   prettierConfig?: string | object
   /**
-   * Manually apply a formatter to the generated content before saving,
-   * see the `prettierConfig` option if you want to use Prettier.
+   * Manually apply a formatter to the generated content before saving, see the `prettierConfig` option if you
+   * want to use Prettier.
    */
   formatTypegen?: TypegenFormatFn
   /**
-   * Configures the default "nonNullDefaults" for the entire schema the type.
-   * Read more about how nexus handles nullability
+   * Configures the default "nonNullDefaults" for the entire schema the type. Read more about how nexus
+   * handles nullability
    */
   nonNullDefaults?: NonNullConfig
-  /**
-   * List of plugins to apply to Nexus, with before/after hooks
-   * executed first to last: before -> resolve -> after
-   */
+  /** List of plugins to apply to Nexus, with before/after hooks executed first to last: before -> resolve -> after */
   plugins?: NexusPlugin[]
-  /**
-   * Provide if you wish to customize the behavior of the schema printing.
-   * Otherwise, uses `printSchema` from graphql-js
-   */
+  /** Provide if you wish to customize the behavior of the schema printing. Otherwise, uses `printSchema` from graphql-js */
   customPrintSchemaFn?: typeof printSchema
-  /**
-   * Customize and toggle on or off various features of Nexus.
-   */
+  /** Customize and toggle on or off various features of Nexus. */
   features?: NexusFeaturesInput
+  /**
+   * Path to the module where your context type is exported
+   *
+   * @example
+   *   contextType: { module: path.join(__dirname, 'context.ts'), export: 'MyContextType' }
+   */
+  contextType?: TypingImport
 }
 
 export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
@@ -274,52 +253,38 @@ export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults
 
 export type SchemaConfig = BuilderConfigInput & {
   /**
-   * All of the GraphQL types. This is an any for simplicity of developer experience,
-   * if it's an object we get the values, if it's an array we flatten out the
-   * valid types, ignoring invalid ones.
+   * All of the GraphQL types. This is an any for simplicity of developer experience, if it's an object we get
+   * the values, if it's an array we flatten out the valid types, ignoring invalid ones.
    */
   types: any
   /**
-   * Whether we should process.exit after the artifacts are generated.
-   * Useful if you wish to explicitly generate the test artifacts at a certain stage in
-   * a startup or build process.
+   * Whether we should process.exit after the artifacts are generated. Useful if you wish to explicitly
+   * generate the test artifacts at a certain stage in a startup or build process.
+   *
    * @default false
    */
   shouldExitAfterGenerateArtifacts?: boolean
+  /**
+   * Custom extensions, as [supported in
+   * graphql-js](https://github.com/graphql/graphql-js/blob/master/src/type/__tests__/extensions-test.js)
+   */
+  extensions?: GraphQLSchemaConfig['extensions']
 } & NexusGenPluginSchemaConfig
 
 export interface TypegenInfo {
-  /**
-   * Headers attached to the generate type output
-   */
+  /** Headers attached to the generate type output */
   headers: string[]
-  /**
-   * All imports for the backing types / context
-   */
+  /** All imports for the source types / context */
   imports: string[]
+  /** A map of all GraphQL types and what TypeScript types they should be represented by. */
+  sourceTypeMap: { [K in GetGen<'objectNames'>]?: string }
+  /** Info about where to import the context from */
+  contextTypeImport: TypingImport | undefined
   /**
-   * A map of all GraphQL types and what TypeScript types they should
-   * be represented by.
-   */
-  backingTypeMap: { [K in GetGen<'objectNames'>]?: string }
-  /**
-   * The string type of the context for the resolvers
-   */
-  contextType?: string
-  /**
-   * Info about where to import the context from
-   */
-  contextTypeImport?: TypingImport
-  /**
-   * The path to the @nexus/schema package.
+   * The path to the @nexus/schema package for typegen.
    *
-   * @default '@nexus/schema'
-   *
-   * @remarks
-   *
-   * This setting is particularly useful when @nexus/schema is being wrapped by
-   * another library/framework such that @nexus/schema is not expected to be a
-   * direct dependency at the application level.
+   * This setting is only necessary when @nexus/schema is being wrapped by another library/framework such that
+   * `@nexus/schema` is not expected to be a direct dependency at the application level.
    */
   nexusSchemaImportId?: string
 }
@@ -358,37 +323,28 @@ export type PluginBuilderLens = {
 }
 
 /**
- * Builds all of the types, properly accounts for any using "mix".
- * Since the enum types are resolved synchronously, these need to guard for
- * circular references at this step, while fields will guard for it during lazy evaluation.
+ * Builds all of the types, properly accounts for any using "mix". Since the enum types are resolved
+ * synchronously, these need to guard for circular references at this step, while fields will guard for it
+ * during lazy evaluation.
  */
 export class SchemaBuilder {
-  /**
-   * Used to check for circular references.
-   */
+  /** Used to check for circular references. */
   protected buildingTypes = new Set()
-  /**
-   * The "final type" map contains all types as they are built.
-   */
+  /** The "final type" map contains all types as they are built. */
   protected finalTypeMap: Record<string, GraphQLNamedType> = {}
   /**
-   * The "defined type" map keeps track of all of the types that were
-   * defined directly as `GraphQL*Type` objects, so we don't accidentally
-   * overwrite any.
+   * The "defined type" map keeps track of all of the types that were defined directly as `GraphQL*Type`
+   * objects, so we don't accidentally overwrite any.
    */
   protected definedTypeMap: Record<string, GraphQLNamedType> = {}
   /**
-   * The "pending type" map keeps track of all types that were defined w/
-   * GraphQL Nexus and haven't been processed into concrete types yet.
+   * The "pending type" map keeps track of all types that were defined w/ GraphQL Nexus and haven't been
+   * processed into concrete types yet.
    */
   protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {}
-  /**
-   * All "extensions" to types (adding fields on types from many locations)
-   */
+  /** All "extensions" to types (adding fields on types from many locations) */
   protected typeExtendMap: Record<string, NexusExtendTypeConfig<string>[] | null> = {}
-  /**
-   * All "extensions" to input types (adding fields on types from many locations)
-   */
+  /** All "extensions" to input types (adding fields on types from many locations) */
   protected inputTypeExtendMap: Record<string, NexusExtendInputTypeConfig<string>[] | null> = {}
 
   protected dynamicInputFields: DynamicInputFields = {}
@@ -396,80 +352,49 @@ export class SchemaBuilder {
   protected dynamicOutputProperties: DynamicOutputProperties = {}
   protected plugins: NexusPlugin[] = []
 
-  /**
-   * All types that need to be traversed for children types
-   */
+  /** All types that need to be traversed for children types */
   protected typesToWalk: TypeToWalk[] = []
 
-  /**
-   * Root type mapping information annotated on the type definitions
-   */
-  protected rootTypings: RootTypings = {}
+  /** Root type mapping information annotated on the type definitions */
+  protected rootTypings: SourceTypings = {}
 
-  /**
-   * Array of missing types
-   */
+  /** Array of missing types */
   protected missingTypes: Record<string, MissingType> = {}
 
-  /**
-   * Methods we are able to access to read/modify builder state from plugins
-   */
+  /** Methods we are able to access to read/modify builder state from plugins */
   protected builderLens: PluginBuilderLens
 
-  /**
-   * Created just before types are walked, this keeps track of all of the resolvers
-   */
+  /** Created just before types are walked, this keeps track of all of the resolvers */
   protected onMissingTypeFns: Exclude<PluginConfig['onMissingType'], undefined>[] = []
 
-  /**
-   * Executed just before types are walked
-   */
+  /** Executed just before types are walked */
   protected onBeforeBuildFns: Exclude<PluginConfig['onBeforeBuild'], undefined>[] = []
 
-  /**
-   * Executed as the field resolvers are included on the field
-   */
+  /** Executed as the field resolvers are included on the field */
   protected onCreateResolverFns: Exclude<PluginConfig['onCreateFieldResolver'], undefined>[] = []
 
-  /**
-   * Executed as the field "subscribe" fields are included on the schema
-   */
+  /** Executed as the field "subscribe" fields are included on the schema */
   protected onCreateSubscribeFns: Exclude<PluginConfig['onCreateFieldSubscribe'], undefined>[] = []
 
-  /**
-   * Executed after the schema is constructed, for any final verification
-   */
+  /** Executed after the schema is constructed, for any final verification */
   protected onAfterBuildFns: Exclude<PluginConfig['onAfterBuild'], undefined>[] = []
 
-  /**
-   * Executed after the object is defined, allowing us to add additional fields to the object
-   */
+  /** Executed after the object is defined, allowing us to add additional fields to the object */
   protected onObjectDefinitionFns: Exclude<PluginConfig['onObjectDefinition'], undefined>[] = []
 
-  /**
-   * Executed after the object is defined, allowing us to add additional fields to the object
-   */
+  /** Executed after the object is defined, allowing us to add additional fields to the object */
   protected onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
 
-  /**
-   * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
-   */
+  /** Called immediately after the field is defined, allows for using metadata to define the shape of the field. */
   protected onAddArgFns: Exclude<PluginConfig['onAddArg'], undefined>[] = []
 
-  /**
-   * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
-   */
+  /** Called immediately after the field is defined, allows for using metadata to define the shape of the field. */
   protected onAddOutputFieldFns: Exclude<PluginConfig['onAddOutputField'], undefined>[] = []
 
-  /**
-   * Called immediately after the field is defined, allows for using metadata to define the shape of the field.
-   */
+  /** Called immediately after the field is defined, allows for using metadata to define the shape of the field. */
   protected onAddInputFieldFns: Exclude<PluginConfig['onAddInputField'], undefined>[] = []
 
-  /**
-   * The `schemaExtension` is created just after the types are walked,
-   * but before the fields are materialized.
-   */
+  /** The `schemaExtension` is created just after the types are walked, but before the fields are materialized. */
   protected _schemaExtension?: NexusSchemaExtension
 
   protected config: BuilderConfig
@@ -484,9 +409,7 @@ export class SchemaBuilder {
 
   constructor(config: BuilderConfigInput) {
     this.config = setConfigDefaults(config)
-    /**
-     * This array of plugin is used to keep retro-compatibility w/ older versions of nexus
-     */
+    /** This array of plugin is used to keep retro-compatibility w/ older versions of nexus */
     this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
 
     // TODO(tim): In 1.0 change to declarativeWrappingPlugin({ disable: true })
@@ -523,11 +446,9 @@ export class SchemaBuilder {
   }
 
   /**
-   * Add type takes a Nexus type, or a GraphQL type and pulls
-   * it into an internal "type registry". It also does an initial pass
-   * on any types that are referenced on the "types" field and pulls
-   * those in too, so you can define types anonymously, without
-   * exporting them.
+   * Add type takes a Nexus type, or a GraphQL type and pulls it into an internal "type registry". It also
+   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so
+   * you can define types anonymously, without exporting them.
    */
   addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusDynamicInputMethod(typeDef)) {
@@ -576,15 +497,15 @@ export class SchemaBuilder {
     if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
       this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name
       this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name
-      if (typeDef.value.rootTyping) {
-        this.rootTypings[typeDef.name] = typeDef.value.rootTyping
+      if (typeDef.value.sourceType) {
+        this.rootTypings[typeDef.name] = typeDef.value.sourceType
       }
     } else if (isScalarType(typeDef)) {
       const scalarDef = typeDef as GraphQLScalarType & {
         extensions?: NexusScalarExtensions
       }
-      if (scalarDef.extensions && scalarDef.extensions.nexus) {
-        const { asNexusMethod, rootTyping } = scalarDef.extensions.nexus
+      if (scalarDef.extensions?.nexus) {
+        const { asNexusMethod, sourceType: rootTyping } = scalarDef.extensions.nexus
         if (asNexusMethod) {
           this.dynamicInputFields[asNexusMethod] = scalarDef.name
           this.dynamicOutputFields[asNexusMethod] = typeDef.name
@@ -641,6 +562,7 @@ export class SchemaBuilder {
     }
     if (isSchema(types)) {
       this.addTypes(types.getTypeMap())
+      return
     }
     if (isNexusPlugin(types)) {
       if (!this.plugins?.includes(types)) {
@@ -920,6 +842,7 @@ export class SchemaBuilder {
       fields: () => this.buildInputObjectFields(fields, inputObjectTypeConfig),
       description: config.description,
       extensions: {
+        ...config.extensions,
         nexus: new NexusInputObjectTypeExtension(config),
       },
     }
@@ -949,8 +872,8 @@ export class SchemaBuilder {
       })
     }
     this.typeExtendMap[config.name] = null
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
@@ -964,6 +887,7 @@ export class SchemaBuilder {
         ),
       isTypeOf: (config as any).isTypeOf,
       extensions: {
+        ...config.extensions,
         nexus: new NexusObjectTypeExtension(config),
       },
     }
@@ -994,8 +918,8 @@ export class SchemaBuilder {
       })
     }
 
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     const interfaceTypeConfig: NexusGraphQLInterfaceTypeConfig = {
       name,
@@ -1009,6 +933,7 @@ export class SchemaBuilder {
           this.buildInterfaceFields(interfaceTypeConfig, interfaces, modifications)
         ),
       extensions: {
+        ...config.extensions,
         nexus: new NexusInterfaceTypeExtension(config),
       },
     }
@@ -1035,7 +960,7 @@ export class SchemaBuilder {
     return field
   }
 
-  private buildEnumType(config: EnumTypeConfig<any>) {
+  private buildEnumType(config: NexusEnumTypeConfig<any>) {
     const { members } = config
     const values: GraphQLEnumValueConfigMap = {}
     if (Array.isArray(members)) {
@@ -1047,6 +972,10 @@ export class SchemaBuilder {
             value: typeof m.value === 'undefined' ? m.name : m.value,
             deprecationReason: m.deprecation,
             description: m.description,
+            extensions: {
+              ...m.extensions,
+              nexus: m.extensions?.nexus ?? {},
+            },
           }
         }
       })
@@ -1069,14 +998,18 @@ export class SchemaBuilder {
     if (!Object.keys(values).length) {
       throw new Error(`GraphQL Nexus: Enum ${config.name} must have at least one member`)
     }
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLEnumType({
         name: config.name,
         values: values,
         description: config.description,
+        extensions: {
+          ...config.extensions,
+          nexus: config.extensions?.nexus ?? {},
+        },
       })
     )
   }
@@ -1093,8 +1026,8 @@ export class SchemaBuilder {
       })
     )
 
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLUnionType({
@@ -1102,15 +1035,27 @@ export class SchemaBuilder {
         resolveType,
         description: config.description,
         types: () => this.buildUnionMembers(config.name, members),
+        extensions: {
+          ...config.extensions,
+          nexus: config.extensions?.nexus ?? {},
+        },
       })
     )
   }
 
   private buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
-    if (config.rootTyping) {
-      this.rootTypings[config.name] = config.rootTyping
+    if (config.sourceType) {
+      this.rootTypings[config.name] = config.sourceType
     }
-    return this.finalize(new GraphQLScalarType(config))
+    return this.finalize(
+      new GraphQLScalarType({
+        ...config,
+        extensions: {
+          ...config.extensions,
+          nexus: config.extensions?.nexus ?? {},
+        },
+      })
+    )
   }
 
   protected finalize<T extends GraphQLNamedType>(type: T): T {
@@ -1186,12 +1131,22 @@ export class SchemaBuilder {
     interfaces.forEach((i) => {
       const config = this.getInterface(i).toConfig()
       Object.keys(config.fields).forEach((field) => {
-        interfaceFieldsMap[field] = config.fields[field]
+        const interfaceField = config.fields[field]
+        interfaceFieldsMap[field] = interfaceField
         if (modifications[field]) {
-          const { type, field: _field, args, ...rest } = modifications[field]
+          // TODO(tim): Refactor this whole mess
+          const { type, field: _field, args, extensions, ...rest } = modifications[field]
+          const extensionConfig: NexusOutputFieldConfig<any, any> = extensions?.nexus?.config ?? {}
           interfaceFieldsMap[field] = {
             ...interfaceFieldsMap[field],
             ...rest,
+            extensions: {
+              ...interfaceField.extensions,
+              ...extensions,
+              nexus:
+                interfaceField.extensions?.nexus?.modify(extensionConfig) ??
+                new NexusFieldExtension(extensionConfig),
+            },
           }
           if (typeof type !== 'undefined') {
             let interfaceReplacement: GraphQLOutputType
@@ -1275,6 +1230,7 @@ export class SchemaBuilder {
       description: fieldConfig.description,
       deprecationReason: fieldConfig.deprecation,
       extensions: {
+        ...fieldConfig.extensions,
         nexus: fieldExtension,
       },
     }
@@ -1319,6 +1275,10 @@ export class SchemaBuilder {
       ) as GraphQLInputType,
       defaultValue: fieldConfig.default,
       description: fieldConfig.description,
+      extensions: {
+        ...fieldConfig.extensions,
+        nexus: fieldConfig.extensions?.nexus ?? {},
+      },
     }
   }
 
@@ -1352,6 +1312,10 @@ export class SchemaBuilder {
         ) as GraphQLInputType,
         description: finalArgDef.description,
         defaultValue: finalArgDef.default,
+        extensions: {
+          ...finalArgDef.extensions,
+          nexus: finalArgDef.extensions?.nexus ?? {},
+        },
       }
     })
     return allArgs
@@ -1700,10 +1664,7 @@ export interface BuildTypes<TypeMapDefs extends Record<string, GraphQLNamedType>
   onAfterBuildFns: SchemaBuilder['onAfterBuildFns']
 }
 
-/**
- * Builds the schema, we may return more than just the schema
- * from this one day.
- */
+/** Builds the schema, we may return more than just the schema from this one day. */
 export function makeSchemaInternal(config: SchemaConfig) {
   const builder = new SchemaBuilder(config)
   builder.addTypes(config.types)
@@ -1729,6 +1690,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
     subscription: Subscription,
     types: objValues(typeMap),
     extensions: {
+      ...config.extensions,
       nexus: schemaExtension,
     },
   }) as NexusGraphQLSchema
@@ -1797,11 +1759,10 @@ export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {
 }
 
 /**
- * Defines the GraphQL schema, by combining the GraphQL types defined
- * by the GraphQL Nexus layer or any manually defined GraphQLType objects.
+ * Defines the GraphQL schema, by combining the GraphQL types defined by the GraphQL Nexus layer or any
+ * manually defined GraphQLType objects.
  *
- * Requires at least one type be named "Query", which will be used as the
- * root query type.
+ * Requires at least one type be named "Query", which will be used as the root query type.
  */
 export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
@@ -1835,10 +1796,7 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
   return schema
 }
 
-/**
- * Like makeSchema except that typegen is always run
- * and waited upon.
- */
+/** Like makeSchema except that typegen is always run and waited upon. */
 export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQLSchema> {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
@@ -1849,8 +1807,8 @@ export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQL
 }
 
 /**
- * Mainly useful for testing, generates the schema and returns the artifacts
- * that would have been otherwise written to the filesystem.
+ * Mainly useful for testing, generates the schema and returns the artifacts that would have been otherwise
+ * written to the filesystem.
  */
 generateSchema.withArtifacts = async (
   config: SchemaConfig,
