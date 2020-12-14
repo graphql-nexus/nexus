@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`field level configuration does not pay the cost of async unless there is an async call 1`] = `
+Object {
+  "data": Object {
+    "users": Object {
+      "edges": Array [
+        Object {
+          "cursor": "Y3Vyc29yOjA=",
+          "node": Object {
+            "id": "User:1",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "Y3Vyc29yOjA=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "Y3Vyc29yOjA=",
+      },
+    },
+  },
+}
+`;

@@ -196,25 +196,23 @@ export const db = new PrismaClient()
 </TabbedContent>
 
 
-Then, update your `Context` type so that it uses the PrismaClient
+Then, update your `Context` type so that it uses the PrismaClient created in `./db.ts`
 
 <TabbedContent tabs={['Diff', 'Code']}>
 <tab>
 
 ```ts
 // api/context.ts
--import { Db, db } from "./db";
-+import { PrismaClient } from '@prisma/client'
+import { db } from "./db";
++import { PrismaClient } from "@prisma/client"
 
 export interface Context {
--  db: Db;
+-  db: Db
 +  db: PrismaClient
 }
-export function createContext(): Context {
-  return {
--   db,
-+   db: new PrismaClient(),
-  }
+
+export const context = {
+  db,
 }
 ```
 
@@ -223,16 +221,15 @@ export function createContext(): Context {
 
 ```ts
 // api/context.ts
-import { PrismaClient } from '@prisma/client'
+import { db } from "./db";
+import { PrismaClient } from "@prisma/client"
 
 export interface Context {
   db: PrismaClient
 }
 
-export function createContext(): Context {
-  return {
-    db: new PrismaClient(),
-  }
+export const context = {
+  db,
 }
 ```
 

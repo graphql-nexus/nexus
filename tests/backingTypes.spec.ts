@@ -43,7 +43,7 @@ function getSchemaWithConstEnums() {
   })
 }
 
-describe('backingTypes', () => {
+describe('sourceTypes', () => {
   let metadata: core.TypegenMetadata
 
   beforeEach(async () => {
@@ -52,43 +52,46 @@ describe('backingTypes', () => {
         typegen: path.join(__dirname, 'test-gen.ts'),
         schema: path.join(__dirname, 'test-gen.graphql'),
       },
-      typegenAutoConfig: {
-        sources: [
+      sourceTypes: {
+        modules: [
           {
+            module: path.join(__dirname, '_types.ts'),
             alias: 't',
-            source: path.join(__dirname, '_types.ts'),
           },
         ],
-        contextType: 't.TestContext',
+      },
+      contextType: {
+        module: path.join(__dirname, '_types.ts'),
+        export: 'TestContext',
       },
     })
   })
 
-  it('can match backing types to regular enums', async () => {
+  it('can match source types to regular enums', async () => {
     const schema = getSchemaWithNormalEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 
-  it('can match backing types for const enums', async () => {
+  it('can match source types for const enums', async () => {
     const schema = getSchemaWithConstEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 })
 
-describe('rootTypings', () => {
-  it('can import enum via rootTyping', async () => {
+describe('sourceTypings', () => {
+  it('can import enum via sourceType', async () => {
     const metadata = new TypegenMetadata({
       outputs: { typegen: null, schema: null },
     })
@@ -97,9 +100,9 @@ describe('rootTypings', () => {
         enumType({
           name: 'TestEnumType',
           members: TestEnum,
-          rootTyping: {
-            path: __filename,
-            name: 'TestEnum',
+          sourceType: {
+            module: __filename,
+            export: 'TestEnum',
           },
         }),
       ],
@@ -108,7 +111,7 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
     expect(typegen.print()).toMatchSnapshot()
   })
@@ -119,9 +122,9 @@ describe('rootTypings', () => {
     })
     const someType = objectType({
       name: 'SomeType',
-      rootTyping: {
-        name: 'invalid',
-        path: './fzeffezpokm',
+      sourceType: {
+        export: 'invalid',
+        module: './fzeffezpokm',
       },
       definition(t) {
         t.id('id')
@@ -136,7 +139,7 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
@@ -150,9 +153,9 @@ describe('rootTypings', () => {
     })
     const someType = objectType({
       name: 'SomeType',
-      rootTyping: {
-        name: 'invalid',
-        path: __dirname + '/invalid_path.ts',
+      sourceType: {
+        export: 'invalid',
+        module: __dirname + '/invalid_path.ts',
       },
       definition(t) {
         t.id('id')
@@ -167,7 +170,7 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     try {

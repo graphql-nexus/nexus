@@ -5,16 +5,15 @@ import { Character, Human, Droid } from './types/backingTypes'
  *
  * Copyright (c) 2015-present, Facebook, Inc.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the MIT license found in the LICENSE file in the root directory of this
+ * source tree.
  */
 
 /**
  * This defines a basic set of data for our Star Wars Schema.
  *
- * This data is hard coded for the sake of the demo, but you could imagine
- * fetching this data from a backend service rather than from hardcoded
- * JSON objects in a more complex demo.
+ * This data is hard coded for the sake of the demo, but you could imagine fetching this data from a backend
+ * service rather than from hardcoded JSON objects in a more complex demo.
  */
 
 const luke = {
@@ -91,25 +90,19 @@ const droidData = {
   '2001': artoo,
 } as { [key in string]: Droid }
 
-/**
- * Helper function to get a character by ID.
- */
+/** Helper function to get a character by ID. */
 function getCharacter(id: string) {
   // Returning a promise just to illustrate GraphQL.js's support.
   return Promise.resolve(humanData[id] || droidData[id])
 }
 
-/**
- * Allows us to query for a character's friends.
- */
+/** Allows us to query for a character's friends. */
 export function getFriends(character: Character) {
   // Notice that GraphQL accepts Arrays of Promises.
   return character.friends.map((id) => getCharacter(id))
 }
 
-/**
- * Allows us to fetch the undisputed hero of the Star Wars trilogy, R2-D2.
- */
+/** Allows us to fetch the undisputed hero of the Star Wars trilogy, R2-D2. */
 export function getHero(episode?: number | null): Character {
   if (episode === 5) {
     // Luke is the hero of Episode V.
@@ -121,18 +114,14 @@ export function getHero(episode?: number | null): Character {
 
 export const allHumans = Object.keys(humanData).map((key) => humanData[key])
 
-/**
- * Allows us to query for the human with the given id.
- */
+/** Allows us to query for the human with the given id. */
 export function getHuman(id: string): Human {
   return humanData[id]
 }
 
 export const allDroids = Object.keys(droidData).map((key) => droidData[key])
 
-/**
- * Allows us to query for the droid with the given id.
- */
+/** Allows us to query for the droid with the given id. */
 export function getDroid(id: string): Droid {
   return droidData[id]
 }

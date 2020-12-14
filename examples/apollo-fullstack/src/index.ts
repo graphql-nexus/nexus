@@ -15,16 +15,19 @@ const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, '../fullstack-schema.graphql'),
-    typegen: path.join(__dirname.replace(/\/dist$/, '/src'), '../src/fullstack-typegen.ts'),
+    typegen: path.join(__dirname, 'fullstack-typegen.ts'),
   },
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
-        source: path.join(__dirname.replace(/\/dist$/, '/src'), './typeDefs.ts'),
+        module: path.join(__dirname, 'typeDefs.ts'),
         alias: 't',
       },
     ],
-    contextType: 't.Context',
+  },
+  contextType: {
+    module: path.join(__dirname, 'context.ts'),
+    export: 'Context',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
 })

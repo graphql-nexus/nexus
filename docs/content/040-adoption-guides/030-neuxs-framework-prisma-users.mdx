@@ -6,7 +6,7 @@ title: Nexus Framework Prisma Users
 
 If you're looking to migrate from the Nexus Framework over to Nexus Schema and you're using the Prisma plugin, this guide is for you.
 
-**This guide assumes you've already followed the [Nexus Framework Users adoption guide](/adoption-guides/nexus-framework-users).**
+**This guide assumes you've already followed the [Framework Users adoption Guide](/adoption-guides/nexus-framework-users).**
 
 ## Dependencies
 
@@ -64,10 +64,10 @@ import { makeSchema } from '@nexus/schema'
 import { nexusPrisma } from 'nexus-plugin-prisma'
 
 export const schema = makeSchema({
-+  typegenAutoConfig: {
-+    sources: [
++  sourceTypes: {
++    modules: [
 +      {
-+        source: require.resolve('.prisma/client/index.d.ts'),
++        module: require.resolve('.prisma/client/index.d.ts'),
 +        alias: "prisma",
 +      }
 +    ]
@@ -100,18 +100,17 @@ import { makeSchema } from '@nexus/schema'
 import { nexusPrisma } from 'nexus-plugin-prisma'
 
 export const schema = makeSchema({
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
         source: require.resolve('.prisma/client/index.d.ts'),
         alias: "prisma",
       },
-+     {
-+       source: require.resolve('./context'),
-+       alias: 'ContextModule'
-+     }
     ],
-+   contextType: 'ContextModule.Context'
++   contextType: {
++     source: require.resolve('./context'),
++     alias: 'ContextModule'
++   }
   }
   plugins: [
     nexusPrisma({
@@ -139,18 +138,17 @@ If your Prisma Schema is using either the `Json` or `DateTime` type, the framewo
     +import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
 
     export const schema = makeSchema({
-      typegenAutoConfig: {
-        sources: [
+      sourceTypes: {
+        modules: [
           {
-            source: require.resolve('.prisma/client/index.d.ts'),
+            module: require.resolve('.prisma/client/index.d.ts'),
             alias: "prisma",
           },
-          {
-            source: require.resolve('./context'),
-            alias: 'ContextModule'
-          }
         ],
-        contextType: 'ContextModule.Context'
+        contextType: {
+          module: require.resolve('./context'),
+          alias: 'ContextModule'
+        }
       }
       plugins: [
         nexusPrisma({

@@ -1,9 +1,7 @@
 import { isType } from 'graphql'
 import { AllNamedTypeDefs, isNexusStruct, NexusListableTypes } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
-/**
- * list()
- */
+/** List() */
 export type NexusListDefConfig<TypeName extends AllNamedTypeDefs> = {
   type: TypeName
 }

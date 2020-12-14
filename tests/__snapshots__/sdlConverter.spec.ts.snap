@@ -17,19 +17,19 @@ exports[`SDLConverter printObjectTypes 1`] = `
   definition(t) {
     t.nonNull.list.string(\\"someList\\", {
       args: {
-        items: nonNull(list(stringArg())
+        items: nonNull(list(stringArg())),
       },
     })
     t.nonNull.field(\\"createPost\\", {
       type: Post,
       args: {
-        input: arg({ type: nonNull(CreatePostInput) })
+        input: arg({ type: nonNull(CreatePostInput) }),
       },
     })
     t.nonNull.field(\\"registerClick\\", {
       type: Query,
       args: {
-        uuid: arg({ type: UUID })
+        uuid: arg({ type: UUID }),
       },
     })
   }
@@ -41,18 +41,18 @@ export const Post = objectType({
     t.implements(Node)
     t.nonNull.uuid(\\"uuid\\")
     t.nonNull.field(\\"author\\", { type: User })
-    t.field(\\"geo\\", { type: nonNull(list(nonNull(list(nonNull(Float))))) })
-    t.field(\\"messyGeo\\", { type: list(list(nonNull(Float))) })
+    t.nonNull.list.nonNull.list.nonNull.float(\\"geo\\")
+    t.list.list.nonNull.float(\\"messyGeo\\")
   }
 })
 export const Query = objectType({
   name: \\"Query\\",
   definition(t) {
     t.nonNull.field(\\"user\\", { type: User })
-    t.field(\\"posts\\", {
-      type: nonNull(list(nonNull(Post))),
+    t.nonNull.list.nonNull.field(\\"posts\\", {
+      type: Post,
       args: {
-        filters: arg({ type: nonNull(PostFilters) })
+        filters: arg({ type: nonNull(PostFilters) }),
       },
     })
     t.nonNull.field(\\"unionField\\", { type: ExampleUnion })
@@ -65,15 +65,15 @@ export const User = objectType({
     t.nonNull.string(\\"name\\", {
       description: \\"This is a description of a name\\",
       args: {
-        prefix: stringArg({ description: \\"And a description of an arg\\" })
+        prefix: stringArg({ description: \\"And a description of an arg\\" }),
       },
     })
     t.nonNull.string(\\"email\\")
     t.string(\\"phone\\")
-    t.field(\\"posts\\", {
-      type: nonNull(list(nonNull(Post))),
+    t.nonNull.list.nonNull.field(\\"posts\\", {
+      type: Post,
       args: {
-        filters: arg({ type: PostFilters })
+        filters: arg({ type: PostFilters }),
       },
     })
     t.field(\\"outEnum\\", { type: SomeEnum })
@@ -89,19 +89,19 @@ export const Mutation = objectType({
   definition(t) {
     t.nonNull.list.string(\\"someList\\", {
       args: {
-        items: nonNull(list(stringArg())
+        items: nonNull(list(stringArg())),
       },
     })
     t.nonNull.field(\\"createPost\\", {
       type: Post,
       args: {
-        input: arg({ type: nonNull(CreatePostInput) })
+        input: arg({ type: nonNull(CreatePostInput) }),
       },
     })
     t.nonNull.field(\\"registerClick\\", {
       type: Query,
       args: {
-        uuid: arg({ type: UUID })
+        uuid: arg({ type: UUID }),
       },
     })
   }
@@ -113,18 +113,18 @@ export const Post = objectType({
     t.implements(Node)
     t.nonNull.uuid(\\"uuid\\")
     t.nonNull.field(\\"author\\", { type: User })
-    t.field(\\"geo\\", { type: nonNull(list(nonNull(list(nonNull(Float))))) })
-    t.field(\\"messyGeo\\", { type: list(list(nonNull(Float))) })
+    t.nonNull.list.nonNull.list.nonNull.float(\\"geo\\")
+    t.list.list.nonNull.float(\\"messyGeo\\")
   }
 })
 export const Query = objectType({
   name: \\"Query\\",
   definition(t) {
     t.nonNull.field(\\"user\\", { type: User })
-    t.field(\\"posts\\", {
-      type: nonNull(list(nonNull(Post))),
+    t.nonNull.list.nonNull.field(\\"posts\\", {
+      type: Post,
       args: {
-        filters: arg({ type: nonNull(PostFilters) })
+        filters: arg({ type: nonNull(PostFilters) }),
       },
     })
     t.nonNull.field(\\"unionField\\", { type: ExampleUnion })
@@ -137,15 +137,15 @@ export const User = objectType({
     t.nonNull.string(\\"name\\", {
       description: \\"This is a description of a name\\",
       args: {
-        prefix: stringArg({ description: \\"And a description of an arg\\" })
+        prefix: stringArg({ description: \\"And a description of an arg\\" }),
       },
     })
     t.nonNull.string(\\"email\\")
     t.string(\\"phone\\")
-    t.field(\\"posts\\", {
-      type: nonNull(list(nonNull(Post))),
+    t.nonNull.list.nonNull.field(\\"posts\\", {
+      type: Post,
       args: {
-        filters: arg({ type: PostFilters })
+        filters: arg({ type: PostFilters }),
       },
     })
     t.field(\\"outEnum\\", { type: SomeEnum })
@@ -165,7 +165,7 @@ export const CreatePostInput = inputObjectType({
   definition(t) {
     t.nonNull.string(\\"name\\")
     t.nonNull.id(\\"author\\")
-    t.field(\\"geo\\", { type: nonNull(list(nonNull(list(Float)))) })
+    t.nonNull.list.nonNull.list.float(\\"geo\\")
   }
 });
 export const PostFilters = inputObjectType({
@@ -209,19 +209,19 @@ const Mutation = objectType({
   definition(t) {
     t.nonNull.list.string(\\"someList\\", {
       args: {
-        items: nonNull(list(stringArg())
+        items: nonNull(list(stringArg())),
       },
     })
     t.nonNull.field(\\"createPost\\", {
       type: Post,
       args: {
-        input: arg({ type: nonNull(CreatePostInput) })
+        input: arg({ type: nonNull(CreatePostInput) }),
       },
     })
     t.nonNull.field(\\"registerClick\\", {
       type: Query,
       args: {
-        uuid: arg({ type: UUID })
+        uuid: arg({ type: UUID }),
       },
     })
   }
@@ -233,18 +233,18 @@ const Post = objectType({
     t.implements(Node)
     t.nonNull.uuid(\\"uuid\\")
     t.nonNull.field(\\"author\\", { type: User })
-    t.field(\\"geo\\", { type: nonNull(list(nonNull(list(nonNull(Float))))) })
-    t.field(\\"messyGeo\\", { type: list(list(nonNull(Float))) })
+    t.nonNull.list.nonNull.list.nonNull.float(\\"geo\\")
+    t.list.list.nonNull.float(\\"messyGeo\\")
   }
 })
 const Query = objectType({
   name: \\"Query\\",
   definition(t) {
     t.nonNull.field(\\"user\\", { type: User })
-    t.field(\\"posts\\", {
-      type: nonNull(list(nonNull(Post))),
+    t.nonNull.list.nonNull.field(\\"posts\\", {
+      type: Post,
       args: {
-        filters: arg({ type: nonNull(PostFilters) })
+        filters: arg({ type: nonNull(PostFilters) }),
       },
     })
     t.nonNull.field(\\"unionField\\", { type: ExampleUnion })
@@ -257,15 +257,15 @@ const User = objectType({
     t.nonNull.string(\\"name\\", {
       description: \\"This is a description of a name\\",
       args: {
-        prefix: stringArg({ description: \\"And a description of an arg\\" })
+        prefix: stringArg({ description: \\"And a description of an arg\\" }),
       },
     })
     t.nonNull.string(\\"email\\")
     t.string(\\"phone\\")
-    t.field(\\"posts\\", {
-      type: nonNull(list(nonNull(Post))),
+    t.nonNull.list.nonNull.field(\\"posts\\", {
+      type: Post,
       args: {
-        filters: arg({ type: PostFilters })
+        filters: arg({ type: PostFilters }),
       },
     })
     t.field(\\"outEnum\\", { type: SomeEnum })
@@ -285,7 +285,7 @@ const CreatePostInput = inputObjectType({
   definition(t) {
     t.nonNull.string(\\"name\\")
     t.nonNull.id(\\"author\\")
-    t.field(\\"geo\\", { type: nonNull(list(nonNull(list(Float)))) })
+    t.nonNull.list.nonNull.list.float(\\"geo\\")
   }
 });
 const PostFilters = inputObjectType({

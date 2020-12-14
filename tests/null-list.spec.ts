@@ -431,7 +431,9 @@ describe('edges cases', () => {
         "astNode": undefined,
         "defaultValue": "Au revoir!",
         "description": "Bonjour !",
-        "extensions": undefined,
+        "extensions": Object {
+          "nexus": Object {},
+        },
         "name": "foo",
         "type": "[String!]",
       }

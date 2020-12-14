@@ -28,9 +28,7 @@ export function convertSDL(sdl: string, commonjs: null | boolean = false, json =
   }
 }
 
-/**
- * Convert an existing SDL schema into a GraphQL Nexus format
- */
+/** Convert an existing SDL schema into a GraphQL Nexus format */
 export class SDLConverter {
   protected export: string
   protected schema: GraphQLSchema | null
@@ -116,17 +114,13 @@ export class SDLConverter {
 
     let typeString: string | undefined = undefined
 
-    if (wrapping.length > 2) {
-      typeString = this.addWrapping(namedType.name, wrapping)
-    } else {
-      ;[...wrapping].reverse().forEach((w) => {
-        if (w === 'List') {
-          prefix += `list.`
-        } else {
-          prefix += `nonNull.`
-        }
-      })
-    }
+    ;[...wrapping].reverse().forEach((w) => {
+      if (w === 'List') {
+        prefix += `list.`
+      } else {
+        prefix += `nonNull.`
+      }
+    })
 
     return `    ${prefix}${this.printFieldMethod(source, field, namedType, typeString)}`
   }
@@ -187,7 +181,7 @@ export class SDLConverter {
     if (key === 'args') {
       let str = `{\n`
       ;(val as GraphQLArgument[]).forEach((arg) => {
-        str += `        ${arg.name}: ${this.printArg(arg)}\n`
+        str += `        ${arg.name}: ${this.printArg(arg)},\n`
       })
       str += `      }`
       return str
@@ -197,6 +191,7 @@ export class SDLConverter {
 
   printArg(arg: GraphQLArgument) {
     const description = arg.description
+    const defaultValue = arg.defaultValue
     const { namedType: type, wrapping } = unwrapGraphQLDef(arg.type)
     const isArg = !isSpecifiedScalarType(type)
     let str = ''
@@ -205,6 +200,7 @@ export class SDLConverter {
       str += `arg(`
     } else {
       this.usedImports.add(`${type.toString().toLowerCase()}Arg`)
+
       str += `${type.toString().toLowerCase()}Arg(`
     }
     const metaToAdd = []
@@ -216,12 +212,15 @@ export class SDLConverter {
     if (description) {
       metaToAdd.push(`description: ${JSON.stringify(description)}`)
     }
+    if (defaultValue) {
+      metaToAdd.push(`default: ${JSON.stringify(defaultValue)}`)
+    }
     str +=
       metaToAdd.length > 1
         ? `{\n          ${metaToAdd.join(',\n          ')}\n        })`
         : metaToAdd.length
         ? `{ ${metaToAdd[0]} })`
-        : ''
+        : ')'
 
     return isArg ? str : this.addWrapping(str, wrapping)
   }
@@ -249,12 +248,17 @@ export class SDLConverter {
   }
 
   printInterfaceType(type: GraphQLInterfaceType): string {
+    const implementing: string[] =
+      // @ts-ignore
+      typeof type.getInterfaces === 'function' ? type.getInterfaces().map((i) => i.name) : []
+    const implementsInterfaces = implementing.length > 0 ? `    t.implements(${implementing.join(', ')})` : ''
     this.exports.add(type.name)
     return this.printBlock([
       `${this.export}${type.name} = interfaceType({`,
       `  name: "${type.name}",`,
       this.maybeDescription(type),
       `  definition(t) {`,
+      implementsInterfaces,
       this.printObjectFields(type),
       `  }`,
       `});`,

@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { plugin } from '../plugin'
-import { ArgsValue, GetGen, MaybePromise, RootValue } from '../typegenTypeHelpers'
+import { ArgsValue, GetGen, MaybePromise, SourceValue } from '../typegenTypeHelpers'
 import { printedGenTyping, printedGenTypingImport } from '../utils'
 
 const FieldauthorizeResolverImport = printedGenTypingImport({
@@ -24,7 +24,7 @@ const fieldDefTypes = printedGenTyping({
 })
 
 export type FieldAuthorizeResolver<TypeName extends string, FieldName extends string> = (
-  root: RootValue<TypeName>,
+  root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo

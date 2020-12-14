@@ -38,17 +38,20 @@ describe('typegenPrinter', () => {
         typegen: path.join(__dirname, 'test-gen.ts'),
         schema: path.join(__dirname, 'test-gen.graphql'),
       },
-      typegenAutoConfig: {
-        backingTypeMap: {
-          UUID: 'string',
-        },
-        sources: [
+      sourceTypes: {
+        modules: [
           {
+            module: path.join(__dirname, '__helpers/index.ts'),
             alias: 't',
-            source: path.join(__dirname, '__helpers/index.ts'),
           },
         ],
-        contextType: 't.TestContext',
+        mapping: {
+          UUID: 'string',
+        },
+      },
+      contextType: {
+        module: path.join(__dirname, '__helpers/index.ts'),
+        export: 'TestContext',
       },
     })
 
@@ -62,7 +65,7 @@ describe('typegenPrinter', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     typegen = new TypegenPrinter(metadata.sortSchema(schema), {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
     jest
       .spyOn(typegen, 'hasResolver')

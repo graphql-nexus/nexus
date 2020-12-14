@@ -71,14 +71,14 @@ describe('scalarType', () => {
     ).toMatchSnapshot()
   })
 
-  it('rootTyping: allows importing a node module for the typing path', async () => {
+  it('sourceTyping: allows importing a node module for the typing path', async () => {
     const schema = makeSchemaInternal({
       types: [
         scalarType({
           name: 'TestScalar',
-          rootTyping: {
-            path: 'graphql',
-            name: 'GraphQLScalar',
+          sourceType: {
+            module: 'graphql',
+            export: 'GraphQLScalar',
           },
           serialize() {},
         }),

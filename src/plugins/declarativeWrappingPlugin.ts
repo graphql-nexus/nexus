@@ -53,14 +53,9 @@ Whether the type should be non null, \`required: true\` = \`nullable: false\`
 ]
 
 export type DeclarativeWrappingPluginConfig = {
-  /**
-   * Whether we should warn, the default when not otherwise specified.
-   */
+  /** Whether we should warn, the default when not otherwise specified. */
   shouldWarn?: boolean
-  /**
-   * Whether we should completely disable the plugin, not install types, and throw when
-   * we encounter any issues.
-   */
+  /** Whether we should completely disable the plugin, not install types, and throw when we encounter any issues. */
   disable?: boolean
 }
 

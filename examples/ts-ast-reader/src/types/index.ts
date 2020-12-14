@@ -11,10 +11,6 @@ export * from './objects'
 export * from './unions'
 export * from './jsdoc'
 
-export interface ContextType {
-  source: ts.SourceFile
-}
-
 export const Query = objectType({
   name: 'Query',
   definition(t) {

@@ -2,18 +2,228 @@
 title: Why Nexus?
 ---
 
-## Why Nexus?
+## Schema-First GraphQL APIs
 
-Nexus was born out of my experience building several production GraphQL APIs, in different languages and frameworks. The first with vanilla [graphql-js](https://github.com/graphql/graphql-js), another schema-first with [graph.ql](https://github.com/matthewmueller/graph.ql) and later [graphql-tools](https://github.com/apollographql/graphql-tools). Following that with [graphene-python](https://docs.graphene-python.org/en/latest/) and most recently with a bit of [graphql-ruby](http://graphql-ruby.org/).
+There's a common path that most GraphQL API developers take when they get started: define a schema with the Schema Definition Language and write resolver logic to furnish data.
 
-After working with the toolkits in other scripting languages, it felt like there was a gap in the JavaScript approaches. Schema-first development starts out great, by simply expressing your schema in the GraphQL Schema Definition Language (SDL) and providing resolvers matching to the types as needed you are up and running fast! No need for tons of requires or "overhead" to get a GraphQL server running.
+A simple schema might look like this:
 
-As your schema then grows to hundreds or thousands of types, manually curating these SDL fragments becomes tedious. Documentation changes can be tough. Modifying fields on interfaces can require manual changes to many implementing types, a process that can be quite error prone.
+```graphql
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+}
 
-_If only there were a way to combine the simplicity of schema-first development, with the long-term maintainability of a definition-first approach._
+type Query {
+  posts: [Post]!
+}
+```
 
-GraphQL Nexus aims to fill that void, making the process as simple as possible while also making good use of the runtime to introduce powerful ways of composing types, introducing type or schema wide changes, and much more.
+The corresponding resolver logic would then be supplied to allow the API to serve data:
 
-The core idea of GraphQL Nexus draws from basing the schema off the SDL - keeping things declarative and simple to understand. It allows you to reference the type names as string literals rather than always need to import to reference types (you can do that too if you prefer).
+```js
+const Query = {
+  posts: () => [
+    {
+      id: '1',
+      title: 'My first GraphQL server',
+      body: 'How I wrote my first GraphQL server',
+    },
+  ],
+}
+```
 
-By combining automatic type generation with some of the more powerful features of TypeScript - type merging, conditional types, and type inference, we can know exactly which type names we are referring to and able to use throughout our code. We can know both the parameters and the return type of resolvers without providing any type annotation. It takes a little getting used to, but it ends up leading to a great feedback loop of the types annotating themselves.
+The schema type definitons, along with the resolvers, would then be passed to something like `ApolloServer` to create and serve the API.
+
+This way of building a GraphQL server is often referred to as the "schema-first" approach. We start by defining the shape of our API and then write code to tell it how to return data.
+
+While the schema-first approach is easy to get started with, it comes with some inherent drawbacks that can make development difficult when applications start getting bigger.
+
+Nexus takes a different approach to building GraphQL servers. Instead of keeping a separate schema and set of resolvers, with Nexus we write _both_ our schema and resolvers in the same spot using code.
+
+## The Code-First Approach
+
+Writing a GraphQL server with Nexus differs starkly to the traditional schema-first approach. With Nexus, we write our schema and resolver logic all in one place with a common language (JavaScript/TypeScript).
+
+Refactoring the `Post` example above to Nexus would look like this:
+
+```ts
+import { objectType, queryType, makeSchema } from '@nexus/schema'
+
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.id('id')
+    t.string('title')
+    t.string('body')
+  },
+})
+
+const Query = queryType({
+  definition(t) {
+    t.list.field('posts', {
+      resolve: () => [
+        {
+          id: '1',
+          title: 'My first GraphQL server',
+          body: 'How I wrote my first GraphQL server',
+        },
+      ],
+    })
+  },
+})
+
+const schema = makeSchema({
+  types: [Post, Query],
+})
+```
+
+The benefits of taking a code-first approach to GraphQL APIs isn't always apparent at first glance. However, the benefits are realized over time, especially as application and team size grows.
+
+There are numerous benefits to taking a code-first approach with Nexus:
+
+- [Schema and resolver co-location](#schema-and-resolver-co-location)
+- [SDL and type generation](#automatic-type-and-schema-definition-language-generation)
+- [Fast feedback loop](#fast-feedback-loop)
+- [Reduce repetition](#reduce-repetition)
+- [No need for extra tooling](#no-need-for-extra-tooling)
+
+## Schema and Resolver Co-location
+
+When building a schema-first GraphQL API, it is common to start out by placing all type definitions and resolvers in a single file. When both the schema and the resolvers live next to one another, it's fairly straightforward to work in both at the same time.
+
+As the application grows, however, it is most often desired to move parts of the schema into their own separate modules and files. It's at this point that working on a GraphQL API becomes a bit more tedious. With this modularization comes the need to switch back and forth between the Schema Definition Language and JavaScript/TypeScript to write the resolvers. Not only does one need to constantly switch between files, they also need to do a context switch mentally to work between the two langauges.
+
+With Nexus, our schema and its resolvers are always defined together. Nexus also allows us to write everything in a common language. This allows us to side-step the co-location/context switching issue altogether and helps us to be more productive, even as our applications grow to be quite large.
+
+## Automatic Type and Schema Definition Language Generation
+
+One major benefit of using Nexus is its ability to automatically generate TypeScript types and GraphQL Schema Definition Language (SDL) files. The generated types are useful for adding extra type safety to the code used to power your GraphQL API. The generated SDL files can be used for many purposes. For example, we can configure our editors to know about the shape of our APIs to give us introspection for the queries and mutations we write.
+
+Type and SDL generation comes for free with Nexus and can be enabled by supplying some configuration in the `makeSchema` call.
+
+```ts
+import path from 'path'
+
+const schema = makeSchema({
+  types: [Post, Query],
+  outputs: {
+    schema: path.join(__dirname, 'generated/schema.gen.graphql'),
+    typegen: path.join(__dirname, 'generated/nexusTypes.gen.ts'),
+  },
+})
+```
+
+## Fast Feedback Loop
+
+Thanks to the automatically generated TypeScript types Nexus is able to integrate seamlessly into your editor and provides a fast feedback loop.
+
+Whenever `makeSchema` generates the TypeScript types your editor receives instant feedback on whether your implementation fullfills the schema requirements (even if you are not a TypeScript user). This allows you spot issues early on, such as:
+
+- Nullability checks
+- A resolver is missing
+- A model type doesn't fulfill the schema type
+
+By having the server restart on file changes this feedback is given almost instantly as changes are made.
+
+## Reduce repetition
+
+A downside of the schema-first approach is the need to repeat yourself in schema definition language and in code.
+
+### Defining enums
+
+When defining an enum using the schema-first approach, the enum must first be defined in the schema definition languange:
+
+```graphql
+enum UserRole {
+  ADMIN
+  EDITOR
+  PUBLISHER
+}
+```
+
+This has to be repeated in the implementation:
+
+```ts
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  PUBLISHER = 'PUBLISHER',
+}
+```
+
+Keeping both of these in sync is tedious and error phrone, especially when files are not co-located together.
+
+Refactoring the above to Nexus would look like this:
+
+```ts
+import { enumType } from '@nexus/schema'
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  PUBLISHER = 'PUBLISHER',
+}
+
+export const UserRoleEnum = enumType({
+  name: 'UserRole',
+  members: UserRole,
+})
+```
+
+The enum values are only defined once: in the model.
+
+### Implementing Interfaces
+
+Interfaces are a standard feature of GraphQL. When using the schema-first approach, interfaces require a lot of repetition:
+
+```graphql
+interface Node {
+  id: ID!
+}
+
+type Post implements Node {
+  id: ID!
+  title: String!
+  body: String!
+}
+```
+
+The above example shows a `Node` interface and a `Post` interface implementing it.
+
+The schema definition languange requires that the `Post` type repeats all the fields from the `Node` interface, as a schema becomes bigger and more interfaces and types are added this quickly becomes tedious.
+
+With Nexus the repetitive work is kept to a bare minimum:
+
+```ts
+import { interfaceType } from '@nexus/schema'
+
+const Node = interfaceType({
+  name: 'Node',
+  definition(t) {
+    t.id('id', { description: 'GUID for a resource' })
+  },
+})
+
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.implements('Node')
+    t.string('title')
+    t.string('body')
+  },
+})
+```
+
+### Build your own abstraction
+
+Enums and Interfaces are built-in building blocks of Nexus, but it doesn't stop here.
+
+Thanks to Nexus' rich [plugin system](/api/plugins) it is possible to build more complex abstractions to improve code re-use, an example of this is the official [connection plugin](/plugins/connection) to help build [relay style pagination](https://relay.dev/graphql/connections.htm).
+
+## No Need for Extra Tooling
+
+When writing a schema-first GraphQL API, it's often necessary to install and configure several editor extentions and other extra tooling. This is because the Schema Definition Language needs to be properly understood by out editors to be useful.
+
+Nexus offers the benefit of providing a great developer experience without the need for any extensions or extra tooling. It also doesn't require developers to learn the Schema Definition Language to be productive. This combination means that JavaScript/TypeScript developers can be added to a project and be successful faster.

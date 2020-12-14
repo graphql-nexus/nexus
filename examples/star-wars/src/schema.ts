@@ -2,10 +2,7 @@ import { makeSchema, nullabilityGuardPlugin } from 'nexus'
 import * as path from 'path'
 import * as allTypes from './graphql'
 
-/**
- * Finally, we construct our schema (whose starting query type is the query
- * type we defined above) and export it.
- */
+/** Finally, we construct our schema (whose starting query type is the query type we defined above) and export it. */
 export const schema = makeSchema({
   types: allTypes,
   outputs: {
@@ -22,14 +19,17 @@ export const schema = makeSchema({
       },
     }),
   ],
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
-        source: path.join(__dirname.replace(/\/dist$/, '/src'), './types/backingTypes.ts'),
+        module: path.join(__dirname, 'types', 'backingTypes.ts'),
         alias: 'swapi',
       },
     ],
-    contextType: 'swapi.ContextType',
+  },
+  contextType: {
+    module: path.join(__dirname, 'types', 'context.ts'),
+    export: 'ContextType',
   },
   prettierConfig: require.resolve('../../../.prettierrc'),
   features: {
