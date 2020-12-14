@@ -36,7 +36,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    * [_A-Za-z][_0-9A-Za-z]*
    *
    * From the spec: Names in GraphQL are case‐sensitive. That is to say name, Name, and NAME all refer to
-   * dfferent names. Underscores are significant, which means other_name and othername are two differen names.
+   * dfferent names. Underscores are significant, which means other_name and othername are two different names.
    *
    * @example
    *   'Post'
@@ -163,9 +163,9 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *
    * This method receives a type builder api that you will use to define the fields of your object type
    * within. You can leverage conditionals, loops, other functions (that take the builder api as an
-   * argument), pull in variables from higher sopes, and so on, to help define your fields. However avoid two things:
+   * argument), pull in variables from higher scopes, and so on, to help define your fields. However avoid two things:
    *
-   * 1. Doing asyncrous work when defining fields.
+   * 1. Doing asynchronous work when defining fields.
    *
    * 2. Triggering side-effects that you would NOT want run at _build_ time––as this code will run during
    * build to support [Nexus' reflection system](https://nxs.li/guides/reflection).
@@ -212,7 +212,7 @@ withNexusSymbol(NexusObjectTypeDef, NexusTypes.Object)
  * Define a GraphQL Object Type.
  *
  * Object types are typically the most common kind of type present in a GraphQL schema. You give them a name
- * and filds that model your domain. Fields are typed and can point to yet another object type you've defined.
+ * and fields that model your domain. Fields are typed and can point to yet another object type you've defined.
  *
  * @example
  *   const Post = objectType({

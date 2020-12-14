@@ -109,16 +109,6 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
    */
   extensions?: GraphQLInputFieldConfig['extensions']
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
-
-/**
- * Deprecated, prefer core.CommonInputFieldConfig
- *
- * TODO(tim): Remove at 1.0
- */
-export interface ScalarInputFieldConfig<T> extends CommonInputFieldConfig<any, any> {
-  default?: T
-}
-
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
   /**
@@ -131,7 +121,7 @@ export interface OutputScalarConfig<TypeName extends string, FieldName extends s
    *
    * 1. A field whose name matches this one
    *
-   * 2. And whose type is compatable
+   * 2. And whose type is compatible
    *
    * 3. And is a scalar
    *
@@ -382,7 +372,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * In Nexus output types are nullable by default so this is useful to configure a field differently. Note if
    * you find yourself using this most of the time then what you probably what is to change the
-   * nonNullDefaults configuration either gloally in your makeSchema config or at the type definition level
+   * nonNullDefaults configuration either globally in your makeSchema config or at the type definition level
    * in one of your type configs to be false for outputs.
    *
    * Chains are read backwards, right to left, like function composition. In other words the thing on the left
@@ -419,7 +409,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    * Chain this property to _unwrap_ the right-hand-side type (the field type or a list) of a Non-Null type.
    *
    * In Nexus output types are nullable by default so this is only useful when you have changed your
-   * nonNullDefaults configuration either gloally in your makeSchema config or at the type definition level
+   * nonNullDefaults configuration either globally in your makeSchema config or at the type definition level
    * in one of your type configs to be false for outputs.
    *
    * Chains are read backwards, right to left, like function composition. In other words the thing on the left
@@ -483,7 +473,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * 1. Has a field whose name matches this one
    *
-   * 2. And whose type is compatable
+   * 2. And whose type is compatible
    *
    * 3. And is a scalar
    *
@@ -501,7 +491,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * String types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing UTF-8 (aka.
    * unicode) character sequences. It is most often used to represent free-form human-readable text. They are
-   * represented in JavaScript using the [string priimtive
+   * represented in JavaScript using the [string primitive
    * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    *
    * This is a shorthand, equivalent to:
@@ -525,7 +515,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * 1. Has a field whose name matches this one
    *
-   * 2. And whose type is compatable
+   * 2. And whose type is compatible
    *
    * 3. And is a scalar
    *
@@ -544,7 +534,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    * ID types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing unique identifiers
    * often used to refetch an object or as the key for a cache. It is serialized in the same way as the
    * [String](https://spec.graphql.org/June2018/#sec-String) type but unlike String not intended to be
-   * human-readable. They are represented in JavaScript using the [string priimtive
+   * human-readable. They are represented in JavaScript using the [string primitive
    * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    *
    * This is a shorthand, equivalent to:
@@ -568,7 +558,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * 1. Has a field whose name matches this one
    *
-   * 2. And whose type is compatable
+   * 2. And whose type is compatible
    *
    * 3. And is a scalar
    *
@@ -609,7 +599,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * 1. Has a field whose name matches this one
    *
-   * 2. And whose type is compatable
+   * 2. And whose type is compatible
    *
    * 3. And is a scalar
    *
@@ -651,7 +641,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * 1. Has a field whose name matches this one
    *
-   * 2. And whose type is compatable
+   * 2. And whose type is compatible
    *
    * 3. And is a scalar
    *
@@ -719,8 +709,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
 
     /* istanbul ignore if */
     if (typeof opts[0] === 'function') {
-      fieldConfig.resolve = opts[0] as any
-      console.warn(messages.removedFunctionShorthand(typeName, fieldName))
+      throw new Error(messages.removedFunctionShorthand(typeName, fieldName))
     } else {
       fieldConfig = { ...fieldConfig, ...opts[0] }
     }

@@ -62,10 +62,9 @@ export interface PluginConfig {
    * `dynamicOutput{Method,Property}` / `dynamicInput{Method,Property}`
    */
   /**
-   * Existing Description: The plugin callback to execute when onInstall lifecycle event occurs. OnInstall
-   * event occurs before type walking which means inline types are not visible at this point yet.
-   * `builderLens.hasType` will only return true for types the user has defined top level in their app, and
-   * any types added by upstream plugins.
+   * The onInstall event occurs before type walking which means inline types are not visible at this point
+   * yet. `builderLens.hasType` will only return true for types the user has defined top level in their app,
+   * and any types added by upstream plugins.
    */
   onInstall?: (builder: PluginBuilderLens) => void
   /**
@@ -114,7 +113,7 @@ export interface PluginConfig {
   onCreateFieldSubscribe?: (createSubscribeInfo: CreateFieldResolverInfo) => MiddlewareFn | undefined
   /**
    * Executed when a field is going to be printed to the nexus "generated types". Gives an opportunity to
-   * override the standard behavior for printing our inferrred type info
+   * override the standard behavior for printing our inferred type info
    */
   // onPrint?: (visitor: Visitor<ASTKindToNode>) => void;
 }
@@ -197,8 +196,8 @@ withNexusSymbol(NexusPlugin, NexusTypes.Plugin)
  * You can specify options which can be defined on the schema, the type or the plugin. The config from each of
  * these will be passed in during schema construction time, and used to augment the field as necessary.
  *
- * You can either return a function, with the new defintion of a resolver implementation, or you can return an
- * "enter" / "leave" pairing which will wrap the pre-execution of the resolver and the "result" of the
+ * You can either return a function, with the new definition of a resolver implementation, or you can return
+ * an "enter" / "leave" pairing which will wrap the pre-execution of the resolver and the "result" of the
  * resolver, respectively.
  */
 export function plugin(config: PluginConfig) {

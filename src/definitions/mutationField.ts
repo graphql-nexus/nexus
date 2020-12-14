@@ -12,7 +12,7 @@ export type MutationFieldConfig<FieldName extends string> =
  * Define one or more fields on the Mutation type.
  *
  * Use this if you are going to modularize your schema and thus be wanting to contribute fields to Mutation
- * type from multiple modules. You do not have to have previously defined a Mutatin type before using this.
+ * type from multiple modules. You do not have to have previously defined a Mutation type before using this.
  * If you haven't Nexus will create one automatically for you.
  *
  * This is shorthand for:
@@ -72,7 +72,7 @@ export function mutationField(
  *
  * Use this instead of mutationType if you are going to modularize your schema and thus be wanting to
  * contribute fields to Mutation type from multiple modules. You do not have to have previously defined a
- * Mutatin type before using this. If you haven't Nexus will create one automatically for you.
+ * Mutation type before using this. If you haven't Nexus will create one automatically for you.
  *
  * This is shorthand for:
  *

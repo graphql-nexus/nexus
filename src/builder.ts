@@ -121,7 +121,6 @@ import {
   NexusPlugin,
   PluginConfig,
 } from './plugin'
-import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
 import { SourceTypesConfigOptions } from './typegenAutoConfig'
 import { TypegenFormatFn } from './typegenFormatPrettier'
@@ -412,11 +411,6 @@ export class SchemaBuilder {
     /** This array of plugin is used to keep retro-compatibility w/ older versions of nexus */
     this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
 
-    // TODO(tim): In 1.0 change to declarativeWrappingPlugin({ disable: true })
-    if (!this.plugins.find((f) => f.config.name === 'declarativeWrapping')) {
-      this.plugins.push(declarativeWrappingPlugin({ shouldWarn: true }))
-    }
-
     this.builderLens = Object.freeze({
       hasType: this.hasType,
       addType: this.addType,
@@ -650,11 +644,9 @@ export class SchemaBuilder {
         // TODO(tim): remove anys/warning at 1.0
         const installResult = pluginConfig.onInstall(this.builderLens) as any
         if (Array.isArray(installResult?.types)) {
-          console.warn(
-            `Since v0.19.0 Nexus no longer supports a return value from onInstall, you should instead use the hasType/addType api (seen in plugin ${pluginConfig.name}). ` +
-              `In the next major version of Nexus this will be a runtime error.`
+          throw new Error(
+            `Nexus no longer supports a return value from onInstall, you should instead use the hasType/addType api (seen in plugin ${pluginConfig.name}). `
           )
-          installResult.types.forEach((t: any) => this.addType(t))
         }
       }
       if (pluginConfig.onCreateFieldResolver) {
@@ -740,7 +732,6 @@ export class SchemaBuilder {
         addField: () => {},
         addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'walk', wrapping),
         warn: () => {},
-        setLegacyResolveType() {},
       })
       obj.definition(definitionBlock)
       alreadyChecked[obj.name] = true
@@ -907,7 +898,6 @@ export class SchemaBuilder {
       addInterfaces: (interfaceDefs) => interfaces.push(...interfaceDefs),
       addModification: (modification) => (modifications[modification.field] = modification),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'build', wrapping),
-      setLegacyResolveType: (fn) => (resolveType = fn),
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
@@ -1022,7 +1012,6 @@ export class SchemaBuilder {
       new UnionDefinitionBlock({
         typeName: config.name,
         addUnionMembers: (unionMembers) => (members = unionMembers),
-        setLegacyResolveType: (fn) => (resolveType = fn),
       })
     )
 
@@ -1510,9 +1499,7 @@ export class SchemaBuilder {
 
       /* istanbul ignore if */
       if (typeof opts === 'function') {
-        console.warn(messages.removedFunctionShorthand(block.typeName, fieldName))
-        // @ts-ignore
-        fieldConfig.resolve = opts
+        throw new Error(messages.removedFunctionShorthand(block.typeName, fieldName))
       } else {
         fieldConfig = { ...fieldConfig, ...opts }
       }
@@ -1555,7 +1542,6 @@ export class SchemaBuilder {
       addField: (f) => this.maybeTraverseOutputFieldType(f),
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'walk', wrapping),
       warn: () => {},
-      setLegacyResolveType: () => {},
     })
     obj.definition(definitionBlock)
     return obj
