@@ -20,13 +20,11 @@ Before we get going we need a moment to introduce an important part of the Nexus
 
 This partly explains why Nexus has a declarative API. It needs a way to run your app reliably at build time. Declarative APIs give Nexus a higher degree of control to do this. Declarative APIs also encode enough semantic value for Nexus to do the things it needs to.
 
-It also explains the need for the `--transpile-only` flag passed to `ts-node-dev`. If you don't know what it is about, **it basically tells TypeScript not to typecheck your app**. Since `@nexus/schema` needs to be run in order to generate TypeScript types, we need to ensure that `@nexus/schema` won't ever be prevented from generating these types because of.. a type error.
+It also explains the need for the `--transpile-only` flag passed to `ts-node-dev`. If you don't know what it is about, **it basically tells TypeScript not to typecheck your app**. Since `nexus` needs to be run in order to generate TypeScript types, we need to ensure that `nexus` won't ever be prevented from generating these types because of.. a type error.
 
 You might be (rightfully) wondering: "Wait, how am I supposed to benefit from Nexus' type-safety if I disable it in `ts-node-dev`... ?". For now, the answer to that is to use your IDE's type-checker. If your IDE/terminal don't have one, then manually run an additional `tsc` process.
 
 Just remember the following though. You should _always_ have your `npm run dev` script running when you're working on your project _even_ when you're not intending to use your server (e.g. access the GraphQL Playground). If you forget to run `npm run dev` then you will not, for example, get the static typing experience that you expect in your resolvers.
-
-> There are plans to run Nexus Reflection as a separate process integrated into your IDE. You can learn more about and track the feature here ([#949](https://github.com/graphql-nexus/nexus/issues/949)) *TODO CHANGE LINK TO A NEXUS SCHEMA ISSUE?*
 
 ## Model the domain
 
@@ -42,13 +40,13 @@ Create a new module for your Post object at `api/graphql/Post.ts`. We _could_ wr
 mkdir api/graphql && touch api/graphql/Post.ts
 ```
 
-To create the `Post` object we'll import the `objectType` function from the `@nexus/schema` package. This will help you building a [GraphQL Object Types](https://graphql.org/graphql-js/object-types/).
+To create the `Post` object we'll import the `objectType` function from the `nexus` package. This will help you building a [GraphQL Object Types](https://graphql.org/graphql-js/object-types/).
 
 <!-- prettier-ignore -->
 ```ts
 // api/graphql/Post.ts
 
-import { objectType } from '@nexus/schema'
+import { objectType } from 'nexus'
 
 export const Post = objectType({
   name: 'Post',            // <- Name of your type
@@ -77,7 +75,7 @@ Finally, we'll import this file and pass it down to `makeSchema`
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 + import * as types from './graphql'
 
@@ -97,7 +95,7 @@ const schema = makeSchema({
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 import * as types from './graphql'
 
@@ -153,7 +151,7 @@ We'll start by letting API clients read the drafts of your blog.
 ```ts
 // api/graphql/Post.ts                   // 1
 
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 
 export const PostQuery = extendType({
   type: 'Query',                         // 2
@@ -218,7 +216,7 @@ You'll see some feedback from your IDE that you're missing a `resolve` property.
 
 ```ts
 // api/graphql/Post.ts
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 // ...
 
 export const PostQuery = extendType({
@@ -240,7 +238,7 @@ export const PostQuery = extendType({
 
 ```ts
 // api/graphql/Post.ts
-import { extendType } from '@nexus/schema'
+import { extendType } from 'nexus'
 // ...
 
 export const PostQuery = extendType({

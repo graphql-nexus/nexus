@@ -57,7 +57,7 @@ Hopefully you can see how the GraphQL types seen by the client are distinct from
 <summary>See code implementation</summary>
 
 ```ts
-import { queryType, objectType } from '@nexus/schema'
+import { queryType, objectType } from 'nexus'
 
 export const Query = queryType({
   definition(t) {
@@ -207,7 +207,7 @@ export interface Comment {
 
 // ./schema.ts
 
-import { makeSchema, objectType, queryType } from '@nexus/schema'
+import { makeSchema, objectType, queryType } from 'nexus'
 import * as path from 'path'
 
 const User = objectType({
@@ -295,7 +295,7 @@ export class CommentModel {
 }
 
 // schema.ts
-import { makeSchema, objectType, queryType } from '@nexus/schema'
+import { makeSchema, objectType, queryType } from 'nexus'
 import * as path from 'path'
 
 const User = objectType({
@@ -384,7 +384,7 @@ export class SomeRandomName {
 }
 
 // schema.ts
-import { makeSchema, objectType } from '@nexus/schema'
+import { makeSchema, objectType } from 'nexus'
 import * as path from 'path'
 
 const User = objectType({
@@ -425,7 +425,7 @@ That being said, if you happen to have some Source Types that are not picked up 
 Nexus will output debug logs, giving your detailed information about which Source Types were found, which were not, and why.
 
 ```ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 
 const schema = makeSchema({
   // ...
@@ -448,7 +448,7 @@ We typically see two use-cases for using the local configuration of Source Types
 To do so, you can use the `rootTyping` property as explained below:
 
 ```ts
-import { objectType, queryType } from '@nexus/schema'
+import { objectType, queryType } from 'nexus'
 
 export interface MyDBUser {
   // |           ^-------------------- Create your Source Type

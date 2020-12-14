@@ -4,11 +4,11 @@ title: 1. Setup and first query
 
 ## Overview
 
-In this first chapter we're just going to get the bare minimum of a Nexus Schema project setup. You'll learn about:
+In this first chapter we're just going to get the bare minimum of a Nexus project setup. You'll learn about:
 
-- The `@nexus/schema` package
+- The `nexus` package
 - The `ts-node-dev` package to run your app
-- Laying out and running a Nexus Schema project
+- Laying out and running a Nexus project
 - GraphQL Playground
 
 ## CLI
@@ -18,10 +18,10 @@ Start by creating your project directory, initializing your `package.json`, and 
 ```bash-symbol
 mkdir nexus-tutorial && cd nexus-tutorial
 npm init -y
-npm add @nexus/schema graphql apollo-server
+npm add nexus graphql apollo-server
 ```
 
-> Note: `@nexus/schema` works with any GraphQL compliant server. We'll use `apollo-server` in this tutorial, but you're free to use whichever fits your use-case best.
+> Note: `nexus` works with any GraphQL compliant server. We'll use `apollo-server` in this tutorial, but you're free to use whichever fits your use-case best.
 
 We'll also need `typescript` and `ts-node-dev` as dev dependencies. `ts-node-dev` will enable you to transpile your TS files on the fly and restart your API on changes.
 
@@ -63,11 +63,11 @@ We'll now create our first module at `api/schema.ts`:
 mkdir api && touch api/schema.ts
 ```
 
-We'll then setup `@nexus/schema` to create an empty schema
+We'll then setup `nexus` to create an empty schema
 
 ```ts
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 
 export const schema = makeSchema({
@@ -80,8 +80,8 @@ export const schema = makeSchema({
 ```
 
 1. GraphQL types that will be used to construct your GraphQL schema. It's voluntarily empty for now.
-1. Output path to where `@nexus/schema` should write the generated TypeScript definition types derived from your schema. This is **mandatory** to benefit from Nexus' type-safety. We call this system "reflection". More on it later.
-1. Output path to where `@nexus/schema` should write the SDL version of your GraphQL schema. More on it later as well.
+1. Output path to where `nexus` should write the generated TypeScript definition types derived from your schema. This is **mandatory** to benefit from Nexus' type-safety. We call this system "reflection". More on it later.
+1. Output path to where `nexus` should write the SDL version of your GraphQL schema. More on it later as well.
 
 Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later.
 

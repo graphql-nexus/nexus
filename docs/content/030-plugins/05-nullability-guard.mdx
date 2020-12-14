@@ -11,7 +11,7 @@ This plugin helps us guard against non-null values crashing our queries in produ
 ### Example
 
 ```ts
-import { nullabilityGuardPlugin } from '@nexus/schema'
+import { nullabilityGuardPlugin } from 'nexus'
 
 const guardPlugin = nullabilityGuardPlugin({
   onGuarded({ ctx, info }) {

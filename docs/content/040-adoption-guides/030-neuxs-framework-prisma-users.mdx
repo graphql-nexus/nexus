@@ -4,7 +4,7 @@ title: Nexus Framework Prisma Users
 
 ## Hello Nexus Framework Prisma User!
 
-If you're looking to migrate from the Nexus Framework over to Nexus Schema and you're using the Prisma plugin, this guide is for you.
+If you're looking to migrate from the Nexus Framework over to Nexus and you're using the Prisma plugin, this guide is for you.
 
 **This guide assumes you've already followed the [Framework Users adoption Guide](/adoption-guides/nexus-framework-users).**
 
@@ -21,12 +21,12 @@ You must also make sure that you are using the version `0.20` or later of `nexus
 
 ## Enabling the plugin
 
-You will now need to work with the `makeSchema` API of `@nexus/schema` directly.
+You will now need to work with the `makeSchema` API of `nexus` directly.
 
 ```ts diff
 -import { use } from 'nexus'
 -import { prisma } from 'nexus-plugin-prisma'
-+import { makeSchema } from '@nexus/schema'
++import { makeSchema } from 'nexus'
 +import { nexusPrisma } from 'nexus-plugin-prisma'
 
 -use(prisma())
@@ -45,7 +45,7 @@ There are a number of defaults that the framework used to provide for you. Here'
 If you were using `t.crud` with the framework, you must also explicitly enable it with the schema plugin
 
 ```ts diff
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { nexusPrisma } from 'nexus-plugin-prisma'
 
 makeSchema({
@@ -57,10 +57,10 @@ makeSchema({
 
 ### Configuring Backing types
 
-To let `@nexus/schema` know of the Prisma Client types so that, for instance, your resolvers expect the right types, you must point `makeSchema` to the Prisma Client where all the types are exported.
+To let `nexus` know of the Prisma Client types so that, for instance, your resolvers expect the right types, you must point `makeSchema` to the Prisma Client where all the types are exported.
 
 ```ts diff
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { nexusPrisma } from 'nexus-plugin-prisma'
 
 export const schema = makeSchema({
@@ -96,7 +96,7 @@ export type Context = {
 Then, we'll go back to the file where we're calling `makeSchema`, and add the following configuration
 
 ```ts diff
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { nexusPrisma } from 'nexus-plugin-prisma'
 
 export const schema = makeSchema({
@@ -122,7 +122,7 @@ export const schema = makeSchema({
 
 ### Configuring Custom Scalars
 
-If your Prisma Schema is using either the `Json` or `DateTime` type, the framework used to provide some GraphQL scalars to map these. With `@nexus/schema`, you will need to install and do the mapping yourself.
+If your Prisma Schema is using either the `Json` or `DateTime` type, the framework used to provide some GraphQL scalars to map these. With `nexus`, you will need to install and do the mapping yourself.
 
 1.  Start by installing the following dependency
 
@@ -133,7 +133,7 @@ If your Prisma Schema is using either the `Json` or `DateTime` type, the framewo
 2.  Then, add the following configuration property to the Prisma plugin
 
     ```ts diff
-    import { makeSchema } from '@nexus/schema'
+    import { makeSchema } from 'nexus'
     import { nexusPrisma } from 'nexus-plugin-prisma'
     +import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
 

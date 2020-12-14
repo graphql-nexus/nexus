@@ -49,7 +49,7 @@ Writing a GraphQL server with Nexus differs starkly to the traditional schema-fi
 Refactoring the `Post` example above to Nexus would look like this:
 
 ```ts
-import { objectType, queryType, makeSchema } from '@nexus/schema'
+import { objectType, queryType, makeSchema } from 'nexus'
 
 const Post = objectType({
   name: 'Post',
@@ -158,7 +158,7 @@ Keeping both of these in sync is tedious and error phrone, especially when files
 Refactoring the above to Nexus would look like this:
 
 ```ts
-import { enumType } from '@nexus/schema'
+import { enumType } from 'nexus'
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -197,7 +197,7 @@ The schema definition languange requires that the `Post` type repeats all the fi
 With Nexus the repetitive work is kept to a bare minimum:
 
 ```ts
-import { interfaceType } from '@nexus/schema'
+import { interfaceType } from 'nexus'
 
 const Node = interfaceType({
   name: 'Node',
