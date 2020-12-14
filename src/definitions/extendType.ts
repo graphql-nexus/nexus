@@ -20,7 +20,7 @@ export interface NexusExtendTypeConfig<TypeName extends string> {
    * Define the fields you want to extend the type with. This method works almost exactly like the objectType
    * "definition" method.
    *
-   * @param t The type builder. Usually the same as that passed to objectType "definition" method excecpt if
+   * @param t The type builder. Usually the same as that passed to objectType "definition" method except if
    *     extending the Subscription type in which case you get a subscription type builder (which differs
    *     slightly in that it requires implementation of a "subscribe" method on field configurations).
    */

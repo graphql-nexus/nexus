@@ -1,14 +1,11 @@
 import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
-import { messages } from '../messages'
-import { AbstractTypeResolver, GetGen } from '../typegenTypeHelpers'
+import { GetGen } from '../typegenTypeHelpers'
 import { NexusObjectTypeDef } from './objectType'
 import { AbstractTypes, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface UnionDefinitionBuilder {
   typeName: string
   addUnionMembers(members: UnionMembers): void
-  // TODO(tim): Remove before 1.0
-  setLegacyResolveType(fn: AbstractTypeResolver<any>): void
 }
 
 export type UnionMembers = Array<GetGen<'objectNames'> | NexusObjectTypeDef<any>>
@@ -21,12 +18,6 @@ export class UnionDefinitionBlock {
    */
   members(...unionMembers: UnionMembers) {
     this.typeBuilder.addUnionMembers(unionMembers)
-  }
-
-  /* istanbul ignore next */
-  protected resolveType(fn: AbstractTypeResolver<any>) {
-    console.error(new Error(messages.removedResolveType(this.typeBuilder.typeName)))
-    this.typeBuilder.setLegacyResolveType(fn)
   }
 }
 
