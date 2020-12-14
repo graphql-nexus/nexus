@@ -22,18 +22,14 @@ withNexusSymbol(NexusNonNullDef, NexusTypes.NonNull)
  *
  * Modify a type to be Non-Null.
  *
- * In Nexus input postition types are non-null by default so this has no use for them (until you've changed
- * the default). On the other hand output postition types are nullable by default so use this to modify them
- * (until you've changed the default).
+ * In Nexus input and output position types are nullable by default so use this to modify them so long as
+ * you've not changed the non-null defaults for one or both positions.
  *
  * If you find yourself using this a large majority of the time then consider changing your nullability defaults.
  *
  * @example
  *   objectType({
  *     name: 'User',
- *     nonNullDefaults: {
- *       inputs: false,
- *     },
  *     definition(t) {
  *       t.field('id', {
  *         type: nonNull('ID'),
