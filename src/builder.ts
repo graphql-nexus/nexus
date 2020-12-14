@@ -121,6 +121,7 @@ import {
   NexusPlugin,
   PluginConfig,
 } from './plugin'
+import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
 import { SourceTypesConfigOptions } from './typegenAutoConfig'
 import { TypegenFormatFn } from './typegenFormatPrettier'
@@ -410,6 +411,10 @@ export class SchemaBuilder {
     this.config = setConfigDefaults(config)
     /** This array of plugin is used to keep retro-compatibility w/ older versions of nexus */
     this.plugins = this.config.plugins.length > 0 ? this.config.plugins : [fieldAuthorizePlugin()]
+
+    if (!this.plugins.find((f) => f.config.name === 'declarativeWrapping')) {
+      this.plugins.push(declarativeWrappingPlugin({ disable: true }))
+    }
 
     this.builderLens = Object.freeze({
       hasType: this.hasType,
