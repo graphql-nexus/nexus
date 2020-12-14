@@ -1,7 +1,7 @@
-import { makeSchema, objectType, queryType, stringArg } from 'nexus'
 import { PrismaClient } from '@prisma/client'
 import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
+import { makeSchema, nullable, objectType, queryType, stringArg } from 'nexus'
 import * as path from 'path'
 
 const prisma = new PrismaClient()
@@ -43,7 +43,7 @@ const apollo = new ApolloServer({
           t.list.field('users', {
             type: 'User',
             args: {
-              world: stringArg({ required: false }),
+              world: nullable(stringArg()),
             },
             resolve(_root, _args, ctx) {
               return ctx.prisma.user.findMany()

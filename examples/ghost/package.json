@@ -14,7 +14,8 @@
     "graphql-tools": "^4.0.7",
     "knex": "^0.19.5",
     "lodash": "^4.17.11",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "nexus": "^1.0.0"
   },
   "devDependencies": {
     "@tgriesser/schemats": "^6.1.0",
