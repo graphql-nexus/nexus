@@ -1,5 +1,5 @@
 import ts from 'typescript'
-import { unionType } from '@nexus/schema'
+import { unionType } from 'nexus'
 import { NexusGenAbstractTypeMembers } from '../ts-ast-reader-typegen'
 
 export const DeclarationName = unionType({

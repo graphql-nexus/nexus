@@ -7,7 +7,7 @@ exports[`queryComplexityPlugin printing the query complexity schema: Full Type O
  */
 
 
-import { QueryComplexity } from \\"@nexus/schema/dist/plugins/queryComplexityPlugin\\"
+import { QueryComplexity } from \\"nexus/dist/plugins/queryComplexityPlugin\\"
 
 
 

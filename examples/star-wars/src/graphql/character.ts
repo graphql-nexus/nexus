@@ -1,4 +1,4 @@
-import { interfaceType, idArg, nonNull } from '@nexus/schema'
+import { interfaceType, idArg, nonNull } from 'nexus'
 import { getFriends } from '../data'
 
 export const Character = interfaceType({

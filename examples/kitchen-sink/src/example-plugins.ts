@@ -1,4 +1,4 @@
-import { plugin, interfaceType, FieldResolver, nonNull } from '@nexus/schema'
+import { plugin, interfaceType, FieldResolver, nonNull } from 'nexus'
 
 export const logMutationTimePlugin = plugin({
   name: 'LogMutationTime',

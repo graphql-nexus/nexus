@@ -280,10 +280,10 @@ export interface TypegenInfo {
   /** Info about where to import the context from */
   contextTypeImport: TypingImport | undefined
   /**
-   * The path to the @nexus/schema package for typegen.
+   * The path to the nexus package for typegen.
    *
-   * This setting is only necessary when @nexus/schema is being wrapped by another library/framework such that
-   * `@nexus/schema` is not expected to be a direct dependency at the application level.
+   * This setting is only necessary when nexus is being wrapped by another library/framework such that `nexus`
+   * is not expected to be a direct dependency at the application level.
    */
   nexusSchemaImportId?: string
 }

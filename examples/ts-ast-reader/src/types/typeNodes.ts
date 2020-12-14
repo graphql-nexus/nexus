@@ -1,143 +1,143 @@
-import { objectType } from "@nexus/schema";
-import { nodeType } from "./mixins";
+import { objectType } from 'nexus'
+import { nodeType } from './mixins'
 
 export const KeywordTypeNode = objectType({
-  name: "KeywordTypeNode",
+  name: 'KeywordTypeNode',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ImportTypeNode = objectType({
-  name: "ImportTypeNode",
+  name: 'ImportTypeNode',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const ThisTypeNode = objectType({
-  name: "ThisTypeNode",
+  name: 'ThisTypeNode',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const FunctionTypeNode = objectType({
-  name: "FunctionTypeNode",
+  name: 'FunctionTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("type", { type: "Node" });
+    nodeType(t)
+    t.field('type', { type: 'Node' })
   },
-});
+})
 
 export const ConstructorTypeNode = objectType({
-  name: "ConstructorTypeNode",
+  name: 'ConstructorTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("type", { type: "Node" });
+    nodeType(t)
+    t.field('type', { type: 'Node' })
   },
-});
+})
 
 export const ArrayTypeNode = objectType({
-  name: "ArrayTypeNode",
+  name: 'ArrayTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("elementType", { type: "Node" });
+    nodeType(t)
+    t.field('elementType', { type: 'Node' })
   },
-});
+})
 
 export const TupleTypeNode = objectType({
-  name: "TupleTypeNode",
+  name: 'TupleTypeNode',
   definition(t) {
-    nodeType(t);
-    t.list.field("elementTypes", { type: "Node" });
+    nodeType(t)
+    t.list.field('elementTypes', { type: 'Node' })
   },
-});
+})
 
 export const OptionalTypeNode = objectType({
-  name: "OptionalTypeNode",
+  name: 'OptionalTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("type", { type: "Node" });
+    nodeType(t)
+    t.field('type', { type: 'Node' })
   },
-});
+})
 
 export const RestTypeNode = objectType({
-  name: "RestTypeNode",
+  name: 'RestTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("type", { type: "Node" });
+    nodeType(t)
+    t.field('type', { type: 'Node' })
   },
-});
+})
 
 export const UnionType = objectType({
-  name: "UnionType",
+  name: 'UnionType',
   definition(t) {
-    nodeType(t);
-    t.list.field("types", { type: "Node" });
+    nodeType(t)
+    t.list.field('types', { type: 'Node' })
   },
-});
+})
 
 export const IntersectionTypeNode = objectType({
-  name: "IntersectionTypeNode",
+  name: 'IntersectionTypeNode',
   definition(t) {
-    nodeType(t);
-    t.list.field("types", { type: "Node" });
+    nodeType(t)
+    t.list.field('types', { type: 'Node' })
   },
-});
+})
 
 export const ConditionalTypeNode = objectType({
-  name: "ConditionalTypeNode",
+  name: 'ConditionalTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("checkType", { type: "Node" });
-    t.field("extendsType", { type: "Node" });
-    t.field("trueType", { type: "Node" });
-    t.field("falseType", { type: "Node" });
+    nodeType(t)
+    t.field('checkType', { type: 'Node' })
+    t.field('extendsType', { type: 'Node' })
+    t.field('trueType', { type: 'Node' })
+    t.field('falseType', { type: 'Node' })
   },
-});
+})
 
 export const InferTypeNode = objectType({
-  name: "InferTypeNode",
+  name: 'InferTypeNode',
   definition(t) {
-    nodeType(t);
-    t.field("typeParameter", { type: "Node" });
+    nodeType(t)
+    t.field('typeParameter', { type: 'Node' })
   },
-});
+})
 
 export const ParenthesizedType = objectType({
-  name: "ParenthesizedType",
+  name: 'ParenthesizedType',
   definition(t) {
-    nodeType(t);
-    t.field("type", { type: "Node" });
+    nodeType(t)
+    t.field('type', { type: 'Node' })
   },
-});
+})
 
 export const IndexedAccessTypeNode = objectType({
-  name: "IndexedAccessTypeNode",
+  name: 'IndexedAccessTypeNode',
 
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const MappedTypeNode = objectType({
-  name: "MappedTypeNode",
+  name: 'MappedTypeNode',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const LiteralType = objectType({
-  name: "LiteralType",
+  name: 'LiteralType',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})
 
 export const TypeLiteral = objectType({
-  name: "TypeLiteral",
+  name: 'TypeLiteral',
   definition(t) {
-    nodeType(t);
+    nodeType(t)
   },
-});
+})

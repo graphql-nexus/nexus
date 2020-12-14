@@ -4,7 +4,7 @@ import { ArgsValue, GetGen, MaybePromise, SourceValue } from '../typegenTypeHelp
 import { printedGenTyping, printedGenTypingImport } from '../utils'
 
 const FieldauthorizeResolverImport = printedGenTypingImport({
-  module: '@nexus/schema/dist/plugins/fieldAuthorizePlugin',
+  module: 'nexus/dist/plugins/fieldAuthorizePlugin',
   bindings: ['FieldAuthorizeResolver'],
 })
 

@@ -17,11 +17,11 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "@nexus/schema": "^0.15.0",
     "@prisma/client": "2.3.0",
     "apollo-server-express": "^2.17.0",
     "express": "^4.17.1",
-    "graphql": "^15.3.0"
+    "graphql": "^15.3.0",
+    "nexus": "^0.0.0-pr.699.1.5377df5"
   },
   "devDependencies": {
     "@prisma/cli": "^2.3.0",

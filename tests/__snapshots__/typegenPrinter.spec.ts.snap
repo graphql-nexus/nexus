@@ -150,7 +150,7 @@ exports[`typegenPrinter should print the full output 1`] = `
 
 
 import { TestContext } from \\"./tests/__helpers/index\\"
-import { core } from \\"@nexus/schema\\"
+import { core } from \\"nexus\\"
 
 
 

@@ -1,4 +1,4 @@
-import { arg, interfaceType, list, nullable } from '@nexus/schema'
+import { arg, interfaceType, list, nullable } from 'nexus'
 import { JSDoc, SyntaxKind } from 'typescript'
 import { allKnownNodes, syntaxKindFilter } from './utils'
 
