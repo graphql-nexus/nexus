@@ -131,12 +131,12 @@ export interface ConnectionPluginConfig {
   /** Prefix for the Connection / Edge type */
   typePrefix?: string
   /**
-   * The path to the @nexus/schema package for typegen.
+   * The path to the nexus package for typegen.
    *
-   * This setting is only necessary when @nexus/schema is being wrapped by another library/framework such that
-   * `@nexus/schema` is not expected to be a direct dependency at the application level.
+   * This setting is only necessary when nexus is being wrapped by another library/framework such that `nexus`
+   * is not expected to be a direct dependency at the application level.
    *
-   * @default '@nexus/schema'
+   * @default 'nexus'
    */
   nexusSchemaImportId?: string
   /**

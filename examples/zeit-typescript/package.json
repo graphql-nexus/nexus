@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "graphql": "^15.3.0",
-    "nexus": "0.18.0-next.2"
+    "nexus": "^0.0.0-pr.699.1.5377df5"
   },
   "devDependencies": {
     "@now/node": "^1.0.1",

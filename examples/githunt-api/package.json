@@ -8,7 +8,7 @@
     "githunt-api": "peggyrayzis/GitHunt-API",
     "graphql": "^14.5.8",
     "graphql-tools": "^4.0.7",
-    "nexus": "^0.16.0"
+    "nexus": "^0.0.0-pr.699.1.5377df5"
   },
   "devDependencies": {
     "nodemon": "^1.18.6",
