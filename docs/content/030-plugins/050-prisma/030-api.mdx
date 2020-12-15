@@ -77,7 +77,7 @@ Currently Prisma enums cannot be [aliased](#alias) ([issue](https://github.com/g
 
 #### Options
 
-n/a
+[`description`](#description) [`deprecation`](#deprecation)
 
 #### GraphQL Schema Contributions [`?`](#graphql-schema-contributions-legend 'How to read this')
 
@@ -200,7 +200,7 @@ scalar S
 
 #### Options
 
-[`alias`](#alias) [`resolve`](#resolve)
+[`alias`](#alias) [`resolve`](#resolve) [`description`](#description) [`deprecation`](#deprecation)
 
 #### Example
 
@@ -259,7 +259,7 @@ Projecting relational fields only affects the current GraphQL object being defin
 
 #### Options
 
-[`type`](#type) [`alias`](#alias) [`resolve`](#resolve)
+[`type`](#type) [`alias`](#alias) [`resolve`](#resolve) [`description`](#description) [`deprecation`](#deprecation)
 
 #### GraphQL Schema Contributions [`?`](#graphql-schema-contributions-legend 'How to read this')
 
@@ -347,7 +347,7 @@ Like [relations](#relation) but also supports batch related options.
 
 #### Options
 
-[`type`](#type) [`alias`](#alias) [`resolve`](#resolve) [`filtering`](#filtering) [`pagination`](#pagination) [`ordering`](#ordering)
+[`type`](#type) [`alias`](#alias) [`resolve`](#resolve) [`filtering`](#filtering) [`pagination`](#pagination) [`ordering`](#ordering) [`description`](#description) [`deprecation`](#deprecation)
 
 #### GraphQL Schema Contributions [`?`](#graphql-schema-contributions-legend 'How to read this')
 
@@ -2028,6 +2028,127 @@ query batchReadRelationFilter {
 
 </tab>
 </TabbedContent>
+
+### `description`
+
+```
+undefined | string
+```
+
+**Applies to**
+
+`t.model.<*>`
+
+**About**
+
+Sets a description to be included in the generated SDL for this field.
+
+- `undefined` (default) No description will be added to the field.
+- `string` A description will be generated with the provided string.
+
+#### Example
+
+<TabbedContent tabs={["Prisma", "Nexus", "GraphQL"]}>
+<tab>
+
+```prisma
+model User {
+  id  Int @id
+  name String
+}
+```
+
+</tab>
+<tab>
+
+```ts
+objectType({
+  name: 'User',
+  definition: (t: any) => {
+    t.model.id()
+    t.model.name({ description: "The user's full name" })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+# Generated
+
+type User {
+  id: Int!
+
+  """The user's full name"""
+  name: String!
+}
+```
+
+</tab>
+</TabbedContent>
+
+
+### `deprecation`
+
+```
+undefined | string
+```
+
+**Applies to**
+
+`t.model.<*>`
+
+**About**
+
+Adds a `@deprecated` directive to the generated SDL for this field.
+
+- `undefined` (default) No deprecation directive will be added to the field.
+- `string` Include a deprecation directive, using the provided string as a reason.
+
+#### Example
+
+<TabbedContent tabs={["Prisma", "Nexus", "GraphQL"]}>
+<tab>
+
+```prisma
+model User {
+  id  Int @id
+  name String
+}
+```
+
+</tab>
+<tab>
+
+```ts
+objectType({
+  name: 'User',
+  definition: (t: any) => {
+    t.model.id()
+    t.model.name({ deprecation: "Names of users are no longer collected" })
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+# Generated
+
+type User {
+  id: Int!
+
+  name: String! @deprecated(reason: "Names of users are no longer collected")
+}
+```
+
+</tab>
+</TabbedContent>
+
 
 ### `computedInputs` (local)
 
