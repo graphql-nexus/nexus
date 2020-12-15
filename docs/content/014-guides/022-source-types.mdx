@@ -18,13 +18,13 @@ To understand the concept better, let's assume the following GraphQL query:
 
 Here is an example of resolution for that query as it would be seen roughly from a GraphQL type _only_ point of view.
 
-![](/assets/source-type-diagram-1.png)
+![](/docs/assets/source-type-diagram-1.png)
 
 When a field's type is an object, then the field's resolver returns a Source Type. Concretely this might for example be a plain JavaScript object containing node/row/document data from a database call. This Source Type data is in turn passed down to all the object type's own field resolvers.
 
 Here is the above diagram updated to include Source Types now.
 
-![](/assets/source-type-diagram-2.png)
+![](/docs/assets/source-type-diagram-2.png)
 
 Here is a step-by-step breakdown of what is going on:
 
