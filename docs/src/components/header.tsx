@@ -195,7 +195,7 @@ const Header = ({ headerProps }: HeaderViewProps) => {
         ))}
       </NavLinks>
       <Link
-        to={'https://github.com/graphql-nexus/schema'}
+        to={'https://github.com/graphql-nexus/nexus'}
         style={{
           color: 'white',
           textDecoration: 'none',
