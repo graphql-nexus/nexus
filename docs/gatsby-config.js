@@ -42,13 +42,13 @@ const gatsbyRemarkPlugins = [
 ]
 
 let plugins = [
-  // {
-  //   resolve: `gatsby-plugin-google-analytics`,
-  //   options: {
-  //     trackingId: 'UA-74131346-14',
-  //     anonymize: true,
-  //   },
-  // },
+  {
+    resolve: `gatsby-plugin-google-analytics`,
+    options: {
+      trackingId: 'UA-74131346-21',
+      anonymize: true,
+    },
+  },
   'gatsby-plugin-react-helmet',
   'gatsby-transformer-sharp',
   'gatsby-plugin-sharp',
