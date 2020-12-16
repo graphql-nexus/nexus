@@ -113,7 +113,7 @@ function graphqlTestContext() {
 +       process.env.DATABASE_URL = databaseUrl;
 +
 +       // Run the migrations to ensure our schema has the required structure
-+       execSync(`${prismaBinary} migrate up --create-db --experimental`, {
++       execSync(`${prismaBinary} migrate deploy --preview-feature`, {
 +         env: {
 +           ...process.env,
 +           DATABASE_URL: databaseUrl,
