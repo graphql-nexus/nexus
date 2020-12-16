@@ -38,7 +38,7 @@ const config = {
     title: 'Nexus - title',
     description: 'Nexus - desc',
     keywords: 'Docs, nexus, 1.0',
-    docsLocation: 'https://github.com/graphql-nexus/nexus/tree/develop/docs/content',
+    docsLocation: 'https://github.com/graphql-nexus/nexus/tree/main/docs/content',
     twitter: {
       site: '@nexusgql',
       creator: '@nexusgql',
