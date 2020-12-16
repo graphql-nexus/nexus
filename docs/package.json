@@ -60,6 +60,7 @@
     "gatsby": "^2.20.28",
     "gatsby-image": "^2.0.33",
     "gatsby-plugin-algolia": "^0.5.0",
+    "gatsby-plugin-google-analytics": "2.8.0",
     "gatsby-plugin-catch-links": "^2.3.0",
     "gatsby-plugin-manifest": "^2.0.24",
     "gatsby-plugin-mdx": "^1.0.73",
