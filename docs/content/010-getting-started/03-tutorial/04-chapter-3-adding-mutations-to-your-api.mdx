@@ -110,7 +110,7 @@ The context passed to Apollo Server can either be a function or a plain JavaScri
 
 For example, if a user is logged in to your application, it would be useful to have the information regarding the user available to all the resolvers and this information would have to be retrieved from your database or an external service. The code responsible for that database or service call would be placed in the function which is passed to Apollo Server as the context.
 
-Finally, let's configure Nexus to know the type of our GraphQL context by adjusting the configuration of the `makeSchema` in our `api/app.ts`.
+Finally, let's configure Nexus to know the type of our GraphQL context by adjusting the configuration of the `makeSchema` in our `api/schema.ts`.
 
 <TabbedContent tabs={['Diff', 'Code']}>
 
