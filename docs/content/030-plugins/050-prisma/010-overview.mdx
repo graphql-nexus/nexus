@@ -149,16 +149,10 @@ There are two ways you can start with the Prisma plugin. Either from scratch, or
     }
     ```
 
-3. Create a migration file:
+3. Create a migration from changes in Prisma schema, and apply it to the database
 
     ```bash-symbol
-    npm run prisma migrate save --experimental
-    ```
-
-4. Migrate your database:
-
-    ```bash-symbol
-    npm run prisma migrate up --experimental
+    npm run prisma migrate dev --preview-feature
     ```
 
 You're ready to start working!
