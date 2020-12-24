@@ -139,18 +139,8 @@ model Post {
 
 With our database schema specified, we're now ready to proceed to our first database migration! To do that, we'll use the Prisma CLI.
 
-Generate our migration files...
-
 ```bash-symbold
-npx prisma migrate save --experimental
-```
-
-You'll be asked to create the database (use the default) and give a name to the migration (call it "init").
-
-Then, apply the migration...
-
-```bash-symbol
-npx prisma migrate up --experimental
+npx prisma migrate dev --preview-feature
 ```
 
 ## Access your database
