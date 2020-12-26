@@ -131,6 +131,7 @@ export const schema = makeSchema({
 +  contextType: {                                    // 1
 +    module: join(__dirname, "./context.ts"),        // 2
 +    alias: "ContextModule",                         // 3
++    export: "Context"                               // 4
 +  },
 })
 ```
@@ -154,6 +155,7 @@ export const schema = makeSchema({
   contextType: {                                    // 1
     module: join(__dirname, "./context.ts"),        // 2
     alias: "ContextModule",                         // 3
+    export: "Context"                               // 4
   },
 })
 ```
@@ -165,6 +167,7 @@ export const schema = makeSchema({
 1. Option to set the context type
 1. Path to the module where the context type is exported
 1. Name of the export in that module
+1. Name of the type generated in nexus-typegen
 
 ## Use the context
 
