@@ -44,6 +44,7 @@ import { GraphQLClient } from "graphql-request";
 +import { nanoid } from "nanoid";
 +import { join } from "path";
 +import { Client } from "pg";
++import { db } from "../api/db";
 import { server } from "../api/server";
 
 type TestContext = {
