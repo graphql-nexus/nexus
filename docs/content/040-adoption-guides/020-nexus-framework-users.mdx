@@ -376,7 +376,7 @@ Nexus Framework has some builtin logging functionality. You can approximate it a
    }
 
    Nexus.makeSchema({
-     contextType: { source: __filename, alias: 'ContextModule' },
+     contextType: { module: __filename, alias: 'ContextModule', export: 'Context' },
      ...
    })
    ```
@@ -450,8 +450,9 @@ import * as Path from 'path'
 
 Nexus.makeSchema({
   contextType: {
-    source: Path.join(__dirname, './path/to/contextModule'),
-    alias: 'ContextModule'
+    module: Path.join(__dirname, './path/to/contextModule'),
+    alias: 'ContextModule',
+    export: 'Context'
   },
   ...
 })
