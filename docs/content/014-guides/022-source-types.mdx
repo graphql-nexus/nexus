@@ -61,7 +61,8 @@ import { queryType, objectType } from 'nexus'
 
 export const Query = queryType({
   definition(t) {
-    t.user({
+    t.field('user', {
+      type: 'User',
       args: {
         id: nonNull(idArg()),
       },
@@ -79,7 +80,7 @@ export interface UserSourceType {
 
 export const User = objectType({
   name: 'User',
-  rootTyping: {
+  sourceType: {
     path: __filename,
     name: 'UserSourceType'
   },
