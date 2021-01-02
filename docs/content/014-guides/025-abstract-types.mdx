@@ -149,7 +149,8 @@ The Centralized strategy allows you to discriminate your union member types in a
 const SearchResult = unionType({
   name: 'SearchResult',
   resolveType(data) {
-    const __typename = data.album ? 'Song' : data.rating ? 'Movie' : data.width ? 'Photo' : null
+    const __typename =
+      'album' in data ? 'Song' : 'rating' in data ? 'Movie' : 'width' in data ? 'Photo' : null
 
     if (!__typename) {
       throw new Error(`Could not resolve the type of data passed to union type "SearchResult"`)
@@ -188,13 +189,8 @@ const Query = queryType({
       },
       resolve(root, args, ctx) {
         return ctx.db.search(args.pattern).map((result) => {
-          const __typename = result.album
-            ? 'Song'
-            : result.rating
-            ? 'Movie'
-            : result.width
-            ? 'Photo'
-            : null
+          const __typename =
+            'album' in data ? 'Song' : 'rating' in data ? 'Movie' : 'width' in data ? 'Photo' : null
 
           if (!__typename) {
             throw new Error(
