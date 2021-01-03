@@ -446,7 +446,7 @@ We typically see two use-cases for using the local configuration of Source Types
 - When your Source Type names can't be matched against your GraphQL Object type names
 - When you simply prefer keeping your Source Types next to your Object type definition
 
-To do so, you can use the `rootTyping` property as explained below:
+To do so, you can use the `sourceType` property as explained below:
 
 ```ts
 import { objectType, queryType } from 'nexus'
@@ -461,10 +461,10 @@ export interface MyDBUser {
 
 export const User = objectType({
   name: 'User',
-  rootTyping: {
-    path: __filename,
+  sourceType: {
+    module: __filename,
     //         ^---------------------- Tell Nexus where the Source Type is.
-    name: 'MyDBUser'
+    export: 'MyDBUser'
     //         ^---------------------- Tell Nexus the name of the exported Source Type.
   },
   definition(t) {
