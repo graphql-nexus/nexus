@@ -48,12 +48,33 @@ To properly get full advantage of TypeScript, we'll need a `tsconfig.json` file.
 
 Let's finally add some npm scripts to simplify our future workflows
 
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
 ```json
 "scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
++  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
++  "build": "tsc"
+}
+```
+
+</tab>
+
+<tab>
+
+```json
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
   "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
   "build": "tsc"
 }
 ```
+
+</tab>
+
+</TabbedContent>
 
 ## Creating our app layout
 
