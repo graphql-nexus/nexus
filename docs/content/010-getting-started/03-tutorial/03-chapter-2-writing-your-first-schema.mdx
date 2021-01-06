@@ -22,7 +22,7 @@ This partly explains why Nexus has a declarative API. It needs a way to run your
 
 It also explains the need for the `--transpile-only` flag passed to `ts-node-dev`. If you don't know what it is about, **it basically tells TypeScript not to typecheck your app**. Since `nexus` needs to be run in order to generate TypeScript types, we need to ensure that `nexus` won't ever be prevented from generating these types because of.. a type error.
 
-You might be (rightfully) wondering: "Wait, how am I supposed to benefit from Nexus' type-safety if I disable it in `ts-node-dev`... ?". For now, the answer to that is to use your IDE's type-checker. If your IDE/terminal don't have one, then manually run an additional `tsc` process.
+You might be (rightfully) wondering: "Wait, how am I supposed to benefit from Nexus' type-safety if I disable it in `ts-node-dev`... ?". For now, the answer to that is to use your IDE's type-checker. If your IDE/terminal doesn't have one, then manually run an additional `tsc` process.
 
 Just remember the following though. You should _always_ have your `npm run dev` script running when you're working on your project _even_ when you're not intending to use your server (e.g. access the GraphQL Playground). If you forget to run `npm run dev` then you will not, for example, get the static typing experience that you expect in your resolvers.
 
