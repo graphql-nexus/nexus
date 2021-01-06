@@ -1,7 +1,7 @@
 import { graphql, GraphQLObjectType } from 'graphql'
 import { DateTimeResolver } from 'graphql-scalars'
 import path from 'path'
-import { asNexusMethod, interfaceType, makeSchema, objectType, queryField } from '../src/core'
+import { asNexusMethod, extendType, interfaceType, makeSchema, objectType, queryField } from '../src/core'
 
 describe('interfaceType', () => {
   it('can be implemented by object types', async () => {
@@ -117,6 +117,59 @@ describe('interfaceType', () => {
               classification
               owner
               breed
+            }
+          }
+        `
+      )
+    ).toMatchSnapshot()
+  })
+  it('can implement interfaces in extend types', async () => {
+    const schema = makeSchema({
+      types: [
+        interfaceType({
+          name: 'Node',
+          definition(t) {
+            t.id('id')
+            // @ts-ignore
+            t.dateTime('createdAt')
+          },
+          resolveType: () => null,
+        }),
+        asNexusMethod(DateTimeResolver, 'dateTime'),
+        objectType({
+          name: 'User',
+          isTypeOf(data) {
+            return typeof data.name === 'string'
+          },
+          definition(t) {
+            t.string('name')
+          },
+        }),
+        extendType({
+          type: 'User',
+          definition(t) {
+            t.implements('Node')
+          },
+        }),
+        queryField('user', {
+          type: 'User',
+          resolve: () => ({ id: `User:1`, name: 'Test User' }),
+        }),
+      ],
+      outputs: {
+        schema: path.join(__dirname, 'interfaceTypeTest.graphql'),
+        typegen: false,
+      },
+      shouldGenerateArtifacts: false,
+    })
+    expect(
+      await graphql(
+        schema,
+        `
+          {
+            user {
+              id
+              name
             }
           }
         `
