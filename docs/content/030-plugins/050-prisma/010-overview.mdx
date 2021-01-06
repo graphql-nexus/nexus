@@ -478,19 +478,6 @@ export type Settings = {
 
 ### Examples
 
-#### Configuring the Prisma Client
-
-```ts
-import { use } from 'nexus'
-import { prisma } from 'nexus-plugin-prisma'
-
-use(
-  prisma({
-    client: { options: { log: ['query'] } },
-  })
-)
-```
-
 #### Using a custom instance of the Prisma Client
 
 ```ts
@@ -499,10 +486,13 @@ import { makeSchema } from 'nexus'
 import { PrismaClient } from 'nexus-plugin-prisma/client'
 
 const schema = makeSchema({
-  types,
-  plugins: [nexusPrisma({
-    client: { instance: new PrismaClient() }
-  })],
+  plugins: [
+    nexusPrisma({
+      client: {
+        instance: new PrismaClient()
+      }
+    })
+  ],
 })
 ```
 
