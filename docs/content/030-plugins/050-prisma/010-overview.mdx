@@ -427,27 +427,6 @@ input UserWhereUniqueInput {
 
 </div>
 
-## Plugin settings
-
-You can _optionally_ configure the plugin. Refer to the jsDoc for details. Here is an example:
-
-```ts
-import { nexusPrisma } from 'nexus-plugin-prisma'
-import { makeSchema } from 'nexus'
-import { PrismaClient } from 'nexus-plugin-prisma/client'
-
-const schema = makeSchema({
-  plugins: [
-    nexusPrisma({
-      experimentalCRUD: true,
-      client: {
-        instance: new PrismaClient()
-      }
-    })
-  ],
-})
-```
-
 ## Recipes
 
 ### Projecting Prisma model fields
