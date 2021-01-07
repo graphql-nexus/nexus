@@ -442,6 +442,10 @@ type UserEdge {
 "
 `;
 
+exports[`field level configuration can configure connection names per-instance 1`] = `"QueryUsersTestFieldConnection"`;
+
+exports[`field level configuration can configure edge names per-instance 1`] = `"QueryUsersTestFieldEdge"`;
+
 exports[`field level configuration can configure the connection per-instance 1`] = `
 "type QueryUsers_Connection {
   \\"\\"\\"
@@ -725,6 +729,10 @@ exports[`global plugin configuration can configure additional fields for the edg
   createdAt: String
 }"
 `;
+
+exports[`global plugin configuration can configure connection names globally 1`] = `"QueryUsersTestGlobalConnection"`;
+
+exports[`global plugin configuration can configure edge names globally 1`] = `"QueryUsersTestGlobalEdge"`;
 
 exports[`global plugin configuration can define additional args for all connections 1`] = `
 "type Query {

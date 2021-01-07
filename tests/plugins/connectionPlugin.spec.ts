@@ -19,6 +19,10 @@ for (let i = 0; i < 10; i++) {
   userNodes.push({ id: `User:${i + 1}`, name: `Test ${i + 1}` })
 }
 
+const upperFirst = (fieldName: string) => {
+  return fieldName.slice(0, 1).toUpperCase().concat(fieldName.slice(1))
+}
+
 const User = objectType({
   name: 'User',
   definition(t) {
@@ -666,6 +670,28 @@ describe('global plugin configuration', () => {
     expect(printType(schema.getType('UserConnection')!)).toMatchSnapshot()
   })
 
+  it('can configure connection names globally', () => {
+    const suffix = 'TestGlobalConnection'
+    const schema = makeTestSchema({
+      getConnectionName(fieldName, parentTypeName) {
+        return `${parentTypeName}${upperFirst(fieldName)}${suffix}`
+      },
+    })
+
+    expect(schema.getType(`QueryUsers${suffix}`)).toMatchSnapshot()
+  })
+
+  it('can configure edge names globally', () => {
+    const suffix = 'TestGlobalEdge'
+    const schema = makeTestSchema({
+      getEdgeName(fieldName, parentTypeName) {
+        return `${parentTypeName}${upperFirst(fieldName)}${suffix}`
+      },
+    })
+
+    expect(schema.getType(`QueryUsers${suffix}`)).toMatchSnapshot()
+  })
+
   it('logs error if the extendConnection resolver is not specified', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation()
     makeTestSchema({
@@ -769,6 +795,34 @@ describe('field level configuration', () => {
     )
     expect(printType(schema.getType('QueryUsers_Connection')!)).toMatchSnapshot()
     expect(printType(schema.getType('QueryUsers_Edge')!)).toMatchSnapshot()
+  })
+
+  it('can configure connection names per-instance', () => {
+    const suffix = 'TestFieldConnection'
+    const schema = makeTestSchema(
+      {},
+      {
+        getConnectionName(fieldName, parentTypeName) {
+          return `${parentTypeName}${upperFirst(fieldName)}${suffix}`
+        },
+      }
+    )
+
+    expect(schema.getType(`QueryUsers${suffix}`)).toMatchSnapshot()
+  })
+
+  it('can configure edge names per-instance', () => {
+    const suffix = 'TestFieldEdge'
+    const schema = makeTestSchema(
+      {},
+      {
+        getEdgeName(fieldName, parentTypeName) {
+          return `${parentTypeName}${upperFirst(fieldName)}${suffix}`
+        },
+      }
+    )
+
+    expect(schema.getType(`QueryUsers${suffix}`)).toMatchSnapshot()
   })
 
   it('can modify the behavior of cursorFromNode ', () => {})
