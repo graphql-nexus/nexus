@@ -1,7 +1,7 @@
 {
   "name": "with-prisma",
   "version": "0.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "yarn build:reflection && tsc",
     "build:reflection": "NEXUS_SHOULD_EXIT_AFTER_REFLECTION=true ts-node api",
