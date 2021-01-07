@@ -128,6 +128,10 @@ export interface ConnectionPluginConfig {
       requireResolver?: boolean
     }
   >
+  /** Allows specifying a custom name for connection types. */
+  getConnectionName?(filedName: string, parentTypeName: string): string
+  /** Allows specifying a custom name for edge types. */
+  getEdgeName?(filedName: string, parentTypeName: string): string
   /** Prefix for the Connection / Edge type */
   typePrefix?: string
   /**
@@ -241,6 +245,10 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   extendEdge?: (
     def: ObjectDefinitionBlock<FieldTypeName<FieldTypeName<TypeName, FieldName>, 'edges'>>
   ) => void
+  /** Allows specifying a custom name for connection types. */
+  getConnectionName?(filedName: string, parentTypeName: string): string
+  /** Allows specifying a custom name for edge types. */
+  getEdgeName?(filedName: string, parentTypeName: string): string
   /** Configures the default "nonNullDefaults" for connection type generated for this connection */
   nonNullDefaults?: NonNullConfig
   /**
@@ -989,7 +997,11 @@ const getTypeNames = (
   // If we have changed the config specific to this field, on either the connection,
   // edge, or page info, then we need a custom type for the connection & edge.
   let connectionName: string
-  if (isConnectionFieldExtended(fieldConfig)) {
+  if (fieldConfig.getConnectionName) {
+    connectionName = fieldConfig.getConnectionName(fieldName, parentTypeName)
+  } else if (pluginConfig.getConnectionName) {
+    connectionName = pluginConfig.getConnectionName(fieldName, parentTypeName)
+  } else if (isConnectionFieldExtended(fieldConfig)) {
     connectionName = `${parentTypeName}${upperFirst(fieldName)}_Connection`
   } else {
     connectionName = `${pluginConfig.typePrefix || ''}${targetTypeName}Connection`
@@ -997,7 +1009,11 @@ const getTypeNames = (
 
   // If we have modified the "edge" at all, then we need
   let edgeName
-  if (isEdgeFieldExtended(fieldConfig)) {
+  if (fieldConfig.getEdgeName) {
+    edgeName = fieldConfig.getEdgeName(fieldName, parentTypeName)
+  } else if (pluginConfig.getEdgeName) {
+    edgeName = pluginConfig.getEdgeName(fieldName, parentTypeName)
+  } else if (isEdgeFieldExtended(fieldConfig)) {
     edgeName = `${parentTypeName}${upperFirst(fieldName)}_Edge`
   } else {
     edgeName = `${pluginConfig.typePrefix || ''}${targetTypeName}Edge`
