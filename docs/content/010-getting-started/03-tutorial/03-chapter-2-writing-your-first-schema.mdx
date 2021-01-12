@@ -20,7 +20,7 @@ Before we get going we need a moment to introduce an important part of the Nexus
 
 This partly explains why Nexus has a declarative API. It needs a way to run your app reliably at build time. Declarative APIs give Nexus a higher degree of control to do this. Declarative APIs also encode enough semantic value for Nexus to do the things it needs to.
 
-It also explains the need for the `--transpile-only` flag passed to `ts-node-dev`. If you don't know what it is about, **it basically tells TypeScript not to typecheck your app**. Since `nexus` needs to be run in order to generate TypeScript types, we need to ensure that `nexus` won't ever be prevented from generating these types because of.. a type error.
+It also explains the need for the `--transpile-only` flag passed to `ts-node-dev`. If you don't know what it is about, **it basically tells TypeScript not to typecheck your app**. Since `nexus` needs to be run in order to generate TypeScript types, we need to ensure that `nexus` won't ever be prevented from generating these types because of a type error.
 
 You might be (rightfully) wondering: "Wait, how am I supposed to benefit from Nexus' type-safety if I disable it in `ts-node-dev`... ?". For now, the answer to that is to use your IDE's type-checker. If your IDE/terminal doesn't have one, then manually run an additional `tsc` process.
 
