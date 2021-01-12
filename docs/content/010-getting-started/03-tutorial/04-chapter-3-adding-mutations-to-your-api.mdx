@@ -278,7 +278,7 @@ Let's revise our implementation with GraphQL arguments.
 
 
 ```ts
-import { objectType, extendType, stringArg } from 'nexus'
+import { objectType, extendType } from 'nexus'
 +import { objectType, extendType, stringArg, nonNull } from 'nexus'
 
 export const PostMutation = extendType({
