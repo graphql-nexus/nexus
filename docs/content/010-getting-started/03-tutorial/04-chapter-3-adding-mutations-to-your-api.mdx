@@ -130,7 +130,7 @@ export const schema = makeSchema({
   },
 +  contextType: {                                    // 1
 +    module: join(__dirname, "./context.ts"),        // 2
-+    export: "Context",                              // 3
++    alias: "ContextModule",                         // 3
 +  },
 })
 ```
