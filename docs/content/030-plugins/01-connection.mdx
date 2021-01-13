@@ -249,3 +249,33 @@ const schema = makeSchema({
   ],
 })
 ```
+
+## Custom names for Connection / Edge types
+
+You can provide a function to generate a custom name for connection and edge types. The function will receive the field and parent type names.
+
+### Globally
+
+```ts
+connectionPlugin({
+  getConnectionName(fieldName, parentTypeName) {
+    return `${parentTypeName}${upperFirst(fieldName)}Connection`
+  },
+  getEdgeName(fieldName, parentTypeName) {
+    return `${parentTypeName}${upperFirst(fieldName)}Edge`
+  },
+})
+```
+
+### One-off / per-field
+
+```ts
+t.connectionField('users', {
+  getConnectionName(fieldName, parentTypeName) {
+    return `${parentTypeName}${upperFirst(fieldName)}Connection`
+  },
+  getEdgeName(fieldName, parentTypeName) {
+    return `${parentTypeName}${upperFirst(fieldName)}Edge`
+  },
+})
+```

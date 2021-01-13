@@ -274,13 +274,13 @@ We need to get the client's input data to complete our resolver. This brings us 
 
 Let's revise our implementation with GraphQL arguments.
 
-<TabbedContent tabs={['Diff', 'Code']}>
+<TabbedContent tabs={['Diff', 'Code', 'SDL']}>
 
 <tab>
 
 
 ```ts
-import { objectType, extendType, stringArg } from 'nexus'
+import { objectType, extendType } from 'nexus'
 +import { objectType, extendType, stringArg, nonNull } from 'nexus'
 
 export const PostMutation = extendType({
@@ -343,7 +343,7 @@ export const PostMutation = extendType({
 
 </tab>
 
-</TabbedContent>
+<tab>
 
 ```ts
 Mutation {
@@ -351,6 +351,10 @@ Mutation {
 +  createDraft(title: String!, body: String!): Post!
 }
 ```
+
+</tab>
+
+</TabbedContent>
 
 1. Add an `args` property to the field definition to define its args. Keys are arg names and values are type specifications.
 2. Use the Nexus helpers for defining an arg type. There is one such helper for every GraphQL scalar such as `intArg` and `booleanArg`. If you want to reference a type like some InputObject then use `arg({ type: "..." })`. You can use the helpers `nonNull` and `nullable` to adjust the nullability type of the arg. You can use the functional helper `list` to turn the arg into a list type too.

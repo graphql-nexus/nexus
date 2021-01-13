@@ -21,7 +21,7 @@ npm add -D @prisma/cli
 
 > **Note**: If you're looking for CRUD capabilities, you must enable the `experimentalCRUD` option.
 
-You can find runnable examples in the [repo examples folder](https://github.com/graphql-nexus/nexus-schema-plugin-prisma/tree/master/examples/schema).
+You can find runnable examples in the [repo examples folder](https://github.com/graphql-nexus/nexus-plugin-prisma/tree/main/examples).
 
 **Example**
 
@@ -426,85 +426,6 @@ input UserWhereUniqueInput {
 ```
 
 </div>
-
-## Plugin settings
-
-You can _optionally_ pass some settings to the plugin.
-
-### Type definition
-
-```ts
-export type PrismaClientOptions = {
-  /**
-   * Options to pass to the Prisma Client instantiated by the plugin.
-   * If you want to instantiate your own Prisma Client, use `instance` instead.
-   */
-  options: ClientOptions
-}
-
-export type PrismaClientInstance = {
-  /**
-   * Instance of your own Prisma Client. You can import it from 'nexus-plugin-prisma/client'.
-   * If you just want to pass some settings to the Prisma Client, use `options` instead.
-   */
-  instance: PrismaClient
-}
-
-export type Settings = {
-  /**
-   * Use this to pass some settings to the Prisma Client instantiated by the plugin or to pass your own Prisma Client
-   */
-  client?: PrismaClientOptions | PrismaClientInstance
-  /**
-   * Enable or disable migrations run by the plugin when editing your schema.prisma file
-   *
-   * @default true
-   */
-  migrations?: boolean
-  /**
-   * Features that require opting into. These are all disabled by default.
-   */
-  features?: {
-    /**
-     * Enable **experimental** CRUD capabilities.
-     * Add a `t.crud` method in your definition block to generate CRUD resolvers in your `Query` and `Mutation` GraphQL Object Type.
-     *
-     * @default false
-     */
-    crud?: boolean
-  }
-}
-```
-
-### Examples
-
-#### Configuring the Prisma Client
-
-```ts
-import { use } from 'nexus'
-import { prisma } from 'nexus-plugin-prisma'
-
-use(
-  prisma({
-    client: { options: { log: ['query'] } },
-  })
-)
-```
-
-#### Using a custom instance of the Prisma Client
-
-```ts
-import { nexusPrisma } from 'nexus-plugin-prisma'
-import { makeSchema } from 'nexus'
-import { PrismaClient } from 'nexus-plugin-prisma/client'
-
-const schema = makeSchema({
-  types,
-  plugins: [nexusPrisma({
-    client: { instance: new PrismaClient() }
-  })],
-})
-```
 
 ## Recipes
 
