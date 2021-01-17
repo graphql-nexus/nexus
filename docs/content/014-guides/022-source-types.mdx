@@ -371,7 +371,7 @@ const schema = makeSchema({
 
 If you happen to have Source Types names that can't be matched against your GraphQL Object type names using a RegEx, there are two solutions.
 
-The first solution is especially useful when most of your types _can be matched using a RegEx_ but you only have a couple of types that can't. In that case, the `backingTypesMap` can help you.
+The first solution is especially useful when most of your types _can be matched using a RegEx_ but you only have a couple of types that can't. In that case, the `mapping` can help you.
 
 When provided, it will be used for the Source Types rather than the auto-resolve mechanism of `sources`. It's also useful as an override for one-off cases or for scalar Source Types.
 
@@ -405,7 +405,7 @@ const schema = makeSchema({
       //      ^----------------- Name used as alias for Nexus to import your Source Types.
       //                         eg: import * as <source> from <alias>
     }],
-    backingTypesMap: {
+    mapping: {
       User: 'db.SomeRandomName'
     // ^-----^------^---------- GraphQL type name
     //       |------|---------- Alias of the source where the Source Type is defined
