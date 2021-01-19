@@ -38,7 +38,7 @@ const schema = makeSchema({
 
 ## Configuration
 
-Note that, In most cases, you should not need to configure anything.
+Note that, in most cases, you should not need to configure anything.
 
 ```ts
 type Options = {
@@ -78,7 +78,7 @@ type Options = {
     typegen?: string
   }
   computedInputs?: GlobalComputedInputs
-  
+
   /**
    * GraphQL doesn't support union types. The plugin has to apply a flattening heuristic and pick by default the broadest member of the union.
    * On update and upsert, the broadest member is the atomic operation, which is not ideal in many cases.
@@ -97,63 +97,63 @@ There are two ways you can start with the Prisma plugin. Either from scratch, or
 
 1. Create a `schema.prisma` file
 
-    ```prisma
-    //schema.prisma
+   ```prisma
+   //schema.prisma
 
-    generator prisma_client {
-      provider = "prisma-client-js"
-    }
+   generator prisma_client {
+     provider = "prisma-client-js"
+   }
 
-    model User {
-      id   Int @id @default(autoincrement())
-      name String
-    }
-    ```
+   model User {
+     id   Int @id @default(autoincrement())
+     name String
+   }
+   ```
 
 2. Add a datasource to your schema. We recommend you use Postgres but MySQL and SQLite are also supported.
 
-    To add your datasource, simply copy/paste one of the block below at the top of your `schema.prisma` file
+   To add your datasource, simply copy/paste one of the block below at the top of your `schema.prisma` file
 
-    > **Note**:  You can also pass the database credentials via a `.env` file. [Read more about it here](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file#using-environment-variables)
+   > **Note**: You can also pass the database credentials via a `.env` file. [Read more about it here](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file#using-environment-variables)
 
-    Using PostgreSQL:
+   Using PostgreSQL:
 
-    ```prisma
-    //schema.prisma
+   ```prisma
+   //schema.prisma
 
-    datasource db {
-      provider = "postgres"
-      url = "postgresql://USER:PASSWORD@localhost:5432/DATABASE"
-    }
-    ```
+   datasource db {
+     provider = "postgres"
+     url = "postgresql://USER:PASSWORD@localhost:5432/DATABASE"
+   }
+   ```
 
-    Using MySQL:
+   Using MySQL:
 
-    ```prisma
-    //schema.prisma
+   ```prisma
+   //schema.prisma
 
-    datasource db {
-      provider = "mysql"
-      url = "mysql://USER:PASSWORD@localhost:3306/DATABASE"
-    }
-    ```
+   datasource db {
+     provider = "mysql"
+     url = "mysql://USER:PASSWORD@localhost:3306/DATABASE"
+   }
+   ```
 
-    Using SQLite:
+   Using SQLite:
 
-    ```prisma
-    //schema.prisma
+   ```prisma
+   //schema.prisma
 
-    datasource db {
-      provider = "sqlite"
-      url = "file:./dev.db"
-    }
-    ```
+   datasource db {
+     provider = "sqlite"
+     url = "file:./dev.db"
+   }
+   ```
 
-3. Create a migration from changes in Prisma schema, and apply it to the database
+3. Create a migration from changes in Prisma schema and run the migration
 
-    ```bash-symbol
-    npm run prisma migrate dev --preview-feature
-    ```
+   ```bash-symbol
+   npx prisma migrate dev --preview-feature
+   ```
 
 You're ready to start working!
 
@@ -163,9 +163,9 @@ When starting from an existing database, you should use [Prisma's introspection]
 
 1. Create a `schema.prisma` file.
 
-  Create a `schema.prisma` file and add your database credentials in it so that Prisma can introspect your database schema.
+Create a `schema.prisma` file and add your database credentials in it so that Prisma can introspect your database schema.
 
-  > **Note**:  You can also pass the database credentials via a `.env` file. [Read more about it here](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file#using-environment-variables)
+> **Note**: You can also pass the database credentials via a `.env` file. [Read more about it here](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file#using-environment-variables)
 
     Using PostgreSQL:
 
@@ -202,19 +202,19 @@ When starting from an existing database, you should use [Prisma's introspection]
 
 2. Introspect your database:
 
-  ```bash-symbol
-  npm run prisma introspect
-  ```
+```bash-symbol
+npm run prisma introspect
+```
 
 3. Generate the Prisma Client. Add the following block at the top of your `schema.prisma` file:
 
-  ```
-  generator prisma_client {
-    provider = "prisma-client-js"
-  }
-  ```
+```
+generator prisma_client {
+  provider = "prisma-client-js"
+}
+```
 
-  The plugin will take care of generating the Prisma Client for you after that.
+The plugin will take care of generating the Prisma Client for you after that.
 
 You're ready to start working!
 
@@ -222,7 +222,7 @@ You're ready to start working!
 
 Given a [Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) (left), you will be able to project these Prisma models onto your API and expose operations against them (middle) resulting in the GraphQL Schema (right).
 
-> **Note**:  `t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
+> **Note**: `t.crud` is an experimental feature. You must explicitly enable it [via the plugin options](#type-definition).
 
 <div class="Row Collapsable">
 

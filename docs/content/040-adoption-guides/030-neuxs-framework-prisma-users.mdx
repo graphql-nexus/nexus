@@ -183,14 +183,8 @@ npx prisma generate
 
 Although you already had to run the command manually with the framework plugin, here's an additional quick reminder on how to run database migrations with Prisma Migrate:
 
-To generate a migrate file, run:
+To generate a migrate file and apply the migration, run:
 
 ```
-npx prisma migrate save --experimental
-```
-
-To apply the created migration file, run:
-
-```
-npx prisma migrate up --experimental
+npx prisma migrate dev --preview-feature
 ```
