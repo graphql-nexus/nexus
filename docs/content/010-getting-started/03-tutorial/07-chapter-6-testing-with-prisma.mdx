@@ -114,7 +114,7 @@ function graphqlTestContext() {
 +       process.env.DATABASE_URL = databaseUrl;
 +
 +       // Run the migrations to ensure our schema has the required structure
-+       execSync(`${prismaBinary} migrate dev --preview-feature`, {
++       execSync(`${prismaBinary} db push --preview-feature`, {
 +         env: {
 +           ...process.env,
 +           DATABASE_URL: databaseUrl,
@@ -225,7 +225,7 @@ function prismaTestContext() {
       process.env.DATABASE_URL = databaseUrl;
 
       // Run the migrations to ensure our schema has the required structure
-      execSync(`${prismaBinary} migrate up --create-db --experimental`, {
+      execSync(`${prismaBinary} db push --preview-feature`, {
         env: {
           ...process.env,
           DATABASE_URL: databaseUrl,
@@ -258,9 +258,9 @@ function prismaTestContext() {
 
 The `prismaTestContext` is in charge of a couple of things:
 
-1. Migrate a randomly generated schema before each of your test. This ensure that your tests can add data to an "isolated" and clean database.
-1. Flush the migrated schema after each of your test
-1. Add an instance of a Prisma Client connected to the schema migrated specifically for your test
+1. Push a randomly generated schema into the database before each test. This ensure that your tests can add data to an "isolated" and clean database.
+1. Flush the changed schema after each test
+1. Add an instance of a Prisma Client connected to the schema specifically for the test
 
 Make sure that the `databaseUrl` variable has the right credentials to connect to your own database.
 Leave the `/testing?schema=...` part though. This ensures, once again, that your tests will add data to your Postgres instance in a separate database called `testing` in a schema that randomly generated.
