@@ -90,4 +90,28 @@ describe('scalarType', () => {
     const typegen = await generator.generateTypesFile(schema.schema, 'foo.ts')
     expect(typegen).toMatch(/import { GraphQLScalar } from \"graphql\"/)
   })
+
+  it('can override the backing type for known scalars', async () => {
+    const schema = makeSchemaInternal({
+      types: [
+        objectType({
+          name: 'Test',
+          definition(t) {
+            t.id('id')
+          },
+        }),
+      ],
+      outputs: false,
+      shouldExitAfterGenerateArtifacts: false,
+      sourceTypes: {
+        modules: [],
+        mapping: {
+          ID: 'unknown',
+        },
+      },
+    })
+    const generator = new TypegenMetadata(resolveTypegenConfig(schema.finalConfig))
+    const typegen = await generator.generateTypesFile(schema.schema, 'foo.ts')
+    expect(typegen).toMatchSnapshot('unknown ID')
+  })
 })
