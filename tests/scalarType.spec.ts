@@ -112,6 +112,7 @@ describe('scalarType', () => {
     })
     const generator = new TypegenMetadata(resolveTypegenConfig(schema.finalConfig))
     const typegen = await generator.generateTypesFile(schema.schema, 'foo.ts')
-    expect(typegen).toMatchSnapshot('unknown ID')
+    expect(typegen).toMatch(/id\?\: unknown | null; \/\/ ID/)
+    expect(typegen).toMatch(/ID: unknown/)
   })
 })
