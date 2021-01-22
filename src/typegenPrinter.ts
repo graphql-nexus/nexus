@@ -457,7 +457,7 @@ export class TypegenPrinter {
     const scalarMap: TypeMapping = {}
     this.groupedTypes.scalar.forEach((e) => {
       if (isSpecifiedScalarType(e)) {
-        scalarMap[e.name] = SpecifiedScalars[e.name as SpecifiedScalarNames]
+        scalarMap[e.name] = this.resolveSourceType(e.name) ?? SpecifiedScalars[e.name as SpecifiedScalarNames]
         return
       }
       const sourceType = this.resolveSourceType(e.name)
@@ -826,7 +826,7 @@ export class TypegenPrinter {
 
   printScalar(type: GraphQLScalarType) {
     if (isSpecifiedScalarType(type)) {
-      return SpecifiedScalars[type.name as SpecifiedScalarNames]
+      return this.resolveSourceType(type.name) ?? SpecifiedScalars[type.name as SpecifiedScalarNames]
     }
     return `NexusGenScalars['${type.name}']`
   }
