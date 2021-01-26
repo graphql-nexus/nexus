@@ -271,7 +271,7 @@ Following from example in the _HTTP Server_ section, here is an example with a s
 import * as Http from 'http'
 import { ApolloServer } from 'apollo-server-express'
 import { makeSchema, subscriptionType } from 'nexus'
-import createExpress from 'express'
+import express from 'express'
 
 /**
  * An example streaming data source.
@@ -309,13 +309,12 @@ const apollo = new ApolloServer({
   schema,
 })
 
-const express = createExpress()
-
+const app = express()
 const httpServer = Http.createServer(app)
 
 apollo.installSubscriptionHandlers(httpServer)
 
-apollo.applyMiddleware({ app: express })
+apollo.applyMiddleware({ app })
 
 httpServer.listen({ port: 4000 }, () => {
   console.log(`server at http://localhost:4000${apollo.graphqlPath}`)
