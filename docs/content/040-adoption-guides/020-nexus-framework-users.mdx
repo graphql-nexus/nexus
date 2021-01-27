@@ -392,7 +392,7 @@ You need to explicitly setup all custom scalars yourself. To match what Nexus Fr
 2. Setup the `Json` and `DateTime` scalars
 
    ```tsx
-   import { makeSchema } from 'nexus'
+   import { makeSchema, asNexusMethod } from 'nexus'
    import { DateTimeResolver, JSONObjectResolver } from 'graphql-scalars'
 
    const jsonScalar = asNexusMethod(JSONObjectResolver, 'json')
