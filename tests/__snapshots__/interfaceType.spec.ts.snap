@@ -24,6 +24,17 @@ Object {
 }
 `;
 
+exports[`interfaceType can implement interfaces in extend types 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "id": "User:1",
+      "name": "Test User",
+    },
+  },
+}
+`;
+
 exports[`interfaceType can not implement itself 1`] = `"GraphQL Nexus: Interface Node can't implement itself"`;
 
 exports[`interfaceType detects circular dependencies 1`] = `"GraphQL Nexus: Interface circular dependency detected NodeA -> NodeC -> NodeB -> NodeA"`;

@@ -906,12 +906,6 @@ export class SchemaBuilder {
       warn: consoleWarn,
     })
     config.definition(definitionBlock)
-    const toExtend = this.typeExtendMap[config.name]
-    if (toExtend) {
-      toExtend.forEach((e) => {
-        e.definition(definitionBlock)
-      })
-    }
 
     if (config.sourceType) {
       this.rootTypings[config.name] = config.sourceType
