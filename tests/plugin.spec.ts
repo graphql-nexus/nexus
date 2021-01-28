@@ -349,6 +349,47 @@ describe('plugin', () => {
     expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
+  it('has an plugin.inputObjectTypeDefTypes field where extra properties for inputObjectType can be added', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation()
+    makeSchema({
+      outputs: false,
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
+      types: [
+        queryField('ok', {
+          type: 'Boolean',
+          // @ts-ignore
+          listTest: true,
+          args: {
+            input: inputObjectType({
+              name: 'SomeType',
+              definition(t) {
+                // @ts-ignore
+                t.boolean('inputField', { listTest: true })
+              },
+              // @ts-ignore
+              extraData: true,
+            }),
+          },
+          resolve: () => [true],
+        }),
+      ],
+      plugins: [
+        plugin({
+          name: 'Node',
+          inputObjectTypeDefTypes: 'extraData?: bool',
+          onAddArg: (field) => {
+            expect(field.type.config.extraData).toBe(true)
+          },
+        }),
+      ],
+    })
+    expect(spy).toBeCalledTimes(0)
+  })
+
   it('has a plugin.completeValue fn which is used to efficiently complete a value which is possibly a promise', async () => {
     const calls: string[] = []
     const testResolve = (name: string) => (): MiddlewareFn => async (root, args, ctx, info, next) => {
