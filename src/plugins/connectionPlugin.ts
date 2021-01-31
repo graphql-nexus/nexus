@@ -890,13 +890,13 @@ function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
 
 function iterateNodes(nodes: any[], args: PaginationArgs, cb: (node: any, i: number) => void) {
   // If we want the first N of an array of nodes, it's pretty straightforward.
-  if (args.first) {
+  if (typeof args.first === 'number') {
     for (let i = 0; i < args.first; i++) {
       if (i < nodes.length) {
         cb(nodes[i], i)
       }
     }
-  } else if (args.last) {
+  } else if (typeof args.last === 'number') {
     for (let i = 0; i < args.last; i++) {
       const idx = nodes.length - args.last + i
       if (idx >= 0) {
