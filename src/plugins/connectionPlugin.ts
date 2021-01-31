@@ -231,7 +231,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * with `first` or `last`, respectively.
    */
   validateArgs?: (
-    args: Record<string, any>,
+    args: ArgsValue<TypeName, FieldName>,
     info: GraphQLResolveInfo,
     root: SourceValue<TypeName>,
     ctx: GetGen<'context'>
