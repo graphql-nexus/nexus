@@ -72,6 +72,8 @@ const UsersFieldBody = `
   }
 `
 
+const UsersAll = parse(`query UsersAll { users { ${UsersFieldBody} } }`)
+
 const UsersLast = parse(`query UsersFieldLast($last: Int!) { users(last: $last) { ${UsersFieldBody} } }`)
 const UsersLastBefore = parse(
   `query UsersFieldLastBefore($last: Int!, $before: String!) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
@@ -651,6 +653,22 @@ describe('global plugin configuration', () => {
       strictArgs: false,
     })
     expect(printType(schema.getQueryType()!)).toMatchSnapshot()
+  })
+
+  it('iterates all nodes if neither first/last are matched', async () => {
+    const schema = makeTestSchema({
+      disableBackwardPagination: true,
+      strictArgs: false,
+      pageInfoFromNodes() {
+        return { hasNextPage: false, hasPreviousPage: false }
+      },
+      validateArgs() {},
+    })
+    const result = await executeOk({
+      schema,
+      document: UsersAll,
+    })
+    expect(result.data?.users?.edges.length).toEqual(10)
   })
 
   it('can configure additional fields for the connection globally', () => {
