@@ -61,7 +61,7 @@ export interface ConnectionPluginConfig {
    * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
    * with `first` or `last`, respectively.
    */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
+  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo, root: unknown, ctx: unknown) => void
   /**
    * If disableForwardPagination or disableBackwardPagination are set to true, we require the `first` or
    * `last` field as needed. Defaults to true, setting this to false will disable this behavior and make the
@@ -230,7 +230,12 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
    * with `first` or `last`, respectively.
    */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
+  validateArgs?: (
+    args: Record<string, any>,
+    info: GraphQLResolveInfo,
+    root: SourceValue<TypeName>,
+    ctx: GetGen<'context'>
+  ) => void
   /**
    * Dynamically adds additional fields to the current "connection" when it is defined. This will cause the
    * resulting type to be prefix'ed with the name of the type/field it is branched off of, so as not to
@@ -654,7 +659,8 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               args: fieldArgs,
               type: wrappedConnectionName as any,
               resolve(root, args: PaginationArgs, ctx, info) {
-                validateArgs(args, info)
+                // TODO(2.0): Maybe switch the arguments around here to be consistent w/ resolver (breaking change)?
+                validateArgs(args, info, root, ctx)
                 return resolveFn(root, args, ctx, info)
               },
             })
@@ -897,6 +903,11 @@ function iterateNodes(nodes: any[], args: PaginationArgs, cb: (node: any, i: num
         cb(nodes[idx], i)
       }
     }
+  } else {
+    // Only happens if we have a custom validateArgs that ignores first/last
+    for (let i = 0; i < nodes.length; i++) {
+      cb(nodes[i], i)
+    }
   }
 }
 
@@ -1104,3 +1115,6 @@ connectionPlugin.defaultCursorFromNode = defaultCursorFromNode
 connectionPlugin.defaultValidateArgs = defaultValidateArgs
 connectionPlugin.defaultHasPreviousPage = defaultHasPreviousPage
 connectionPlugin.defaultHasNextPage = defaultHasNextPage
+connectionPlugin.base64Encode = base64Encode
+connectionPlugin.base64Decode = base64Decode
+connectionPlugin.CURSOR_PREFIX = CURSOR_PREFIX
