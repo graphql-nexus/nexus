@@ -3,7 +3,7 @@ import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
 
-export interface NexusInputObjectTypeConfig<TypeName extends string> {
+export type NexusInputObjectTypeConfig<TypeName extends string> = {
   /** Name of the input object type */
   name: TypeName
   /** Definition block for the input type */
@@ -21,7 +21,7 @@ export interface NexusInputObjectTypeConfig<TypeName extends string> {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLInputObjectTypeConfig['extensions']
-}
+} & NexusGenPluginInputTypeConfig<TypeName>
 
 export class NexusInputObjectTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusInputObjectTypeConfig<any>) {
