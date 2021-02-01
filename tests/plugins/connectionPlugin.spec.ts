@@ -1126,7 +1126,7 @@ describe('connectionPlugin extensions', () => {
           count(root, args, ctx) {
             expect(args).toEqual({
               first: 1,
-              after: 'Y3Vyc29yOjA=',
+              after: '0',
               round: 100,
             })
             return 100
@@ -1158,7 +1158,7 @@ describe('connectionPlugin extensions', () => {
               resolve(root, args, ctx) {
                 expect(args).toEqual({
                   first: 1,
-                  after: 'Y3Vyc29yOjA=',
+                  after: '0',
                   round: 100,
                 })
                 return 100
@@ -1198,7 +1198,7 @@ describe('connectionPlugin extensions', () => {
             delta(root, args, ctx) {
               expect(args).toEqual({
                 first: 1,
-                after: 'Y3Vyc29yOjA=',
+                after: '0',
                 format: 'ms',
               })
               return '5ms'
@@ -1231,7 +1231,7 @@ describe('connectionPlugin extensions', () => {
               resolve(root, args, ctx) {
                 expect(args).toEqual({
                   first: 1,
-                  after: 'Y3Vyc29yOjA=',
+                  after: '0',
                   format: 'ms',
                 })
                 return '5ms'

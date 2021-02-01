@@ -503,15 +503,12 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                         description: `Flattened list of ${targetTypeName} type`,
                       })
                     }
+                    if (pluginExtendConnection) {
+                      eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
+                        t2.field(extensionFieldName, extensionFieldConfig)
+                      })
+                    }
                     provideSourceAndArgs(t2, () => {
-                      if (pluginExtendConnection) {
-                        eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
-                          t2.field(extensionFieldName, {
-                            ...extensionFieldConfig,
-                            resolve: (fieldConfig as any)[extensionFieldName] ?? defaultFieldResolver,
-                          })
-                        })
-                      }
                       if (fieldConfig.extendConnection instanceof Function) {
                         fieldConfig.extendConnection(t2)
                       }
@@ -536,15 +533,12 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       type: targetType,
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
                     })
+                    if (pluginExtendEdge) {
+                      eachObj(pluginExtendEdge, (val, key) => {
+                        t2.field(key, val)
+                      })
+                    }
                     provideArgs(t2, () => {
-                      if (pluginExtendEdge) {
-                        eachObj(pluginExtendEdge, (val, key) => {
-                          t2.field(key, {
-                            ...val,
-                            resolve: (fieldConfig as any).edgeFields?.[key] ?? defaultFieldResolver,
-                          })
-                        })
-                      }
                       if (fieldConfig.extendEdge instanceof Function) {
                         fieldConfig.extendEdge(t2)
                       }
@@ -783,19 +777,18 @@ export function makeResolveFn(
                     index: i,
                     nodes: allNodes,
                   }),
-                  (rawCursor) => {
-                    return withArgs(args, {
+                  (rawCursor) =>
+                    wrapEdge(pluginConfig, fieldConfig, formattedArgs, {
                       cursor: encodeCursor(rawCursor),
                       node,
                     })
-                  }
                 )
               })
             )
           } else {
             resolvedNodeList.push(maybeNode)
             resolvedEdgeList.push(
-              withArgs(args, {
+              wrapEdge(pluginConfig, fieldConfig, formattedArgs, {
                 node: maybeNode,
                 cursor: completeValue(
                   cursorFromNode(maybeNode, formattedArgs, ctx, info, {
@@ -846,7 +839,7 @@ export function makeResolveFn(
       )
     }
 
-    return withSource(root, args, {
+    const connectionResult = withSource(root, formattedArgs, {
       get nodes() {
         return completeValue(resolveEdgesAndNodes(), (o) => o.nodes)
       },
@@ -857,7 +850,40 @@ export function makeResolveFn(
         return resolvePageInfo()
       },
     })
+
+    if (pluginConfig.extendConnection) {
+      Object.keys(pluginConfig.extendConnection).forEach((connectionField) => {
+        const resolve = (fieldConfig as any)[connectionField] ?? defaultFieldResolver
+        Object.defineProperty(connectionResult, connectionField, {
+          value: (args: object, ctx: unknown, info: GraphQLResolveInfo) => {
+            return resolve(root, { ...formattedArgs, ...args }, ctx, info)
+          },
+        })
+      })
+    }
+
+    return connectionResult
   }
+}
+
+function wrapEdge<T extends object>(
+  pluginConfig: ConnectionPluginConfig,
+  fieldConfig: ConnectionFieldConfig,
+  formattedArgs: PaginationArgs,
+  edgeParentType: T
+): T {
+  const edge = withArgs(formattedArgs, edgeParentType)
+  if (pluginConfig.extendEdge) {
+    Object.keys(pluginConfig.extendEdge).forEach((edgeField) => {
+      const resolve = (fieldConfig as any).edgeFields?.[edgeField] ?? defaultFieldResolver
+      Object.defineProperty(edge, edgeField, {
+        value: (args: object, ctx: unknown, info: GraphQLResolveInfo) => {
+          return resolve(edge, { ...formattedArgs, ...args }, ctx, info)
+        },
+      })
+    })
+  }
+  return edge
 }
 
 /**
