@@ -62,6 +62,7 @@ type PostConnection {
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
   """
   pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type PostEdge {

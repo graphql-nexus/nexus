@@ -1250,4 +1250,60 @@ describe('connectionPlugin extensions', () => {
       })
     })
   })
+
+  describe('should receive the connection source field when extending', () => {
+    test('the connection type on the schema', async () => {
+      const schema = makeTestSchema(
+        {
+          extendConnection: {
+            count: {
+              type: 'Int',
+              args: {
+                round: 'Int',
+              },
+            },
+          },
+        },
+        {
+          // @ts-ignore
+          count(root, args, ctx) {
+            expect(root).toEqual({ someId: 123 })
+            return 100
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: CountFirst,
+        rootValue: { someId: 123 },
+        variableValues: { first: 1, ok: true },
+      })
+    })
+
+    test('the connection type on the field', async () => {
+      expect.assertions(2)
+      const schema = makeTestSchema(
+        {},
+        {
+          extendConnection(t) {
+            t.int('count', {
+              args: {
+                round: 'Int',
+              },
+              resolve(root, args, ctx) {
+                expect(root).toEqual({ someId: 123 })
+                return 100
+              },
+            })
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: CountFirst,
+        rootValue: { someId: 123 },
+        variableValues: { first: 1, ok: true },
+      })
+    })
+  })
 })

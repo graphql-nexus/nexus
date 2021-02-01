@@ -363,6 +363,17 @@ export type EdgeFieldResolver<TypeName extends string, FieldName extends string,
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>>
 
+export type ConnectionFieldResolver<
+  TypeName extends string,
+  FieldName extends string,
+  ConnectionFieldName extends string
+> = (
+  root: SourceValue<TypeName>,
+  args: ArgsValue<FieldTypeName<TypeName, FieldName>, ConnectionFieldName>,
+  context: GetGen<'context'>,
+  info: GraphQLResolveInfo
+) => MaybePromise<ResultValue<FieldTypeName<TypeName, FieldName>, ConnectionFieldName>>
+
 export type ConnectionNodesResolver<TypeName extends string, FieldName extends string> = (
   root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
@@ -419,7 +430,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
           dynamicConfig.push(
             `${key}${
               val.requireResolver === false ? '?:' : ':'
-            } core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`
+            } connectionPluginCore.ConnectionFieldResolver<TypeName, FieldName, "${key}">`
           )
         })
       }
@@ -492,7 +503,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                         description: `Flattened list of ${targetTypeName} type`,
                       })
                     }
-                    provideArgs(t2, () => {
+                    provideSourceAndArgs(t2, () => {
                       if (pluginExtendConnection) {
                         eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
                           t2.field(extensionFieldName, {
@@ -835,7 +846,7 @@ export function makeResolveFn(
       )
     }
 
-    return withArgs(args, {
+    return withSource(root, args, {
       get nodes() {
         return completeValue(resolveEdgesAndNodes(), (o) => o.nodes)
       },
@@ -864,6 +875,21 @@ function withArgs<T extends object>(args: PaginationArgs, connectionParentType: 
   return connectionParentType
 }
 
+/**
+ * Adds __connectionSource to the object representing the Connection type, so it can be accessed by other
+ * fields in the top level
+ *
+ * @param args
+ * @param connectionParentType
+ */
+function withSource<T extends object>(source: unknown, args: PaginationArgs, connectionParentType: T): T {
+  Object.defineProperty(connectionParentType, '__connectionSource', {
+    value: source,
+    enumerable: false,
+  })
+  return withArgs(args, connectionParentType)
+}
+
 /** Takes __connectionArgs from the source object and merges with the args provided by the */
 function mergeArgs(obj: object, fieldArgs: ArgsValue<any, any>): ArgsValue<any, any> {
   return { ...(obj as any).__connectionArgs, ...fieldArgs }
@@ -881,6 +907,21 @@ function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
       ...config,
       resolve(root, args, ctx, info) {
         return resolve(root, mergeArgs(root, args), ctx, info)
+      },
+    })
+  }
+  fn()
+  block.field = fieldDef
+}
+
+function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
+  const fieldDef = block.field
+  block.field = function (fieldName, config) {
+    const { resolve = defaultFieldResolver } = config
+    fieldDef.call(this, fieldName, {
+      ...config,
+      resolve(root, args, ctx, info) {
+        return resolve(root.__connectionSource, mergeArgs(root, args), ctx, info)
       },
     })
   }

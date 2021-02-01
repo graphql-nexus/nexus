@@ -28,6 +28,7 @@ declare global {
     connectionField<FieldName extends string>(
       fieldName: FieldName,
       config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> & {
+        totalCount: connectionPluginCore.ConnectionFieldResolver<TypeName, FieldName, 'totalCount'>
         edgeFields: { delta: connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, 'delta'> }
       }
     ): void
@@ -145,6 +146,7 @@ export interface NexusGenFieldTypes {
     // field return type
     edges: Array<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
     pageInfo: NexusGenRootTypes['PageInfo'] // PageInfo!
+    totalCount: number // Int!
   }
   PostEdge: {
     // field return type
@@ -213,6 +215,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     edges: 'PostEdge'
     pageInfo: 'PageInfo'
+    totalCount: 'Int'
   }
   PostEdge: {
     // field return type name

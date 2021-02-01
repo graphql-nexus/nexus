@@ -11,6 +11,7 @@ import {
   inputObjectType,
   interfaceType,
   mutationType,
+  nonNull,
   objectType,
   queryType,
   scalarType,
@@ -136,6 +137,13 @@ export const User = objectType({
       type: Post,
       nodes() {
         return mockData.posts
+      },
+      totalCount(root) {
+        if (!root.firstName) {
+          // root.firstName should be the source value here
+          throw new Error()
+        }
+        return 0
       },
       edgeFields: {
         delta(root, args, ctx) {
@@ -295,6 +303,11 @@ export const plugins = [
         args: {
           format: 'String',
         },
+      },
+    },
+    extendConnection: {
+      totalCount: {
+        type: nonNull('Int'),
       },
     },
   }),
