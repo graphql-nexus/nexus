@@ -1,5 +1,5 @@
 ---
-title: Removing nexus-plugin-prisma
+title: Removing nexus-plugin-prisma from your project
 ---
 
 ## Overview
@@ -65,7 +65,7 @@ export const schema = makeSchema({
 
 `t.model()` is a function that's exposed by the `nexus-plugin-prisma` which allows you to _project_ the field of a Prisma model to your GraphQL API inside of an `objectType` definition.
 
-This section explains how you can replace your calls to `t.model()` inside with the plain Nexus API. 
+This section explains how you can replace your calls to `t.model()` with the plain Nexus API. 
 
 ### `String`
 
@@ -1175,10 +1175,139 @@ When migrating, it's not practical to try and replicate all the generated types 
 
 As an example, this guide shows how to replicate some of the generated pagination, filtering and ordering capabilities.
 
-To implement these capabilities, you follow Nexus approach for defining arguments for fields and using these inside of your resolver functions.
+To implement these capabilities, you follow Nexus' approach for defining arguments for fields and using these inside of your resolver functions. Here's a version of the `t.model()` code from above that offers similar capabilities:
 
-### Nullability
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
 
+<tab>
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.nonNull.int('id')
+    t.string('name')
+    t.nonNull.list.nonNull.field('posts', {
+      type: 'Post',
+      args: {
+        cursor: arg({ type: 'PostWhereUniqueInput' }),
+        take: intArg(),
+        skip: intArg(),
+        orderBy: arg({ type: 'PostOrderByInput' }),
+        where: arg({ type: 'PostWhereInput' }),
+      },
+      resolve: (parent, args, context) => {
+        return context.prisma.user
+          .findUnique({
+            where: { id: parent.id },
+          })
+          .posts({
+            cursor: args.cursor || undefined,
+            take: args.take || undefined,
+            skip: args.skip || undefined,
+            orderBy: args.orderBy || undefined,
+            where: {
+              id: args.where?.id || undefined,
+              title: args.where?.title || undefined
+            },
+          })
+      },
+    })
+  },
+})
+
+const SortOrder = enumType({
+  name: 'SortOrder',
+  members: ['asc', 'desc'],
+})
+
+const PostOrderByInput = inputObjectType({
+  name: 'PostOrderByInput',
+  definition(t) {
+    t.field('title', {
+      type: 'SortOrder',
+    })
+  },
+})
+
+const PostWhereUniqueInput = inputObjectType({
+  name: 'PostWhereUniqueInput',
+  definition(t) {
+    t.int('id')
+  },
+})
+
+const PostWhereInput = inputObjectType({
+  name: 'PostWhereInput',
+  definition(t) {
+    t.int('id')
+    t.field('title', { type: 'StringFilter' })
+  },
+})
+
+const StringFilter = inputObjectType({
+  name: 'StringFilter',
+  definition(t) {
+    t.string('contains')
+    t.string('endsWith')
+    t.string('equals')
+    t.string('gt')
+    t.string('gte')
+    t.list.nonNull.string('in')
+    t.string('lt')
+    t.string('lte')
+    t.list.nonNull.string('notIn')
+    t.string('startsWith')
+  },
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type User {
+  id: Int!
+  name: String
+  posts(cursor: PostWhereUniqueInput, orderBy: PostOrderByInput, skip: Int, take: Int, where: PostWhereInput): [Post!]!
+}
+input PostOrderByInput {
+  title: SortOrder
+}
+
+input PostWhereInput {
+  id: Int
+  title: StringFilter
+}
+
+input PostWhereUniqueInput {
+  id: Int
+}
+
+input StringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  notIn: [String!]
+  startsWith: String
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+```
+
+</tab>
+
+</TabbedContent>
 
 ## Migrating from `t.crud()` to plain Nexus
 
+Coming soon.
