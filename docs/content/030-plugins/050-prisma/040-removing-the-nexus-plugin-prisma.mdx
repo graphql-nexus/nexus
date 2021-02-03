@@ -1,0 +1,1184 @@
+---
+title: Removing nexus-plugin-prisma
+---
+
+## Overview
+
+This page describes how you can remove the `nexus-plugin-prisma` from your GraphQL schema implementation and only use plain Nexus.
+
+> **Note**: The [Prisma](https://www.prisma.io) team is currently [rewriting](https://github.com/graphql-nexus/nexus-plugin-prisma/issues/1039) the plugin to make it maintainable longterm.
+
+## Removing the plugin from your project
+
+### Uninstall the npm package
+
+You can remove the npm package from your project using the following command:
+
+<TabbedContent tabs={[<FileWithIcon text="npm" icon="code"/>, <FileWithIcon text="Yarn" icon="code"/>]}>     
+ 
+<tab>    
+
+```
+npm uninstall nexus-plugin-prisma
+```
+
+</tab>   
+ 
+<tab>    
+
+```
+yarn remove nexus-plugin-prisma
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+
+### Remove the plugin from `plugins` in `makeSchema`
+
+You can remove the plugin from your project by removing the `nexusPrisma()` function call from the `plugins` section inside `makeSchema`:
+
+```ts
+import { makeSchema } from 'nexus'
+-import { nexusPrisma } from 'nexus-plugin-prisma'
+
+export const schema = makeSchema({
+  types: [Query, Mutation, Post, User],
+- plugins: [nexusPrisma({ experimentalCRUD: true })],
+  outputs: {
+    schema: __dirname + '/../schema.graphql',
+    typegen: __dirname + '/generated/nexus.ts',
+  },
+  sourceTypes: {
+    modules: [
+      {
+        module: '@prisma/client',
+        alias: 'prisma',
+      },
+    ],
+  },
+})
+```
+
+## Migrating from `t.model()` to plain Nexus
+
+`t.model()` is a function that's exposed by the `nexus-plugin-prisma` which allows you to _project_ the field of a Prisma model to your GraphQL API inside of an `objectType` definition.
+
+This section explains how you can replace your calls to `t.model()` inside with the plain Nexus API. 
+
+### `String`
+
+Assume you currently project the following `String` field via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.model.id()
+|    t.model.name()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model User {
+  id   Int    @id @default(autoincrement())
+|  name String
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type User {
+  id: Int!
+|  name: String!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The field can be migrated to plain Nexus using the following change:
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.string('name')
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition. 
+
+### `Int`
+
+Assume you currently project the following `Int` field via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+|    t.model.viewCount()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model Post {
+  id        Int @id @default(autoincrement())
+|  viewCount Int
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type Post {
+  id: Int!
+|  viewCount: Int!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The field can be migrated to plain Nexus using the following change:
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.int('viewCount')
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition. 
+
+### `Float`
+
+Assume you currently project the following `Float` field via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+|    t.model.rating()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model Post {
+  id     Int @id @default(autoincrement())
+|  rating Float
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type Post {
+  id: Int!
+|  rating: Float!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The field can be migrated to plain Nexus using the following change:
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.float('rating')
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition. 
+
+### `Boolean`
+
+Assume you currently project the following `Boolean` field via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+|    t.model.published()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model Post {
+  id        Int @id @default(autoincrement())
+|  published Boolean
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type Post {
+  id: Int!
+|  published: Boolean!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The field can be migrated to plain Nexus using the following change:
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.boolean('published')
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition.
+
+### `Json`
+
+Assume you currently project the following `Json` field via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+|    t.model.jsonData()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model Post {
+  id       Int @id @default(autoincrement())
+|  jsonData Json
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type Post {
+  id: Int!
+|  jsonData: Json!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The field can be migrated to plain Nexus using the following change:
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.field('jsonData', {
+|      type: 'Json'
+|    })
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition.
+
+### `DateTime`
+
+Assume you currently project the following `DateTime` fields via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+|    t.model.createdAt()
+|    t.model.updatedAt()
+},
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model Post {
+  id         Int      @id @default(autoincrement())
+|  createdAt  DateTime @default(now())
+|  updatedAt  DateTime @updatedAt
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type Post {
+  id: Int!
+|  createdAt: DateTime!
+|  updatedAt: DateTime!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The `DateTime` type is not natively supported by GraphQL (nor by Nexus), so you need to first add it to your GraphQL schema. You can use the standard ISO date implementation for GraphQL scalars from the [`graphql-iso-date`](https://github.com/excitement-engineer/graphql-iso-date) npm package.
+
+First, add the package to your project:
+
+<TabbedContent tabs={[<FileWithIcon text="npm" icon="code"/>, <FileWithIcon text="Yarn" icon="code"/>]}>     
+ 
+<tab>    
+
+```
+npm install graphql-iso-date
+```
+
+</tab>   
+ 
+<tab>    
+
+```
+yarn add graphql-iso-date
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+If you're using TypeScript, you should also install the types of that package:
+
+<TabbedContent tabs={[<FileWithIcon text="npm" icon="code"/>, <FileWithIcon text="Yarn" icon="code"/>]}>     
+ 
+<tab>    
+
+```
+npm install @types/graphql-iso-date --save-dev
+```
+
+</tab>   
+ 
+<tab>    
+
+```
+yarn add @types/graphql-iso-date --dev
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+Next, you need to add the `DateTime` type to your GraphQL schema using the Nexus API:
+
+```ts
+// e.g. in `src/types/DateTime.ts`
+import { GraphQLDateTime } from 'graphql-iso-date'
+import { asNexusMethod } from 'nexus'
+
+export const DateTime = asNexusMethod(GraphQLDateTime, 'date')
+```
+
+To make it available via GraphQL, you can now add it to Nexu's `makeSchema` function:
+
+```ts
+// e.g. in `src/schema.ts`
+import { DateTime } from './types/DateTime'
+
+export const schema = makeSchema({
+  types: [
+    Query, 
+    Mutation,
+    // ... other types
++    DateTime
+  ]
+})
+```
+
+The fields can now be migrated to plain Nexus using the following change:
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.field('createdAt', {
+|      type: 'DateTime'
+|    })
+|    t.nonNull.field('updatedAt', {
+|      type: 'DateTime'
+|    })
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition.
+
+### `enum`
+
+Assume you currently project the following enum field via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus type" icon="code"/>, <FileWithIcon text="Prisma model" icon="code"/>, <FileWithIcon text="GraphQL type" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.model.id()
+|    t.model.role()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model User {
+  id   Int @id @default(autoincrement())
+|  role Role
+}
+
+|enum Role {
+|  USER
+|  ADMIN
+|}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type User {
+  id: Int!
+|  role: Role!
+}
+
+|enum Role {
+|  USER
+|  ADMIN
+|}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The field can be migrated to plain Nexus using the following change:
+
+```ts
+// e.g. in `src/types/User.ts`
+import { objectType, enumType } from 'nexus'
+
+|export const Role = enumType({
+|  name: 'Role',
+|  members: ['USER', 'ADMIN']
+|})
+
+export const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.nonNull.int('id')
+|    t.nonNull.field('role', {
+|      type: 'Role'
+|    })
+  }
+}
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition.
+
+You also need to make sure the `Role` type is added to your GraphQL schema by passing it to Nexus' `makeSchema` function:
+
+```ts
+// e.g. in `src/schema.ts`
+import { Role } from './types/User.ts'
+
+export const schema = makeSchema({
+  types: [
+    Query, 
+    Mutation,
+    User,
+    // ... other types
++    Role
+  ]
+})
+```
+
+### Relation fields
+
+Using `t.model()` automatically _resolves_ [relation fields](https://www.prisma.io/docs/concepts/components/prisma-schema/relations#relation-fields) from the Prisma schema in your GraphQL API implementation. When migrating away from `t.model()`, you need to _manually_ resolve relation fields. 
+
+Note that there's a clear pattern for implementing the resolvers by using the first GraphQL resolver argument, typically called `parent` or `root`. The following sections explain this pattern and show how to migrate 1-1, 1-n and m-n relations from `t.model()` to plain Nexus.
+
+> **Note**: If you want to learn more about the underlying mechanics of resolving relations in GraphQL, check out this article: [GraphQL Server Basics: GraphQL Schemas, TypeDefs & Resolvers Explained](https://www.prisma.io/blog/graphql-server-basics-the-schema-ac5e2950214e)
+
+#### 1-1 relations
+
+Assume you currently project the following relation fields via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="Prisma models" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.model.id()
+    t.model.name()
+|    t.model.profile()
+  },
+})
+
+const Profile = objectType({
+  name: 'Profile',
+  definition(t) {
+    t.model.id()
+    t.model.bio()
+|    t.model.user()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+|  profile Profile?
+}
+
+model Profile {
+  id     Int    @id @default(autoincrement())
+  bio    String
+|  user   User   @relation(fields: [userId], references: [id])
+  userId Int 
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type User {
+  id: Int!
+  name: String
+|  profile: Profile
+}
+
+type Profile {
+  id: Int!
+  bio: String!
+|  user: User
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The fields can be migrated to plain Nexus using the following changes to resolve the relation fields manually:
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.nonNull.int('id')
+    t.nonNull.string('name')
+|    t.field('profile', {
+|      type: 'Profile',
+|      resolve: (parent, _, context) => {
+|        return context.prisma.user.findUnique({
+|          where: { id: parent.id }
+|        }).profile()
+|      }
+|    })
+  },
+})
+
+const Profile = objectType({
+  name: 'Profile',
+  definition(t) {
+    t.nonNull.int('id')
+    t.nonNull.string('bio')
+|    t.nonNull.field('user', {
+|      type: 'User',
+|      resolve: (parent, _, context) => {
+|        return context.prisma.profile.findUnique({
+|          where: { id: parent.id }
+|        }).user()
+|      }
+|    })
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition.
+
+The pattern for resolving the relation is:
+
+1. Use Prisma Client's `findUnique` query for the model that you currently define, in this case:
+    - `prisma.profile.findUnique(...)`
+    - `prisma.user.findUnique(...)`
+1. In both cases, the `id` of the target record is carried in the first resolver argument, called `parent` in the code above.
+1. Use Prisma Client's fluent API to retrieve the target relation of the returned record:
+    - `prisma.profile.findUnique(...).user()`
+    - `prisma.user.findUnique(...).profile()`
+
+#### 1-n relations
+
+Assume you currently project the following relation fields via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="Prisma models" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.model.id()
+    t.model.name()
+|    t.model.posts()
+  },
+})
+
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.title()
+|    t.model.author()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model User {
+  id    Int     @id @default(autoincrement())
+  name  String
+|  posts Post[]?
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+|  author   User   @relation(fields: [authorId], references: [id])
+  authorId Int 
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type User {
+  id: Int!
+  name: String
+|  posts: [Post!]!
+}
+
+type Post {
+  id: Int!
+  title: String!
+|  author: User!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The fields can be migrated to plain Nexus using the following changes to resolve the relation fields manually:
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.nonNull.int('id')
+    t.nonNull.string('name')
+|    t.nonNull.list.nonNull.field('posts', {
+|      type: 'Post',
+|      resolve: (parent, _, context) => {
+|        return context.prisma.user.findUnique({
+|          where: { id: parent.id }
+|        }).posts()
+|      }
+|    })
+  },
+})
+
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+    t.nonNull.string('bio')
+|    t.nonNull.field('author', {
+|      type: 'User',
+|      resolve: (parent, _, context) => {
+|        return context.prisma.post.findUnique({
+|          where: { id: parent.id }
+|        }).author()
+|      }
+|    })
+  },
+})
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition. In this case, you want to make the list itself _and_ its elements required, so you have to add the `nonNull` operator twice. You can learn more about nullability in Nexus [here](../../guides/schema#lists-and-nullability).
+
+The pattern for resolving the relation is:
+
+1. Use Prisma Client's `findUnique` query for the model that you currently define, in this case:
+    - `prisma.post.findUnique(...)`
+    - `prisma.user.findUnique(...)`
+1. In both cases, the `id` of the target record is carried in the first resolver argument, called `parent` in the code above.
+1. Use Prisma Client's fluent API to retrieve the target relation of the returned record:
+    - `prisma.post.findUnique(...).author()`
+    - `prisma.user.findUnique(...).posts()`
+
+#### m-n relations
+
+Assume you currently project the following relation fields via `t.model()` from Prisma to GraphQL: 
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="Prisma models" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.title()
+|    t.model.categories()
+  },
+})
+
+const Category = objectType({
+  name: 'Category',
+  definition(t) {
+    t.model.id()
+    t.model.name()
+|    t.model.posts()
+  },
+})
+
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model Post {
+  id         Int        @id @default(autoincrement())
+  title      String
+|  categories Category[]
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String
+|  posts Post[]
+}
+```
+
+</tab>   
+
+<tab>    
+
+```graphql
+type Post {
+  id: Int
+  title: String
+|  categories: [Category!]!
+}
+
+type Category {
+  id: Int
+  name: String
+|  posts: [Post!]!
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The fields can be migrated to plain Nexus using the following changes to resolve the relation fields manually:
+
+```ts
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.nonNull.int('id')
+    t.nonNull.string('bio')
+|    t.nonNull.list.nonNull.field('categories', {
+|      type: 'Category',
+|      resolve: (parent, _, context) => {
+|        return context.prisma.post.findUnique({
+|          where: { id: parent.id }
+|        }).categories()
+|      }
+|    })
+  },
+})
+
+const Category = objectType({
+  name: 'Category',
+  definition(t) {
+    t.nonNull.int('id')
+    t.nonNull.string('name')
+|    t.nonNull.list.nonNull.field('posts', {
+|      type: 'Post',
+|      resolve: (parent, _, context) => {
+|        return context.prisma.category.findUnique({
+|          where: { id: parent.id }
+|        }).posts()
+|      }
+|    })
+  },
+})
+
+```
+
+Note that Nexus field definitions inside `objectType` are nullable by default, so you have to be explicit about making the field required by adding the `nonNull` operator to the definition. In this case, you want to make the list itself _and_ its elements required, so you have to add the `nonNull` operator twice. You can learn more about nullability in Nexus [here](../../guides/schema#lists-and-nullability).
+
+The pattern for resolving the relation is:
+
+1. Use Prisma Client's `findUnique` query for the model that you currently define, in this case:
+    - `prisma.post.findUnique(...)`
+    - `prisma.category.findUnique(...)`
+1. In both cases, the `id` of the target record is carried in the first resolver argument, called `parent` in the code above.
+1. Use Prisma Client's fluent API to retrieve the target relation of the returned record:
+    - `prisma.post.findUnique(...).categories()`
+    - `prisma.category.findUnique(...).posts()`
+
+#### Pagination, filtering, sorting
+
+When using `t.model()` resolve relation fields, you can enable filtering, pagination and ordering on to-many-relations (i.e., when the relation field is specified as a _list_).
+
+Consider this example:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="Prisma models" icon="code"/>]}>     
+ 
+<tab>    
+
+```ts
+const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.model.id()
+    t.model.name()
+|    t.model.posts({
+|      pagination: true,
+|      filtering: true,
+|      ordering: true
+|    })
+  },
+})
+
+const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.model.id()
+    t.model.title()
+    t.model.author()
+  },
+})
+```
+
+</tab>   
+ 
+<tab>    
+
+```prisma
+model User {
+  id    Int     @id @default(autoincrement())
+  name  String
+|  posts Post[]
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId Int 
+}
+```
+
+</tab>   
+ 
+</TabbedContent>
+
+The following GraphQL types are generated based on the Nexus type definition above:
+
+```graphql
+type User {
+  id: Int!
+  name: String
+|  posts(
+|    after: PostWhereUniqueInput, 
+|    before: PostWhereUniqueInput, 
+|    first: Int, 
+|    last: Int, 
+|    orderBy: [PostOrderByInput!], 
+|    where: PostWhereInput
+|  ): [Post!]!
+}
+
+type Post {
+  id: Int!
+  title: String!
+  author: User!
+}
+```
+
+The referenced `PostWhereInput`, `PostWhereUniqueInput` and `PostOrderByInput` types as well as the types they reference look as follows:
+
+<details><summary>Expand to view all generated types</summary>
+
+```graphql
+input PostWhereInput {
+  AND: [PostWhereInput!]
+  NOT: [PostWhereInput!]
+  OR: [PostWhereInput!]
+  author: UserWhereInput
+  authorId: IntNullableFilter
+  id: IntFilter
+  title: StringFilter
+}
+
+input PostWhereUniqueInput {
+  id: Int
+}
+
+input UserWhereInput {
+  AND: [UserWhereInput!]
+  NOT: [UserWhereInput!]
+  OR: [UserWhereInput!]
+  id: IntFilter
+  name: StringFilter
+  posts: PostListRelationFilter
+}
+
+input IntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input IntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
+input NestedIntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input NestedIntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
+input StringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  mode: QueryMode
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input StringNullableFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringNullableFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input NestedStringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input PostListRelationFilter {
+  every: PostWhereInput
+  none: PostWhereInput
+  some: PostWhereInput
+}
+
+input PostOrderByInput {
+  authorId: SortOrder
+  id: SortOrder
+  title: SortOrder
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+```
+
+</details>
+
+Note that depending on which scalar types are used on the fields of your Prisma models, there are multiple combinations of the `TYPEFilter`, `NestedTYPEFilter`, `NullableTYPEFilter` and `NestedNullableTYPEFilter` where `TYPE` is the name of a scalar type. 
+
+For example, in the case above, the Prisma models have fields of types `Int` and `String` so the generated types include `StringFilter`, `NestedStringFilter`, `NullableStringFilter` and `NestedNullableStringFilter` as well as `IntFilter`, `NestedIntFilter`, `NullableIntFilter` and `NestedNullableIntFilter`.
+
+When migrating, it's not practical to try and replicate all the generated types but instead implement the concrete types and operations you actually want to expose in your API.
+
+As an example, this guide shows how to replicate some of the generated pagination, filtering and ordering capabilities.
+
+To implement these capabilities, you follow Nexus approach for defining arguments for fields and using these inside of your resolver functions.
+
+### Nullability
+
+
+## Migrating from `t.crud()` to plain Nexus
+
