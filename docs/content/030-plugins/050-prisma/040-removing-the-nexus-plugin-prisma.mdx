@@ -1009,8 +1009,6 @@ model Post {
  
 </TabbedContent>
 
-##### Generated GraphQL types
-
 The following GraphQL types are generated based on the Nexus type definition above:
 
 ```graphql
@@ -1034,11 +1032,9 @@ type Post {
 }
 ```
 
-The referenced `PostWhereInput` and `PostWhereUniqueInput` types as well as the types they reference look as follows:
+The referenced `PostWhereInput`, `PostWhereUniqueInput` and `PostOrderByInput` types as well as the types they reference look as follows:
 
 <details><summary>Expand to view all generated types</summary>
-
-Test
 
 ```graphql
 input PostWhereInput {
@@ -1059,12 +1055,53 @@ input UserWhereInput {
   AND: [UserWhereInput!]
   NOT: [UserWhereInput!]
   OR: [UserWhereInput!]
-  email: StringFilter
   id: IntFilter
-  name: StringNullableFilter
+  name: StringFilter
   posts: PostListRelationFilter
-  profile: ProfileWhereInput
-  role: EnumRoleFilter
+}
+
+input IntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input IntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
+}
+
+input NestedIntFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntFilter
+  notIn: [Int!]
+}
+
+input NestedIntNullableFilter {
+  equals: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  lt: Int
+  lte: Int
+  not: NestedIntNullableFilter
+  notIn: [Int!]
 }
 
 input StringFilter {
@@ -1091,16 +1128,54 @@ input StringNullableFilter {
   in: [String!]
   lt: String
   lte: String
-  mode: QueryMode
   not: NestedStringNullableFilter
   notIn: [String!]
   startsWith: String
+}
+
+input NestedStringFilter {
+  contains: String
+  endsWith: String
+  equals: String
+  gt: String
+  gte: String
+  in: [String!]
+  lt: String
+  lte: String
+  not: NestedStringFilter
+  notIn: [String!]
+  startsWith: String
+}
+
+input PostListRelationFilter {
+  every: PostWhereInput
+  none: PostWhereInput
+  some: PostWhereInput
+}
+
+input PostOrderByInput {
+  authorId: SortOrder
+  id: SortOrder
+  title: SortOrder
+}
+
+enum SortOrder {
+  asc
+  desc
 }
 ```
 
 </details>
 
+Note that depending on which scalar types are used on the fields of your Prisma models, there are multiple combinations of the `TYPEFilter`, `NestedTYPEFilter`, `NullableTYPEFilter` and `NestedNullableTYPEFilter` where `TYPE` is the name of a scalar type. 
 
+For example, in the case above, the Prisma models have fields of types `Int` and `String` so the generated types include `StringFilter`, `NestedStringFilter`, `NullableStringFilter` and `NestedNullableStringFilter` as well as `IntFilter`, `NestedIntFilter`, `NullableIntFilter` and `NestedNullableIntFilter`.
+
+When migrating, it's not practical to try and replicate all the generated types but instead implement the concrete types and operations you actually want to expose in your API.
+
+As an example, this guide shows how to replicate some of the generated pagination, filtering and ordering capabilities.
+
+To implement these capabilities, you follow Nexus approach for defining arguments for fields and using these inside of your resolver functions.
 
 ### Nullability
 
