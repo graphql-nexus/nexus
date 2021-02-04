@@ -841,6 +841,9 @@ export class TypegenPrinter {
     const pluginArgExt: string[] = [`  interface NexusGenPluginArgConfig {`]
     const pluginSchemaExt: string[] = [`  interface NexusGenPluginSchemaConfig {`]
     const pluginTypeExt: string[] = [`  interface NexusGenPluginTypeConfig<TypeName extends string> {`]
+    const pluginInputTypeExt: string[] = [
+      `  interface NexusGenPluginInputTypeConfig<TypeName extends string> {`,
+    ]
     const printInlineDefs: string[] = []
     const plugins = this.schema.extensions.nexus.config.plugins || []
     plugins.forEach((plugin) => {
@@ -853,6 +856,9 @@ export class TypegenPrinter {
       if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(padLeft(this.printType(plugin.config.objectTypeDefTypes), '    '))
       }
+      if (plugin.config.inputObjectTypeDefTypes) {
+        pluginInputTypeExt.push(padLeft(this.printType(plugin.config.inputObjectTypeDefTypes), '    '))
+      }
       if (plugin.config.argTypeDefTypes) {
         pluginArgExt.push(padLeft(this.printType(plugin.config.argTypeDefTypes), '    '))
       }
@@ -863,6 +869,7 @@ export class TypegenPrinter {
         'declare global {',
         [
           pluginTypeExt.concat('  }').join('\n'),
+          pluginInputTypeExt.concat('  }').join('\n'),
           pluginFieldExt.concat('  }').join('\n'),
           pluginInputFieldExt.concat('  }').join('\n'),
           pluginSchemaExt.concat('  }').join('\n'),

@@ -61,7 +61,7 @@ export interface ConnectionPluginConfig {
    * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
    * with `first` or `last`, respectively.
    */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
+  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo, root: unknown, ctx: unknown) => void
   /**
    * If disableForwardPagination or disableBackwardPagination are set to true, we require the `first` or
    * `last` field as needed. Defaults to true, setting this to false will disable this behavior and make the
@@ -230,7 +230,12 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
    * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
    * with `first` or `last`, respectively.
    */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
+  validateArgs?: (
+    args: ArgsValue<TypeName, FieldName>,
+    info: GraphQLResolveInfo,
+    root: SourceValue<TypeName>,
+    ctx: GetGen<'context'>
+  ) => void
   /**
    * Dynamically adds additional fields to the current "connection" when it is defined. This will cause the
    * resulting type to be prefix'ed with the name of the type/field it is branched off of, so as not to
@@ -358,6 +363,17 @@ export type EdgeFieldResolver<TypeName extends string, FieldName extends string,
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>>
 
+export type ConnectionFieldResolver<
+  TypeName extends string,
+  FieldName extends string,
+  ConnectionFieldName extends string
+> = (
+  root: SourceValue<TypeName>,
+  args: ArgsValue<FieldTypeName<TypeName, FieldName>, ConnectionFieldName>,
+  context: GetGen<'context'>,
+  info: GraphQLResolveInfo
+) => MaybePromise<ResultValue<FieldTypeName<TypeName, FieldName>, ConnectionFieldName>>
+
 export type ConnectionNodesResolver<TypeName extends string, FieldName extends string> = (
   root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
@@ -414,7 +430,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
           dynamicConfig.push(
             `${key}${
               val.requireResolver === false ? '?:' : ':'
-            } core.FieldResolver<core.FieldTypeName<TypeName, FieldName>, "${key}">`
+            } connectionPluginCore.ConnectionFieldResolver<TypeName, FieldName, "${key}">`
           )
         })
       }
@@ -487,15 +503,12 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                         description: `Flattened list of ${targetTypeName} type`,
                       })
                     }
-                    provideArgs(t2, () => {
-                      if (pluginExtendConnection) {
-                        eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
-                          t2.field(extensionFieldName, {
-                            ...extensionFieldConfig,
-                            resolve: (fieldConfig as any)[extensionFieldName] ?? defaultFieldResolver,
-                          })
-                        })
-                      }
+                    if (pluginExtendConnection) {
+                      eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
+                        t2.field(extensionFieldName, extensionFieldConfig)
+                      })
+                    }
+                    provideSourceAndArgs(t2, () => {
                       if (fieldConfig.extendConnection instanceof Function) {
                         fieldConfig.extendConnection(t2)
                       }
@@ -520,15 +533,12 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       type: targetType,
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
                     })
+                    if (pluginExtendEdge) {
+                      eachObj(pluginExtendEdge, (val, key) => {
+                        t2.field(key, val)
+                      })
+                    }
                     provideArgs(t2, () => {
-                      if (pluginExtendEdge) {
-                        eachObj(pluginExtendEdge, (val, key) => {
-                          t2.field(key, {
-                            ...val,
-                            resolve: (fieldConfig as any).edgeFields?.[key] ?? defaultFieldResolver,
-                          })
-                        })
-                      }
                       if (fieldConfig.extendEdge instanceof Function) {
                         fieldConfig.extendEdge(t2)
                       }
@@ -654,7 +664,8 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               args: fieldArgs,
               type: wrappedConnectionName as any,
               resolve(root, args: PaginationArgs, ctx, info) {
-                validateArgs(args, info)
+                // TODO(2.0): Maybe switch the arguments around here to be consistent w/ resolver (breaking change)?
+                validateArgs(args, info, root, ctx)
                 return resolveFn(root, args, ctx, info)
               },
             })
@@ -766,19 +777,18 @@ export function makeResolveFn(
                     index: i,
                     nodes: allNodes,
                   }),
-                  (rawCursor) => {
-                    return withArgs(args, {
+                  (rawCursor) =>
+                    wrapEdge(pluginConfig, fieldConfig, formattedArgs, {
                       cursor: encodeCursor(rawCursor),
                       node,
                     })
-                  }
                 )
               })
             )
           } else {
             resolvedNodeList.push(maybeNode)
             resolvedEdgeList.push(
-              withArgs(args, {
+              wrapEdge(pluginConfig, fieldConfig, formattedArgs, {
                 node: maybeNode,
                 cursor: completeValue(
                   cursorFromNode(maybeNode, formattedArgs, ctx, info, {
@@ -829,7 +839,7 @@ export function makeResolveFn(
       )
     }
 
-    return withArgs(args, {
+    const connectionResult = withSource(root, formattedArgs, {
       get nodes() {
         return completeValue(resolveEdgesAndNodes(), (o) => o.nodes)
       },
@@ -840,7 +850,40 @@ export function makeResolveFn(
         return resolvePageInfo()
       },
     })
+
+    if (pluginConfig.extendConnection) {
+      Object.keys(pluginConfig.extendConnection).forEach((connectionField) => {
+        const resolve = (fieldConfig as any)[connectionField] ?? defaultFieldResolver
+        Object.defineProperty(connectionResult, connectionField, {
+          value: (args: object, ctx: unknown, info: GraphQLResolveInfo) => {
+            return resolve(root, { ...formattedArgs, ...args }, ctx, info)
+          },
+        })
+      })
+    }
+
+    return connectionResult
   }
+}
+
+function wrapEdge<T extends object>(
+  pluginConfig: ConnectionPluginConfig,
+  fieldConfig: ConnectionFieldConfig,
+  formattedArgs: PaginationArgs,
+  edgeParentType: T
+): T {
+  const edge = withArgs(formattedArgs, edgeParentType)
+  if (pluginConfig.extendEdge) {
+    Object.keys(pluginConfig.extendEdge).forEach((edgeField) => {
+      const resolve = (fieldConfig as any).edgeFields?.[edgeField] ?? defaultFieldResolver
+      Object.defineProperty(edge, edgeField, {
+        value: (args: object, ctx: unknown, info: GraphQLResolveInfo) => {
+          return resolve(edge, { ...formattedArgs, ...args }, ctx, info)
+        },
+      })
+    })
+  }
+  return edge
 }
 
 /**
@@ -856,6 +899,21 @@ function withArgs<T extends object>(args: PaginationArgs, connectionParentType: 
     enumerable: false,
   })
   return connectionParentType
+}
+
+/**
+ * Adds __connectionSource to the object representing the Connection type, so it can be accessed by other
+ * fields in the top level
+ *
+ * @param args
+ * @param connectionParentType
+ */
+function withSource<T extends object>(source: unknown, args: PaginationArgs, connectionParentType: T): T {
+  Object.defineProperty(connectionParentType, '__connectionSource', {
+    value: source,
+    enumerable: false,
+  })
+  return withArgs(args, connectionParentType)
 }
 
 /** Takes __connectionArgs from the source object and merges with the args provided by the */
@@ -882,20 +940,40 @@ function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
   block.field = fieldDef
 }
 
+function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
+  const fieldDef = block.field
+  block.field = function (fieldName, config) {
+    const { resolve = defaultFieldResolver } = config
+    fieldDef.call(this, fieldName, {
+      ...config,
+      resolve(root, args, ctx, info) {
+        return resolve(root.__connectionSource, mergeArgs(root, args), ctx, info)
+      },
+    })
+  }
+  fn()
+  block.field = fieldDef
+}
+
 function iterateNodes(nodes: any[], args: PaginationArgs, cb: (node: any, i: number) => void) {
   // If we want the first N of an array of nodes, it's pretty straightforward.
-  if (args.first) {
+  if (typeof args.first === 'number') {
     for (let i = 0; i < args.first; i++) {
       if (i < nodes.length) {
         cb(nodes[i], i)
       }
     }
-  } else if (args.last) {
+  } else if (typeof args.last === 'number') {
     for (let i = 0; i < args.last; i++) {
       const idx = nodes.length - args.last + i
       if (idx >= 0) {
         cb(nodes[idx], i)
       }
+    }
+  } else {
+    // Only happens if we have a custom validateArgs that ignores first/last
+    for (let i = 0; i < nodes.length; i++) {
+      cb(nodes[i], i)
     }
   }
 }
@@ -1104,3 +1182,6 @@ connectionPlugin.defaultCursorFromNode = defaultCursorFromNode
 connectionPlugin.defaultValidateArgs = defaultValidateArgs
 connectionPlugin.defaultHasPreviousPage = defaultHasPreviousPage
 connectionPlugin.defaultHasNextPage = defaultHasNextPage
+connectionPlugin.base64Encode = base64Encode
+connectionPlugin.base64Decode = base64Decode
+connectionPlugin.CURSOR_PREFIX = CURSOR_PREFIX
