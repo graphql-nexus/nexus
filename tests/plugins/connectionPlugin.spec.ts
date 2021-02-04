@@ -11,7 +11,7 @@ import {
 } from 'graphql'
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
-import { generateSchema, SchemaConfig, scalarType } from '../../src/core'
+import { generateSchema, SchemaConfig, scalarType, queryField } from '../../src/core'
 import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
@@ -72,6 +72,8 @@ const UsersFieldBody = `
   }
 `
 
+const UsersAll = parse(`query UsersAll { users { ${UsersFieldBody} } }`)
+
 const UsersLast = parse(`query UsersFieldLast($last: Int!) { users(last: $last) { ${UsersFieldBody} } }`)
 const UsersLastBefore = parse(
   `query UsersFieldLastBefore($last: Int!, $before: String!) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
@@ -106,7 +108,8 @@ const customResolveFn: GraphQLFieldResolver<any, any> = (root: any, args: any) =
 const makeTestSchema = (
   pluginConfig: ConnectionPluginConfig = {},
   fieldConfig: Omit<ConnectionFieldConfig<any, any>, 'type'> = {},
-  makeSchemaConfig: Omit<SchemaConfig, 'types'> = {}
+  makeSchemaConfig: Omit<SchemaConfig, 'types'> = {},
+  additionalTypes: any[] = []
 ) =>
   makeSchema({
     outputs: false,
@@ -130,6 +133,7 @@ const makeTestSchema = (
           })
         },
       }),
+      ...additionalTypes,
     ],
     nonNullDefaults: {
       input: false,
@@ -653,6 +657,22 @@ describe('global plugin configuration', () => {
     expect(printType(schema.getQueryType()!)).toMatchSnapshot()
   })
 
+  it('iterates all nodes if neither first/last are matched', async () => {
+    const schema = makeTestSchema({
+      disableBackwardPagination: true,
+      strictArgs: false,
+      pageInfoFromNodes() {
+        return { hasNextPage: false, hasPreviousPage: false }
+      },
+      validateArgs() {},
+    })
+    const result = await executeOk({
+      schema,
+      document: UsersAll,
+    })
+    expect(result.data?.users?.edges.length).toEqual(10)
+  })
+
   it('can configure additional fields for the connection globally', () => {
     const schema = makeTestSchema(
       {
@@ -1106,7 +1126,7 @@ describe('connectionPlugin extensions', () => {
           count(root, args, ctx) {
             expect(args).toEqual({
               first: 1,
-              after: 'Y3Vyc29yOjA=',
+              after: '0',
               round: 100,
             })
             return 100
@@ -1138,7 +1158,7 @@ describe('connectionPlugin extensions', () => {
               resolve(root, args, ctx) {
                 expect(args).toEqual({
                   first: 1,
-                  after: 'Y3Vyc29yOjA=',
+                  after: '0',
                   round: 100,
                 })
                 return 100
@@ -1178,7 +1198,7 @@ describe('connectionPlugin extensions', () => {
             delta(root, args, ctx) {
               expect(args).toEqual({
                 first: 1,
-                after: 'Y3Vyc29yOjA=',
+                after: '0',
                 format: 'ms',
               })
               return '5ms'
@@ -1211,7 +1231,7 @@ describe('connectionPlugin extensions', () => {
               resolve(root, args, ctx) {
                 expect(args).toEqual({
                   first: 1,
-                  after: 'Y3Vyc29yOjA=',
+                  after: '0',
                   format: 'ms',
                 })
                 return '5ms'
@@ -1230,6 +1250,177 @@ describe('connectionPlugin extensions', () => {
           ok: true,
         },
       })
+    })
+  })
+
+  describe('should receive the connection source field when extending', () => {
+    test('the connection type on the schema', async () => {
+      const schema = makeTestSchema(
+        {
+          extendConnection: {
+            count: {
+              type: 'Int',
+              args: {
+                round: 'Int',
+              },
+            },
+          },
+        },
+        {
+          // @ts-ignore
+          count(root, args, ctx) {
+            expect(root).toEqual({ someId: 123 })
+            return 100
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: CountFirst,
+        rootValue: { someId: 123 },
+        variableValues: { first: 1, ok: true },
+      })
+    })
+
+    test('the connection type on the field', async () => {
+      expect.assertions(2)
+      const schema = makeTestSchema(
+        {},
+        {
+          extendConnection(t) {
+            t.int('count', {
+              args: {
+                round: 'Int',
+              },
+              resolve(root, args, ctx) {
+                expect(root).toEqual({ someId: 123 })
+                return 100
+              },
+            })
+          },
+        }
+      )
+      await executeOk({
+        schema,
+        document: CountFirst,
+        rootValue: { someId: 123 },
+        variableValues: { first: 1, ok: true },
+      })
+    })
+  })
+
+  describe('should call the correct fn when extending', () => {
+    it('edge field', async () => {
+      const DeltaTwice = parse(
+        `query DeltaField($first: Int!, $after: String, $format: String, $ok: Boolean!) {
+          ok(ok: $ok)
+          users(first: $first, after: $after) { ${DeltaFieldBody} } 
+          users2(first: $first, after: $after) { ${DeltaFieldBody} } 
+        }`
+      )
+
+      const first = jest.fn().mockImplementation(() => 1)
+      const second = jest.fn().mockImplementation(() => 2)
+
+      const schema = makeTestSchema(
+        {
+          extendEdge: {
+            delta: {
+              type: 'Int',
+            },
+          },
+        },
+        {
+          // @ts-ignore
+          edgeFields: {
+            delta: first,
+          },
+        },
+        {},
+        [
+          queryField((t) => {
+            // @ts-expect-error
+            t.connectionField('users2', {
+              type: User,
+              nodes(root: any, args: any, ctx: any, info: any) {
+                return userNodes
+              },
+              edgeFields: {
+                delta: second,
+              },
+            })
+          }),
+        ]
+      )
+
+      await executeOk({
+        schema,
+        document: DeltaTwice,
+        variableValues: {
+          first: 1,
+          after: 'Y3Vyc29yOjA=',
+          format: 'ms',
+          ok: true,
+        },
+      })
+      expect(first).toBeCalledTimes(1)
+      expect(second).toBeCalledTimes(1)
+    })
+
+    it('connection field', async () => {
+      const CountTwice = parse(
+        `query CountField($first: Int!, $after: String, $round: Int, $ok: Boolean!) {
+          ok(ok: $ok)
+          users(first: $first, after: $after) { ${CountFieldBody} } 
+          users2(first: $first, after: $after) { ${CountFieldBody} } 
+        }`
+      )
+
+      const first = jest.fn().mockImplementation(() => 1)
+      const second = jest.fn().mockImplementation(() => 2)
+
+      const schema = makeTestSchema(
+        {
+          extendConnection: {
+            count: {
+              type: 'Int',
+              args: {
+                round: 'Int',
+              },
+            },
+          },
+        },
+        {
+          // @ts-ignore
+          count: first,
+        },
+        {},
+        [
+          queryField((t) => {
+            // @ts-expect-error
+            t.connectionField('users2', {
+              type: User,
+              nodes(root: any, args: any, ctx: any, info: any) {
+                return userNodes
+              },
+              count: second,
+            })
+          }),
+        ]
+      )
+
+      await executeOk({
+        schema,
+        document: CountTwice,
+        variableValues: {
+          first: 1,
+          after: 'Y3Vyc29yOjA=',
+          format: 'ms',
+          ok: true,
+        },
+      })
+      expect(first).toBeCalledTimes(1)
+      expect(second).toBeCalledTimes(1)
     })
   })
 })

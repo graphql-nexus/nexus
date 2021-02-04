@@ -54,6 +54,8 @@ export interface PluginConfig {
   inputFieldDefTypes?: StringLike | StringLike[]
   /** Any type definitions we want to add to the type definition option */
   objectTypeDefTypes?: StringLike | StringLike[]
+  /** Any type definitions we want to add to the input type definition option */
+  inputObjectTypeDefTypes?: StringLike | StringLike[]
   /** Any type definitions we want to add to the arg definition option */
   argTypeDefTypes?: StringLike | StringLike[]
   /**
@@ -230,6 +232,7 @@ function validatePluginConfig(pluginConfig: PluginConfig): void {
     'fieldDefTypes',
     'inputFieldDefTypes',
     'objectTypeDefTypes',
+    'inputObjectTypeDefTypes',
     'argTypeDefTypes',
     ...optionalPropFns,
   ]
