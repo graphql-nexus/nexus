@@ -12,6 +12,7 @@ This page describes how you can remove the `nexus-plugin-prisma` from your Graph
 
 ### Uninstall the npm package
 
+Nexus
 You can remove the npm package from your project using the following command:
 
 <TabbedContent tabs={[<FileWithIcon text="npm" icon="code"/>, <FileWithIcon text="Yarn" icon="code"/>]}>     
@@ -60,6 +61,14 @@ export const schema = makeSchema({
   },
 })
 ```
+
+### Using the SDL Converter
+
+Nexus and `nexus-plugin-prisma` generates and emits GraphQL types into a `.graphql` file in your project.
+Copy and paste the generated types into the [SDL Converter](https://nexusjs.org/converter) to convert your existing SDL into Nexus code.
+
+![](https://imgur.com/MK4FKyd.png)
+
 
 ## Migrating from `t.model()` to plain Nexus
 
@@ -1310,4 +1319,715 @@ enum SortOrder {
 
 ## Migrating from `t.crud()` to plain Nexus
 
-Coming soon.
+`t.crud` is an experimental feature provided by the `nexus-plugin-prisma`. `t.crud` contains configurable GraphQL `Query` and `Mutation` resolvers
+ that allow you to use create, read, update and delete operations against your Prisma models.
+
+This section provides instructions how you can replace your `t.crud()` using the plain Nexus API.
+
+The migration guide will be based on the following example Prisma schema:
+
+```prisma
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  authorId  Int?
+  published Boolean  @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  name  String?
+  email String  @unique
+  posts Post[]
+} 
+```
+
+### Resolvers
+
+Queries and mutations require the resolve property to generate their appropriate responses.
+
+This section gives an example how you can write your own resolvers for the different GraphQL operations.
+
+#### Query 
+
+Here is an example query resolver:
+
+```ts
+const Query = objectType({
+  name: 'Query',
+  definition(t) {
+    t.field('posts', {
+      type: 'Post',
+      args: { /** ... query arguments */ },
+      resolve: async (parent, args, ctx) => {
+        const posts = ctx.prisma.post.findMany({
+          where: { /** ...query PostWhereInput */ }
+        })
+      }
+    })
+  }
+})
+```
+
+#### Mutation
+
+Here is an example of a mutation resolver:
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+    t.field('createOnePost', {
+      type: Post,
+      args: { /** ...mutation arguments */ },
+      resolve: async (parent, args, context) => {
+        const post = await context.prisma.post.create({
+          data: { /** ...mutation UserCreateInput */ }
+        })
+        return post
+      }
+    })
+  }
+});
+```
+
+### Queries
+
+#### `posts`
+
+Assuming you have exposed the following resolver from your Prisma schema:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>
+
+```ts
+const Query = queryType({
+  definition(t) {
+    t.crud.posts()
+  }
+})
+
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Post {
+  author: User
+  content: String
+  id: Int!
+  published: Boolean!
+  title: String!
+}
+
+type User {
+  email: String!
+  id: Int!
+  name: String
+  posts(after: PostWhereUniqueInput, before: PostWhereUniqueInput, first: Int, last: Int): [Post!]!
+}
+
+type Query {
+  posts(after: PostWhereUniqueInput, before: PostWhereUniqueInput, first: Int, last: Int): [Post!]!
+}
+
+input PostWhereUniqueInput {
+  id: Int
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+The above `Query` can be migrated to vanilla Nexus by making the following changes:
+
+```ts
+const Query = objectType({
+  name: "Query",
+  definition(t) {
+|    t.nonNull.list.nonNull.field("posts", {
+|      type: Post,
+|      args: {
+|        after: arg({ type: PostWhereUniqueInput }),
+|        before: arg({ type: PostWhereUniqueInput }),
+|        first: intArg(),
+|        last: intArg(),
+|      },
+|    })
+})
+
+const PostWhereUniqueInput = inputObjectType({
+  name: "PostWhereUniqueInput",
+  definition(t) {
+    t.int("id")
+  }
+});
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+#### `post`
+
+Assume you have the `post` query available in your API:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>
+ 
+<tab>
+
+```ts
+const Query = queryType({
+  definition(t) {
+    t.crud.post()
+  }
+})
+
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Query {
+  post(where: PostWhereUniqueInput!): Post
+}
+
+input PostWhereUniqueInput {
+  id: Int
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+The fields can be migrated to plain Nexus by making the following changes:
+
+```ts
+const Query = objectType({
+  name: "Query",
+  definition(t) {
+|    t.field("post", {
+|      type: Post,
+|      args: {
+|        where: arg({ type: nonNull(PostWhereUniqueInput) }),
+|      },
+|    })
+})
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+
+### Mutations
+
+#### `createOnePost`
+
+Assume the `createOnePost` mutation is made available in your API as follows:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>
+
+```ts
+const Mutation = mutationType({
+  definition(t) {
+    t.crud.createOnePost()
+  }
+})
+
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Mutation {
+  createOnePost(data: PostCreateInput!): Post!
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+`createOnePost` is dependent on a number of `inputTypes` that are referenced in the existing API as follows:
+<details><summary>Expand to view all generated types</summary>
+
+```graphql
+input PostCreateInput {
+  author: UserCreateNestedOneWithoutPostsInput
+  content: String
+  published: Boolean
+  title: String!
+}
+
+input UserCreateNestedOneWithoutPostsInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutPostsInput
+  create: UserCreateWithoutPostsInput
+}
+
+input UserWhereUniqueInput {
+  email: String
+  id: Int
+}
+
+input UserCreateOrConnectWithoutPostsInput {
+  create: UserCreateWithoutPostsInput!
+  where: UserWhereUniqueInput!
+}
+
+input UserCreateWithoutPostsInput {
+  email: String!
+  name: String
+}
+```
+</details>
+
+The `Query` can be migrated to plain Nexus as follows:
+
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+|    t.nonNull.field("createOnePost", {
+|      type: Post,
+|      args: {
+|        data: arg({ type: nonNull(PostCreateInput) }),
+|      },
+|    })
+})
+
+const PostCreateInput = inputObjectType({
+  name: "PostCreateInput",
+  definition(t) {
+    t.field("author", { type: UserCreateNestedOneWithoutPostsInput })
+    t.string("content")
+    t.boolean("published")
+    t.nonNull.string("title")
+  }
+});
+
+const UserCreateNestedOneWithoutPostsInput = inputObjectType({
+  name: "UserCreateNestedOneWithoutPostsInput",
+  definition(t) {
+    t.field("connect", { type: UserWhereUniqueInput })
+    t.field("connectOrCreate", { type: UserCreateOrConnectWithoutPostsInput })
+    t.field("create", { type: UserCreateWithoutPostsInput })
+  }
+});
+
+const UserWhereUniqueInput = inputObjectType({
+  name: "UserWhereUniqueInput",
+  definition(t) {
+    t.string("email")
+    t.int("id")
+  }
+});
+
+const UserCreateOrConnectWithoutPostsInput = inputObjectType({
+  name: "UserCreateOrConnectWithoutPostsInput",
+  definition(t) {
+    t.nonNull.field("create", { type: UserCreateWithoutPostsInput })
+    t.nonNull.field("where", { type: UserWhereUniqueInput })
+  }
+});
+
+const UserCreateWithoutPostsInput = inputObjectType({
+  name: "UserCreateWithoutPostsInput",
+  definition(t) {
+    t.nonNull.string("email")
+    t.string("name")
+  }
+});
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+#### `updateOnePost`
+
+Assume your `updateOnePost` mutation is made available in your API:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>
+
+```ts
+const Mutation = mutationType({
+  definition(t) {
+    t.crud.updateOnePost()
+  }
+})
+
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Query {
+  updateOnePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+The referenced input types mentioned in `updateOnePost` mutation are as follows:
+
+<details><summary>Expand to view all generated types</summary>
+
+```graphql
+input PostUpdateInput {
+  author: UserUpdateOneWithoutPostsInput
+  content: NullableStringFieldUpdateOperationsInput
+  published: BoolFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+}
+
+input PostWhereUniqueInput {
+  id: Int
+}
+
+input UserUpdateOneWithoutPostsInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutPostsInput
+  create: UserCreateWithoutPostsInput
+  delete: Boolean
+  disconnect: Boolean
+  update: UserUpdateWithoutPostsInput
+  upsert: UserUpsertWithoutPostsInput
+}
+
+input NullableStringFieldUpdateOperationsInput {
+  set: String
+}
+
+input BoolFieldUpdateOperationsInput {
+  set: Boolean
+}
+
+input StringFieldUpdateOperationsInput {
+  set: String
+}
+
+input UserUpdateWithoutPostsInput {
+  email: StringFieldUpdateOperationsInput
+  name: NullableStringFieldUpdateOperationsInput
+}
+
+input UserUpsertWithoutPostsInput {
+  create: UserCreateWithoutPostsInput!
+  update: UserUpdateWithoutPostsInput!
+}
+```
+</details>
+
+The above can be migrated to vanilla Nexus as follows:
+
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+|    t.field("updateOnePost", {
+|      type: Post,
+|      args: {
+|        data: arg({ type: nonNull(PostUpdateInput) }),
+|        where: arg({ type: nonNull(PostWhereUniqueInput) }),
+|      },
+|    })
+})
+
+const PostUpdateInput = inputObjectType({
+  name: "PostUpdateInput",
+  definition(t) {
+    t.field("author", { type: UserUpdateOneWithoutPostsInput })
+    t.field("content", { type: NullableStringFieldUpdateOperationsInput })
+    t.field("published", { type: BoolFieldUpdateOperationsInput })
+    t.field("title", { type: StringFieldUpdateOperationsInput })
+  }
+});
+
+const PostWhereUniqueInput = inputObjectType({
+  name: "PostWhereUniqueInput",
+  definition(t) {
+    t.int("id")
+  }
+});
+
+const UserUpdateOneWithoutPostsInput = inputObjectType({
+  name: "UserUpdateOneWithoutPostsInput",
+  definition(t) {
+    t.field("connect", { type: UserWhereUniqueInput })
+    t.field("connectOrCreate", { type: UserCreateOrConnectWithoutPostsInput })
+    t.field("create", { type: UserCreateWithoutPostsInput })
+    t.boolean("delete")
+    t.boolean("disconnect")
+    t.field("update", { type: UserUpdateWithoutPostsInput })
+    t.field("upsert", { type: UserUpsertWithoutPostsInput })
+  }
+});
+
+const NullableStringFieldUpdateOperationsInput = inputObjectType({
+  name: "NullableStringFieldUpdateOperationsInput",
+  definition(t) {
+    t.string("set")
+  }
+});
+
+const BoolFieldUpdateOperationsInput = inputObjectType({
+  name: "BoolFieldUpdateOperationsInput",
+  definition(t) {
+    t.boolean("set")
+  }
+});
+
+const StringFieldUpdateOperationsInput = inputObjectType({
+  name: "StringFieldUpdateOperationsInput",
+  definition(t) {
+    t.string("set")
+  }
+});
+
+const UserUpdateWithoutPostsInput = inputObjectType({
+  name: "UserUpdateWithoutPostsInput",
+  definition(t) {
+    t.field("email", { type: StringFieldUpdateOperationsInput })
+    t.field("name", { type: NullableStringFieldUpdateOperationsInput })
+  }
+});
+
+const UserUpsertWithoutPostsInput = inputObjectType({
+  name: "UserUpsertWithoutPostsInput",
+  definition(t) {
+    t.nonNull.field("create", { type: UserCreateWithoutPostsInput })
+    t.nonNull.field("update", { type: UserUpdateWithoutPostsInput })
+  }
+});
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+#### `updateManyPost`
+
+Assume you have made your `updateManyPost` mutation available in your API:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>
+
+```ts
+const Mutation = mutationType({
+  definition(t) {
+    t.crud.updateManyPost()
+  }
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Query {
+  updateManyPost(data: PostUpdateManyMutationInput!, where: PostWhereInput): AffectedRowsOutput!
+}
+
+type AffectedRowsOutput {
+  count: Int!
+}
+
+input PostUpdateManyMutationInput {
+  content: NullableStringFieldUpdateOperationsInput
+  published: BoolFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+You can migrate the `Mutation` to plain Nexus as follows:
+
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+|    t.nonNull.field("updateManyPost", {
+|      type: AffectedRowsOutput,
+|      args: {
+|        data: arg({ type: nonNull(PostUpdateManyMutationInput) }),
+|        where: arg({ type: PostWhereInput }),
+|      },
+|    })
+})
+
+const AffectedRowsOutput = objectType({
+  name: "AffectedRowsOutput",
+  definition(t) {
+    t.nonNull.int("count")
+  }
+})
+
+const PostUpdateManyMutationInput = inputObjectType({
+  name: "PostUpdateManyMutationInput",
+  definition(t) {
+    t.field("content", { type: NullableStringFieldUpdateOperationsInput })
+    t.field("published", { type: BoolFieldUpdateOperationsInput })
+    t.field("title", { type: StringFieldUpdateOperationsInput })
+  }
+});
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+#### `upsertOnePost`
+
+Assume the `upsertOnePost` GraphQL operation is available in your API:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
+ 
+<tab>
+
+```ts
+const Mutation = mutationType({
+  definition(t) {
+    t.crud.upsertOnePost()
+  }
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Query {
+  upsertOnePost(create: PostCreateInput!, update: PostUpdateInput!, where: PostWhereUniqueInput!): Post!
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+The above field can be migrated to vanilla Nexus by making the following change:
+
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+|    t.nonNull.field("upsertOnePost", {
+|      type: Post,
+|      args: {
+|        create: arg({ type: nonNull(PostCreateInput) }),
+|        update: arg({ type: nonNull(PostUpdateInput) }),
+|        where: arg({ type: nonNull(PostWhereUniqueInput) }),
+|      },
+|    })
+})
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+#### `deleteOnePost`
+
+Assume the `deleteOnePost` mutation is made available in your API:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>
+ 
+<tab>
+
+```ts
+const Mutation = mutationType({
+  definition(t) {
+    t.crud.deleteOnePost()
+  }
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Query {
+  deleteOnePost(where: PostWhereUniqueInput!): Post
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+The above `Mutation` can be migrated to plain Nexus by making the following changes:
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+|    t.field("deleteOnePost", {
+|      type: Post,
+|      args: {
+|        where: arg({ type: nonNull(PostWhereUniqueInput) }),
+|      },
+|    })
+})
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
+
+#### `deleteManyPost`
+
+Assume you have the `deleteManyPost` available in your API:
+
+<TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>
+ 
+<tab>
+
+```ts
+const Mutation = mutationType({
+  definition(t) {
+    t.crud.deleteManyPost()
+  }
+})
+```
+
+</tab>
+
+<tab>
+
+```graphql
+type Query {
+  deleteManyPost(where: PostWhereInput!): AffectedRowsOutput
+}
+```
+
+</tab>
+ 
+</TabbedContent>
+
+You can migrate it to plain Nexus by making the following changes:
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+|    t.nonNull.field("deleteManyPost", {
+|      type: AffectedRowsOutput,
+|      args: {
+|        where: arg({ type: PostWhereInput }),
+|      },
+|    })
+})
+```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter). Refer to the [resolvers](#resolvers) section on how to add the resolve property to your GraphQL operation.
