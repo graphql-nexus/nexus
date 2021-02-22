@@ -11,5 +11,14 @@
     "importHelpers": true,
     "resolveJsonModule": true
   },
-  "exclude": ["./examples", "./scripts", "./dist", "./tests", "./website", "./gulpfile.ts", "./package.json"]
+  "exclude": [
+    "./examples",
+    "./scripts",
+    "./dist",
+    "./tests",
+    "./website",
+    "./gulpfile.ts",
+    "./package.json",
+    "./docs"
+  ]
 }
