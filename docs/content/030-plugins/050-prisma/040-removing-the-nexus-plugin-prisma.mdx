@@ -12,6 +12,7 @@ This page describes how you can remove the `nexus-plugin-prisma` from your Graph
 
 ### Uninstall the npm package
 
+Nexus
 You can remove the npm package from your project using the following command:
 
 <TabbedContent tabs={[<FileWithIcon text="npm" icon="code"/>, <FileWithIcon text="Yarn" icon="code"/>]}>     
@@ -63,9 +64,11 @@ export const schema = makeSchema({
 
 ### Using the SDL Converter
 
-You can convert your existing schema into Nexus code using the [SDL Converter](https://nexusjs.org/converter).
+Nexus and `nexus-plugin-prisma` generates and emits GraphQL types into a `.graphql` file in your project.
+Copy and paste the generated types into the [SDL Converter](https://nexusjs.org/converter) to convert your existing SDL into Nexus code.
 
 ![](https://imgur.com/MK4FKyd.png)
+
 
 ## Migrating from `t.model()` to plain Nexus
 
@@ -1341,6 +1344,54 @@ model User {
 } 
 ```
 
+### Resolvers
+
+Queries and mutations require the resolve property to generate their appropriate responses.
+
+This section gives an example how you can write your own resolvers for the different GraphQL operations.
+
+#### Query 
+
+Here is an example query resolver:
+
+```ts
+const Query = objectType({
+  name: 'Query',
+  definition(t) {
+    t.field('posts', {
+      type: 'Post',
+      args: { /** ... query arguments */ },
+      resolve: async (parent, args, ctx) => {
+        const posts = ctx.prisma.post.findMany({
+          where: { /** ...query PostWhereInput */ }
+        })
+      }
+    })
+  }
+})
+```
+
+#### Mutation
+
+Here is an example of a mutation resolver:
+```ts
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+    t.field('createOnePost', {
+      type: Post,
+      args: { /** ...mutation arguments */ },
+      resolve: async (parent, args, context) => {
+        const post = await context.prisma.post.create({
+          data: { /** ...mutation UserCreateInput */ }
+        })
+        return post
+      }
+    })
+  }
+});
+```
+
 ### Queries
 
 #### `posts`
@@ -1418,6 +1469,8 @@ const PostWhereUniqueInput = inputObjectType({
 });
 ```
 
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
+
 #### `post`
 
 Assume you have the `post` query available in your API:
@@ -1429,7 +1482,7 @@ Assume you have the `post` query available in your API:
 ```ts
 const Query = queryType({
   definition(t) {
-    t.crud.posts()
+    t.crud.post()
   }
 })
 
@@ -1468,11 +1521,14 @@ const Query = objectType({
 })
 ```
 
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
+
+
 ### Mutations
 
-#### `createPost`
+#### `createOnePost`
 
-Assume the `createPost` mutation is made available in your API as follows:
+Assume the `createOnePost` mutation is made available in your API as follows:
 
 <TabbedContent tabs={[<FileWithIcon text="Nexus types" icon="code"/>, <FileWithIcon text="GraphQL types" icon="code"/>]}>     
  
@@ -1592,6 +1648,8 @@ const UserCreateWithoutPostsInput = inputObjectType({
   }
 });
 ```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
 
 #### `updateOnePost`
 
@@ -1757,6 +1815,8 @@ const UserUpsertWithoutPostsInput = inputObjectType({
 });
 ```
 
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
+
 #### `updateManyPost`
 
 Assume you have made your `updateManyPost` mutation available in your API:
@@ -1829,6 +1889,8 @@ const PostUpdateManyMutationInput = inputObjectType({
 });
 ```
 
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
+
 #### `upsertOnePost`
 
 Assume the `upsertOnePost` GraphQL operation is available in your API:
@@ -1876,6 +1938,8 @@ const Mutation = objectType({
 })
 ```
 
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
+
 #### `deleteOnePost`
 
 Assume the `deleteOnePost` mutation is made available in your API:
@@ -1920,6 +1984,8 @@ const Mutation = objectType({
 })
 ```
 
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
+
 #### `deleteManyPost`
 
 Assume you have the `deleteManyPost` available in your API:
@@ -1963,3 +2029,5 @@ const Mutation = objectType({
 |    })
 })
 ```
+
+> **Note**: Convert your existing SDL to Nexus code with the [SDL Converter](https://nexusjs.org/converter).
