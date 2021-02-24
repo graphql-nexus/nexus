@@ -958,17 +958,14 @@ function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void)
 function iterateNodes(nodes: any[], args: PaginationArgs, cb: (node: any, i: number) => void) {
   // If we want the first N of an array of nodes, it's pretty straightforward.
   if (typeof args.first === 'number') {
-    for (let i = 0; i < args.first; i++) {
-      if (i < nodes.length) {
-        cb(nodes[i], i)
-      }
+    const len = Math.min(args.first, nodes.length)
+    for (let i = 0; i < len; i++) {
+      cb(nodes[i], i)
     }
   } else if (typeof args.last === 'number') {
-    for (let i = 0; i < args.last; i++) {
-      const idx = nodes.length - args.last + i
-      if (idx >= 0) {
-        cb(nodes[idx], i)
-      }
+    const len = Math.min(args.last, nodes.length)
+    for (let i = 0; i < len; i++) {
+      cb(nodes[i], i)
     }
   } else {
     // Only happens if we have a custom validateArgs that ignores first/last
@@ -1037,7 +1034,7 @@ function defaultCursorFromNode(
   args: PaginationArgs,
   ctx: any,
   info: GraphQLResolveInfo,
-  { index }: { index: number; nodes: any[] }
+  { index, nodes }: { index: number; nodes: any[] }
 ) {
   let cursorIndex = index
   // If we're paginating forward, assume we're incrementing from the offset provided via "after",
@@ -1054,7 +1051,8 @@ function defaultCursorFromNode(
   if (typeof args.last === 'number') {
     if (args.before) {
       const offset = parseInt(args.before, 10)
-      cursorIndex = offset - args.last + index
+      const len = Math.min(nodes.length, args.last)
+      cursorIndex = offset - len + index
     } else {
       /* istanbul ignore next */
       throw new Error('Unreachable')

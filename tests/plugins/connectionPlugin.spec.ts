@@ -1424,3 +1424,53 @@ describe('connectionPlugin extensions', () => {
     })
   })
 })
+
+describe('iteration', () => {
+  const MAX_INT = 2147483647
+
+  it('only iterates the necessary number of nodes forward', async () => {
+    const schema = makeTestSchema(
+      {},
+      {
+        nodes(root: any, args: any) {
+          expect(args).toEqual({ first: MAX_INT })
+          return userNodes
+        },
+      }
+    )
+    const start = new Date().valueOf()
+    const nodes = await executeOk({
+      schema,
+      document: UsersFirst,
+      variableValues: { first: MAX_INT },
+    })
+    const end = new Date().valueOf()
+    expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < first
+    expect(nodes.data?.users.edges.length).toEqual(10)
+    expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
+    expect(Buffer.from(nodes.data?.users.edges[9].cursor, 'base64').toString('utf8')).toEqual('cursor:9')
+  })
+
+  it('only iterates the necessary number of nodes backward', async () => {
+    const schema = makeTestSchema(
+      {},
+      {
+        nodes(root: any, args: any) {
+          expect(args).toEqual({ last: MAX_INT, before: '9' })
+          return userNodes.slice(0, Number(args.before) - userNodes.length)
+        },
+      }
+    )
+    const start = new Date().valueOf()
+    const nodes = await executeOk({
+      schema,
+      document: UsersLastBefore,
+      variableValues: { last: MAX_INT, before: 'Y3Vyc29yOjk=' },
+    })
+    const end = new Date().valueOf()
+    expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < last
+    expect(nodes.data?.users.edges.length).toEqual(9)
+    expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
+    expect(Buffer.from(nodes.data?.users.edges[8].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+  })
+})
