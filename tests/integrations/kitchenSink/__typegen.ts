@@ -96,11 +96,13 @@ export interface NexusGenObjects {
     // root type
     edges?: Array<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
     pageInfo: NexusGenRootTypes['PageInfo'] // PageInfo!
+    totalCount: number // Int!
   }
   PostEdge: {
     // root type
     cursor: string // String!
-    node?: NexusGenRootTypes['Post'] | null // Post
+    delta?: string | null // String
+    node: NexusGenRootTypes['Post'] // Post!
   }
   Query: {}
   Subscription: {}
@@ -152,7 +154,7 @@ export interface NexusGenFieldTypes {
     // field return type
     cursor: string // String!
     delta: string | null // String
-    node: NexusGenRootTypes['Post'] | null // Post
+    node: NexusGenRootTypes['Post'] // Post!
   }
   Query: {
     // field return type

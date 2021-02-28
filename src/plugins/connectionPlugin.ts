@@ -489,7 +489,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: connectionName,
                   definition(t2) {
-                    t2.list.field('edges', {
+                    t2.nullable.list.nullable.field('edges', {
                       type: edgeName as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
                     })
@@ -529,7 +529,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       type: cursorType ?? nonNull('String'),
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
                     })
-                    t2.field('node', {
+                    t2.nonNull.field('node', {
                       type: targetType,
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
                     })

@@ -75,7 +75,7 @@ type PostEdge {
   """
   https://facebook.github.io/relay/graphql/connections.htm#sec-Node
   """
-  node: Post
+  node: Post!
 }
 
 input PostSearchInput {

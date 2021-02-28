@@ -200,7 +200,7 @@ exports[`basic behavior should adhere to the Relay spec 2`] = `
   cursor: String!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User
+  node: User!
 }"
 `;
 
@@ -303,7 +303,7 @@ type QueryFieldLevel_Connection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
   \\"\\"\\"
-  edges: [QueryFieldLevel_Edge!]!
+  edges: [QueryFieldLevel_Edge]
 
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
@@ -324,7 +324,7 @@ type QueryFieldLevel2_Connection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
   \\"\\"\\"
-  edges: [QueryFieldLevel2_Edge!]!
+  edges: [QueryFieldLevel2_Edge]
 
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
@@ -350,7 +350,7 @@ type UserConnection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
   \\"\\"\\"
-  edges: [UserEdge!]!
+  edges: [UserEdge]
 
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
@@ -424,7 +424,7 @@ type UserConnection {
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
   \\"\\"\\"
-  edges: [UserEdge!]!
+  edges: [UserEdge]
 
   \\"\\"\\"
   https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
@@ -481,7 +481,7 @@ exports[`field level configuration can configure the edge per-instance 2`] = `
   cursor: String!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User
+  node: User!
   role: String
 }"
 `;
@@ -507,7 +507,7 @@ type AnalyticsUserEdge {
   cursor: String!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User
+  node: User!
 }
 
 \\"\\"\\"
@@ -586,7 +586,7 @@ type UserEdge {
   cursor: String!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User
+  node: User!
 }
 "
 `;
@@ -725,7 +725,7 @@ exports[`global plugin configuration can configure additional fields for the edg
   cursor: String!
 
   \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User
+  node: User!
   createdAt: String
 }"
 `;
