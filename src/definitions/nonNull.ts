@@ -67,7 +67,7 @@ withNexusSymbol(NexusNonNullDef, NexusTypes.NonNull)
  */
 export function nonNull<TypeName extends NexusNonNullableTypes>(type: TypeName) {
   if (isNexusNonNullTypeDef(type) || isNonNullType(type)) {
-    return type
+    return type as NexusNonNullDef<any>
   }
   if (isNexusNullTypeDef(type)) {
     return new NexusNonNullDef(type.ofNexusType)
