@@ -1,5 +1,5 @@
 ---
-title: 3. Adding mutations to Your API
+title: 3. Adding mutations to your API
 ---
 
 ## Overview
@@ -21,7 +21,7 @@ The GraphQL Context is a plain JavaScript object shared across all resolvers. Yo
 
 So go ahead and create the database with its type definition.
 
-```bash-symbol
+```bash-symbol copy
 touch api/db.ts
 ```
 
@@ -51,7 +51,7 @@ Now to expose it in our GraphQL context there is two things we need to do:
 
 We'll begin by creating a new module to hold out the context and its type.
 
-```bash-symbol
+```bash-symbol copy
 touch api/context.ts
 ```
 
@@ -80,9 +80,13 @@ import { ApolloServer } from 'apollo-server'
 +import { context } from './context'
 import { schema } from './schema'
 
-export const server = new ApolloServer({
+const server = new ApolloServer({
   schema,
 +  context 
+})
+
+server.listen().then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`)
 })
 ```
 
@@ -96,9 +100,13 @@ import { ApolloServer } from 'apollo-server'
 import { context } from './context'
 import { schema } from './schema'
 
-export const server = new ApolloServer({
+const server = new ApolloServer({
   schema,
   context
+})
+
+server.listen().then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`)
 })
 ```
 
@@ -237,7 +245,6 @@ As before we will take the collocation approach.
 <!-- prettier-ignore -->
 ```ts
 // api/graphql/Post.ts
-// ...
 
 export const PostMutation = extendType({
   type: 'Mutation',
@@ -309,7 +316,6 @@ export const PostMutation = extendType({
 </tab>
 
 <tab>
-
 
 ```ts
 import { objectType, extendType, stringArg, nonNull } from 'nexus'
@@ -516,7 +522,7 @@ Great, now head on over to the GraphQL Playground and run this query (left). If 
   
 <block>
 
-```graphql
+```graphql copy
 mutation {
   publish(draftId: 1) {
     id
@@ -555,7 +561,7 @@ Now, that published draft should be visible via the `posts` Query. Run this quer
 
 <block>
 
-```graphql
+```graphql copy
 query {
   posts {
     id

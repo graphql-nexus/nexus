@@ -24,7 +24,7 @@ During this tutorial, you'll use the [Jest testing framework](https://jestjs.io/
 
 First, install `jest` and accompanying tools.
 
-```bash-symbol
+```bash-symbol copy
 npm add --save-dev jest @types/jest ts-jest graphql-request get-port
 ```
 
@@ -71,7 +71,7 @@ Then, configure jest and npm scripts in your `package.json`
     }
   },
   "testEnvironment": "node"
-}
+},
 ```
 
 </tab>
@@ -80,7 +80,7 @@ Then, configure jest and npm scripts in your `package.json`
 
 Finally, create a `tests` folder at the root of your project and a `Post.test.ts` file inside it
 
-```bash-symbol
+```bash-symbol copy
 mkdir tests && touch tests/Post.test.ts
 ```
 
@@ -92,7 +92,7 @@ When run, it will boot your app in the same process as the test suite and expose
 
 Create a `tests/__helpers.ts` module with the following contents.
 
-```bash-symbol
+```bash-symbol copy
 touch tests/__helpers.ts
 ```
 
@@ -252,13 +252,13 @@ it('ensures that a draft can be created and published', async () => {
 
 1. The test context exposes a GraphQL client at `ctx.client.request` that will help us run operations against our API. Here We're using it to send a publish mutation.
 2. This is the mutation from the end of last chapter.
-3. The result will be snapshoted inline allowing us to see the input and output collocated!
+3. The result will be snapshotted inline allowing us to see the input and output collocated!
 
 ## Try it out
 
 Now run your tests and let's see the snapshots come to life! It should look similar to this:
 
-```bash-symbol
+```bash-symbol copy
 npm run test
 ```
 

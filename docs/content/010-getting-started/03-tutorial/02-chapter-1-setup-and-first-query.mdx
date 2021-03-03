@@ -15,7 +15,7 @@ In this first chapter we're just going to get the bare minimum of a Nexus projec
 
 Start by creating your project directory, initializing your `package.json`, and adding the needed runtime dependencies.
 
-```bash-symbol
+```bash-symbol copy
 mkdir nexus-tutorial && cd nexus-tutorial
 npm init -y
 npm add nexus graphql apollo-server
@@ -25,13 +25,13 @@ npm add nexus graphql apollo-server
 
 We'll also need `typescript` and `ts-node-dev` as dev dependencies. `ts-node-dev` will enable you to transpile your TS files on the fly and restart your API on changes.
 
-```bash-symbol
+```bash-symbol copy
 npm add --save-dev typescript ts-node-dev
 ```
 
 To properly get full advantage of TypeScript, we'll need a `tsconfig.json` file. Create one at the root of your project and copy paste the following
 
-```json
+```json file=tsconfig.json copy
 {
   "compilerOptions": {
     "target": "ES2018",
@@ -52,10 +52,10 @@ Let's finally add some npm scripts to simplify our future workflows
 
 <tab>
 
-```json
+```json file=package.json
 "scripts": {
   "test": "echo \"Error: no test specified\" && exit 1",
-+  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
++  "dev": "ts-node-dev --transpile-only --no-notify api/server.ts",
 +  "build": "tsc"
 }
 ```
@@ -64,12 +64,12 @@ Let's finally add some npm scripts to simplify our future workflows
 
 <tab>
 
-```json
+```json copy
 "scripts": {
   "test": "echo \"Error: no test specified\" && exit 1",
-  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
+  "dev": "ts-node-dev --transpile-only --no-notify api/server.ts",
   "build": "tsc"
-}
+},
 ```
 
 </tab>
@@ -80,13 +80,13 @@ Let's finally add some npm scripts to simplify our future workflows
 
 We'll now create our first module at `api/schema.ts`:
 
-```bash-symbol
+```bash-symbol copy
 mkdir api && touch api/schema.ts
 ```
 
 We'll then setup `nexus` to create an empty schema
 
-```ts
+```ts copy
 // api/schema.ts
 import { makeSchema } from 'nexus'
 import { join } from 'path'
@@ -108,19 +108,12 @@ Finally, we'll setup the GraphQL server. We'll intentionally separate the server
 
 Create an `api/server.ts` file and add the following code to instantiate your GraphQL server
 
-```ts
+```ts copy
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
 import { schema } from './schema'
 
-export const server = new ApolloServer({ schema })
-```
-
-Then create an `api/app.ts` file and add the following to make the server listening
-
-```ts
-// api/app.ts
-import { server } from './server'
+const server = new ApolloServer({ schema })
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`)
@@ -131,7 +124,7 @@ server.listen().then(({ url }) => {
 
 Ok, with our entrypoint setup, let's boot up dev mode and see what happens.
 
-```bash-symbol
+```bash-symbol copy
 npm run dev
 ```
 

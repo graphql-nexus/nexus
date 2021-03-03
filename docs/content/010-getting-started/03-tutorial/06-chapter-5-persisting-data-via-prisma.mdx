@@ -4,14 +4,10 @@ title: 5. Persisting data (via Prisma)
 
 ## Overview
 
-So far we have been working with in-memory data while we learn about other parts of Nexus in a focused manner, but in this chapter we're going to put the focus squarely on data and show how Nexus can be used with a database. This marks an important step toward your blog app becoming more real. You'll learn about:
+So far we have been working with in-memory data while we learn about other parts of Nexus in a focused manner, but in this chapter we're going to put the focus squarely on data and show how Nexus can be used with a database. This marks an important step toward your blog app becoming more real. 
 
-- Prisma
-- Setting up a Postgres database locally
-
-We're going to be using a database called Postgres and a tool called Prisma to interact with it.
-
-Postgres is a well known open-source relational database. Prisma is a new way of working with databases that we'll learn more about in a moment.
+In this section, you'll learn how to add Prisma to your GraphQL API.
+Prisma is a new way of working with databases that we'll learn more about in a moment.
 
 Its important to understand that Nexus does not _require_ these technology choices and _could_ actually be used with any database and abstractions over them (raw SQL, query builder, ORM..). However, Nexus is built by a team at Prisma (the company) and unsurprisingly there is great integration between its tools and Nexus.
 
@@ -20,70 +16,51 @@ Its important to understand that Nexus does not _require_ these technology choic
 So, what _is_ Prisma? It is an open source database toolkit that consists of the following parts:
 
 - **Prisma Client**: Auto-generated and type-safe query builder for Node.js & TypeScript
-- **Prisma Migrate** (experimental): Declarative data modeling & migration system
+- **Prisma Migrate** (Preview): Declarative data modeling & migration system
 - **Prisma Studio**: GUI to view and edit data in your database
 
 At the heart of Prisma is the _Prisma Schema,_ a file usually called `schema.prisma`, that you will see later in this tutorial. It is a declarative file wherein using a domain specific language you encode your database schema, connection to the database, and more.
+Prisma currently supports 4 relational databases: MySQL, PostgreSQL, SQL Server and SQLite.
 
 Prisma has great [docs](https://www.prisma.io/docs/understand-prisma/introduction) so definitely check them out at some point. For now you can stay in the flow of this tutorial if you want though. We're going to focus on Prisma Client.
 
-## Connect to your database
+## Set up Prisma
 
 Now that you know a bit about Prisma, let's get going! Do the following:
 
 - Install the Prisma client and CLI
 - Use it in your `api/schema.ts` module
 - Create your Prisma Schema
-- Create a `.env` file to store your database credentials
-- Connect to your database
 
 like so:
 
-```bash-symbol
+```bash-symbol copy
 npm add @prisma/client
 npm add --save-dev prisma
 ```
 
-```bash-symbol
+Next, add Prisma to your project by creating your [Prisma schema](https://www.prisma.io/docs/concepts/components/prisma-schema/) file with the following command:
+
+```bash-symbol copy
 npx prisma init
 ```
 
-Almost done, but we still need to setup a Postgres database for our app to connect to. There are a ton of ways to do this so we're just going to show the most straight forward cross-platform way we know how. First, make sure you have [docker installed](https://docs.docker.com/get-docker/). Then, simply run this command:
+The command creates a new directory called `prisma` which will contain a `schema.prisma` file and add a `.env` file at the root of your project.
 
-```bash-symbol
-docker run --detach --publish 5432:5432 -e POSTGRES_PASSWORD=postgres --name nexus-tutorial-postgres postgres:10
-```
+For ease of set up, this guide will use SQLite. If you wish to use your preferred database, you can make the switch by simply changing the `provider` and `url` in your `schema.prisma` file.
 
-That's it. You now have a Postgres server running.
-
-If you prefer setting up your local Postgres another way go for it. If our suggest approach doesn't work for you, then checkout a few other approaches listed on the [Nexus recipes page](https://www.nexusjs.org/#/references/recipes?id=setting-up-postgresql).
-
-Finally, in the `prisma/.env` file you've created before, replace `<postgres_connection_url>` with your actual database URL.
-
-<TabbedContent tabs={['Diff', 'Code']}>
-<tab>
-
-```diff
--DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
-+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/myapp"
-```
-
-</tab>
-<tab>
+To connect to your database, you'll need to set the `url` field in the `datasource` block in your Prisma schema. 
+Since the `url` is set via an environment variable, you will define it in `.env`. 
 
 ```diff
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/myapp"
 ```
 
-
-</tab>
-</TabbedContent>
-
 <!-- **TODO: find a way to make sure their connection url is working**
 Confirm things are setup correctly by ...
 -->
 
-## Create your database schema
+## Create your first database model
 
 It is now time to replace our in-memory data with actual tables in our database. To do this we'll write models in our Prisma Schema.
 
@@ -92,12 +69,12 @@ In chapters 2 and 3 we already began to model our blog domain with the GraphQL t
 <TabbedContent tabs={['Diff', 'Code']}>
 <tab>
 
-```groovy diff
+```prisma diff
 // prisma/schema.prisma
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
++  provider = "sqlite"
++  url      = "file:./dev.db"
 }
 
 generator client {
@@ -115,12 +92,12 @@ generator client {
 </tab>
 <tab>
 
-```groovy
+```prisma
 // prisma/schema.prisma
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
@@ -140,9 +117,12 @@ model Post {
 
 With our database schema specified, we're now ready to proceed to our first database migration! To do that, we'll use the Prisma CLI.
 
-```bash-symbold
-npx prisma migrate dev --preview-feature
+```bash-symbol copy
+npx prisma migrate dev --name init --preview-feature
 ```
+
+This will create a database migration called `init`. Once a migration is complete, the Prisma CLI will create `dev.db` database and apply the changes against your database.
+Once the first migration is complete, the Prisma CLI will install `@prisma/client` package. In subsequent migrations, Prisma CLI will generate the Prisma Client.
 
 ## Access your database
 
@@ -176,7 +156,7 @@ export const db = new PrismaClient()
 </tab>
 <tab>
 
-```ts
+```ts copy
 // api/db.ts
 import { PrismaClient } from '@prisma/client'
 
@@ -210,7 +190,7 @@ export const context = {
 </tab>
 <tab>
 
-```ts
+```ts copy
 // api/context.ts
 import { db } from "./db";
 import { PrismaClient } from "@prisma/client"
@@ -227,11 +207,6 @@ export const context = {
 </tab>
 </TabbedContent>
 
-Finally, generate the PrismaClient using the Prisma CLI
-
-```bash-symbol
-npx prisma generate
-```
 
 Let's now replace all our previous in-memory db interactions with calls to the Prisma Client
 
@@ -316,7 +291,7 @@ export const PostMutation = extendType({
 </tab>
 <tab>
 
-```ts
+```ts copy
 // api/graphql/Post.ts
 // ...
 

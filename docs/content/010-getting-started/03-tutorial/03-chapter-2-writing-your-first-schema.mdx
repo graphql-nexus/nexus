@@ -36,7 +36,7 @@ Your modeling work is going to start on the API layer as opposed to the database
 
 Create a new module for your Post object at `api/graphql/Post.ts`. We _could_ write our whole schema within say `api/schema.ts` or `api/graphql.ts`, but modularizing your GraphQL type definitions can help scale your codebase. Neither approach is inherently wrong though, so do as you see you fit. For this tutorial we'll use the modular style.
 
-```bash-symbol
+```bash-symbol copy
 mkdir api/graphql && touch api/graphql/Post.ts
 ```
 
@@ -268,7 +268,7 @@ You can now open up your GraphQL playground and try the following query (left); 
 
 <block>
 
-```graphql
+```graphql copy
 {
   drafts {
     id
