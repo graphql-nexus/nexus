@@ -67,7 +67,21 @@ withNexusSymbol(NexusNonNullDef, NexusTypes.NonNull)
  */
 export function nonNull<TypeName extends NexusNonNullableTypes>(type: TypeName) {
   if (isNexusNonNullTypeDef(type) || isNonNullType(type)) {
-    return type
+	/*
+	  Ran into an issue around the generated return type for `nonNull()`, 
+	  which produces:
+	  
+	  ```ts
+	  NexusNonNullDef<any> | (TypeName & GraphQLNonNull<any>)
+	  ```
+	  
+	  This is problematic when you reach a decent amount of types, where you'll 
+	  hit a `union type that is too complex to represent` error. Removing the 
+	  right hand side of the clause resolves the issue, and the fact that it's a 
+	  `GraphQLNonNull` type is irrelevant, so we can just cast it to 
+	  `NexusNonNullDef<any>` here
+	*/
+    return type as NexusNonNullDef<any>
   }
   if (isNexusNullTypeDef(type)) {
     return new NexusNonNullDef(type.ofNexusType)
