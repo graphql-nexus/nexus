@@ -193,8 +193,6 @@ function prismaTestContext() {
 
   return {
     async before() {
-      process.env.DATABASE_URL = databaseUrl;
-
       // Run the migrations to ensure our schema has the required structure
       execSync(`${prismaBinary} db push --preview-feature`,);
 
