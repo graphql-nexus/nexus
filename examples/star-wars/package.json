@@ -2,7 +2,7 @@
   "name": "@graphql-nexus/example-swapi-example",
   "version": "0.0.0",
   "scripts": {
-    "start": "ts-node-dev --ignore-watch star-wars-typegen.ts --no-notify --transpileOnly --respawn ./src"
+    "start": "ts-node-dev --ignore-watch star-wars-typegen.ts --no-notify --transpile-only --respawn ./src"
   },
   "dependencies": {
     "apollo-server": "^2.18.1",
