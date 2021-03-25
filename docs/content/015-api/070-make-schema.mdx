@@ -79,17 +79,17 @@ makeSchema({
         typeMatch: name => new RegExp(`(?:interface|type|class)\\s+(${name}s?)\\W`, 'g'),
       },
     ],
-    // Typing for the GraphQL context
-    contextType: {
-      module: '@packages/data-context/src/DataContext.ts',
-      alias: 'ctx',
-    },
     mapping: {
       Date: 'Date',
       DateTime: 'Date',
       UUID: 'string',
     },
     debug: false,
+  },
+  // Typing for the GraphQL context
+  contextType: {
+    module: '@packages/data-context/src/DataContext.ts',
+    alias: 'ctx',
   },
 })
 ```
