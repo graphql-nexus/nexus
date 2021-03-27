@@ -1,4 +1,4 @@
-import { GraphQLArgument, GraphQLInputObjectType, GraphQLInputType, GraphQLOutputType } from 'graphql'
+import type { GraphQLArgument, GraphQLInputObjectType, GraphQLInputType, GraphQLOutputType } from 'graphql'
 import { list, makeSchema, nonNull, nullable } from '../src'
 import { arg, inputObjectType, objectType, queryType, stringArg } from '../src/core'
 

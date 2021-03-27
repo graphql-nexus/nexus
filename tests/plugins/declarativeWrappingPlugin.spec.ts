@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType, GraphQLSchema } from 'graphql'
+import type { GraphQLInputObjectType, GraphQLSchema } from 'graphql'
 import { makeSchema, queryType } from '../../src'
 import { arg, inputObjectType, declarativeWrappingPlugin, SchemaConfig } from '../../src/core'
 
