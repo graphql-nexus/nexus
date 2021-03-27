@@ -1,6 +1,6 @@
 import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
-import { GetGen } from '../typegenTypeHelpers'
-import { NexusObjectTypeDef } from './objectType'
+import type { GetGen } from '../typegenTypeHelpers'
+import type { NexusObjectTypeDef } from './objectType'
 import { AbstractTypes, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface UnionDefinitionBuilder {

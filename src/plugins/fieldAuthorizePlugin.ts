@@ -1,6 +1,6 @@
-import { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 import { plugin } from '../plugin'
-import { ArgsValue, GetGen, MaybePromise, SourceValue } from '../typegenTypeHelpers'
+import type { ArgsValue, GetGen, MaybePromise, SourceValue } from '../typegenTypeHelpers'
 import { printedGenTyping, printedGenTypingImport } from '../utils'
 
 const FieldauthorizeResolverImport = printedGenTypingImport({

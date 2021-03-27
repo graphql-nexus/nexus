@@ -1,5 +1,5 @@
 import { expectAssignable } from 'tsd'
-import { MaybePromiseDeep } from './typegenTypeHelpers'
+import type { MaybePromiseDeep } from './typegenTypeHelpers'
 
 /** MaybePromiseDeep */
 

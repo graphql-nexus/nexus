@@ -1,5 +1,5 @@
-import { GraphQLField } from 'graphql'
-import { ArgsValue, GetGen, SourceValue } from '../core'
+import type { GraphQLField } from 'graphql'
+import type { ArgsValue, GetGen, SourceValue } from '../core'
 import { plugin } from '../plugin'
 import { printedGenTyping, printedGenTypingImport } from '../utils'
 

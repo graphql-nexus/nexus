@@ -1,7 +1,7 @@
-import { PluginBuilderLens } from './builder'
-import { InputDefinitionBlock, OutputDefinitionBlock } from './definitions/definitionBlocks'
+import type { PluginBuilderLens } from './builder'
+import type { InputDefinitionBlock, OutputDefinitionBlock } from './definitions/definitionBlocks'
 import { NexusTypes, withNexusSymbol } from './definitions/_types'
-import { NexusWrapKind } from './definitions/wrapping'
+import type { NexusWrapKind } from './definitions/wrapping'
 
 export type OutputFactoryConfig<T> = {
   /** The name of the type this field is being declared on */

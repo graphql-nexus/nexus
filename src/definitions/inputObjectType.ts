@@ -1,6 +1,6 @@
 import { assertValidName, GraphQLInputObjectTypeConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
-import { InputDefinitionBlock } from './definitionBlocks'
+import type { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
 
 export type NexusInputObjectTypeConfig<TypeName extends string> = {

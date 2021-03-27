@@ -21,10 +21,10 @@ import {
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
-import { TypegenInfo } from './builder'
+import type { TypegenInfo } from './builder'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
-import { NexusGraphQLSchema } from './definitions/_types'
-import { StringLike } from './plugin'
+import type { NexusGraphQLSchema } from './definitions/_types'
+import type { StringLike } from './plugin'
 import {
   eachObj,
   getOwnPackage,
@@ -198,7 +198,7 @@ export class TypegenPrinter {
       }
     })
     eachObj(importMap, (val, key) => {
-      imports.push(`import { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
+      imports.push(`import type { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
     })
     eachObj(this.printImports, (val, key) => {
       const { default: def, ...rest } = val
@@ -213,7 +213,7 @@ export class TypegenPrinter {
       if (bindings.length) {
         idents.push(`{ ${bindings.join(', ')} }`)
       }
-      imports.push(`import ${idents.join(', ')} from ${JSON.stringify(key)}`)
+      imports.push(`import type ${idents.join(', ')} from ${JSON.stringify(key)}`)
     })
     return imports.join('\n')
   }

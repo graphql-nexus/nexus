@@ -12,7 +12,7 @@ import {
 import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
 import { generateSchema, SchemaConfig, scalarType, queryField } from '../../src/core'
-import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
+import type { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
 for (let i = 0; i < 10; i++) {

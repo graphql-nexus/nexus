@@ -110,7 +110,7 @@ describe('makeSchema', () => {
         },
         path.normalize(`/dev/null/file.ts`)
       )
-      expect(tsTypes).toContain(`import { GraphQLInputFieldConfigMap } from "graphql"`)
+      expect(tsTypes).toContain(`import type { GraphQLInputFieldConfigMap } from "graphql"`)
       expect(tsTypes).toContain(`context: GraphQLInputFieldConfigMap`)
     })
 
@@ -147,8 +147,8 @@ describe('makeSchema', () => {
         path.join(__dirname, 'nexus.ts')
       )
 
-      expect(tsTypes).toContain(`import * as thisFile from "./makeSchema.spec"`)
-      expect(tsTypes).toContain(`import { Context } from "./makeSchema.spec"`)
+      expect(tsTypes).toContain(`import type * as thisFile from "./makeSchema.spec"`)
+      expect(tsTypes).toContain(`import type { Context } from "./makeSchema.spec"`)
     })
   })
 })

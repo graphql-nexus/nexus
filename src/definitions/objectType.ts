@@ -1,7 +1,7 @@
 import { assertValidName, GraphQLObjectType } from 'graphql'
-import { InterfaceFieldsFor } from '../typegenTypeHelpers'
+import type { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
+import type { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
 import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {

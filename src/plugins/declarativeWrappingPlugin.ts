@@ -1,5 +1,5 @@
-import { NexusFinalArgConfig } from '../definitions/args'
-import { NexusInputFieldDef, NexusOutputFieldDef } from '../definitions/definitionBlocks'
+import type { NexusFinalArgConfig } from '../definitions/args'
+import type { NexusInputFieldDef, NexusOutputFieldDef } from '../definitions/definitionBlocks'
 import { list } from '../definitions/list'
 import { nonNull } from '../definitions/nonNull'
 import { nullable } from '../definitions/nullable'
