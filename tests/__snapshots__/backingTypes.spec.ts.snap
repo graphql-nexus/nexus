@@ -19,7 +19,7 @@ exports[`sourceTypings can import enum via sourceType 1`] = `
  */
 
 
-import { TestEnum } from \\"./tests/backingTypes.spec\\"
+import type { TestEnum } from \\"./tests/backingTypes.spec\\"
 
 
 

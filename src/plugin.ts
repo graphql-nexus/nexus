@@ -1,5 +1,5 @@
-import { GraphQLFieldResolver, GraphQLInterfaceType, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
-import { PluginBuilderLens, SchemaConfig } from './builder'
+import type { GraphQLFieldResolver, GraphQLInterfaceType, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
+import type { PluginBuilderLens, SchemaConfig } from './builder'
 import {
   Maybe,
   NexusGraphQLFieldConfig,
@@ -9,13 +9,17 @@ import {
   Omit,
   withNexusSymbol,
 } from './definitions/_types'
-import { InputDefinitionBlock, NexusOutputFieldDef, NexusInputFieldDef } from './definitions/definitionBlocks'
-import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
-import { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
-import { NexusSchemaExtension } from './extensions'
+import type {
+  InputDefinitionBlock,
+  NexusOutputFieldDef,
+  NexusInputFieldDef,
+} from './definitions/definitionBlocks'
+import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
+import type { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
+import type { NexusSchemaExtension } from './extensions'
 import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
-import { NexusFinalArgConfig } from './definitions/args'
-import { UnwrapPromise } from './typeHelpersInternal'
+import type { NexusFinalArgConfig } from './definitions/args'
+import type { UnwrapPromise } from './typeHelpersInternal'
 
 export { PluginBuilderLens }
 

@@ -42,7 +42,7 @@ import {
   isWrappingType,
   printSchema,
 } from 'graphql'
-import { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
+import type { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
@@ -50,10 +50,10 @@ import {
   NexusOutputFieldDef,
   OutputDefinitionBlock,
 } from './definitions/definitionBlocks'
-import { NexusEnumTypeConfig } from './definitions/enumType'
-import { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitions/extendInputType'
-import { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
-import { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
+import type { NexusEnumTypeConfig } from './definitions/enumType'
+import type { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitions/extendInputType'
+import type { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
+import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import {
   FieldModificationDef,
   Implemented,
@@ -62,7 +62,7 @@ import {
   NexusInterfaceTypeDef,
 } from './definitions/interfaceType'
 import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
-import { NexusScalarTypeConfig } from './definitions/scalarType'
+import type { NexusScalarTypeConfig } from './definitions/scalarType'
 import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
 import {
   AllNexusArgsDefs,
@@ -91,7 +91,7 @@ import {
   unwrapGraphQLDef,
   unwrapNexusDef,
 } from './definitions/wrapping'
-import {
+import type {
   MissingType,
   NexusFeaturesInput,
   NexusGraphQLFieldConfig,
@@ -103,8 +103,8 @@ import {
   SourceTypings,
   TypingImport,
 } from './definitions/_types'
-import { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
-import { DynamicOutputPropertyDef } from './dynamicProperty'
+import type { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
+import type { DynamicOutputPropertyDef } from './dynamicProperty'
 import {
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
@@ -123,12 +123,12 @@ import {
 } from './plugin'
 import { declarativeWrappingPlugin } from './plugins'
 import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
-import { SourceTypesConfigOptions } from './typegenAutoConfig'
-import { TypegenFormatFn } from './typegenFormatPrettier'
+import type { SourceTypesConfigOptions } from './typegenAutoConfig'
+import type { TypegenFormatFn } from './typegenFormatPrettier'
 import { TypegenMetadata } from './typegenMetadata'
-import { AbstractTypeResolver, GetGen } from './typegenTypeHelpers'
+import type { AbstractTypeResolver, GetGen } from './typegenTypeHelpers'
 import { resolveTypegenConfig } from './typegenUtils'
-import { RequiredDeeply } from './typeHelpersInternal'
+import type { RequiredDeeply } from './typeHelpersInternal'
 import {
   assertNoMissingTypes,
   casesHandled,

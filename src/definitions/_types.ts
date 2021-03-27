@@ -1,4 +1,4 @@
-import {
+import type {
   GraphQLCompositeType,
   GraphQLEnumType,
   GraphQLFieldConfig,
@@ -13,17 +13,17 @@ import {
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql'
-import {
+import type {
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
   NexusInterfaceTypeExtension,
   NexusObjectTypeExtension,
   NexusSchemaExtension,
 } from '../extensions'
-import * as AbstractTypes from '../typegenAbstractTypes'
-import { RequiredDeeply } from '../typeHelpersInternal'
+import type * as AbstractTypes from '../typegenAbstractTypes'
+import type { RequiredDeeply } from '../typeHelpersInternal'
 
-export { AbstractTypes }
+export type { AbstractTypes }
 
 export type Maybe<T> = T | null
 

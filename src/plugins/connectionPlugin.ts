@@ -1,6 +1,6 @@
 import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
+import type { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
 import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
 import { NexusNullDef, nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
@@ -9,10 +9,10 @@ import {
   AllNexusOutputTypeDefs,
   applyNexusWrapping,
 } from '../definitions/wrapping'
-import { NonNullConfig } from '../definitions/_types'
+import type { NonNullConfig } from '../definitions/_types'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
-import {
+import type {
   ArgsValue,
   FieldTypeName,
   GetGen,
@@ -21,7 +21,7 @@ import {
   ResultValue,
   SourceValue,
 } from '../typegenTypeHelpers'
-import { MaybePromiseLike } from '../typeHelpersInternal'
+import type { MaybePromiseLike } from '../typeHelpersInternal'
 import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
 
 export interface ConnectionPluginConfig {

@@ -1,7 +1,7 @@
 import * as fs from 'fs-jetpack'
 import * as Path from 'path'
 import * as tsm from 'ts-morph'
-import * as ts from 'typescript'
+import type * as ts from 'typescript'
 ;(global as any).TS_FORMAT_PROJECT_ROOT = 'src/'
 
 export function typeCheck(

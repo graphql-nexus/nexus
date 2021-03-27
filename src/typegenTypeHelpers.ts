@@ -1,6 +1,6 @@
-import { GraphQLAbstractType, GraphQLResolveInfo } from 'graphql'
-import { NexusInterfaceTypeDef } from './definitions/interfaceType'
-import { NexusObjectTypeDef } from './definitions/objectType'
+import type { GraphQLAbstractType, GraphQLResolveInfo } from 'graphql'
+import type { NexusInterfaceTypeDef } from './definitions/interfaceType'
+import type { NexusObjectTypeDef } from './definitions/objectType'
 
 declare global {
   interface NexusGen {}

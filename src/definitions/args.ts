@@ -1,6 +1,6 @@
-import { GraphQLScalarTypeConfig } from 'graphql'
-import { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
-import { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
+import type { GraphQLScalarTypeConfig } from 'graphql'
+import type { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
+import type { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 
 export type ArgsRecord = Record<string, AllNexusArgsDefs>

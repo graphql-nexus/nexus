@@ -1,6 +1,6 @@
 import * as path from 'path'
-import { BuilderConfigInput } from './builder'
-import { TypegenMetadataConfig } from './typegenMetadata'
+import type { BuilderConfigInput } from './builder'
+import type { TypegenMetadataConfig } from './typegenMetadata'
 import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
 
 /** Normalizes the builder config into the config we need for typegen */

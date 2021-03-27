@@ -1,7 +1,7 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
 import * as path from 'path'
-import { TypegenInfo } from './builder'
-import { TypingImport } from './definitions/_types'
+import type { TypegenInfo } from './builder'
+import type { TypingImport } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
 import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils'
 
@@ -261,7 +261,7 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
       .forEach((alias) => {
         const [importPath, glob] = importsMap[alias]
         const safeImportPath = importPath.replace(/\\+/g, '/')
-        imports.push(`import ${glob ? '* as ' : ''}${alias} from "${safeImportPath}"`)
+        imports.push(`import type ${glob ? '* as ' : ''}${alias} from "${safeImportPath}"`)
       })
 
     const typegenInfo = {

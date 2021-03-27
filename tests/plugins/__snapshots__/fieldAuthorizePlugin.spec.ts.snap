@@ -49,7 +49,7 @@ exports[`fieldAuthorizePlugin printing the authorize schema: Full Type Output 1`
  */
 
 
-import { FieldAuthorizeResolver } from \\"nexus/dist/plugins/fieldAuthorizePlugin\\"
+import type { FieldAuthorizeResolver } from \\"nexus/dist/plugins/fieldAuthorizePlugin\\"
 
 
 

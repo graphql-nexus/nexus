@@ -1,9 +1,16 @@
-import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLInputFieldConfig } from 'graphql'
+import type { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLInputFieldConfig } from 'graphql'
 import { messages } from '../messages'
-import { AllInputTypes, FieldResolver, GetGen, GetGen3, HasGen3, NeedsResolver } from '../typegenTypeHelpers'
-import { ArgsRecord } from './args'
-import { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
-import { BaseScalars } from './_types'
+import type {
+  AllInputTypes,
+  FieldResolver,
+  GetGen,
+  GetGen3,
+  HasGen3,
+  NeedsResolver,
+} from '../typegenTypeHelpers'
+import type { ArgsRecord } from './args'
+import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
+import type { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
   //todo

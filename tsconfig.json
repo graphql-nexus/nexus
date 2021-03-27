@@ -9,7 +9,9 @@
     "strict": true,
     "noUnusedLocals": true,
     "importHelpers": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "importsNotUsedAsValues": "error"
   },
   "exclude": [
     "./examples",

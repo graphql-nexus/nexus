@@ -1,6 +1,6 @@
 import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
-import { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers'
-import { ArgsRecord } from './args'
+import type { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers'
+import type { ArgsRecord } from './args'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 

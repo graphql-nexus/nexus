@@ -12,10 +12,10 @@ import {
   isWrappingType,
 } from 'graphql'
 import { forEach } from 'iterall'
-import { GraphQLPossibleOutputs } from '../definitions/_types'
-import { NexusGraphQLNamedType } from '../extensions'
+import type { GraphQLPossibleOutputs } from '../definitions/_types'
+import type { NexusGraphQLNamedType } from '../extensions'
 import { CreateFieldResolverInfo, plugin } from '../plugin'
-import { AllOutputTypes, GetGen, GetGen2 } from '../typegenTypeHelpers'
+import type { AllOutputTypes, GetGen, GetGen2 } from '../typegenTypeHelpers'
 import { isPromiseLike, printedGenTyping } from '../utils'
 
 export interface NullabilityPluginFallbackFn {

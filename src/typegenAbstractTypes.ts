@@ -1,5 +1,5 @@
-import { GraphQLResolveInfo } from 'graphql'
-import {
+import type { GraphQLResolveInfo } from 'graphql'
+import type {
   AbstractTypeResolver,
   GetGen,
   GetGen2,
@@ -7,7 +7,7 @@ import {
   MaybePromise,
   SourceValue,
 } from './typegenTypeHelpers'
-import { ConditionalKeys, ConditionalPick, ValueOf } from './typeHelpersInternal'
+import type { ConditionalKeys, ConditionalPick, ValueOf } from './typeHelpersInternal'
 
 /**
  * Returns a union of all the type names of the members of an abstract type

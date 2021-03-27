@@ -1,6 +1,6 @@
 import { assertValidName } from 'graphql'
-import { GetGen } from '../typegenTypeHelpers'
-import { InputDefinitionBlock } from './definitionBlocks'
+import type { GetGen } from '../typegenTypeHelpers'
+import type { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, withNexusSymbol } from './_types'
 
 export interface NexusExtendInputTypeConfig<TypeName extends string> {
