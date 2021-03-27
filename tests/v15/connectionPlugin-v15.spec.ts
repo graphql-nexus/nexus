@@ -1,7 +1,7 @@
 import { executeSync, parse } from 'graphql'
 import { connectionPlugin, makeSchema, objectType } from '../../src'
-import { SchemaConfig } from '../../src/core'
-import { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
+import type { SchemaConfig } from '../../src/core'
+import type { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
 
 const userNodes: { id: string; name: string }[] = []
 for (let i = 0; i < 10; i++) {
