@@ -67,7 +67,7 @@ withNexusSymbol(NexusNonNullDef, NexusTypes.NonNull)
  */
 export function nonNull<TypeName extends NexusNonNullableTypes>(type: TypeName) {
   if (isNexusNonNullTypeDef(type) || isNonNullType(type)) {
-	/*
+    /*
 	  Ran into an issue around the generated return type for `nonNull()`, 
 	  which produces:
 	  
