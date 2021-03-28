@@ -232,13 +232,13 @@ const Query = queryType({
 })
 ```
 
-In a serious/large application with a model layer in the codebase its likely this kind of logic would not live in your resolvers at all.
+In a serious/large application with a model layer in the codebase it's likely this kind of logic would not live in your resolvers at all.
 
 Like with the Centralized strategy Nexus leverages TypeScript to ensure your implementation is correct.
 
 1. The resolver return type for fields whose type is a union will ensure all returned data includes a `__typename` field.
 2. For a given union type, if all fields that are typed as it have their resolvers returning data with `__typename` then back on the union type `resolveType` will be optional.
-3. Nexus is smart about what it needs to be satisfied by `__typename` presence. Rather than being a requirement of the model type, it is a requirement of the model type in resolver cases under the union type. For example note below how the `Photo` model type is not required to include `__typename` under the `photos` Query type field:
+3. Nexus is smart about when it needs to be satisfied by `__typename` presence. Rather than being a requirement of the model type, it is a requirement of the model type in resolver cases under the union type. For example note below how the `Photo` model type is not required to include `__typename` under the `photos` Query type field:
 
    ```ts
    const Query = queryType({
@@ -269,7 +269,7 @@ Like with the Centralized strategy Nexus leverages TypeScript to ensure your imp
    })
    ```
 
-Beware that when this strategy is enabled the `abstractTypeRuntimeChecks` feature will automatically be disabled. This is because it is not practical at runtime to find out if resolvers will return objects that include the `__typename` field. This trade-off can be acceptable since the runtime checks are a redundant safety measure over the static type checks. So as long as you are not ignoring static errors related to Nexus' abstract type type checks then you then you should still have a safe implementation.
+Beware that when this strategy is enabled the `abstractTypeRuntimeChecks` feature will automatically be disabled. This is because it is not practical at runtime to find out if resolvers will return objects that include the `__typename` field. This trade-off can be acceptable since the runtime checks are a redundant safety measure over the static type checks. So as long as you are not ignoring static errors related to Nexus' abstract type type checks then you should still have a safe implementation.
 
 #### Modular Strategy (`isTypeOf`)
 
@@ -342,7 +342,7 @@ makeSchema({
 })
 ```
 
-Nexus enables enabling/disabling strategies because having them all enabled at can lead to a confusing excess of type errors when there is an invalid implementation of an abstract type. Nexus doesn't force you to pick only one strategy, however it does consider using multiple strategies sightly more advanced. Refer to the [Multiple Strategies](#multiple-strategies) section for details.
+Nexus enables enabling/disabling strategies because having them all enabled at can lead to a confusing excess of type errors when there is an invalid implementation of an abstract type. Nexus doesn't force you to pick only one strategy, however it does consider using multiple strategies slightly more advanced. Refer to the [Multiple Strategies](#multiple-strategies) section for details.
 
 When you customize the strategy settings all strategies become disabled except for those that you opt into. For example in the following:
 
@@ -403,7 +403,7 @@ In addition to giving typings for static type checks Nexus also performs runtime
 
 Runtime checks are automatically enabled. In development they will be a warning but in production they will be a thrown error. This way your development flow will not be unduly interrupted but your e.g. deployment pipeline in CI will be halted helping ensure you ship correct code to your users.
 
-If ever you need to diable this runtime check you can disable the feature like so:
+If ever you need to disable this runtime check you can disable the feature like so:
 
 ```ts
 makeSchema({
@@ -432,7 +432,7 @@ Here is a summary of the effects:
 | DMF & Modular               | `*` `__typename` required _unless_ `isTypeOf` implemented on all member types of the abstract type.                                                            |
 | DMF & Modular & centralized | `*` `__typename` required _unless_ `isTypeOf` implemented on all member types of the abstract type _or_ `resolveType` on the abstract type.                    |
 
-`*` Nexus cannot require `resolveType`/`isTypeOf` even though it _should_ becuase it cannot statically detect when you have implemented `__typename`.
+`*` Nexus cannot require `resolveType`/`isTypeOf` even though it _should_ because it cannot statically detect when you have implemented `__typename`.
 
 Here is a code example:
 
@@ -570,7 +570,7 @@ The default `resolveType` implementation is actually to apply the other strategi
 
 ### Interface Types in Theory
 
-Interfaces allow you to define a set of fields that you can then use across objects in your schema to enforce that they all have the fields defined in the interface. Interfaces also act as a form of polymorphism at runtime. You can make a field's type be an interface and may thus then return any type that implements the interface. To illustrate the point we'll appropiate the schema that we used to show off union types.
+Interfaces allow you to define a set of fields that you can then use across objects in your schema to enforce that they all have the fields defined in the interface. Interfaces also act as a form of polymorphism at runtime. You can make a field's type be an interface and may thus then return any type that implements the interface. To illustrate the point we'll appropriate the schema that we used to show off union types.
 
 ```graphql
 interface Media {
