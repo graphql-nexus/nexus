@@ -12,7 +12,7 @@ This plugin integrates [Prisma](https://www.prisma.io/) into [Nexus](https://nex
 
 ```bash-symbol
 npm add nexus-plugin-prisma @prisma/client
-npm add -D @prisma/cli
+npm add -D prisma
 ```
 
 ## Usage
@@ -154,7 +154,7 @@ There are two ways you can start with the Prisma plugin. Either from scratch, or
 3. Create a migration from changes in Prisma schema and run the migration
 
    ```bash-symbol
-   npx prisma migrate dev --preview-feature
+   npx prisma migrate dev
    ```
 
 You're ready to start working!
@@ -205,7 +205,7 @@ Create a `schema.prisma` file and add your database credentials in it so that Pr
 2. Introspect your database:
 
 ```bash-symbol
-npm run prisma introspect
+npx prisma db pull
 ```
 
 3. Generate the Prisma Client. Add the following block at the top of your `schema.prisma` file:
