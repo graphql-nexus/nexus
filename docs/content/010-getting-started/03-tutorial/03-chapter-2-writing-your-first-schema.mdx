@@ -182,7 +182,7 @@ type Query {
 1. The Query object is a central place in your schema where many other types will appear. Like before with the modular GraphQL types decision we again can decide to be modular here. We could either create a new `api/graphql/Query.ts` module (not modular), or we could _collocate_ the exposure of Post object with its definition in `api/graphql/Post.ts` (modular). Staying consistent with before, we'll take the modular way.
 1. To achieve collocation in Nexus we'll use `schema.extendType`. Its API is _very_ similar to `schema.objectType` with the difference that the defined fields are merged into the _targeted_ type.
 1. `.nonNull` specifies that clients will always get a value for this field. By default, in Nexus, all "output types" (types returned by fields) are nullable. This is for [best practice reasons](https://graphql.org/learn/best-practices/#nullability). In this case though we indeed want to guarantee that a list will always be returned, never `null`.
-   If you're ever dissatisfied with Nexus' defaults, not to worry, [you can change them](https://www.nexusjs.org/#/api/modules/main/exports/settings?id=schemanullableinputs).
+   If you're ever dissatisfied with Nexus' defaults, not to worry, [you can change them](https://nexusjs.org/docs/api/make-schema#nonnulldefaults).
 1. `.list` augments the field's type spec, making it wrapped by a List type. Here, a `[Post]`.
 1. The first parameter specifies the field's name, here `drafts`
 1. `type: 'Post'` specifies what the field's type should be. Here, a `Post`
