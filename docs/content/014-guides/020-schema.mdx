@@ -134,9 +134,9 @@ objectType({
   definition(t) {
     t.id('a')
     t.list.id('b')
-    t.nullable.list.id('c')
-    t.list.nullable.id('d')
-    t.nullable.list.nullable.id('e')
+    t.nonNull.list.id('c')
+    t.list.nonNull.id('d')
+    t.nonNull.list.nonNull.id('e')
   },
 })
 ```
@@ -144,10 +144,10 @@ objectType({
 ```graphql
 type Alpha {
   a: ID
-  b: [ID!]!
-  c: [ID!]
-  d: [ID]!
-  e: [ID]
+  b: [ID]
+  c: [ID]!
+  d: [ID!]
+  e: [ID!]!
 }
 ```
 
