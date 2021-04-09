@@ -7,7 +7,7 @@ import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
 export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadataConfig {
   const {
     outputs,
-    shouldGenerateArtifacts = Boolean(!process.env.NODE_ENV || process.env.NODE_ENV === 'development'),
+    shouldGenerateArtifacts = Boolean(!process.env.NODE_ENV || process.env.NODE_ENV !== 'production'),
     ...rest
   } = config
 
