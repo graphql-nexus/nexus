@@ -149,7 +149,7 @@ export const isObject = (obj: any): boolean => obj !== null && typeof obj === 'o
 
 export const assertAbsolutePath = (pathName: string, property: string) => {
   if (!Path.isAbsolute(pathName)) {
-    throw new Error(`Expected path for ${property} to be an absolute path, saw ${pathName}`)
+    throw new Error(`Expected path for "${property}" to be an absolute path, saw "${pathName}"`)
   }
   return pathName
 }
@@ -472,7 +472,7 @@ export function getOwnPackage(): { name: string } {
 
 /** Use this to make assertion at end of if-else chain that all members of a union have been accounted for. */
 export function casesHandled(x: never): never {
-  throw new Error(`A case was not handled for value: ${x}`)
+  throw new Error(`A case was not handled for value: "${x}"`)
 }
 
 /** Quickly log objects */
@@ -490,7 +490,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
 
   if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
     throw new Error(
-      `Expected an absolute path or Node package for the root typing path of the type ${typeName}, saw ${rootTypePath}`
+      `Expected an absolute path or Node package for the root typing path of the type "${typeName}", saw "${rootTypePath}"`
     )
   }
 
@@ -498,10 +498,10 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
     try {
       require.resolve(rootTypePath)
     } catch (e) {
-      throw new Error(`Module ${rootTypePath} for the type ${typeName} does not exist`)
+      throw new Error(`Module "${rootTypePath}" for the type "${typeName}" does not exist`)
     }
   } else if (!fs.existsSync(rootTypePath)) {
-    throw new Error(`Root typing path ${rootTypePath} for the type ${typeName} does not exist`)
+    throw new Error(`Root typing path "${rootTypePath}" for the type "${typeName}" does not exist`)
   }
 
   if (isNodeModule(rootTypePath)) {
