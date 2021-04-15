@@ -36,7 +36,7 @@ Then, configure jest and npm scripts in your `package.json`
 
 ```json
 "scripts": {
-  "dev": "ts-node-dev --transpile-only --no-notify api/app",
+  "dev": "ts-node-dev --transpile-only --no-notify api/index.ts",
   "build": "tsc",
 +  "generate": "ts-node --transpile-only api/schema",
 +  "test": "npm run generate && jest"
@@ -58,7 +58,7 @@ Then, configure jest and npm scripts in your `package.json`
 
 ```json
 "scripts": {
-  "dev": "ts-node-dev --transpile-only --no-notify api/app",
+  "dev": "ts-node-dev --transpile-only --no-notify api/index.ts",
   "build": "tsc",
   "generate": "ts-node --transpile-only api/schema",
   "test": "npm run generate && jest"

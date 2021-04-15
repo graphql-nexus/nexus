@@ -55,7 +55,7 @@ Let's finally add some npm scripts to simplify our future workflows
 ```json file=package.json
 "scripts": {
   "test": "echo \"Error: no test specified\" && exit 1",
-+  "dev": "ts-node-dev --transpile-only --no-notify api/server.ts",
++  "dev": "ts-node-dev --transpile-only --no-notify api/index.ts",
 +  "build": "tsc"
 }
 ```
@@ -67,7 +67,7 @@ Let's finally add some npm scripts to simplify our future workflows
 ```json copy
 "scripts": {
   "test": "echo \"Error: no test specified\" && exit 1",
-  "dev": "ts-node-dev --transpile-only --no-notify api/server.ts",
+  "dev": "ts-node-dev --transpile-only --no-notify api/index.ts",
   "build": "tsc"
 },
 ```
@@ -106,14 +106,19 @@ export const schema = makeSchema({
 
 Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later.
 
-Create an `api/server.ts` file and add the following code to instantiate your GraphQL server
+Create `api/server.ts` and `api/index.ts` files and add the following code to instantiate your GraphQL server:
 
 ```ts copy
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
 import { schema } from './schema'
 
-const server = new ApolloServer({ schema })
+export const server = new ApolloServer({ schema })
+```
+
+```ts copy
+// api/index.ts
+import { server } from './server.ts'
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`)
