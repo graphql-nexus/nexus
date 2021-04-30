@@ -125,7 +125,9 @@ makeSchema({
 ## nonNullDefaults
 
 Controls the nullability of the input / output types emitted by `nexus`. The current Nexus default is
-`{ output: true, input: false }`, though the `graphql-js` / spec default is `{ output: false, input: false }`.
+`{ output: false, input: false }` same as `graphql-js` spec.
+`output`: Whether output field (object type fields) types are non-null by default.
+`input`: Whether input field (field arguments, input object type fields) types are non-null by default.
 
 You should make a decision on this and supply the option yourself, it may be changed / required in the future.
 
