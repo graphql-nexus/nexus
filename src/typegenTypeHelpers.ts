@@ -1,4 +1,5 @@
 import type { GraphQLAbstractType, GraphQLResolveInfo } from 'graphql'
+
 import type { NexusInterfaceTypeDef } from './definitions/interfaceType'
 import type { NexusObjectTypeDef } from './definitions/objectType'
 
@@ -35,8 +36,6 @@ export type MaybePromise<T> = PromiseLike<T> | T
  * use this to help signify that.
  */
 export type MaybePromiseDeep<T> = Date extends T
-  ? MaybePromise<T>
-  : null extends T
   ? MaybePromise<T>
   : boolean extends T
   ? MaybePromise<T>
