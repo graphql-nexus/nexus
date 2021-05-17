@@ -1,17 +1,9 @@
-import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
-import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import type { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
-import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
-import { NexusNullDef, nullable } from '../definitions/nullable'
-import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
 import {
   AllNexusNamedOutputTypeDefs,
   AllNexusOutputTypeDefs,
   applyNexusWrapping,
 } from '../definitions/wrapping'
-import type { NonNullConfig } from '../definitions/_types'
-import { dynamicOutputMethod } from '../dynamicMethod'
-import { completeValue, plugin } from '../plugin'
+import { ArgsRecord, intArg, stringArg } from '../definitions/args'
 import type {
   ArgsValue,
   FieldTypeName,
@@ -21,8 +13,17 @@ import type {
   ResultValue,
   SourceValue,
 } from '../typegenTypeHelpers'
-import type { MaybePromiseLike } from '../typeHelpersInternal'
+import type { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
+import { GraphQLFieldResolver, GraphQLResolveInfo, defaultFieldResolver } from 'graphql'
+import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
+import { NexusNullDef, nullable } from '../definitions/nullable'
+import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
+import { completeValue, plugin } from '../plugin'
 import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
+
+import type { MaybePromiseLike } from '../typeHelpersInternal'
+import type { NonNullConfig } from '../definitions/_types'
+import { dynamicOutputMethod } from '../dynamicMethod'
 
 export interface ConnectionPluginConfig {
   /**
@@ -310,7 +311,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<'context'>,
         info: GraphQLResolveInfo
-      ) => MaybePromise<ResultValue<TypeName, FieldName>> | MaybePromiseDeep<ResultValue<TypeName, FieldName>>
+      ) => MaybePromiseDeep<ResultValue<TypeName, FieldName>>
 
       // resolve XOR nodes
       nodes?: never
