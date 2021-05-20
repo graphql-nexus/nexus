@@ -143,7 +143,7 @@ describe('sourceTypings', () => {
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
-      `"Expected an absolute path or Node package for the root typing path of the type \\\"SomeType\\\", saw \\\"./fzeffezpokm\\\""`
+      `"Expected an absolute path or Node package for the root typing path of the type \\"SomeType\\", saw \\"./fzeffezpokm\\""`
     )
   })
 
