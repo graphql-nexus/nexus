@@ -143,7 +143,7 @@ describe('sourceTypings', () => {
     })
 
     expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
-      `"Expected an absolute path or Node package for the root typing path of the type \"SomeType\", saw \"./fzeffezpokm\""`
+      `"Expected an absolute path or Node package for the root typing path of the type \\\"SomeType\\\", saw \\\"./fzeffezpokm\\\""`
     )
   })
 
@@ -177,7 +177,7 @@ describe('sourceTypings', () => {
       typegen.print()
     } catch (e) {
       expect(e.message.replace(__dirname, '')).toMatchInlineSnapshot(
-        `"Root typing path \"/invalid_path.ts\" for the type \"SomeType\" does not exist"`
+        `"Root typing path \\"/invalid_path.ts\\" for the type \\"SomeType\\" does not exist"`
       )
     }
   })
