@@ -21,7 +21,7 @@ import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from '.
 import type { NexusFinalArgConfig } from './definitions/args'
 import type { UnwrapPromise } from './typeHelpersInternal'
 
-export { PluginBuilderLens }
+export type { PluginBuilderLens }
 
 export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   /** The internal Nexus "builder" object */
