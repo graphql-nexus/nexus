@@ -139,6 +139,7 @@ import {
   graphql15InterfaceConfig,
   graphql15InterfaceType,
   invariantGuard,
+  isArray,
   isObject,
   mapValues,
   objValues,
@@ -952,7 +953,7 @@ export class SchemaBuilder {
   private buildEnumType(config: NexusEnumTypeConfig<any>) {
     const { members } = config
     const values: GraphQLEnumValueConfigMap = {}
-    if (Array.isArray(members)) {
+    if (isArray(members)) {
       members.forEach((m) => {
         if (typeof m === 'string') {
           values[m] = { value: m }
