@@ -34,6 +34,6 @@ npm run examples
 - [apollo-fullstack](apollo-fullstack)
 - [star-wars](star-wars)
 - [kitchen-sink](kitchen-sink)
-- [nexus-prisma](nexus-prisma)
+- [with-prisma](with-prisma)
 
-> The `nexus-prisma` example is not included when all examples are ran at once. You can try it by following the instructions in its [README](nexus-prisma) instead.
+> The `with-prisma` example is not included when all examples are ran at once. You can try it by following the instructions in its [README](with-prisma) instead.

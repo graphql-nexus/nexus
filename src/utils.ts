@@ -600,3 +600,12 @@ export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
   }
   return type as T & { getInterfaces(): GraphQLInterfaceType[] }
 }
+
+/**
+ * A specially typed version of `Array.isArray` to work around [this issue](https://github.com/microsoft/TypeScript/issues/17002).
+ */
+export function isArray<T>(
+  arg: T | {}
+): arg is T extends readonly any[] ? (unknown extends T ? never : readonly any[]) : any[] {
+  return Array.isArray(arg)
+}

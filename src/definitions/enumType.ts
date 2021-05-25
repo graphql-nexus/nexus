@@ -34,7 +34,7 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
   sourceType?: SourceTypingDef
   /** All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum */
   members:
-    | Array<string | EnumMemberInfo>
+    | ReadonlyArray<string | EnumMemberInfo>
     | Record<string, string | number | object | boolean>
     | TypeScriptEnumLike
   /**
