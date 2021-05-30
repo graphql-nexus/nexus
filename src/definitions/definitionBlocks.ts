@@ -116,7 +116,8 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
    * graphql-js based tools which rely on looking for special data here.
    */
   extensions?: GraphQLInputFieldConfig['extensions']
-} & NexusGenPluginFieldConfig<TypeName, FieldName>
+} & NexusGenPluginFieldConfig<TypeName, FieldName> &
+  NexusGenPluginInputFieldConfig<TypeName, FieldName>
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
   /**
