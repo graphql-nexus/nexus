@@ -2,7 +2,7 @@ import { printSchema } from 'graphql'
 import os from 'os'
 import path from 'path'
 import { objectType } from '../src'
-import { generateSchema, makeSchema } from '../src/builder'
+import { generateSchema, makeSchema } from '../src/makeSchema'
 import { queryField } from '../src/definitions/queryField'
 
 export type Test = {
