@@ -2,7 +2,7 @@ import * as blocks from './blocks'
 import * as core from './core'
 
 // All of the Public API definitions
-export { makeSchema } from './builder'
+export { makeSchema } from './makeSchema'
 export { arg, booleanArg, floatArg, idArg, intArg, stringArg } from './definitions/args'
 export { decorateType } from './definitions/decorateType'
 export { enumType } from './definitions/enumType'
