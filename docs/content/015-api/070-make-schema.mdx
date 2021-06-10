@@ -133,9 +133,26 @@ You should make a decision on this and supply the option yourself, it may be cha
 
 Read more on this in the [getting-started](../../../getting-started) guide.
 
-### typegenConfig, formatTypegen
+### typegenConfig
 
-Escape hatches for more advanced cases which need further control over. You typically won't need these.
+Escape hatch for more advanced cases which need further control over generated files. You typically won't need this.
+
+### formatTypegen
+
+Manually apply a formatter to the generated content before saving. Function exposes content and type of generated file.
+
+```ts
+makeSchema({
+  // ...
+  formatTypegen: (content, type) => {
+    if (type === 'types') {
+      return `/* eslint-disable */
+      \n ${content}`;
+    }
+    return content;
+  },
+})
+```
 
 ### customPrintSchemaFn
 
