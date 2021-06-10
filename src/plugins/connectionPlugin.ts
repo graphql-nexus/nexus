@@ -156,10 +156,9 @@ export interface ConnectionPluginConfig {
 }
 
 // Extract the node value from the connection for a given field.
-export type NodeValue<TypeName extends string = any, FieldName extends string = any> = ResultValue<
-  EdgeTypeLookup<TypeName, FieldName>,
-  'node'
->
+export type NodeValue<TypeName extends string = any, FieldName extends string = any> = SourceValue<
+  EdgeTypeLookup<TypeName, FieldName>
+>['node']
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
   type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
