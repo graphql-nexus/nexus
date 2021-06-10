@@ -602,7 +602,8 @@ export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
 }
 
 /**
- * A specially typed version of `Array.isArray` to work around [this issue](https://github.com/microsoft/TypeScript/issues/17002).
+ * A specially typed version of `Array.isArray` to work around [this
+ * issue](https://github.com/microsoft/TypeScript/issues/17002).
  */
 export function isArray<T>(
   arg: T | {}
