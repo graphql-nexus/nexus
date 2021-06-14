@@ -142,6 +142,7 @@ import {
   objValues,
   UNKNOWN_TYPE_SCALAR,
 } from './utils'
+import { TO_NEXUS, isToNexusObject } from './definitions/toNexus'
 
 type NexusShapedOutput = {
   name: string
@@ -325,6 +326,8 @@ export type PluginBuilderLens = {
  * during lazy evaluation.
  */
 export class SchemaBuilder {
+  /** All objects containing a TO_NEXUS symbol */
+  private toNexusObjects = new Set()
   /** Used to check for circular references. */
   protected buildingTypes = new Set()
   /** The "final type" map contains all types as they are built. */
@@ -554,6 +557,14 @@ export class SchemaBuilder {
 
   addTypes(types: any) {
     if (!types) {
+      return
+    }
+    if (isToNexusObject(types)) {
+      if (this.toNexusObjects.has(types)) {
+        return
+      }
+      this.toNexusObjects.add(types)
+      this.addTypes(types[TO_NEXUS]())
       return
     }
     if (isSchema(types)) {

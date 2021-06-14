@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toNexus toNexus 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "id": "User:1",
+      "ok": true,
+    },
+  },
+}
+`;
