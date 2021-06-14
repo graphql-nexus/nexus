@@ -31,7 +31,7 @@ class User {
 describe('toNexus', () => {
   test('toNexus', async () => {
     const schema = makeSchema({
-      types: [User],
+      types: [User, User], // Shouldn't be an issue importing twice
       outputs: {
         schema: false,
         typegen: false,
