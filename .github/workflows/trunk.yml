@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 12.x
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile || yarn --frozen-lockfile
       - name: Install GraphQL@14.x
         run: yarn add graphql@^14.5.8
       - name: Test
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile || yarn --frozen-lockfile
       - name: Check Prettier
         if: matrix.os != 'windows-latest'
         run: yarn format:ci
@@ -66,7 +66,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile && yarn format:ci
+        run: yarn --frozen-lockfile || yarn --frozen-lockfile
+      - name: Check Formatting
+        run: yarn format:ci
       - name: Link
         run: yarn link
       - name: Example Install
@@ -85,7 +87,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v1
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile || yarn --frozen-lockfile
       - name: Release Canary
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
