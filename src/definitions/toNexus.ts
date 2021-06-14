@@ -1,12 +1,7 @@
-/**
- * Symbol marking an object as something that can provide Nexus schema definitions
- */
+/** Symbol marking an object as something that can provide Nexus schema definitions */
 export const TO_NEXUS = Symbol.for('@nexus/toNexus')
 
-/**
- * Object containing a symbol defining a function that should be fed into the Nexus
- * type construction layer
- */
+/** Object containing a symbol defining a function that should be fed into the Nexus type construction layer */
 export type ToNexusObject = {
   [TO_NEXUS]: () => any
 }
