@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { core, enumType, makeSchema, queryType } from '..'
+import { core, enumType, makeSchema, objectType, queryType } from '../src'
 import { A, B } from './_types'
 
 const { TypegenPrinter, TypegenMetadata } = core
@@ -43,7 +43,7 @@ function getSchemaWithConstEnums() {
   })
 }
 
-describe('backingTypes', () => {
+describe('sourceTypes', () => {
   let metadata: core.TypegenMetadata
 
   beforeEach(async () => {
@@ -52,54 +52,57 @@ describe('backingTypes', () => {
         typegen: path.join(__dirname, 'test-gen.ts'),
         schema: path.join(__dirname, 'test-gen.graphql'),
       },
-      typegenAutoConfig: {
-        sources: [
+      sourceTypes: {
+        modules: [
           {
+            module: path.join(__dirname, '_types.ts'),
             alias: 't',
-            source: path.join(__dirname, '_types.ts'),
           },
         ],
-        contextType: 't.TestContext',
+      },
+      contextType: {
+        module: path.join(__dirname, '_types.ts'),
+        export: 'TestContext',
       },
     })
   })
 
-  it('can match backing types to regular enums', async () => {
+  it('can match source types to regular enums', async () => {
     const schema = getSchemaWithNormalEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 
-  it('can match backing types for const enums', async () => {
+  it('can match source types for const enums', async () => {
     const schema = getSchemaWithConstEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
 
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 })
 
-describe('rootTypings', () => {
-  it('can import enum via rootTyping', async () => {
+describe('sourceTypings', () => {
+  it('can import enum via sourceType', async () => {
     const metadata = new TypegenMetadata({
-      outputs: { typegen: false, schema: false },
+      outputs: { typegen: null, schema: null },
     })
     const schema = makeSchema({
       types: [
         enumType({
           name: 'TestEnumType',
           members: TestEnum,
-          rootTyping: {
-            path: __filename,
-            name: 'TestEnum',
+          sourceType: {
+            module: __filename,
+            export: 'TestEnum',
           },
         }),
       ],
@@ -108,8 +111,74 @@ describe('rootTypings', () => {
     const typegenInfo = await metadata.getTypegenInfo(schema)
     const typegen = new TypegenPrinter(schema, {
       ...typegenInfo,
-      typegenFile: '',
+      typegenPath: '',
     })
     expect(typegen.print()).toMatchSnapshot()
+  })
+
+  it('throws error if root typing path is not an absolute path', async () => {
+    const metadata = new TypegenMetadata({
+      outputs: { typegen: null, schema: null },
+    })
+    const someType = objectType({
+      name: 'SomeType',
+      sourceType: {
+        export: 'invalid',
+        module: './fzeffezpokm',
+      },
+      definition(t) {
+        t.id('id')
+      },
+    })
+
+    const schema = makeSchema({
+      types: [someType],
+      outputs: false,
+    })
+
+    const typegenInfo = await metadata.getTypegenInfo(schema)
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenPath: '',
+    })
+
+    expect(() => typegen.print()).toThrowErrorMatchingInlineSnapshot(
+      `"Expected an absolute path or Node package for the root typing path of the type \\"SomeType\\", saw \\"./fzeffezpokm\\""`
+    )
+  })
+
+  it('throws error if root typing path does not exist', async () => {
+    const metadata = new TypegenMetadata({
+      outputs: { typegen: null, schema: null },
+    })
+    const someType = objectType({
+      name: 'SomeType',
+      sourceType: {
+        export: 'invalid',
+        module: __dirname + '/invalid_path.ts',
+      },
+      definition(t) {
+        t.id('id')
+      },
+    })
+
+    const schema = makeSchema({
+      types: [someType],
+      outputs: false,
+    })
+
+    const typegenInfo = await metadata.getTypegenInfo(schema)
+    const typegen = new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenPath: '',
+    })
+
+    try {
+      typegen.print()
+    } catch (e) {
+      expect(e.message.replace(__dirname, '')).toMatchInlineSnapshot(
+        `"Root typing path \\"/invalid_path.ts\\" for the type \\"SomeType\\" does not exist"`
+      )
+    }
   })
 })

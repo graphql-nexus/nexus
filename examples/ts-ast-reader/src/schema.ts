@@ -1,4 +1,4 @@
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { GraphQLNamedType, isObjectType } from 'graphql'
 import path from 'path'
 import * as types from './types'
@@ -9,32 +9,43 @@ export const schema = makeSchema({
     schema: path.join(__dirname, '../ts-ast-reader-schema.graphql'),
     typegen: path.join(__dirname, 'ts-ast-reader-typegen.ts'),
   },
-  typegenAutoConfig: {
-    sources: [
+  sourceTypes: {
+    modules: [
       {
         alias: 'ts',
-        source: 'typescript',
+        module: 'typescript',
         glob: false,
         typeMatch: tsTypeMatch,
       },
       {
         alias: 't',
-        source: path.join(__dirname, './types/index.ts'),
+        module: path.join(__dirname, './types/index.ts'),
         onlyTypes: [],
       },
     ],
-    contextType: 't.ContextType',
-    backingTypeMap: {
+    mapping: {
       Token: 'ts.Token<any>',
     },
     // debug: true,
   },
-  prettierConfig: require.resolve('../../../package.json'),
+  contextType: {
+    module: path.join(__dirname, './types/context.ts'),
+    export: 'ContextType',
+  },
+  prettierConfig: require.resolve('../../../.prettierrc'),
+  nonNullDefaults: {
+    output: true,
+  },
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+    },
+  },
 })
 
 /**
- * When the type is a "Node", we want to first look for types with
- * the name `Node`, e.g. TypeReferenceNode vs TypeReference
+ * When the type is a "Node", we want to first look for types with the name `Node`, e.g. TypeReferenceNode vs
+ * TypeReference
  */
 function tsTypeMatch(type: GraphQLNamedType, defaultMatch: RegExp) {
   if (isNodeType(type)) {

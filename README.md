@@ -1,6 +1,6 @@
-# Nexus Schema
+# Nexus
 
-![trunk](https://github.com/graphql-nexus/schema/workflows/trunk/badge.svg)
+[![trunk](https://github.com/graphql-nexus/nexus/workflows/trunk/badge.svg)](https://github.com/graphql-nexus/nexus/actions/workflows/trunk.yml)
 [![npm version](https://badge.fury.io/js/%40nexus%2Fschema.svg)](https://badge.fury.io/js/%40nexus%2Fschema)
 
 Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript.
@@ -8,10 +8,10 @@ Declarative, code-first and strongly typed GraphQL schema construction for TypeS
 ## Installation
 
 ```
-npm install @nexus/schema graphql
+npm install nexus graphql
 ```
 
-Note you must also add `graphql`. Nexus Schema pins to it as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/).
+Note you must also add `graphql`. Nexus pins to it as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/).
 
 ## Features
 
@@ -33,31 +33,31 @@ Note you must also add `graphql`. Nexus Schema pins to it as a [peer dependency]
 ## Example
 
 ```ts
-import { queryType, stringArg, makeSchema } from "@nexus/schema";
-import { GraphQLServer } from "graphql-yoga";
+import { queryType, stringArg, makeSchema } from 'nexus'
+import { GraphQLServer } from 'graphql-yoga'
 
 const Query = queryType({
   definition(t) {
-    t.string("hello", {
-      args: { name: stringArg({ nullable: true }) },
-      resolve: (parent, { name }) => `Hello ${name || "World"}!`,
-    });
+    t.string('hello', {
+      args: { name: stringArg() },
+      resolve: (parent, { name }) => `Hello ${name || 'World'}!`,
+    })
   },
-});
+})
 
 const schema = makeSchema({
   types: [Query],
   outputs: {
-    schema: __dirname + "/generated/schema.graphql",
-    typegen: __dirname + "/generated/typings.ts",
+    schema: __dirname + '/generated/schema.graphql',
+    typegen: __dirname + '/generated/typings.ts',
   },
-});
+})
 
 const server = new GraphQLServer({
   schema,
-});
+})
 
-server.start(() => `Server is running on http://localhost:4000`);
+server.start(() => `Server is running on http://localhost:4000`)
 ```
 
 More examples can be found in the [`/examples`](./examples) directory:
@@ -70,7 +70,7 @@ More examples can be found in the [`/examples`](./examples) directory:
 
 ## Documentation
 
-You can find the docs for Nexus Schema [here](http://nexusjs.org/).
+You can find the docs for Nexus [here](http://nexusjs.org/).
 
 ## Migrate from SDL
 

@@ -1,5 +1,16 @@
-import { buildSchema, graphql, GraphQLSchema, printSchema, introspectionFromSchema } from 'graphql'
-import { makeSchema, MiddlewareFn, objectType, plugin, queryField, interfaceType } from '../src/core'
+import { buildSchema, graphql, GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
+import {
+  interfaceType,
+  list,
+  makeSchema,
+  MiddlewareFn,
+  nonNull,
+  objectType,
+  plugin,
+  queryField,
+  booleanArg,
+  inputObjectType,
+} from '../src/core'
 import { nullabilityGuardPlugin } from '../src/plugins'
 import { EXAMPLE_SDL } from './_sdl'
 
@@ -29,7 +40,6 @@ describe('plugin', () => {
           onBeforeBuild: () => lifecycleCalls.push('onBeforeBuild'),
           onInstall: () => {
             lifecycleCalls.push('onInstall')
-            return { types: [] }
           },
           onCreateFieldResolver({ fieldConfig }) {
             return async (root, args, ctx, info, next) => {
@@ -46,6 +56,11 @@ describe('plugin', () => {
         }),
         nullGuardPlugin,
       ],
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
     })
     const result = await graphql(
       schema,
@@ -91,6 +106,11 @@ describe('plugin', () => {
       outputs: false,
       types: [buildSchema(EXAMPLE_SDL), nullGuardPlugin],
       plugins: [nullGuardPlugin],
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
     })
   })
 
@@ -126,7 +146,7 @@ describe('plugin', () => {
             if (!exec) {
               return null
             }
-            const [match, typeName, fieldType] = exec
+            const [, typeName, fieldType] = exec
             switch (fieldType) {
               case 'Edge': {
                 return objectType({
@@ -141,8 +161,8 @@ describe('plugin', () => {
                 return objectType({
                   name: name,
                   definition(t) {
-                    t.list.field('edges', {
-                      type: `${typeName}Edge`,
+                    t.field('edges', {
+                      type: list(`${typeName}Edge`),
                     })
                     t.field('connectionInfo', {
                       type: 'ConnectionInfo',
@@ -155,7 +175,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('composes the onCreateFieldResolve fns', async () => {
@@ -208,17 +228,24 @@ describe('plugin', () => {
     //
     const schema = makeSchema({
       outputs: false,
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
       types: [
         interfaceType({
           name: 'Node',
+          resolveType(n) {
+            return n.__typename
+          },
           definition(t) {
-            t.id('id', {
-              nullable: false,
+            t.field('id', {
+              type: nonNull('ID'),
               resolve: () => {
                 throw new Error('Abstract')
               },
             })
-            t.resolveType((n) => n.__typename)
           },
         }),
         objectType({
@@ -241,8 +268,8 @@ describe('plugin', () => {
             const node = (config as any).node as any
             if (node) {
               t.implements('Node')
-              t.id('id', {
-                nullable: false,
+              t.field('id', {
+                type: nonNull('ID'),
                 resolve: (root) => `${config.name}:${root[node]}`,
               })
             }
@@ -265,6 +292,102 @@ describe('plugin', () => {
       `
     )
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
+  })
+
+  it('has an onAddOutputField / onAddInputField / onAddArg option, which receives the field metadata, and can modify the field', async () => {
+    //
+    const schema = makeSchema({
+      outputs: false,
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
+      types: [
+        queryField('ok', {
+          type: 'Boolean',
+          // @ts-ignore
+          listTest: true,
+          args: {
+            // @ts-ignore
+            filter: booleanArg({ listTest: true }),
+            input: inputObjectType({
+              name: 'SomeType',
+              definition(t) {
+                // @ts-ignore
+                t.boolean('inputField', { listTest: true })
+              },
+            }),
+          },
+          resolve: () => [true],
+        }),
+      ],
+      plugins: [
+        plugin({
+          name: 'Node',
+          onAddOutputField(field) {
+            // @ts-ignore
+            if (field.listTest) {
+              field.type = list(field.type)
+            }
+          },
+          onAddInputField(field) {
+            // @ts-ignore
+            if (field.listTest) {
+              field.type = list(field.type)
+            }
+          },
+          onAddArg(arg) {
+            // @ts-ignore
+            if (arg.listTest) {
+              arg.type = list(arg.type)
+            }
+          },
+        }),
+      ],
+    })
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+  })
+
+  it('has an plugin.inputObjectTypeDefTypes field where extra properties for inputObjectType can be added', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation()
+    makeSchema({
+      outputs: false,
+      features: {
+        abstractTypeStrategies: {
+          __typename: true,
+        },
+      },
+      types: [
+        queryField('ok', {
+          type: 'Boolean',
+          // @ts-ignore
+          listTest: true,
+          args: {
+            input: inputObjectType({
+              name: 'SomeType',
+              definition(t) {
+                // @ts-ignore
+                t.boolean('inputField', { listTest: true })
+              },
+              // @ts-ignore
+              extraData: true,
+            }),
+          },
+          resolve: () => [true],
+        }),
+      ],
+      plugins: [
+        plugin({
+          name: 'Node',
+          inputObjectTypeDefTypes: 'extraData?: bool',
+          onAddArg: (field) => {
+            expect(field.type.config.extraData).toBe(true)
+          },
+        }),
+      ],
+    })
+    expect(spy).toBeCalledTimes(0)
   })
 
   it('has a plugin.completeValue fn which is used to efficiently complete a value which is possibly a promise', async () => {

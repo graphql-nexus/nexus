@@ -1,6 +1,7 @@
 {
   "name": "@graphql-nexus/example-kitchen-sink",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "build": "ts-node --log-error src/index.ts",
     "debug": "ts-node-dev --inspect-brk --no-notify --transpileOnly --respawn ./src",
@@ -8,7 +9,6 @@
     "start": "ts-node --transpile-only src/index.ts"
   },
   "dependencies": {
-    "@nexus/schema": "^0.16.0",
     "apollo-server": "^2.18.1",
     "graphql": "^15.3.0",
     "graphql-query-complexity": "^0.4.1",
@@ -16,6 +16,7 @@
     "graphql-subscriptions": "^1.0.0",
     "graphql-tools": "^4.0.7",
     "lodash": "^4.17.15",
+    "nexus": "^1.0.0",
     "subscriptions-transport-ws": "^0.9.15",
     "ts-node": "^8.5.4",
     "typescript": "^3.9"

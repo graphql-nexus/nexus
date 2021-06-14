@@ -45,9 +45,8 @@ export interface LaunchApi extends RESTDataSource {
 
 export interface UserApi extends DataSource {
   /**
-   * User can be called with an argument that includes email, but it doesn't
-   * have to be. If the user is already on the context, it will use that user
-   * instead
+   * User can be called with an argument that includes email, but it doesn't have to be. If the user is
+   * already on the context, it will use that user instead
    */
   findOrCreateUser(obj?: { email?: string | null }): Promise<DBUser | null>
   bookTrips(obj: { launchIds: string[] }): Promise<DBTrip[]>
@@ -65,11 +64,4 @@ export interface Utils {
     getCursor?: Function
   }): T[]
   createStore(): {}
-}
-
-export interface Context {
-  dataSources: {
-    userAPI: UserApi
-    launchAPI: LaunchApi
-  }
 }

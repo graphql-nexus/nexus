@@ -1,9 +1,7 @@
 import { expectAssignable } from 'tsd'
-import { MaybePromiseDeep } from './typegenTypeHelpers'
+import type { MaybePromiseDeep } from './typegenTypeHelpers'
 
-/**
- * MaybePromiseDeep
- */
+/** MaybePromiseDeep */
 
 // A case found by Sytten https://github.com/graphql-nexus/schema/issues/470
 // The presence of .then was leading to type errors

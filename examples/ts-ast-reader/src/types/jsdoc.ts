@@ -1,63 +1,62 @@
-import { interfaceType, objectType, blocks } from "@nexus/schema";
-import ts from "typescript";
+import { interfaceType, objectType, blocks, nullable } from 'nexus'
+import ts from 'typescript'
 
 export const JSDoc = objectType({
-  name: "JSDoc",
+  name: 'JSDoc',
   definition: (t) => {
-    t.string("comment", { nullable: true });
-    t.list.field("tags", { type: "JSDocTag", nullable: true });
+    t.field('comment', { type: nullable('String') })
+    t.list.field('tags', { type: nullable('JSDocTag') })
   },
-});
+})
 
 export const JSDocTag = interfaceType({
-  name: "JSDocTag",
-  definition(t) {
-    t.string("tagName", {
-      nullable: true,
-      resolve: (root) => `${root.tagName.escapedText}`,
-    });
-    t.string("comment", { nullable: true });
-    t.resolveType((tag, ctx, info) => {
-      if (info.schema.getType(ts.SyntaxKind[tag.kind])) {
-        return ts.SyntaxKind[tag.kind] as any;
-      }
-      return "JSDocUnknownTag";
-    });
+  name: 'JSDocTag',
+  resolveType(tag, _ctx, info) {
+    if (info.schema.getType(ts.SyntaxKind[tag.kind])) {
+      return ts.SyntaxKind[tag.kind] as any
+    }
+    return 'JSDocUnknownTag'
   },
-});
+  definition(t) {
+    t.field('tagName', {
+      type: nullable('String'),
+      resolve: (root) => `${root.tagName.escapedText}`,
+    })
+    t.field('comment', { type: nullable('String') })
+  },
+})
 
-const jsDocTag = (t: blocks.ObjectDefinitionBlock<any>) =>
-  t.implements("JSDocTag");
+const jsDocTag = (t: blocks.ObjectDefinitionBlock<any>) => t.implements('JSDocTag')
 
 export const JSDocUnknownTag = objectType({
-  name: "JSDocUnknownTag",
+  name: 'JSDocUnknownTag',
   definition: jsDocTag,
-});
+})
 export const JSDocAugmentsTag = objectType({
-  name: "JSDocAugmentsTag",
+  name: 'JSDocAugmentsTag',
   definition: jsDocTag,
-});
+})
 export const JSDocClassTag = objectType({
-  name: "JSDocClassTag",
+  name: 'JSDocClassTag',
   definition: jsDocTag,
-});
+})
 export const JSDocEnumTag = objectType({
-  name: "JSDocEnumTag",
+  name: 'JSDocEnumTag',
   definition: jsDocTag,
-});
+})
 export const JSDocThisTag = objectType({
-  name: "JSDocThisTag",
+  name: 'JSDocThisTag',
   definition: jsDocTag,
-});
+})
 export const JSDocTemplateTag = objectType({
-  name: "JSDocTemplateTag",
+  name: 'JSDocTemplateTag',
   definition: jsDocTag,
-});
+})
 export const JSDocReturnTag = objectType({
-  name: "JSDocReturnTag",
+  name: 'JSDocReturnTag',
   definition: jsDocTag,
-});
+})
 export const JSDocTypeTag = objectType({
-  name: "JSDocTypeTag",
+  name: 'JSDocTypeTag',
   definition: jsDocTag,
-});
+})

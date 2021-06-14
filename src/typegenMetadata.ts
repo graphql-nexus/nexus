@@ -1,32 +1,29 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
-import path from 'path'
-import { BuilderConfig, TypegenInfo } from './builder'
-import { NexusGraphQLSchema } from './definitions/_types'
+import * as path from 'path'
+import type { BuilderConfigInput, TypegenInfo } from './builder'
+import type { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
 import { typegenAutoConfig } from './typegenAutoConfig'
 import { TypegenFormatFn, typegenFormatPrettier } from './typegenFormatPrettier'
 import { TypegenPrinter } from './typegenPrinter'
 
-export interface TypegenMetadataConfig extends Omit<BuilderConfig, 'outputs' | 'shouldGenerateArtifacts'> {
+export interface TypegenMetadataConfig
+  extends Omit<BuilderConfigInput, 'outputs' | 'shouldGenerateArtifacts'> {
   nexusSchemaImportId?: string
   outputs: {
-    schema: false | string
-    typegen: false | string
+    schema: null | string
+    typegen: null | string
   }
 }
 
 /**
- * Passed into the SchemaBuilder, this keeps track of any necessary
- * field / type metadata we need to be aware of when building the
- * generated types and/or SDL artifact, including but not limited to:
+ * Passed into the SchemaBuilder, this keeps track of any necessary field / type metadata we need to be aware
+ * of when building the generated types and/or SDL artifact, including but not limited to:
  */
 export class TypegenMetadata {
   constructor(protected config: TypegenMetadataConfig) {}
 
-  /**
-   * Generates the artifacts of the build based on what we
-   * know about the schema and how it was defined.
-   */
+  /** Generates the artifacts of the build based on what we know about the schema and how it was defined. */
   async generateArtifacts(schema: NexusGraphQLSchema) {
     const sortedSchema = this.sortSchema(schema)
     if (this.config.outputs.schema || this.config.outputs.typegen) {
@@ -43,7 +40,7 @@ export class TypegenMetadata {
     }
   }
 
-  async generateArtifactContents(schema: NexusGraphQLSchema, typeFilePath: string | false) {
+  async generateArtifactContents(schema: NexusGraphQLSchema, typeFilePath: string | null) {
     const [schemaTypes, tsTypes] = await Promise.all([
       this.generateSchemaFile(schema),
       typeFilePath ? this.generateTypesFile(schema, typeFilePath) : '',
@@ -92,7 +89,7 @@ export class TypegenMetadata {
       }
       // VSCode reacts to file changes better if a file is first deleted,
       // apparently. See issue motivating this logic here:
-      // https://github.com/prisma-labs/nexus/issues/247.
+      // https://github.com/graphql-nexus/schema/issues/247.
       try {
         await removeFile(filePath)
       } catch (e) {
@@ -105,9 +102,7 @@ export class TypegenMetadata {
     }
   }
 
-  /**
-   * Generates the schema, adding any directives as necessary
-   */
+  /** Generates the schema, adding any directives as necessary */
   generateSchemaFile(schema: GraphQLSchema): string {
     let printedSchema = this.config.customPrintSchemaFn
       ? this.config.customPrintSchemaFn(schema)
@@ -115,36 +110,36 @@ export class TypegenMetadata {
     return [SDL_HEADER, printedSchema].join('\n\n')
   }
 
-  /**
-   * Generates the type definitions
-   */
-  async generateTypesFile(schema: NexusGraphQLSchema, typegenFile: string): Promise<string> {
+  /** Generates the type definitions */
+  async generateTypesFile(schema: NexusGraphQLSchema, typegenPath: string): Promise<string> {
+    const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
+
     return new TypegenPrinter(schema, {
-      ...(await this.getTypegenInfo(schema)),
-      typegenFile,
+      ...typegenInfo,
+      typegenPath,
     }).print()
   }
 
-  async getTypegenInfo(schema: GraphQLSchema): Promise<TypegenInfo> {
-    if (this.config.typegenConfig) {
-      if (this.config.typegenAutoConfig) {
-        console.warn(
-          `Only one of typegenConfig and typegenAutoConfig should be specified, ignoring typegenConfig`
-        )
-      }
-      return this.config.typegenConfig(schema, this.config.outputs.typegen || '')
+  async getTypegenInfo(schema: GraphQLSchema, typegenPath?: string): Promise<TypegenInfo> {
+    if ('typegenConfig' in this.config) {
+      throw new Error(
+        'Error: typegenConfig was removed from the API. Please open an issue if you were using it.'
+      )
     }
 
-    if (this.config.typegenAutoConfig) {
-      return typegenAutoConfig(this.config.typegenAutoConfig)(schema, this.config.outputs.typegen || '')
+    if (this.config.sourceTypes) {
+      return typegenAutoConfig(this.config.sourceTypes, this.config.contextType)(
+        schema,
+        typegenPath || this.config.outputs.typegen || ''
+      )
     }
 
     return {
       nexusSchemaImportId: this.config.nexusSchemaImportId,
       headers: [TYPEGEN_HEADER],
       imports: [],
-      contextType: 'any',
-      backingTypeMap: {},
+      contextTypeImport: this.config.contextType,
+      sourceTypeMap: {},
     }
   }
 }

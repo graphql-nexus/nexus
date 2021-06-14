@@ -1,4 +1,4 @@
-import { fieldAuthorizePlugin, makeSchema } from '@nexus/schema'
+import { fieldAuthorizePlugin, makeSchema } from 'nexus'
 import path from 'path'
 import * as allTypes from './schema'
 
@@ -9,22 +9,21 @@ export const schema = makeSchema({
     typegen: path.join(__dirname, 'generated', 'ghost-nexus.ts'),
   },
   plugins: [fieldAuthorizePlugin()],
-  typegenAutoConfig: {
-    contextType: 'ctx.Context',
-    sources: [
+  sourceTypes: {
+    modules: [
       {
-        alias: 'ctx',
-        source: path.join(__dirname, 'data-sources', 'Context.ts'),
-      },
-      {
+        module: path.join(__dirname, 'generated', 'ghost-db-types.ts'),
         alias: 'db',
-        source: path.join(__dirname, 'generated', 'ghost-db-types.ts'),
         typeMatch: (type) => new RegExp(`(?:interface)\\s+(${type.name}s)\\W`),
       },
     ],
-    backingTypeMap: {
+    mapping: {
       Date: 'Date',
     },
   },
-  prettierConfig: require.resolve('../../../package.json'),
+  contextType: {
+    module: path.join(__dirname, 'data-sources', 'Context.ts'),
+    export: 'Context',
+  },
+  prettierConfig: require.resolve('../../../.prettierrc'),
 })

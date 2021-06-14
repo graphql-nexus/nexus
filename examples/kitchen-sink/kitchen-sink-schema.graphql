@@ -99,7 +99,8 @@ input NestedType {
 }
 
 interface Node {
-  id: ID!
+  data: Node
+  id: ID
 }
 
 """
@@ -143,6 +144,27 @@ type Query {
   ): BooleanConnection
   complexQuery(count: Int!): [ComplexObject]
   dateAsList: [Date]
+  deprecatedConnection(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor
+    """
+    before: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last n elements from the list.
+    """
+    last: Int
+  ): BooleanConnection! @deprecated(reason: "Dont use this, use booleanConnection instead")
   extended: SomeItem
   getNumberOrNull(a: Int!): Int
   guardedConnection(
@@ -197,6 +219,10 @@ type Query {
     """
     first: Int!
   ): UserConnection
+
+  """
+  A connection with some user nodes
+  """
   usersConnectionNodes(
     """
     Returns the elements in the list that come after the specified cursor
@@ -250,12 +276,19 @@ type SomeItem {
   id: ID
 }
 
-type TestObj implements Bar & Baz {
+type SomeNode implements Node {
+  data: SomeNode
+  id: ID
+}
+
+type TestObj implements Bar & Baz & Node {
   """
   'A' description
   """
   a: Bar
   argsTest(a: InputType = { answer: 2, key: "one" }): Boolean
+  data: Node
+  id: ID!
   item: String
   ok: Boolean
 }

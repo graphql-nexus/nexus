@@ -2,9 +2,10 @@
 ### Do not make changes to this file directly
 
 type Query {
-  users(world: String): [User!]!
+  users(world: String): [User]
 }
 
 type User {
-  id: ID!
+  id: ID
+  name: String
 }

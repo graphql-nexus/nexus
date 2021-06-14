@@ -1,7 +1,9 @@
+import * as fs from 'fs'
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
   GraphQLNamedType,
   GraphQLObjectType,
   GraphQLResolveInfo,
@@ -9,11 +11,10 @@ import {
   GraphQLSchema,
   GraphQLType,
   GraphQLUnionType,
+  isAbstractType,
   isEnumType,
   isInputObjectType,
   isInterfaceType,
-  isListType,
-  isNonNullType,
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
@@ -21,10 +22,24 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import path from 'path'
+import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
-import { MissingType, NexusTypes, withNexusSymbol } from './definitions/_types'
-import { PluginConfig } from './plugin'
+import {
+  AllNexusArgsDefs,
+  AllNexusNamedTypeDefs,
+  AllNexusTypeDefs,
+  isNexusWrappingType,
+  isNexusArgDef,
+  AllNexusNamedInputTypeDefs,
+} from './definitions/wrapping'
+import {
+  MissingType,
+  NexusFeatures,
+  NexusGraphQLSchema,
+  NexusTypes,
+  TypingImport,
+  withNexusSymbol,
+} from './definitions/_types'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
   return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]))
@@ -32,15 +47,11 @@ export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => 
 
 // ----------------------------
 
-/**
- *
- * Copied from graphql-js:
- *
- */
+/** Copied from graphql-js: */
 
 /**
- * Given an invalid input string and a list of valid options, returns a filtered
- * list of valid options sorted based on their similarity with the input.
+ * Given an invalid input string and a list of valid options, returns a filtered list of valid options sorted
+ * based on their similarity with the input.
  */
 export function suggestionList(input: string = '', options: string[] = []): string[] {
   var optionsByDistance = Object.create(null)
@@ -63,14 +74,12 @@ export function suggestionList(input: string = '', options: string[] = []): stri
 /**
  * Computes the lexical distance between strings A and B.
  *
- * The "distance" between two strings is given by counting the minimum number
- * of edits needed to transform string A into string B. An edit can be an
- * insertion, deletion, or substitution of a single character, or a swap of two
- * adjacent characters.
+ * The "distance" between two strings is given by counting the minimum number of edits needed to transform
+ * string A into string B. An edit can be an insertion, deletion, or substitution of a single character, or a
+ * swap of two adjacent characters.
  *
- * Includes a custom alteration from Damerau-Levenshtein to treat case changes
- * as a single edit which helps identify mis-cased values with an edit distance
- * of 1.
+ * Includes a custom alteration from Damerau-Levenshtein to treat case changes as a single edit which helps
+ * identify mis-cased values with an edit distance of 1.
  *
  * This distance can be useful for detecting typos in input or sorting
  */
@@ -139,8 +148,8 @@ export function eachObj<T>(obj: Record<string, T>, iter: (val: T, key: string, i
 export const isObject = (obj: any): boolean => obj !== null && typeof obj === 'object'
 
 export const assertAbsolutePath = (pathName: string, property: string) => {
-  if (!path.isAbsolute(pathName)) {
-    throw new Error(`Expected path for ${property} to be an absolute path, saw ${pathName}`)
+  if (!Path.isAbsolute(pathName)) {
+    throw new Error(`Expected path for "${property}" to be an absolute path, saw "${pathName}"`)
   }
   return pathName
 }
@@ -207,13 +216,34 @@ export function isPromiseLike(value: any): value is PromiseLike<any> {
   return Boolean(value && typeof value.then === 'function')
 }
 
-export function relativePathTo(absolutePath: string, outputPath: string): string {
-  const filename = path.basename(absolutePath).replace(/(\.d)?\.ts/, '')
-  const relative = path.relative(path.dirname(outputPath), path.dirname(absolutePath))
-  if (relative.indexOf('.') !== 0) {
-    return `./${path.join(relative, filename)}`
-  }
-  return path.join(relative, filename)
+export const typeScriptFileExtension = /(\.d)?\.ts$/
+
+function makeRelativePathExplicitlyRelative(path: string) {
+  if (Path.isAbsolute(path)) return path
+  if (path.startsWith('./')) return path
+  return `./${path}`
+}
+
+function nixifyPathSlashes(path: string): string {
+  return path.replace(/\\+/g, '/')
+}
+
+/**
+ * Format a path so it is suitable to be used as a module import.
+ *
+ * - Implicitly relative is made explicitly relative - TypeScript file extension is stripped - Windows slashes
+ * converted into *nix slashes
+ *
+ * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
+ */
+export function formatPathForModuleImport(path: string) {
+  return nixifyPathSlashes(makeRelativePathExplicitlyRelative(path).replace(typeScriptFileExtension, ''))
+}
+
+export function relativePathTo(absolutePath: string, fromPath: string): string {
+  const filename = Path.basename(absolutePath)
+  const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
+  return formatPathForModuleImport(Path.join(relative, filename))
 }
 
 export interface PrintedGenTypingImportConfig {
@@ -268,30 +298,6 @@ export function printedGenTyping(config: PrintedGenTypingConfig) {
   return new PrintedGenTyping(config)
 }
 
-export function unwrapType(
-  type: GraphQLType
-): { type: GraphQLNamedType; isNonNull: boolean; list: boolean[] } {
-  let finalType = type
-  let isNonNull = false
-  const list = []
-  while (isWrappingType(finalType)) {
-    while (isListType(finalType)) {
-      finalType = finalType.ofType
-      if (isNonNullType(finalType)) {
-        finalType = finalType.ofType
-        list.unshift(true)
-      } else {
-        list.unshift(false)
-      }
-    }
-    if (isNonNullType(finalType)) {
-      isNonNull = true
-      finalType = finalType.ofType
-    }
-  }
-  return { type: finalType, isNonNull, list }
-}
-
 export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record<string, MissingType>) {
   const missingTypesNames = Object.keys(missingTypes)
   const schemaTypeMap = schema.getTypeMap()
@@ -324,6 +330,77 @@ export function assertNoMissingTypes(schema: GraphQLSchema, missingTypes: Record
   }
 }
 
+export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, features: NexusFeatures) {
+  if (features.abstractTypeRuntimeChecks === false) {
+    return
+  }
+
+  const abstractTypes = Object.values(schema.getTypeMap()).filter(isAbstractType)
+
+  abstractTypes.forEach((type) => {
+    const kind = isInterfaceType(type) ? 'Interface' : 'Union'
+    const resolveTypeImplemented = type.resolveType !== undefined
+    const typesWithoutIsTypeOf = schema.getPossibleTypes(type).filter((type) => type.isTypeOf === undefined)
+
+    // if no resolveType implemented but resolveType strategy enabled and isTypeOf strategy disabled
+    if (
+      resolveTypeImplemented === false &&
+      features.abstractTypeStrategies.resolveType === true &&
+      features.abstractTypeStrategies.isTypeOf === false
+    ) {
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }".`
+      const message = `${messagePrefix} It is missing a \`resolveType\` implementation.`
+      raiseProgrammerError(new Error(message))
+    }
+
+    // if some isTypeOf implementations are missing but isTypeOf strategy enabled
+    if (
+      typesWithoutIsTypeOf.length > 0 &&
+      features.abstractTypeStrategies.isTypeOf === true &&
+      features.abstractTypeStrategies.resolveType === false
+    ) {
+      const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }".`
+      const messageSuffix = `are missing an \`isTypeOf\` implementation: ${messageBadTypes}`
+      let message
+      if (kind === 'Union') {
+        message = `${messagePrefix} Some members of union type "${type.name}" ${messageSuffix}`
+      } else if (kind === 'Interface') {
+        message = `${messagePrefix} Some objects implementing the interface type "${type.name}" ${messageSuffix}`
+      } else {
+        casesHandled(kind)
+      }
+      raiseProgrammerError(new Error(message))
+    }
+
+    // if some isTypeOf or resolveType implementations are missing but isTypeOf and resolveType strategy enabled
+    if (
+      (resolveTypeImplemented === false || typesWithoutIsTypeOf.length > 0) &&
+      features.abstractTypeStrategies.isTypeOf === true &&
+      features.abstractTypeStrategies.resolveType === true
+    ) {
+      const messageBadTypes = typesWithoutIsTypeOf.map((t) => `"${t.name}"`).join(', ')
+      const messagePrefix = `You have a faulty implementation for your ${kind.toLowerCase()} type "${
+        type.name
+      }". Either implement its \`resolveType\` or implement \`isTypeOf\` on each object`
+      const messageSuffix = `These objects are missing an \`isTypeOf\` implementation: ${messageBadTypes}`
+      let message
+      if (kind === 'Union') {
+        message = `${messagePrefix} in the union. ${messageSuffix}`
+      } else if (kind === 'Interface') {
+        message = `${messagePrefix} that implements this interface. ${messageSuffix}`
+      } else {
+        casesHandled(kind)
+      }
+      raiseProgrammerError(new Error(message))
+    }
+  })
+}
+
 export function consoleWarn(msg: string) {
   console.warn(msg)
 }
@@ -333,12 +410,12 @@ export function log(msg: string) {
 }
 
 /**
- * Calculate the venn diagram between two iterables based on reference equality
- * checks. The returned tripple contains items thusly:
+ * Calculate the venn diagram between two iterables based on reference equality checks. The returned tripple
+ * contains items thusly:
  *
- *    * items only in arg 1 --> first tripple slot
- *    * items in args 1 & 2 --> second tripple slot
- *    * items only in arg 2 --> third tripple slot
+ *     * items only in arg 1 --> first tripple slot
+ *     * items in args 1 & 2 --> second tripple slot
+ *     * items only in arg 2 --> third tripple slot
  */
 export function venn<T>(xs: Iterable<T>, ys: Iterable<T>): [Set<T>, Set<T>, Set<T>] {
   const lefts: Set<T> = new Set(xs)
@@ -356,27 +433,12 @@ export function venn<T>(xs: Iterable<T>, ys: Iterable<T>): [Set<T>, Set<T>, Set<
   return [lefts, boths, rights]
 }
 
-/**
- * Validate that the data returned from a plugin from the `onInstall` hook is valid.
- */
-export function validateOnInstallHookResult(
-  pluginName: string,
-  hookResult: ReturnType<Exclude<PluginConfig['onInstall'], undefined>>
-): void {
-  if (!Array.isArray(hookResult?.types)) {
-    throw new Error(
-      `Plugin "${pluginName}" returned invalid data for "onInstall" hook:\n\nexpected structure:\n\n  { types: NexusAcceptedTypeDef[] }\n\ngot:\n\n  ${hookResult}`
-    )
-  }
-  // TODO we should validate that the array members all fall under NexusAcceptedTypeDef
-}
-
 export const UNKNOWN_TYPE_SCALAR = decorateType(
   new GraphQLScalarType({
     name: 'NEXUS__UNKNOWN__TYPE',
     description: `
     This scalar should never make it into production. It is used as a placeholder for situations
-    where GraphQL Nexus encounters a missing type. We don't want to error immedately, otherwise
+    where GraphQL Nexus encounters a missing type. We don't want to error immediately, otherwise
     the TypeScript definitions will not be updated.
   `,
     parseValue(value) {
@@ -390,7 +452,7 @@ export const UNKNOWN_TYPE_SCALAR = decorateType(
     },
   }),
   {
-    rootTyping: 'never',
+    sourceType: 'never',
   }
 )
 
@@ -408,10 +470,143 @@ export function getOwnPackage(): { name: string } {
   return require('../package.json')
 }
 
-/**
- * Use this to make assertion at end of if-else chain that all members of a
- * union have been accounted for.
- */
+/** Use this to make assertion at end of if-else chain that all members of a union have been accounted for. */
 export function casesHandled(x: never): never {
-  throw new Error(`A case was not handled for value: ${x}`)
+  throw new Error(`A case was not handled for value: "${x}"`)
+}
+
+/** Quickly log objects */
+export function dump(x: any) {
+  console.log(require('util').inspect(x, { depth: null }))
+}
+
+function isNodeModule(path: string) {
+  // Avoid treating absolute windows paths as Node packages e.g. D:/a/b/c
+  return !Path.isAbsolute(path) && /^([A-z0-9@])/.test(path)
+}
+
+export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
+  const rootTypePath = rootType.module
+
+  if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
+    throw new Error(
+      `Expected an absolute path or Node package for the root typing path of the type "${typeName}", saw "${rootTypePath}"`
+    )
+  }
+
+  if (isNodeModule(rootTypePath)) {
+    try {
+      require.resolve(rootTypePath)
+    } catch (e) {
+      throw new Error(`Module "${rootTypePath}" for the type "${typeName}" does not exist`)
+    }
+  } else if (!fs.existsSync(rootTypePath)) {
+    throw new Error(`Root typing path "${rootTypePath}" for the type "${typeName}" does not exist`)
+  }
+
+  if (isNodeModule(rootTypePath)) {
+    return rootTypePath
+  }
+
+  if (Path.isAbsolute(rootTypePath)) {
+    return relativePathTo(rootTypePath, outputPath)
+  }
+
+  return rootTypePath
+}
+
+/** Given the right hand side of an arg definition, returns the underlying "named type" for us to add to the builder */
+export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusNamedInputTypeDefs | string {
+  let finalValue = argDef
+  if (typeof finalValue === 'string') {
+    return finalValue
+  }
+  while (isNexusWrappingType(finalValue) || isWrappingType(finalValue) || isNexusArgDef(finalValue)) {
+    if (isNexusArgDef(finalValue)) {
+      finalValue = finalValue.value.type
+    } else if (isNexusWrappingType(finalValue)) {
+      finalValue = finalValue.ofNexusType
+    } else if (isWrappingType(finalValue)) {
+      finalValue = finalValue.ofType
+    }
+  }
+  return finalValue
+}
+
+export function getNexusNamedType(
+  type: AllNexusTypeDefs | GraphQLType | string
+): AllNexusNamedTypeDefs | GraphQLNamedType | string {
+  if (typeof type === 'string') {
+    return type
+  }
+  let namedType = type
+  while (isNexusWrappingType(namedType) || isWrappingType(namedType)) {
+    if (isNexusWrappingType(namedType)) {
+      namedType = namedType.ofNexusType
+    }
+    if (isWrappingType(namedType)) {
+      namedType = namedType.ofType
+    }
+  }
+  return namedType
+}
+
+/** Assertion utility with nexus-aware feedback for users. */
+export function invariantGuard(val: any) {
+  /* istanbul ignore next */
+  if (Boolean(val) === false) {
+    throw new Error(
+      'Nexus Error: This should never happen, ' +
+        'please check your code or if you think this is a bug open a GitHub issue https://github.com/graphql-nexus/schema/issues/new.'
+    )
+  }
+}
+
+/** Is the current stage production? If NODE_ENV envar is set to "production" or "prod" then yes it is. */
+export function isProductionStage() {
+  return process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod'
+}
+
+/** Throw a programmer error in production but only log it in development. */
+export function raiseProgrammerError(error: Error) {
+  if (isProductionStage()) {
+    throw error
+  } else {
+    console.error(error)
+  }
+}
+
+export class Unreachable extends Error {
+  /* istanbul ignore next */
+  constructor(val: never) {
+    super(`Unreachable case or branch, unexpected ${val}`)
+  }
+}
+
+export function graphql15InterfaceConfig<T extends GraphQLInterfaceTypeConfig<any, any>>(
+  config: T
+): T & { interfaces: GraphQLInterfaceType[] } {
+  return {
+    ...config,
+    interfaces: [],
+  }
+}
+
+export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
+  type: T & { getInterfaces?: () => GraphQLInterfaceType[] }
+): T & { getInterfaces(): GraphQLInterfaceType[] } {
+  if (typeof type.getInterfaces !== 'function') {
+    type.getInterfaces = () => []
+  }
+  return type as T & { getInterfaces(): GraphQLInterfaceType[] }
+}
+
+/**
+ * A specially typed version of `Array.isArray` to work around [this
+ * issue](https://github.com/microsoft/TypeScript/issues/17002).
+ */
+export function isArray<T>(
+  arg: T | {}
+): arg is T extends readonly any[] ? (unknown extends T ? never : readonly any[]) : any[] {
+  return Array.isArray(arg)
 }

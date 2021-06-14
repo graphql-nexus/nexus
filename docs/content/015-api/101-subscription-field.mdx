@@ -1,0 +1,29 @@
+---
+title: subscriptionField
+codeStyle: true
+---
+
+## subscriptionField
+
+Often times you want to split up subscription fields into different domains of your application.
+
+Like `queryField` and `mutationField` except that like `subscriptionType` the `subscribe` field is required on the type configuration. Refer to [`subscriptionType`](/api/subscription-type) docs for details
+
+```ts
+import { subscriptionField } from 'nexus'
+
+export const SubscriptionField = subscriptionField('truths', {
+  type: 'Boolean',
+  subscribe() {
+    return (async function*() {
+      while (true) {
+        await new Promise(res => setTimeout(res, 1000))
+        yield Math.random() > 0.5
+      }
+    })()
+  },
+  resolve(eventData) {
+    return eventData
+  },
+})
+```

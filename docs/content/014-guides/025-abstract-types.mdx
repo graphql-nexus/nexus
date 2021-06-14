@@ -1,0 +1,692 @@
+---
+title: Abstract Types
+---
+
+## Overview
+
+This guide covers the topic of GraphQL Union types and Interface types. You will learn how Nexus makes these features of the GraphQL specification easy and safe to work with.
+
+## Union Types
+
+### Union Types in Theory
+
+#### Introduction
+
+A GraphQL Union type is a polymorphic type. That is, it permits multiple disparate types to be gathered under a single field. Take for example this schema:
+
+```graphql
+type Photo {
+  width: Int
+  height: Int
+  url: String
+}
+
+enum MovieRating {
+  g
+  pg
+  pg13
+  r
+}
+
+type Movie {
+  rating: MovieRating
+  url: String
+}
+
+type Song {
+  album: String
+  url: String
+}
+
+union SearchResult = Photo | Movie | Song
+
+type Query {
+  search(pattern: String): SearchResult
+}
+```
+
+`SearchResult` is a union type and with it we can model search results which may be of various types.
+
+References:
+
+- [GraphQL.org Union Types](https://graphql.org/learn/schema/#union-types)
+
+#### Over the Wire
+
+When it comes time to implementing union types in your GraphQL schema it is necessary to annotate the data so that clients can send operations to the GraphQL API in a type safe way. Take for example this query against the schema we've seen above:
+
+```graphql
+query {
+  search(pattern: "Strawberry") {
+    ... on Photo {
+      width
+      height
+      url
+    }
+    ... on Movie {
+      rating
+      url
+    }
+    ... on Song {
+      album
+      url
+    }
+  }
+}
+```
+
+In order for this builtin polymorphic system to work, your GraphQL API must ultimately annotate the outgoing data with a property to discriminate results by on the client side. The spec states that this discriminant property is `__typename`.
+
+### Union Types in Practice
+
+We can represent the above schema in Nexus as follows:
+
+```ts
+const Movie = objectType({
+  name: 'Movie',
+  definition(t) {
+    t.string('url')
+    t.field('rating', {
+      type: 'MovieRating',
+    })
+  },
+})
+
+const MovieRating = enumType({
+  name: 'MovieRating',
+  members: ['g', 'pg', 'pg13', 'r'],
+})
+
+const Photo = objectType({
+  name: 'Photo',
+  definition(t) {
+    t.string('url')
+    t.int('width')
+    t.int('height')
+  },
+})
+
+const Song = objectType({
+  name: 'Song',
+  definition(t) {
+    t.string('url')
+    t.string('album')
+  },
+})
+
+const SearchResult = unionType({
+  name: 'SearchResult',
+  definition(t) {
+    t.members('Photo', 'Movie', 'Song')
+  },
+})
+
+const Query = queryType({
+  definition(t) {
+    t.field('search', {
+      type: 'SearchResult',
+      args: {
+        pattern: stringArg(),
+      },
+    })
+  },
+})
+```
+
+But what is missing here is the implementation of the discriminant property. In Nexus there are three possible implementations to choose from, depending on your preferences or requirements (e.g. team standards).
+
+1. Centralized Strategy: Implement `resolveType` on the union type itself
+2. Modular Strategy: Implement `isTypeOf` on each member of the union
+3. Discriminant Model Field (DMF) Strategy: Return a `__typename` discriminant property in the model data.
+
+Let's explore each of these strategies.
+
+#### Centralized Strategy (`resolveType`)
+
+The Centralized strategy allows you to discriminate your union member types in a centralized (to the union type) way. For example:
+
+```ts
+const SearchResult = unionType({
+  name: 'SearchResult',
+  resolveType(data) {
+    const __typename =
+      'album' in data ? 'Song' : 'rating' in data ? 'Movie' : 'width' in data ? 'Photo' : null
+
+    if (!__typename) {
+      throw new Error(`Could not resolve the type of data passed to union type "SearchResult"`)
+    }
+
+    return __typename
+  },
+  definition(t) {
+    t.members('Photo', 'Movie', 'Song')
+  },
+})
+```
+
+Each time you add a new member to the union type you will need to update your implementation of `resolveType`.
+
+Nexus leverages TypeScript to statically ensure that your implementation is correct. Specifically:
+
+1. `resolveType` field will be required, unless one of:
+   - Each member type has had `isTypeOf` implemented
+   - Each member type has had its model type (backing type) specified to include `__typename`
+   - The ResolveType strategy is disabled globally
+2. `resolveType` `data` param will be typed as a union of all the member types' model types (backing types).
+3. `resolveType` return type will be typed as a union of string literals matching the GraphQL object type names of all members in the GraphQL union type.
+
+#### Discriminant Model Field (DMF) Strategy (`__typename`)
+
+The DMF strategy allows you to discriminate your union member types in a _potentialy_ modular way. It is based on supplying at `__typename` field in the model data returned by resolvers of fields typed as an abstract type. Here is an example:
+
+```ts
+const Query = queryType({
+  definition(t) {
+    t.field('search', {
+      type: 'SearchResult',
+      args: {
+        pattern: stringArg(),
+      },
+      resolve(root, args, ctx) {
+        return ctx.db.search(args.pattern).map((result) => {
+          const __typename =
+            'album' in data ? 'Song' : 'rating' in data ? 'Movie' : 'width' in data ? 'Photo' : null
+
+          if (!__typename) {
+            throw new Error(
+              `Could not resolve the type of data passed to union type "SearchResult"`
+            )
+          }
+
+          return {
+            ...result,
+            __typename,
+          }
+        })
+      },
+    })
+  },
+})
+```
+
+As you can see the technique looks quite similar at face value to the Centralized strategy shown before. However your implementation might not look like this at all. For example maybe your data models already contain a discriminant property `typeName`. For example:
+
+```ts
+const Query = queryType({
+  definition(t) {
+    t.field('search', {
+      type: 'SearchResult',
+      args: {
+        pattern: stringArg(),
+      },
+      resolve(root, args, ctx) {
+        return ctx.db.search(args.pattern).map((result) => {
+          return {
+            ...result,
+            __typename: result.typeName,
+          }
+        })
+      },
+    })
+  },
+})
+```
+
+In a serious/large application with a model layer in the codebase it's likely this kind of logic would not live in your resolvers at all.
+
+Like with the Centralized strategy Nexus leverages TypeScript to ensure your implementation is correct.
+
+1. The resolver return type for fields whose type is a union will ensure all returned data includes a `__typename` field.
+2. For a given union type, if all fields that are typed as it have their resolvers returning data with `__typename` then back on the union type `resolveType` will be optional.
+3. Nexus is smart about when it needs to be satisfied by `__typename` presence. Rather than being a requirement of the model type, it is a requirement of the model type in resolver cases under the union type. For example note below how the `Photo` model type is not required to include `__typename` under the `photos` Query type field:
+
+   ```ts
+   const Query = queryType({
+     definition(t) {
+       t.list.field('photos', {
+         type: 'Photo',
+         resolve(root, args, ctx) {
+           // Nexus does not require __typename here
+           return ctx.db.get.photos()
+         },
+       })
+       t.field('search', {
+         type: 'SearchResult',
+         args: {
+           pattern: stringArg(),
+         },
+         resolve(root, args, ctx) {
+           // Nexus requires __typename here
+           return ctx.db.search(args.pattern).map((result) => {
+             return {
+               ...result,
+               __typename: result.typeName,
+             }
+           })
+         },
+       })
+     },
+   })
+   ```
+
+Beware that when this strategy is enabled the `abstractTypeRuntimeChecks` feature will automatically be disabled. This is because it is not practical at runtime to find out if resolvers will return objects that include the `__typename` field. This trade-off can be acceptable since the runtime checks are a redundant safety measure over the static type checks. So as long as you are not ignoring static errors related to Nexus' abstract type type checks then you should still have a safe implementation.
+
+#### Modular Strategy (`isTypeOf`)
+
+The Modular strategy allows you to discriminate your union member types in a modular way (surprise). It uses a predicate function that you implement that allows Nexus (actually GraphQL.js under the hood) to know at runtime if data being sent to the client is of a respective type or not. Here is an example:
+
+```ts
+const Movie = objectType({
+  name: 'Movie',
+  isTypeOf(data) {
+    return Boolean(data.rating)
+  },
+  definition(t) {
+    t.string('url')
+    t.field('rating', {
+      type: 'MovieRating',
+    })
+  },
+})
+
+const Photo = objectType({
+  name: 'Photo',
+  isTypeOf(data) {
+    return Boolean(data.width)
+  },
+  definition(t) {
+    t.string('url')
+    t.int('width')
+    t.int('height')
+  },
+})
+
+const Song = objectType({
+  name: 'Song',
+  isTypeOf(data) {
+    return Boolean(data.album)
+  },
+  definition(t) {
+    t.string('url')
+    t.string('album')
+  },
+})
+```
+
+Like with the Centralized and DMF strategies Nexus leverages TypeScript to ensure your implementation is correct in the following ways:
+
+1. If an object is a member of a union type then that object's `isTypeOf` field will be required, unless:
+   - The union type has defined `resolveType`
+   - The model type includes `__typename` property whose type is a string literal matching the GraphQL object name (case sensitive).
+   - The fields where the union type is used include `__typename` in the returned model data
+   - The IsTypeOf strategy is disabled globally
+
+### Picking Your Strategy (Or Strategies)
+
+#### Configuration
+
+Nexus enables you to pick the strategy you want to use. By default only the Centralized strategy is enabled. You can pick your strategies in the `makeSchema` configuration.
+
+```ts
+import { makeSchema } from 'nexus'
+
+makeSchema({
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true, // default
+      isTypeOf: false, // default
+      __typename: false, // default
+    },
+  },
+  //...
+})
+```
+
+Nexus enables enabling/disabling strategies because having them all enabled at can lead to a confusing excess of type errors when there is an invalid implementation of an abstract type. Nexus doesn't force you to pick only one strategy, however it does consider using multiple strategies slightly more advanced. Refer to the [Multiple Strategies](#multiple-strategies) section for details.
+
+When you customize the strategy settings all strategies become disabled except for those that you opt into. For example in the following:
+
+```ts
+import { makeSchema } from 'nexus'
+
+makeSchema({
+  features: {
+    abstractTypeStrategies: {
+      isTypeOf: true,
+    },
+  },
+  //...
+})
+```
+
+The resolved settings would be:
+
+```ts
+{
+  abstractTypeStrategies: {
+    resolveType: false, // The `true` default when no config is given is NOT inherited here
+    isTypeOf: true,
+    __typename: false,
+  }
+}
+```
+
+_Not_:
+
+```ts
+{
+  abstractTypeStrategies: {
+    resolveType: true,  // <-- NOT what actually happens
+    isTypeOf: true,
+    __typename: false,
+  }
+}
+```
+
+#### One Strategy
+
+There is no right or wrong strategy to use. Use the one that you and/or your team agree upon. These are some questions you can ask yourself:
+
+| Questions                                                                             | If affirmative, then maybe                                                                                                 |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Is my schema simple? Do I develop alone?                                              | Centralized (ResolveType)                                                                                                  |
+| Is my schema large? Do I have many collaborators?                                     | Modular (DMF, IsTypeOf)                                                                                                    |
+| Do I keep a discriminant property in the databse already?                             | DMF: implement `__typename` in your model layer if you have one                                                            |
+| Do I have objects that are part of multiple unions types and/or implement interfaces? | DMF or IsTypeOf to avoid repeated logic across multiple `resolveType` implementations required by the ResolveType strategy |
+
+### Runtime Checks
+
+In addition to giving typings for static type checks Nexus also performs runtime checks. This redundancy exists for a few reasons:
+
+1. Nexus can provide clear and concise feedback at runtime whereas with TypeScript the error messages and reasons can be cryptic.
+1. Can help you in the case where you miss the type errors for some reason.
+
+Runtime checks are automatically enabled. In development they will be a warning but in production they will be a thrown error. This way your development flow will not be unduly interrupted but your e.g. deployment pipeline in CI will be halted helping ensure you ship correct code to your users.
+
+If ever you need to disable this runtime check you can disable the feature like so:
+
+```ts
+makeSchema({
+  features: {
+    abstractTypeRuntimeChecks: false,
+  },
+})
+```
+
+Note that if you enable the DMF strategy (`features.abstractTypeStrategies.__typename`) then this runtime checks feature will be automatically disabled. For details about why refer to the DMF strategy docs above.
+
+#### Multiple Strategies
+
+It is possible to enable multiple strategies at once. However doing so creates harder to understand feedback. The following discusses the build and runtime ramifications in detail. Enabling multiple strategies is not recommended for people new to GraphQL.
+
+##### _At Buildtime_
+
+Nexus leverages TypeScript to statically encode all the rules discussed in this guide. When you have enabled multiple strategies it will degrade Nexus' ability to provide precise feedback. This is why Nexus considers having multiple strategies an advanced pattern. The static errors produced are likely to confuse newcomers, who cannot tell which ones stem from which strategy or why `__typename` is required while not `isTypeOf`/`resolveType`.
+
+Here is a summary of the effects:
+
+| Combination                 | Effect                                                                                                                                                         |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Modular & Centralized       | `isTypeOf` on all member types & `resolveType` on abstract type required until either all members have `isTypeOf` implemented or `resolveType` is implemented. |
+| DMF & Centralized           | `*` `__typename` required _unless_ `resolveType` implemented on the abstract type.                                                                             |
+| DMF & Modular               | `*` `__typename` required _unless_ `isTypeOf` implemented on all member types of the abstract type.                                                            |
+| DMF & Modular & centralized | `*` `__typename` required _unless_ `isTypeOf` implemented on all member types of the abstract type _or_ `resolveType` on the abstract type.                    |
+
+`*` Nexus cannot require `resolveType`/`isTypeOf` even though it _should_ because it cannot statically detect when you have implemented `__typename`.
+
+Here is a code example:
+
+<TabbedContent tabs={['With resolveType implemented', 'Without resolveType implemented']}>
+<tab>
+
+```ts
+makeSchema({
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+      __typename: true,
+    },
+  },
+  //...
+})
+
+// ... your types elsewhere ...
+
+queryType({
+  definition(t) {
+    t.field('search', {
+      type: 'SearchResult',
+      args: {
+        pattern: stringArg(),
+      },
+      resolve(_, args, ctx) {
+        return ctx.db.search(args.pattern).map((result) => {
+          return {
+            ...result,
+            __typename: 'Photo', // <-- OPTIONAL b/c resolveType present (below)
+          }
+        })
+      },
+    })
+  },
+})
+
+unionType({
+  name: 'SearchResult',
+  resolveType(data) {
+    // <-- OPTIONAL; If given, __typename becomes OPTIONAL
+    if (data.__typename /* <-- OPTIONAL b/c resolveType used */) {
+      return data.__typename
+    }
+
+    // ... fallback to whatever other logic you need
+  },
+  definition(t) {
+    t.members('Photo' /* ... */)
+  },
+})
+
+objectType({
+  name: 'Photo',
+  definition(t) {
+    t.string('url')
+    t.int('width')
+    t.int('height')
+  },
+})
+```
+
+</tab>
+<tab>
+
+```ts
+makeSchema({
+  features: {
+    abstractTypeStrategies: {
+      resolveType: true,
+      __typename: true,
+    },
+  },
+  //...
+})
+
+// ... your types elsewhere ...
+
+queryType({
+  definition(t) {
+    t.field('search', {
+      type: 'SearchResult',
+      args: {
+        pattern: stringArg(),
+      },
+      resolve(_, args, ctx) {
+        return ctx.db.search(args.pattern).map((result) => {
+          return {
+            ...result,
+            __typename: 'Photo', // <-- REQUIRED b/c resolveType not present
+          }
+        })
+      },
+    })
+  },
+})
+
+unionType({
+  name: 'SearchResult',
+  // resolveType <-- OPTIONAL
+  definition(t) {
+    t.members('Photo' /* ... */)
+  },
+})
+
+objectType({
+  name: 'Photo',
+  definition(t) {
+    t.string('url')
+    t.int('width')
+    t.int('height')
+  },
+})
+```
+
+</tab>
+</TabbedContent>
+
+> **Local Abstract Type Settings in the Future?**
+
+Currently Nexus only supports global abstract type strategy settings. In the future however ([#623](https://github.com/graphql-nexus/nexus/issues/623)) there may be ways to enable a particular strategy for only a subset of your schema. This way you could for example express that `__typename` is required in the returned model data of resolvers for one abstract type but require all other objects whom are members of _other_ abstract types to implement `isTypeOf`.
+
+##### _At Runtime_
+
+When multiple strategies are enabled the following runtime precedence rules apply. Using a strategy here means the implementations of others of lower priority are discarded.
+
+1. Centralized (`resolveType`)
+2. DMF (`__typename`)
+3. Modular (`isTypeOf`)
+
+The default `resolveType` implementation is actually to apply the other strategies. If you're curious how that looks internally you can see the code [here](https://github.com/graphql/graphql-js/blob/cadcef85a21e35ec6df7229b88182a4a4ad5b23a/src/execution/execute.js#L1132-L1170).
+
+## Interface Types
+
+### Interface Types in Theory
+
+Interfaces allow you to define a set of fields that you can then use across objects in your schema to enforce that they all have the fields defined in the interface. Interfaces also act as a form of polymorphism at runtime. You can make a field's type be an interface and may thus then return any type that implements the interface. To illustrate the point we'll appropriate the schema that we used to show off union types.
+
+```graphql
+interface Media {
+  url: String
+}
+
+type Photo implements Media {
+  width: Int
+  height: Int
+}
+
+enum MovieRating {
+  g
+  pg
+  pg13
+  r
+}
+
+type Movie implements Media {
+  rating: MovieRating
+}
+
+type Song implements Media {
+  album: String
+}
+
+type Query {
+  search(pattern: String): Media
+}
+```
+
+When a client sends a `search` query they will be able to select common fields as specified by the interface. Note this is unlike unions in which GraphQL assumes zero overlap between members. In contrast in GraphQL interfaces signify an intersection of fields between implementors and thus can be selected unqualified.
+
+```graphql
+query {
+  search(pattern: "Strawberry") {
+    url
+    ... on Photo {
+      width
+      height
+    }
+    ... on Movie {
+      rating
+    }
+    ... on Song {
+      album
+    }
+  }
+}
+```
+
+The mechanisms by which type discrimination is communicated over the wire for interface types is identical to how it works for union types, the `__typename` field. Refer to the union type guide for details.
+
+References:
+
+- [GrpahQL.org Interface Types](https://graphql.org/learn/schema/#interfaces)
+
+### Interface Types in Practice
+
+We can represent the above schema in Nexus as follows:
+
+```ts
+const Media = interfaceType({
+  name: 'Media',
+  definition(t) {
+    t.string('url')
+  },
+})
+
+const Movie = objectType({
+  name: 'Movie',
+  definition(t) {
+    t.implements('Media')
+    t.field('rating', {
+      type: 'MovieRating',
+    })
+  },
+})
+
+const MovieRating = enumType({
+  name: 'MovieRating',
+  members: ['g', 'pg', 'pg13', 'r'],
+})
+
+const Photo = objectType({
+  name: 'Photo',
+  definition(t) {
+    t.implements('Media')
+    t.int('width')
+    t.int('height')
+  },
+})
+
+const Song = objectType({
+  name: 'Song',
+  definition(t) {
+    t.implements('Media')
+    t.string('album')
+  },
+})
+
+const Query = queryType({
+  definition(t) {
+    t.field('search', {
+      type: 'Media',
+      args: {
+        pattern: stringArg(),
+      },
+    })
+  },
+})
+```
+
+What's missing here is the discriminant property implementation. Nexus supports the same system for interface types as it does for union types. So for details about the various strategies to do this please refer to the corresponding section for union types.
+
+If you are already familiar with how the system works for union types, here are a few notes to reaffirm the sameness:
+
+- `resolveType` on interface type configuration receives a param whose type is the union of all model types of implementing GraphQL objects in your schema. Akin to how for union types it is data of one of the GraphQL union's member types.
+- `isTypeOf` and `__typename` work the same and in fact their presence can serve the needs of both interface types and union type use-cases at the same time.

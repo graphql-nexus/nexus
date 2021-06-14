@@ -3,7 +3,7 @@ import path from 'path'
 import { ChildProcess, spawn, SpawnOptions } from 'child_process'
 import getPort from 'get-port'
 import http from 'http'
-import { linkExamples, linkWebsite, linkNexus } from './tasks/link-examples'
+import { linkExamples, linkNexus } from './tasks/link-examples'
 import { unlinkExamples } from './tasks/unlink-examples'
 import { allExamples } from './tasks/constants'
 import { upgradeDeps } from './tasks/upgrade-deps'
@@ -34,11 +34,11 @@ gulp.task('link-examples', async () => {
 })
 
 gulp.task('api-tsc', () => {
-  runService('yarn', 'tsc -w -p api/tsconfig.json', { stdio: 'ignore' })
+  runService('yarn', 'tsc -w -p api/tsconfig.cjs.json', { stdio: 'ignore' })
 })
 
 gulp.task('core-tsc', () => {
-  runService('yarn', 'tsc -w -p tsconfig.json', {
+  runService('yarn', 'tsc -w -p tsconfig.cjs.json', {
     stdio: 'ignore',
     cwd: path.join(__dirname, '..'),
   })

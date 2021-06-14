@@ -12,10 +12,10 @@ import {
   isWrappingType,
 } from 'graphql'
 import { forEach } from 'iterall'
-import { GraphQLPossibleOutputs } from '../definitions/_types'
-import { NexusGraphQLNamedType } from '../extensions'
+import type { GraphQLPossibleOutputs } from '../definitions/_types'
+import type { NexusGraphQLNamedType } from '../extensions'
 import { CreateFieldResolverInfo, plugin } from '../plugin'
-import { AllOutputTypes, GetGen, GetGen2 } from '../typegenTypeHelpers'
+import type { AllOutputTypes, GetGen, GetGen2 } from '../typegenTypeHelpers'
 import { isPromiseLike, printedGenTyping } from '../utils'
 
 export interface NullabilityPluginFallbackFn {
@@ -38,19 +38,14 @@ export type NullFallbackValues = Partial<
 >
 
 export type NullabilityGuardConfig = {
-  /**
-   * Whether we should guard against non-null values. Defaults to "true" if NODE_ENV === "production",
-   * false otherwise.
-   */
+  /** Whether we should guard against non-null values. Defaults to "true" if NODE_ENV === "production", false otherwise. */
   shouldGuard?: boolean
   /**
-   * When a nullish value is "guarded", meaning it is coerced into an acceptable non-null
-   * value, this function will be called if supplied.
+   * When a nullish value is "guarded", meaning it is coerced into an acceptable non-null value, this function
+   * will be called if supplied.
    */
   onGuarded?: (obj: NullabilityPluginOnGuardedConfig) => void
-  /**
-   * A mapping of typename to the value that should be used in the case of a null value.
-   */
+  /** A mapping of typename to the value that should be used in the case of a null value. */
   fallbackValues?: NullFallbackValues
 }
 

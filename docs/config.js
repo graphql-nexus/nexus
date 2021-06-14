@@ -23,7 +23,7 @@ const config = {
     // ],
     links: [
       { name: 'Docs', link: '../docs' },
-      { name: 'Playground', link: '../playground' },
+      { name: 'Playground', link: 'https://nxs.li/playground' },
       { name: 'SDL Converter', link: '../converter' },
       { name: 'Examples', link: '../docs/getting-started/examples' },
     ],
@@ -38,7 +38,7 @@ const config = {
     title: 'Nexus - title',
     description: 'Nexus - desc',
     keywords: 'Docs, nexus, 1.0',
-    docsLocation: 'https://github.com/graphql-nexus/schema/tree/develop/docs/content',
+    docsLocation: 'https://github.com/graphql-nexus/nexus/tree/main/docs/content',
     twitter: {
       site: '@nexusgql',
       creator: '@nexusgql',

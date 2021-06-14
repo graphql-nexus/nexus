@@ -1,11 +1,11 @@
-import { objectType, idArg, stringArg } from '@nexus/schema'
+import { idArg, list, nonNull, nullable, objectType, stringArg } from 'nexus'
 
 export const Mutation = objectType({
   name: 'Mutation',
   definition(t) {
     t.field('bookTrips', {
       type: 'TripUpdateResponse',
-      args: { launchIds: idArg({ list: [true], required: true }) },
+      args: { launchIds: nonNull(list(nonNull(idArg()))) },
       async resolve(_, { launchIds }, { dataSources }) {
         const results = await dataSources.userAPI.bookTrips({ launchIds })
         const launches = await dataSources.launchAPI.getLaunchesByIds({
@@ -26,7 +26,7 @@ export const Mutation = objectType({
     })
     t.field('cancelTrip', {
       type: 'TripUpdateResponse',
-      args: { launchId: idArg({ required: true }) },
+      args: { launchId: nonNull(idArg()) },
       async resolve(_, { launchId }, { dataSources }) {
         const result = dataSources.userAPI.cancelTrip({ launchId })
 
@@ -45,7 +45,6 @@ export const Mutation = objectType({
       },
     })
     t.string('login', {
-      nullable: true,
       args: { email: stringArg() },
       async resolve(_, { email }, { dataSources }) {
         const user = await dataSources.userAPI.findOrCreateUser({ email })
@@ -62,7 +61,7 @@ export const TripUpdateResponse = objectType({
   name: 'TripUpdateResponse',
   definition(t) {
     t.boolean('success')
-    t.string('message', { nullable: true })
-    t.field('launches', { type: 'Launch', nullable: true, list: true })
+    t.string('message')
+    t.field('launches', { type: list('Launch') })
   },
 })

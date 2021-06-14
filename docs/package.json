@@ -1,7 +1,53 @@
 {
   "name": "nexus-docs",
-  "description": "Nexus Docs",
   "version": "1.0.0",
+  "description": "Nexus Docs",
+  "keywords": [
+    "nexus"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build --prefix-paths --log-pages",
+    "clean": "gatsby clean",
+    "dev": "gatsby develop",
+    "prettify": "prettier --write \"**/*.{js,mdx,json,md,ts,tsx,yml,toml,graphql,css}\"",
+    "serve": "yarn build && gatsby serve --prefix-paths -o",
+    "test": "jest"
+  },
+  "jest": {
+    "collectCoverage": false,
+    "coverageReporters": [
+      "lcov",
+      "text",
+      "html"
+    ],
+    "globals": {
+      "__PATH_PREFIX__": ""
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "moduleNameMapper": {
+      "typeface-*": "identity-obj-proxy",
+      ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
+      ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__tests__/__mocks__/file.js"
+    },
+    "setupTestFrameworkScriptFile": "./jest.setup.js",
+    "testPathIgnorePatterns": [
+      "node_modules",
+      ".cache"
+    ],
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(tsx?|jsx?)$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(gatsby)/)"
+    ]
+  },
   "dependencies": {
     "@mdx-js/mdx": "^1.5.5",
     "@mdx-js/react": "^1.5.5",
@@ -36,6 +82,7 @@
     "gatsby-transformer-remark": "^2.3.2",
     "gatsby-transformer-sharp": "^2.1.17",
     "is-absolute-url": "^3.0.3",
+    "jquery": "^3.5.1",
     "lodash": "^4.17.15",
     "polished": "^3.5.1",
     "prism-react-renderer": "^1.0.2",
@@ -58,18 +105,6 @@
     "styled-components-ts": "^0.0.15",
     "write": "^2.0.0"
   },
-  "keywords": [
-    "nexus"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "clean": "gatsby clean",
-    "build": "gatsby build --prefix-paths --log-pages",
-    "dev": "gatsby develop",
-    "serve": "yarn build && gatsby serve --prefix-paths -o",
-    "prettify": "prettier --write \"**/*.{js,mdx,json,md,ts,tsx,yml,toml,graphql,css}\"",
-    "test": "jest"
-  },
   "devDependencies": {
     "@mdx-js/loader": "^0.20.3",
     "@mdx-js/tag": "^0.20.3",
@@ -85,39 +120,5 @@
     "ts-jest": "^24.0.0",
     "tslint": "^5.13.1",
     "typescript": "^3.3.3333"
-  },
-  "jest": {
-    "setupTestFrameworkScriptFile": "./jest.setup.js",
-    "globals": {
-      "__PATH_PREFIX__": ""
-    },
-    "testURL": "http://localhost",
-    "transform": {
-      "^.+\\.(tsx?|jsx?)$": "ts-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(gatsby)/)"
-    ],
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
-    "testPathIgnorePatterns": [
-      "node_modules",
-      ".cache"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "moduleNameMapper": {
-      "typeface-*": "identity-obj-proxy",
-      ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
-      ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__tests__/__mocks__/file.js"
-    },
-    "collectCoverage": false,
-    "coverageReporters": [
-      "lcov",
-      "text",
-      "html"
-    ]
   }
 }

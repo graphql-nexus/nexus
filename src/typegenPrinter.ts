@@ -1,9 +1,9 @@
 import {
+  getNamedType,
+  GraphQLAbstractType,
   GraphQLArgument,
-  GraphQLEnumType,
   GraphQLField,
   GraphQLInputField,
-  GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -21,19 +21,20 @@ import {
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
-import path from 'path'
-import { TypegenInfo } from './builder'
+import type { TypegenInfo } from './builder'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
-import { NexusGraphQLSchema } from './definitions/_types'
-import { StringLike } from './plugin'
+import type { NexusGraphQLSchema } from './definitions/_types'
+import type { StringLike } from './plugin'
 import {
   eachObj,
   getOwnPackage,
+  graphql15InterfaceType,
   GroupedTypes,
   groupTypes,
   mapObj,
+  mapValues,
   PrintedGenTypingImport,
-  relativePathTo,
+  resolveImportPath,
 } from './utils'
 
 const SpecifiedScalars = {
@@ -50,19 +51,19 @@ type TypeMapping = Record<string, string>
 type RootTypeMapping = Record<string, string | Record<string, [string, string]>>
 
 interface TypegenInfoWithFile extends TypegenInfo {
-  typegenFile: string
+  typegenPath: string
 }
 
 /**
  * We track and output a few main things:
  *
  * 1. "root" types, or the values that fill the first
- *    argument for a given object type
+ *     argument for a given object type
  *
  * 2. "arg" types, the values that are arguments to output fields.
  *
  * 3. "return" types, the values returned from the resolvers... usually
- *    just list/nullable variations on the "root" types for other types
+ *     just list/nullable variations on the "root" types for other types
  *
  * 4. The names of all types, grouped by type.
  *
@@ -71,10 +72,12 @@ interface TypegenInfoWithFile extends TypegenInfo {
 export class TypegenPrinter {
   groupedTypes: GroupedTypes
   printImports: Record<string, Record<string, boolean | string>>
+  hasDiscriminatedTypes: boolean
 
   constructor(protected schema: NexusGraphQLSchema, protected typegenInfo: TypegenInfoWithFile) {
     this.groupedTypes = groupTypes(schema)
     this.printImports = {}
+    this.hasDiscriminatedTypes = false
   }
 
   print() {
@@ -82,18 +85,25 @@ export class TypegenPrinter {
       this.printInputTypeMap(),
       this.printEnumTypeMap(),
       this.printScalarTypeMap(),
-      this.printRootTypeMap(),
+      this.printObjectTypeMap(),
+      this.printInterfaceTypeMap(),
+      this.printUnionTypeMap(),
+      this.printRootTypeDef(),
       this.printAllTypesMap(),
-      this.printReturnTypeMap(),
+      this.printFieldTypesMap(),
+      this.printFieldTypeNamesMap(),
       this.printArgTypeMap(),
-      this.printAbstractResolveReturnTypeMap(),
+      this.printAbstractTypeMembers(),
       this.printInheritedFieldMap(),
-      this.printTypeNames('object', 'NexusGenObjectNames'),
-      this.printTypeNames('input', 'NexusGenInputNames'),
-      this.printTypeNames('enum', 'NexusGenEnumNames'),
-      this.printTypeNames('interface', 'NexusGenInterfaceNames'),
-      this.printTypeNames('scalar', 'NexusGenScalarNames'),
-      this.printTypeNames('union', 'NexusGenUnionNames'),
+      this.printTypeNames('object', 'NexusGenObjectNames', 'NexusGenObjects'),
+      this.printTypeNames('input', 'NexusGenInputNames', 'NexusGenInputs'),
+      this.printTypeNames('enum', 'NexusGenEnumNames', 'NexusGenEnums'),
+      this.printTypeNames('interface', 'NexusGenInterfaceNames', 'NexusGenInterfaces'),
+      this.printTypeNames('scalar', 'NexusGenScalarNames', 'NexusGenScalars'),
+      this.printTypeNames('union', 'NexusGenUnionNames', 'NexusGenUnions'),
+      this.printIsTypeOfObjectTypeNames('NexusGenObjectsUsingAbstractStrategyIsTypeOf'),
+      this.printResolveTypeAbstractTypes('NexusGenAbstractsUsingStrategyResolveType'),
+      this.printFeaturesConfig('NexusGenFeaturesConfig'),
       this.printGenTypeMap(),
       this.printPlugins(),
     ].join('\n\n')
@@ -121,10 +131,12 @@ export class TypegenPrinter {
         `  context: ${this.printContext()};`,
         `  inputTypes: NexusGenInputs;`,
         `  rootTypes: NexusGenRootTypes;`,
+        `  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;`,
         `  argTypes: NexusGenArgTypes;`,
         `  fieldTypes: NexusGenFieldTypes;`,
+        `  fieldTypeNames: NexusGenFieldTypeNames;`,
         `  allTypes: NexusGenAllTypes;`,
-        `  inheritedFields: NexusGenInheritedFields;`,
+        `  typeInterfaces: NexusGenTypeInterfaces;`,
         `  objectNames: NexusGenObjectNames;`,
         `  inputNames: NexusGenInputNames;`,
         `  enumNames: NexusGenEnumNames;`,
@@ -135,7 +147,10 @@ export class TypegenPrinter {
         `  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];`,
         `  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']`,
         `  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];`,
-        `  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;`,
+        `  abstractTypeMembers: NexusGenAbstractTypeMembers;`,
+        `  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;`,
+        `  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;`,
+        `  features: NexusGenFeaturesConfig;`,
       ])
       .concat('}')
       .join('\n')
@@ -146,30 +161,44 @@ export class TypegenPrinter {
       rootTypings,
       dynamicFields: { dynamicInputFields, dynamicOutputFields },
     } = this.schema.extensions.nexus.config
+    const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
-    const outputPath = this.typegenInfo.typegenFile
+    const outputPath = this.typegenInfo.typegenPath
     const nexusSchemaImportId = this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name
 
     if (!this.printImports[nexusSchemaImportId]) {
-      if ([dynamicInputFields, dynamicOutputFields].some((o) => Object.keys(o).length > 0)) {
+      if (
+        [dynamicInputFields, dynamicOutputFields].some((o) => Object.keys(o).length > 0) ||
+        this.hasDiscriminatedTypes === true
+      ) {
         this.printImports[nexusSchemaImportId] = {
           core: true,
         }
       }
     }
 
-    eachObj(rootTypings, (val, key) => {
-      if (typeof val !== 'string') {
-        const importPath = (path.isAbsolute(val.path) ? relativePathTo(val.path, outputPath) : val.path)
-          .replace(/(\.d)?\.ts/, '')
-          .replace(/\\+/g, '/')
+    if (contextTypeImport) {
+      const importPath = resolveImportPath(contextTypeImport, 'context', outputPath)
+      importMap[importPath] = importMap[importPath] || new Set()
+      importMap[importPath].add(
+        contextTypeImport.alias
+          ? `${contextTypeImport.export} as ${contextTypeImport.alias}`
+          : contextTypeImport.export
+      )
+    }
+
+    eachObj(rootTypings, (rootType, typeName) => {
+      if (typeof rootType !== 'string') {
+        const importPath = resolveImportPath(rootType, typeName, outputPath)
         importMap[importPath] = importMap[importPath] || new Set()
-        importMap[importPath].add(val.alias ? `${val.name} as ${val.alias}` : val.name)
+        importMap[importPath].add(
+          rootType.alias ? `${rootType.export} as ${rootType.alias}` : rootType.export
+        )
       }
     })
     eachObj(importMap, (val, key) => {
-      imports.push(`import { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
+      imports.push(`import type { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
     })
     eachObj(this.printImports, (val, key) => {
       const { default: def, ...rest } = val
@@ -184,7 +213,7 @@ export class TypegenPrinter {
       if (bindings.length) {
         idents.push(`{ ${bindings.join(', ')} }`)
       }
-      imports.push(`import ${idents.join(', ')} from ${JSON.stringify(key)}`)
+      imports.push(`import type ${idents.join(', ')} from ${JSON.stringify(key)}`)
     })
     return imports.join('\n')
   }
@@ -199,11 +228,18 @@ export class TypegenPrinter {
       .concat(
         mapObj(dynamicInputFields, (val, key) => {
           if (typeof val === 'string') {
-            return `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // ${JSON.stringify(
-              val
-            )};`
+            const baseType = this.schema.getType(val)
+            return this.prependDoc(
+              `    ${key}<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // ${JSON.stringify(
+                val
+              )};`,
+              baseType?.description
+            )
           }
-          return `    ${key}${val.value.typeDefinition || `(...args: any): void`}`
+          return this.prependDoc(
+            `    ${key}${val.value.typeDefinition || `(...args: any): void`}`,
+            val.value.typeDescription
+          )
         })
       )
       .concat([`  }`, `}`])
@@ -220,15 +256,37 @@ export class TypegenPrinter {
       .concat(
         mapObj(dynamicOutputFields, (val, key) => {
           if (typeof val === 'string') {
-            return `    ${key}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
-              val
-            )};`
+            const baseType = this.schema.getType(val)
+            return this.prependDoc(
+              `    ${key}<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // ${JSON.stringify(
+                val
+              )};`,
+              baseType?.description
+            )
           }
-          return `    ${key}${val.value.typeDefinition || `(...args: any): void`}`
+          return this.prependDoc(
+            `    ${key}${val.value.typeDefinition || `(...args: any): void`}`,
+            val.value.typeDescription
+          )
         })
       )
       .concat([`  }`, `}`])
       .join('\n')
+  }
+
+  prependDoc(typeDef: string, typeDescription?: string | null) {
+    let outStr = ''
+    if (typeDescription) {
+      let parts = typeDescription.split('\n').map((f) => f.trimLeft())
+      if (parts[0] === '') {
+        parts = parts.slice(1)
+      }
+      if (parts[parts.length - 1] === '') {
+        parts = parts.slice(0, -1)
+      }
+      outStr = ['    /**', ...parts.map((p) => `     *${p ? ` ${p}` : ''}`), '     */'].join('\n') + '\n'
+    }
+    return `${outStr}${typeDef}`
   }
 
   printDynamicOutputPropertyDefinitions() {
@@ -240,7 +298,10 @@ export class TypegenPrinter {
     return [`declare global {`, `  interface NexusGenCustomOutputProperties<TypeName extends string> {`]
       .concat(
         mapObj(dynamicOutputProperties, (val, key) => {
-          return `    ${key}${val.value.typeDefinition || `: any`}`
+          return this.prependDoc(
+            `    ${key}${val.value.typeDefinition || `: any`}`,
+            val.value.typeDescription
+          )
         })
       )
       .concat([`  }`, `}`])
@@ -248,12 +309,32 @@ export class TypegenPrinter {
   }
 
   printInheritedFieldMap() {
-    // TODO:
-    return 'export interface NexusGenInheritedFields {}'
+    const hasInterfaces: (
+      | (GraphQLInterfaceType & { getInterfaces(): GraphQLInterfaceType[] })
+      | GraphQLObjectType
+    )[] = []
+    const withInterfaces = hasInterfaces
+      .concat(this.groupedTypes.object, this.groupedTypes.interface.map(graphql15InterfaceType))
+      .map((o) => {
+        if (o.getInterfaces().length) {
+          return [o.name, o.getInterfaces().map((i) => i.name)]
+        }
+        return null
+      })
+      .filter((f) => f) as [string, string[]][]
+
+    return ['export interface NexusGenTypeInterfaces {']
+      .concat(
+        withInterfaces.map(([name, interfaces]) => {
+          return `  ${name}: ${interfaces.map((i) => JSON.stringify(i)).join(' | ')}`
+        })
+      )
+      .concat('}')
+      .join('\n')
   }
 
   printContext() {
-    return this.typegenInfo.contextType || '{}'
+    return this.typegenInfo.contextTypeImport?.alias || this.typegenInfo.contextTypeImport?.export || 'any'
   }
 
   buildResolveSourceTypeMap() {
@@ -278,11 +359,11 @@ export class TypegenPrinter {
     return sourceMap
   }
 
-  printAbstractResolveReturnTypeMap() {
-    return this.printTypeInterface('NexusGenAbstractResolveReturnTypes', this.buildResolveReturnTypesMap())
+  printAbstractTypeMembers() {
+    return this.printTypeInterface('NexusGenAbstractTypeMembers', this.buildAbstractTypeMembers())
   }
 
-  buildResolveReturnTypesMap() {
+  buildAbstractTypeMembers() {
     const sourceMap: TypeMapping = {}
     const abstractTypes: (GraphQLInterfaceType | GraphQLUnionType)[] = []
     abstractTypes
@@ -304,24 +385,55 @@ export class TypegenPrinter {
     return sourceMap
   }
 
-  printTypeNames(name: keyof GroupedTypes, exportName: string) {
+  printTypeNames(name: keyof GroupedTypes, exportName: string, source: string) {
     const obj = this.groupedTypes[name] as GraphQLNamedType[]
+    const typeDef = obj.length === 0 ? 'never' : `keyof ${source}`
+    return `export type ${exportName} = ${typeDef};`
+  }
+
+  printIsTypeOfObjectTypeNames(exportName: string) {
+    const objectTypes = this.groupedTypes.object.filter((o) => o.isTypeOf !== undefined)
     const typeDef =
-      obj.length === 0
+      objectTypes.length === 0
         ? 'never'
-        : obj
+        : objectTypes
             .map((o) => JSON.stringify(o.name))
             .sort()
             .join(' | ')
     return `export type ${exportName} = ${typeDef};`
   }
 
+  printResolveTypeAbstractTypes(exportName: string) {
+    const abstractTypes = [...this.groupedTypes.interface, ...this.groupedTypes.union].filter(
+      (o) => o.resolveType !== undefined
+    )
+    const typeDef =
+      abstractTypes.length === 0
+        ? 'never'
+        : abstractTypes
+
+            .map((o) => JSON.stringify(o.name))
+            .sort()
+            .join(' | ')
+    return `export type ${exportName} = ${typeDef};`
+  }
+
+  printFeaturesConfig(exportName: string) {
+    const abstractTypes = this.schema.extensions.nexus.config.features?.abstractTypeStrategies ?? {}
+    const unionProps = renderObject(mapValues(abstractTypes, (val) => val ?? false))
+
+    return [`export type ${exportName} = {`]
+      .concat(`  abstractTypeStrategies: ${unionProps}`)
+      .concat('}')
+      .join('\n')
+  }
+
   buildEnumTypeMap() {
     const enumMap: TypeMapping = {}
     this.groupedTypes.enum.forEach((e) => {
-      const backingType = this.resolveBackingType(e.name)
-      if (backingType) {
-        enumMap[e.name] = backingType
+      const sourceType = this.resolveSourceType(e.name)
+      if (sourceType) {
+        enumMap[e.name] = sourceType
       } else {
         const values = e.getValues().map((val) => JSON.stringify(val.value))
         enumMap[e.name] = values.join(' | ')
@@ -345,12 +457,12 @@ export class TypegenPrinter {
     const scalarMap: TypeMapping = {}
     this.groupedTypes.scalar.forEach((e) => {
       if (isSpecifiedScalarType(e)) {
-        scalarMap[e.name] = SpecifiedScalars[e.name as SpecifiedScalarNames]
+        scalarMap[e.name] = this.resolveSourceType(e.name) ?? SpecifiedScalars[e.name as SpecifiedScalarNames]
         return
       }
-      const backingType = this.resolveBackingType(e.name)
-      if (backingType) {
-        scalarMap[e.name] = backingType
+      const sourceType = this.resolveSourceType(e.name)
+      if (sourceType) {
+        scalarMap[e.name] = sourceType
       } else {
         scalarMap[e.name] = 'any'
       }
@@ -370,77 +482,82 @@ export class TypegenPrinter {
     return this.printTypeInterface('NexusGenScalars', this.buildScalarTypeMap())
   }
 
-  buildRootTypeMap() {
+  shouldDiscriminateType(
+    abstractType: GraphQLAbstractType,
+    objectType: GraphQLObjectType
+  ): 'required' | 'optional' | false {
+    if (!this.schema.extensions.nexus.config.features?.abstractTypeStrategies?.__typename) {
+      return false
+    }
+
+    if (abstractType.resolveType !== undefined) {
+      return 'optional'
+    }
+
+    if (objectType.isTypeOf !== undefined) {
+      return 'optional'
+    }
+
+    return 'required'
+  }
+
+  maybeDiscriminate(abstractType: GraphQLAbstractType, objectType: GraphQLObjectType) {
+    const requiredOrOptional = this.shouldDiscriminateType(abstractType, objectType)
+
+    if (requiredOrOptional === false) {
+      return `NexusGenRootTypes['${objectType.name}']`
+    }
+
+    this.hasDiscriminatedTypes = true
+
+    return `core.Discriminate<'${objectType.name}', '${requiredOrOptional}'>`
+  }
+
+  buildRootTypeMap(hasFields: Array<GraphQLInterfaceType | GraphQLObjectType | GraphQLUnionType>) {
     const rootTypeMap: RootTypeMapping = {}
-    const hasFields: (GraphQLInterfaceType | GraphQLObjectType | GraphQLUnionType)[] = []
-    hasFields
-      .concat(this.groupedTypes.object)
-      .concat(this.groupedTypes.interface)
-      .concat(this.groupedTypes.union)
-      .forEach((type) => {
-        const rootTyping = this.resolveBackingType(type.name)
-        if (rootTyping) {
-          rootTypeMap[type.name] = rootTyping
-          return
-        }
-        if (isUnionType(type)) {
-          rootTypeMap[type.name] = type
-            .getTypes()
-            .map((t) => `NexusGenRootTypes['${t.name}']`)
-            .join(' | ')
-        } else if (isInterfaceType(type)) {
-          const possibleRoots = this.schema
-            .getPossibleTypes(type)
-            .map((t) => `NexusGenRootTypes['${t.name}']`)
-          if (possibleRoots.length > 0) {
-            rootTypeMap[type.name] = possibleRoots.join(' | ')
-          } else {
-            rootTypeMap[type.name] = 'any'
-          }
-        } else if (type.name === 'Query' || type.name === 'Mutation') {
-          rootTypeMap[type.name] = '{}'
+    hasFields.forEach((type) => {
+      const rootTyping = this.resolveSourceType(type.name)
+      if (rootTyping) {
+        rootTypeMap[type.name] = rootTyping
+        return
+      }
+      if (isUnionType(type)) {
+        rootTypeMap[type.name] = type
+          .getTypes()
+          .map((t) => this.maybeDiscriminate(type, t))
+          .join(' | ')
+      } else if (isInterfaceType(type)) {
+        const possibleRoots = this.schema.getPossibleTypes(type).map((t) => this.maybeDiscriminate(type, t))
+        if (possibleRoots.length > 0) {
+          rootTypeMap[type.name] = possibleRoots.join(' | ')
         } else {
-          eachObj(type.getFields(), (field) => {
-            const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {})
-            if (!this.hasResolver(field, type)) {
-              if (typeof obj !== 'string') {
-                obj[field.name] = [
-                  this.argSeparator(field.type as GraphQLInputType),
-                  this.printOutputType(field.type),
-                ]
-              }
-            }
-          })
+          rootTypeMap[type.name] = 'any'
         }
-      })
+      } else if (type.name === 'Query' || type.name === 'Mutation') {
+        rootTypeMap[type.name] = '{}'
+      } else {
+        eachObj(type.getFields(), (field) => {
+          const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {})
+          if (!this.hasResolver(field, type)) {
+            if (typeof obj !== 'string') {
+              obj[field.name] = [
+                this.argSeparator(field.type as GraphQLInputType, false),
+                this.printOutputType(field.type),
+              ]
+            }
+          }
+        })
+      }
+    })
     return rootTypeMap
   }
 
-  resolveBackingType(typeName: string): string | undefined {
+  resolveSourceType(typeName: string): string | undefined {
     const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
     if (rootTyping) {
-      return typeof rootTyping === 'string' ? rootTyping : rootTyping.name
+      return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
-    return (this.typegenInfo.backingTypeMap as any)[typeName]
-  }
-
-  buildAllTypesMap() {
-    const typeMap: TypeMapping = {}
-    const toCheck: (GraphQLInputObjectType | GraphQLEnumType | GraphQLScalarType)[] = []
-    toCheck
-      .concat(this.groupedTypes.input)
-      .concat(this.groupedTypes.enum)
-      .concat(this.groupedTypes.scalar)
-      .forEach((type) => {
-        if (isInputObjectType(type)) {
-          typeMap[type.name] = `NexusGenInputs['${type.name}']`
-        } else if (isEnumType(type)) {
-          typeMap[type.name] = `NexusGenEnums['${type.name}']`
-        } else if (isScalarType(type)) {
-          typeMap[type.name] = `NexusGenScalars['${type.name}']`
-        }
-      })
-    return typeMap
+    return (this.typegenInfo.sourceTypeMap as any)[typeName]
   }
 
   hasResolver(
@@ -454,20 +571,47 @@ export class TypegenPrinter {
     return Boolean(field.resolve)
   }
 
-  printRootTypeMap() {
-    return this.printRootTypeFieldInterface('NexusGenRootTypes', this.buildRootTypeMap())
+  printObjectTypeMap() {
+    return this.printRootTypeFieldInterface(
+      'NexusGenObjects',
+      this.buildRootTypeMap(this.groupedTypes.object)
+    )
+  }
+
+  printInterfaceTypeMap() {
+    return this.printRootTypeFieldInterface(
+      'NexusGenInterfaces',
+      this.buildRootTypeMap(this.groupedTypes.interface)
+    )
+  }
+
+  printUnionTypeMap() {
+    return this.printRootTypeFieldInterface('NexusGenUnions', this.buildRootTypeMap(this.groupedTypes.union))
+  }
+
+  printRootTypeDef() {
+    const toJoin: string[] = []
+    if (this.groupedTypes.interface.length) {
+      toJoin.push('NexusGenInterfaces')
+    }
+    if (this.groupedTypes.object.length) {
+      toJoin.push('NexusGenObjects')
+    }
+    if (this.groupedTypes.union.length) {
+      toJoin.push('NexusGenUnions')
+    }
+    return `export type NexusGenRootTypes = ${toJoin.join(' & ')}`
   }
 
   printAllTypesMap() {
-    const typeMapping = this.buildAllTypesMap()
-    return [`export interface NexusGenAllTypes extends NexusGenRootTypes {`]
-      .concat(
-        mapObj(typeMapping, (val, key) => {
-          return `  ${key}: ${val};`
-        })
-      )
-      .concat('}')
-      .join('\n')
+    const toJoin: string[] = ['NexusGenRootTypes']
+    if (this.groupedTypes.scalar.length) {
+      toJoin.push('NexusGenScalars')
+    }
+    if (this.groupedTypes.enum.length) {
+      toJoin.push('NexusGenEnums')
+    }
+    return `export type NexusGenAllTypes = ${toJoin.join(' & ')}`
   }
 
   buildArgTypeMap() {
@@ -504,6 +648,21 @@ export class TypegenPrinter {
         eachObj(type.getFields(), (field) => {
           returnTypeMap[type.name] = returnTypeMap[type.name] || {}
           returnTypeMap[type.name][field.name] = [':', this.printOutputType(field.type)]
+        })
+      })
+    return returnTypeMap
+  }
+
+  buildReturnTypeNamesMap() {
+    const returnTypeMap: TypeFieldMapping = {}
+    const hasFields: (GraphQLInterfaceType | GraphQLObjectType)[] = []
+    hasFields
+      .concat(this.groupedTypes.object)
+      .concat(this.groupedTypes.interface)
+      .forEach((type) => {
+        eachObj(type.getFields(), (field) => {
+          returnTypeMap[type.name] = returnTypeMap[type.name] || {}
+          returnTypeMap[type.name][field.name] = [':', `'${getNamedType(field.type).name}'`]
         })
       })
     return returnTypeMap
@@ -547,18 +706,27 @@ export class TypegenPrinter {
     return typing
   }
 
-  printReturnTypeMap() {
+  printFieldTypesMap() {
     return this.printTypeFieldInterface('NexusGenFieldTypes', this.buildReturnTypeMap(), 'field return type')
   }
 
-  normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
-    return [this.argSeparator(arg.type), this.argTypeRepresentation(arg.type)]
+  printFieldTypeNamesMap() {
+    return this.printTypeFieldInterface(
+      'NexusGenFieldTypeNames',
+      this.buildReturnTypeNamesMap(),
+      'field return type name'
+    )
   }
 
-  argSeparator(type: GraphQLInputType) {
-    if (isNonNullType(type)) {
+  normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
+    return [this.argSeparator(arg.type, Boolean(arg.defaultValue)), this.argTypeRepresentation(arg.type)]
+  }
+
+  argSeparator(type: GraphQLInputType, hasDefaultValue: boolean) {
+    if (hasDefaultValue || isNonNullType(type)) {
       return ':'
     }
+
     return '?:'
   }
 
@@ -658,7 +826,7 @@ export class TypegenPrinter {
 
   printScalar(type: GraphQLScalarType) {
     if (isSpecifiedScalarType(type)) {
-      return SpecifiedScalars[type.name as SpecifiedScalarNames]
+      return this.resolveSourceType(type.name) ?? SpecifiedScalars[type.name as SpecifiedScalarNames]
     }
     return `NexusGenScalars['${type.name}']`
   }
@@ -667,16 +835,32 @@ export class TypegenPrinter {
     const pluginFieldExt: string[] = [
       `  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {`,
     ]
+    const pluginInputFieldExt: string[] = [
+      `  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {`,
+    ]
+    const pluginArgExt: string[] = [`  interface NexusGenPluginArgConfig {`]
     const pluginSchemaExt: string[] = [`  interface NexusGenPluginSchemaConfig {`]
     const pluginTypeExt: string[] = [`  interface NexusGenPluginTypeConfig<TypeName extends string> {`]
+    const pluginInputTypeExt: string[] = [
+      `  interface NexusGenPluginInputTypeConfig<TypeName extends string> {`,
+    ]
     const printInlineDefs: string[] = []
     const plugins = this.schema.extensions.nexus.config.plugins || []
     plugins.forEach((plugin) => {
       if (plugin.config.fieldDefTypes) {
         pluginFieldExt.push(padLeft(this.printType(plugin.config.fieldDefTypes), '    '))
       }
+      if (plugin.config.inputFieldDefTypes) {
+        pluginInputFieldExt.push(padLeft(this.printType(plugin.config.inputFieldDefTypes), '    '))
+      }
       if (plugin.config.objectTypeDefTypes) {
         pluginTypeExt.push(padLeft(this.printType(plugin.config.objectTypeDefTypes), '    '))
+      }
+      if (plugin.config.inputObjectTypeDefTypes) {
+        pluginInputTypeExt.push(padLeft(this.printType(plugin.config.inputObjectTypeDefTypes), '    '))
+      }
+      if (plugin.config.argTypeDefTypes) {
+        pluginArgExt.push(padLeft(this.printType(plugin.config.argTypeDefTypes), '    '))
       }
     })
     return [
@@ -685,8 +869,11 @@ export class TypegenPrinter {
         'declare global {',
         [
           pluginTypeExt.concat('  }').join('\n'),
+          pluginInputTypeExt.concat('  }').join('\n'),
           pluginFieldExt.concat('  }').join('\n'),
+          pluginInputFieldExt.concat('  }').join('\n'),
           pluginSchemaExt.concat('  }').join('\n'),
+          pluginArgExt.concat('  }').join('\n'),
         ].join('\n'),
         '}',
       ].join('\n'),
@@ -743,3 +930,13 @@ const GLOBAL_DECLARATION = `
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }`
+
+function renderObject(object: Record<string, any>): string {
+  return [
+    '{',
+    mapObj(object, (val, key) => {
+      return `    ${key}: ${val}`
+    }).join('\n'),
+    '  }',
+  ].join('\n')
+}

@@ -24,14 +24,14 @@ const HeaderWrapper = styled.div`
   justify-content: center;
 
   .container {
-    width: 1110px;
+    width: 1390px;
   }
 
   @media (min-width: 0px) and (max-width: 1024px) {
     height: auto;
     padding: 24px 8px 8px;
     flex-direction: column;
-    background: var(--main-font-color);
+    background: var(--dark-color);
     .container {
       width: 100%;
     }
@@ -77,7 +77,7 @@ const NavLinks = styled.div`
     margin: 0 3rem 0;
   }
 
-  @media (min-width: 0px) and (max-width: 767px) {
+  @media (min-width: 0px) and (max-width: 768px) {
     flex-direction: column;
     margin: 0;
     a {
@@ -87,10 +87,10 @@ const NavLinks = styled.div`
 `
 
 const DocsMobileButton = styled.div`
-  background: var(--header-btn-color);
+  background: var(--white-color);
   box-shadow: 0px 4px 8px rgba(60, 45, 111, 0.1), 0px 1px 3px rgba(60, 45, 111, 0.15);
   border-radius: 5px;
-  color: var(--code-linenum-color);
+  color: var(--main-font-color);
   display: none;
   padding: 0 14px;
   height: 42px;
@@ -110,14 +110,7 @@ const MobileOnlyNav = styled.div`
   z-index: 210;
   top: 0px;
   transition: top 0.35s;
-  background: radial-gradient(
-      37.86% 77.79% at 50% 100%,
-      rgba(113, 128, 150, 0.25) 0%,
-      rgba(113, 128, 150, 0) 100%
-    ),
-    linear-gradient(180deg, var(--main-font-color) 0%, var(--tag-media-color) 100%),
-    linear-gradient(180deg, var(--gradient2-color) 0%, rgba(27, 32, 43, 0) 100%),
-    var(--gradient1-color);
+  background: var(--dark-color);
 
   width: 100%;
   left: 0;
@@ -126,7 +119,7 @@ const MobileOnlyNav = styled.div`
     top: 120px;
     display: block;
   }
-  @media (min-width: 0px) and (max-width: 767px) {
+  @media (min-width: 0px) and (max-width: 768px) {
     padding: 2rem 1rem;
   }
 `
@@ -161,7 +154,7 @@ const MenuMobileBtn = styled.a`
   letter-spacing: 0.1em;
   color: var(--white-color) !important;
   text-transform: uppercase;
-  @media (min-width: 0px) and (max-width: 767px) {
+  @media (min-width: 0px) and (max-width: 768px) {
     display: block;
   }
 `
@@ -169,7 +162,8 @@ const MenuMobileBtn = styled.a`
 const NonMobileMenu = styled.div`
   display: flex;
   width: 50%;
-  @media (min-width: 0px) and (max-width: 767px) {
+  margin-right: 280px;
+  @media (min-width: 0px) and (max-width: 768px) {
     display: none;
   }
 `
@@ -201,7 +195,7 @@ const Header = ({ headerProps }: HeaderViewProps) => {
         ))}
       </NavLinks>
       <Link
-        to={'https://github.com/graphql-nexus/schema'}
+        to={'https://github.com/graphql-nexus/nexus'}
         style={{
           color: 'white',
           textDecoration: 'none',

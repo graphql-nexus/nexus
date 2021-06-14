@@ -1,7 +1,7 @@
 {
   "name": "with-prisma",
   "version": "0.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "yarn build:reflection && tsc",
     "build:reflection": "NEXUS_SHOULD_EXIT_AFTER_REFLECTION=true ts-node api",
@@ -17,15 +17,15 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "@nexus/schema": "^0.15.0",
-    "@prisma/client": "2.3.0",
-    "apollo-server-express": "^2.17.0",
+    "@prisma/client": "2.14.0",
+    "apollo-server-express": "^2.19.1",
     "express": "^4.17.1",
-    "graphql": "^15.3.0"
+    "graphql": "^15.3.0",
+    "nexus": "^1.0.0"
   },
   "devDependencies": {
-    "@prisma/cli": "^2.3.0",
-    "prettier": "2.0.5",
+    "@prisma/cli": "^2.14.0",
+    "prettier": "2.2.1",
     "ts-node-dev": "^1.0.0-pre.62",
     "typescript": "^4.0.2"
   }

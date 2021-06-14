@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2015",
+    "rootDir": "../../../",
+    "moduleResolution": "node"
+  },
+  "include": ["__app.ts"]
+}

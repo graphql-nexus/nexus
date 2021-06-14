@@ -1,4 +1,4 @@
-import { plugin, interfaceType, FieldResolver } from '@nexus/schema'
+import { plugin, interfaceType, FieldResolver, nonNull } from 'nexus'
 
 export const logMutationTimePlugin = plugin({
   name: 'LogMutationTime',
@@ -32,30 +32,31 @@ export const NodePlugin = plugin({
         resolveFn = node
       }
       t.implements('Node')
-      t.id('id', {
-        nullable: false,
+      t.field('id', {
+        type: nonNull('ID'),
         resolve: resolveFn,
       })
     }
   },
-  onMissingType(t, builder) {
+  onMissingType(t, _builder) {
     if (t === 'Node') {
       return interfaceType({
         name: 'Node',
         description:
-          'A "Node" is a field with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
+          'A "Node" is an Object with a required ID field (id), per the https://relay.dev/docs/en/graphql-server-specification',
+        resolveType(source) {
+          if (source.__typename) {
+            return source.__typename
+          }
+
+          throw new Error('__typename missing for resolving Node')
+        },
         definition(t) {
-          t.id('id', {
-            nullable: false,
+          t.field('id', {
+            type: nonNull('ID'),
             resolve: () => {
               throw new Error('Abstract')
             },
-          })
-          t.resolveType((t) => {
-            if (t.__typename) {
-              return t.__typename
-            }
-            throw new Error('__typename missing for resolving Node')
           })
         },
       })

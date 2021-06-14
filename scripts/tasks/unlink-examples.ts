@@ -20,19 +20,11 @@ async function unlinkDir(dir: string) {
 export async function unlinkExamples() {
   const root = path.join(__dirname, '../..')
   await Promise.all(
-    allExamples
-      .map(async (exampleDir) => {
-        const dir = path.join(root, `examples/${exampleDir}`)
-        console.log(`Unliking ${exampleDir}`)
-        unlinkDir(dir)
-        console.log(`Finished unlinking ${exampleDir}`)
-      })
-      .concat(
-        (async () => {
-          console.log('Unlinking website')
-          await unlinkDir(path.join(root, 'website'))
-          console.log('Finished unlinking website')
-        })()
-      )
+    allExamples.map(async (exampleDir) => {
+      const dir = path.join(root, `examples/${exampleDir}`)
+      console.log(`Unliking ${exampleDir}`)
+      unlinkDir(dir)
+      console.log(`Finished unlinking ${exampleDir}`)
+    })
   )
 }

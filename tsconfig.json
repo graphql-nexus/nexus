@@ -9,7 +9,18 @@
     "strict": true,
     "noUnusedLocals": true,
     "importHelpers": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "importsNotUsedAsValues": "error"
   },
-  "exclude": ["./examples", "./scripts", "./dist", "./tests", "./website", "./gulpfile.ts", "./package.json"]
+  "exclude": [
+    "./examples",
+    "./scripts",
+    "./dist",
+    "./tests",
+    "./website",
+    "./gulpfile.ts",
+    "./package.json",
+    "./docs"
+  ]
 }

@@ -1,0 +1,286 @@
+---
+title: Schema
+tocDepth: 2
+---
+
+## Overview
+
+This is the Nexus component guide. Here you will find concepts explained and a survey of how to use the API. If you are not familiar with Nexus this is a good document to read. If you are familiar, then API Docs may be of more use to you.
+
+## GraphQL type builders
+
+We will now begin exploring the GraphQL schema building parts of the schema component. Having prior knowledge of GraphQL language itself will greatly help. If you are new to GraphQL you may want to read some of the resources listed below.
+
+- [graphql.org](https://graphql.org)
+- [howtographql.com](https://www.howtographql.com)
+- [Production Ready GraphQL](https://book.productionreadygraphql.com/)
+
+### Object Type
+
+[graphql.org Object Types](https://graphql.org/learn/schema/#object-types-and-fields)
+
+#### Basic anatomy
+
+<!-- prettier-ignore -->
+```ts
+                                      objectType({
+// A type Builder method -------------^
+                                        name: 'Foo',
+// The name of this type ----------------------^
+                                        definition(t) {
+// The type definition block -----------^          |
+// Where fields are defined                        |
+//                                                 |
+// Object of Object Type Field --------------------^
+// Builder methods
+                                          t.field('bar', {
+// A field builder method ------------------^      |
+// The name of this field -------------------------^
+                                            type: 'Bar',
+// The type of this field -------------------------^
+                                            resolve(parent, args, ctx, info) {
+// The method called to return a -----------^       |       |     |    |
+// value for this field when queried                |       |     |    |
+//                                                  |       |     |    |
+// The backing data model for Foo ------------------^       |     |    |
+//                                                          |     |    |
+// The client arguments to this field ----------------------^     |    |
+//                                                                |    |
+// Contextual data for this request ------------------------------^    |
+// Shared across all resolvers                                         |
+//                                                                     |
+// Technical detail about this request --------------------------------^
+// E.g. client's query AST
+
+// Your logic to return a value ------------> ...
+// for this field
+                                            },
+                                          })
+
+                                          t.string('qux')
+// A scalar-type convenience builder -------^       |
+//                                                  |
+// No resolver means Nexus returns the -------------^
+// `qux` property from the backing data model
+
+                                        },
+                                      })
+```
+
+#### Scalar fields
+
+```ts
+objectType({
+  name: 'Alpha',
+  definition(t) {
+    t.id('a')
+    t.string('b')
+    t.int('c')
+    t.float('d')
+    t.boolean('e')
+  },
+})
+```
+
+```graphql
+type Alpha {
+  a: ID!
+  b: String!
+  c: Int!
+  d: Float!
+  e: Boolean!
+}
+```
+
+#### Relational fields
+
+```ts
+objectType({
+  name: 'Alpha',
+  definition(t) {
+    t.field('beta', {
+      type: 'Beta',
+      resolve() {
+        return { foo: 'bar' }
+      },
+    })
+  },
+})
+objectType({
+  name: 'Beta',
+  definition(t) {
+    t.string('foo')
+  },
+})
+```
+
+```graphql
+type Alpha {
+  beta: Beta!
+}
+
+type Beta {
+  foo: String!
+}
+```
+
+##### Lists and nullability
+
+The following demonstration assumes the Nexus nullability defaults.
+
+```ts
+objectType({
+  name: 'Alpha',
+  definition(t) {
+    t.id('a')
+    t.list.id('b')
+    t.nonNull.list.id('c')
+    t.list.nonNull.id('d')
+    t.nonNull.list.nonNull.id('e')
+  },
+})
+```
+
+```graphql
+type Alpha {
+  a: ID
+  b: [ID]
+  c: [ID]!
+  d: [ID!]
+  e: [ID!]!
+}
+```
+
+
+### Entrypoint types
+
+### Enum type
+
+Enum types are a scalar with a finite set of allowed values. They can be used as argument types and as field types.
+
+[graphql.org Enumeration Types docs](https://graphql.org/learn/schema/#enumeration-types)
+
+
+
+```ts
+enumType({
+  name: 'Alpha',
+  members: ['Zeta', 'Yolo'],
+})
+```
+
+```graphql
+enum Alpha {
+  Zeta
+  Yolo
+}
+```
+
+
+
+#### Example: As argument type and field type
+
+
+
+```ts
+queryType({
+  definition(t) {
+    t.field('anyAlpha', {
+      type: 'Alpha',
+      resolve(t) {
+        return Math.random() > 0.1 : 'Zeta' : 'Yolo'
+      }
+    })
+    t.field('alphas', {
+      type: list('Alpha'),
+      args: {
+        except: arg({
+          type: list(nonNull("Alpha")),
+        })
+      },
+      resolve(_root, args) {
+        return ['Zeta', 'Yolo'].filter(alpha => {
+          return !args.except.includes(alpha)
+        })
+      }
+    })
+  }
+})
+```
+
+```graphql
+type Query {
+  anyAlpha: Alpha!
+  alphas(except: [Alpha!]!): [Alpha!]!
+}
+```
+
+
+
+
+```graphql
+query {
+  anyAlpha
+  alphas(except: ["Zeta"])
+}
+```
+
+```json
+{
+  "data": {
+    "anyAlpha": "Zeta",
+    "alphas": ["Yolo"]
+  }
+}
+```
+
+
+
+### Union Type
+
+🚧 Work in progress.
+
+### Interface Type
+
+🚧 Work in progress.
+
+### Field Arguments
+
+🚧 Work in progress.
+
+### Input Object Type
+
+🚧 Work in progress.
+
+### Lists
+
+🚧 Work in progress.
+
+### Descriptions
+
+🚧 Work in progress.
+
+### Deprecations
+
+🚧 Work in progress.
+
+## Data Modelling
+
+As the API author, there are three design tasks you will invariable perform over and over again:
+
+1. Create data types that model logical entities and concepts in your business domain.
+2. Define connections between these data types that model how logical entities and concepts relate in your business domain.
+3. Define entrypoints which allow traversal into this graph of data.
+
+This is an iterative process that can generally be seen as an finite loop wherein your team gradually refines and expands (or contracts!) the data graph as you respond to changing client app needs, business needs, and so on. Data modelling is hard work. For one thing it is a subtle art, occasionally underappreciated. There are typically multiple ways to model any one thing and competing tradeoffs that leave no obvious winner abound. If the process of data modelling itself or data modelling in GraphQL is new to you, you may find this book by [Marc-Andre Giroux](https://twitter.com/__xuorig__) helpful: [Production Ready GraphQL](https://book.productionreadygraphql.com/).
+
+## Type-safety
+
+Nexus is designed to be nearly 100% type-safe by default. It can automatically type your resolvers args and context, but there's one thing it cannot do without your help: **knowing the types that come from your data-sources (such as your database).**
+
+By default, Nexus will generate types based on your GraphQL schema.
+However, the data that flows through your resolvers can be completely different than what your GraphQL Schema expresses.
+
+If that's the case, you will need to tell Nexus what the shape of this data is thanks to the ***Source Types***.
+
+[You can read more about them here](/guides/source-types).

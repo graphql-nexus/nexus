@@ -2,9 +2,23 @@ name: trunk
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
 
 jobs:
+  graphql-14:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Install GraphQL@14.x
+        run: yarn add graphql@^14.5.8
+      - name: Test
+        run: yarn -s test:ci --testPathIgnorePatterns v15
+
   test:
     strategy:
       matrix:
@@ -18,6 +32,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         run: yarn --frozen-lockfile
+      - name: Check Prettier
+        if: matrix.os != 'windows-latest'
+        run: yarn format:ci
       - name: Test
         run: yarn -s test:ci
       - name: Upload coverage to Codecov
@@ -49,12 +66,30 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --frozen-lockfile && yarn format:ci
       - name: Link
         run: yarn link
       - name: Example Install
         run: yarn --cwd=examples/${{ matrix.example }} --frozen-lockfile
       - name: Example Use Link
-        run: yarn --cwd=examples/${{ matrix.example }} link @nexus/schema
+        run: yarn --cwd=examples/${{ matrix.example }} link nexus
       - name: Example Typecheck
         run: yarn --cwd=examples/${{ matrix.example }} tsc
+
+  release-canary:
+    needs: [test, test-examples]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Release Canary
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          yarn -s dripip preview --json > result.json
+          jq '.' < result.json

@@ -7,8 +7,7 @@ This example shows how to use Nexus with [Prisma](https://prisma.io) without the
 ```
 npm install
 npx prisma generate
-npx prisma migrate save --experimental
-npx prisma migrate up --experimental
+npx prisma migrate dev --preview-feature
 ```
 
 Terminal 1

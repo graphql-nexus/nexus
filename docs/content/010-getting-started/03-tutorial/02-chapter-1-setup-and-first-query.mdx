@@ -4,34 +4,34 @@ title: 1. Setup and first query
 
 ## Overview
 
-In this first chapter we're just going to get the bare minimum of a Nexus Schema project setup. You'll learn about:
+In this first chapter we're just going to get the bare minimum of a Nexus project setup. You'll learn about:
 
-- The `@nexus/schema` package
+- The `nexus` package
 - The `ts-node-dev` package to run your app
-- Laying out and running a Nexus Schema project
+- Laying out and running a Nexus project
 - GraphQL Playground
 
 ## CLI
 
 Start by creating your project directory, initializing your `package.json`, and adding the needed runtime dependencies.
 
-```bash-symbol
+```bash-symbol copy
 mkdir nexus-tutorial && cd nexus-tutorial
 npm init -y
-npm add @nexus/schema graphql apollo-server
+npm add nexus graphql apollo-server
 ```
 
-> Note: `@nexus/schema` works with any GraphQL compliant server. We'll use `apollo-server` in this tutorial, but you're free to use whichever fits your use-case best.
+> Note: `nexus` works with any GraphQL compliant server. We'll use `apollo-server` in this tutorial, but you're free to use whichever fits your use-case best.
 
 We'll also need `typescript` and `ts-node-dev` as dev dependencies. `ts-node-dev` will enable you to transpile your TS files on the fly and restart your API on changes.
 
-```bash-symbol
+```bash-symbol copy
 npm add --save-dev typescript ts-node-dev
 ```
 
 To properly get full advantage of TypeScript, we'll need a `tsconfig.json` file. Create one at the root of your project and copy paste the following
 
-```json
+```json file=tsconfig.json copy
 {
   "compilerOptions": {
     "target": "ES2018",
@@ -48,46 +48,67 @@ To properly get full advantage of TypeScript, we'll need a `tsconfig.json` file.
 
 Let's finally add some npm scripts to simplify our future workflows
 
-```json
+<TabbedContent tabs={['Diff', 'Code']}>
+
+<tab>
+
+```json file=package.json
 "scripts": {
-  "dev": "ts-node-dev --transpile-only --no-notify api/app.ts",
-  "build": "tsc"
+  "test": "echo \"Error: no test specified\" && exit 1",
++  "dev": "ts-node-dev --transpile-only --no-notify api/index.ts",
++  "build": "tsc"
 }
 ```
+
+</tab>
+
+<tab>
+
+```json copy
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "ts-node-dev --transpile-only --no-notify api/index.ts",
+  "build": "tsc"
+},
+```
+
+</tab>
+
+</TabbedContent>
 
 ## Creating our app layout
 
 We'll now create our first module at `api/schema.ts`:
 
-```bash-symbol
-mkdir api && touch api/app.ts
+```bash-symbol copy
+mkdir api && touch api/schema.ts
 ```
 
-We'll then setup `@nexus/schema` to create an empty schema
+We'll then setup `nexus` to create an empty schema
 
-```ts
+```ts copy
 // api/schema.ts
-import { makeSchema } from '@nexus/schema'
+import { makeSchema } from 'nexus'
 import { join } from 'path'
 
 export const schema = makeSchema({
   types: [], // 1
   outputs: {
     typegen: join(__dirname, '..', 'nexus-typegen.ts'), // 2
-    schema: join(__dirname, '..', 'schema.graphql') // 3
-  }
+    schema: join(__dirname, '..', 'schema.graphql'), // 3
+  },
 })
 ```
 
 1. GraphQL types that will be used to construct your GraphQL schema. It's voluntarily empty for now.
-1. Output path to where `@nexus/schema` should write the generated TypeScript definition types derived from your schema. This is **mandatory** to benefit from Nexus' type-safety. We call this system "reflection". More on it later.
-1. Output path to where `@nexus/schema` should write the SDL version of your GraphQL schema. More on it later as well.
+1. Output path to where `nexus` should write the generated TypeScript definition types derived from your schema. This is **mandatory** to benefit from Nexus' type-safety. We call this system "reflection". More on it later.
+1. Output path to where `nexus` should write the SDL version of your GraphQL schema. More on it later as well.
 
-Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later. 
+Finally, we'll setup the GraphQL server. We'll intentionally separate the server instantiation from the server listening to make testing easier later.
 
-Create an `api/server.ts` file and add the following code to instantiate your GraphQL server
+Create `api/server.ts` and `api/index.ts` files and add the following code to instantiate your GraphQL server:
 
-```ts
+```ts copy
 // api/server.ts
 import { ApolloServer } from 'apollo-server'
 import { schema } from './schema'
@@ -95,11 +116,9 @@ import { schema } from './schema'
 export const server = new ApolloServer({ schema })
 ```
 
-Then create an `api/app.ts` file and add the following to make the server listening
-
-```ts
-// api/app.ts
-import { server } from './server'
+```ts copy
+// api/index.ts
+import { server } from './server.ts'
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`)
@@ -110,19 +129,19 @@ server.listen().then(({ url }) => {
 
 Ok, with our entrypoint setup, let's boot up dev mode and see what happens.
 
-```bash-symbol
+```bash-symbol copy
 npm run dev
 ```
 
 You should also see a message indicating that your server is running, and where
 
 ```bash-symbol
-🚀 Server ready at http://localhost:4000/graphql
+🚀 Server ready at http://localhost:4000
 ```
 
 ## Try it out
 
-Open it up, what do you see? It should be an instance of [GraphQL Playground](https://github.com/prisma-labs/graphql-playground).
+Open it up, what do you see? It should be an instance of [GraphQL Playground](https://github.com/graphql/graphql-playground).
 
 ![image](https://user-images.githubusercontent.com/284476/83534302-ae1b7d00-a4be-11ea-9a13-2665bf152e2a.png)
 

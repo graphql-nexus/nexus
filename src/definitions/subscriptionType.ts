@@ -1,131 +1,173 @@
-import { GraphQLResolveInfo } from 'graphql'
-import {
-  ArgsValue,
-  FieldResolver,
-  GetGen,
-  HasGen3,
-  MaybePromise,
-  MaybePromiseDeep,
-  NeedsResolver,
-  ResultValue,
-} from '../typegenTypeHelpers'
-import { CommonOutputFieldConfig } from './definitionBlocks'
-import { ObjectDefinitionBlock, ObjectDefinitionBuilder, objectType } from './objectType'
-import { AllNexusOutputTypeDefs } from './wrapping'
+import type { GraphQLResolveInfo } from 'graphql'
+import type { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
+import type { IsEqual } from '../typeHelpersInternal'
+import type { CommonOutputFieldConfig } from './definitionBlocks'
+import { objectType } from './objectType'
+import type { AllNexusOutputTypeDefs } from './wrapping'
 
-export interface SubscriptionScalarConfig<TypeName extends string, FieldName extends string, T = any>
-  extends CommonOutputFieldConfig<TypeName, FieldName> {
-  /**
-   * Resolve method for the field
-   */
-  resolve?: FieldResolver<TypeName, FieldName>
+export type IsSubscriptionType<T> = IsEqual<T, 'Subscription'>
 
-  subscribe(
-    root: object,
-    args: ArgsValue<TypeName, FieldName>,
-    ctx: GetGen<'context'>,
-    info: GraphQLResolveInfo
-  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>
-}
-
-export type ScalarSubSpread<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? HasGen3<'argTypes', TypeName, FieldName> extends true
-    ? [ScalarSubConfig<TypeName, FieldName>]
-    : [ScalarSubConfig<TypeName, FieldName>] | [FieldResolver<TypeName, FieldName>]
-  : HasGen3<'argTypes', TypeName, FieldName> extends true
-  ? [ScalarSubConfig<TypeName, FieldName>]
-  : [] | [FieldResolver<TypeName, FieldName>] | [ScalarSubConfig<TypeName, FieldName>]
-
-export type ScalarSubConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? SubscriptionScalarConfig<TypeName, FieldName> & {
-      resolve: FieldResolver<TypeName, FieldName>
-    }
-  : SubscriptionScalarConfig<TypeName, FieldName>
-
-export interface SubscribeFieldConfig<TypeName extends string, FieldName extends string, T = any>
-  extends CommonOutputFieldConfig<TypeName, FieldName> {
-  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
-
-  /**
-   * Resolve method for the field
-   */
+export interface SubscriptionTypeConfigBase<FieldName extends string, Event = any> {
   resolve(
-    root: T,
-    args: ArgsValue<TypeName, FieldName>,
+    root: Event,
+    args: ArgsValue<'Subscription', FieldName>,
     context: GetGen<'context'>,
     info: GraphQLResolveInfo
   ):
     | MaybePromise<ResultValue<'Subscription', FieldName>>
     | MaybePromiseDeep<ResultValue<'Subscription', FieldName>>
-
   subscribe(
     root: object,
-    args: ArgsValue<TypeName, FieldName>,
+    args: ArgsValue<'Subscription', FieldName>,
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
-  ): MaybePromise<AsyncIterator<T>> | MaybePromiseDeep<AsyncIterator<T>>
+  ): MaybePromise<AsyncIterator<Event>> | MaybePromiseDeep<AsyncIterator<Event>>
 }
 
-export interface SubscriptionDefinitionBuilder extends ObjectDefinitionBuilder<'Subscription'> {}
+// prettier-ignore
+export type SubscriptionScalarConfig<FieldName extends string, Event> =
+    CommonOutputFieldConfig<'Subscription', FieldName>
+  & SubscriptionTypeConfigBase<FieldName, Event>
 
-export class SubscriptionDefinitionBlock extends ObjectDefinitionBlock<'Subscription'> {
-  constructor(protected typeBuilder: SubscriptionDefinitionBuilder, protected isList = false) {
-    super(typeBuilder)
+// prettier-ignore
+export interface SubscriptionTypeConfig<FieldName extends string, Event>
+  extends SubscriptionScalarConfig<FieldName, Event>
+  {
+    type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
   }
 
-  get list() {
-    if (this.isList) {
-      throw new Error('Cannot chain list.list, in the definition block. Use `list: []` config value')
-    }
-    return new SubscriptionDefinitionBlock(this.typeBuilder, true)
-  }
-
-  string<FieldName extends string>(
-    fieldName: FieldName,
-    ...opts: ScalarSubSpread<'Subscription', FieldName>
-  ) {
-    this.addScalarField(fieldName, 'String', opts)
-  }
-
-  int<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
-    this.addScalarField(fieldName, 'Int', opts)
-  }
-
-  boolean<FieldName extends string>(
-    fieldName: FieldName,
-    ...opts: ScalarSubSpread<'Subscription', FieldName>
-  ) {
-    this.addScalarField(fieldName, 'Boolean', opts)
-  }
-
-  id<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
-    this.addScalarField(fieldName, 'ID', opts)
-  }
-
-  float<FieldName extends string>(fieldName: FieldName, ...opts: ScalarSubSpread<'Subscription', FieldName>) {
-    this.addScalarField(fieldName, 'Float', opts)
-  }
-
-  field<FieldName extends string>(
-    name: FieldName,
-    fieldConfig: SubscribeFieldConfig<'Subscription', FieldName>
-  ) {
-    const field: any = { name, ...fieldConfig }
-    this.typeBuilder.addField(this.decorateField(field))
-  }
+// prettier-ignore
+export interface SubscriptionBuilder {
+  list: SubscriptionBuilder
+  nonNull: Omit<SubscriptionBuilder, 'nonNull' | 'nullable'>
+  nullable: Omit<SubscriptionBuilder, 'nonNull' | 'nullable'>
+  string<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  int<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  boolean<FieldName extends string, Event>(fieldName: FieldName, opts: SubscriptionScalarConfig<FieldName, Event>): void
+  id<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  float<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
+  field<FieldName extends string, Event>(name: FieldName, fieldConfig: SubscriptionTypeConfig<FieldName, Event>): void
 }
 
-export type NexusSubscriptionTypeConfig = {
-  name: 'Subscription'
-  definition(t: SubscriptionDefinitionBlock): void
+export type SubscriptionTypeParams = {
+  definition(t: SubscriptionBuilder): void
 }
 
-export function subscriptionType(config: Omit<NexusSubscriptionTypeConfig, 'name'>) {
-  return objectType({ name: 'Subscription', ...config })
+/**
+ * [2018 GraphQL Spec](https://spec.graphql.org/June2018/#sec-Subscription)
+ *
+ * Define a Subscription type.
+ *
+ * This is a shorthand for:
+ *
+ * `objectType({ name: 'Subscription' })`
+ *
+ * The Subscription type is one of three [root
+ * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent
+ * API operations your clients can run to be pushed data changes over time.
+ *
+ * You can only have one of these in your schema. If you are going to modularize your schema and thus be
+ * wanting to contribute fields to the Subscription type from multiple modules then use
+ * [queryField](https://nxs.li/docs/api/subscription-field) intead.
+ *
+ * Note that the main difference about Subscription type from other object types is that its field
+ * configurations require a special "subscribe" method where you can return an asynchronous iterator.
+ * Promises yielded by that iterator become available to the resolver in its first param, the source data.
+ *
+ * @example
+ *   // Contrived but simple self-contained example
+ *
+ *   subscriptionType({
+ *     definition(t) {
+ *       t.boolean('truths', {
+ *         subscribe() {
+ *           async function* createTruthsStream() {
+ *             while (true) {
+ *               await new Promise((res) => setTimeout(res, 1000))
+ *               yield Math.random() > 0.5
+ *             }
+ *           }
+ *           return createTruthsStream()
+ *         },
+ *         resolve(truthPromise) {
+ *           return truthPromise
+ *         },
+ *       })
+ *     },
+ *   })
+ *
+ * @example
+ *   // A slightly less contrived example
+ *   // See the full working example at
+ *   // https://nxs.li/examples/subscriptions
+ *
+ *   import { PubSub } from 'apollo-server-express'
+ *   import { makeSchema, mutationType, objectType, stringArg, subscriptionType } from '_AT_nexus/schema'
+ *   import * as path from 'path'
+ *
+ *   export const pubsub = new PubSub()
+ *
+ *   type User = {
+ *     email: string
+ *   }
+ *
+ *   type Event<T> = {
+ *     data: T
+ *   }
+ *
+ *   export const schema = makeSchema({
+ *     types: [
+ *       subscriptionType({
+ *         definition(t) {
+ *           t.field('signup', {
+ *             type: 'User',
+ *             subscribe() {
+ *               return pubsub.asyncIterator('signup')
+ *             },
+ *             async resolve(eventPromise: Promise<Event<User>>) {
+ *               const event = await eventPromise
+ *               return event.data
+ *             },
+ *           })
+ *         },
+ *       }),
+ *
+ *       mutationType({
+ *         definition(t) {
+ *           t.field('signup', {
+ *             type: 'User',
+ *             args: {
+ *               email: stringArg(),
+ *             },
+ *             async resolve(_, args) {
+ *               const newUser = {
+ *                 email: args.email,
+ *               }
+ *               // ...
+ *               await pubsub.publish('signup', {
+ *                 data: newUser,
+ *               })
+ *               return newUser
+ *             },
+ *           })
+ *         },
+ *       }),
+ *
+ *       objectType({
+ *         name: 'User',
+ *         definition(t) {
+ *           t.string('email')
+ *         },
+ *       }),
+ *     ],
+ *     typegenAutoConfig: {
+ *       sources: [{ source: __filename, alias: 'SourceTypes' }],
+ *     },
+ *   })
+ *
+ * @param config Specify your Subscription type's fields, description, and more. See each config property's jsDoc
+ *     for more detail.
+ */
+export function subscriptionType(config: SubscriptionTypeParams) {
+  return objectType({ ...config, name: 'Subscription' } as any)
 }

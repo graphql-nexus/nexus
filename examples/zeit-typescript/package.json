@@ -13,8 +13,8 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "@nexus/schema": "^0.16.0",
-    "graphql": "^15.3.0"
+    "graphql": "^15.3.0",
+    "nexus": "^1.0.0"
   },
   "devDependencies": {
     "@now/node": "^1.0.1",

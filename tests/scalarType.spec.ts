@@ -8,6 +8,7 @@ import {
   objectType,
   queryField,
   resolveTypegenConfig,
+  scalarType,
 } from '../src/core'
 import { TypegenMetadata } from '../src/typegenMetadata'
 
@@ -42,9 +43,9 @@ describe('scalarType', () => {
               name: 'SomeInput',
               definition(t) {
                 // @ts-ignore
-                t.date('date', { required: true })
+                t.date('date')
               },
-            }).asArg({ required: true }),
+            }).asArg(),
           },
           resolve: (root, args) => ({
             id: `User:1`,
@@ -68,5 +69,50 @@ describe('scalarType', () => {
         `
       )
     ).toMatchSnapshot()
+  })
+
+  it('sourceTyping: allows importing a node module for the typing path', async () => {
+    const schema = makeSchemaInternal({
+      types: [
+        scalarType({
+          name: 'TestScalar',
+          sourceType: {
+            module: 'graphql',
+            export: 'GraphQLScalar',
+          },
+          serialize() {},
+        }),
+      ],
+      outputs: false,
+      shouldExitAfterGenerateArtifacts: false,
+    })
+    const generator = new TypegenMetadata(resolveTypegenConfig(schema.finalConfig))
+    const typegen = await generator.generateTypesFile(schema.schema, 'foo.ts')
+    expect(typegen).toMatch(/import type { GraphQLScalar } from \"graphql\"/)
+  })
+
+  it('can override the backing type for known scalars', async () => {
+    const schema = makeSchemaInternal({
+      types: [
+        objectType({
+          name: 'Test',
+          definition(t) {
+            t.id('id')
+          },
+        }),
+      ],
+      outputs: false,
+      shouldExitAfterGenerateArtifacts: false,
+      sourceTypes: {
+        modules: [],
+        mapping: {
+          ID: 'unknown',
+        },
+      },
+    })
+    const generator = new TypegenMetadata(resolveTypegenConfig(schema.finalConfig))
+    const typegen = await generator.generateTypesFile(schema.schema, 'foo.ts')
+    expect(typegen).toMatch(/id\?\: unknown | null; \/\/ ID/)
+    expect(typegen).toMatch(/ID: unknown/)
   })
 })

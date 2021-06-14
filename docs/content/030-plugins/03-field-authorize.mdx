@@ -1,0 +1,34 @@
+---
+title: Field Authorize
+---
+
+## Field Authorize
+
+The field Authorize Plugin plugin provides a new property on the field config called `authorize`.
+
+```ts
+import { makeSchema, fieldAuthorizePlugin } from 'nexus'
+
+const schema = makeSchema({
+  // ... types, etc,
+  plugins: [
+    // ... other plugins
+    fieldAuthorizePlugin(),
+  ],
+})
+```
+
+It allows us to define field-level authorization to a query:
+
+```ts
+t.field('postById', {
+  type: Post,
+  args: { id: idArg() },
+  authorize: (root, args, ctx) => ctx.auth.canViewPost(args.id),
+  resolve(root, args, ctx) {
+    return ctx.post.byId(args.id)
+  },
+})
+```
+
+`authorize` is a function that provides authorization for an individual field. Returning `true` or `Promise<true>` means the field can be accessed. Returning `false` or `Promise<false>` will respond with a "Not Authorized" error for the field. Returning or throwing an error will also prevent the resolver from executing.

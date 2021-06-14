@@ -1,7 +1,7 @@
 import { graphql } from 'graphql'
 import path from 'path'
 import { fieldAuthorizePlugin, makeSchema, objectType, queryField } from '../../src'
-import { generateSchema } from '../../src/core'
+import { generateSchema, declarativeWrappingPlugin } from '../../src/core'
 
 describe('fieldAuthorizePlugin', () => {
   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -261,7 +261,7 @@ describe('fieldAuthorizePlugin', () => {
             resolve: () => true,
           }),
         ],
-        plugins: [fieldAuthorizePlugin()],
+        plugins: [fieldAuthorizePlugin(), declarativeWrappingPlugin({ disable: true })],
       },
       path.join(__dirname, 'test.gen.ts')
     )

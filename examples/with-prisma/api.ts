@@ -1,7 +1,7 @@
-import { makeSchema, objectType, queryType, stringArg } from '@nexus/schema'
 import { PrismaClient } from '@prisma/client'
 import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
+import { makeSchema, nullable, objectType, queryType, stringArg } from 'nexus'
 import * as path from 'path'
 
 const prisma = new PrismaClient()
@@ -9,9 +9,12 @@ const prisma = new PrismaClient()
 const apollo = new ApolloServer({
   context: () => ({ prisma }),
   schema: makeSchema({
-    typegenAutoConfig: {
-      contextType: '{ prisma: PrismaClient.PrismaClient }',
-      sources: [{ source: '.prisma/client', alias: 'PrismaClient' }],
+    sourceTypes: {
+      modules: [{ module: '.prisma/client', alias: 'PrismaClient' }],
+    },
+    contextType: {
+      module: path.join(__dirname, 'context.ts'),
+      export: 'Context',
     },
     outputs: {
       typegen: path.join(
@@ -40,7 +43,7 @@ const apollo = new ApolloServer({
           t.list.field('users', {
             type: 'User',
             args: {
-              world: stringArg({ required: false }),
+              world: nullable(stringArg()),
             },
             resolve(_root, _args, ctx) {
               return ctx.prisma.user.findMany()

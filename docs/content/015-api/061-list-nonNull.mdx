@@ -1,0 +1,125 @@
+---
+title: list / nonNull
+codeStyle: true
+---
+
+## list
+
+[GraphQL Docs on List Type](https://graphql.org/learn/schema/#lists-and-non-null)
+
+Types (including arguments) can be passed into the `list()` function to wrap them in a list type.
+
+```ts
+import { queryType, stringArg, list } from 'nexus'
+
+queryType({
+  definition(t) {
+    t.field('tags', {
+      type: list('String') // -> [String]
+      args: {
+        ids: list(stringArg()) // or list('String') -> [String]
+      },
+      resolve() {
+        // ...
+      }
+    })
+  }
+})
+```
+
+⚠️ If `nonNullDefaults.input` or `nonNullDefaults.output` is true, `list('String')` will resolve to `nonNull(list(nonNull('String')))`, producing the following type: `[String!]!`
+
+Below are some usage examples of `list()`:
+
+| Example                            | GraphQL Type (nonNullDefaults = false) | GraphQL Type (nonNullDefaults = true) |
+| ---------------------------------- | -------------------------------------- | ------------------------------------- |
+| `list(nonNull('String'))`          | `[String!]`                            | `[String!]!`                          |
+| `list(list('String'))`             | `[[String]]`                           | `[[String!]!]!`                       |
+| `nonNull(list('String'))`          | `[String]!`                            | `[String!]!`                          |
+| `nonNull(list(nonNull('String')))` | `[String!]!`                           | `[String!]!`                          |
+
+## nonNull
+
+[GraphQL Docs on List Type](https://graphql.org/learn/schema/#lists-and-non-null)
+
+Types (including arguments) can be passed into the `nonNull()` function to mark them as non-null.
+
+```ts
+import { queryType, stringArg, nonNull } from 'nexus'
+
+queryType({
+  definition(t) {
+    t.field('tags', {
+      type: nonNull('String') // => String!
+      args: {
+        id: nonNull(stringArg()) // or nonNull('String') => String!
+      },
+      resolve() {
+        // ...
+      }
+    })
+  }
+})
+```
+
+In case `nonNullDefaults.output` or `nonNullDefaults.input` is `true`, `nonNull` will behave as a no-op.
+
+Below are some more usage examples of `nonNull`:
+
+| Example                            | Produced GraphQL Type (nonNullDefaults = true) | Produced GraphQL Type (nonNullDefaults = false) |
+| ---------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| `nonNull('String')`                | `String!`                                      | `String!`                                       |
+| `nonNull(list('String'))`          | `[String]!`                                    | `[String]!`                                     |
+| `list(nonNull('String'))`          | `[String!]`                                    | `[String!]`                                     |
+| `nonNull(list(nonNull('String')))` | `[String!]!`                                   | `[String!]!`                                    |
+| `nonNull(nonNull('String'))`       | `String!`                                      | `String!`                                       |
+| `nonNull(nullable('String'))`      | `String!`                                      | `String!`                                       |
+
+## nullable
+
+The `nullable()` helper is intended to be used when `nonNullDefaults.output` or `nonNullDefaults.input` is `true`.
+
+While input and output types are nullable by default, you can set them to be non-nullable globally, or per-type, thanks to the `nonNullDefaults` configuration.
+
+When types are non-nullable by default:
+
+- `String` will resolve to `nonNull('String')`, producing the type `String!`
+- `list('String')` will resolve to `nonNull(list(nonNull('String')))`, producing the type `[String!]!`
+
+To revert the non-nullability, we can use the `nullable()` helper to mark Types and Arguments as nullable.
+
+```ts
+import { queryType, stringArg, nonNull } from 'nexus'
+
+queryType({
+  nonNullDefaults: {
+    input: true // input types are non-nullable by default
+    output: true // output types are non-nullable by default
+  },
+  definition(t) {
+    t.field('tags', {
+      type: list(nullable('String')) // => [String]!
+      args: {
+        id: nullable(stringArg()) // or nullable('String') => String
+      },
+      resolve() {
+        // ...
+      }
+    })
+  }
+})
+```
+
+In case `nonNullDefaults.output` or `nonNullDefaults.input` is `false`, `nullable` will behave as a no-op.
+
+Below are some more usage examples of `nullable()`:
+
+| Example                              | GraphQL Type (nonNullDefaults = false) | GraphQL Type (nonNullDefaults = true) |
+| ------------------------------------ | -------------------------------------- | ------------------------------------- |
+| `nullable('String')`                 | `String`                               | `String`                              |
+| `nullable(list('String'))`           | `[String]`                             | `[String!]`                           |
+| `list(nullable('String'))`           | `[String]`                             | `[String]!`                           |
+| `nullable(list(nullable('String')))` | `[String]`                             | `[String]`                            |
+| `nullable(nonNull('String'))`        | `String`                               | `String`                              |
+| `nonNull(nullable('String'))`        | `String!`                              | `String!`                             |
+| `nullable(nullable('String'))`       | `String`                               | `String`                              |

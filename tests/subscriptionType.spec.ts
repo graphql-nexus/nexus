@@ -1,12 +1,32 @@
 import * as GQL from 'graphql'
-import { makeSchema, subscriptionType } from '../src/core'
-import { mockStream, subscribe, take } from './_helpers'
+import { list, makeSchema, subscriptionType } from '../src/core'
+import { mockStream, subscribe, take } from './__helpers'
 
 it('defines a field on the mutation type as shorthand', async () => {
   const schema = makeSchema({
     types: [
       subscriptionType({
         definition(t) {
+          // lists
+          t.list.field('someFields', {
+            type: 'Int',
+            subscribe() {
+              return mockStream(10, 0, (int) => int - 1)
+            },
+            resolve: (event) => {
+              return event
+            },
+          })
+          t.field('someInts', {
+            type: list('Int'),
+            subscribe() {
+              return mockStream(10, 0, (int) => int + 1)
+            },
+            resolve: (event) => {
+              return event
+            },
+          })
+          // singular
           t.field('someField', {
             type: 'Int',
             subscribe() {
@@ -62,18 +82,20 @@ it('defines a field on the mutation type as shorthand', async () => {
     outputs: false,
   })
 
-  expect(GQL.printSchema(schema)).toMatchInlineSnapshot(`
-    "type Subscription {
-      someField: Int
-      someInt: Int
-      someString: String
-      someFloat: Float
-      someBoolean: Boolean
-      someID: ID
+  expect(GQL.printSchema(GQL.lexicographicSortSchema(schema))).toMatchInlineSnapshot(`
+    "type Query {
+      ok: Boolean!
     }
 
-    type Query {
-      ok: Boolean!
+    type Subscription {
+      someBoolean: Boolean
+      someField: Int
+      someFields: [Int]
+      someFloat: Float
+      someID: ID
+      someInt: Int
+      someInts: [Int]
+      someString: String
     }
     "
   `)

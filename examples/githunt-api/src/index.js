@@ -1,7 +1,7 @@
 // @ts-check
 const { ApolloServer } = require('apollo-server')
 const path = require('path')
-const { makeSchema } = require('@nexus/schema')
+const { makeSchema } = require('nexus')
 const types = require('./schema')
 
 const schema = makeSchema({
@@ -10,7 +10,7 @@ const schema = makeSchema({
     schema: path.join(__dirname, '../githunt-api-schema.graphql'),
     typegen: path.join(__dirname, './githunt-typegen.ts'),
   },
-  prettierConfig: require.resolve('../../../package.json'),
+  prettierConfig: require.resolve('../../../.prettierrc'),
 })
 
 const server = new ApolloServer({

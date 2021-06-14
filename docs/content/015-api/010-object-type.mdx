@@ -6,7 +6,7 @@ codeStyle: true
 ## objectType
 
 ```ts
-objectType(typeName: string, fn: ObjectDefinitionBlock): NexusObjectType
+objectType(config: ObjectDefinitionBlock): NexusObjectType
 ```
 
 The most basic components of a GraphQL schema are object types, a type you can fetch from your schema, with fields:
@@ -17,7 +17,7 @@ const User = objectType({
   definition(t) {
     t.int('id', { description: 'Id of the user' })
     t.string('fullName', { description: 'Full name of the user' })
-    t.field('status', { type: 'StatusEnum' })
+    t.field('status', { type: StatusEnum })
     t.list.field('posts', {
       type: Post, // or "Post"
       resolve(root, args, ctx) {
@@ -46,4 +46,4 @@ const StatusEnum = enumType({
 
 `queryType` / `mutationType` are shorthand for the root types.
 
-Check the type-definitions or [the examples](https://github.com/graphql-nexus/schema/tree/develop/examples) for a full illustration of the various options of `objectType`, or feel free to open a PR on the docs to help document!
+Check the type-definitions or [the examples](https://github.com/graphql-nexus/nexus/tree/main/examples) for a full illustration of the various options of `objectType`, or feel free to open a PR on the docs to help document!

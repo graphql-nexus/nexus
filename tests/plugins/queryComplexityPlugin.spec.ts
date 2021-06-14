@@ -1,7 +1,7 @@
-import { GraphQLObjectType } from 'graphql'
+import type { GraphQLObjectType } from 'graphql'
 import path from 'path'
 import { makeSchema, objectType, queryComplexityPlugin, queryField } from '../../src'
-import { generateSchema } from '../../src/core'
+import { generateSchema, declarativeWrappingPlugin } from '../../src/core'
 
 describe('queryComplexityPlugin', () => {
   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -88,7 +88,7 @@ describe('queryComplexityPlugin', () => {
   })
 
   test('throws error if complexity is of invalid type', () => {
-    const testSchema = createTestSchema([
+    createTestSchema([
       objectType({
         name: 'User',
         definition(t) {
@@ -112,7 +112,7 @@ describe('queryComplexityPlugin', () => {
             resolve: () => true,
           }),
         ],
-        plugins: [queryComplexityPlugin()],
+        plugins: [queryComplexityPlugin(), declarativeWrappingPlugin({ disable: true })],
       },
       path.join(__dirname, 'test.gen.ts')
     )

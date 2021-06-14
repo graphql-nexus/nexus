@@ -1,15 +1,16 @@
 {
   "name": "@graphql-nexus/ts-ast-reader",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "start": "ts-node-dev --no-notify --transpileOnly --respawn ./src"
   },
   "dependencies": {
-    "@nexus/schema": "^0.16.0",
     "apollo-server": "^2.18.1",
     "fs-extra": "^7.0.1",
     "graphql": "^15.3.0",
     "graphql-tools": "^4.0.7",
+    "nexus": "^1.0.0",
     "ts-node-dev": "1.0.0-pre.31",
     "typescript": "^3.9"
   },

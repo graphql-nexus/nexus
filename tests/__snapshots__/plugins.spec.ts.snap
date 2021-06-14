@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`onInstall plugins does not have access to inline types 1`] = `
-"type Query {
-  bar(inline: Inline): String
+"input Inline {
+  hidden: String
 }
 
-input Inline {
-  hidden: String
+type Query {
+  bar(inline: Inline): String
 }
 "
 `;
@@ -41,41 +41,3 @@ exports[`runtime config validation checks name is not empty 1`] = `"Plugin \\"\\
 exports[`runtime config validation checks name is string 1`] = `"Plugin \\"1\\" is giving an invalid value for property name: expected \\"string\\" type, got number type"`;
 
 exports[`runtime config validation checks name present 1`] = `"Plugin \\"undefined\\" is missing required properties: name"`;
-
-exports[`runtime onInstall hook handler does not validate types array members yet 1`] = `"Cannot read property 'name' of null"`;
-
-exports[`runtime onInstall hook handler validates return value against shallow schema 1`] = `
-"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
-
-expected structure:
-
-  { types: NexusAcceptedTypeDef[] }
-
-got:
-
-  null"
-`;
-
-exports[`runtime onInstall hook handler validates return value against shallow schema 2`] = `
-"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
-
-expected structure:
-
-  { types: NexusAcceptedTypeDef[] }
-
-got:
-
-  [object Object]"
-`;
-
-exports[`runtime onInstall hook handler validates return value against shallow schema 3`] = `
-"Plugin \\"x\\" returned invalid data for \\"onInstall\\" hook:
-
-expected structure:
-
-  { types: NexusAcceptedTypeDef[] }
-
-got:
-
-  [object Object]"
-`;

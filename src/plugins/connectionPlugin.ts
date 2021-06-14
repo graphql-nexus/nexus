@@ -1,27 +1,28 @@
-import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
+import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import { FieldOutConfig } from '../definitions/definitionBlocks'
+import type { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
+import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
+import { NexusNullDef, nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
-import { AllNexusOutputTypeDefs } from '../definitions/wrapping'
+import {
+  AllNexusNamedOutputTypeDefs,
+  AllNexusOutputTypeDefs,
+  applyNexusWrapping,
+} from '../definitions/wrapping'
+import type { NonNullConfig } from '../definitions/_types'
 import { dynamicOutputMethod } from '../dynamicMethod'
 import { completeValue, plugin } from '../plugin'
-import {
+import type {
   ArgsValue,
+  FieldTypeName,
   GetGen,
   MaybePromise,
   MaybePromiseDeep,
   ResultValue,
-  RootValue,
+  SourceValue,
 } from '../typegenTypeHelpers'
-import {
-  eachObj,
-  getOwnPackage,
-  isObject,
-  isPromiseLike,
-  mapObj,
-  pathToArray,
-  printedGenTypingImport,
-} from '../utils'
+import type { MaybePromiseLike } from '../typeHelpersInternal'
+import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
 
 export interface ConnectionPluginConfig {
   /**
@@ -37,8 +38,7 @@ export interface ConnectionPluginConfig {
    */
   includeNodesField?: boolean
   /**
-   * Any args to include by default on all connection fields,
-   * in addition to the ones in the spec.
+   * Any args to include by default on all connection fields, in addition to the ones in the spec.
    *
    * @default null
    */
@@ -58,14 +58,14 @@ export interface ConnectionPluginConfig {
   /**
    * Custom logic to validate the arguments.
    *
-   * Defaults to requiring that either a `first` or `last` is provided, and
-   * that after / before must be paired with `first` or `last`, respectively.
+   * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
+   * with `first` or `last`, respectively.
    */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
+  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo, root: unknown, ctx: unknown) => void
   /**
-   * If disableForwardPagination or disableBackwardPagination are set to true,
-   * we require the `first` or `last` field as needed. Defaults to true,
-   * setting this to false will disable this behavior and make the field nullable.
+   * If disableForwardPagination or disableBackwardPagination are set to true, we require the `first` or
+   * `last` field as needed. Defaults to true, setting this to false will disable this behavior and make the
+   * field nullable.
    */
   strictArgs?: boolean
   /**
@@ -73,7 +73,7 @@ export interface ConnectionPluginConfig {
    *
    * Default is `cursor:${index}`
    *
-   * @default "field"
+   * @default field
    */
   cursorFromNode?: (
     node: any,
@@ -83,60 +83,98 @@ export interface ConnectionPluginConfig {
     forCursor: { index: number; nodes: any[] }
   ) => string | Promise<string>
   /**
-   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
-   * when customizing the behavior of `cursorFromNode`
+   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed when
+   * customizing the behavior of `cursorFromNode`
    */
   pageInfoFromNodes?: (
     allNodes: any[],
     args: PaginationArgs,
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
-  ) => { hasNextPage: boolean; hasPreviousPage: boolean }
-  /**
-   * Conversion from a cursor string into an opaque token. Defaults to base64Encode(string)
-   */
+  ) => MaybePromise<{ hasNextPage: boolean; hasPreviousPage: boolean }>
+  /** Conversion from a cursor string into an opaque token. Defaults to base64Encode(string) */
   encodeCursor?: (value: string) => string
-  /**
-   * Conversion from an opaque token into a cursor string. Defaults to base64Decode(string)
-   */
+  /** Conversion from an opaque token into a cursor string. Defaults to base64Decode(string) */
   decodeCursor?: (cursor: string) => string
+  /** Extend *all* edges to include additional fields, beyond cursor and node */
+  extendEdge?: Record<
+    string,
+    Omit<FieldOutConfig<any, any>, 'resolve'> & {
+      /**
+       * Set requireResolver to false if you have already resolved this information during the resolve of the
+       * edges in the parent resolve method
+       *
+       * @default true
+       */
+      requireResolver?: boolean
+    }
+  >
   /**
-   * Extend *all* edges to include additional fields, beyond cursor and node
+   * Any additional fields to make available to the connection type, beyond edges / pageInfo / nodes.
+   *
+   * Any fields defined extended on the Connection type will automatically receive the args from the
+   * connection. If the field also defines args, they will be merged with the args of the connection, with
+   * the extension's field args taking precedence if there is a conflict.
    */
-  extendEdge?: Record<string, Omit<FieldOutConfig<any, any>, 'resolve'>>
-  /**
-   * Any additional fields to make available to the connection type,
-   * beyond edges, pageInfo
-   */
-  extendConnection?: Record<string, Omit<FieldOutConfig<any, any>, 'resolve'>>
-  /**
-   * Prefix for the Connection / Edge type
-   */
+  extendConnection?: Record<
+    string,
+    Omit<FieldOutConfig<any, any>, 'resolve'> & {
+      /**
+       * Set requireResolver to false if you have already resolved this information during the resolve of the
+       * edges in the parent resolve method
+       *
+       * @default true
+       */
+      requireResolver?: boolean
+    }
+  >
+  /** Allows specifying a custom name for connection types. */
+  getConnectionName?(filedName: string, parentTypeName: string): string
+  /** Allows specifying a custom name for edge types. */
+  getEdgeName?(filedName: string, parentTypeName: string): string
+  /** Prefix for the Connection / Edge type */
   typePrefix?: string
   /**
-   * The path to the @nexus/schema package. Needed for typegen.
+   * The path to the nexus package for typegen.
    *
-   * @default '@nexus/schema'
+   * This setting is only necessary when nexus is being wrapped by another library/framework such that `nexus`
+   * is not expected to be a direct dependency at the application level.
    *
-   * @remarks
-   *
-   * This setting is particularly useful when @nexus/schema is being wrapped by
-   * another library/framework such that @nexus/schema is not expected to be a
-   * direct dependency at the application level.
+   * @default 'nexus'
    */
   nexusSchemaImportId?: string
+  /**
+   * Configures the default "nonNullDefaults" settings for any connection types created globally by this
+   * config / connection field.
+   */
+  nonNullDefaults?: NonNullConfig
+  /** Allows specifying a custom cursor type, as the name of a scalar */
+  cursorType?:
+    | GetGen<'scalarNames'>
+    | NexusNullDef<GetGen<'scalarNames'>>
+    | NexusNonNullDef<GetGen<'scalarNames'>>
 }
 
 // Extract the node value from the connection for a given field.
-export type NodeValue<TypeName extends string = any, FieldName extends string = any> = Exclude<
-  Exclude<Exclude<ResultValue<TypeName, FieldName>, null | undefined>['edges'], null | undefined>[number],
-  null | undefined
+export type NodeValue<TypeName extends string = any, FieldName extends string = any> = SourceValue<
+  EdgeTypeLookup<TypeName, FieldName>
 >['node']
 
 export type ConnectionFieldConfig<TypeName extends string = any, FieldName extends string = any> = {
-  type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+  type: GetGen<'allOutputTypes', string> | AllNexusNamedOutputTypeDefs
   /**
-   * Additional args to use for just this field
+   * Whether the connection field can be null
+   *
+   * @default (depends on whether nullability is configured in type or schema)
+   */
+  nullable?: boolean
+  /**
+   * Additional args to include for just this field
+   *
+   * @example
+   *   additionalArgs: {
+   *     orderBy: arg({ type: nonNull(SortOrderEnum) })
+   *   }
    */
   additionalArgs?: ArgsRecord
   /**
@@ -148,7 +186,7 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   /**
    * Approach we use to transform a node into a cursor.
    *
-   * @default "nodeField"
+   * @default nodeField
    */
   cursorFromNode?: (
     node: NodeValue<TypeName, FieldName>,
@@ -158,53 +196,85 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     forCursor: { index: number; nodes: NodeValue<TypeName, FieldName>[] }
   ) => string | Promise<string>
   /**
-   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed
-   * when customizing the behavior of `cursorFromNode`
+   * Override the default behavior of determining hasNextPage / hasPreviousPage. Usually needed when
+   * customizing the behavior of `cursorFromNode`
    */
   pageInfoFromNodes?: (
     nodes: NodeValue<TypeName, FieldName>[],
     args: ArgsValue<TypeName, FieldName>,
     ctx: GetGen<'context'>,
     info: GraphQLResolveInfo
-  ) => { hasNextPage: boolean; hasPreviousPage: boolean }
+  ) => MaybePromise<{ hasNextPage: boolean; hasPreviousPage: boolean }>
   /**
    * Whether the field allows for backward pagination
+   *
+   * @see https://relay.dev/graphql/connections.htm#sec-Backward-pagination-arguments
    */
   disableForwardPagination?: boolean
   /**
    * Whether the field allows for backward pagination
+   *
+   * @see https://relay.dev/graphql/connections.htm#sec-Forward-pagination-arguments
    */
   disableBackwardPagination?: boolean
   /**
-   * If disableForwardPagination or disableBackwardPagination are set to true,
-   * we require the `first` or `last` field as needed. Defaults to true,
-   * setting this to false will disable this behavior and make the field nullable.
+   * If disableForwardPagination or disableBackwardPagination are set to true, we require the `first` or
+   * `last` field as needed. Defaults to true, setting this to false will disable this behavior and make the
+   * field nullable.
    */
   strictArgs?: boolean
   /**
    * Custom logic to validate the arguments.
    *
-   * Defaults to requiring that either a `first` or `last` is provided, and
-   * that after / before must be paired with `first` or `last`, respectively.
+   * Defaults to requiring that either a `first` or `last` is provided, and that after / before must be paired
+   * with `first` or `last`, respectively.
    */
-  validateArgs?: (args: Record<string, any>, info: GraphQLResolveInfo) => void
+  validateArgs?: (
+    args: ArgsValue<TypeName, FieldName>,
+    info: GraphQLResolveInfo,
+    root: SourceValue<TypeName>,
+    ctx: GetGen<'context'>
+  ) => void
   /**
-   * Dynamically adds additional fields to the current "connection" when it is defined.
-   * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
-   * so as not to conflict with any non-extended connections.
+   * Dynamically adds additional fields to the current "connection" when it is defined. This will cause the
+   * resulting type to be prefix'ed with the name of the type/field it is branched off of, so as not to
+   * conflict with any non-extended connections.
    */
-  extendConnection?: (def: ObjectDefinitionBlock<any>) => void
+  extendConnection?: (def: ObjectDefinitionBlock<FieldTypeName<TypeName, FieldName>>) => void
   /**
-   * Dynamically adds additional fields to the connection "edge" when it is defined.
-   * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
-   * so as not to conflict with any non-extended connections.
+   * Dynamically adds additional fields to the connection "edge" when it is defined. This will cause the
+   * resulting type to be prefix'ed with the name of the type/field it is branched off of, so as not to
+   * conflict with any non-extended connections.
    */
-  extendEdge?: (def: ObjectDefinitionBlock<any>) => void
+  extendEdge?: (
+    def: ObjectDefinitionBlock<FieldTypeName<FieldTypeName<TypeName, FieldName>, 'edges'>>
+  ) => void
+  /** Allows specifying a custom name for connection types. */
+  getConnectionName?(filedName: string, parentTypeName: string): string
+  /** Allows specifying a custom name for edge types. */
+  getEdgeName?(filedName: string, parentTypeName: string): string
+  /** Configures the default "nonNullDefaults" for connection type generated for this connection */
+  nonNullDefaults?: NonNullConfig
+  /**
+   * Allows specifying a custom cursor type, as the name of a scalar
+   *
+   * @example
+   *   cursorType: 'CustomString'
+   */
+  cursorType?:
+    | GetGen<'scalarNames'>
+    | NexusNullDef<GetGen<'scalarNames'>>
+    | NexusNonNullDef<GetGen<'scalarNames'>>
+  /**
+   * Defined automatically if you have extended the connectionPlugin globally
+   *
+   * If you wish to set "requireResolver" to false on the edge field definition in the connection plugin
+   */
+  edgeFields?: unknown
 } & (
   | {
       /**
-       * Nodes should resolve to an Array, with a length of one greater than the direction you
-       * are paginating.
+       * Nodes should resolve to an Array, with a length of one greater than the direction you are paginating.
        *
        * For example, if you're paginating forward, and assuming an Array with length 20:
        *
@@ -212,12 +282,12 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
        *
        * (last: 2) - [{id: 18}, {id: 19}, {id: 20}] - note {id: 18} is extra
        *
-       * We will then slice the array in the direction we're iterating, and if there are more
-       * than "N" results, we will assume there's a next page. If you set `assumeExactNodeCount: true`
-       * in the config, we will assume that a next page exists if the length >= the node count.
+       * We will then slice the array in the direction we're iterating, and if there are more than "N"
+       * results, we will assume there's a next page. If you set `assumeExactNodeCount: true` in the config,
+       * we will assume that a next page exists if the length >= the node count.
        */
       nodes: (
-        root: RootValue<TypeName>,
+        root: SourceValue<TypeName>,
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<'context'>,
         info: GraphQLResolveInfo
@@ -228,14 +298,14 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
     }
   | {
       /**
-       * Implement the full resolve, including `edges` and `pageInfo`. Useful for more complex
-       * pagination cases, where you may want to use utilities from other libraries like
-       * GraphQL Relay JS, and only use Nexus for the construction and type-safety:
+       * Implement the full resolve, including `edges` and `pageInfo`. Useful in more complex pagination
+       * cases, or if you want to use utilities from other libraries like GraphQL Relay JS, and only use
+       * Nexus for the construction and type-safety:
        *
-       * https://github.com/graphql/graphql-relay-js
+       * Https://github.com/graphql/graphql-relay-js
        */
       resolve: (
-        root: RootValue<TypeName>,
+        root: SourceValue<TypeName>,
         args: ArgsValue<TypeName, FieldName>,
         ctx: GetGen<'context'>,
         info: GraphQLResolveInfo
@@ -245,44 +315,31 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
       nodes?: never
     }
 ) &
+  Pick<CommonFieldConfig, 'deprecation' | 'description'> &
   NexusGenPluginFieldConfig<TypeName, FieldName>
 
-const ForwardPaginateArgs = {
-  first: intArg({
-    nullable: true,
-    description: 'Returns the first n elements from the list.',
-  }),
-  after: stringArg({
-    nullable: true,
-    description: 'Returns the elements in the list that come after the specified cursor',
-  }),
+export const ForwardPaginateArgs = {
+  first: nullable(intArg({ description: 'Returns the first n elements from the list.' })),
+  after: nullable(
+    stringArg({ description: 'Returns the elements in the list that come after the specified cursor' })
+  ),
 }
 
-const ForwardOnlyStrictArgs = {
+export const ForwardOnlyStrictArgs = {
   ...ForwardPaginateArgs,
-  first: intArg({
-    nullable: false,
-    description: 'Returns the first n elements from the list.',
-  }),
+  first: nonNull(intArg({ description: 'Returns the first n elements from the list.' })),
 }
 
-const BackwardPaginateArgs = {
-  last: intArg({
-    nullable: true,
-    description: 'Returns the last n elements from the list.',
-  }),
-  before: stringArg({
-    nullable: true,
-    description: 'Returns the elements in the list that come before the specified cursor',
-  }),
+export const BackwardPaginateArgs = {
+  last: nullable(intArg({ description: 'Returns the last n elements from the list.' })),
+  before: nullable(
+    stringArg({ description: 'Returns the elements in the list that come before the specified cursor' })
+  ),
 }
 
-const BackwardOnlyStrictArgs = {
+export const BackwardOnlyStrictArgs = {
   ...BackwardPaginateArgs,
-  last: intArg({
-    nullable: false,
-    description: 'Returns the last n elements from the list.',
-  }),
+  last: nonNull(intArg({ description: 'Returns the last n elements from the list.' })),
 }
 
 function base64Encode(str: string) {
@@ -293,15 +350,31 @@ function base64Decode(str: string) {
   return Buffer.from(str, 'base64').toString('utf8')
 }
 
+export type EdgeTypeLookup<TypeName extends string, FieldName extends string> = FieldTypeName<
+  FieldTypeName<TypeName, FieldName>,
+  'edges'
+>
+
 export type EdgeFieldResolver<TypeName extends string, FieldName extends string, EdgeField extends string> = (
-  root: RootValue<TypeName>,
-  args: ArgsValue<TypeName, FieldName>,
+  root: SourceValue<EdgeTypeLookup<TypeName, FieldName>>,
+  args: ArgsValue<TypeName, FieldName> & ArgsValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
-) => MaybePromise<ResultValue<TypeName, FieldName>['edges'][EdgeField]>
+) => MaybePromise<ResultValue<EdgeTypeLookup<TypeName, FieldName>, EdgeField>>
+
+export type ConnectionFieldResolver<
+  TypeName extends string,
+  FieldName extends string,
+  ConnectionFieldName extends string
+> = (
+  root: SourceValue<TypeName>,
+  args: ArgsValue<FieldTypeName<TypeName, FieldName>, ConnectionFieldName>,
+  context: GetGen<'context'>,
+  info: GraphQLResolveInfo
+) => MaybePromise<ResultValue<FieldTypeName<TypeName, FieldName>, ConnectionFieldName>>
 
 export type ConnectionNodesResolver<TypeName extends string, FieldName extends string> = (
-  root: RootValue<TypeName>,
+  root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
@@ -313,13 +386,13 @@ export type PageInfoFieldResolver<
   FieldName extends string,
   EdgeField extends string
 > = (
-  root: RootValue<TypeName>,
+  root: SourceValue<TypeName>,
   args: ArgsValue<TypeName, FieldName>,
   context: GetGen<'context'>,
   info: GraphQLResolveInfo
 ) => MaybePromise<ResultValue<TypeName, FieldName>['pageInfo'][EdgeField]>
 
-type EdgeLike = { cursor: string | PromiseLike<string>; node: any }
+export type EdgeLike = { cursor: string | PromiseLike<string>; node: any }
 
 export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig) => {
   const pluginConfig: ConnectionPluginConfig = { ...connectionPluginConfig }
@@ -350,17 +423,24 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       } = pluginConfig
 
       // If to add fields to every connection, we require the resolver be defined on the
-      // field definition.
+      // field definition, unless fromResolve: true is passed in the config
       if (pluginExtendConnection) {
         eachObj(pluginExtendConnection, (val, key) => {
-          dynamicConfig.push(`${key}: core.SubFieldResolver<TypeName, FieldName, "${key}">`)
+          dynamicConfig.push(
+            `${key}${
+              val.requireResolver === false ? '?:' : ':'
+            } connectionPluginCore.ConnectionFieldResolver<TypeName, FieldName, "${key}">`
+          )
         })
       }
 
       if (pluginExtendEdge) {
         const edgeFields = mapObj(
           pluginExtendEdge,
-          (val, key) => `${key}: connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, "${key}">`
+          (val, key) =>
+            `${key}${
+              val.requireResolver === false ? '?:' : ':'
+            } connectionPluginCore.EdgeFieldResolver<TypeName, FieldName, "${key}">`
         )
         dynamicConfig.push(`edgeFields: { ${edgeFields.join(', ')} }`)
       }
@@ -374,14 +454,23 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
       b.addType(
         dynamicOutputMethod({
           name: nexusFieldName,
+          typeDescription: `
+            Adds a Relay-style connection to the type, with numerous options for configuration
+
+            @see https://nexusjs.org/docs/plugins/connection
+          `,
           typeDefinition: `<FieldName extends string>(
-            fieldName: FieldName, 
-            config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName> ${printedDynamicConfig}
-          ): void`,
-          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage }) {
+      fieldName: FieldName,
+      config: connectionPluginCore.ConnectionFieldConfig<TypeName, FieldName>${printedDynamicConfig}
+    ): void`,
+          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage, builder, wrapping }) {
             const [fieldName, fieldConfig] = factoryArgs as [string, ConnectionFieldConfig]
             const targetType = fieldConfig.type
 
+            /* istanbul ignore if */
+            if (wrapping?.includes('List')) {
+              throw new Error(`Cannot chain .list with connectionField (on ${parentTypeName}.${fieldName})`)
+            }
             const { targetTypeName, connectionName, edgeName } = getTypeNames(
               fieldName,
               parentTypeName,
@@ -397,17 +486,14 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
             if (!b.hasType(connectionName)) {
               b.addType(
                 objectType({
-                  name: connectionName as any,
+                  name: connectionName,
                   definition(t2) {
-                    t2.field('edges', {
+                    t2.list.field('edges', {
                       type: edgeName as any,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
-                      nullable: true,
-                      list: [false],
                     })
-                    t2.field('pageInfo', {
+                    t2.nonNull.field('pageInfo', {
                       type: 'PageInfo' as any,
-                      nullable: false,
                       description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
                     })
                     if (includeNodesField) {
@@ -417,14 +503,17 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                       })
                     }
                     if (pluginExtendConnection) {
-                      eachObj(pluginExtendConnection, (val, key) => {
-                        t2.field(key, val)
+                      eachObj(pluginExtendConnection, (extensionFieldConfig, extensionFieldName) => {
+                        t2.field(extensionFieldName, extensionFieldConfig)
                       })
                     }
-                    if (fieldConfig.extendConnection instanceof Function) {
-                      fieldConfig.extendConnection(t2)
-                    }
+                    provideSourceAndArgs(t2, () => {
+                      if (fieldConfig.extendConnection instanceof Function) {
+                        fieldConfig.extendConnection(t2)
+                      }
+                    })
                   },
+                  nonNullDefaults: fieldConfig.nonNullDefaults ?? pluginConfig.nonNullDefaults,
                 })
               )
             }
@@ -435,26 +524,26 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: edgeName,
                   definition(t2) {
-                    t2.string('cursor', {
-                      nullable: false,
+                    t2.field('cursor', {
+                      type: cursorType ?? nonNull('String'),
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
                     })
-
                     t2.field('node', {
                       type: targetType,
                       description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
                     })
-
                     if (pluginExtendEdge) {
                       eachObj(pluginExtendEdge, (val, key) => {
                         t2.field(key, val)
                       })
                     }
-
-                    if (fieldConfig.extendEdge instanceof Function) {
-                      fieldConfig.extendEdge(t2)
-                    }
+                    provideArgs(t2, () => {
+                      if (fieldConfig.extendEdge instanceof Function) {
+                        fieldConfig.extendEdge(t2)
+                      }
+                    })
                   },
+                  nonNullDefaults: fieldConfig.nonNullDefaults ?? pluginConfig.nonNullDefaults,
                 })
               )
             }
@@ -467,20 +556,20 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   description:
                     'PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo',
                   definition(t2) {
-                    t2.boolean('hasNextPage', {
-                      nullable: false,
+                    t2.nonNull.field('hasNextPage', {
+                      type: 'Boolean',
                       description: `Used to indicate whether more edges exist following the set defined by the clients arguments.`,
                     })
-                    t2.boolean('hasPreviousPage', {
-                      nullable: false,
+                    t2.nonNull.field('hasPreviousPage', {
+                      type: 'Boolean',
                       description: `Used to indicate whether more edges exist prior to the set defined by the clients arguments.`,
                     })
-                    t2.string('startCursor', {
-                      nullable: true,
+                    t2.nullable.field('startCursor', {
+                      type: 'String',
                       description: `The cursor corresponding to the first nodes in edges. Null if the connection is empty.`,
                     })
-                    t2.string('endCursor', {
-                      nullable: true,
+                    t2.nullable.field('endCursor', {
+                      type: 'String',
                       description: `The cursor corresponding to the last nodes in edges. Null if the connection is empty.`,
                     })
                   },
@@ -492,6 +581,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               disableForwardPagination,
               validateArgs = defaultValidateArgs,
               strictArgs = true,
+              cursorType,
             } = {
               ...pluginConfig,
               ...fieldConfig,
@@ -535,12 +625,14 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 resolveFn = (root, args, ctx, info) => {
                   return completeValue(fieldConfig.resolve(root, args, ctx, info), (val) => {
                     if (val && val.nodes === undefined) {
-                      return {
+                      return withArgs(args, {
+                        get nodes() {
+                          return completeValue(val.edges, (edges) => edges.map((edge: any) => edge.node))
+                        },
                         ...val,
-                        nodes: completeValue(val.edges, (edges) => edges.map((edge: any) => edge.node)),
-                      }
+                      })
                     }
-                    return val
+                    return withArgs(args, { ...val })
                   })
                 }
               } else {
@@ -550,22 +642,35 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
               resolveFn = makeResolveFn(pluginConfig, fieldConfig)
             }
 
+            let wrappedConnectionName: AllNexusOutputTypeDefs | string = connectionName
+            if (wrapping) {
+              if (typeof fieldConfig.nullable === 'boolean') {
+                throw new Error(
+                  '[connectionPlugin]: You cannot chain .null/.nonNull and also set the nullable in the connectionField definition.'
+                )
+              }
+              wrappedConnectionName = applyNexusWrapping(connectionName, wrapping)
+            } else {
+              if (fieldConfig.nullable === true) {
+                wrappedConnectionName = nullable(wrappedConnectionName as any)
+              } else if (fieldConfig.nullable === false) {
+                wrappedConnectionName = nonNull(wrappedConnectionName as any)
+              }
+            }
             // Add the field to the type.
             t.field(fieldName, {
               ...nonConnectionFieldProps(fieldConfig),
               args: fieldArgs,
-              type: connectionName as any,
+              type: wrappedConnectionName as any,
               resolve(root, args: PaginationArgs, ctx, info) {
-                validateArgs(args, info)
+                // TODO(2.0): Maybe switch the arguments around here to be consistent w/ resolver (breaking change)?
+                validateArgs(args, info, root, ctx)
                 return resolveFn(root, args, ctx, info)
               },
             })
           },
         })
       )
-
-      // TODO: Deprecate this syntax
-      return { types: [] }
     },
   })
 }
@@ -586,6 +691,7 @@ function nonConnectionFieldProps(fieldConfig: ConnectionFieldConfig) {
     type,
     validateArgs,
     strictArgs,
+    nullable,
     ...rest
   } = fieldConfig
   return rest
@@ -622,19 +728,24 @@ export function makeResolveFn(
 
     // Local variable to cache the execution of fetching the nodes,
     // which is needed for all fields.
-    let cachedNodes: Promise<Array<any>>
-    let cachedEdges: Promise<{
-      edges: Array<EdgeLike | null>
+    let cachedNodes: MaybePromiseLike<Array<any>>
+    let cachedEdges: MaybePromiseLike<{
+      edges: EdgeLike[]
       nodes: any[]
     }>
+    let hasPromise = false
 
-    // Get all the nodes, before any pagination sliciing
+    // Get all the nodes, before any pagination slicing
     const resolveAllNodes = () => {
       if (cachedNodes !== undefined) {
         return cachedNodes
       }
-      cachedNodes = Promise.resolve(nodesResolve(root, formattedArgs, ctx, info) || null)
-      return cachedNodes.then((allNodes) => (allNodes ? Array.from(allNodes) : allNodes))
+
+      cachedNodes = completeValue(nodesResolve(root, formattedArgs, ctx, info) ?? null, (allNodes) => {
+        return allNodes ? Array.from(allNodes) : allNodes
+      })
+
+      return cachedNodes
     }
 
     const resolveEdgesAndNodes = () => {
@@ -642,7 +753,7 @@ export function makeResolveFn(
         return cachedEdges
       }
 
-      cachedEdges = resolveAllNodes().then((allNodes) => {
+      cachedEdges = completeValue(resolveAllNodes(), (allNodes) => {
         if (!allNodes) {
           const arrPath = JSON.stringify(pathToArray(info.path))
           console.warn(
@@ -653,7 +764,6 @@ export function makeResolveFn(
 
         const resolvedEdgeList: MaybePromise<EdgeLike>[] = []
         const resolvedNodeList: any[] = []
-        let hasPromise = false
 
         iterateNodes(allNodes, args, (maybeNode, i) => {
           if (isPromiseLike(maybeNode)) {
@@ -666,27 +776,28 @@ export function makeResolveFn(
                     index: i,
                     nodes: allNodes,
                   }),
-                  (rawCursor) => {
-                    return {
+                  (rawCursor) =>
+                    wrapEdge(pluginConfig, fieldConfig, formattedArgs, {
                       cursor: encodeCursor(rawCursor),
                       node,
-                    }
-                  }
+                    })
                 )
               })
             )
           } else {
             resolvedNodeList.push(maybeNode)
-            resolvedEdgeList.push({
-              node: maybeNode,
-              cursor: completeValue(
-                cursorFromNode(maybeNode, formattedArgs, ctx, info, {
-                  index: i,
-                  nodes: allNodes,
-                }),
-                (rawCursor) => encodeCursor(rawCursor)
-              ),
-            })
+            resolvedEdgeList.push(
+              wrapEdge(pluginConfig, fieldConfig, formattedArgs, {
+                node: maybeNode,
+                cursor: completeValue(
+                  cursorFromNode(maybeNode, formattedArgs, ctx, info, {
+                    index: i,
+                    nodes: allNodes,
+                  }),
+                  (rawCursor) => encodeCursor(rawCursor)
+                ),
+              })
+            )
           }
         })
 
@@ -699,7 +810,7 @@ export function makeResolveFn(
 
         return {
           nodes: resolvedNodeList,
-          // todo find typesafe way of doing this
+          // todo find type-safe way of doing this
           edges: resolvedEdgeList as EdgeLike[],
         }
       })
@@ -707,49 +818,158 @@ export function makeResolveFn(
       return cachedEdges
     }
 
-    const resolvePageInfo = async () => {
-      const [allNodes, { edges }] = await Promise.all([resolveAllNodes(), resolveEdgesAndNodes()])
-      let basePageInfo = allNodes
-        ? pageInfoFromNodes(allNodes, args, ctx, info)
-        : {
-            hasNextPage: false,
-            hasPreviousPage: false,
-          }
-      return {
-        ...basePageInfo,
-        startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
-        endCursor: edges?.[edges.length - 1]?.cursor ?? null,
-      }
+    const resolvePageInfo = () => {
+      return completeValue(resolveAllNodes(), (allNodes) =>
+        completeValue(resolveEdgesAndNodes(), ({ edges }) =>
+          completeValue(
+            allNodes
+              ? pageInfoFromNodes(allNodes, args, ctx, info)
+              : {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                },
+            (basePageInfo) => ({
+              ...basePageInfo,
+              startCursor: edges?.[0]?.cursor ? edges[0].cursor : null,
+              endCursor: edges?.[edges.length - 1]?.cursor ?? null,
+            })
+          )
+        )
+      )
     }
 
-    return {
+    const connectionResult = withSource(root, formattedArgs, {
       get nodes() {
-        return resolveEdgesAndNodes().then((o) => o.nodes)
+        return completeValue(resolveEdgesAndNodes(), (o) => o.nodes)
       },
       get edges() {
-        return resolveEdgesAndNodes().then((o) => o.edges)
+        return completeValue(resolveEdgesAndNodes(), (o) => o.edges)
       },
       get pageInfo() {
         return resolvePageInfo()
       },
+    })
+
+    if (pluginConfig.extendConnection) {
+      Object.keys(pluginConfig.extendConnection).forEach((connectionField) => {
+        const resolve = (fieldConfig as any)[connectionField] ?? defaultFieldResolver
+        Object.defineProperty(connectionResult, connectionField, {
+          value: (args: object, ctx: unknown, info: GraphQLResolveInfo) => {
+            return resolve(root, { ...formattedArgs, ...args }, ctx, info)
+          },
+        })
+      })
     }
+
+    return connectionResult
   }
+}
+
+function wrapEdge<T extends object>(
+  pluginConfig: ConnectionPluginConfig,
+  fieldConfig: ConnectionFieldConfig,
+  formattedArgs: PaginationArgs,
+  edgeParentType: T
+): T {
+  const edge = withArgs(formattedArgs, edgeParentType)
+  if (pluginConfig.extendEdge) {
+    Object.keys(pluginConfig.extendEdge).forEach((edgeField) => {
+      const resolve = (fieldConfig as any).edgeFields?.[edgeField] ?? defaultFieldResolver
+      Object.defineProperty(edge, edgeField, {
+        value: (args: object, ctx: unknown, info: GraphQLResolveInfo) => {
+          return resolve(edge, { ...formattedArgs, ...args }, ctx, info)
+        },
+      })
+    })
+  }
+  return edge
+}
+
+/**
+ * Adds __connectionArgs to the object representing the Connection type, so it can be accessed by other fields
+ * in the top level
+ *
+ * @param args
+ * @param connectionParentType
+ */
+function withArgs<T extends object>(args: PaginationArgs, connectionParentType: T): T {
+  Object.defineProperty(connectionParentType, '__connectionArgs', {
+    value: args,
+    enumerable: false,
+  })
+  return connectionParentType
+}
+
+/**
+ * Adds __connectionSource to the object representing the Connection type, so it can be accessed by other
+ * fields in the top level
+ *
+ * @param args
+ * @param connectionParentType
+ */
+function withSource<T extends object>(source: unknown, args: PaginationArgs, connectionParentType: T): T {
+  Object.defineProperty(connectionParentType, '__connectionSource', {
+    value: source,
+    enumerable: false,
+  })
+  return withArgs(args, connectionParentType)
+}
+
+/** Takes __connectionArgs from the source object and merges with the args provided by the */
+function mergeArgs(obj: object, fieldArgs: ArgsValue<any, any>): ArgsValue<any, any> {
+  return { ...(obj as any).__connectionArgs, ...fieldArgs }
+}
+
+/**
+ * Takes a "builder", and a function which takes a builder, and ensures that all fields defined within that
+ * function invocation are provided the __connectionArgs defined by the connection
+ */
+function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
+  const fieldDef = block.field
+  block.field = function (fieldName, config) {
+    const { resolve = defaultFieldResolver } = config
+    fieldDef.call(this, fieldName, {
+      ...config,
+      resolve(root, args, ctx, info) {
+        return resolve(root, mergeArgs(root, args), ctx, info)
+      },
+    })
+  }
+  fn()
+  block.field = fieldDef
+}
+
+function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
+  const fieldDef = block.field
+  block.field = function (fieldName, config) {
+    const { resolve = defaultFieldResolver } = config
+    fieldDef.call(this, fieldName, {
+      ...config,
+      resolve(root, args, ctx, info) {
+        return resolve(root.__connectionSource, mergeArgs(root, args), ctx, info)
+      },
+    })
+  }
+  fn()
+  block.field = fieldDef
 }
 
 function iterateNodes(nodes: any[], args: PaginationArgs, cb: (node: any, i: number) => void) {
   // If we want the first N of an array of nodes, it's pretty straightforward.
-  if (args.first) {
-    for (let i = 0; i < args.first; i++) {
-      if (i < nodes.length) {
-        cb(nodes[i], i)
-      }
+  if (typeof args.first === 'number') {
+    const len = Math.min(args.first, nodes.length)
+    for (let i = 0; i < len; i++) {
+      cb(nodes[i], i)
     }
-  } else if (args.last) {
-    for (let i = 0; i < args.last; i++) {
-      const idx = nodes.length - args.last + i
-      if (idx >= 0) {
-        cb(nodes[idx], i)
-      }
+  } else if (typeof args.last === 'number') {
+    const len = Math.min(args.last, nodes.length)
+    for (let i = 0; i < len; i++) {
+      cb(nodes[i], i)
+    }
+  } else {
+    // Only happens if we have a custom validateArgs that ignores first/last
+    for (let i = 0; i < nodes.length; i++) {
+      cb(nodes[i], i)
     }
   }
 }
@@ -786,9 +1006,7 @@ function defaultHasNextPage(nodes: any[], args: PaginationArgs) {
   throw new Error('Unreachable')
 }
 
-/**
- * A sensible default for determining "previous page".
- */
+/** A sensible default for determining "previous page". */
 function defaultHasPreviousPage(nodes: any[], args: PaginationArgs) {
   // If we're paginating forward, and we don't have an "after", we'll assume that we don't have
   // a previous page, otherwise we will assume we have one, unless the after cursor === "0".
@@ -815,7 +1033,7 @@ function defaultCursorFromNode(
   args: PaginationArgs,
   ctx: any,
   info: GraphQLResolveInfo,
-  { index }: { index: number; nodes: any[] }
+  { index, nodes }: { index: number; nodes: any[] }
 ) {
   let cursorIndex = index
   // If we're paginating forward, assume we're incrementing from the offset provided via "after",
@@ -832,7 +1050,8 @@ function defaultCursorFromNode(
   if (typeof args.last === 'number') {
     if (args.before) {
       const offset = parseInt(args.before, 10)
-      cursorIndex = offset - args.last + index
+      const len = Math.min(nodes.length, args.last)
+      cursorIndex = offset - len + index
     } else {
       /* istanbul ignore next */
       throw new Error('Unreachable')
@@ -853,7 +1072,11 @@ const getTypeNames = (
   // If we have changed the config specific to this field, on either the connection,
   // edge, or page info, then we need a custom type for the connection & edge.
   let connectionName: string
-  if (isConnectionFieldExtended(fieldConfig)) {
+  if (fieldConfig.getConnectionName) {
+    connectionName = fieldConfig.getConnectionName(fieldName, parentTypeName)
+  } else if (pluginConfig.getConnectionName) {
+    connectionName = pluginConfig.getConnectionName(fieldName, parentTypeName)
+  } else if (isConnectionFieldExtended(fieldConfig)) {
     connectionName = `${parentTypeName}${upperFirst(fieldName)}_Connection`
   } else {
     connectionName = `${pluginConfig.typePrefix || ''}${targetTypeName}Connection`
@@ -861,7 +1084,11 @@ const getTypeNames = (
 
   // If we have modified the "edge" at all, then we need
   let edgeName
-  if (isEdgeFieldExtended(fieldConfig)) {
+  if (fieldConfig.getEdgeName) {
+    edgeName = fieldConfig.getEdgeName(fieldName, parentTypeName)
+  } else if (pluginConfig.getEdgeName) {
+    edgeName = pluginConfig.getEdgeName(fieldName, parentTypeName)
+  } else if (isEdgeFieldExtended(fieldConfig)) {
     edgeName = `${parentTypeName}${upperFirst(fieldName)}_Edge`
   } else {
     edgeName = `${pluginConfig.typePrefix || ''}${targetTypeName}Edge`
@@ -882,7 +1109,7 @@ const isConnectionFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
 }
 
 const isEdgeFieldExtended = (fieldConfig: ConnectionFieldConfig) => {
-  if (fieldConfig.extendEdge) {
+  if (fieldConfig.extendEdge || fieldConfig.cursorType) {
     return true
   }
   return false
@@ -905,17 +1132,19 @@ const assertCorrectConfig = (
     )
   }
   eachObj(pluginConfig.extendConnection || {}, (val, key) => {
-    if (typeof fieldConfig[key] !== 'function') {
+    if (typeof fieldConfig[key] !== 'function' && val.requireResolver !== false) {
       console.error(
-        new Error(`Nexus Connection Plugin: Missing ${key} resolver property for ${typeName}.${fieldName}`)
+        new Error(
+          `Nexus Connection Plugin: Missing ${key} resolver property for ${typeName}.${fieldName}. Set requireResolver to "false" on the field config if you do not need a resolver.`
+        )
       )
     }
   })
   eachObj(pluginConfig.extendEdge || {}, (val, key) => {
-    if (!isObject(fieldConfig.edgeFields) || typeof fieldConfig.edgeFields[key] !== 'function') {
+    if (typeof fieldConfig.edgeFields?.[key] !== 'function' && val.requireResolver !== false) {
       console.error(
         new Error(
-          `Nexus Connection Plugin: Missing edgeFields.${key} resolver property for ${typeName}.${fieldName}`
+          `Nexus Connection Plugin: Missing edgeFields.${key} resolver property for ${typeName}.${fieldName}. Set requireResolver to "false" on the edge field config if you do not need a resolver.`
         )
       )
     }
@@ -950,3 +1179,6 @@ connectionPlugin.defaultCursorFromNode = defaultCursorFromNode
 connectionPlugin.defaultValidateArgs = defaultValidateArgs
 connectionPlugin.defaultHasPreviousPage = defaultHasPreviousPage
 connectionPlugin.defaultHasNextPage = defaultHasNextPage
+connectionPlugin.base64Encode = base64Encode
+connectionPlugin.base64Decode = base64Decode
+connectionPlugin.CURSOR_PREFIX = CURSOR_PREFIX
