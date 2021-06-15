@@ -29,7 +29,7 @@ export interface EnumMemberInfo {
 export interface NexusEnumTypeConfig<TypeName extends string> {
   name: TypeName
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /** Source type information for this type */
   sourceType?: SourceTypingDef
   /** All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum */

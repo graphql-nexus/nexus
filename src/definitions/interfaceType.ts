@@ -44,7 +44,7 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    */
   nonNullDefaults?: NonNullConfig
   /** The description to annotate the GraphQL SDL */
-  description?: string | null
+  description?: string
   /** Source type information for this type */
   sourceType?: SourceTypingDef
   /**
