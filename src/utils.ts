@@ -24,6 +24,7 @@ import {
 } from 'graphql'
 import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
+import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './definitions/nexusMeta'
 import {
   AllNexusArgsDefs,
   AllNexusNamedTypeDefs,
@@ -534,18 +535,21 @@ export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusName
 }
 
 export function getNexusNamedType(
-  type: AllNexusTypeDefs | GraphQLType | string
+  type: AllNexusTypeDefs | NexusMetaType | GraphQLType | string
 ): AllNexusNamedTypeDefs | GraphQLNamedType | string {
   if (typeof type === 'string') {
     return type
   }
   let namedType = type
-  while (isNexusWrappingType(namedType) || isWrappingType(namedType)) {
+  while (isNexusWrappingType(namedType) || isWrappingType(namedType) || isNexusMetaType(namedType)) {
     if (isNexusWrappingType(namedType)) {
       namedType = namedType.ofNexusType
     }
     if (isWrappingType(namedType)) {
       namedType = namedType.ofType
+    }
+    if (isNexusMetaType(namedType)) {
+      namedType = resolveNexusMetaType(namedType)
     }
   }
   return namedType

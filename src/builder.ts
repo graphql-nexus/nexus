@@ -142,7 +142,14 @@ import {
   objValues,
   UNKNOWN_TYPE_SCALAR,
 } from './utils'
-import { TO_NEXUS, isToNexusObject } from './definitions/toNexus'
+import {
+  NEXUS_BUILD,
+  isNexusMetaBuild,
+  isNexusMeta,
+  isNexusMetaType,
+  ToNexusMeta,
+  resolveNexusMetaType,
+} from './definitions/nexusMeta'
 
 type NexusShapedOutput = {
   name: string
@@ -326,8 +333,8 @@ export type PluginBuilderLens = {
  * during lazy evaluation.
  */
 export class SchemaBuilder {
-  /** All objects containing a TO_NEXUS symbol */
-  private toNexusObjects = new Set()
+  /** All objects containing a NEXUS_BUILD / NEXUS_TYPE symbol */
+  private nexusMetaObjects = new Set()
   /** Used to check for circular references. */
   protected buildingTypes = new Set()
   /** The "final type" map contains all types as they are built. */
@@ -559,12 +566,8 @@ export class SchemaBuilder {
     if (!types) {
       return
     }
-    if (isToNexusObject(types)) {
-      if (this.toNexusObjects.has(types)) {
-        return
-      }
-      this.toNexusObjects.add(types)
-      this.addTypes(types[TO_NEXUS]())
+    if (isNexusMeta(types)) {
+      this.addToNexusMeta(types)
       return
     }
     if (isSchema(types)) {
@@ -593,6 +596,20 @@ export class SchemaBuilder {
       types.forEach((typeDef) => this.addTypes(typeDef))
     } else if (isObject(types)) {
       Object.keys(types).forEach((key) => this.addTypes(types[key]))
+    }
+  }
+
+  private addToNexusMeta(type: ToNexusMeta) {
+    if (this.nexusMetaObjects.has(type)) {
+      return
+    }
+    this.nexusMetaObjects.add(type)
+
+    if (isNexusMetaBuild(type)) {
+      this.addTypes(type[NEXUS_BUILD]())
+    }
+    if (isNexusMetaType(type)) {
+      this.addType(resolveNexusMetaType(type))
     }
   }
 

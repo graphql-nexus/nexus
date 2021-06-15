@@ -24,6 +24,7 @@ import { NexusNonNullDef, nonNull } from './nonNull'
 import { NexusNullDef, nullable } from './nullable'
 import type { NexusObjectTypeDef } from './objectType'
 import type { NexusScalarTypeDef } from './scalarType'
+import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './nexusMeta'
 import type { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
 
@@ -195,15 +196,17 @@ export function unwrapGraphQLDef(
 
 /** Unwraps any wrapped Nexus or GraphQL types, turning into a list of wrapping */
 export function unwrapNexusDef(
-  typeDef: AllNexusTypeDefs | AllNexusArgsDefs | GraphQLType | string
+  typeDef: AllNexusTypeDefs | AllNexusArgsDefs | GraphQLType | NexusMetaType | string
 ): {
   namedType: AllNexusNamedTypeDefs | AllNexusArgsDefs | GraphQLNamedType | string
   wrapping: NexusWrapKind[]
 } {
   const wrapping: NexusWrapKind[] = []
   let namedType = typeDef
-  while (isNexusWrappingType(namedType) || isWrappingType(namedType)) {
-    if (isWrappingType(namedType)) {
+  while (isNexusWrappingType(namedType) || isWrappingType(namedType) || isNexusMetaType(namedType)) {
+    if (isNexusMetaType(namedType)) {
+      namedType = resolveNexusMetaType(namedType)
+    } else if (isWrappingType(namedType)) {
       if (isListType(namedType)) {
         wrapping.unshift('List')
       } else if (isNonNullType(namedType)) {
