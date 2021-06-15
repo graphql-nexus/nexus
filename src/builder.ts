@@ -147,7 +147,7 @@ import {
   isNexusMetaBuild,
   isNexusMeta,
   isNexusMetaType,
-  ToNexusMeta,
+  NexusMeta,
   resolveNexusMetaType,
 } from './definitions/nexusMeta'
 
@@ -317,7 +317,7 @@ export type DynamicBlockDef =
   | DynamicOutputMethodDef<string>
   | DynamicOutputPropertyDef<string>
 
-export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef
+export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef | NexusMeta
 
 export type PluginBuilderLens = {
   hasType: SchemaBuilder['hasType']
@@ -457,6 +457,11 @@ export class SchemaBuilder {
    * you can define types anonymously, without exporting them.
    */
   addType = (typeDef: NexusAcceptedTypeDef) => {
+    if (isNexusMeta(typeDef)) {
+      this.addToNexusMeta(typeDef)
+      return
+    }
+
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef
       return
@@ -566,10 +571,6 @@ export class SchemaBuilder {
     if (!types) {
       return
     }
-    if (isNexusMeta(types)) {
-      this.addToNexusMeta(types)
-      return
-    }
     if (isSchema(types)) {
       this.addTypes(types.getTypeMap())
       return
@@ -589,7 +590,8 @@ export class SchemaBuilder {
       isNamedType(types) ||
       isNexusDynamicInputMethod(types) ||
       isNexusDynamicOutputMethod(types) ||
-      isNexusDynamicOutputProperty(types)
+      isNexusDynamicOutputProperty(types) ||
+      isNexusMeta(types)
     ) {
       this.addType(types)
     } else if (Array.isArray(types)) {
@@ -599,14 +601,15 @@ export class SchemaBuilder {
     }
   }
 
-  private addToNexusMeta(type: ToNexusMeta) {
+  private addToNexusMeta(type: NexusMeta) {
     if (this.nexusMetaObjects.has(type)) {
       return
     }
     this.nexusMetaObjects.add(type)
 
     if (isNexusMetaBuild(type)) {
-      this.addTypes(type[NEXUS_BUILD]())
+      const types = type[NEXUS_BUILD]()
+      this.addTypes(types)
     }
     if (isNexusMetaType(type)) {
       this.addType(resolveNexusMetaType(type))

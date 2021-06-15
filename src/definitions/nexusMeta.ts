@@ -1,3 +1,4 @@
+import { ownProp } from '../utils'
 import type { NexusInterfaceTypeDef } from './interfaceType'
 import type { NexusObjectTypeDef } from './objectType'
 import { isNexusStruct, isNexusInterfaceTypeDef, isNexusObjectTypeDef } from './wrapping'
@@ -24,10 +25,10 @@ export type NexusMetaBuild = {
   [NEXUS_BUILD]: () => any
 }
 
-export type ToNexusMeta = NexusMetaType | NexusMetaBuild
+export type NexusMeta = NexusMetaType | NexusMetaBuild
 
 export function isNexusMetaBuild(obj: any): obj is NexusMetaBuild {
-  return obj && Boolean(obj[NEXUS_BUILD]) && typeof obj[NEXUS_BUILD] === 'function'
+  return obj && typeof ownProp.get(obj, NEXUS_BUILD) === 'function'
 }
 
 export function isNexusMetaType(obj: any): obj is NexusMetaType {
@@ -35,11 +36,11 @@ export function isNexusMetaType(obj: any): obj is NexusMetaType {
 }
 
 export function isNexusMetaTypeProp(obj: any): obj is NexusMetaTypeProp {
-  return obj && Boolean(obj[NEXUS_TYPE]) && isNexusStruct(obj[NEXUS_TYPE])
+  return ownProp.has(obj, NEXUS_TYPE) && isNexusStruct(ownProp.get(obj, NEXUS_TYPE))
 }
 
 export function isNexusMetaTypeFn(obj: any): obj is NexusMetaTypeFn {
-  return obj && Boolean(obj[NEXUS_TYPE]) && typeof obj[NEXUS_TYPE] === 'function'
+  return ownProp.has(obj, NEXUS_TYPE) && typeof ownProp.get(obj, NEXUS_TYPE) === 'function'
 }
 
 export function isNexusMeta(obj: any): obj is NexusMetaBuild | NexusMetaTypeFn | NexusMetaType {
@@ -52,13 +53,9 @@ export function isNexusMeta(obj: any): obj is NexusMetaBuild | NexusMetaTypeFn |
  * @param obj
  */
 export function resolveNexusMetaType(obj: NexusMetaType): OutType {
-  let value = obj[NEXUS_TYPE]
+  let value = ownProp.get(obj, NEXUS_TYPE)
   if (typeof value === 'function') {
-    const result = value.call(obj)
-    Object.defineProperty(obj, NEXUS_TYPE, {
-      value: result,
-    })
-    value = result
+    value = ownProp.setOrGet(obj, NEXUS_TYPE, value.call(obj))
   }
   if (!isNexusObjectTypeDef(value) && !isNexusInterfaceTypeDef(value)) {
     throw new Error(`Expected property of NEXUS_TYPE to be an object or interface type`)

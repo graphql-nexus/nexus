@@ -614,3 +614,19 @@ export function isArray<T>(
 ): arg is T extends readonly any[] ? (unknown extends T ? never : readonly any[]) : any[] {
   return Array.isArray(arg)
 }
+
+export const ownProp = {
+  has(obj: any, key: PropertyKey) {
+    return Boolean(Object.getOwnPropertyDescriptor(obj, key))
+  },
+  setOrGet(obj: any, key: PropertyKey, value: any) {
+    if (!this.has(obj, key)) {
+      Object.defineProperty(obj, key, { value })
+      return value
+    }
+    return this.get(obj, key)
+  },
+  get(obj: any, key: PropertyKey) {
+    return Object.getOwnPropertyDescriptor(obj, key)?.value
+  },
+}
