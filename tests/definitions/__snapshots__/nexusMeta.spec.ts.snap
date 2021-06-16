@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`nexusMeta NEXUS_BUILD can define NEXUS_TYPE 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "id": "UserType:1",
+      "info": Object {
+        "text": "Info",
+      },
+      "ok": true,
+    },
+  },
+}
+`;
+
+exports[`nexusMeta NEXUS_TYPE method 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "friend": Object {
+        "id": "User:2",
+        "ok": false,
+      },
+      "id": "User:1",
+      "info": Object {
+        "text": "Info",
+      },
+      "ok": true,
+    },
+  },
+}
+`;

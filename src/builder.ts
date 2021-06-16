@@ -142,7 +142,14 @@ import {
   objValues,
   UNKNOWN_TYPE_SCALAR,
 } from './utils'
-import { TO_NEXUS, isToNexusObject } from './definitions/toNexus'
+import {
+  NEXUS_BUILD,
+  isNexusMetaBuild,
+  isNexusMeta,
+  isNexusMetaType,
+  NexusMeta,
+  resolveNexusMetaType,
+} from './definitions/nexusMeta'
 
 type NexusShapedOutput = {
   name: string
@@ -310,7 +317,7 @@ export type DynamicBlockDef =
   | DynamicOutputMethodDef<string>
   | DynamicOutputPropertyDef<string>
 
-export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef
+export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef | NexusMeta
 
 export type PluginBuilderLens = {
   hasType: SchemaBuilder['hasType']
@@ -326,8 +333,8 @@ export type PluginBuilderLens = {
  * during lazy evaluation.
  */
 export class SchemaBuilder {
-  /** All objects containing a TO_NEXUS symbol */
-  private toNexusObjects = new Set()
+  /** All objects containing a NEXUS_BUILD / NEXUS_TYPE symbol */
+  private nexusMetaObjects = new Set()
   /** Used to check for circular references. */
   protected buildingTypes = new Set()
   /** The "final type" map contains all types as they are built. */
@@ -450,6 +457,11 @@ export class SchemaBuilder {
    * you can define types anonymously, without exporting them.
    */
   addType = (typeDef: NexusAcceptedTypeDef) => {
+    if (isNexusMeta(typeDef)) {
+      this.addToNexusMeta(typeDef)
+      return
+    }
+
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef
       return
@@ -559,14 +571,6 @@ export class SchemaBuilder {
     if (!types) {
       return
     }
-    if (isToNexusObject(types)) {
-      if (this.toNexusObjects.has(types)) {
-        return
-      }
-      this.toNexusObjects.add(types)
-      this.addTypes(types[TO_NEXUS]())
-      return
-    }
     if (isSchema(types)) {
       this.addTypes(types.getTypeMap())
       return
@@ -586,13 +590,29 @@ export class SchemaBuilder {
       isNamedType(types) ||
       isNexusDynamicInputMethod(types) ||
       isNexusDynamicOutputMethod(types) ||
-      isNexusDynamicOutputProperty(types)
+      isNexusDynamicOutputProperty(types) ||
+      isNexusMeta(types)
     ) {
       this.addType(types)
     } else if (Array.isArray(types)) {
       types.forEach((typeDef) => this.addTypes(typeDef))
     } else if (isObject(types)) {
       Object.keys(types).forEach((key) => this.addTypes(types[key]))
+    }
+  }
+
+  private addToNexusMeta(type: NexusMeta) {
+    if (this.nexusMetaObjects.has(type)) {
+      return
+    }
+    this.nexusMetaObjects.add(type)
+
+    if (isNexusMetaBuild(type)) {
+      const types = type[NEXUS_BUILD]()
+      this.addTypes(types)
+    }
+    if (isNexusMetaType(type)) {
+      this.addType(resolveNexusMetaType(type))
     }
   }
 

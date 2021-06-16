@@ -24,6 +24,7 @@ import {
 } from 'graphql'
 import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
+import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './definitions/nexusMeta'
 import {
   AllNexusArgsDefs,
   AllNexusNamedTypeDefs,
@@ -534,18 +535,21 @@ export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusName
 }
 
 export function getNexusNamedType(
-  type: AllNexusTypeDefs | GraphQLType | string
+  type: AllNexusTypeDefs | NexusMetaType | GraphQLType | string
 ): AllNexusNamedTypeDefs | GraphQLNamedType | string {
   if (typeof type === 'string') {
     return type
   }
   let namedType = type
-  while (isNexusWrappingType(namedType) || isWrappingType(namedType)) {
+  while (isNexusWrappingType(namedType) || isWrappingType(namedType) || isNexusMetaType(namedType)) {
     if (isNexusWrappingType(namedType)) {
       namedType = namedType.ofNexusType
     }
     if (isWrappingType(namedType)) {
       namedType = namedType.ofType
+    }
+    if (isNexusMetaType(namedType)) {
+      namedType = resolveNexusMetaType(namedType)
     }
   }
   return namedType
@@ -609,4 +613,17 @@ export function isArray<T>(
   arg: T | {}
 ): arg is T extends readonly any[] ? (unknown extends T ? never : readonly any[]) : any[] {
   return Array.isArray(arg)
+}
+
+export const ownProp = {
+  has<O extends object, K extends keyof O>(obj: O, key: K): boolean {
+    return Boolean(Object.getOwnPropertyDescriptor(obj, key))
+  },
+  set<O extends object, K extends keyof O>(obj: O, key: K, value: O[K]): O[K] {
+    Object.defineProperty(obj, key, { value })
+    return value
+  },
+  get<O extends object, K extends keyof O>(obj: O, key: K): O[K] | undefined {
+    return Object.getOwnPropertyDescriptor(obj, key)?.value
+  },
 }

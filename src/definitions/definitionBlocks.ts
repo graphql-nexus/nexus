@@ -9,6 +9,7 @@ import type {
   NeedsResolver,
 } from '../typegenTypeHelpers'
 import type { ArgsRecord } from './args'
+import type { NexusMetaType } from './nexusMeta'
 import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
 import type { BaseScalars } from './_types'
 
@@ -270,7 +271,7 @@ export interface NexusOutputFieldConfig<TypeName extends string, FieldName exten
    *     },
    *   })
    */
-  type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+  type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs | NexusMetaType
 }
 
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
