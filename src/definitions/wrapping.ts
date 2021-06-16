@@ -66,10 +66,19 @@ export type NexusListableTypes =
   | NexusNonNullDef<NexusNonNullableTypes>
   | NexusNullDef<NexusNullableTypes>
   | GraphQLType
+  | NexusMetaType
 
-export type NexusNonNullableTypes = AllNamedTypeDefs | NexusListDef<NexusListableTypes> | NexusArgDef<any>
+export type NexusNonNullableTypes =
+  | AllNamedTypeDefs
+  | NexusListDef<NexusListableTypes>
+  | NexusArgDef<any>
+  | NexusMetaType
 
-export type NexusNullableTypes = AllNamedTypeDefs | NexusListDef<NexusListableTypes> | NexusArgDef<any>
+export type NexusNullableTypes =
+  | AllNamedTypeDefs
+  | NexusListDef<NexusListableTypes>
+  | NexusArgDef<any>
+  | NexusMetaType
 
 export type AllNamedTypeDefs = GetGen<'allNamedTypes', string> | AllNexusNamedTypeDefs
 
