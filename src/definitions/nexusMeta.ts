@@ -55,7 +55,7 @@ export function isNexusMeta(obj: any): obj is NexusMetaBuild | NexusMetaTypeFn |
 export function resolveNexusMetaType(obj: NexusMetaType): OutType {
   let value = ownProp.get(obj, NEXUS_TYPE)
   if (typeof value === 'function') {
-    value = ownProp.setOrGet(obj, NEXUS_TYPE, value.call(obj))
+    value = ownProp.set(obj, NEXUS_TYPE, value.call(obj))
   }
   if (!isNexusObjectTypeDef(value) && !isNexusInterfaceTypeDef(value)) {
     throw new Error(`Expected property of NEXUS_TYPE to be an object or interface type`)

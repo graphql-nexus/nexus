@@ -616,17 +616,14 @@ export function isArray<T>(
 }
 
 export const ownProp = {
-  has(obj: any, key: PropertyKey) {
+  has<O extends object, K extends keyof O>(obj: O, key: K): boolean {
     return Boolean(Object.getOwnPropertyDescriptor(obj, key))
   },
-  setOrGet(obj: any, key: PropertyKey, value: any) {
-    if (!this.has(obj, key)) {
-      Object.defineProperty(obj, key, { value })
-      return value
-    }
-    return this.get(obj, key)
+  set<O extends object, K extends keyof O>(obj: O, key: K, value: O[K]): O[K] {
+    Object.defineProperty(obj, key, { value })
+    return value
   },
-  get(obj: any, key: PropertyKey) {
+  get<O extends object, K extends keyof O>(obj: O, key: K): O[K] | undefined {
     return Object.getOwnPropertyDescriptor(obj, key)?.value
   },
 }
