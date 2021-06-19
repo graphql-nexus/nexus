@@ -1,10 +1,24 @@
 import { graphql } from 'graphql'
 import { makeSchema, objectType, queryField } from '../../src'
-import { NEXUS_BUILD, NEXUS_TYPE } from '../../src/core'
+import { list, NEXUS_BUILD, NEXUS_TYPE, nonNull, nullable } from '../../src/core'
 
 interface UserData {
   id?: string
   ok?: boolean
+}
+
+class Post {
+  static [NEXUS_TYPE]() {
+    return objectType({
+      name: 'Post',
+      definition(t) {
+        t.string('content')
+        t.field('author', {
+          type: 'User',
+        })
+      },
+    })
+  }
 }
 
 class User {
@@ -28,10 +42,16 @@ class User {
       definition(t) {
         t.id('id')
         t.boolean('ok')
-        t.field('info', { type: UserInfo })
+        t.field('info', { type: nonNull(UserInfo) })
         t.field('friend', {
           type: User,
           resolve: () => new User({ id: 'User:2', ok: false }),
+        })
+        t.field('posts', {
+          type: list(Post),
+        })
+        t.field('topPost', {
+          type: nullable(Post),
         })
       },
     })
