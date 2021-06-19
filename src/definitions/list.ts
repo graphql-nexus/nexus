@@ -1,4 +1,5 @@
 import { isType } from 'graphql'
+import { isNexusMeta } from './nexusMeta'
 import { AllNamedTypeDefs, isNexusStruct, NexusListableTypes } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 /** List() */
@@ -13,7 +14,12 @@ export class NexusListDef<TypeName extends NexusListableTypes> {
 
   constructor(readonly ofNexusType: TypeName) {
     /* istanbul ignore if */
-    if (typeof ofNexusType !== 'string' && !isNexusStruct(ofNexusType) && !isType(ofNexusType)) {
+    if (
+      typeof ofNexusType !== 'string' &&
+      !isNexusStruct(ofNexusType) &&
+      !isNexusMeta(ofNexusType) &&
+      !isType(ofNexusType)
+    ) {
       throw new Error('Cannot wrap unknown types in list(). Saw ' + ofNexusType)
     }
   }

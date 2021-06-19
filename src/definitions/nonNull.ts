@@ -1,4 +1,5 @@
 import { isNonNullType, isType } from 'graphql'
+import { isNexusMeta } from './nexusMeta'
 import { isNexusNonNullTypeDef, isNexusNullTypeDef, isNexusStruct, NexusNonNullableTypes } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 
@@ -8,7 +9,12 @@ export class NexusNonNullDef<TypeName extends NexusNonNullableTypes> {
   private _isNexusNonNullDef: boolean = true
 
   constructor(readonly ofNexusType: TypeName) {
-    if (typeof ofNexusType !== 'string' && !isNexusStruct(ofNexusType) && !isType(ofNexusType)) {
+    if (
+      typeof ofNexusType !== 'string' &&
+      !isNexusStruct(ofNexusType) &&
+      !isNexusMeta(ofNexusType) &&
+      !isType(ofNexusType)
+    ) {
       throw new Error('Cannot wrap unknown types in a nonNull(). Saw ' + ofNexusType)
     }
   }
