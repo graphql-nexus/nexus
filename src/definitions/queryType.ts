@@ -18,7 +18,7 @@ import { NexusObjectTypeConfig, objectType } from './objectType'
  *
  * @example
  *   queryType({
- *     definitin(t) {
+ *     definition(t) {
  *       t.field('user', {
  *         type: 'User',
  *         args: {

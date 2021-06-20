@@ -18,7 +18,7 @@ import { NexusObjectTypeConfig, objectType } from './objectType'
  *
  * @example
  *   mutationType({
- *     definitin(t) {
+ *     definition(t) {
  *       t.field('signup', {
  *         type: 'User',
  *         args: {
