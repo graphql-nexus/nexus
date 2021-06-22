@@ -1,4 +1,5 @@
 import type { GraphQLAbstractType, GraphQLResolveInfo } from 'graphql'
+
 import type { NexusInterfaceTypeDef } from './definitions/interfaceType'
 import type { NexusObjectTypeDef } from './definitions/objectType'
 
@@ -34,27 +35,20 @@ export type MaybePromise<T> = PromiseLike<T> | T
  * Because the GraphQL field execution algorithm automatically resolves promises at any level of the tree, we
  * use this to help signify that.
  */
-export type MaybePromiseDeep<T> = Date extends T
+export type MaybePromiseDeep<T> = [T] extends [Date]
   ? MaybePromise<T>
-  : null extends T
+  : [T] extends [boolean]
   ? MaybePromise<T>
-  : boolean extends T
+  : [T] extends [number]
   ? MaybePromise<T>
-  : number extends T
+  : [T] extends [string]
   ? MaybePromise<T>
-  : string extends T
-  ? MaybePromise<T>
-  : T extends Array<infer U>
+  : [T] extends [Array<infer U>]
   ? MaybePromise<Array<MaybePromiseDeep<U>>>
-  : T extends ReadonlyArray<infer Y>
+  : [T] extends [ReadonlyArray<infer Y>]
   ? MaybePromise<ReadonlyArray<MaybePromiseDeep<Y>>>
-  : T extends object
-  ? MaybePromise<
-      | T
-      | {
-          [P in keyof T]: MaybePromiseDeep<T[P]>
-        }
-    >
+  : [T] extends object
+  ? MaybePromise<{ [P in keyof T]: MaybePromiseDeep<T[P]> }>
   : MaybePromise<T>
 
 /**
