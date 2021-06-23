@@ -21,8 +21,8 @@ export interface NexusExtendTypeConfig<TypeName extends string> {
    * "definition" method.
    *
    * @param t The type builder. Usually the same as that passed to objectType "definition" method except if
-   *     extending the Subscription type in which case you get a subscription type builder (which differs
-   *     slightly in that it requires implementation of a "subscribe" method on field configurations).
+   *   extending the Subscription type in which case you get a subscription type builder (which differs
+   *   slightly in that it requires implementation of a "subscribe" method on field configurations).
    */
   definition(
     t: IsSubscriptionType<TypeName> extends true ? SubscriptionBuilder : ObjectDefinitionBlock<TypeName>
@@ -57,10 +57,10 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject)
  * use-case is so common Nexus ships dedicated functions for it: queryField, mutationField, subscriptionField.
  *
  * You can extend types before defining them strictly with objectType or the root field functions (queryType
- * etc.). The typing for "type" property will appear to suggest that you cannot, however once Nexus
- * reflection has run you'll see that the type you "extended" exists in the schema and that your static
- * typing error has been resolved. This behaviour is a convenience especially when extending root types which
- * you might never define in your schema directly.
+ * etc.). The typing for "type" property will appear to suggest that you cannot, however once Nexus reflection
+ * has run you'll see that the type you "extended" exists in the schema and that your static typing error has
+ * been resolved. This behaviour is a convenience especially when extending root types which you might never
+ * define in your schema directly.
  *
  * @example
  *   // types/User.ts
@@ -85,8 +85,8 @@ withNexusSymbol(NexusExtendTypeDef, NexusTypes.ExtendObject)
  *     },
  *   })
  *
- * @param config The specification of which type to extend and how. This is basically a subset of the configuration
- *     object passed to the objectType function.
+ * @param config The specification of which type to extend and how. This is basically a subset of the
+ *   configuration object passed to the objectType function.
  */
 export function extendType<TypeName extends AllOutputTypesPossible>(config: NexusExtendTypeConfig<TypeName>) {
   return new NexusExtendTypeDef(config.type, { ...config, name: config.type }) as NexusExtendTypeDef<any>

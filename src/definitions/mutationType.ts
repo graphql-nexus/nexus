@@ -37,7 +37,7 @@ import { NexusObjectTypeConfig, objectType } from './objectType'
  *   })
  *
  * @param config Specify your Mutation type's fields, description, and more. See each config property's jsDoc
- *     for more detail.
+ *   for more detail.
  */
 export function mutationType(config: Omit<NexusObjectTypeConfig<'Mutation'>, 'name'>) {
   return objectType({ ...config, name: 'Mutation' })

@@ -38,7 +38,7 @@ export type RequiredDeeply<T> = DoRequireDeeply<Exclude<T, undefined>>
  * Represents a POJO. Prevents from allowing arrays and functions.
  *
  * @remarks
- *  TypeScript interfaces will not be considered sub-types.
+ *   TypeScript interfaces will not be considered sub-types.
  */
 export type PlainObject = {
   [x: string]: Primitive | object

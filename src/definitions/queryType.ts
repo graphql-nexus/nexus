@@ -36,8 +36,8 @@ import { NexusObjectTypeConfig, objectType } from './objectType'
  *     },
  *   })
  *
- * @param config Specify your Query type's fields, description, and more. See each config property's jsDoc
- *     for more detail.
+ * @param config Specify your Query type's fields, description, and more. See each config property's jsDoc for
+ *   more detail.
  */
 export function queryType(config: Omit<NexusObjectTypeConfig<'Query'>, 'name'>) {
   return objectType({ ...config, name: 'Query' })

@@ -118,8 +118,8 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *
    * @example
    *   {
-   *   module: 'some-package',
-   *   export: 'User',
+   *     "module": "some-package",
+   *     "export": "User"
    *   }
    *
    * @example
@@ -162,13 +162,12 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    * Define the fields of your object type.
    *
    * This method receives a type builder api that you will use to define the fields of your object type
-   * within. You can leverage conditionals, loops, other functions (that take the builder api as an
-   * argument), pull in variables from higher scopes, and so on, to help define your fields. However avoid two things:
+   * within. You can leverage conditionals, loops, other functions (that take the builder api as an argument),
+   * pull in variables from higher scopes, and so on, to help define your fields. However avoid two things:
    *
    * 1. Doing asynchronous work when defining fields.
-   *
-   * 2. Triggering side-effects that you would NOT want run at _build_ time––as this code will run during
-   * build to support [Nexus' reflection system](https://nxs.li/guides/reflection).
+   * 2. Triggering side-effects that you would NOT want run at *build* time––as this code will run during build
+   *    to support [Nexus' reflection system](https://nxs.li/guides/reflection).
    *
    * @example
    *   objectType({
@@ -186,8 +185,8 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   })
    *
    * @param t The type builder API for object types. The primary method you'll find is "t.field" but there are
-   *     many convenient shorthands available as well, plus anything plugins have added. Explore each one's jsDoc
-   *     for more detail.
+   *   many convenient shorthands available as well, plus anything plugins have added. Explore each one's
+   *   jsDoc for more detail.
    */
   definition(t: ObjectDefinitionBlock<TypeName>): void
 } & AbstractTypes.MaybeTypeDefConfigFieldIsTypeOf<TypeName> &

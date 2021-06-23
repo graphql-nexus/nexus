@@ -233,7 +233,7 @@ function nixifyPathSlashes(path: string): string {
  * Format a path so it is suitable to be used as a module import.
  *
  * - Implicitly relative is made explicitly relative - TypeScript file extension is stripped - Windows slashes
- * converted into *nix slashes
+ *   converted into *nix slashes
  *
  * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
  */

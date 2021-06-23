@@ -63,9 +63,9 @@ withNexusSymbol(DynamicOutputMethodDef, NexusTypes.DynamicOutputMethod)
  * Defines a new property on the object definition block for an output type, taking arbitrary input to define
  * additional types. See the connectionPlugin:
  *
- * T.connectionField('posts', { nullable: true, totalCount(root, args, ctx, info) {
- *     return ctx.user.getTotalPostCount(root.id, args) }, nodes(root, args, ctx, info) {
- *     return ctx.user.getPosts(root.id, args) } })
+ * T.connectionField('posts', { nullable: true, totalCount(root, args, ctx, info) { return
+ * ctx.user.getTotalPostCount(root.id, args) }, nodes(root, args, ctx, info) { return
+ * ctx.user.getPosts(root.id, args) } })
  */
 export function dynamicOutputMethod<T extends string>(config: DynamicOutputMethodConfig<T>) {
   return new DynamicOutputMethodDef(config.name, config)
