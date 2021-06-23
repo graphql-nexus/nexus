@@ -688,6 +688,31 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *   resolver, and more. See jsdoc on each field within for details.
    */
   field<FieldName extends string>(name: FieldName, config: FieldOutConfig<TypeName, FieldName>): void
+  /**
+   * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Language.Fields)
+   *
+   * Define a field on this object.
+   *
+   * A field describes one discrete piece of information available to request within a [selection
+   * set](https://spec.graphql.org/June2018/#sec-Selection-Sets). They are in fact most of what any selection
+   * set will contain. Fields can be typed as scalars (marking the terminal point of a branch of a selection
+   * set) or as other object types in your schema thus allowing you to model relationships between things.
+   *
+   * @example
+   *   objectType({
+   *     name: 'User',
+   *     definition(t) {
+   *       t.field({
+   *         name: 'id',
+   *         type: id(),
+   *         description: 'The unique identification number for this user',
+   *       })
+   *     },
+   *   })
+   *
+   * @param config The configuration for things like the field's type, its description, its arguments, its
+   *   resolver, and more. See jsdoc on each field within for details.
+   */
   field<FieldName extends string>(config: FieldOutConfigWithName<TypeName, FieldName>): void
   field<FieldName extends string>(
     ...args:
