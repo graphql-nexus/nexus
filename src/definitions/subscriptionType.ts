@@ -30,11 +30,17 @@ export type SubscriptionScalarConfig<FieldName extends string, Event> =
   & SubscriptionTypeConfigBase<FieldName, Event>
 
 // prettier-ignore
-export interface SubscriptionTypeConfig<FieldName extends string, Event>
-  extends SubscriptionScalarConfig<FieldName, Event>
-  {
-    type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
-  }
+export interface SubscriptionTypeConfig<FieldName extends string, Event> extends SubscriptionScalarConfig<FieldName, Event> {
+  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
+}
+
+// prettier-ignore
+export interface SubscriptionTypeConfigWithName<FieldName extends string, Event> extends SubscriptionTypeConfig<FieldName, Event> {
+  /**
+   * The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   */  
+  name: FieldName
+}
 
 // prettier-ignore
 export interface SubscriptionBuilder {
@@ -46,7 +52,8 @@ export interface SubscriptionBuilder {
   boolean<FieldName extends string, Event>(fieldName: FieldName, opts: SubscriptionScalarConfig<FieldName, Event>): void
   id<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
   float<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
-  field<FieldName extends string, Event>(name: FieldName, fieldConfig: SubscriptionTypeConfig<FieldName, Event>): void
+  field<FieldName extends string, Event>(config: SubscriptionTypeConfigWithName<FieldName, Event>): void
+  field<FieldName extends string, Event>(name: FieldName, config: SubscriptionTypeConfig<FieldName, Event>): void
 }
 
 export type SubscriptionTypeParams = {

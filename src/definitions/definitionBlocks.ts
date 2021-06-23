@@ -176,8 +176,8 @@ export interface OutputScalarConfig<TypeName extends string, FieldName extends s
   resolve?: FieldResolver<TypeName, FieldName>
 }
 
-export interface NexusOutputFieldConfig<TypeName extends string, FieldName extends string>
-  extends OutputScalarConfig<TypeName, FieldName> {
+// prettier-ignore
+export interface NexusOutputFieldConfig<TypeName extends string, FieldName extends string> extends OutputScalarConfig<TypeName, FieldName> {
   /**
    * [GraphQL 2018 Spec](https://spec.graphql.org/June2018/#sec-Types)
    *
@@ -274,6 +274,14 @@ export interface NexusOutputFieldConfig<TypeName extends string, FieldName exten
   type: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs | NexusMetaType
 }
 
+// prettier-ignore
+export interface NexusOutputFieldConfigWithName<TypeName extends string, FieldName extends string> extends NexusOutputFieldConfig<TypeName, FieldName> {
+  /**
+   * The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   */
+  name: FieldName
+}
+
 export type NexusOutputFieldDef = NexusOutputFieldConfig<string, any> & {
   name: string
   configFor: 'outputField'
@@ -299,14 +307,21 @@ export type ScalarOutConfig<TypeName extends string, FieldName extends string> =
       }
     : OutputScalarConfig<TypeName, FieldName>
 
-export type FieldOutConfig<TypeName extends string, FieldName extends string> = NeedsResolver<
-  TypeName,
-  FieldName
-> extends true
-  ? NexusOutputFieldConfig<TypeName, FieldName> & {
-      resolve: FieldResolver<TypeName, FieldName>
-    }
-  : NexusOutputFieldConfig<TypeName, FieldName>
+// prettier-ignore
+export type FieldOutConfig<TypeName extends string, FieldName extends string> =
+  NeedsResolver<TypeName, FieldName> extends true
+    ? NexusOutputFieldConfig<TypeName, FieldName> & {
+        resolve: FieldResolver<TypeName, FieldName>
+      }
+    : NexusOutputFieldConfig<TypeName, FieldName>
+
+// prettier-ignore
+export type FieldOutConfigWithName<TypeName extends string, FieldName extends string> =
+  NeedsResolver<TypeName, FieldName> extends true
+    ? NexusOutputFieldConfigWithName<TypeName, FieldName> & {
+        resolve: FieldResolver<TypeName, FieldName>
+      }
+    : NexusOutputFieldConfigWithName<TypeName, FieldName>
 
 export interface OutputDefinitionBuilder {
   typeName: string
@@ -685,9 +700,22 @@ export class OutputDefinitionBlock<TypeName extends string> {
    * @param config The configuration for things like the field's type, its description, its arguments,
    *     its resolver, and more. See jsdoc on each field within for details.
    */
-  field<FieldName extends string>(name: FieldName, config: FieldOutConfig<TypeName, FieldName>) {
+  field<FieldName extends string>(name: FieldName, config: FieldOutConfig<TypeName, FieldName>): void
+  field<FieldName extends string>(config: FieldOutConfigWithName<TypeName, FieldName>): void
+  field<FieldName extends string>(
+    ...args:
+      | [name: FieldName, config: FieldOutConfig<TypeName, FieldName>]
+      | [config: FieldOutConfigWithName<TypeName, FieldName>]
+  ): void {
+    let config: FieldOutConfigWithName<TypeName, FieldName> =
+      args.length === 2
+        ? {
+            name: args[0],
+            ...args[1],
+          }
+        : args[0]
+
     this.typeBuilder.addField({
-      name,
       ...config,
       configFor: 'outputField',
       wrapping: this.wrapping,
@@ -726,9 +754,19 @@ export class OutputDefinitionBlock<TypeName extends string> {
   }
 }
 
-export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string>
-  extends CommonInputFieldConfig<TypeName, FieldName> {
+/** TODO move the code below to definitionBlocks/input.ts Input */
+
+// prettier-ignore
+export interface NexusInputFieldConfig<TypeName extends string, FieldName extends string> extends CommonInputFieldConfig<TypeName, FieldName> {
   type: AllInputTypes | AllNexusInputTypeDefs
+}
+
+// prettier-ignore
+export interface NexusInputFieldConfigWithName<TypeName extends string, FieldName extends string> extends NexusInputFieldConfig<TypeName, FieldName> {
+  /**
+   * The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   */
+  name: FieldName
 }
 
 export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
@@ -788,13 +826,23 @@ export class InputDefinitionBlock<TypeName extends string> {
     this.field(fieldName, { ...config, type: 'Float' })
   }
 
+  field<FieldName extends string>(config: NexusInputFieldConfigWithName<TypeName, FieldName>): void
+  field<FieldName extends string>(name: FieldName, config: NexusInputFieldConfig<TypeName, FieldName>): void
   field<FieldName extends string>(
-    fieldName: FieldName,
-    fieldConfig: NexusInputFieldConfig<TypeName, FieldName>
-  ) {
+    ...args:
+      | [FieldName, NexusInputFieldConfig<TypeName, FieldName>]
+      | [NexusInputFieldConfigWithName<TypeName, FieldName>]
+  ): void {
+    let config: NexusInputFieldConfigWithName<TypeName, FieldName> =
+      args.length === 2
+        ? {
+            name: args[0],
+            ...args[1],
+          }
+        : args[0]
+
     this.typeBuilder.addField({
-      name: fieldName,
-      ...fieldConfig,
+      ...config,
       wrapping: this.wrapping,
       parentType: this.typeName,
       configFor: 'inputField',
