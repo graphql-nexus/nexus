@@ -1,7 +1,7 @@
 /// <reference path="../_setup.ts" />
 import { join, relative } from 'path'
 import { core } from '../../src'
-import { BuilderConfigInput } from '../../src/core'
+import type { BuilderConfigInput } from '../../src/core'
 
 const { generateSchema, typegenFormatPrettier } = core
 

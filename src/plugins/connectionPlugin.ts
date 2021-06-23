@@ -1,6 +1,10 @@
 import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import type { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
+import type {
+  CommonFieldConfig,
+  FieldOutConfig,
+  FieldOutConfigWithName,
+} from '../definitions/definitionBlocks'
 import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
 import { NexusNullDef, nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
@@ -923,9 +927,16 @@ function mergeArgs(obj: object, fieldArgs: ArgsValue<any, any>): ArgsValue<any, 
  */
 function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
   const fieldDef = block.field
-  block.field = function (fieldName, config) {
+  block.field = function (
+    ...args:
+      | [name: string, config: FieldOutConfig<any, string>]
+      | [config: FieldOutConfigWithName<any, string>]
+  ) {
+    let config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
+
     const { resolve = defaultFieldResolver } = config
-    fieldDef.call(this, fieldName, {
+
+    fieldDef.call(this, {
       ...config,
       resolve(root, args, ctx, info) {
         return resolve(root, mergeArgs(root, args), ctx, info)
@@ -938,9 +949,16 @@ function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
 
 function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
   const fieldDef = block.field
-  block.field = function (fieldName, config) {
+  block.field = function (
+    ...args:
+      | [name: string, config: FieldOutConfig<any, string>]
+      | [config: FieldOutConfigWithName<any, string>]
+  ) {
+    let config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
+
     const { resolve = defaultFieldResolver } = config
-    fieldDef.call(this, fieldName, {
+
+    fieldDef.call(this, {
       ...config,
       resolve(root, args, ctx, info) {
         return resolve(root.__connectionSource, mergeArgs(root, args), ctx, info)

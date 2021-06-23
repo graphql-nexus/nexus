@@ -10,12 +10,15 @@ exports[`extendInputType should allow extending input objects 1`] = `
 exports[`extendType should allow adding types to the Query type 1`] = `
 Array [
   "user",
+  "user2",
   "post",
+  "post2",
 ]
 `;
 
 exports[`inputObjectType should output lists properly, #33 1`] = `
 "input AddToBasketInput {
   extras: [ExtraBasketInput]
+  extras2: [ExtraBasketInput]
 }"
 `;

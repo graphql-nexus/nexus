@@ -707,13 +707,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
       | [name: FieldName, config: FieldOutConfig<TypeName, FieldName>]
       | [config: FieldOutConfigWithName<TypeName, FieldName>]
   ): void {
-    let config: FieldOutConfigWithName<TypeName, FieldName> =
-      args.length === 2
-        ? {
-            name: args[0],
-            ...args[1],
-          }
-        : args[0]
+    const config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
 
     this.typeBuilder.addField({
       ...config,
@@ -833,13 +827,7 @@ export class InputDefinitionBlock<TypeName extends string> {
       | [FieldName, NexusInputFieldConfig<TypeName, FieldName>]
       | [NexusInputFieldConfigWithName<TypeName, FieldName>]
   ): void {
-    let config: NexusInputFieldConfigWithName<TypeName, FieldName> =
-      args.length === 2
-        ? {
-            name: args[0],
-            ...args[1],
-          }
-        : args[0]
+    const config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
 
     this.typeBuilder.addField({
       ...config,
