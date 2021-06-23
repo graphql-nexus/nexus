@@ -22,7 +22,7 @@ jobs:
   test:
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [12.x, 14.x]
         os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -57,7 +57,7 @@ jobs:
           # rm examples/star-wars/star-wars-schema.graphql
           # node examples/star-wars/dist/schema.js
           # git diff --exit-code
-        node-version: [10.x]
+        node-version: [12.x]
         os: [macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
