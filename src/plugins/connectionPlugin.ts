@@ -705,10 +705,8 @@ export function makeResolveFn(
   return (root, args: PaginationArgs, ctx, info) => {
     const { nodes: nodesResolve } = fieldConfig
     const { decodeCursor = base64Decode, encodeCursor = base64Encode } = pluginConfig
-    const {
-      pageInfoFromNodes = defaultPageInfoFromNodes,
-      cursorFromNode = defaultCursorFromNode,
-    } = mergedConfig
+    const { pageInfoFromNodes = defaultPageInfoFromNodes, cursorFromNode = defaultCursorFromNode } =
+      mergedConfig
     if (!nodesResolve) {
       return null
     }
@@ -802,10 +800,9 @@ export function makeResolveFn(
         })
 
         if (hasPromise) {
-          return Promise.all([
-            Promise.all(resolvedEdgeList),
-            Promise.all(resolvedNodeList),
-          ]).then(([edges, nodes]) => ({ edges, nodes }))
+          return Promise.all([Promise.all(resolvedEdgeList), Promise.all(resolvedNodeList)]).then(
+            ([edges, nodes]) => ({ edges, nodes })
+          )
         }
 
         return {

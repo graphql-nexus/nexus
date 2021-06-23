@@ -165,9 +165,8 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
           return null
         }
 
-        const importPath = (path.isAbsolute(pathOrModule)
-          ? relativePathTo(resolvedPath, outputPath)
-          : pathOrModule
+        const importPath = (
+          path.isAbsolute(pathOrModule) ? relativePathTo(resolvedPath, outputPath) : pathOrModule
         ).replace(typeScriptFileExtension, '')
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {

@@ -42,9 +42,8 @@ export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
 >
 
 /** Returns whether all the abstract type names where TypeName is used have implemented `resolveType` */
-export type IsStrategyResolveTypeImplementedInAllAbstractTypes<
-  TypeName extends string
-> = AbstractTypeNames<TypeName> extends GetGen<'abstractsUsingStrategyResolveType'> ? true : false
+export type IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName extends string> =
+  AbstractTypeNames<TypeName> extends GetGen<'abstractsUsingStrategyResolveType'> ? true : false
 
 /** Returns whether all the members of an abstract type have implemented `isTypeOf` */
 export type IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
