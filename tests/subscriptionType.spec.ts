@@ -36,6 +36,16 @@ it('defines a field on the mutation type as shorthand', async () => {
               return event
             },
           })
+          t.field({
+            name: 'someField2',
+            type: 'Int',
+            subscribe() {
+              return mockStream(10, 0, (int) => int - 1)
+            },
+            resolve: (event) => {
+              return event
+            },
+          })
           t.int('someInt', {
             subscribe() {
               return mockStream(10, 0, (int) => int + 1)
@@ -90,6 +100,7 @@ it('defines a field on the mutation type as shorthand', async () => {
     type Subscription {
       someBoolean: Boolean
       someField: Int
+      someField2: Int
       someFields: [Int]
       someFloat: Float
       someID: ID
@@ -107,6 +118,14 @@ it('defines a field on the mutation type as shorthand', async () => {
         `
           subscription {
             someField
+          }
+        `
+      ).then(take(3)),
+      subscribe(
+        schema,
+        `
+          subscription {
+            someField2
           }
         `
       ).then(take(3)),
@@ -167,6 +186,23 @@ it('defines a field on the mutation type as shorthand', async () => {
         Object {
           "data": Object {
             "someField": -3,
+          },
+        },
+      ],
+      Array [
+        Object {
+          "data": Object {
+            "someField2": -1,
+          },
+        },
+        Object {
+          "data": Object {
+            "someField2": -2,
+          },
+        },
+        Object {
+          "data": Object {
+            "someField2": -3,
           },
         },
       ],
