@@ -1,6 +1,10 @@
 import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
 import { ArgsRecord, intArg, stringArg } from '../definitions/args'
-import type { CommonFieldConfig, FieldOutConfig } from '../definitions/definitionBlocks'
+import type {
+  CommonFieldConfig,
+  FieldOutConfig,
+  FieldOutConfigWithName,
+} from '../definitions/definitionBlocks'
 import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
 import { NexusNullDef, nullable } from '../definitions/nullable'
 import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
@@ -113,8 +117,8 @@ export interface ConnectionPluginConfig {
    * Any additional fields to make available to the connection type, beyond edges / pageInfo / nodes.
    *
    * Any fields defined extended on the Connection type will automatically receive the args from the
-   * connection. If the field also defines args, they will be merged with the args of the connection, with
-   * the extension's field args taking precedence if there is a conflict.
+   * connection. If the field also defines args, they will be merged with the args of the connection, with the
+   * extension's field args taking precedence if there is a conflict.
    */
   extendConnection?: Record<
     string,
@@ -299,8 +303,8 @@ export type ConnectionFieldConfig<TypeName extends string = any, FieldName exten
   | {
       /**
        * Implement the full resolve, including `edges` and `pageInfo`. Useful in more complex pagination
-       * cases, or if you want to use utilities from other libraries like GraphQL Relay JS, and only use
-       * Nexus for the construction and type-safety:
+       * cases, or if you want to use utilities from other libraries like GraphQL Relay JS, and only use Nexus
+       * for the construction and type-safety:
        *
        * Https://github.com/graphql/graphql-relay-js
        */
@@ -705,10 +709,8 @@ export function makeResolveFn(
   return (root, args: PaginationArgs, ctx, info) => {
     const { nodes: nodesResolve } = fieldConfig
     const { decodeCursor = base64Decode, encodeCursor = base64Encode } = pluginConfig
-    const {
-      pageInfoFromNodes = defaultPageInfoFromNodes,
-      cursorFromNode = defaultCursorFromNode,
-    } = mergedConfig
+    const { pageInfoFromNodes = defaultPageInfoFromNodes, cursorFromNode = defaultCursorFromNode } =
+      mergedConfig
     if (!nodesResolve) {
       return null
     }
@@ -802,10 +804,9 @@ export function makeResolveFn(
         })
 
         if (hasPromise) {
-          return Promise.all([
-            Promise.all(resolvedEdgeList),
-            Promise.all(resolvedNodeList),
-          ]).then(([edges, nodes]) => ({ edges, nodes }))
+          return Promise.all([Promise.all(resolvedEdgeList), Promise.all(resolvedNodeList)]).then(
+            ([edges, nodes]) => ({ edges, nodes })
+          )
         }
 
         return {
@@ -926,9 +927,16 @@ function mergeArgs(obj: object, fieldArgs: ArgsValue<any, any>): ArgsValue<any, 
  */
 function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
   const fieldDef = block.field
-  block.field = function (fieldName, config) {
+  block.field = function (
+    ...args:
+      | [name: string, config: FieldOutConfig<any, string>]
+      | [config: FieldOutConfigWithName<any, string>]
+  ) {
+    let config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
+
     const { resolve = defaultFieldResolver } = config
-    fieldDef.call(this, fieldName, {
+
+    fieldDef.call(this, {
       ...config,
       resolve(root, args, ctx, info) {
         return resolve(root, mergeArgs(root, args), ctx, info)
@@ -941,9 +949,16 @@ function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
 
 function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
   const fieldDef = block.field
-  block.field = function (fieldName, config) {
+  block.field = function (
+    ...args:
+      | [name: string, config: FieldOutConfig<any, string>]
+      | [config: FieldOutConfigWithName<any, string>]
+  ) {
+    let config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
+
     const { resolve = defaultFieldResolver } = config
-    fieldDef.call(this, fieldName, {
+
+    fieldDef.call(this, {
       ...config,
       resolve(root, args, ctx, info) {
         return resolve(root.__connectionSource, mergeArgs(root, args), ctx, info)

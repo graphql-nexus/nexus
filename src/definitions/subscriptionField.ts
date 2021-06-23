@@ -15,16 +15,16 @@ export type SubscriptionFieldConfig<FieldName extends string, Event> =
  * `extendType({ type: 'Subscription' })`
  *
  * The Subscription type is one of three [root
- * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent
- * API operations your clients can run to be pushed data changes over time.
+ * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent API
+ * operations your clients can run to be pushed data changes over time.
  *
  * Use this instead of subscriptionType if you are going to modularize your schema and thus be wanting to
  * contribute fields to the Subscription type from multiple modules. You do not have to have previously
  * defined a Query type before using this. If you haven't Nexus will create one automatically for you.
  *
  * Note that the main difference about Subscription type from other object types is that its field
- * configurations require a special "subscribe" method where you can return an asynchronous iterator.
- * Promises yielded by that iterator become available to the resolver in its first param, the source data.
+ * configurations require a special "subscribe" method where you can return an asynchronous iterator. Promises
+ * yielded by that iterator become available to the resolver in its first param, the source data.
  *
  * If you need to leverage plugins or define multiple fields then use the typeBuilder overload variant of this
  * function. Otherwise you may prefer to the field name/config variant.
@@ -126,16 +126,16 @@ export function subscriptionField(
  * `extendType({ type: 'Subscription' })`
  *
  * The Subscription type is one of three [root
- * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent
- * API operations your clients can run to be pushed data changes over time.
+ * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent API
+ * operations your clients can run to be pushed data changes over time.
  *
  * Use this instead of subscriptionType if you are going to modularize your schema and thus be wanting to
  * contribute fields to the Subscription type from multiple modules. You do not have to have previously
  * defined a Query type before using this. If you haven't Nexus will create one automatically for you.
  *
  * Note that the main difference about Subscription type from other object types is that its field
- * configurations require a special "subscribe" method where you can return an asynchronous iterator.
- * Promises yielded by that iterator become available to the resolver in its first param, the source data.
+ * configurations require a special "subscribe" method where you can return an asynchronous iterator. Promises
+ * yielded by that iterator become available to the resolver in its first param, the source data.
  *
  * If you need to leverage plugins or define multiple fields then use the typeBuilder overload variant of this
  * function. Otherwise you may prefer to the field name/config variant.
@@ -222,8 +222,7 @@ export function subscriptionField(
  *   })
  *
  * @param name The name of the field on the Query type. Names are case‐sensitive and must conform to pattern:
- *
- *     [_A-Za-z][_0-9A-Za-z]*
+ *   `[_A-Za-z][_0-9A-Za-z]*`
  * @param config The same type of configuration you would pass to t.field("...", config)
  */
 export function subscriptionField<FieldName extends string, Event>(

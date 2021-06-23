@@ -31,8 +31,7 @@ export interface SourceTypeModule {
    *
    * If not provided, the default implementation is:
    *
-   * (type) => [
-   *     new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g"), ]
+   * (type) => [ new RegExp(`(?:interface|type|class|enum)\\s+(${type.name})\\W`, "g"), ]
    */
   typeMatch?: (type: GraphQLNamedType, defaultRegex: RegExp) => RegExp | RegExp[]
   /**
@@ -165,9 +164,8 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
           return null
         }
 
-        const importPath = (path.isAbsolute(pathOrModule)
-          ? relativePathTo(resolvedPath, outputPath)
-          : pathOrModule
+        const importPath = (
+          path.isAbsolute(pathOrModule) ? relativePathTo(resolvedPath, outputPath) : pathOrModule
         ).replace(typeScriptFileExtension, '')
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {

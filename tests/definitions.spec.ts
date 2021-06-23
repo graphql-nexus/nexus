@@ -138,15 +138,15 @@ describe('objectType', () => {
         t.string('email', {
           description: 'The email of the person whos account this is',
         })
-        t.field('nestedList', {
-          type: list(nonNull(list('String'))),
-        })
+        t.field('nestedList', { type: list(nonNull(list('String'))) })
+        t.field({ name: 'nestedList2', type: list(nonNull(list('String'))) })
       },
     })
     const typeMap = buildTypes<{ Account: GraphQLObjectType }>([Account])
     const fields = typeMap.Account.getFields()
-    expect(Object.keys(fields).sort()).toEqual(['email', 'id', 'name', 'nestedList'])
+    expect(Object.keys(fields).sort()).toEqual(['email', 'id', 'name', 'nestedList', 'nestedList2'])
     expect(fields.nestedList.type.toString()).toEqual('[[String]!]')
+    expect(fields.nestedList2.type.toString()).toEqual('[[String]!]')
   })
 })
 
@@ -156,14 +156,14 @@ describe('extendType', () => {
       type: 'Query',
       definition(t) {
         t.field('user', { type: 'User', args: { id: idArg() } })
+        t.field({ name: 'user2', type: 'User', args: { id: idArg() } })
       },
     })
     const GetPost = extendType({
       type: 'Query',
       definition(t) {
-        t.field('post', {
-          type: PostObject,
-        })
+        t.field('post', { type: PostObject })
+        t.field({ name: 'post2', type: PostObject })
       },
     })
     expect(
@@ -187,6 +187,7 @@ describe('inputObjectType', () => {
         name: 'AddToBasketInput',
         definition(t) {
           t.list.field('extras', { type: 'ExtraBasketInput' })
+          t.list.field({ name: 'extras2', type: 'ExtraBasketInput' })
         },
       }),
     ])

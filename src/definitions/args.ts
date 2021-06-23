@@ -53,7 +53,7 @@ export interface ScalarArgConfig<T> extends CommonArgConfig {
   /**
    * The default value for this argument when ***none*** is given by the client.
    *
-   * Note that _null_ is still considered something meaning if the client gives an explicit null that will
+   * Note that *null* is still considered something meaning if the client gives an explicit null that will
    * prevent the default from activating. This is why the type of an arg with a default value in the resolver
    * includes "undefined | null".
    *
@@ -87,10 +87,8 @@ export interface NexusArgConfig<T extends string> extends NexusAsArgConfig<T> {
    * Types may be expressed in one of three ways:
    *
    * 1. As string literals matching the name of a builtin scalar.
-   *
    * 2. As string literals matching the name of another type. Thanks to [Nexus' reflection
-   * system](https://nxs.li/guides/reflection) this is typesafe and autocompletable.
-   *
+   *    system](https://nxs.li/guides/reflection) this is typesafe and autocompletable.
    * 3. As references to other enums or input object type definitions.
    *
    * Type modifier helpers like list() may also be used and in turn accept one of the three methods listed above.
@@ -159,7 +157,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg)
  *   })
  *
  * @param config Configuration for the argument like its type and description. See jsdoc on each config field
- *     for details.
+ *   for details.
  */
 export function arg<T extends string>(config: NexusArgConfig<T>) {
   if (!config.type) {
@@ -193,8 +191,7 @@ export function arg<T extends string>(config: NexusArgConfig<T>) {
  *     },
  *   })
  *
- * @param config Configuration for the argument like its description. See jsdoc on each config field
- *     for details.
+ * @param config Configuration for the argument like its description. See jsdoc on each config field for details.
  */
 export function stringArg(config?: ScalarArgConfig<string>) {
   return arg({ type: 'String', ...config })
@@ -224,8 +221,7 @@ export function stringArg(config?: ScalarArgConfig<string>) {
  *     },
  *   })
  *
- * @param config Configuration for the argument like its description. See jsdoc on each config field
- *     for details.
+ * @param config Configuration for the argument like its description. See jsdoc on each config field for details.
  */
 export function intArg(config?: ScalarArgConfig<number>) {
   return arg({ type: 'Int', ...config })
@@ -255,8 +251,7 @@ export function intArg(config?: ScalarArgConfig<number>) {
  *     },
  *   })
  *
- * @param config Configuration for the argument like its description. See jsdoc on each config field
- *     for details.
+ * @param config Configuration for the argument like its description. See jsdoc on each config field for details.
  */
 export function floatArg(config?: ScalarArgConfig<number>) {
   return arg({ type: 'Float', ...config })
@@ -286,8 +281,7 @@ export function floatArg(config?: ScalarArgConfig<number>) {
  *     },
  *   })
  *
- * @param config Configuration for the argument like its description. See jsdoc on each config field
- *     for details.
+ * @param config Configuration for the argument like its description. See jsdoc on each config field for details.
  */
 export function idArg(config?: ScalarArgConfig<string>) {
   return arg({ type: 'ID', ...config })
@@ -317,8 +311,7 @@ export function idArg(config?: ScalarArgConfig<string>) {
  *     },
  *   })
  *
- * @param config Configuration for the argument like its description. See jsdoc on each config field
- *     for details.
+ * @param config Configuration for the argument like its description. See jsdoc on each config field for details.
  */
 export function booleanArg(config?: ScalarArgConfig<boolean>) {
   return arg({ type: 'Boolean', ...config })

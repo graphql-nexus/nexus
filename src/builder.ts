@@ -453,8 +453,8 @@ export class SchemaBuilder {
 
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls it into an internal "type registry". It also
-   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so
-   * you can define types anonymously, without exporting them.
+   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so you
+   * can define types anonymously, without exporting them.
    */
   addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusMeta(typeDef)) {

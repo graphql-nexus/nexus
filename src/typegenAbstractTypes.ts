@@ -42,9 +42,8 @@ export type AbstractTypeNames<TypeName extends string> = ConditionalKeys<
 >
 
 /** Returns whether all the abstract type names where TypeName is used have implemented `resolveType` */
-export type IsStrategyResolveTypeImplementedInAllAbstractTypes<
-  TypeName extends string
-> = AbstractTypeNames<TypeName> extends GetGen<'abstractsUsingStrategyResolveType'> ? true : false
+export type IsStrategyResolveTypeImplementedInAllAbstractTypes<TypeName extends string> =
+  AbstractTypeNames<TypeName> extends GetGen<'abstractsUsingStrategyResolveType'> ? true : false
 
 /** Returns whether all the members of an abstract type have implemented `isTypeOf` */
 export type IsStrategyIsTypeOfImplementedInAllMembers<AbstractTypeName extends string> = GetGen2<
@@ -64,7 +63,7 @@ export type IsTypeOfHandler<TypeName extends string> = (
  * Get an object with the `isTypeOf` field if applicable for the given object Type.
  *
  * @remarks
- *  Intersect the result of this with other things to build up the final options for a type def.
+ *   Intersect the result of this with other things to build up the final options for a type def.
  */
 export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
   // is isTypeOf strategy disabled ?
@@ -122,23 +121,24 @@ export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
          *   })
          *
          * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL objects that
-         *     are members of the abstract types that this type is a member of. For example for some type A in two
-         *     union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would receive
-         *     source data from A, B, C, D, & E at runtime.
+         *   are members of the abstract types that this type is a member of. For example for some type A in
+         *   two union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would
+         *   receive source data from A, B, C, D, & E at runtime.
          * @param context The context data for this request.
          *
-         * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
-         *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
-         *     It is often used to store information like the current user making the request. Nexus is not responsible
-         *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
-         *     [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+         *   The context data is typically a singleton scoped to the lifecycle of the request. This means
+         *   created at the beginning of a request and then passed to all the resolvers that execute while
+         *   resolving the request. It is often used to store information like the current user making the
+         *   request. Nexus is not responsible for this however. That is typically something you'll do with
+         *   e.g. [Mercurius](https://mercurius.dev) or [Apollo
+         *   Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
          *
-         * Note that the type here will be whatever you have specified for "contextType" in your makeSchema
-         *     configuration.
+         *   Note that the type here will be whatever you have specified for "contextType" in your makeSchema
+         *   configuration.
          * @param info The GraphQL resolve info.
          *
-         * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
-         *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+         *   This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+         *   document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
          * @returns A boolean indicating if the received source data is of this type or not.
          */
         isTypeOf?: IsTypeOfHandler<TypeName>
@@ -200,23 +200,24 @@ export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
          *   })
          *
          * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL objects that
-         *     are members of the abstract types that this type is a member of. For example for some type A in two
-         *     union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would receive
-         *     source data from A, B, C, D, & E at runtime.
+         *   are members of the abstract types that this type is a member of. For example for some type A in
+         *   two union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would
+         *   receive source data from A, B, C, D, & E at runtime.
          * @param context The context data for this request.
          *
-         * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
-         *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
-         *     It is often used to store information like the current user making the request. Nexus is not responsible
-         *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
-         *     [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+         *   The context data is typically a singleton scoped to the lifecycle of the request. This means
+         *   created at the beginning of a request and then passed to all the resolvers that execute while
+         *   resolving the request. It is often used to store information like the current user making the
+         *   request. Nexus is not responsible for this however. That is typically something you'll do with
+         *   e.g. [Mercurius](https://mercurius.dev) or [Apollo
+         *   Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
          *
-         * Note that the type here will be whatever you have specified for "contextType" in your makeSchema
-         *     configuration.
+         *   Note that the type here will be whatever you have specified for "contextType" in your makeSchema
+         *   configuration.
          * @param info The GraphQL resolve info.
          *
-         * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
-         *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+         *   This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+         *   document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
          * @returns A boolean indicating if the received source data is of this type or not.
          */
         isTypeOf?: IsTypeOfHandler<TypeName>
@@ -277,23 +278,24 @@ export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
          *   })
          *
          * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL objects that
-         *     are members of the abstract types that this type is a member of. For example for some type A in two
-         *     union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would receive
-         *     source data from A, B, C, D, & E at runtime.
+         *   are members of the abstract types that this type is a member of. For example for some type A in
+         *   two union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would
+         *   receive source data from A, B, C, D, & E at runtime.
          * @param context The context data for this request.
          *
-         * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
-         *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
-         *     It is often used to store information like the current user making the request. Nexus is not responsible
-         *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
-         *     [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+         *   The context data is typically a singleton scoped to the lifecycle of the request. This means
+         *   created at the beginning of a request and then passed to all the resolvers that execute while
+         *   resolving the request. It is often used to store information like the current user making the
+         *   request. Nexus is not responsible for this however. That is typically something you'll do with
+         *   e.g. [Mercurius](https://mercurius.dev) or [Apollo
+         *   Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
          *
-         * Note that the type here will be whatever you have specified for "contextType" in your makeSchema
-         *     configuration.
+         *   Note that the type here will be whatever you have specified for "contextType" in your makeSchema
+         *   configuration.
          * @param info The GraphQL resolve info.
          *
-         * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
-         *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+         *   This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+         *   document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
          * @returns A boolean indicating if the received source data is of this type or not.
          */
         isTypeOf?: IsTypeOfHandler<TypeName>
@@ -344,23 +346,24 @@ export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
          *   })
          *
          * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL objects that
-         *     are members of the abstract types that this type is a member of. For example for some type A in two
-         *     union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would receive
-         *     source data from A, B, C, D, & E at runtime.
+         *   are members of the abstract types that this type is a member of. For example for some type A in
+         *   two union types whose members are A,B.C and A,D,E respectively then isTypeOf method for A would
+         *   receive source data from A, B, C, D, & E at runtime.
          * @param context The context data for this request.
          *
-         * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
-         *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
-         *     It is often used to store information like the current user making the request. Nexus is not responsible
-         *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
-         *     [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+         *   The context data is typically a singleton scoped to the lifecycle of the request. This means
+         *   created at the beginning of a request and then passed to all the resolvers that execute while
+         *   resolving the request. It is often used to store information like the current user making the
+         *   request. Nexus is not responsible for this however. That is typically something you'll do with
+         *   e.g. [Mercurius](https://mercurius.dev) or [Apollo
+         *   Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
          *
-         * Note that the type here will be whatever you have specified for "contextType" in your makeSchema
-         *     configuration.
+         *   Note that the type here will be whatever you have specified for "contextType" in your makeSchema
+         *   configuration.
          * @param info The GraphQL resolve info.
          *
-         * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
-         *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+         *   This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+         *   document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
          * @returns A boolean indicating if the received source data is of this type or not.
          */
         isTypeOf: IsTypeOfHandler<TypeName>
@@ -370,7 +373,7 @@ export type MaybeTypeDefConfigFieldIsTypeOf<TypeName extends string> =
  * Get an object with the `resolveType` field if applicable for the given abstract Type.
  *
  * @remarks
- *  Intersect the result of this with other things to build up the final options for a type def.
+ *   Intersect the result of this with other things to build up the final options for a type def.
  */
 export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> = IsFeatureEnabled2<
   'abstractTypeStrategies',

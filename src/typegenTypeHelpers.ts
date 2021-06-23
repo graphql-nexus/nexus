@@ -100,20 +100,20 @@ export type FieldResolver<TypeName extends string, FieldName extends string> = (
   source: SourceValue<TypeName>,
   /**
    * If you have defined arguments on this field then this parameter will contain any arguments passed by the
-   * client. If you specified default values for any arguments and the client did not explicitly pass _any_
+   * client. If you specified default values for any arguments and the client did not explicitly pass *any*
    * value (including null) for those arguments then you will see the defaults here.
    *
    * Note that thanks to [Nexus' reflection system](https://nxs.li/guides/reflection) this parameter's type
-   *     will always be type safe.
+   * will always be type safe.
    */
   args: ArgsValue<TypeName, FieldName>,
   /**
    * The context data for this request.
    *
    * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
-   *     the beginning of a request and then passed to all the resolvers that execute while resolving the request.
-   *     It is often used to store information like the current user making the request. Nexus is not responsible
-   *     for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
+   * the beginning of a request and then passed to all the resolvers that execute while resolving the request.
+   * It is often used to store information like the current user making the request. Nexus is not responsible
+   * for this however. That is typically something you'll do with e.g. [Mercurius](https://mercurius.dev) or
    * [Apollo Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
    *
    * Note that the type here will be whatever you have specified for "contextType" in your makeSchema configuration.

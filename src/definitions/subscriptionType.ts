@@ -30,11 +30,17 @@ export type SubscriptionScalarConfig<FieldName extends string, Event> =
   & SubscriptionTypeConfigBase<FieldName, Event>
 
 // prettier-ignore
-export interface SubscriptionTypeConfig<FieldName extends string, Event>
-  extends SubscriptionScalarConfig<FieldName, Event>
-  {
-    type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
-  }
+export interface SubscriptionTypeConfig<FieldName extends string, Event> extends SubscriptionScalarConfig<FieldName, Event> {
+  type: GetGen<'allOutputTypes'> | AllNexusOutputTypeDefs
+}
+
+// prettier-ignore
+export interface SubscriptionTypeConfigWithName<FieldName extends string, Event> extends SubscriptionTypeConfig<FieldName, Event> {
+  /**
+   * The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
+   */  
+  name: FieldName
+}
 
 // prettier-ignore
 export interface SubscriptionBuilder {
@@ -46,7 +52,8 @@ export interface SubscriptionBuilder {
   boolean<FieldName extends string, Event>(fieldName: FieldName, opts: SubscriptionScalarConfig<FieldName, Event>): void
   id<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
   float<FieldName extends string, Event>(fieldName: FieldName, config: SubscriptionScalarConfig<FieldName, Event>): void
-  field<FieldName extends string, Event>(name: FieldName, fieldConfig: SubscriptionTypeConfig<FieldName, Event>): void
+  field<FieldName extends string, Event>(config: SubscriptionTypeConfigWithName<FieldName, Event>): void
+  field<FieldName extends string, Event>(name: FieldName, config: SubscriptionTypeConfig<FieldName, Event>): void
 }
 
 export type SubscriptionTypeParams = {
@@ -63,16 +70,16 @@ export type SubscriptionTypeParams = {
  * `objectType({ name: 'Subscription' })`
  *
  * The Subscription type is one of three [root
- * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent
- * API operations your clients can run to be pushed data changes over time.
+ * types](https://spec.graphql.org/June2018/#sec-Root-Operation-Types) in GraphQL and its fields represent API
+ * operations your clients can run to be pushed data changes over time.
  *
  * You can only have one of these in your schema. If you are going to modularize your schema and thus be
  * wanting to contribute fields to the Subscription type from multiple modules then use
  * [queryField](https://nxs.li/docs/api/subscription-field) intead.
  *
  * Note that the main difference about Subscription type from other object types is that its field
- * configurations require a special "subscribe" method where you can return an asynchronous iterator.
- * Promises yielded by that iterator become available to the resolver in its first param, the source data.
+ * configurations require a special "subscribe" method where you can return an asynchronous iterator. Promises
+ * yielded by that iterator become available to the resolver in its first param, the source data.
  *
  * @example
  *   // Contrived but simple self-contained example
@@ -165,8 +172,8 @@ export type SubscriptionTypeParams = {
  *     },
  *   })
  *
- * @param config Specify your Subscription type's fields, description, and more. See each config property's jsDoc
- *     for more detail.
+ * @param config Specify your Subscription type's fields, description, and more. See each config property's
+ *   jsDoc for more detail.
  */
 export function subscriptionType(config: SubscriptionTypeParams) {
   return objectType({ ...config, name: 'Subscription' } as any)

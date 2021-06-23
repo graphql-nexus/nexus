@@ -50,16 +50,15 @@ export const defaultFormatError = ({ error }: FieldAuthorizePluginErrorConfig): 
 
 export const fieldAuthorizePlugin = (authConfig: FieldAuthorizePluginConfig = {}) => {
   const { formatError = defaultFormatError } = authConfig
-  const ensureError = (root: any, args: any, ctx: GetGen<'context'>, info: GraphQLResolveInfo) => (
-    error: Error
-  ) => {
-    const finalErr = formatError({ error, root, args, ctx, info })
-    if (finalErr instanceof Error) {
-      throw finalErr
+  const ensureError =
+    (root: any, args: any, ctx: GetGen<'context'>, info: GraphQLResolveInfo) => (error: Error) => {
+      const finalErr = formatError({ error, root, args, ctx, info })
+      if (finalErr instanceof Error) {
+        throw finalErr
+      }
+      console.error(`Non-Error value ${finalErr} returned from custom formatError in authorize plugin`)
+      throw new Error('Not authorized')
     }
-    console.error(`Non-Error value ${finalErr} returned from custom formatError in authorize plugin`)
-    throw new Error('Not authorized')
-  }
   let hasWarned = false
   return plugin({
     name: 'NexusAuthorize',

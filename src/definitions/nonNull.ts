@@ -60,16 +60,13 @@ withNexusSymbol(NexusNonNullDef, NexusTypes.NonNull)
  *
  * @param type The type to wrap in Non-Null. This may be expressed in one of three ways:
  *
- * 1. As string literals matching the name of a builtin scalar. E.g.: 'ID', 'String', ...
+ *   1. As string literals matching the name of a builtin scalar. E.g.: 'ID', 'String', ...
+ *   2. As string literals matching the name of another type. E.g.: 'User', 'Location', ... Thanks to [Nexus'
+ *        reflection system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. This is
+ *        the idiomatic approach in Nexus because it avoids excessive importing and circular references.
+ *   3. As references to other enums or object type definitions. E.g.: User, Location
  *
- * 2. As string literals matching the name of another type. E.g.: 'User', 'Location', ... Thanks to
- *     [Nexus' reflection
- *     system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. This is the idiomatic
- *     approach in Nexus because it avoids excessive importing and circular references.
- *
- * 3. As references to other enums or object type definitions. E.g.: User, Location
- *
- * You may also use other type modifier helpers like list() which in turn accept one of the three
+ *   You may also use other type modifier helpers like list() which in turn accept one of the three
  */
 export function nonNull<TypeName extends NexusNonNullableTypes>(type: TypeName) {
   if (isNexusNonNullTypeDef(type) || isNonNullType(type)) {
