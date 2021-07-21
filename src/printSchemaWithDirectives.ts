@@ -56,7 +56,10 @@ function printFilteredSchemaWithDirectives(
     .join('\n\n')
 }
 
-function printSchemaDefinition(schema: GraphQLSchema): Maybe<string> {
+function printSchemaDefinition(
+  // & description for GraphQL 14 types
+  schema: GraphQLSchema & { description?: Maybe<string> }
+): Maybe<string> {
   if (schema.description == null && isSchemaOfCommonNames(schema)) {
     return
   }
@@ -141,9 +144,12 @@ function printScalar(type: GraphQLScalarType): string {
   return printDescription(type) + `scalar ${type.name}` + printSpecifiedByURL(type) + printDirectives(type)
 }
 
-function printImplementedInterfaces(type: GraphQLObjectType | GraphQLInterfaceType): string {
-  const interfaces = type.getInterfaces()
-  return interfaces.length ? ' implements ' + interfaces.map((i) => i.name).join(' & ') : ''
+function printImplementedInterfaces(
+  // & getInterfaces added for GraphQL 14 types
+  type: (GraphQLObjectType | GraphQLInterfaceType) & { getInterfaces?: () => GraphQLInterfaceType[] }
+): string {
+  const interfaces = type.getInterfaces?.()
+  return interfaces?.length ? ' implements ' + interfaces.map((i) => i.name).join(' & ') : ''
 }
 
 function printObject(type: GraphQLObjectType): string {
@@ -268,7 +274,10 @@ function printDeprecated(reason: Maybe<string>): string {
   return ' @deprecated'
 }
 
-function printSpecifiedByURL(scalar: GraphQLScalarType & { specifiedByURL?: string }): string {
+function printSpecifiedByURL(
+  // https://github.com/graphql/graphql-js/issues/3156
+  scalar: GraphQLScalarType & { specifiedByURL?: Maybe<string>; specifiedByUrl?: Maybe<string> }
+): string {
   const specifiedByURL = scalar.specifiedByURL ?? scalar.specifiedByUrl
   if (specifiedByURL == null) {
     return ''
