@@ -1,5 +1,5 @@
 import { arg, interfaceType, list, nullable } from 'nexus'
-import { JSDoc, SyntaxKind } from 'typescript'
+import ts, { JSDoc, SyntaxKind } from 'typescript'
 import { allKnownNodes, syntaxKindFilter } from './utils'
 
 const syntaxKindArgs = {
@@ -50,7 +50,7 @@ export const Node = interfaceType({
         if (!root.modifiers) {
           return null
         }
-        return syntaxKindFilter(args, Array.from(root.modifiers))
+        return syntaxKindFilter<ts.Modifier>(args, Array.from(root.modifiers))
       },
     })
     t.field('parent', { type: 'Node' })
@@ -78,7 +78,7 @@ export const JSDocInterface = interfaceType({
       resolve(root) {
         if ('jsDoc' in root) {
           // https://github.com/Microsoft/TypeScript/issues/19856
-          return ((root as unknown) as { jsDoc: JSDoc[] }).jsDoc
+          return (root as unknown as { jsDoc: JSDoc[] }).jsDoc
         }
         return null
       },

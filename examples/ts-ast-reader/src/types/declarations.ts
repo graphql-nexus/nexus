@@ -1,4 +1,5 @@
-import { objectType, arg, list, nullable } from 'nexus'
+import { objectType, arg, list, nullable, core } from 'nexus'
+import ts from 'typescript'
 import { nodeType, functionLikeDeclaration, hasTypeParameters } from './mixins'
 import { filteredNodesList } from './utils'
 
@@ -21,7 +22,7 @@ export const SourceFile = objectType({
     t.list.field('statements', {
       type: 'Node',
       args: nodeSkipSyntax,
-      resolve: (root, args) => filteredNodesList(args, Array.from(root.statements)),
+      resolve: (root, args) => filteredNodesList<ts.Statement>(args, Array.from(root.statements)),
     })
   },
 })
@@ -156,7 +157,7 @@ export const ClassDeclaration = objectType({
     t.list.field('members', {
       type: 'Node',
       args: nodeSkipSyntax,
-      resolve: (root, args) => filteredNodesList(args, Array.from(root.members)),
+      resolve: (root, args) => filteredNodesList<ts.ClassElement>(args, Array.from(root.members)),
     })
   },
 })
