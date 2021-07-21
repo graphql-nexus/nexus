@@ -1,4 +1,5 @@
 import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
+import type { Directives } from '../core'
 import type { GetGen } from '../typegenTypeHelpers'
 import type { NexusObjectTypeDef } from './objectType'
 import { AbstractTypes, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
@@ -41,6 +42,13 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLUnionTypeConfig<any, any>['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the union type definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {

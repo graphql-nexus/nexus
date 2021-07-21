@@ -1,6 +1,7 @@
 import { assertValidName, GraphQLInputObjectTypeConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import type { InputDefinitionBlock } from './definitionBlocks'
+import type { Directives } from './directive'
 import { NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
 
 export type NexusInputObjectTypeConfig<TypeName extends string> = {
@@ -21,6 +22,13 @@ export type NexusInputObjectTypeConfig<TypeName extends string> = {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLInputObjectTypeConfig['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the input object type definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 } & NexusGenPluginInputTypeConfig<TypeName>
 
 export class NexusInputObjectTypeDef<TypeName extends string> {

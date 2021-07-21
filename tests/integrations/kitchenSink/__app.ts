@@ -1,7 +1,10 @@
 import {
   arg,
+  booleanArg,
   connectionPlugin,
+  core,
   declarativeWrappingPlugin,
+  directive,
   dynamicInputMethod,
   dynamicOutputMethod,
   dynamicOutputProperty,
@@ -18,15 +21,57 @@ import {
   stringArg,
   subscriptionField,
   subscriptionType,
+  useDirective,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
 import './__typegen'
+
+export const typeDirective = directive({
+  name: 'TestTypeDirective',
+  locations: ['OBJECT', 'INTERFACE', 'ENUM', 'SCALAR'],
+  description: 'Testing type directives',
+  args: {
+    bool: booleanArg(),
+  },
+})
+
+export const fieldDirective = directive({
+  name: 'TestFieldDirective',
+  locations: ['FIELD_DEFINITION', 'INPUT_FIELD_DEFINITION'],
+  description: 'Testing the object directive',
+  args: {
+    bool: booleanArg(),
+  },
+})
+
+export const testAllDirective = directive({
+  name: 'TestAllDirective',
+  locations: core.SchemaLocation,
+  description: 'Testing directive in all positions',
+})
+
+export const testRequiredArgDirective = directive({
+  name: 'TestRequiredArgDirective',
+  locations: ['OBJECT'],
+  description: 'Testing with required arg',
+  args: {
+    bool: nonNull(booleanArg()),
+  },
+})
+
+export const testRepeatableDirective = directive({
+  name: 'TestRepeatableDirective',
+  locations: core.SchemaLocation,
+  description: 'Testing a repeatable directive',
+  isRepeatable: true,
+})
 
 export const scalar = scalarType({
   name: 'MyCustomScalar',
   description: 'No-Op scalar for testing purposes only',
   asNexusMethod: 'myCustomScalar',
   serialize() {},
+  directives: [testAllDirective],
 })
 
 export const query = queryType({
@@ -34,6 +79,7 @@ export const query = queryType({
     t.string('foo', { resolve: () => 'bar' })
     t.myCustomScalar('customScalar')
   },
+  directives: [testRepeatableDirective, testRepeatableDirective],
 })
 
 const mockData = {
@@ -51,6 +97,7 @@ export const I = interfaceType({
       extensions: {
         extensionAdditionFromFieldConfig: true,
       },
+      directives: [fieldDirective({ bool: true })],
     })
   },
 })
@@ -60,6 +107,7 @@ export const i = objectType({
   definition(t) {
     t.implements('I')
   },
+  directives: [typeDirective],
 })
 
 export const i2 = objectType({
@@ -126,6 +174,7 @@ export const Post = objectType({
     // tslint:disable-next-line: no-unused-expression
     t.body
   },
+  directives: [testRequiredArgDirective({ bool: true })],
 })
 
 export const User = objectType({
@@ -179,7 +228,7 @@ export const Query = extendType({
             { name: 'ACTIVE', value: 'active' },
             { name: 'PENDING', value: 'pending' },
           ],
-        }).asArg({ default: 'active' }),
+        }).asArg({ default: 'active', directives: [testAllDirective] }),
       },
       resolve: () => mockData.user,
     })
@@ -258,6 +307,7 @@ export const Subscription = subscriptionType({
       resolve: (event: number) => {
         return event
       },
+      directives: [testAllDirective],
     })
     t.string('someString', {
       subscribe() {
@@ -266,6 +316,7 @@ export const Subscription = subscriptionType({
       resolve: (event: string) => {
         return event
       },
+      directives: [useDirective('TestFieldDirective', { bool: true })],
     })
     t.float('someFloat', {
       subscribe() {

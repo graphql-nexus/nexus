@@ -3,6 +3,7 @@ import * as path from 'path'
 import type { BuilderConfigInput, TypegenInfo } from './builder'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
+import { printSchemaWithDirectives } from './printSchemaWithDirectives'
 import { typegenAutoConfig } from './typegenAutoConfig'
 import { TypegenFormatFn, typegenFormatPrettier } from './typegenFormatPrettier'
 import { TypegenPrinter } from './typegenPrinter'
@@ -24,12 +25,13 @@ export class TypegenMetadata {
   constructor(protected config: TypegenMetadataConfig) {}
 
   /** Generates the artifacts of the build based on what we know about the schema and how it was defined. */
-  async generateArtifacts(schema: NexusGraphQLSchema) {
+  async generateArtifacts(schema: NexusGraphQLSchema, hasSDLDirectives: boolean) {
     const sortedSchema = this.sortSchema(schema)
     if (this.config.outputs.schema || this.config.outputs.typegen) {
       const { schemaTypes, tsTypes } = await this.generateArtifactContents(
         sortedSchema,
-        this.config.outputs.typegen
+        this.config.outputs.typegen,
+        hasSDLDirectives
       )
       if (this.config.outputs.schema) {
         await this.writeFile('schema', schemaTypes, this.config.outputs.schema)
@@ -40,9 +42,13 @@ export class TypegenMetadata {
     }
   }
 
-  async generateArtifactContents(schema: NexusGraphQLSchema, typeFilePath: string | null) {
+  async generateArtifactContents(
+    schema: NexusGraphQLSchema,
+    typeFilePath: string | null,
+    hasSDLDirectives: boolean
+  ) {
     const [schemaTypes, tsTypes] = await Promise.all([
-      this.generateSchemaFile(schema),
+      this.generateSchemaFile(schema, hasSDLDirectives),
       typeFilePath ? this.generateTypesFile(schema, typeFilePath) : '',
     ])
     return { schemaTypes, tsTypes }
@@ -103,10 +109,11 @@ export class TypegenMetadata {
   }
 
   /** Generates the schema, adding any directives as necessary */
-  generateSchemaFile(schema: GraphQLSchema): string {
+  generateSchemaFile(schema: GraphQLSchema, hasSDLDirectives: boolean): string {
+    const printer = hasSDLDirectives ? printSchemaWithDirectives : printSchema
     let printedSchema = this.config.customPrintSchemaFn
       ? this.config.customPrintSchemaFn(schema)
-      : printSchema(schema)
+      : printer(schema)
     return [SDL_HEADER, printedSchema].join('\n\n')
   }
 

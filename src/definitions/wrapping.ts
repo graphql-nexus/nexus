@@ -27,6 +27,8 @@ import type { NexusScalarTypeDef } from './scalarType'
 import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './nexusMeta'
 import type { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
+import type { NexusDirectiveDef } from './directive'
+import type { NexusDirectiveUse } from '../core'
 
 export type AllNexusNamedInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
@@ -180,6 +182,13 @@ export function isNexusPrintedGenTypingImport(obj: any): obj is PrintedGenTyping
 
 export function isNexusPlugin(obj: any): obj is NexusPlugin {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Plugin
+}
+
+export function isNexusDirective(obj: any): obj is NexusDirectiveDef {
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Directive
+}
+export function isNexusDirectiveUse(obj: any): obj is NexusDirectiveUse {
+  return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.DirectiveUse
 }
 
 export type NexusWrapKind = 'NonNull' | 'Null' | 'List'

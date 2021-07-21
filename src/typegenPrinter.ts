@@ -18,10 +18,12 @@ import {
   isNonNullType,
   isObjectType,
   isScalarType,
+  isSpecifiedDirective,
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
 import type { TypegenInfo } from './builder'
+import { SchemaLocation } from './definitions/directive'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import type { StringLike } from './plugin'
@@ -97,6 +99,7 @@ export class TypegenPrinter {
       this.printTypeNames('interface', 'NexusGenInterfaceNames', 'NexusGenInterfaces'),
       this.printTypeNames('scalar', 'NexusGenScalarNames', 'NexusGenScalars'),
       this.printTypeNames('union', 'NexusGenUnionNames', 'NexusGenUnions'),
+      this.printDirectives(),
       this.printIsTypeOfObjectTypeNames('NexusGenObjectsUsingAbstractStrategyIsTypeOf'),
       this.printResolveTypeAbstractTypes('NexusGenAbstractsUsingStrategyResolveType'),
       this.printFeaturesConfig('NexusGenFeaturesConfig'),
@@ -121,11 +124,56 @@ export class TypegenPrinter {
     ].join('\n')
   }
 
+  printDirectives() {
+    const customDirectives = this.schema.getDirectives().filter((d) => !isSpecifiedDirective(d))
+    const schemaDirectiveArgs: Record<string, GraphQLArgument[] | undefined> = {}
+
+    // Gather the mappings between directives, locations, etc.
+    customDirectives.forEach((d) => {
+      d.locations.forEach((l) => {
+        if (SchemaLocation.includes(l as any)) {
+          schemaDirectiveArgs[d.name] = d.args ?? undefined
+        }
+      })
+    })
+
+    const directiveNames = Object.keys(schemaDirectiveArgs)
+      .map((i) => JSON.stringify(i))
+      .join(' | ')
+
+    const toPrint: string[] = [`export type NexusGenDirectives = ${directiveNames || 'never'}`]
+
+    // Print the mappings of the directive names -> args
+    // NexusGenDirectiveArgs
+    let directiveArgs = [`export interface NexusGenDirectiveArgs {`]
+
+    eachObj(schemaDirectiveArgs, (val, key) => {
+      if (val) {
+        directiveArgs.push(`  ${key}: {`)
+        val.forEach((arg) => {
+          const [sep, rep] = this.normalizeArg(arg)
+          directiveArgs.push(`    ${arg.name}${sep}${rep}`)
+        })
+        directiveArgs.push(`  }`)
+      } else {
+        directiveArgs.push(`  ${key}: never`)
+      }
+    })
+
+    directiveArgs.push('}')
+
+    toPrint.push(directiveArgs.join('\n'))
+
+    return toPrint.join('\n\n')
+  }
+
   printGenTypeMap() {
     return [`export interface NexusGenTypes {`]
       .concat([
         `  context: ${this.printContext()};`,
         `  inputTypes: NexusGenInputs;`,
+        `  directives: NexusGenDirectives;`,
+        `  directiveArgs: NexusGenDirectiveArgs;`,
         `  rootTypes: NexusGenRootTypes;`,
         `  inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;`,
         `  argTypes: NexusGenArgTypes;`,

@@ -56,3 +56,5 @@ type DoRequireDeeply<T> = {
 export type MaybePromiseLike<T> = T | PromiseLike<T>
 
 export type UnwrapPromise<R> = R extends PromiseLike<infer U> ? U : R
+
+export type MaybeReadonlyArray<T> = Array<T> | ReadonlyArray<T>

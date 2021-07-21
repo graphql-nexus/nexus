@@ -314,6 +314,27 @@ export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = never
 
+export type NexusGenDirectives =
+  | 'TestAllDirective'
+  | 'TestFieldDirective'
+  | 'TestRepeatableDirective'
+  | 'TestRequiredArgDirective'
+  | 'TestTypeDirective'
+
+export interface NexusGenDirectiveArgs {
+  TestAllDirective: {}
+  TestFieldDirective: {
+    bool?: boolean | null // Boolean
+  }
+  TestRepeatableDirective: {}
+  TestRequiredArgDirective: {
+    bool: boolean // Boolean!
+  }
+  TestTypeDirective: {
+    bool?: boolean | null // Boolean
+  }
+}
+
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
 export type NexusGenAbstractsUsingStrategyResolveType = 'I'
@@ -329,6 +350,8 @@ export type NexusGenFeaturesConfig = {
 export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
+  directives: NexusGenDirectives
+  directiveArgs: NexusGenDirectiveArgs
   rootTypes: NexusGenRootTypes
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars
   argTypes: NexusGenArgTypes

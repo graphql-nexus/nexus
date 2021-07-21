@@ -52,6 +52,8 @@ export enum NexusTypes {
   PrintedGenTypingImport = 'PrintedGenTypingImport',
   Scalar = 'Scalar',
   Union = 'Union',
+  Directive = 'Directive',
+  DirectiveUse = 'DirectiveUse',
 }
 
 export interface DeprecationInfo {

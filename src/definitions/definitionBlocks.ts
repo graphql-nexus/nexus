@@ -9,15 +9,14 @@ import type {
   NeedsResolver,
 } from '../typegenTypeHelpers'
 import type { ArgsRecord } from './args'
+import type { Directives } from './directive'
 import type { NexusMetaType } from './nexusMeta'
 import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
 import type { BaseScalars } from './_types'
 
 export interface CommonFieldConfig {
-  //todo
   /** The description to annotate the GraphQL SDL */
   description?: string
-  //todo
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
@@ -105,6 +104,13 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
    *   })
    */
   extensions?: GraphQLFieldConfig<any, any>['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the output field definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
 export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
@@ -116,6 +122,13 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
    * graphql-js based tools which rely on looking for special data here.
    */
   extensions?: GraphQLInputFieldConfig['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the input field definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {

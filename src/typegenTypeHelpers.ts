@@ -155,6 +155,8 @@ export type GenTypesShapeKeys =
   | 'inputTypes'
   | 'rootTypes'
   | 'inputTypeShapes'
+  | 'directives'
+  | 'directiveArgs'
   | 'argTypes'
   | 'fieldTypes'
   | 'fieldTypeNames'

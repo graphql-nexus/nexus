@@ -2,6 +2,7 @@ import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
 import type { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers'
 import type { ArgsRecord } from './args'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
+import type { Directives } from './directive'
 import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
@@ -53,6 +54,13 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLInterfaceTypeConfig<any, any>['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the output field definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {

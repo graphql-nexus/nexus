@@ -1,5 +1,6 @@
 import { assertValidName, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 import { decorateType } from './decorateType'
+import type { Directives } from './directive'
 import { NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface ScalarBase
@@ -21,6 +22,13 @@ export interface ScalarConfig {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the scalar type definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 }
 
 export interface NexusScalarTypeConfig<T extends string> extends ScalarBase, ScalarConfig {

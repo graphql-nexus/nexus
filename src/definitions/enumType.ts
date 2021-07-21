@@ -1,5 +1,6 @@
 import { assertValidName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
+import type { Directives } from './directive'
 import { NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 type TypeScriptEnumLike = {
@@ -24,6 +25,13 @@ export interface EnumMemberInfo {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLEnumValueConfig['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the enum member definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 }
 
 export interface NexusEnumTypeConfig<TypeName extends string> {
@@ -43,6 +51,13 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLEnumTypeConfig['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the enum type definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 }
 
 export class NexusEnumTypeDef<TypeName extends string> {

@@ -1,5 +1,6 @@
 import type { GraphQLScalarTypeConfig } from 'graphql'
 import type { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
+import type { Directives } from './directive'
 import type { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
 import { NexusTypes, withNexusSymbol } from './_types'
 
@@ -47,6 +48,13 @@ export type CommonArgConfig = {
    * graphql-js based tools which rely on looking for special data here.
    */
   extensions?: GraphQLScalarTypeConfig<any, any>['extensions']
+  /**
+   * A list of directives / directive uses (with args) for the arg definition
+   *
+   * @example
+   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
 } & NexusGenPluginArgConfig
 
 export interface ScalarArgConfig<T> extends CommonArgConfig {
