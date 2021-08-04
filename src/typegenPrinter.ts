@@ -16,6 +16,7 @@ import {
   isInterfaceType,
   isListType,
   isNonNullType,
+  isNullableType,
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
@@ -719,11 +720,11 @@ export class TypegenPrinter {
   }
 
   argSeparator(type: GraphQLInputType, hasDefaultValue: boolean) {
-    if (!hasDefaultValue && isNonNullType(type)) {
-      return ':'
+    if (hasDefaultValue || isNullableType(type)) {
+      return '?:'
     }
 
-    return '?:'
+    return ':'
   }
 
   argTypeRepresentation(arg: GraphQLInputType): string {
