@@ -279,7 +279,7 @@ export interface NexusGenArgTypes {
     user: {
       // args
       id?: string | null // ID
-      status?: NexusGenEnums['UserStatus'] | null // UserStatus
+      status: NexusGenEnums['UserStatus'] | null // UserStatus
     }
   }
   User: {

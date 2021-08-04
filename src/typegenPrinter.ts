@@ -16,7 +16,6 @@ import {
   isInterfaceType,
   isListType,
   isNonNullType,
-  isNullableType,
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
@@ -716,15 +715,15 @@ export class TypegenPrinter {
   }
 
   normalizeArg(arg: GraphQLInputField | GraphQLArgument): [string, string] {
-    return [this.argSeparator(arg.type, arg.defaultValue !== undefined), this.argTypeRepresentation(arg.type)]
+    return [this.argSeparator(arg.type, Boolean(arg.defaultValue)), this.argTypeRepresentation(arg.type)]
   }
 
   argSeparator(type: GraphQLInputType, hasDefaultValue: boolean) {
-    if (hasDefaultValue || isNullableType(type)) {
-      return '?:'
+    if (hasDefaultValue || isNonNullType(type)) {
+      return ':'
     }
 
-    return ':'
+    return '?:'
   }
 
   argTypeRepresentation(arg: GraphQLInputType): string {
