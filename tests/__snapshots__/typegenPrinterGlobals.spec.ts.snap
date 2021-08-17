@@ -7,7 +7,7 @@ Object {
  * Do not make changes to this file directly
  */
 
-import { NexusGenTypes } from './types.gen'
+import type { NexusGenTypes } from './types.gen'
 
 
 
@@ -15,6 +15,8 @@ import { NexusGenTypes } from './types.gen'
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
+
+import type { TestContext } from \\"./../__helpers/index\\"
 
 
 declare global {
@@ -486,7 +488,7 @@ exports[`typegenPrinter: no input changes should print the full output, with inp
  * Do not make changes to this file directly
  */
 
-import { NexusGenTypes } from './types.gen'
+import type { NexusGenTypes } from './types.gen'
 
 
 
@@ -494,6 +496,8 @@ import { NexusGenTypes } from './types.gen'
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
+
+
 
 
 declare global {
