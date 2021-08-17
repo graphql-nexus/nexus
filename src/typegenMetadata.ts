@@ -132,6 +132,7 @@ export class TypegenMetadata {
     const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
 
     return new TypegenPrinter(schema, {
+      declareInputs: true,
       ...typegenInfo,
       typegenPath,
     }).print()
@@ -139,7 +140,7 @@ export class TypegenMetadata {
 
   /** Generates the type definitions */
   async generateConfiguredTypes(schema: NexusGraphQLSchema, typegen: ConfiguredTypegen) {
-    const { outputPath: typegenPath, globalsPath, declareInputs } = typegen
+    const { outputPath: typegenPath, globalsPath, declareInputs = true } = typegen
     const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
 
     return new TypegenPrinter(schema, {

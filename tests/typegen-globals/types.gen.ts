@@ -10,7 +10,7 @@ export interface CreatePostInput {
 
 export interface PostFilters {
   order: OrderEnum // OrderEnum!
-  search?: string | null // String
+  search: string | null // String
 }
 
 export interface NexusGenInputs {
