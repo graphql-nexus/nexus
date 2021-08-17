@@ -75,6 +75,7 @@ describe('sourceTypes', () => {
       typegenPath: '',
     })
 
+    // @ts-expect-error
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 
@@ -86,6 +87,7 @@ describe('sourceTypes', () => {
       typegenPath: '',
     })
 
+    // @ts-expect-error
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 })
