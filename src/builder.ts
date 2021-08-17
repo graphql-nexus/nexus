@@ -176,6 +176,27 @@ type PossibleOutputType =
 
 type PossibleInputType = string | AllNexusNamedInputTypeDefs | GraphQLType
 
+export interface ConfiguredTypegen {
+  /** Path for the generated type defs */
+  outputPath: string
+  /**
+   * Determine the path the "globals" are output, useful when you have a monorepo setup and need to isolate
+   * the globals from the rest of the types in order to have multiple schemas/ts projects
+   */
+  globalsPath?: string
+  /**
+   * If globalsPath is defined, these headers are added to the "globals" generated file, rather than the
+   * typegen generated file
+   */
+  globalsHeaders?: string[]
+  /**
+   * If "true", declares dedicated interfaces for any inputs / args
+   *
+   * @default true
+   */
+  declareInputs?: boolean
+}
+
 export interface BuilderConfigInput {
   /**
    * Generated artifact settings. Set to false to disable all. Set to true to enable all and use default
@@ -195,7 +216,7 @@ export interface BuilderConfigInput {
          * will pick it up without any configuration needed by you. For more details about the @types system
          * refer to https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types
          */
-        typegen?: boolean | string
+        typegen?: boolean | string | ConfiguredTypegen
         /**
          * GraphQL SDL file generation toggle and location.
          *

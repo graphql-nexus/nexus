@@ -1,5 +1,6 @@
 import * as path from 'path'
 import type { BuilderConfigInput } from './builder'
+import type { ConfiguredTypegen } from './core'
 import type { TypegenMetadataConfig } from './typegenMetadata'
 import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
 
@@ -13,7 +14,7 @@ export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadat
 
   const defaultSDLFilePath = path.join(process.cwd(), 'schema.graphql')
 
-  let typegenFilePath: string | null = null
+  let typegenFilePath: string | ConfiguredTypegen | null = null
   let sdlFilePath: string | null = null
 
   if (outputs === undefined) {
@@ -32,6 +33,17 @@ export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadat
     // handle typegen configuration
     if (typeof outputs.typegen === 'string') {
       typegenFilePath = assertAbsolutePath(outputs.typegen, 'outputs.typegen')
+    } else if (typeof outputs.typegen === 'object') {
+      typegenFilePath = {
+        ...outputs.typegen,
+        outputPath: assertAbsolutePath(outputs.typegen.outputPath, 'outputs.typegen.outputPath'),
+      } as ConfiguredTypegen
+      if (outputs.typegen.globalsPath) {
+        typegenFilePath.globalsPath = assertAbsolutePath(
+          outputs.typegen.globalsPath,
+          'outputs.typegen.globalsPath'
+        )
+      }
     }
   } else if (outputs !== false) {
     console.warn(

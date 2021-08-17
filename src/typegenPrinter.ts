@@ -24,6 +24,7 @@ import {
 import type { TypegenInfo } from './builder'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import type { NexusGraphQLSchema } from './definitions/_types'
+import { TYPEGEN_HEADER } from './lang'
 import type { StringLike } from './plugin'
 import {
   eachObj,
@@ -34,6 +35,7 @@ import {
   mapObj,
   mapValues,
   PrintedGenTypingImport,
+  relativePathTo,
   resolveImportPath,
 } from './utils'
 
@@ -52,6 +54,9 @@ type RootTypeMapping = Record<string, string | Record<string, [string, string]>>
 
 interface TypegenInfoWithFile extends TypegenInfo {
   typegenPath: string
+  globalsPath?: string
+  globalsHeaders?: string
+  declareInputs?: boolean
 }
 
 /**
@@ -77,7 +82,28 @@ export class TypegenPrinter {
   }
 
   print() {
-    const body = [
+    const body = [this.printCommon(), this.printPlugins()].join('\n\n')
+    return [this.printHeaders(), body].join('\n\n')
+  }
+
+  printConfigured() {
+    if (this.typegenInfo.globalsPath) {
+      const common = this.printCommon()
+      const tsTypes = [this.printHeadersCommon(), common].join('\n\n')
+      const globalTypes = [this.printHeadersGlobal(), this.printPlugins()].join('\n\n')
+      return {
+        tsTypes,
+        globalTypes,
+      }
+    }
+    return {
+      tsTypes: this.print(),
+      globalTypes: null,
+    }
+  }
+
+  private printCommon() {
+    return [
       this.printInputTypeMap(),
       this.printEnumTypeMap(),
       this.printScalarTypeMap(),
@@ -101,24 +127,40 @@ export class TypegenPrinter {
       this.printResolveTypeAbstractTypes('NexusGenAbstractsUsingStrategyResolveType'),
       this.printFeaturesConfig('NexusGenFeaturesConfig'),
       this.printGenTypeMap(),
-      this.printPlugins(),
     ].join('\n\n')
-    return [this.printHeaders(), body].join('\n\n')
   }
 
   printHeaders() {
-    const fieldDefs = [
-      this.printDynamicInputFieldDefinitions(),
-      this.printDynamicOutputFieldDefinitions(),
-      this.printDynamicOutputPropertyDefinitions(),
-    ]
+    return [this.printHeadersCommon(), this.printHeadersGlobal()].join('\n')
+  }
+
+  private printHeadersCommon() {
     return [
       this.typegenInfo.headers.join('\n'),
       this.typegenInfo.imports.join('\n'),
       this.printDynamicImport(),
-      ...fieldDefs,
-      GLOBAL_DECLARATION,
     ].join('\n')
+  }
+
+  private printHeadersGlobal() {
+    const headers = [
+      this.printDynamicInputFieldDefinitions(),
+      this.printDynamicOutputFieldDefinitions(),
+      this.printDynamicOutputPropertyDefinitions(),
+      GLOBAL_DECLARATION,
+    ]
+
+    if (this.typegenInfo.globalsPath) {
+      headers.unshift(
+        `import { NexusGenTypes } from '${relativePathTo(
+          this.typegenInfo.typegenPath,
+          this.typegenInfo.globalsPath ?? ''
+        )}'`
+      )
+      headers.unshift(this.typegenInfo.globalsHeaders ?? TYPEGEN_HEADER)
+    }
+
+    return headers.join('\n')
   }
 
   printGenTypeMap() {
@@ -467,11 +509,29 @@ export class TypegenPrinter {
   }
 
   printInputTypeMap() {
-    return this.printTypeFieldInterface('NexusGenInputs', this.buildInputTypeMap(), 'input type')
+    const inputTypeMap = this.buildInputTypeMap()
+
+    if (this.typegenInfo.declareInputs) {
+      const declaredInputs: string[] = mapObj(inputTypeMap, (fields, inputName) =>
+        this.printNamedObj(inputName, fields)
+      )
+      return [...declaredInputs, this.printNamedMap('NexusGenInputs', inputTypeMap)].join('\n\n')
+    }
+
+    return this.printTypeFieldInterface('NexusGenInputs', inputTypeMap, 'input type')
   }
 
   printEnumTypeMap() {
-    return this.printTypeInterface('NexusGenEnums', this.buildEnumTypeMap())
+    const enumTypeMap = this.buildEnumTypeMap()
+
+    if (this.typegenInfo.declareInputs) {
+      return [
+        ...mapObj(enumTypeMap, (val, name) => `export type ${name} = ${val}`),
+        this.printNamedMap('NexusGenEnums', enumTypeMap),
+      ].join('\n\n')
+    }
+
+    return this.printTypeInterface('NexusGenEnums', enumTypeMap)
   }
 
   printScalarTypeMap() {
@@ -631,7 +691,34 @@ export class TypegenPrinter {
   }
 
   printArgTypeMap() {
-    return this.printArgTypeFieldInterface(this.buildArgTypeMap())
+    const argTypeMap = this.buildArgTypeMap()
+    if (this.typegenInfo.declareInputs) {
+      const declaredArgs: string[] = []
+      eachObj(argTypeMap, (fields, typeName) => {
+        eachObj(fields, (args, fieldName) => {
+          declaredArgs.push(this.printNamedObj(this.getArgsName(typeName, fieldName), args))
+        })
+      })
+      return [...declaredArgs, this.printArgTypeFieldInterface(argTypeMap)].join('\n\n')
+    }
+
+    return this.printArgTypeFieldInterface(argTypeMap)
+  }
+
+  private getArgsName(typeName: string, fieldName: string) {
+    return `${typeName}${fieldName.slice(0, 1).toUpperCase().concat(fieldName.slice(1))}Args`
+  }
+
+  printNamedObj(name: string, obj: Record<string, [string, string]>) {
+    return [
+      `export interface ${name} {`,
+      ...mapObj(obj, (val, key) => `  ${key}${val[0]} ${val[1]}`),
+      `}`,
+    ].join('\n')
+  }
+
+  printNamedMap(name: string, obj: Record<string, any>) {
+    return [`export interface ${name} {`, ...mapObj(obj, (val, key) => `  ${key}: ${key}`), `}`].join('\n')
   }
 
   buildReturnTypeMap() {
@@ -695,7 +782,11 @@ export class TypegenPrinter {
     } else if (isScalarType(type)) {
       typing.push(this.printScalar(type))
     } else if (isEnumType(type)) {
-      typing.push(`NexusGenEnums['${type.name}']`)
+      if (this.typegenInfo.declareInputs) {
+        typing.push(type.name)
+      } else {
+        typing.push(`NexusGenEnums['${type.name}']`)
+      }
     } else if (isObjectType(type) || isInterfaceType(type) || isUnionType(type)) {
       typing.push(`NexusGenRootTypes['${type.name}']`)
     }
@@ -757,9 +848,17 @@ export class TypegenPrinter {
     } else if (isScalarType(arg)) {
       typing.push(this.printScalar(arg))
     } else if (isEnumType(arg)) {
-      typing.push(`NexusGenEnums['${arg.name}']`)
+      if (this.typegenInfo.declareInputs) {
+        typing.push(arg.name)
+      } else {
+        typing.push(`NexusGenEnums['${arg.name}']`)
+      }
     } else if (isInputObjectType(arg)) {
-      typing.push(`NexusGenInputs['${arg.name}']`)
+      if (this.typegenInfo.declareInputs) {
+        typing.push(arg.name)
+      } else {
+        typing.push(`NexusGenInputs['${arg.name}']`)
+      }
     }
     return typing
   }
@@ -798,8 +897,16 @@ export class TypegenPrinter {
   printArgTypeFieldInterface(typeMapping: Record<string, TypeFieldMapping>) {
     return [`export interface NexusGenArgTypes {`]
       .concat(
-        mapObj(typeMapping, (val, key) => {
-          return [`  ${key}: {`]
+        mapObj(typeMapping, (val, typeName) => {
+          if (this.typegenInfo.declareInputs) {
+            return [`  ${typeName}: {`]
+              .concat(
+                mapObj(val, (_, fieldName) => `    ${fieldName}: ${this.getArgsName(typeName, fieldName)}`)
+              )
+              .concat('  }')
+              .join('\n')
+          }
+          return [`  ${typeName}: {`]
             .concat(mapObj(val, this.printObj('    ', 'args')))
             .concat('  }')
             .join('\n')
