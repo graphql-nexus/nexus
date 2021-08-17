@@ -1,4 +1,4 @@
-import { makeSchemaInternal, SchemaConfig } from './builder'
+import { ConfiguredTypegen, makeSchemaInternal, SchemaConfig } from './builder'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TypegenMetadata } from './typegenMetadata'
 import { resolveTypegenConfig } from './typegenUtils'
@@ -58,19 +58,19 @@ export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQL
  */
 generateSchema.withArtifacts = async (
   config: SchemaConfig,
-  typeFilePath: string | null = null
+  typegen: string | null | ConfiguredTypegen = null
 ): Promise<{
   schema: NexusGraphQLSchema
   schemaTypes: string
   tsTypes: string
+  globalTypes: string | null
 }> => {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  const { schemaTypes, tsTypes } = await new TypegenMetadata(typegenConfig).generateArtifactContents(
-    schema,
-    typeFilePath
-  )
+  const { schemaTypes, tsTypes, globalTypes } = await new TypegenMetadata(
+    typegenConfig
+  ).generateArtifactContents(schema, typegen)
   assertNoMissingTypes(schema, missingTypes)
   runAbstractTypeRuntimeChecks(schema, finalConfig.features)
-  return { schema, schemaTypes, tsTypes }
+  return { schema, schemaTypes, tsTypes, globalTypes }
 }

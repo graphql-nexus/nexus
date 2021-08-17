@@ -2,10 +2,6 @@
 
 import type { core } from '../../src'
 
-declare global {
-  interface NexusGen extends NexusGenTypes {}
-}
-
 export interface CreatePostInput {
   author: string // ID!
   geo: Array<Array<number | null>> // [[Float]!]!
@@ -233,13 +229,4 @@ export interface NexusGenTypes {
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
   abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig
-}
-
-declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {}
-  interface NexusGenPluginInputTypeConfig<TypeName extends string> {}
-  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
-  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {}
-  interface NexusGenPluginSchemaConfig {}
-  interface NexusGenPluginArgConfig {}
 }
