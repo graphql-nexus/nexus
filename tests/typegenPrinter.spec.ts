@@ -68,7 +68,9 @@ describe('typegenPrinter', () => {
       typegenPath: '',
     })
     jest
+      // @ts-expect-error
       .spyOn(typegen, 'hasResolver')
+      // @ts-expect-error
       .mockImplementation((field: GraphQLField<any, any>, type: GraphQLObjectType | GraphQLInterfaceType) => {
         if (type.name === 'Query' || type.name === 'Mutation') {
           return true
@@ -82,30 +84,37 @@ describe('typegenPrinter', () => {
   })
 
   it('builds the enum object type defs', () => {
+    // @ts-expect-error
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 
   it('builds the input object type defs', () => {
+    // @ts-expect-error
     expect(typegen.printInputTypeMap()).toMatchSnapshot()
   })
 
   it('should build an argument type map', () => {
+    // @ts-expect-error
     expect(typegen.printArgTypeMap()).toMatchSnapshot()
   })
 
   it('should print a object type map', () => {
+    // @ts-expect-error
     expect(typegen.printObjectTypeMap()).toMatchSnapshot()
   })
 
   it('should print a interface type map', () => {
+    // @ts-expect-error
     expect(typegen.printInterfaceTypeMap()).toMatchSnapshot()
   })
 
   it('should print a union type map', () => {
+    // @ts-expect-error
     expect(typegen.printUnionTypeMap()).toMatchSnapshot()
   })
 
   it('should print a root type map', () => {
+    // @ts-expect-error
     expect(typegen.printRootTypeDef()).toMatchSnapshot()
   })
 
@@ -115,7 +124,9 @@ describe('typegenPrinter', () => {
     // If the field has a resolver, we assume it's derived, otherwise
     // you'll need to supply a backing root type with more information.
     jest
+      // @ts-expect-error
       .spyOn(typegen, 'hasResolver')
+      // @ts-expect-error
       .mockImplementation((field: GraphQLField<any, any>, type: GraphQLObjectType | GraphQLInterfaceType) => {
         if (type.name === 'Query' || type.name === 'Mutation') {
           return true
@@ -125,11 +136,14 @@ describe('typegenPrinter', () => {
         }
         return false
       })
+    // @ts-expect-error
     expect(typegen.printObjectTypeMap()).toMatchSnapshot()
+    // @ts-expect-error
     expect(typegen.printRootTypeDef()).toMatchSnapshot()
   })
 
   it('should print a return type map', () => {
+    // @ts-expect-error
     expect(typegen.printFieldTypesMap()).toMatchSnapshot()
   })
 
