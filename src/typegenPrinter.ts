@@ -201,10 +201,7 @@ export class TypegenPrinter {
   }
 
   private printDynamicImport(forGlobal = false) {
-    const {
-      rootTypings,
-      dynamicFields: { dynamicInputFields, dynamicOutputFields },
-    } = this.schema.extensions.nexus.config
+    const { rootTypings } = this.schema.extensions.nexus.config
     const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
@@ -212,27 +209,19 @@ export class TypegenPrinter {
     const nexusSchemaImportId = this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name
 
     if (!this.printImports[nexusSchemaImportId]) {
-      if (
-        [dynamicInputFields, dynamicOutputFields].some((o) => Object.keys(o).length > 0) ||
-        this.hasDiscriminatedTypes === true
-      ) {
-        this.printImports[nexusSchemaImportId] = {
-          core: true,
-        }
-      }
-    }
-
-    if (contextTypeImport) {
-      const importPath = resolveImportPath(contextTypeImport, 'context', outputPath)
-      importMap[importPath] = importMap[importPath] || new Set()
-      importMap[importPath].add(
-        contextTypeImport.alias
-          ? `${contextTypeImport.export} as ${contextTypeImport.alias}`
-          : contextTypeImport.export
-      )
+      this.maybeAddCoreImport(forGlobal)
     }
 
     if (!forGlobal) {
+      if (contextTypeImport) {
+        const importPath = resolveImportPath(contextTypeImport, 'context', outputPath)
+        importMap[importPath] = importMap[importPath] || new Set()
+        importMap[importPath].add(
+          contextTypeImport.alias
+            ? `${contextTypeImport.export} as ${contextTypeImport.alias}`
+            : contextTypeImport.export
+        )
+      }
       eachObj(rootTypings, (rootType, typeName) => {
         if (typeof rootType !== 'string') {
           const importPath = resolveImportPath(rootType, typeName, outputPath)
@@ -242,11 +231,11 @@ export class TypegenPrinter {
           )
         }
       })
+      eachObj(importMap, (val, key) => {
+        imports.push(`import type { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
+      })
     }
 
-    eachObj(importMap, (val, key) => {
-      imports.push(`import type { ${Array.from(val).join(', ')} } from ${JSON.stringify(key)}`)
-    })
     eachObj(this.printImports, (val, key) => {
       const { default: def, ...rest } = val
       const idents = []
@@ -263,6 +252,28 @@ export class TypegenPrinter {
       imports.push(`import type ${idents.join(', ')} from ${JSON.stringify(key)}`)
     })
     return imports.join('\n')
+  }
+
+  private maybeAddCoreImport(forGlobal = false) {
+    const nexusSchemaImportId = this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name
+    const {
+      dynamicFields: { dynamicInputFields, dynamicOutputFields },
+    } = this.schema.extensions.nexus.config
+
+    let shouldAdd = false
+    const hasDynamicFields = [dynamicInputFields, dynamicOutputFields].some((o) => Object.keys(o).length > 0)
+
+    if (!this.typegenInfo.globalsPath) {
+      shouldAdd = hasDynamicFields || this.hasDiscriminatedTypes
+    } else {
+      shouldAdd = forGlobal ? hasDynamicFields : this.hasDiscriminatedTypes
+    }
+
+    if (shouldAdd) {
+      this.printImports[nexusSchemaImportId] = {
+        core: true,
+      }
+    }
   }
 
   private printDynamicInputFieldDefinitions() {
