@@ -55,7 +55,7 @@ type RootTypeMapping = Record<string, string | Record<string, [string, string]>>
 interface TypegenInfoWithFile extends TypegenInfo {
   typegenPath: string
   globalsPath?: string
-  globalsHeaders?: string
+  globalsHeaders?: string[]
   declareInputs?: boolean
 }
 
@@ -157,7 +157,8 @@ export class TypegenPrinter {
           this.typegenInfo.globalsPath ?? ''
         )}'`
       )
-      headers.unshift(this.typegenInfo.globalsHeaders ?? TYPEGEN_HEADER)
+      headers.unshift(...(this.typegenInfo.globalsHeaders ?? []))
+      headers.unshift(TYPEGEN_HEADER)
     }
 
     return headers.join('\n')
