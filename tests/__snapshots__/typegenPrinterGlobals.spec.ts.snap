@@ -16,7 +16,7 @@ declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-import type { TestContext } from \\"./../__helpers/index\\"
+
 
 
 declare global {

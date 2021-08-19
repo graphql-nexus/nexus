@@ -13,7 +13,7 @@ export interface TypegenMetadataConfig
   nexusSchemaImportId?: string
   outputs: {
     schema: null | string
-    typegen: null | string | ConfiguredTypegen
+    typegen: null | ConfiguredTypegen
   }
 }
 
@@ -162,7 +162,7 @@ export class TypegenMetadata {
     if (this.config.sourceTypes) {
       return typegenAutoConfig(this.config.sourceTypes, this.config.contextType)(
         schema,
-        typegenPath || this.normalizeTypegenPath(this.config.outputs.typegen) || ''
+        typegenPath || this.config.outputs.typegen?.outputPath || ''
       )
     }
 
@@ -173,9 +173,5 @@ export class TypegenMetadata {
       contextTypeImport: this.config.contextType,
       sourceTypeMap: {},
     }
-  }
-
-  private normalizeTypegenPath(typegen: string | ConfiguredTypegen | null) {
-    return typeof typegen === 'string' ? typegen : typegen ? typegen.outputPath : null
   }
 }
