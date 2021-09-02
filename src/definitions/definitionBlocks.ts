@@ -129,7 +129,9 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
    *   directives: [useDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
-} & NexusGenPluginFieldConfig<TypeName, FieldName>
+} & NexusGenPluginFieldConfig<TypeName, FieldName> &
+  NexusGenPluginInputFieldConfig<TypeName, FieldName>
+
 export interface OutputScalarConfig<TypeName extends string, FieldName extends string>
   extends CommonOutputFieldConfig<TypeName, FieldName> {
   /**

@@ -49,7 +49,9 @@ describe('sourceTypes', () => {
   beforeEach(async () => {
     metadata = new TypegenMetadata({
       outputs: {
-        typegen: path.join(__dirname, 'test-gen.ts'),
+        typegen: {
+          outputPath: path.join(__dirname, 'test-gen.ts'),
+        },
         schema: path.join(__dirname, 'test-gen.graphql'),
       },
       sourceTypes: {
@@ -75,6 +77,7 @@ describe('sourceTypes', () => {
       typegenPath: '',
     })
 
+    // @ts-expect-error
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 
@@ -86,6 +89,7 @@ describe('sourceTypes', () => {
       typegenPath: '',
     })
 
+    // @ts-expect-error
     expect(typegen.printEnumTypeMap()).toMatchSnapshot()
   })
 })

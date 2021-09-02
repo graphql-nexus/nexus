@@ -1,5 +1,6 @@
-import { GraphQLSchema, isObjectType, specifiedDirectives } from 'graphql'
-import { SchemaBuilder, SchemaConfig } from './builder'
+import { GraphQLNamedType, GraphQLSchema, isObjectType, specifiedDirectives } from 'graphql'
+import { isNexusObjectTypeDef } from './definitions/wrapping'
+import { ConfiguredTypegen, SchemaBuilder, SchemaConfig } from './builder'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TypegenMetadata } from './typegenMetadata'
 import { resolveTypegenConfig } from './typegenUtils'
@@ -21,10 +22,17 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
     // in the optional thunk for the typegen config
     const typegenPromise = new TypegenMetadata(typegenConfig).generateArtifacts(schema, hasSDLDirectives)
     if (config.shouldExitAfterGenerateArtifacts) {
+      let typegenPath = '(not enabled)'
+      if (typegenConfig.outputs.typegen) {
+        typegenPath = typegenConfig.outputs.typegen.outputPath
+        if (typegenConfig.outputs.typegen.globalsPath) {
+          typegenPath += ` / ${typegenConfig.outputs.typegen.globalsPath}`
+        }
+      }
       typegenPromise
         .then(() => {
           console.log(`Generated Artifacts:
-          TypeScript Types  ==> ${typegenConfig.outputs.typegen || '(not enabled)'}
+          TypeScript Types  ==> ${typegenPath}
           GraphQL Schema    ==> ${typegenConfig.outputs.schema || '(not enabled)'}`)
           process.exit(0)
         })
@@ -59,28 +67,49 @@ export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQL
  */
 generateSchema.withArtifacts = async (
   config: SchemaConfig,
-  typeFilePath: string | null = null
+  typegen: string | null | ConfiguredTypegen = null
 ): Promise<{
   schema: NexusGraphQLSchema
   schemaTypes: string
   tsTypes: string
+  globalTypes: string | null
 }> => {
   const { schema, missingTypes, finalConfig, hasSDLDirectives } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  const { schemaTypes, tsTypes } = await new TypegenMetadata(typegenConfig).generateArtifactContents(
-    schema,
-    typeFilePath,
-    hasSDLDirectives
-  )
+  const { schemaTypes, tsTypes, globalTypes } = await new TypegenMetadata(
+    typegenConfig
+  ).generateArtifactContents(schema, typegen, hasSDLDirectives)
   assertNoMissingTypes(schema, missingTypes)
   runAbstractTypeRuntimeChecks(schema, finalConfig.features)
-  return { schema, schemaTypes, tsTypes }
+  return { schema, schemaTypes, tsTypes, globalTypes }
 }
 
 /** Builds the schema, we may return more than just the schema from this one day. */
 export function makeSchemaInternal(config: SchemaConfig) {
   const builder = new SchemaBuilder(config)
   builder.addTypes(config.types)
+  if (config.schemaRoots) {
+    builder.addTypes(config.schemaRoots)
+  }
+
+  function getRootType(rootType: 'query' | 'mutation' | 'subscription', defaultType: string) {
+    const rootTypeVal = config.schemaRoots?.[rootType] ?? defaultType
+    let returnVal: null | GraphQLNamedType = null
+    if (typeof rootTypeVal === 'string') {
+      returnVal = typeMap[rootTypeVal]
+    } else if (rootTypeVal) {
+      if (isNexusObjectTypeDef(rootTypeVal)) {
+        returnVal = typeMap[rootTypeVal.name]
+      } else if (isObjectType(rootTypeVal)) {
+        returnVal = typeMap[rootTypeVal.name]
+      }
+    }
+    if (returnVal && !isObjectType(returnVal)) {
+      throw new Error(`Expected ${rootType} to be a objectType, saw ${returnVal.constructor.name}`)
+    }
+    return returnVal
+  }
+
   const {
     finalConfig,
     typeMap,
@@ -91,25 +120,11 @@ export function makeSchemaInternal(config: SchemaConfig) {
     schemaDirectives,
     hasSDLDirectives,
   } = builder.getFinalTypeMap()
-  const { Query, Mutation, Subscription } = typeMap
-
-  /* istanbul ignore next */
-  if (!isObjectType(Query)) {
-    throw new Error(`Expected Query to be a objectType, saw ${Query.constructor.name}`)
-  }
-  /* istanbul ignore next */
-  if (Mutation && !isObjectType(Mutation)) {
-    throw new Error(`Expected Mutation to be a objectType, saw ${Mutation.constructor.name}`)
-  }
-  /* istanbul ignore next */
-  if (Subscription && !isObjectType(Subscription)) {
-    throw new Error(`Expected Subscription to be a objectType, saw ${Subscription.constructor.name}`)
-  }
 
   const schema = new GraphQLSchema({
-    query: Query,
-    mutation: Mutation,
-    subscription: Subscription,
+    query: getRootType('query', 'Query'),
+    mutation: getRootType('mutation', 'Mutation'),
+    subscription: getRootType('subscription', 'Subscription'),
     types: objValues(typeMap),
     extensions: {
       ...config.extensions,

@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`builder can replace the Mutation root type with an alternate type 1`] = `
+"schema {
+  query: Query
+  mutation: RootMutation
+}
+
+type Mutation {
+  ok: String
+}
+
+type Query {
+  ok: Boolean!
+}
+
+type RootMutation {
+  name: String
+}
+"
+`;
+
+exports[`builder can replace the Query root type with an alternate type 1`] = `
+"schema {
+  query: RootQuery
+}
+
+type Query {
+  ok: String
+}
+
+type RootQuery {
+  name: String
+}
+"
+`;
+
+exports[`builder can replace the Subscription root type with an alternate type 1`] = `
+"schema {
+  query: Query
+  subscription: RootSubscription
+}
+
+type Query {
+  ok: Boolean!
+}
+
+type RootSubscription {
+  name: String
+}
+
+type Subscription {
+  ok: String
+}
+"
+`;

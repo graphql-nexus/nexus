@@ -21,7 +21,11 @@ const schema = makeSchema({
   types,
   outputs: {
     schema: path.join(__dirname, '../kitchen-sink-schema.graphql'),
-    typegen: path.join(__dirname, './kitchen-sink.gen.ts'),
+    typegen: {
+      outputPath: path.join(__dirname, './kitchen-sink.gen.ts'),
+      globalsPath: path.join(__dirname, './kitchen-sink-globals.gen.ts'),
+      declareInputs: true,
+    },
   },
   plugins: [
     NodePlugin,

@@ -1,6 +1,7 @@
 import { GraphQLSchema, lexicographicSortSchema, printSchema } from 'graphql'
 import * as path from 'path'
 import type { BuilderConfigInput, TypegenInfo } from './builder'
+import type { ConfiguredTypegen } from './core'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
 import { printSchemaWithDirectives } from './printSchemaWithDirectives'
@@ -13,7 +14,7 @@ export interface TypegenMetadataConfig
   nexusSchemaImportId?: string
   outputs: {
     schema: null | string
-    typegen: null | string
+    typegen: null | ConfiguredTypegen
   }
 }
 
@@ -27,31 +28,50 @@ export class TypegenMetadata {
   /** Generates the artifacts of the build based on what we know about the schema and how it was defined. */
   async generateArtifacts(schema: NexusGraphQLSchema, hasSDLDirectives: boolean) {
     const sortedSchema = this.sortSchema(schema)
-    if (this.config.outputs.schema || this.config.outputs.typegen) {
-      const { schemaTypes, tsTypes } = await this.generateArtifactContents(
+    const { typegen } = this.config.outputs
+    if (this.config.outputs.schema || typegen) {
+      const { schemaTypes, tsTypes, globalTypes } = await this.generateArtifactContents(
         sortedSchema,
-        this.config.outputs.typegen,
+        typegen,
         hasSDLDirectives
       )
       if (this.config.outputs.schema) {
         await this.writeFile('schema', schemaTypes, this.config.outputs.schema)
       }
-      if (this.config.outputs.typegen) {
-        await this.writeFile('types', tsTypes, this.config.outputs.typegen)
+      if (typegen) {
+        if (typeof typegen === 'string') {
+          await this.writeFile('types', tsTypes, typegen)
+        } else {
+          await this.writeFile('types', tsTypes, typegen.outputPath)
+          if (typeof typegen.globalsPath === 'string') {
+            await this.writeFile('types', globalTypes ?? '', typegen.globalsPath)
+          }
+        }
       }
     }
   }
 
   async generateArtifactContents(
     schema: NexusGraphQLSchema,
-    typeFilePath: string | null,
+    typegen: string | null | ConfiguredTypegen,
     hasSDLDirectives: boolean
   ) {
-    const [schemaTypes, tsTypes] = await Promise.all([
-      this.generateSchemaFile(schema, hasSDLDirectives),
-      typeFilePath ? this.generateTypesFile(schema, typeFilePath) : '',
-    ])
-    return { schemaTypes, tsTypes }
+    const result = {
+      schemaTypes: this.generateSchemaFile(schema, hasSDLDirectives),
+      tsTypes: '',
+      globalTypes: null as null | string,
+    }
+    if (!typegen) {
+      return result
+    }
+    if (typeof typegen === 'string') {
+      result.tsTypes = await this.generateTypesFile(schema, typegen)
+    } else {
+      const generateResult = await this.generateConfiguredTypes(schema, typegen)
+      result.tsTypes = generateResult.tsTypes
+      result.globalTypes = generateResult.globalTypes
+    }
+    return result
   }
 
   sortSchema(schema: NexusGraphQLSchema) {
@@ -122,9 +142,24 @@ export class TypegenMetadata {
     const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
 
     return new TypegenPrinter(schema, {
+      declareInputs: false,
       ...typegenInfo,
       typegenPath,
     }).print()
+  }
+
+  /** Generates the type definitions */
+  async generateConfiguredTypes(schema: NexusGraphQLSchema, typegen: ConfiguredTypegen) {
+    const { outputPath: typegenPath, globalsPath, globalsHeaders, declareInputs = false } = typegen
+    const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
+
+    return new TypegenPrinter(schema, {
+      ...typegenInfo,
+      typegenPath,
+      globalsPath,
+      globalsHeaders,
+      declareInputs,
+    }).printConfigured()
   }
 
   async getTypegenInfo(schema: GraphQLSchema, typegenPath?: string): Promise<TypegenInfo> {
@@ -137,7 +172,7 @@ export class TypegenMetadata {
     if (this.config.sourceTypes) {
       return typegenAutoConfig(this.config.sourceTypes, this.config.contextType)(
         schema,
-        typegenPath || this.config.outputs.typegen || ''
+        typegenPath || this.config.outputs.typegen?.outputPath || ''
       )
     }
 
