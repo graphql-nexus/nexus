@@ -1,3 +1,4 @@
+import type { GraphQLSchema } from 'graphql'
 import { ConfiguredTypegen, makeSchemaInternal, SchemaConfig } from './builder'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TypegenMetadata } from './typegenMetadata'
@@ -10,7 +11,7 @@ import { assertNoMissingTypes, runAbstractTypeRuntimeChecks } from './utils'
  *
  * Requires at least one type be named "Query", which will be used as the root query type.
  */
-export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
+export function makeSchema(config: SchemaConfig): GraphQLSchema {
   const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   const sdl = typegenConfig.outputs.schema

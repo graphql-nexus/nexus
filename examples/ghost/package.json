@@ -9,7 +9,7 @@
     "dataloader": "tgriesser/dataloader.git#ts-types",
     "express": "^4.16.4",
     "ghost": "^3.35.3",
-    "graphql": "^15.3.0",
+    "graphql": "^16.0.0-rc.2",
     "graphql-scalars": "^1.2.6",
     "graphql-tools": "^4.0.7",
     "knex": "^0.19.5",

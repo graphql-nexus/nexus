@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "apollo-server": "^2.18.1",
-    "graphql": "^15.3.0",
+    "graphql": "^16.0.0-rc.2",
     "graphql-query-complexity": "^0.4.1",
     "graphql-relay": "^0.6.0",
     "graphql-subscriptions": "^1.0.0",

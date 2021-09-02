@@ -20,7 +20,7 @@
     "@prisma/client": "2.14.0",
     "apollo-server-express": "^2.19.1",
     "express": "^4.17.1",
-    "graphql": "^15.3.0",
+    "graphql": "^16.0.0-rc.2",
     "nexus": "^1.0.0"
   },
   "devDependencies": {

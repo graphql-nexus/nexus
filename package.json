@@ -84,7 +84,7 @@
     "dripip": "^0.10.0",
     "eslint": "^6.6.0",
     "get-port": "^5.1.1",
-    "graphql": "^16.0.0-rc.1",
+    "graphql": "^16.0.0-rc.2",
     "graphql-relay": "^0.6.0",
     "graphql-scalars": "^1.2.6",
     "gulp": "4.0.2",

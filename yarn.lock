@@ -3402,7 +3402,7 @@ graphql@^15.1.0:
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.3.0.tgz#3ad2b0caab0d110e3be4a5a9b2aa281e362b5278"
   integrity sha512-GTCJtzJmkFLWRfFJuoo9RWWa/FfamUHgiFosxi/X1Ani4AVWbeyBenZTNX6dM+7WSbbFfTo/25eh0LLkwHMw2w==
 
-graphql@^16.0.0-rc.1:
+graphql@^16.0.0-rc.2:
   version "16.0.0-rc.2.experimental-stream-defer.3"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.0.0-rc.2.experimental-stream-defer.3.tgz#3487d10c42eae8fff6b2a9f0d3fb8b59a7695f9f"
   integrity sha512-++JcxPCvCvlKvH4AniHbZzC4JmflOrPYUp2M/OEr+QgiESqSDBLiaxR/TuoTm8kyC3s7dqyr8NZqF36SqPFFDg==

@@ -25,7 +25,8 @@ import type { RequiredDeeply } from '../typeHelpersInternal'
 
 export type { AbstractTypes }
 
-export type Maybe<T> = T | null
+/** Conveniently represents flow's "Maybe" type https://flow.org/en/docs/types/maybe/ */
+export type Maybe<T> = null | undefined | T
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
