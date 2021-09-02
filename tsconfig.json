@@ -11,7 +11,8 @@
     "importHelpers": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "importsNotUsedAsValues": "error"
+    "importsNotUsedAsValues": "error",
+    "stripInternal": true
   },
   "exclude": [
     "./examples",

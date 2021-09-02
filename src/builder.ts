@@ -107,6 +107,7 @@ import type {
 import type { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
 import type { DynamicOutputPropertyDef } from './dynamicProperty'
 import {
+  hasNexusExtension,
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
   NexusInterfaceTypeExtension,
@@ -142,6 +143,7 @@ import {
   mapValues,
   objValues,
   UNKNOWN_TYPE_SCALAR,
+  unpack,
 } from './utils'
 import {
   NEXUS_BUILD,
@@ -484,8 +486,8 @@ export class SchemaBuilder {
 
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls it into an internal "type registry". It also
-   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so you
-   * can define types anonymously, without exporting them.
+   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so
+   * you can define types anonymously, without exporting them.
    */
   addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusMeta(typeDef)) {
@@ -651,7 +653,7 @@ export class SchemaBuilder {
     config: ReturnType<GraphQLObjectType['toConfig'] | GraphQLInterfaceType['toConfig']>
   ) {
     const { fields, ...rest } = config
-    const fieldsConfig = typeof fields === 'function' ? fields() : fields
+    const fieldsConfig = unpack(fields)
     return mapValues(fieldsConfig, (val, key) => {
       const { resolve, type, ...fieldConfig } = val
       const finalType = this.replaceNamedType(type)
@@ -1127,7 +1129,7 @@ export class SchemaBuilder {
         name: 'Query',
         fields: {
           ok: {
-            type: GraphQLNonNull(GraphQLBoolean),
+            type: new GraphQLNonNull(GraphQLBoolean),
             resolve: () => true,
           },
         },
@@ -1183,16 +1185,18 @@ export class SchemaBuilder {
         if (modifications[field]) {
           // TODO(tim): Refactor this whole mess
           const { type, field: _field, args, extensions, ...rest } = modifications[field]
-          const extensionConfig: NexusOutputFieldConfig<any, any> = extensions?.nexus?.config ?? {}
+          const extensionConfig: NexusOutputFieldConfig<any, any> = hasNexusExtension(extensions?.nexus)
+            ? extensions?.nexus?.config ?? {}
+            : {}
           interfaceFieldsMap[field] = {
             ...interfaceFieldsMap[field],
             ...rest,
             extensions: {
               ...interfaceField.extensions,
               ...extensions,
-              nexus:
-                interfaceField.extensions?.nexus?.modify(extensionConfig) ??
-                new NexusFieldExtension(extensionConfig),
+              nexus: hasNexusExtension(interfaceField.extensions?.nexus)
+                ? interfaceField.extensions?.nexus?.modify(extensionConfig)
+                : new NexusFieldExtension(extensionConfig),
             },
           }
           if (typeof type !== 'undefined') {

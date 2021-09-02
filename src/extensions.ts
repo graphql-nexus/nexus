@@ -6,6 +6,11 @@ import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import type { NexusInterfaceTypeConfig } from './definitions/interfaceType'
 import type { NexusObjectTypeConfig } from './definitions/objectType'
 
+/** @internal */
+export function hasNexusExtension(val: any): val is any {
+  return Boolean(val)
+}
+
 export type NexusGraphQLNamedType = GraphQLNamedType & {
   extensions?: {
     nexus?: {

@@ -26,6 +26,7 @@ import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './defini
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
 import type { StringLike } from './plugin'
+import { hasNexusExtension } from './extensions'
 import {
   eachObj,
   getOwnPackage,
@@ -62,11 +63,10 @@ interface TypegenInfoWithFile extends TypegenInfo {
 /**
  * We track and output a few main things:
  *
- * 1. "root" types, or the values that fill the first argument for a given object type
- * 2. "arg" types, the values that are arguments to output fields.
- * 3. "return" types, the values returned from the resolvers... usually just list/nullable variations on the
- *    "root" types for other types
- * 4. The names of all types, grouped by type.
+ * 1. "root" types, or the values that fill the first argument for a given object type 2. "arg" types, the
+ * values that are arguments to output fields. 3. "return" types, the values returned from the resolvers...
+ * usually just list/nullable variations on the
+ *     "root" types for other types 4. The names of all types, grouped by type.
  *
  * - Non-scalar types will get a dedicated "Root" type associated with it
  */
@@ -368,7 +368,7 @@ export class TypegenPrinter {
 
   private printInheritedFieldMap() {
     const hasInterfaces: (
-      | (GraphQLInterfaceType & { getInterfaces(): GraphQLInterfaceType[] })
+      | (GraphQLInterfaceType & { getInterfaces(): ReadonlyArray<GraphQLInterfaceType> })
       | GraphQLObjectType
     )[] = []
     const withInterfaces = hasInterfaces
@@ -619,7 +619,7 @@ export class TypegenPrinter {
     // Used in test mocking
     _type: GraphQLObjectType
   ) {
-    if (field.extensions && field.extensions.nexus) {
+    if (field.extensions && hasNexusExtension(field.extensions.nexus)) {
       return field.extensions.nexus.hasDefinedResolver
     }
     return Boolean(field.resolve)
@@ -914,17 +914,19 @@ export class TypegenPrinter {
       .join('\n')
   }
 
-  private printObj =
-    (space: string, source: string) => (val: Record<string, [string, string]>, key: string) => {
-      return [`${space}${key}: { // ${source}`]
-        .concat(
-          mapObj(val, (v2, k2) => {
-            return `${space}  ${k2}${v2[0]} ${v2[1]}`
-          })
-        )
-        .concat(`${space}}`)
-        .join('\n')
-    }
+  private printObj = (space: string, source: string) => (
+    val: Record<string, [string, string]>,
+    key: string
+  ) => {
+    return [`${space}${key}: { // ${source}`]
+      .concat(
+        mapObj(val, (v2, k2) => {
+          return `${space}  ${k2}${v2[0]} ${v2[1]}`
+        })
+      )
+      .concat(`${space}}`)
+      .join('\n')
+  }
 
   private printScalar(type: GraphQLScalarType) {
     if (isSpecifiedScalarType(type)) {
