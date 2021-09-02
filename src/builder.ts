@@ -1716,7 +1716,6 @@ export function makeSchemaInternal(config: SchemaConfig) {
     builder.addTypes(config.schemaRoots)
   }
   const { finalConfig, typeMap, missingTypes, schemaExtension, onAfterBuildFns } = builder.getFinalTypeMap()
-  const { Query, Mutation, Subscription } = typeMap
 
   function getRootType(rootType: 'query' | 'mutation' | 'subscription', defaultType: string) {
     const rootTypeVal = config.schemaRoots?.[rootType] ?? defaultType
@@ -1734,19 +1733,6 @@ export function makeSchemaInternal(config: SchemaConfig) {
       throw new Error(`Expected ${rootType} to be a objectType, saw ${returnVal.constructor.name}`)
     }
     return returnVal
-  }
-
-  /* istanbul ignore next */
-  if (!isObjectType(Query)) {
-    throw new Error(`Expected Query to be a objectType, saw ${Query.constructor.name}`)
-  }
-  /* istanbul ignore next */
-  if (Mutation && !isObjectType(Mutation)) {
-    throw new Error(`Expected Mutation to be a objectType, saw ${Mutation.constructor.name}`)
-  }
-  /* istanbul ignore next */
-  if (Subscription && !isObjectType(Subscription)) {
-    throw new Error(`Expected Subscription to be a objectType, saw ${Subscription.constructor.name}`)
   }
 
   const schema = new GraphQLSchema({
