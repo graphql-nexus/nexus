@@ -4,12 +4,11 @@ declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface InlineInputType {
-  abc: number // Int!
-}
-
 export interface NexusGenInputs {
-  InlineInputType: InlineInputType
+  InlineInputType: {
+    // input type
+    abc: number // Int!
+  }
 }
 
 export interface NexusGenEnums {}
@@ -63,18 +62,16 @@ export interface NexusGenFieldTypeNames {
   }
 }
 
-export interface DeclarativeWrappingOutputSomeListOfListsArgs {
-  int: number // Int!
-}
-
-export interface DeclarativeWrappingOutputSomeNullFieldArgs {
-  input?: InlineInputType | null // InlineInputType
-}
-
 export interface NexusGenArgTypes {
   DeclarativeWrappingOutput: {
-    someListOfLists: DeclarativeWrappingOutputSomeListOfListsArgs
-    someNullField: DeclarativeWrappingOutputSomeNullFieldArgs
+    someListOfLists: {
+      // args
+      int: number // Int!
+    }
+    someNullField: {
+      // args
+      input?: NexusGenInputs['InlineInputType'] | null // InlineInputType
+    }
   }
 }
 

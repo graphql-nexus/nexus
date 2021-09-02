@@ -192,7 +192,7 @@ export interface ConfiguredTypegen {
   /**
    * If "true", declares dedicated interfaces for any inputs / args
    *
-   * @default true
+   * @default false
    */
   declareInputs?: boolean
 }
