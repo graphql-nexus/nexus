@@ -24,7 +24,7 @@ describe('wrapping', () => {
     })
 
     it('should wrap if the type is a GraphQL type', () => {
-      const x = normalizeArgWrapping(nonNull(list(GraphQLList(GraphQLString))))
+      const x = normalizeArgWrapping(nonNull(list(new GraphQLList(GraphQLString))))
       expect(x).toBeInstanceOf(NexusArgDef)
     })
   })

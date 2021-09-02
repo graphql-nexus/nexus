@@ -107,8 +107,7 @@ it('defines a field on the mutation type as shorthand', async () => {
       someInt: Int
       someInts: [Int]
       someString: String
-    }
-    "
+    }"
   `)
 
   expect(

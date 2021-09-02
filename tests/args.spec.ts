@@ -44,17 +44,17 @@ beforeAll(() => {
 
 it('can be implemented by object types', async () => {
   expect(
-    await graphql(
+    await graphql({
       schema,
-      `
-        {
-          user(int: 1, bool: true, float: 123.45, str: "Test") {
-            id
-            name
-          }
+      source: `
+      {
+        user(int: 1, bool: true, float: 123.45, str: "Test") {
+          id
+          name
         }
-      `
-    )
+      }
+    `,
+    })
   ).toMatchSnapshot()
 })
 

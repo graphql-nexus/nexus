@@ -2,6 +2,7 @@ import { graphql } from 'graphql'
 import path from 'path'
 import { fieldAuthorizePlugin, makeSchema, objectType, queryField } from '../../src'
 import { generateSchema, declarativeWrappingPlugin } from '../../src/core'
+import { ensureResult } from '../__helpers/ensureResult'
 
 describe('fieldAuthorizePlugin', () => {
   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -85,18 +86,19 @@ describe('fieldAuthorizePlugin', () => {
     ],
   })
   const mockCtx = { user: { id: 1 } }
-  const testField = (field: string, passes = false, schema = testSchema) => {
-    return graphql(
-      schema,
-      `
+  const testField = async (field: string, passes = false, schema = testSchema) => {
+    return ensureResult(
+      await graphql({
+        schema,
+        source: `
         {
           ${field} {
             id
           }
         }
       `,
-      {},
-      mockCtx
+        contextValue: mockCtx,
+      })
     )
   }
 

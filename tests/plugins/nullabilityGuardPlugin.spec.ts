@@ -10,6 +10,7 @@ import {
   queryField,
   unionType,
 } from '../../src'
+import { ensureResult } from '../__helpers/ensureResult'
 
 type NullabilityGuardConfig = nullabilityGuardPluginCore.NullabilityGuardConfig
 
@@ -41,7 +42,7 @@ const types = [
     description: 'Showing that the defaults works for all resolvers, not just Nexus ones',
     fields: () => ({
       id: {
-        type: GraphQLNonNull(GraphQLID),
+        type: new GraphQLNonNull(GraphQLID),
       },
     }),
   }),
@@ -147,15 +148,17 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should trigger the nullability guard', async () => {
-    const { errors = [], data } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           getUserWithGuard {
             id
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.getUserWithGuard).toEqual({ id: 'User:N/A' })
@@ -163,13 +166,15 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should fill ints with a default', async () => {
-    const { errors = [], data } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           intList
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.intList).toEqual([1, 2, -1])
@@ -177,15 +182,17 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should fill with defaults', async () => {
-    const { errors = [], data } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           userList {
             id
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.userList).toEqual([{ id: 'User:N/A' }, { id: 'User:N/A' }, { id: 'User:N/A' }])
@@ -194,15 +201,17 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should guard on GraphQLObjectType fields', async () => {
-    const { errors = [], data } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           objType {
             id
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.objType).toEqual({ id: 'SomeObjectType:N/A' })
@@ -210,9 +219,10 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should guard interface types', async () => {
-    const { errors = [], data } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           interfaceType {
             __typename
@@ -225,7 +235,8 @@ describe('nullabilityGuardPlugin', () => {
             }
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.interfaceType).toEqual({
@@ -238,33 +249,34 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should guard union types', async () => {
-    const { errors = [], data } = await graphql(
-      makeSchema({
-        outputs: false,
-        nonNullDefaults: {
-          output: true,
-        },
-        types: [
-          types,
-          unionType({
-            name: 'UserOrAccount',
-            definition(t) {
-              t.members('User', 'Account')
-            },
-          }),
-          queryField('unionType', {
-            type: 'UserOrAccount',
-            resolve: () => null,
-          }),
-        ],
-        plugins: [nullPlugin()],
-        features: {
-          abstractTypeStrategies: {
-            resolveType: true,
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: makeSchema({
+          outputs: false,
+          nonNullDefaults: {
+            output: true,
           },
-        },
-      }),
-      `
+          types: [
+            types,
+            unionType({
+              name: 'UserOrAccount',
+              definition(t) {
+                t.members('User', 'Account')
+              },
+            }),
+            queryField('unionType', {
+              type: 'UserOrAccount',
+              resolve: () => null,
+            }),
+          ],
+          plugins: [nullPlugin()],
+          features: {
+            abstractTypeStrategies: {
+              resolveType: true,
+            },
+          },
+        }),
+        source: `
         {
           unionType {
             __typename
@@ -278,7 +290,8 @@ describe('nullabilityGuardPlugin', () => {
             }
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.unionType).toEqual({
@@ -294,13 +307,15 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('should guard on enumType fields', async () => {
-    const { errors = [], data } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           enumType
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.enumType).toEqual('A')
@@ -322,15 +337,17 @@ describe('nullabilityGuardPlugin', () => {
         },
       },
     })
-    const { errors = [], data } = await graphql(
-      schema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: schema,
+        source: `
         {
           getUserWithGuard {
             id
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toEqual([])
     expect(data!.getUserWithGuard).toEqual({ id: 'User:N/A' })
@@ -352,15 +369,17 @@ describe('nullabilityGuardPlugin', () => {
         },
       },
     })
-    const { errors = [], data } = await graphql(
-      schema,
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: schema,
+        source: `
         {
           getUserWithGuard {
             id
           }
         }
-      `
+      `,
+      })
     )
     expect(errors).toHaveLength(1)
     expect(errors[0].message).toEqual('Cannot return null for non-nullable field User.id.')
@@ -379,15 +398,17 @@ describe('nullabilityGuardPlugin', () => {
         },
       },
     })
-    const { errors: errors2 = [], data: data2 } = await graphql(
-      schema2,
-      `
+    const { errors: errors2 = [], data: data2 } = ensureResult(
+      await graphql({
+        schema: schema2,
+        source: `
         {
           getUserWithGuard {
             id
           }
         }
-      `
+      `,
+      })
     )
     expect(errors2).toEqual([])
     expect(data2!.getUserWithGuard).toEqual({ id: 'User:N/A' })
@@ -442,13 +463,15 @@ describe('nullabilityGuardPlugin', () => {
   })
 
   it('will still fail if it cant handle with a guard', async () => {
-    const { errors = [] } = await graphql(
-      defaultSchema,
-      `
+    const { errors = [] } = ensureResult(
+      await graphql({
+        schema: defaultSchema,
+        source: `
         {
           shouldFail
         }
-      `
+      `,
+      })
     )
     expect(errors).toHaveLength(1)
     expect(errors[0].message).toEqual('Cannot return null for non-nullable field Query.shouldFail.')
@@ -456,26 +479,28 @@ describe('nullabilityGuardPlugin', () => {
 
   it('will return null for nullable list values', async () => {
     const onGuardedMock = jest.fn()
-    const { errors = [], data } = await graphql(
-      makeSchema({
-        types: [
-          queryField('nullableList', {
-            type: list('String'),
-            resolve: async () => null,
-          }),
-        ],
-        outputs: false,
-        plugins: [
-          nullPlugin({
-            onGuarded: onGuardedMock,
-          }),
-        ],
-      }),
-      `
+    const { errors = [], data } = ensureResult(
+      await graphql({
+        schema: makeSchema({
+          types: [
+            queryField('nullableList', {
+              type: list('String'),
+              resolve: async () => null,
+            }),
+          ],
+          outputs: false,
+          plugins: [
+            nullPlugin({
+              onGuarded: onGuardedMock,
+            }),
+          ],
+        }),
+        source: `
         {
           nullableList
         }
-      `
+      `,
+      })
     )
     expect(errors).toHaveLength(0)
     expect(data!.nullableList).toEqual(null)

@@ -21,6 +21,5 @@ type Foo implements Node2 & Node {
 
 type Query {
   ok: Boolean!
-}
-"
+}"
 `;

@@ -1,5 +1,6 @@
 import { graphql } from 'graphql'
 import { makeSchema, queryType, scalarType } from '../src'
+import { ensureResult } from './__helpers/ensureResult'
 
 describe('custom scalars', () => {
   it('resolve custom scalar with inline functions', async () => {
@@ -25,12 +26,12 @@ describe('custom scalars', () => {
       ],
       outputs: false,
     })
-    const query = `
+    const source = `
       {
         testDate
       }
     `
-    const result = await graphql(schema, query)
+    const result = ensureResult(await graphql({ schema, source }))
     expect(result.data!.testDate).toBe(now.getTime())
   })
 })

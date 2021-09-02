@@ -13,6 +13,7 @@ import {
 } from '../src/core'
 import { nullabilityGuardPlugin } from '../src/plugins'
 import { EXAMPLE_SDL } from './_sdl'
+import { ensureResult } from './__helpers/ensureResult'
 
 const nullGuardPlugin = nullabilityGuardPlugin({
   shouldGuard: true,
@@ -62,9 +63,9 @@ describe('plugin', () => {
         },
       },
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           user {
             id
@@ -80,8 +81,8 @@ describe('plugin', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(lifecycleCalls).toMatchSnapshot()
     expect(beforeCalls).toMatchSnapshot()
     expect(afterCalls).toMatchSnapshot()
@@ -213,14 +214,14 @@ describe('plugin', () => {
         }),
       ],
     })
-    await graphql(
+    await graphql({
       schema,
-      `
+      source: `
         {
           testCompose
         }
-      `
-    )
+      `,
+    })
     expect(calls).toMatchSnapshot()
   })
 
@@ -277,9 +278,10 @@ describe('plugin', () => {
         }),
       ],
     })
-    const result = await graphql(
-      schema,
-      `
+    const result = ensureResult(
+      await graphql({
+        schema,
+        source: `
         {
           getNode {
             __typename
@@ -289,7 +291,8 @@ describe('plugin', () => {
             }
           }
         }
-      `
+      `,
+      })
     )
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
   })
@@ -425,14 +428,14 @@ describe('plugin', () => {
         }),
       ],
     })
-    await graphql(
+    await graphql({
       schema,
-      `
+      source: `
         {
           testCompose
         }
-      `
-    )
+      `,
+    })
     expect(calls).toMatchSnapshot()
   })
 })

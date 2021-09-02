@@ -51,9 +51,9 @@ describe('unionType', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           fragment UserOrErrorFields on UserOrError {
             __typename
             ... on User {
@@ -72,8 +72,8 @@ describe('unionType', () => {
               ...UserOrErrorFields
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
 })

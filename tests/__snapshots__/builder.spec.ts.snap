@@ -16,8 +16,7 @@ type Query {
 
 type RootMutation {
   name: String
-}
-"
+}"
 `;
 
 exports[`builder can replace the Query root type with an alternate type 1`] = `
@@ -31,8 +30,7 @@ type Query {
 
 type RootQuery {
   name: String
-}
-"
+}"
 `;
 
 exports[`builder can replace the Subscription root type with an alternate type 1`] = `
@@ -51,6 +49,5 @@ type RootSubscription {
 
 type Subscription {
   ok: String
-}
-"
+}"
 `;

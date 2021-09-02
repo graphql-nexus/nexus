@@ -13,6 +13,7 @@ import { connectionFromArray } from 'graphql-relay'
 import { arg, connectionPlugin, makeSchema, nonNull, objectType } from '../../src'
 import { generateSchema, SchemaConfig, scalarType, queryField } from '../../src/core'
 import type { ConnectionFieldConfig, ConnectionPluginConfig } from '../../src/plugins/connectionPlugin'
+import { ensureResult } from '../__helpers/ensureResult'
 
 const userNodes: { id: string; name: string }[] = []
 for (let i = 0; i < 10; i++) {
@@ -96,7 +97,7 @@ const DeltaFirst = parse(
 )
 
 const executeOk = async (args: ExecutionArgs) => {
-  const result = await execute(args)
+  const result = ensureResult(await execute(args))
   expect(result.errors).toBeUndefined()
   return result
 }
