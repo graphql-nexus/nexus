@@ -69,6 +69,7 @@ import {
   AllNexusNamedInputTypeDefs,
   AllNexusNamedOutputTypeDefs,
   AllNexusNamedTypeDefs,
+  AllNexusOutputTypeDefs,
   finalizeWrapping,
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
@@ -283,6 +284,15 @@ export type SchemaConfig = BuilderConfigInput & {
    * the values, if it's an array we flatten out the valid types, ignoring invalid ones.
    */
   types: any
+  /**
+   * If we wish to override the "Root" type for the schema, we can do so by specifying the rootTypes option,
+   * which will replace the default roots of Query / Mutation / Subscription
+   */
+  schemaRoots?: {
+    query?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+    mutation?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+    subscription?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+  }
   /**
    * Whether we should process.exit after the artifacts are generated. Useful if you wish to explicitly
    * generate the test artifacts at a certain stage in a startup or build process.
@@ -1702,8 +1712,29 @@ export interface BuildTypes<TypeMapDefs extends Record<string, GraphQLNamedType>
 export function makeSchemaInternal(config: SchemaConfig) {
   const builder = new SchemaBuilder(config)
   builder.addTypes(config.types)
+  if (config.schemaRoots) {
+    builder.addTypes(config.schemaRoots)
+  }
   const { finalConfig, typeMap, missingTypes, schemaExtension, onAfterBuildFns } = builder.getFinalTypeMap()
   const { Query, Mutation, Subscription } = typeMap
+
+  function getRootType(rootType: 'query' | 'mutation' | 'subscription', defaultType: string) {
+    const rootTypeVal = config.schemaRoots?.[rootType] ?? defaultType
+    let returnVal: null | GraphQLNamedType = null
+    if (typeof rootTypeVal === 'string') {
+      returnVal = typeMap[rootTypeVal]
+    } else if (rootTypeVal) {
+      if (isNexusObjectTypeDef(rootTypeVal)) {
+        returnVal = typeMap[rootTypeVal.name]
+      } else if (isObjectType(rootTypeVal)) {
+        returnVal = typeMap[rootTypeVal.name]
+      }
+    }
+    if (returnVal && !isObjectType(returnVal)) {
+      throw new Error(`Expected ${rootType} to be a objectType, saw ${returnVal.constructor.name}`)
+    }
+    return returnVal
+  }
 
   /* istanbul ignore next */
   if (!isObjectType(Query)) {
@@ -1719,9 +1750,9 @@ export function makeSchemaInternal(config: SchemaConfig) {
   }
 
   const schema = new GraphQLSchema({
-    query: Query,
-    mutation: Mutation,
-    subscription: Subscription,
+    query: getRootType('query', 'Query'),
+    mutation: getRootType('mutation', 'Mutation'),
+    subscription: getRootType('subscription', 'Subscription'),
     types: objValues(typeMap),
     extensions: {
       ...config.extensions,
