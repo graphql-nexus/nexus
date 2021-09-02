@@ -267,29 +267,21 @@ exports[`typegenPrinter: no input changes should print the full output, with inp
 
 import type { core } from \\"nexus\\"
 
-export interface CreatePostInput {
-  name: string; // String!
-  author: string; // ID!
-  geo: Array<Array<number | null>>; // [[Float]!]!
-}
-
-export interface PostFilters {
-  order: OrderEnum; // OrderEnum!
-  search: string | null; // String
-}
-
 export interface NexusGenInputs {
-  CreatePostInput: CreatePostInput
-  PostFilters: PostFilters
+  CreatePostInput: { // input type
+    name: string; // String!
+    author: string; // ID!
+    geo: Array<Array<number | null>>; // [[Float]!]!
+  }
+  PostFilters: { // input type
+    order: NexusGenEnums['OrderEnum']; // OrderEnum!
+    search: string | null; // String
+  }
 }
-
-export type OrderEnum = \\"ASC\\" | \\"DESC\\"
-
-export type SomeEnum = \\"A\\" | \\"B\\"
 
 export interface NexusGenEnums {
-  OrderEnum: OrderEnum
-  SomeEnum: SomeEnum
+  OrderEnum: \\"ASC\\" | \\"DESC\\"
+  SomeEnum: \\"A\\" | \\"B\\"
 }
 
 export interface NexusGenScalars {
@@ -344,7 +336,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     phone: string | null; // String
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
-    outEnum: SomeEnum | null; // SomeEnum
+    outEnum: NexusGenEnums['SomeEnum'] | null; // SomeEnum
   }
   Node: { // field return type
     id: string; // ID!
@@ -382,42 +374,30 @@ export interface NexusGenFieldTypeNames {
   }
 }
 
-export interface MutationSomeListArgs {
-  items: Array<string | null>; // [String]!
-}
-
-export interface MutationCreatePostArgs {
-  input: CreatePostInput; // CreatePostInput!
-}
-
-export interface MutationRegisterClickArgs {
-  uuid?: NexusGenScalars['UUID'] | null; // UUID
-}
-
-export interface QueryPostsArgs {
-  filters: PostFilters; // PostFilters!
-}
-
-export interface UserNameArgs {
-  prefix?: string | null; // String
-}
-
-export interface UserPostsArgs {
-  filters?: PostFilters | null; // PostFilters
-}
-
 export interface NexusGenArgTypes {
   Mutation: {
-    someList: MutationSomeListArgs
-    createPost: MutationCreatePostArgs
-    registerClick: MutationRegisterClickArgs
+    someList: { // args
+      items: Array<string | null>; // [String]!
+    }
+    createPost: { // args
+      input: NexusGenInputs['CreatePostInput']; // CreatePostInput!
+    }
+    registerClick: { // args
+      uuid?: NexusGenScalars['UUID'] | null; // UUID
+    }
   }
   Query: {
-    posts: QueryPostsArgs
+    posts: { // args
+      filters: NexusGenInputs['PostFilters']; // PostFilters!
+    }
   }
   User: {
-    name: UserNameArgs
-    posts: UserPostsArgs
+    name: { // args
+      prefix?: string | null; // String
+    }
+    posts: { // args
+      filters?: NexusGenInputs['PostFilters'] | null; // PostFilters
+    }
   }
 }
 

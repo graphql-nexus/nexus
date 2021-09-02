@@ -45,24 +45,20 @@ declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
-export interface PostSearchInput {
-  body?: string | null // String
-  title?: string | null // String
-}
-
-export interface Something {
-  id: number // Int!
-}
-
 export interface NexusGenInputs {
-  PostSearchInput: PostSearchInput
-  Something: Something
+  PostSearchInput: {
+    // input type
+    body?: string | null // String
+    title?: string | null // String
+  }
+  Something: {
+    // input type
+    id: number // Int!
+  }
 }
-
-export type UserStatus = 'active' | 'pending'
 
 export interface NexusGenEnums {
-  UserStatus: UserStatus
+  UserStatus: 'active' | 'pending'
 }
 
 export interface NexusGenScalars {
@@ -261,44 +257,39 @@ export interface NexusGenFieldTypeNames {
   }
 }
 
-export interface MutationCreateUserArgs {
-  firstName?: string | null // String
-  lastName?: string | null // String
-}
-
-export interface PostEdgeDeltaArgs {
-  format?: string | null // String
-}
-
-export interface QuerySearchPostsArgs {
-  input?: PostSearchInput | null // PostSearchInput
-}
-
-export interface QueryUserArgs {
-  id?: string | null // ID
-  status: UserStatus | null // UserStatus
-}
-
-export interface UserPostsArgs {
-  after?: string | null // String
-  before?: string | null // String
-  first?: number | null // Int
-  last?: number | null // Int
-}
-
 export interface NexusGenArgTypes {
   Mutation: {
-    createUser: MutationCreateUserArgs
+    createUser: {
+      // args
+      firstName?: string | null // String
+      lastName?: string | null // String
+    }
   }
   PostEdge: {
-    delta: PostEdgeDeltaArgs
+    delta: {
+      // args
+      format?: string | null // String
+    }
   }
   Query: {
-    searchPosts: QuerySearchPostsArgs
-    user: QueryUserArgs
+    searchPosts: {
+      // args
+      input?: NexusGenInputs['PostSearchInput'] | null // PostSearchInput
+    }
+    user: {
+      // args
+      id?: string | null // ID
+      status: NexusGenEnums['UserStatus'] | null // UserStatus
+    }
   }
   User: {
-    posts: UserPostsArgs
+    posts: {
+      // args
+      after?: string | null // String
+      before?: string | null // String
+      first?: number | null // Int
+      last?: number | null // Int
+    }
   }
 }
 

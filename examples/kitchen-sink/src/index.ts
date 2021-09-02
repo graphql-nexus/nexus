@@ -24,6 +24,7 @@ const schema = makeSchema({
     typegen: {
       outputPath: path.join(__dirname, './kitchen-sink.gen.ts'),
       globalsPath: path.join(__dirname, './kitchen-sink-globals.gen.ts'),
+      declareInputs: true,
     },
   },
   plugins: [
