@@ -1,4 +1,4 @@
-import { printSchema } from 'graphql'
+import { lexicographicSortSchema, printSchema } from 'graphql'
 import { makeSchema, objectType } from '../src'
 
 describe('builder', () => {
@@ -23,7 +23,7 @@ describe('builder', () => {
         query: OtherQuery,
       },
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('can replace the Mutation root type with an alternate type', () => {
@@ -47,7 +47,7 @@ describe('builder', () => {
         mutation: OtherMutation,
       },
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 
   it('can replace the Subscription root type with an alternate type', () => {
@@ -71,6 +71,6 @@ describe('builder', () => {
         subscription: OtherSubscription,
       },
     })
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
   })
 })
