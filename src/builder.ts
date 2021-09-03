@@ -270,6 +270,15 @@ export interface BuilderConfigInput {
    *   contextType: { module: path.join(__dirname, 'context.ts'), export: 'MyContextType' }
    */
   contextType?: TypingImport
+  /**
+   * If we wish to override the "Root" type for the schema, we can do so by specifying the rootTypes option,
+   * which will replace the default roots of Query / Mutation / Subscription
+   */
+  schemaRoots?: {
+    query?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+    mutation?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+    subscription?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
+  }
 }
 
 export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
@@ -284,15 +293,6 @@ export type SchemaConfig = BuilderConfigInput & {
    * the values, if it's an array we flatten out the valid types, ignoring invalid ones.
    */
   types: any
-  /**
-   * If we wish to override the "Root" type for the schema, we can do so by specifying the rootTypes option,
-   * which will replace the default roots of Query / Mutation / Subscription
-   */
-  schemaRoots?: {
-    query?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
-    mutation?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
-    subscription?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
-  }
   /**
    * Whether we should process.exit after the artifacts are generated. Useful if you wish to explicitly
    * generate the test artifacts at a certain stage in a startup or build process.
@@ -394,7 +394,7 @@ export class SchemaBuilder {
   protected typesToWalk: TypeToWalk[] = []
 
   /** Root type mapping information annotated on the type definitions */
-  protected rootTypings: SourceTypings = {}
+  protected sourceTypings: SourceTypings = {}
 
   /** Array of missing types */
   protected missingTypes: Record<string, MissingType> = {}
@@ -540,7 +540,7 @@ export class SchemaBuilder {
       this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name
       this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name
       if (typeDef.value.sourceType) {
-        this.rootTypings[typeDef.name] = typeDef.value.sourceType
+        this.sourceTypings[typeDef.name] = typeDef.value.sourceType
       }
     } else if (isScalarType(typeDef)) {
       const scalarDef = typeDef as GraphQLScalarType & {
@@ -553,7 +553,7 @@ export class SchemaBuilder {
           this.dynamicOutputFields[asNexusMethod] = typeDef.name
         }
         if (rootTyping) {
-          this.rootTypings[scalarDef.name] = rootTyping
+          this.sourceTypings[scalarDef.name] = rootTyping
         }
       }
     }
@@ -807,7 +807,7 @@ export class SchemaBuilder {
 
   buildNexusTypes() {
     // If Query isn't defined, set it to null so it falls through to "missingType"
-    if (!this.pendingTypeMap.Query) {
+    if (!this.pendingTypeMap.Query && !this.config.schemaRoots?.query) {
       this.pendingTypeMap.Query = null as any
     }
     Object.keys(this.pendingTypeMap).forEach((key) => {
@@ -853,7 +853,7 @@ export class SchemaBuilder {
         dynamicOutputFields: this.dynamicOutputFields,
         dynamicOutputProperties: this.dynamicOutputProperties,
       },
-      rootTypings: this.rootTypings,
+      sourceTypings: this.sourceTypings,
     })
   }
 
@@ -928,7 +928,7 @@ export class SchemaBuilder {
     }
     this.typeExtendMap[config.name] = null
     if (config.sourceType) {
-      this.rootTypings[config.name] = config.sourceType
+      this.sourceTypings[config.name] = config.sourceType
     }
     const objectTypeConfig: NexusGraphQLObjectTypeConfig = {
       name: config.name,
@@ -967,7 +967,7 @@ export class SchemaBuilder {
     config.definition(definitionBlock)
 
     if (config.sourceType) {
-      this.rootTypings[config.name] = config.sourceType
+      this.sourceTypings[config.name] = config.sourceType
     }
     const interfaceTypeConfig: NexusGraphQLInterfaceTypeConfig = {
       name,
@@ -1047,7 +1047,7 @@ export class SchemaBuilder {
       throw new Error(`GraphQL Nexus: Enum ${config.name} must have at least one member`)
     }
     if (config.sourceType) {
-      this.rootTypings[config.name] = config.sourceType
+      this.sourceTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLEnumType({
@@ -1074,7 +1074,7 @@ export class SchemaBuilder {
     )
 
     if (config.sourceType) {
-      this.rootTypings[config.name] = config.sourceType
+      this.sourceTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLUnionType({
@@ -1092,7 +1092,7 @@ export class SchemaBuilder {
 
   private buildScalarType(config: NexusScalarTypeConfig<string>): GraphQLScalarType {
     if (config.sourceType) {
-      this.rootTypings[config.name] = config.sourceType
+      this.sourceTypings[config.name] = config.sourceType
     }
     return this.finalize(
       new GraphQLScalarType({

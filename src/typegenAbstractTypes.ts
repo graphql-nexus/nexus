@@ -1,4 +1,5 @@
 import type { GraphQLResolveInfo } from 'graphql'
+import type { Maybe } from './definitions/_types'
 import type {
   AbstractTypeResolver,
   GetGen,
@@ -389,7 +390,7 @@ export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> = IsFeat
        * implementation will first look for __typename, then fallback to calling `isTypeOf` on each
        * implementing Object type.
        */
-      resolveType?: AbstractTypeResolver<TypeName>
+      resolveType?: Maybe<AbstractTypeResolver<TypeName>>
     } // Make resolveType optional when __typename strategy is enabled
   : IsFeatureEnabled2<'abstractTypeStrategies', '__typename'> extends true
   ? {
@@ -400,7 +401,7 @@ export type MaybeTypeDefConfigFieldResolveType<TypeName extends string> = IsFeat
        * implementation will first look for __typename, then fallback to calling `isTypeOf` on each
        * implementing Object type.
        */
-      resolveType?: AbstractTypeResolver<TypeName>
+      resolveType?: Maybe<AbstractTypeResolver<TypeName>>
     }
   : {
       /**
