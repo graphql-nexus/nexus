@@ -31,9 +31,10 @@ import {
   AllNexusTypeDefs,
   isNexusWrappingType,
   isNexusArgDef,
-  AllNexusNamedInputTypeDefs,
+  AllNamedInputTypeDefs,
 } from './definitions/wrapping'
 import {
+  Maybe,
   MissingType,
   NexusFeatures,
   NexusGraphQLSchema,
@@ -266,7 +267,7 @@ export interface PrintedGenTypingConfig {
   name: string
   optional: boolean
   type: string
-  description?: string
+  description?: Maybe<string>
   imports?: PrintedGenTypingImport[]
 }
 
@@ -517,7 +518,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
 }
 
 /** Given the right hand side of an arg definition, returns the underlying "named type" for us to add to the builder */
-export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusNamedInputTypeDefs | string {
+export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNamedInputTypeDefs | string {
   let finalValue = argDef
   if (typeof finalValue === 'string') {
     return finalValue

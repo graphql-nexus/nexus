@@ -11,18 +11,18 @@ import type {
 import type { ArgsRecord } from './args'
 import type { NexusMetaType } from './nexusMeta'
 import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
-import type { BaseScalars } from './_types'
+import type { BaseScalars, Maybe } from './_types'
 
 export interface CommonFieldConfig {
   //todo
   /** The description to annotate the GraphQL SDL */
-  description?: string
+  description?: Maybe<string>
   //todo
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
    */
-  deprecation?: string // | DeprecationInfo;
+  deprecation?: Maybe<string> // | DeprecationInfo;
 }
 
 export type CommonOutputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {

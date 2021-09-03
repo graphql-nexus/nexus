@@ -1,7 +1,8 @@
 import type { GraphQLScalarTypeConfig } from 'graphql'
+import type { AllNexusInputTypeDefs } from '../core'
 import type { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
-import type { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
-import { NexusTypes, withNexusSymbol } from './_types'
+import type { AllNexusArgsDefs } from './wrapping'
+import { Maybe, NexusTypes, withNexusSymbol } from './_types'
 
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
@@ -39,7 +40,7 @@ export type CommonArgConfig = {
    *   //   ): [Int]
    *   // }
    */
-  description?: string
+  description?: Maybe<string>
 
   /**
    * Data that will be added to the arg-level [extensions field on the graphql-js type def
