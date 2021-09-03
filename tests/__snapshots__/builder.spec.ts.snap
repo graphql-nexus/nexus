@@ -54,3 +54,14 @@ type Subscription {
 }
 "
 `;
+
+exports[`builder does not add a placeholder Query type when an alternate queryRoot has been defined 1`] = `
+"schema {
+  query: RootQuery
+}
+
+type RootQuery {
+  name: String
+}
+"
+`;

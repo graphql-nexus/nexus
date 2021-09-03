@@ -61,7 +61,7 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
 
 export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
   dynamicFields: DynamicFieldDefs
-  rootTypings: SourceTypings
+  sourceTypings: SourceTypings
 }
 
 /**

@@ -201,7 +201,7 @@ export class TypegenPrinter {
   }
 
   private printDynamicImport(forGlobal = false) {
-    const { rootTypings } = this.schema.extensions.nexus.config
+    const { sourceTypings } = this.schema.extensions.nexus.config
     const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
@@ -222,7 +222,7 @@ export class TypegenPrinter {
             : contextTypeImport.export
         )
       }
-      eachObj(rootTypings, (rootType, typeName) => {
+      eachObj(sourceTypings, (rootType, typeName) => {
         if (typeof rootType !== 'string') {
           const importPath = resolveImportPath(rootType, typeName, outputPath)
           importMap[importPath] = importMap[importPath] || new Set()
@@ -607,7 +607,7 @@ export class TypegenPrinter {
   }
 
   private resolveSourceType(typeName: string): string | undefined {
-    const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
+    const rootTyping = this.schema.extensions.nexus.config.sourceTypings[typeName]
     if (rootTyping) {
       return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
