@@ -1,6 +1,6 @@
 import { assertValidName, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 import { decorateType } from './decorateType'
-import { NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import { Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface ScalarBase
   extends Pick<
@@ -10,7 +10,7 @@ export interface ScalarBase
 
 export interface ScalarConfig {
   /** Any deprecation info for this scalar type */
-  deprecation?: string // | DeprecationInfo;
+  deprecation?: Maybe<string> // | DeprecationInfo;
   /** Adds this type as a method on the Object/Interface definition blocks */
   asNexusMethod?: string
   /** Source type information for this type */

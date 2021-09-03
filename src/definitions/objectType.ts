@@ -2,7 +2,7 @@ import { assertValidName, GraphQLObjectType } from 'graphql'
 import type { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import type { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
-import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
+import { AbstractTypes, Maybe, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void
@@ -102,7 +102,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   //   # ...
    *   // }
    */
-  description?: string
+  description?: Maybe<string>
   /**
    * [Source Types Guide](https://nxs.li/guides/backing-types)
    *

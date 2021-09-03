@@ -1,4 +1,4 @@
-import type { FieldOutConfig, OutputDefinitionBlock } from '../core'
+import type { FieldOutConfig, OutputDefinitionBlock } from './definitionBlocks'
 import { extendType, NexusExtendTypeDef } from './extendType'
 
 export type QueryFieldConfig<FieldName extends string> =
