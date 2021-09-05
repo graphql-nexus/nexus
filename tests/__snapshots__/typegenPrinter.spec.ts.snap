@@ -75,7 +75,7 @@ exports[`typegenPrinter should not print roots for fields with resolvers 2`] = `
 
 exports[`typegenPrinter should print a interface type map 1`] = `
 "export interface NexusGenInterfaces {
-  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  Node: core.Discriminate<'Post', 'optional'> | core.Discriminate<'User', 'optional'>;
 }"
 `;
 
@@ -138,7 +138,7 @@ exports[`typegenPrinter should print a root type map 1`] = `"export type NexusGe
 
 exports[`typegenPrinter should print a union type map 1`] = `
 "export interface NexusGenUnions {
-  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  ExampleUnion: core.Discriminate<'Post', 'optional'> | core.Discriminate<'User', 'optional'>;
 }"
 `;
 
@@ -206,11 +206,11 @@ export interface NexusGenObjects {
 }
 
 export interface NexusGenInterfaces {
-  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  Node: core.Discriminate<'Post', 'optional'> | core.Discriminate<'User', 'optional'>;
 }
 
 export interface NexusGenUnions {
-  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>;
+  ExampleUnion: core.Discriminate<'Post', 'optional'> | core.Discriminate<'User', 'optional'>;
 }
 
 export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions
@@ -330,7 +330,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions;
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
-export type NexusGenAbstractsUsingStrategyResolveType = never;
+export type NexusGenAbstractsUsingStrategyResolveType = \\"ExampleUnion\\" | \\"Node\\";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

@@ -41,6 +41,8 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLUnionTypeConfig<any, any>['extensions']
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {

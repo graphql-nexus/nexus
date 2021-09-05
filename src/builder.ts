@@ -1,11 +1,9 @@
 import {
   assertValidName,
   defaultFieldResolver,
-  getNamedType,
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
-  GraphQLField,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
@@ -18,7 +16,6 @@ import {
   GraphQLInputType,
   GraphQLInt,
   GraphQLInterfaceType,
-  GraphQLInterfaceTypeConfig,
   GraphQLList,
   GraphQLNamedType,
   GraphQLNonNull,
@@ -31,14 +28,13 @@ import {
   GraphQLType,
   GraphQLUnionType,
   isInputObjectType,
+  isInputType,
   isInterfaceType,
   isLeafType,
   isNamedType,
   isObjectType,
   isOutputType,
-  isScalarType,
   isSchema,
-  isUnionType,
   isWrappingType,
   printSchema,
 } from 'graphql'
@@ -79,6 +75,8 @@ import {
   isNexusExtendTypeDef,
   isNexusInputObjectTypeDef,
   isNexusInterfaceTypeDef,
+  isNexusNamedInputTypeDef,
+  isNexusNamedOuputTypeDef,
   isNexusNamedTypeDef,
   isNexusObjectTypeDef,
   isNexusPlugin,
@@ -111,7 +109,6 @@ import {
   NexusInputObjectTypeExtension,
   NexusInterfaceTypeExtension,
   NexusObjectTypeExtension,
-  NexusScalarExtensions,
   NexusSchemaExtension,
 } from './extensions'
 import { messages } from './messages'
@@ -134,12 +131,10 @@ import {
   eachObj,
   getArgNamedType,
   getNexusNamedType,
-  graphql15InterfaceConfig,
   graphql15InterfaceType,
   invariantGuard,
   isArray,
   isObject,
-  mapValues,
   objValues,
   UNKNOWN_TYPE_SCALAR,
 } from './utils'
@@ -151,6 +146,7 @@ import {
   NexusMeta,
   resolveNexusMetaType,
 } from './definitions/nexusMeta'
+import { rebuildNamedType, RebuildConfig } from './rebuildType'
 
 type NexusShapedOutput = {
   name: string
@@ -198,7 +194,55 @@ export interface ConfiguredTypegen {
   declareInputs?: boolean
 }
 
+export interface MergeSchemaConfig {
+  /**
+   * GraphQL Schema to merge into the Nexus type definitions.
+   *
+   * We unwrap each type, preserve the "nullable/nonNull" status of any fields &
+   * arguments, and then combine with the local Nexus GraphQL types.
+   *
+   * If you have multiple schemas
+   */
+  schema: GraphQLSchema
+  /**
+   * If we want to "merge" specific types, provide a list of the types you wish to merge here.
+   *
+   * @default ['Query', 'Mutation']
+   */
+  mergeTypes?: string[] | true
+  /**
+   * If there are types that we don't want to include from the external schema in our final
+   * Nexus generated schema, provide them here.
+   */
+  skipTypes?: string[]
+  /**
+   * If there are certain "fields" that we want to skip, we can specify
+   * the fields here and we'll ensure they don't get merged into the schema
+   */
+  skipFields?: Record<string, string[]>
+  /**
+   * If there are certain arguments for any type fields that we want to skip, we can specify
+   * the fields here & ensure they don't get merged into the final schema.
+   *
+   * @example
+   *   skipArgs: {
+   *     Mutation: {
+   *       createAccount: ['internalId']
+   *     }
+   *   }
+   */
+  skipArgs?: Record<string, Record<string, string[]>>
+}
+
 export interface BuilderConfigInput {
+  /**
+   * If we have an external schema that we want to "merge into" our local Nexus schema definitions,
+   * we can configure it here.
+   *
+   * If you have more than one schema that needs merging, you can look into using
+   * graphql-tools to pre-merge into a single schema: https://www.graphql-tools.com/docs/schema-merging
+   */
+  mergeSchema?: MergeSchemaConfig
   /**
    * Generated artifact settings. Set to false to disable all. Set to true to enable all and use default
    * paths. Leave undefined for default behaviour of each artifact.
@@ -326,7 +370,6 @@ export interface TypegenInfo {
 }
 
 export type TypeToWalk =
-  | { type: 'named'; value: GraphQLNamedType }
   | { type: 'input'; value: NexusShapedInput }
   | { type: 'object'; value: NexusShapedOutput }
   | { type: 'interface'; value: NexusInterfaceTypeConfig<any> }
@@ -367,77 +410,93 @@ export class SchemaBuilder {
   /** All objects containing a NEXUS_BUILD / NEXUS_TYPE symbol */
   private nexusMetaObjects = new Set()
   /** Used to check for circular references. */
-  protected buildingTypes = new Set()
+  private buildingTypes = new Set()
   /** The "final type" map contains all types as they are built. */
-  protected finalTypeMap: Record<string, GraphQLNamedType> = {}
+  private finalTypeMap: Record<string, GraphQLNamedType> = {}
   /**
    * The "defined type" map keeps track of all of the types that were defined directly as `GraphQL*Type`
    * objects, so we don't accidentally overwrite any.
    */
-  protected definedTypeMap: Record<string, GraphQLNamedType> = {}
+  private definedTypeMap: Record<string, GraphQLNamedType> = {}
   /**
    * The "pending type" map keeps track of all types that were defined w/ GraphQL Nexus and haven't been
    * processed into concrete types yet.
    */
-  protected pendingTypeMap: Record<string, AllNexusNamedTypeDefs> = {}
-  /** All "extensions" to types (adding fields on types from many locations) */
-  protected typeExtendMap: Record<string, NexusExtendTypeConfig<string>[] | null> = {}
-  /** All "extensions" to input types (adding fields on types from many locations) */
-  protected inputTypeExtendMap: Record<string, NexusExtendInputTypeConfig<string>[] | null> = {}
+  private pendingTypeMap: Record<string, AllNexusNamedTypeDefs | null> = {}
+  /**
+   * All "extensions" to types (adding fields on types from many locations)
+   */
+  private typeExtendMap: Record<string, NexusExtendTypeConfig<string>[] | null> = {}
+  /**
+   * All "extensions" to input types (adding fields on types from many locations)
+   */
+  private inputTypeExtendMap: Record<string, NexusExtendInputTypeConfig<string>[] | null> = {}
+  /**
+   * When we encounter "named" types from graphql-js, we keep them separate from Nexus definitions.
+   * This way we can have Nexus definitions take precedence without worrying about conflicts,
+   * particularly when we're looking to override behavior from inherited types.
+   */
+  private graphqlNamedTypeMap: Record<string, AllNexusNamedTypeDefs> = {}
 
-  protected dynamicInputFields: DynamicInputFields = {}
-  protected dynamicOutputFields: DynamicOutputFields = {}
-  protected dynamicOutputProperties: DynamicOutputProperties = {}
-  protected plugins: NexusPlugin[] = []
+  /**
+   * If we're merging against a remote schema, the types from the schema are kept here,
+   * for fallbacks / merging when we're building the actual Schema
+   */
+  private graphqlMergeSchemaMap: Record<string, AllNexusNamedTypeDefs> = {}
+
+  private dynamicInputFields: DynamicInputFields = {}
+  private dynamicOutputFields: DynamicOutputFields = {}
+  private dynamicOutputProperties: DynamicOutputProperties = {}
+  private plugins: NexusPlugin[] = []
 
   /** All types that need to be traversed for children types */
-  protected typesToWalk: TypeToWalk[] = []
+  private typesToWalk: TypeToWalk[] = []
 
   /** Root type mapping information annotated on the type definitions */
-  protected sourceTypings: SourceTypings = {}
+  private sourceTypings: SourceTypings = {}
 
   /** Array of missing types */
-  protected missingTypes: Record<string, MissingType> = {}
+  private missingTypes: Record<string, MissingType> = {}
 
   /** Methods we are able to access to read/modify builder state from plugins */
-  protected builderLens: PluginBuilderLens
+  private builderLens: PluginBuilderLens
 
   /** Created just before types are walked, this keeps track of all of the resolvers */
-  protected onMissingTypeFns: Exclude<PluginConfig['onMissingType'], undefined>[] = []
+  private onMissingTypeFns: Exclude<PluginConfig['onMissingType'], undefined>[] = []
 
   /** Executed just before types are walked */
-  protected onBeforeBuildFns: Exclude<PluginConfig['onBeforeBuild'], undefined>[] = []
+  private onBeforeBuildFns: Exclude<PluginConfig['onBeforeBuild'], undefined>[] = []
 
   /** Executed as the field resolvers are included on the field */
-  protected onCreateResolverFns: Exclude<PluginConfig['onCreateFieldResolver'], undefined>[] = []
+  private onCreateResolverFns: Exclude<PluginConfig['onCreateFieldResolver'], undefined>[] = []
 
   /** Executed as the field "subscribe" fields are included on the schema */
-  protected onCreateSubscribeFns: Exclude<PluginConfig['onCreateFieldSubscribe'], undefined>[] = []
+  private onCreateSubscribeFns: Exclude<PluginConfig['onCreateFieldSubscribe'], undefined>[] = []
 
   /** Executed after the schema is constructed, for any final verification */
-  protected onAfterBuildFns: Exclude<PluginConfig['onAfterBuild'], undefined>[] = []
+  private onAfterBuildFns: Exclude<PluginConfig['onAfterBuild'], undefined>[] = []
 
   /** Executed after the object is defined, allowing us to add additional fields to the object */
-  protected onObjectDefinitionFns: Exclude<PluginConfig['onObjectDefinition'], undefined>[] = []
+  private onObjectDefinitionFns: Exclude<PluginConfig['onObjectDefinition'], undefined>[] = []
 
   /** Executed after the object is defined, allowing us to add additional fields to the object */
-  protected onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
+  private onInputObjectDefinitionFns: Exclude<PluginConfig['onInputObjectDefinition'], undefined>[] = []
 
   /** Called immediately after the field is defined, allows for using metadata to define the shape of the field. */
-  protected onAddArgFns: Exclude<PluginConfig['onAddArg'], undefined>[] = []
+  private onAddArgFns: Exclude<PluginConfig['onAddArg'], undefined>[] = []
 
   /** Called immediately after the field is defined, allows for using metadata to define the shape of the field. */
-  protected onAddOutputFieldFns: Exclude<PluginConfig['onAddOutputField'], undefined>[] = []
+  private onAddOutputFieldFns: Exclude<PluginConfig['onAddOutputField'], undefined>[] = []
 
   /** Called immediately after the field is defined, allows for using metadata to define the shape of the field. */
-  protected onAddInputFieldFns: Exclude<PluginConfig['onAddInputField'], undefined>[] = []
+  private onAddInputFieldFns: Exclude<PluginConfig['onAddInputField'], undefined>[] = []
 
   /** The `schemaExtension` is created just after the types are walked, but before the fields are materialized. */
-  protected _schemaExtension?: NexusSchemaExtension
+  private _schemaExtension?: NexusSchemaExtension
 
-  protected config: BuilderConfig
+  private config: BuilderConfig
 
-  get schemaExtension() {
+  private get schemaExtension() {
     /* istanbul ignore next */
     if (!this._schemaExtension) {
       throw new Error('Cannot reference schemaExtension before it is created')
@@ -461,6 +520,10 @@ export class SchemaBuilder {
       hasConfigOption: this.hasConfigOption,
       getConfigOption: this.getConfigOption,
     })
+
+    if (config.mergeSchema) {
+      this.graphqlMergeSchemaMap = this.handleMergeSchema(config.mergeSchema)
+    }
   }
 
   setConfigOption = <K extends keyof BuilderConfigInput>(key: K, value: BuilderConfigInput[K]) => {
@@ -479,7 +542,12 @@ export class SchemaBuilder {
   }
 
   hasType = (typeName: string): boolean => {
-    return Boolean(this.pendingTypeMap[typeName] || this.finalTypeMap[typeName])
+    return Boolean(
+      this.pendingTypeMap[typeName] ||
+        this.finalTypeMap[typeName] ||
+        this.graphqlNamedTypeMap[typeName] ||
+        this.graphqlMergeSchemaMap[typeName]
+    )
   }
 
   /**
@@ -487,12 +555,7 @@ export class SchemaBuilder {
    * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so you
    * can define types anonymously, without exporting them.
    */
-  addType = (typeDef: NexusAcceptedTypeDef) => {
-    if (isNexusMeta(typeDef)) {
-      this.addToNexusMeta(typeDef)
-      return
-    }
-
+  private addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusDynamicInputMethod(typeDef)) {
       this.dynamicInputFields[typeDef.name] = typeDef
       return
@@ -506,12 +569,15 @@ export class SchemaBuilder {
       return
     }
 
-    // Don't worry about internal types.
-    if (typeDef.name?.indexOf('__') === 0) {
+    if (isNexusMeta(typeDef)) {
+      this.addToNexusMeta(typeDef)
       return
     }
 
-    const existingType = this.definedTypeMap[typeDef.name] || this.pendingTypeMap[typeDef.name]
+    // Don't worry about internal types.
+    if (typeDef.name?.startsWith('__')) {
+      return
+    }
 
     if (isNexusExtendTypeDef(typeDef)) {
       const typeExtensions = (this.typeExtendMap[typeDef.name] = this.typeExtendMap[typeDef.name] || [])
@@ -528,65 +594,70 @@ export class SchemaBuilder {
       return
     }
 
+    // Check the "defined" type map for existing Nexus types. We are able to conflict with external types,
+    // as we assume that locally defined types take precedence.
+    const existingType = this.pendingTypeMap[typeDef.name]
+
+    // If we already have a "Nexus" type, but it's not the same, trigger mark as an error,
+    // otherwise early exit
     if (existingType) {
-      // Allow importing the same exact type more than once.
-      if (existingType === typeDef) {
-        return
+      if (existingType !== typeDef) {
+        throw extendError(typeDef.name)
       }
-      throw extendError(typeDef.name)
+      return
     }
 
-    if (isNexusScalarTypeDef(typeDef) && typeDef.value.asNexusMethod) {
-      this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name
-      this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name
-      if (typeDef.value.sourceType) {
+    if (isNexusNamedTypeDef(typeDef)) {
+      if (isNexusNamedOuputTypeDef(typeDef) && typeDef.value.asNexusMethod) {
+        this.dynamicOutputFields[typeDef.value.asNexusMethod] = typeDef.name
+      }
+      if (isNexusNamedInputTypeDef(typeDef) && typeDef.value.asNexusMethod) {
+        this.dynamicInputFields[typeDef.value.asNexusMethod] = typeDef.name
+      }
+      if (isNexusScalarTypeDef(typeDef) && typeDef.value.sourceType) {
         this.sourceTypings[typeDef.name] = typeDef.value.sourceType
       }
-    } else if (isScalarType(typeDef)) {
-      const scalarDef = typeDef as GraphQLScalarType & {
-        extensions?: NexusScalarExtensions
-      }
-      if (scalarDef.extensions?.nexus) {
-        const { asNexusMethod, sourceType: rootTyping } = scalarDef.extensions.nexus
-        if (asNexusMethod) {
-          this.dynamicInputFields[asNexusMethod] = scalarDef.name
-          this.dynamicOutputFields[asNexusMethod] = typeDef.name
-        }
-        if (rootTyping) {
-          this.sourceTypings[scalarDef.name] = rootTyping
-        }
-      }
     }
 
+    // If it's a concrete GraphQL type, we handle it directly by convering the
+    // type to a Nexus structure, and capturing all of the referenced types
+    // while we're reconstructing.
     if (isNamedType(typeDef)) {
-      let finalTypeDef = typeDef
-      if (isObjectType(typeDef)) {
-        const config = typeDef.toConfig()
-        finalTypeDef = new GraphQLObjectType({
-          ...config,
-          fields: () => this.rebuildNamedOutputFields(config),
-          interfaces: () => config.interfaces.map((t) => this.getInterface(t.name)),
-        })
-      } else if (isInterfaceType(typeDef)) {
-        const config = graphql15InterfaceConfig(typeDef.toConfig())
-        finalTypeDef = new GraphQLInterfaceType({
-          ...config,
-          fields: () => this.rebuildNamedOutputFields(config),
-          interfaces: () => config.interfaces.map((t) => this.getInterface(t.name)),
-        } as GraphQLInterfaceTypeConfig<any, any>)
-      } else if (isUnionType(typeDef)) {
-        const config = typeDef.toConfig()
-        finalTypeDef = new GraphQLUnionType({
-          ...config,
-          types: () => config.types.map((t) => this.getObjectType(t.name)),
-        })
+      // If we've already captured the named type, we can skip it
+      if (this.graphqlNamedTypeMap[typeDef.name]) {
+        return
       }
-      this.finalTypeMap[typeDef.name] = finalTypeDef
-      this.definedTypeMap[typeDef.name] = typeDef
-      this.typesToWalk.push({ type: 'named', value: typeDef })
-    } else {
-      this.pendingTypeMap[typeDef.name] = typeDef
+
+      // If we've used decorateType to wrap, then we can grab the types off
+      if (typeDef.extensions?.nexus) {
+        const { asNexusMethod, sourceType } = typeDef.extensions.nexus
+        if (asNexusMethod) {
+          if (isInputType(typeDef)) {
+            this.dynamicInputFields[asNexusMethod] = typeDef.name
+          }
+          if (isOutputType(typeDef)) {
+            this.dynamicOutputFields[asNexusMethod] = typeDef.name
+          }
+        }
+        if (sourceType) {
+          this.sourceTypings[typeDef.name] = sourceType
+        }
+      }
+      this.graphqlNamedTypeMap[typeDef.name] = this.handleNativeType(typeDef, {
+        captureLeafType: (t) => {
+          if (!this.graphqlNamedTypeMap[t.name] && t.name !== typeDef.name) {
+            this.addType(t)
+          }
+        },
+      })
+      if (typeDef.extensions?.nexus) {
+        this.addType(this.graphqlNamedTypeMap[typeDef.name])
+      }
+      return
     }
+
+    this.pendingTypeMap[typeDef.name] = typeDef
+
     if (isNexusInputObjectTypeDef(typeDef)) {
       this.typesToWalk.push({ type: 'input', value: typeDef.value })
     }
@@ -603,7 +674,20 @@ export class SchemaBuilder {
       return
     }
     if (isSchema(types)) {
-      this.addTypes(types.getTypeMap())
+      if (this.config.mergeSchema?.schema === types) {
+        return
+      } else if (!this.config.mergeSchema) {
+        if (Object.keys(this.graphqlMergeSchemaMap).length) {
+          console.error(
+            new Error(
+              `It looks like you're trying to merge multiple GraphQL schemas.\n Please open a GitHub ticket with more info about your use case.`
+            )
+          )
+        }
+        this.graphqlMergeSchemaMap = this.handleMergeSchema({ schema: types })
+      } else {
+        this.addTypes(types.getTypeMap())
+      }
       return
     }
     if (isNexusPlugin(types)) {
@@ -647,36 +731,7 @@ export class SchemaBuilder {
     }
   }
 
-  rebuildNamedOutputFields(
-    config: ReturnType<GraphQLObjectType['toConfig'] | GraphQLInterfaceType['toConfig']>
-  ) {
-    const { fields, ...rest } = config
-    const fieldsConfig = typeof fields === 'function' ? fields() : fields
-    return mapValues(fieldsConfig, (val, key) => {
-      const { resolve, type, ...fieldConfig } = val
-      const finalType = this.replaceNamedType(type)
-      return {
-        ...fieldConfig,
-        type: finalType,
-        resolve: this.makeFinalResolver(
-          {
-            builder: this.builderLens,
-            fieldConfig: {
-              ...fieldConfig,
-              type: finalType,
-              name: key,
-            },
-            schemaConfig: this.config,
-            parentTypeConfig: rest as any, // TODO(tim): remove as any when we drop support for 14.x
-            schemaExtension: this.schemaExtension,
-          },
-          resolve
-        ),
-      }
-    })
-  }
-
-  walkTypes() {
+  private walkTypes() {
     let obj
     while ((obj = this.typesToWalk.shift())) {
       switch (obj.type) {
@@ -685,9 +740,6 @@ export class SchemaBuilder {
           break
         case 'interface':
           this.walkInterfaceType(obj.value)
-          break
-        case 'named':
-          this.walkNamedTypes(obj.value)
           break
         case 'object':
           this.walkOutputType(obj.value)
@@ -698,7 +750,7 @@ export class SchemaBuilder {
     }
   }
 
-  beforeWalkTypes() {
+  private beforeWalkTypes() {
     this.plugins.forEach((obj, i) => {
       if (!isNexusPlugin(obj)) {
         throw new Error(`Expected a plugin in plugins[${i}], saw ${obj}`)
@@ -746,7 +798,7 @@ export class SchemaBuilder {
     })
   }
 
-  beforeBuildTypes() {
+  private beforeBuildTypes() {
     this.onBeforeBuildFns.forEach((fn) => {
       fn(this.builderLens)
       if (this.typesToWalk.length > 0) {
@@ -755,7 +807,7 @@ export class SchemaBuilder {
     })
   }
 
-  checkForInterfaceCircularDependencies() {
+  private checkForInterfaceCircularDependencies() {
     const interfaces: Record<string, NexusInterfaceTypeConfig<any>> = {}
     Object.keys(this.pendingTypeMap)
       .map((key) => this.pendingTypeMap[key])
@@ -805,7 +857,7 @@ export class SchemaBuilder {
     })
   }
 
-  buildNexusTypes() {
+  private buildNexusTypes() {
     // If Query isn't defined, set it to null so it falls through to "missingType"
     if (!this.pendingTypeMap.Query && !this.config.schemaRoots?.query) {
       this.pendingTypeMap.Query = null as any
@@ -845,7 +897,7 @@ export class SchemaBuilder {
     })
   }
 
-  createSchemaExtension() {
+  private createSchemaExtension() {
     this._schemaExtension = new NexusSchemaExtension({
       ...this.config,
       dynamicFields: {
@@ -873,7 +925,16 @@ export class SchemaBuilder {
     }
   }
 
-  buildInputObjectType(config: NexusInputObjectTypeConfig<any>): GraphQLInputObjectType {
+  private shouldMerge(typeName: string) {
+    if (!this.config.mergeSchema) {
+      return false
+    }
+    const { mergeTypes = ['Query', 'Mutation'] } = this.config.mergeSchema
+
+    return Boolean(mergeTypes === true || mergeTypes.includes(typeName))
+  }
+
+  private buildInputObjectType(config: NexusInputObjectTypeConfig<any>): GraphQLInputObjectType {
     const fields: NexusInputFieldDef[] = []
     const definitionBlock = new InputDefinitionBlock({
       typeName: config.name,
@@ -881,6 +942,10 @@ export class SchemaBuilder {
       addDynamicInputFields: (block, wrapping) => this.addDynamicInputFields(block, wrapping),
       warn: consoleWarn,
     })
+    const externalNamedType = this.graphqlMergeSchemaMap[config.name]
+    if (this.shouldMerge(config.name) && isNexusInputObjectTypeDef(externalNamedType)) {
+      externalNamedType.value.definition(definitionBlock)
+    }
     config.definition(definitionBlock)
     this.onInputObjectDefinitionFns.forEach((fn) => {
       fn(definitionBlock, config)
@@ -904,7 +969,7 @@ export class SchemaBuilder {
     return this.finalize(new GraphQLInputObjectType(inputObjectTypeConfig))
   }
 
-  buildObjectType(config: NexusObjectTypeConfig<string>) {
+  private buildObjectType(config: NexusObjectTypeConfig<string>) {
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
     const modifications: Record<string, FieldModificationDef<any, any>> = {}
@@ -916,6 +981,10 @@ export class SchemaBuilder {
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'build', wrapping),
       warn: consoleWarn,
     })
+    const externalNamedType = this.graphqlMergeSchemaMap[config.name]
+    if (this.shouldMerge(config.name) && isNexusObjectTypeDef(externalNamedType)) {
+      externalNamedType.value.definition(definitionBlock)
+    }
     config.definition(definitionBlock)
     this.onObjectDefinitionFns.forEach((fn) => {
       fn(definitionBlock, config)
@@ -949,7 +1018,7 @@ export class SchemaBuilder {
     return this.finalize(new GraphQLObjectType(objectTypeConfig))
   }
 
-  buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
+  private buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config
     let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
 
@@ -964,6 +1033,10 @@ export class SchemaBuilder {
       addDynamicOutputMembers: (block, wrapping) => this.addDynamicOutputMembers(block, 'build', wrapping),
       warn: consoleWarn,
     })
+    const externalNamedType = this.graphqlMergeSchemaMap[config.name]
+    if (this.shouldMerge(config.name) && isNexusInterfaceTypeDef(externalNamedType)) {
+      externalNamedType.value.definition(definitionBlock)
+    }
     config.definition(definitionBlock)
 
     if (config.sourceType) {
@@ -1105,12 +1178,12 @@ export class SchemaBuilder {
     )
   }
 
-  protected finalize<T extends GraphQLNamedType>(type: T): T {
+  private finalize<T extends GraphQLNamedType>(type: T): T {
     this.finalTypeMap[type.name] = type
     return type
   }
 
-  protected missingType(typeName: string, fromObject: boolean = false): GraphQLNamedType {
+  private missingType(typeName: string, fromObject: boolean = false): GraphQLNamedType {
     invariantGuard(typeName)
     if (this.onMissingTypeFns.length) {
       for (let i = 0; i < this.onMissingTypeFns.length; i++) {
@@ -1138,10 +1211,11 @@ export class SchemaBuilder {
       this.missingTypes[typeName] = { fromObject }
     }
 
-    return UNKNOWN_TYPE_SCALAR
+    this.addType(UNKNOWN_TYPE_SCALAR)
+    return this.getOrBuildType(UNKNOWN_TYPE_SCALAR)
   }
 
-  protected buildUnionMembers(unionName: string, members: UnionMembers | undefined) {
+  private buildUnionMembers(unionName: string, members: UnionMembers | undefined) {
     const unionMembers: GraphQLObjectType[] = []
     /* istanbul ignore next */
     if (!members) {
@@ -1160,7 +1234,7 @@ export class SchemaBuilder {
     return unionMembers
   }
 
-  protected buildInterfaceList(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
+  private buildInterfaceList(interfaces: (string | NexusInterfaceTypeDef<any>)[]) {
     const list: GraphQLInterfaceType[] = []
     interfaces.forEach((i) => {
       const type = this.getInterface(i)
@@ -1169,7 +1243,7 @@ export class SchemaBuilder {
     return Array.from(new Set(list))
   }
 
-  protected buildInterfaceFields(
+  private buildInterfaceFields(
     forTypeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig,
     interfaces: (string | NexusInterfaceTypeDef<any>)[],
     modifications: Record<string, FieldModificationDef<any, any>>
@@ -1214,7 +1288,7 @@ export class SchemaBuilder {
           }
           if (typeof args !== 'undefined') {
             interfaceFieldsMap[field].args = {
-              ...this.buildArgs(args, forTypeConfig, field),
+              ...this.buildArgs(args ?? {}, forTypeConfig, field),
               ...interfaceFieldsMap[field].args,
             }
           }
@@ -1224,7 +1298,7 @@ export class SchemaBuilder {
     return interfaceFieldsMap
   }
 
-  protected buildOutputFields(
+  private buildOutputFields(
     fields: NexusOutputFieldDef[],
     typeConfig: NexusGraphQLInterfaceTypeConfig | NexusGraphQLObjectTypeConfig,
     intoObject: GraphQLFieldConfigMap<any, any>
@@ -1235,7 +1309,7 @@ export class SchemaBuilder {
     return intoObject
   }
 
-  protected buildInputObjectFields(
+  private buildInputObjectFields(
     fields: NexusInputFieldDef[],
     typeConfig: NexusGraphQLInputObjectTypeConfig
   ): GraphQLInputFieldConfigMap {
@@ -1246,7 +1320,7 @@ export class SchemaBuilder {
     return fieldMap
   }
 
-  protected getNonNullDefault(
+  private getNonNullDefault(
     nonNullDefaultConfig: { nonNullDefaults?: NonNullConfig } | undefined,
     kind: 'input' | 'output'
   ): boolean {
@@ -1255,7 +1329,7 @@ export class SchemaBuilder {
     return nonNullDefaults[kind] ?? this.config.nonNullDefaults[kind] ?? false
   }
 
-  protected buildOutputField(
+  private buildOutputField(
     fieldConfig: NexusOutputFieldDef,
     typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig
   ): GraphQLFieldConfig<any, any> {
@@ -1297,7 +1371,7 @@ export class SchemaBuilder {
     }
   }
 
-  protected makeFinalResolver(info: CreateFieldResolverInfo, resolver?: GraphQLFieldResolver<any, any>) {
+  private makeFinalResolver(info: CreateFieldResolverInfo, resolver?: GraphQLFieldResolver<any, any>) {
     const resolveFn = resolver || defaultFieldResolver
     if (this.onCreateResolverFns.length) {
       const toCompose = this.onCreateResolverFns.map((fn) => fn(info)).filter((f) => f) as MiddlewareFn[]
@@ -1308,7 +1382,7 @@ export class SchemaBuilder {
     return resolveFn
   }
 
-  protected buildInputObjectField(
+  private buildInputObjectField(
     fieldConfig: NexusInputFieldDef,
     typeConfig: NexusGraphQLInputObjectTypeConfig
   ): GraphQLInputFieldConfig {
@@ -1329,27 +1403,27 @@ export class SchemaBuilder {
     }
   }
 
-  protected buildArgs(
+  private buildArgs(
     args: ArgsRecord,
     typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig,
     fieldName: string
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {}
-    Object.keys(args).forEach((argName) => {
+    for (const [argName, arg] of Object.entries(args)) {
       const nonNullDefault = this.getNonNullDefault(typeConfig.extensions?.nexus?.config, 'input')
       let finalArgDef: NexusFinalArgConfig = {
-        ...normalizeArgWrapping(args[argName]).value,
+        ...normalizeArgWrapping(arg).value,
         fieldName,
         argName,
         parentType: typeConfig.name,
         configFor: 'arg',
       }
-      this.onAddArgFns.forEach((onArgDef) => {
+      for (const onArgDef of this.onAddArgFns) {
         const result = onArgDef(finalArgDef)
         if (result != null) {
           finalArgDef = result
         }
-      })
+      }
       const { namedType, wrapping } = unwrapNexusDef(finalArgDef.type)
       const finalWrap = finalizeWrapping(nonNullDefault, wrapping)
       allArgs[argName] = {
@@ -1364,11 +1438,11 @@ export class SchemaBuilder {
           nexus: finalArgDef.extensions?.nexus ?? {},
         },
       }
-    })
+    }
     return allArgs
   }
 
-  protected getInterface(name: string | NexusInterfaceTypeDef<any>): GraphQLInterfaceType {
+  private getInterface(name: string | NexusInterfaceTypeDef<any>): GraphQLInterfaceType {
     const type = this.getOrBuildType(name)
     if (!isInterfaceType(type)) {
       /* istanbul ignore next */
@@ -1377,7 +1451,7 @@ export class SchemaBuilder {
     return type
   }
 
-  protected getInputType(
+  private getInputType(
     possibleInputType: PossibleInputType
   ): Exclude<GraphQLInputType, GraphQLNonNull<any> | GraphQLList<any>> {
     const nexusNamedType = getNexusNamedType(possibleInputType)
@@ -1391,7 +1465,7 @@ export class SchemaBuilder {
     return graphqlType
   }
 
-  protected getOutputType(
+  private getOutputType(
     possibleOutputType: PossibleOutputType
   ): Exclude<GraphQLOutputType, GraphQLNonNull<any> | GraphQLList<any>> {
     const graphqlType = this.getOrBuildType(possibleOutputType)
@@ -1404,21 +1478,7 @@ export class SchemaBuilder {
     return graphqlType
   }
 
-  protected getObjectOrInterfaceType(
-    name: string | NexusObjectTypeDef<string>
-  ): GraphQLObjectType | GraphQLInterfaceType {
-    if (isNexusNamedTypeDef(name)) {
-      return this.getObjectOrInterfaceType(name.name)
-    }
-    const type = this.getOrBuildType(name)
-    if (!isObjectType(type) && !isInterfaceType(type)) {
-      /* istanbul ignore next */
-      throw new Error(`Expected ${name} to be a objectType / interfaceType, saw ${type.constructor.name}`)
-    }
-    return type
-  }
-
-  protected getObjectType(name: string | NexusObjectTypeDef<string>): GraphQLObjectType {
+  private getObjectType(name: string | NexusObjectTypeDef<string>): GraphQLObjectType {
     if (isNexusNamedTypeDef(name)) {
       return this.getObjectType(name.name)
     }
@@ -1430,7 +1490,7 @@ export class SchemaBuilder {
     return type
   }
 
-  protected getOrBuildType(
+  private getOrBuildType(
     type: string | AllNexusNamedTypeDefs | GraphQLNamedType,
     fromObject: boolean = false
   ): GraphQLNamedType {
@@ -1456,7 +1516,8 @@ export class SchemaBuilder {
         `GraphQL Nexus: Circular dependency detected, while building types ${Array.from(this.buildingTypes)}`
       )
     }
-    const pendingType = this.pendingTypeMap[type]
+    const pendingType =
+      this.pendingTypeMap[type] ?? this.graphqlNamedTypeMap[type] ?? this.graphqlMergeSchemaMap[type]
 
     if (isNexusNamedTypeDef(pendingType)) {
       this.buildingTypes.add(pendingType.name)
@@ -1479,7 +1540,7 @@ export class SchemaBuilder {
     return this.missingType(type, fromObject)
   }
 
-  protected walkInputType<T extends NexusShapedInput>(obj: T) {
+  private walkInputType<T extends NexusShapedInput>(obj: T) {
     const definitionBlock = new InputDefinitionBlock({
       typeName: obj.name,
       addField: (f) => this.maybeTraverseInputFieldType(f),
@@ -1490,10 +1551,10 @@ export class SchemaBuilder {
     return obj
   }
 
-  addDynamicInputFields(block: InputDefinitionBlock<any>, wrapping?: NexusWrapKind[]) {
+  private addDynamicInputFields(block: InputDefinitionBlock<any>, wrapping?: NexusWrapKind[]) {
     eachObj(this.dynamicInputFields, (val, methodName) => {
       if (typeof val === 'string') {
-        return this.addDynamicScalar(methodName, val, block)
+        return this.addDynamicField(methodName, val, block)
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
@@ -1508,14 +1569,14 @@ export class SchemaBuilder {
     })
   }
 
-  addDynamicOutputMembers(
+  private addDynamicOutputMembers(
     block: OutputDefinitionBlock<any>,
     stage: 'walk' | 'build',
     wrapping?: NexusWrapKind[]
   ) {
     eachObj(this.dynamicOutputFields, (val, methodName) => {
       if (typeof val === 'string') {
-        return this.addDynamicScalar(methodName, val, block)
+        return this.addDynamicField(methodName, val, block)
       }
       // @ts-ignore
       block[methodName] = (...args: any[]) => {
@@ -1544,7 +1605,7 @@ export class SchemaBuilder {
     })
   }
 
-  addDynamicScalar(
+  private addDynamicField(
     methodName: string,
     typeName: string,
     block: OutputDefinitionBlock<any> | InputDefinitionBlock<any>
@@ -1567,7 +1628,7 @@ export class SchemaBuilder {
     }
   }
 
-  protected walkOutputType<T extends NexusShapedOutput>(obj: T) {
+  private walkOutputType<T extends NexusShapedOutput>(obj: T) {
     const definitionBlock = new ObjectDefinitionBlock({
       typeName: obj.name,
       addInterfaces: (i) => {
@@ -1586,7 +1647,7 @@ export class SchemaBuilder {
     return obj
   }
 
-  protected walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
+  private walkInterfaceType(obj: NexusInterfaceTypeConfig<any>) {
     const definitionBlock = new InterfaceDefinitionBlock({
       typeName: obj.name,
       addModification: (o) => this.maybeTraverseModification(o),
@@ -1605,7 +1666,7 @@ export class SchemaBuilder {
     return obj
   }
 
-  protected maybeTraverseModification(mod: FieldModificationDef<any, any>) {
+  private maybeTraverseModification(mod: FieldModificationDef<any, any>) {
     const { type, args } = mod
     if (type) {
       const namedFieldType = getNexusNamedType(mod.type)
@@ -1618,7 +1679,7 @@ export class SchemaBuilder {
     }
   }
 
-  protected maybeTraverseOutputFieldType(type: NexusOutputFieldDef) {
+  private maybeTraverseOutputFieldType(type: NexusOutputFieldDef) {
     const { args, type: fieldType } = type
     const namedFieldType = getNexusNamedType(fieldType)
     if (typeof namedFieldType !== 'string') {
@@ -1638,7 +1699,7 @@ export class SchemaBuilder {
     })
   }
 
-  protected maybeTraverseInputFieldType(type: NexusInputFieldDef) {
+  private maybeTraverseInputFieldType(type: NexusInputFieldDef) {
     const { type: fieldType } = type
     const namedFieldType = getNexusNamedType(fieldType)
     if (typeof namedFieldType !== 'string') {
@@ -1646,47 +1707,36 @@ export class SchemaBuilder {
     }
   }
 
-  protected walkNamedTypes(namedType: GraphQLNamedType) {
-    if (isObjectType(namedType) || isInterfaceType(namedType)) {
-      eachObj(namedType.getFields(), (val) => this.addNamedTypeOutputField(val))
+  /**
+   * Given a "mergeSchema", gathers all of the types and constructs them
+   * into a map of types that we keep as a "merge schema"
+   *
+   * @param config
+   */
+  private handleMergeSchema(config: MergeSchemaConfig) {
+    const { types } = config.schema.toConfig()
+    const mergedTypes: Record<string, AllNexusNamedTypeDefs> = {}
+
+    // We don't need to worry about capturing any types while walking,
+    // because we have the entire schema
+    for (const type of types) {
+      if (type.name.startsWith('__')) {
+        continue
+      }
+      if (config.skipTypes?.includes(type.name)) {
+        continue
+      }
+      mergedTypes[type.name] = this.handleNativeType(type, config)
     }
-    if (isObjectType(namedType)) {
-      namedType.getInterfaces().forEach((i) => this.addUnknownTypeInternal(i))
-    }
-    if (isInputObjectType(namedType)) {
-      eachObj(namedType.getFields(), (val) => this.addUnknownTypeInternal(getNamedType(val.type)))
-    }
-    if (isUnionType(namedType)) {
-      namedType.getTypes().forEach((type) => this.addUnknownTypeInternal(type))
-    }
+    return mergedTypes
   }
 
-  protected addUnknownTypeInternal(t: GraphQLNamedType) {
-    if (!this.definedTypeMap[t.name]) {
-      this.addType(t)
+  private handleNativeType(type: GraphQLType, config: RebuildConfig) {
+    while (isWrappingType(type)) {
+      type = type.ofType
     }
-  }
-
-  protected addNamedTypeOutputField(obj: GraphQLField<any, any>) {
-    this.addUnknownTypeInternal(getNamedType(obj.type))
-    if (obj.args) {
-      obj.args.forEach((val) => this.addType(getNamedType(val.type)))
-    }
-  }
-
-  protected replaceNamedType(type: GraphQLType) {
-    let wrappingTypes: any[] = []
-    let finalType = type
-    while (isWrappingType(finalType)) {
-      wrappingTypes.unshift(finalType.constructor)
-      finalType = finalType.ofType
-    }
-    if (this.finalTypeMap[finalType.name] === this.definedTypeMap[finalType.name]) {
-      return type
-    }
-    return wrappingTypes.reduce((result, Wrapper) => {
-      return new Wrapper(result)
-    }, this.finalTypeMap[finalType.name])
+    this.pendingTypeMap[type.name] ??= null
+    return rebuildNamedType(type, config)
   }
 }
 

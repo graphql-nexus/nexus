@@ -14,10 +14,8 @@ import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } fro
 import type { BaseScalars, Maybe } from './_types'
 
 export interface CommonFieldConfig {
-  //todo
   /** The description to annotate the GraphQL SDL */
   description?: Maybe<string>
-  //todo
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
@@ -75,7 +73,7 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
    *     },
    *   })
    */
-  args?: ArgsRecord
+  args?: Maybe<ArgsRecord>
   /**
    * Data that will be added to the field-level [extensions field on the graphql-js type def
    * instances](https://github.com/graphql/graphql-js/issues/1527) resulting from makeSchema. Useful for some
