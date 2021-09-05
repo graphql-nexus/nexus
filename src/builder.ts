@@ -879,7 +879,7 @@ export class SchemaBuilder {
     })
     Object.keys(this.typeExtendMap).forEach((key) => {
       // If we haven't defined the type, assume it's an object type
-      if (this.typeExtendMap[key] !== null) {
+      if (this.typeExtendMap[key] !== null && !this.hasType(key)) {
         this.buildObjectType({
           name: key,
           definition() {},
@@ -888,7 +888,7 @@ export class SchemaBuilder {
     })
     Object.keys(this.inputTypeExtendMap).forEach((key) => {
       // If we haven't defined the type, assume it's an input object type
-      if (this.inputTypeExtendMap[key] !== null) {
+      if (this.inputTypeExtendMap[key] !== null && !this.hasType(key)) {
         this.buildInputObjectType({
           name: key,
           definition() {},

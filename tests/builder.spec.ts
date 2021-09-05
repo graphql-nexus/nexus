@@ -2,11 +2,20 @@ import {
   buildSchema,
   GraphQLNamedType,
   GraphQLObjectType,
+  GraphQLString,
   lexicographicSortSchema,
   printSchema,
   printType,
 } from 'graphql'
-import { interfaceType, makeSchema, mutationType, objectType, queryField, queryType } from '../src'
+import {
+  extendType,
+  interfaceType,
+  makeSchema,
+  mutationType,
+  objectType,
+  queryField,
+  queryType,
+} from '../src'
 
 describe('builder', () => {
   it('can replace the Query root type with an alternate type', () => {
@@ -290,5 +299,37 @@ describe('builder.mergeSchema', () => {
 
     expect(printType(unmerged.getType('Query') as GraphQLNamedType)).toMatchSnapshot('unmerged query')
     expect(printType(unmerged.getType('Mutation') as GraphQLNamedType)).toMatchSnapshot('unmerged mutation')
+  })
+})
+
+describe('graphql-js interop', () => {
+  it('extend types works with GraphQLNamedType (#88)', () => {
+    const Viewer = new GraphQLObjectType({
+      name: 'Viewer',
+      fields: {
+        name: { type: GraphQLString },
+      },
+    })
+
+    // Using extendType to extend types defined with `graphql`
+    const NexusViewer = extendType({
+      type: 'Viewer',
+      definition(t) {
+        t.int('age')
+      },
+    })
+
+    const Query = new GraphQLObjectType({
+      name: 'Query',
+      fields: () => ({
+        viewer: { type: Viewer },
+      }),
+    })
+
+    const schema = makeSchema({
+      types: [Query, NexusViewer],
+    })
+
+    expect(printSchema(schema)).toMatchSnapshot()
   })
 })

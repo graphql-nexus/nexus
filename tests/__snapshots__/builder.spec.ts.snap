@@ -147,3 +147,15 @@ exports[`builder.mergeSchema can merge with local types: unmerged 1`] = `
   localName: String
 }"
 `;
+
+exports[`graphql-js interop extend types works with GraphQLNamedType (#88) 1`] = `
+"type Query {
+  viewer: Viewer
+}
+
+type Viewer {
+  name: String
+  age: Int
+}
+"
+`;
