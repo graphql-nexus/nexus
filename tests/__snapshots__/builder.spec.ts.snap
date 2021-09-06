@@ -65,3 +65,97 @@ type RootQuery {
 }
 "
 `;
+
+exports[`builder.mergeSchema Merges Mutation & Query types by default: merged mutation 1`] = `
+"type Mutation {
+  externalMutation(a: String): String
+  localMutation: String
+}"
+`;
+
+exports[`builder.mergeSchema Merges Mutation & Query types by default: merged query 1`] = `
+"type Query {
+  externalFn(a: String): String
+  localFn: String
+}"
+`;
+
+exports[`builder.mergeSchema Merges Mutation & Query types by default: unmerged mutation 1`] = `
+"type Mutation {
+  localMutation: String
+}"
+`;
+
+exports[`builder.mergeSchema Merges Mutation & Query types by default: unmerged query 1`] = `
+"type Query {
+  localFn: String
+}"
+`;
+
+exports[`builder.mergeSchema can merge with an externally created schema 1`] = `
+"type Author implements Node {
+  books: [Book]
+
+  \\"\\"\\"A Node ID is globally unique\\"\\"\\"
+  id: ID!
+}
+
+type Book implements Node {
+  id: ID!
+  name: String
+}
+
+interface ExternalNode {
+  id: ID!
+}
+
+type InternalType {
+  fieldName: String
+}
+
+interface Node {
+  \\"\\"\\"A Node ID is globally unique\\"\\"\\"
+  id: ID!
+}
+
+type Query {
+  internalNodesByIds(ids: [ID!]!, internal: String!): [Node]!
+  node(id: ID!): Node
+  someBook: Book
+  userByUuids(uuid: UUID): User
+}
+
+type User implements ExternalNode & Node {
+  id: ID!
+  name: String
+}
+
+scalar UUID
+"
+`;
+
+exports[`builder.mergeSchema can merge with local types: merged 1`] = `
+"type User implements Node & ExternalNode {
+  id: ID!
+  name: String
+  localName: String
+}"
+`;
+
+exports[`builder.mergeSchema can merge with local types: unmerged 1`] = `
+"type User {
+  localName: String
+}"
+`;
+
+exports[`graphql-js interop extend types works with GraphQLNamedType (#88) 1`] = `
+"type Query {
+  viewer: Viewer
+}
+
+type Viewer {
+  name: String
+  age: Int
+}
+"
+`;

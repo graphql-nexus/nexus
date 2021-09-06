@@ -39,17 +39,32 @@ export interface NexusGenScalars {
 
 export interface NexusGenObjects {
   Mutation: {}
-  Post: {}
+  Post: {
+    // root type
+    author: NexusGenRootTypes['User'] // User!
+    geo: number[][] // [[Float!]!]!
+    id: string // ID!
+    messyGeo?: Array<number[] | null> | null // [[Float!]]
+    uuid: NexusGenScalars['UUID'] // UUID!
+  }
   Query: {}
-  User: {}
+  User: {
+    // root type
+    email: string // String!
+    id: string // ID!
+    name: string // String!
+    outEnum?: NexusGenEnums['SomeEnum'] | null // SomeEnum
+    phone?: string | null // String
+    posts: NexusGenRootTypes['Post'][] // [Post!]!
+  }
 }
 
 export interface NexusGenInterfaces {
-  Node: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>
+  Node: core.Discriminate<'Post', 'optional'> | core.Discriminate<'User', 'optional'>
 }
 
 export interface NexusGenUnions {
-  ExampleUnion: core.Discriminate<'Post', 'required'> | core.Discriminate<'User', 'required'>
+  ExampleUnion: core.Discriminate<'Post', 'optional'> | core.Discriminate<'User', 'optional'>
 }
 
 export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions
@@ -185,7 +200,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenAbstractsUsingStrategyResolveType = never
+export type NexusGenAbstractsUsingStrategyResolveType = 'ExampleUnion' | 'Node'
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

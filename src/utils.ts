@@ -178,7 +178,7 @@ export function groupTypes(schema: GraphQLSchema) {
   Object.keys(schemaTypeMap)
     .sort()
     .forEach((typeName) => {
-      if (typeName.indexOf('__') === 0) {
+      if (typeName.startsWith('__')) {
         return
       }
       const type = schema.getType(typeName)
@@ -627,4 +627,11 @@ export const ownProp = {
   get<O extends object, K extends keyof O>(obj: O, key: K): O[K] | undefined {
     return Object.getOwnPropertyDescriptor(obj, key)?.value
   },
+}
+
+export function result<T>(val: T | (() => T)): T {
+  if (val instanceof Function) {
+    return val()
+  }
+  return val as T
 }

@@ -189,6 +189,8 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *   jsDoc for more detail.
    */
   definition(t: ObjectDefinitionBlock<TypeName>): void
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 } & AbstractTypes.MaybeTypeDefConfigFieldIsTypeOf<TypeName> &
   NexusGenPluginTypeConfig<TypeName>
 

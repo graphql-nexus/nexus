@@ -43,6 +43,8 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLEnumTypeConfig['extensions']
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 }
 
 export class NexusEnumTypeDef<TypeName extends string> {

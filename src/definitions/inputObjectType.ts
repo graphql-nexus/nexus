@@ -21,6 +21,8 @@ export type NexusInputObjectTypeConfig<TypeName extends string> = {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLInputObjectTypeConfig['extensions']
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 } & NexusGenPluginInputTypeConfig<TypeName>
 
 export class NexusInputObjectTypeDef<TypeName extends string> {

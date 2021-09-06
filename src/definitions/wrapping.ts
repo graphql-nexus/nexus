@@ -201,6 +201,13 @@ export function isNexusArgDef(obj: any): obj is NexusArgDef<AllInputTypes> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Arg
 }
 
+export function isNexusNamedOuputTypeDef(obj: any): obj is AllNexusNamedOutputTypeDefs {
+  return isNexusNamedTypeDef(obj) && !isNexusInputObjectTypeDef(obj)
+}
+export function isNexusNamedInputTypeDef(obj: any): obj is AllNexusNamedInputTypeDefs {
+  return isNexusNamedTypeDef(obj) && !isNexusObjectTypeDef(obj) && !isNexusInterfaceTypeDef(obj)
+}
+
 export function isNexusDynamicOutputProperty<T extends string>(obj: any): obj is DynamicOutputPropertyDef<T> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.DynamicOutputProperty
 }

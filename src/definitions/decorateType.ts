@@ -6,17 +6,13 @@ export interface TypeExtensionConfig {
   sourceType?: SourceTypingDef
 }
 
-export type NexusTypeExtensions = {
-  nexus: TypeExtensionConfig
-}
-
 export function decorateType<T extends GraphQLNamedType>(type: T, config: TypeExtensionConfig): T {
   type.extensions = {
     ...type.extensions,
     nexus: {
-      asNexusMethod: config.asNexusMethod,
-      sourceType: config.sourceType,
+      ...type.extensions?.nexus,
+      ...config,
     },
   }
-  return type as any
+  return type
 }
