@@ -859,7 +859,7 @@ export class SchemaBuilder {
 
   private buildNexusTypes() {
     // If Query isn't defined, set it to null so it falls through to "missingType"
-    if (!this.pendingTypeMap.Query && !this.config.schemaRoots?.query) {
+    if (!this.pendingTypeMap.Query && !this.config.schemaRoots?.query && !this.typeExtendMap.Query) {
       this.pendingTypeMap.Query = null as any
     }
     Object.keys(this.pendingTypeMap).forEach((key) => {
