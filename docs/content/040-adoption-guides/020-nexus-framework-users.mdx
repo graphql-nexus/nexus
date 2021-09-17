@@ -27,7 +27,7 @@ You will need to manage the TypeScript toolchain yourself.
 1. Install `typescript`, `ts-node`, and `ts-node-dev`.
 
    ```bash-symbol
-   npm add -D typescript ts-node ts-node-dev
+   npm install -D typescript ts-node ts-node-dev
    ```
 
 2. The following applies to VSCode but something like it might apply to other editors as well. You must also make sure your editor is set to use the local version of TypeScript rather than the one the editor ships with. Summon the command pallet `command+shift+p` and then enter and select `typescript: select TypeScript Version...`. Then select `Workspace Version`.
@@ -205,13 +205,13 @@ Nexus framework comes bundled with Apollo Server and runs it for you. You will n
 1. Install new dependencies
 
    ```tsx
-   npm add express apollo-server-express
+   npm install express apollo-server-express
    ```
 
 2. If using TypeScript then Install typings for Express
 
    ```tsx
-   npm add -D @types/express
+   npm install -D @types/express
    ```
 
 3. If using TypeScript then you [need to](https://github.com/apollographql/apollo-server/issues/1977#issuecomment-662946590) enable `esModuleInterop` to be able to use Apollo Server
@@ -337,7 +337,7 @@ Nexus Framework has some builtin logging functionality. You can approximate it a
 1. Install your logger
 
    ```tsx
-   npm add floggy
+   npm install floggy
    ```
 
 2. Create your application logger. The logger you export here should be used across your codebase.
@@ -386,7 +386,7 @@ You need to explicitly setup all custom scalars yourself. To match what Nexus Fr
 1. Install the `graphql-scalars` package
 
    ```json
-   npm add graphql-scalars
+   npm install graphql-scalars
    ```
 
 2. Setup the `Json` and `DateTime` scalars
@@ -536,13 +536,13 @@ In Nexus Framework there was a testing module for system testing your app. You n
 1.  Install your test framework
 
     ```tsx
-    npm add jest
+    npm install jest
     ```
 
 2.  If you are a TypeScript user then install and configure `ts-jest`
 
     ```bash
-    npm add ts-jest
+    npm install ts-jest
     ```
 
     We will configure using a `jest.config.js` module in your project root. Do not use a JSON based configuration unless you know that you won't need the dynamic code used in some later steps here.
@@ -639,7 +639,7 @@ In Nexus Framework there was a testing module for system testing your app. You n
 6.  You will need a way to run your app in tests. Here is one way [adapted from the tutorial](https://todo.com).
 
     ```tsx
-    npm add -D graphql-request
+    npm install -D graphql-request
     ```
 
     ```tsx
@@ -688,7 +688,7 @@ Nexus Framework had a CLI for scaffolding new projects. You can approximate this
 Nexus Framework has a gradual settings API with features such as automatic mapping of environment variables to settings. You can use the [`setset`](https://github.com/jasonkuhrt/setset) package manually to gain back this functionality.
 
 ```tsx
-npm add setset
+npm install setset
 ```
 
 ```tsx

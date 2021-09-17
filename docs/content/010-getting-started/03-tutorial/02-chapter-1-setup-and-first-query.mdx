@@ -18,7 +18,7 @@ Start by creating your project directory, initializing your `package.json`, and 
 ```bash-symbol copy
 mkdir nexus-tutorial && cd nexus-tutorial
 npm init -y
-npm add nexus graphql apollo-server
+npm install nexus graphql apollo-server
 ```
 
 > Note: `nexus` works with any GraphQL compliant server. We'll use `apollo-server` in this tutorial, but you're free to use whichever fits your use-case best.
@@ -26,7 +26,7 @@ npm add nexus graphql apollo-server
 We'll also need `typescript` and `ts-node-dev` as dev dependencies. `ts-node-dev` will enable you to transpile your TS files on the fly and restart your API on changes.
 
 ```bash-symbol copy
-npm add --save-dev typescript ts-node-dev
+npm install --save-dev typescript ts-node-dev
 ```
 
 To properly get full advantage of TypeScript, we'll need a `tsconfig.json` file. Create one at the root of your project and copy paste the following
