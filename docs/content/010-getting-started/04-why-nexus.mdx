@@ -63,6 +63,7 @@ const Post = objectType({
 const Query = queryType({
   definition(t) {
     t.list.field('posts', {
+      type: Post,
       resolve: () => [
         {
           id: '1',
