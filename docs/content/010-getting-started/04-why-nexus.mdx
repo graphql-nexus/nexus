@@ -94,7 +94,7 @@ There are numerous benefits to taking a code-first approach with Nexus:
 
 When building a schema-first GraphQL API, it is common to start out by placing all type definitions and resolvers in a single file. When both the schema and the resolvers live next to one another, it's fairly straightforward to work in both at the same time.
 
-As the application grows, however, it is most often desired to move parts of the schema into their own separate modules and files. It's at this point that working on a GraphQL API becomes a bit more tedious. With this modularization comes the need to switch back and forth between the Schema Definition Language and JavaScript/TypeScript to write the resolvers. Not only does one need to constantly switch between files, they also need to do a context switch mentally to work between the two langauges.
+As the application grows, however, it is most often desired to move parts of the schema into their own separate modules and files. It's at this point that working on a GraphQL API becomes a bit more tedious. With this modularization comes the need to switch back and forth between the Schema Definition Language and JavaScript/TypeScript to write the resolvers. Not only does one need to constantly switch between files, they also need to do a context switch mentally to work between the two languages.
 
 With Nexus, our schema and its resolvers are always defined together. Nexus also allows us to write everything in a common language. This allows us to side-step the co-location/context switching issue altogether and helps us to be more productive, even as our applications grow to be quite large.
 
