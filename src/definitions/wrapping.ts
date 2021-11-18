@@ -292,10 +292,10 @@ export function rewrapAsGraphQLType(baseType: GraphQLNamedType, wrapping: NexusF
   let finalType: GraphQLType = baseType
   wrapping.forEach((wrap) => {
     if (wrap === 'List') {
-      finalType = GraphQLList(finalType)
+      finalType = new GraphQLList(finalType)
     } else if (wrap === 'NonNull') {
       if (!isNonNullType(finalType)) {
-        finalType = GraphQLNonNull(finalType)
+        finalType = new GraphQLNonNull(finalType)
       }
     } else {
       throw new Unreachable(wrap)

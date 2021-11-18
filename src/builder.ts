@@ -1200,7 +1200,7 @@ export class SchemaBuilder {
         name: 'Query',
         fields: {
           ok: {
-            type: GraphQLNonNull(GraphQLBoolean),
+            type: new GraphQLNonNull(GraphQLBoolean),
             resolve: () => true,
           },
         },
