@@ -88,7 +88,7 @@ mkdir tests && touch tests/Post.test.ts
 
 To ease testing, we'll create a small utility that we'll call `createTestContext`, which is designed for running integration tests.
 
-When run, it will boot your app in the same process as the test suite and expose an interface for your tests to interact with it. Jest runs each test suite in its own process, so if you have have say eight test suites running in parallel that means you'll have eight app processes running too.
+When run, it will boot your app in the same process as the test suite and expose an interface for your tests to interact with it. Jest runs each test suite in its own process, so if you have say eight test suites running in parallel that means you'll have eight app processes running too.
 
 Create a `tests/__helpers.ts` module with the following contents.
 
