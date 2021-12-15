@@ -82,7 +82,7 @@ export const schema = makeSchema({
 
 ### Configuring Context Type
 
-The framework used to automatically inject and type your context so that an instance of the client would be there for you. We know need to configure that manually. To do so, we'll first create a `context.ts` file where we'll export a type containing the Prisma Client.
+The framework used to automatically inject and type your context so that an instance of the client would be there for you. We now need to configure that manually. To do so, we'll first create a `context.ts` file where we'll export a type containing the Prisma Client.
 
 ```tsx
 // context.ts
@@ -128,7 +128,7 @@ If your Prisma Schema is using either the `Json` or `DateTime` type, the framewo
 
     ```bash
     npm install graphql-scalars
-    ```
+    ```xf
 
 2.  Then, add the following configuration property to the Prisma plugin
 
