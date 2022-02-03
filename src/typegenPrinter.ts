@@ -755,13 +755,13 @@ export class TypegenPrinter {
       if (item.length === 1) {
         if (Array.isArray(item[0])) {
           const toPrint = combine(item[0])
-          return toPrint.indexOf('null') === -1 ? `${toPrint}[]` : `Array<${toPrint}>`
+          return `ReadonlyArray<${toPrint}>`
         }
         return item[0]
       }
       if (Array.isArray(item[1])) {
         const toPrint = combine(item[1])
-        return toPrint.indexOf('null') === -1 ? `${toPrint}[] | null` : `Array<${toPrint}> | null`
+        return `ReadonlyArray<${toPrint}> | null`
       }
       return `${item[1]} | null`
     }
