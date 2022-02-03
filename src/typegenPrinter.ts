@@ -817,16 +817,23 @@ export class TypegenPrinter {
 
   private argTypeRepresentation(arg: GraphQLInputType): string {
     const argType = this.argTypeArr(arg)
+    const useReadonlyArrayForInputs = !!this.typegenInfo.useReadonlyArrayForInputs
     function combine(item: any[]): string {
       if (item.length === 1) {
         if (Array.isArray(item[0])) {
           const toPrint = combine(item[0])
+          if (useReadonlyArrayForInputs) {
+            return `ReadonlyArray<${toPrint}>`
+          }
           return toPrint.indexOf('null') === -1 ? `${toPrint}[]` : `Array<${toPrint}>`
         }
         return item[0]
       }
       if (Array.isArray(item[1])) {
         const toPrint = combine(item[1])
+        if (useReadonlyArrayForInputs) {
+          return `ReadonlyArray<${toPrint}> | null`
+        }
         return toPrint.indexOf('null') === -1 ? `${toPrint}[] | null` : `Array<${toPrint}> | null`
       }
       return `${item[1]} | null`

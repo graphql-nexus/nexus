@@ -172,6 +172,7 @@ export class TypegenMetadata {
       imports: [],
       contextTypeImport: this.config.contextType,
       sourceTypeMap: {},
+      useReadonlyArrayForInputs: this.config.useReadonlyArrayForInputs,
     }
   }
 }
