@@ -1,4 +1,4 @@
-import type { FieldOutConfig, OutputDefinitionBlock } from '../core'
+import type { FieldOutConfig, OutputDefinitionBlock } from './definitionBlocks'
 import { extendType, NexusExtendTypeDef } from './extendType'
 
 export type QueryFieldConfig<FieldName extends string> =
@@ -101,7 +101,7 @@ export function queryField(
  *   })
  *
  * @param name The name of the field on the Query type. Names are case‐sensitive and must conform to pattern:
- *   `[_A-Za-z][_0-9A-Za-z]*`
+ *     `[_A-Za-z][_0-9A-Za-z]*`
  * @param config The same type of configuration you would pass to t.field("...", config)
  */
 export function queryField<FieldName extends string>(

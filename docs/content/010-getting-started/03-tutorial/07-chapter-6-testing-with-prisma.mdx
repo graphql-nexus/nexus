@@ -26,7 +26,7 @@ To achieve some of the steps described above, we'll tweak our test context.
 First, install the `sqlite3` and `nanoid` packages
 
 ```bash copy
-npm add --save-dev sqlite3 @types/sqlite3
+npm install --save-dev sqlite3 @types/sqlite3
 ```
 
 Then, head to your `tests/__helpers.ts` file to add the following imports and code
@@ -220,7 +220,7 @@ function prismaTestContext() {
 The `prismaTestContext` is in charge of a couple of things:
 
 1. Connect to an in-memory instance of the SQLite database
-2. Pushes the Prisma Schema to the adatabase
+2. Pushes the Prisma Schema to the database
 3. Generates a new Prisma Client
 4. Add an instance of a Prisma Client connected to the schema specifically for the test
 

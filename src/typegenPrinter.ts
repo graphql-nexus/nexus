@@ -201,7 +201,7 @@ export class TypegenPrinter {
   }
 
   private printDynamicImport(forGlobal = false) {
-    const { rootTypings } = this.schema.extensions.nexus.config
+    const { sourceTypings } = this.schema.extensions.nexus.config
     const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
@@ -222,7 +222,7 @@ export class TypegenPrinter {
             : contextTypeImport.export
         )
       }
-      eachObj(rootTypings, (rootType, typeName) => {
+      eachObj(sourceTypings, (rootType, typeName) => {
         if (typeof rootType !== 'string') {
           const importPath = resolveImportPath(rootType, typeName, outputPath)
           importMap[importPath] = importMap[importPath] || new Set()
@@ -607,7 +607,7 @@ export class TypegenPrinter {
   }
 
   private resolveSourceType(typeName: string): string | undefined {
-    const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
+    const rootTyping = this.schema.extensions.nexus.config.sourceTypings[typeName]
     if (rootTyping) {
       return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
@@ -914,17 +914,19 @@ export class TypegenPrinter {
       .join('\n')
   }
 
-  private printObj =
-    (space: string, source: string) => (val: Record<string, [string, string]>, key: string) => {
-      return [`${space}${key}: { // ${source}`]
-        .concat(
-          mapObj(val, (v2, k2) => {
-            return `${space}  ${k2}${v2[0]} ${v2[1]}`
-          })
-        )
-        .concat(`${space}}`)
-        .join('\n')
-    }
+  private printObj = (space: string, source: string) => (
+    val: Record<string, [string, string]>,
+    key: string
+  ) => {
+    return [`${space}${key}: { // ${source}`]
+      .concat(
+        mapObj(val, (v2, k2) => {
+          return `${space}  ${k2}${v2[0]} ${v2[1]}`
+        })
+      )
+      .concat(`${space}}`)
+      .join('\n')
+  }
 
   private printScalar(type: GraphQLScalarType) {
     if (isSpecifiedScalarType(type)) {

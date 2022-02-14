@@ -10,11 +10,31 @@ codeStyle: true
 Defines a complex object which can be passed as an input value.
 
 ```ts
-export const InputType = inputObjectType({
-  name: 'InputType',
+import { extendType, inputObjectType } from 'nexus'
+
+export const CommentInputType = inputObjectType({
+  name: 'CommentInputType',
   definition(t) {
-    t.nonNull.string('key')
-    t.int('answer')
+    t.nonNull.int('userId')
+    t.nonNull.string('body')
+  }
+})
+
+export const CommentMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('createComment', {
+      type: 'Comment',
+      args: { data: CommentInputType },
+      resolve(_root, args, ctx) {
+        return ctx.prisma.comment.create({
+          data: {
+            user_id: args.userId,
+            body: args.body,
+          }
+        })
+      }
+    })
   },
 })
 ```

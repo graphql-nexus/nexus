@@ -15,7 +15,7 @@ import { queryType, stringArg, list } from 'nexus'
 queryType({
   definition(t) {
     t.field('tags', {
-      type: list('String') // -> [String]
+      type: list('String'), // -> [String]
       args: {
         ids: list(stringArg()) // or list('String') -> [String]
       },

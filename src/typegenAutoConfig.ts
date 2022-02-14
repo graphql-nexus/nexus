@@ -164,8 +164,9 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
           return null
         }
 
-        const importPath = (
-          path.isAbsolute(pathOrModule) ? relativePathTo(resolvedPath, outputPath) : pathOrModule
+        const importPath = (path.isAbsolute(pathOrModule)
+          ? relativePathTo(resolvedPath, outputPath)
+          : pathOrModule
         ).replace(typeScriptFileExtension, '')
 
         if (allImportsMap[alias] && allImportsMap[alias] !== importPath) {
@@ -194,7 +195,7 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
     const builtinScalars = new Set(Object.keys(SCALAR_TYPES))
 
     Object.keys(typeMap).forEach((typeName) => {
-      if (typeName.indexOf('__') === 0) {
+      if (typeName.startsWith('__')) {
         return
       }
       if (typesToIgnore.has(typeName)) {

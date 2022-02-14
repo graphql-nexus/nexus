@@ -1,7 +1,7 @@
 import type { GraphQLScalarTypeConfig } from 'graphql'
 import type { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
 import type { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
-import { NexusTypes, withNexusSymbol } from './_types'
+import { Maybe, NexusTypes, withNexusSymbol } from './_types'
 
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 
@@ -39,7 +39,7 @@ export type CommonArgConfig = {
    *   //   ): [Int]
    *   // }
    */
-  description?: string
+  description?: Maybe<string>
 
   /**
    * Data that will be added to the arg-level [extensions field on the graphql-js type def
@@ -86,10 +86,10 @@ export interface NexusArgConfig<T extends string> extends NexusAsArgConfig<T> {
    *
    * Types may be expressed in one of three ways:
    *
-   * 1. As string literals matching the name of a builtin scalar.
-   * 2. As string literals matching the name of another type. Thanks to [Nexus' reflection
-   *    system](https://nxs.li/guides/reflection) this is typesafe and autocompletable.
-   * 3. As references to other enums or input object type definitions.
+   * 1. As string literals matching the name of a builtin scalar. 2. As string literals matching the name of
+   * another type. Thanks to [Nexus' reflection
+   *     system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. 3. As references to other
+   * enums or input object type definitions.
    *
    * Type modifier helpers like list() may also be used and in turn accept one of the three methods listed above.
    *
@@ -157,7 +157,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg)
  *   })
  *
  * @param config Configuration for the argument like its type and description. See jsdoc on each config field
- *   for details.
+ *     for details.
  */
 export function arg<T extends string>(config: NexusArgConfig<T>) {
   if (!config.type) {

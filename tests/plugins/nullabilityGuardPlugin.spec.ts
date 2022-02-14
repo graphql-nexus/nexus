@@ -41,7 +41,7 @@ const types = [
     description: 'Showing that the defaults works for all resolvers, not just Nexus ones',
     fields: () => ({
       id: {
-        type: GraphQLNonNull(GraphQLID),
+        type: new GraphQLNonNull(GraphQLID),
       },
     }),
   }),

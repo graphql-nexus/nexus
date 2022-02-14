@@ -31,9 +31,10 @@ import {
   AllNexusTypeDefs,
   isNexusWrappingType,
   isNexusArgDef,
-  AllNexusNamedInputTypeDefs,
+  AllNamedInputTypeDefs,
 } from './definitions/wrapping'
 import {
+  Maybe,
   MissingType,
   NexusFeatures,
   NexusGraphQLSchema,
@@ -177,7 +178,7 @@ export function groupTypes(schema: GraphQLSchema) {
   Object.keys(schemaTypeMap)
     .sort()
     .forEach((typeName) => {
-      if (typeName.indexOf('__') === 0) {
+      if (typeName.startsWith('__')) {
         return
       }
       const type = schema.getType(typeName)
@@ -266,7 +267,7 @@ export interface PrintedGenTypingConfig {
   name: string
   optional: boolean
   type: string
-  description?: string
+  description?: Maybe<string>
   imports?: PrintedGenTypingImport[]
 }
 
@@ -517,7 +518,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
 }
 
 /** Given the right hand side of an arg definition, returns the underlying "named type" for us to add to the builder */
-export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusNamedInputTypeDefs | string {
+export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNamedInputTypeDefs | string {
   let finalValue = argDef
   if (typeof finalValue === 'string') {
     return finalValue
@@ -634,4 +635,11 @@ export const ownProp = {
   get<O extends object, K extends keyof O>(obj: O, key: K): O[K] | undefined {
     return Object.getOwnPropertyDescriptor(obj, key)?.value
   },
+}
+
+export function result<T>(val: T | (() => T)): T {
+  if (val instanceof Function) {
+    return val()
+  }
+  return val as T
 }

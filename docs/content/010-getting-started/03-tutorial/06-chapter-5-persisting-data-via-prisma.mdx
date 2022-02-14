@@ -35,8 +35,8 @@ Now that you know a bit about Prisma, let's get going! Do the following:
 like so:
 
 ```bash-symbol copy
-npm add @prisma/client
-npm add --save-dev prisma
+npm install @prisma/client
+npm install --save-dev prisma
 ```
 
 Next, add Prisma to your project by creating your [Prisma schema](https://www.prisma.io/docs/concepts/components/prisma-schema/) file with the following command:
@@ -135,7 +135,7 @@ Now let's finally ditch our in-memory data! Let's replace it with the Prisma Cli
 // api/db.ts
 +import { PrismaClient } from '@prisma/client'
 
-export const db = new PrismaClient()
++export const db = new PrismaClient()
 
 -export interface Post {
 -  id: number
@@ -266,15 +266,15 @@ export const PostMutation = extendType({
         draftId: nonNull(intArg()),
       },
       resolve(_root, args, ctx) {
--       let postToPublish = ctx.db.posts.find((p) => p.id === args.draftId)
+-       let draftToPublish = ctx.db.posts.find((p) => p.id === args.draftId)
 
--       if (!postToPublish) {
+-       if (!draftToPublish) {
 -         throw new Error('Could not find draft with id ' + args.draftId)
 -       }
 
--       postToPublish.published = true
+-       draftToPublish.published = true
 
--       return postToPublish
+-       return draftToPublish
 
 +       return ctx.db.post.update({
 +         where: { id: args.draftId },

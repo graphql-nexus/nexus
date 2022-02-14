@@ -2,18 +2,18 @@ import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
 import type { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers'
 import type { ArgsRecord } from './args'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import { AbstractTypes, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
+import { AbstractTypes, Maybe, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 
 export interface FieldModification<TypeName extends string, FieldName extends string> {
   type?: ModificationType<TypeName, FieldName>
   /** The description to annotate the GraphQL SDL */
-  description?: string
+  description?: Maybe<string>
   /** The resolve method we should be resolving the field with */
   resolve?: FieldResolver<TypeName, FieldName>
   /** You are allowed to add non-required args when modifying a field */
-  args?: ArgsRecord
+  args?: Maybe<ArgsRecord>
   /**
    * Custom extensions, as supported in graphql-js
    *
@@ -44,7 +44,7 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    */
   nonNullDefaults?: NonNullConfig
   /** The description to annotate the GraphQL SDL */
-  description?: string
+  description?: Maybe<string>
   /** Source type information for this type */
   sourceType?: SourceTypingDef
   /**
@@ -53,6 +53,8 @@ export type NexusInterfaceTypeConfig<TypeName extends string> = {
    * @see https://github.com/graphql/graphql-js/issues/1527
    */
   extensions?: GraphQLInterfaceTypeConfig<any, any>['extensions']
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export interface InterfaceDefinitionBuilder<TypeName extends string> extends OutputDefinitionBuilder {
