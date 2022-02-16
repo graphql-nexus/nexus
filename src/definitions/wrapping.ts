@@ -209,9 +209,7 @@ export function isNexusPlugin(obj: any): obj is NexusPlugin {
 export type NexusWrapKind = 'NonNull' | 'Null' | 'List'
 export type NexusFinalWrapKind = 'NonNull' | 'List'
 
-export function unwrapGraphQLDef(
-  typeDef: GraphQLType
-): {
+export function unwrapGraphQLDef(typeDef: GraphQLType): {
   namedType: GraphQLNamedType
   wrapping: NexusFinalWrapKind[]
 } {

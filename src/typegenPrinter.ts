@@ -914,19 +914,17 @@ export class TypegenPrinter {
       .join('\n')
   }
 
-  private printObj = (space: string, source: string) => (
-    val: Record<string, [string, string]>,
-    key: string
-  ) => {
-    return [`${space}${key}: { // ${source}`]
-      .concat(
-        mapObj(val, (v2, k2) => {
-          return `${space}  ${k2}${v2[0]} ${v2[1]}`
-        })
-      )
-      .concat(`${space}}`)
-      .join('\n')
-  }
+  private printObj =
+    (space: string, source: string) => (val: Record<string, [string, string]>, key: string) => {
+      return [`${space}${key}: { // ${source}`]
+        .concat(
+          mapObj(val, (v2, k2) => {
+            return `${space}  ${k2}${v2[0]} ${v2[1]}`
+          })
+        )
+        .concat(`${space}}`)
+        .join('\n')
+    }
 
   private printScalar(type: GraphQLScalarType) {
     if (isSpecifiedScalarType(type)) {
