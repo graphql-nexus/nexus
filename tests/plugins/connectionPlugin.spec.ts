@@ -1041,6 +1041,8 @@ describe('field level configuration', () => {
         scalarType({
           name: 'UUID',
           serialize() {},
+          parseLiteral() {},
+          parseValue() {},
         }),
         scalarType({
           name: 'UUID4',

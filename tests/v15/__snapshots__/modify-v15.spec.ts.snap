@@ -27,6 +27,5 @@ type Mule implements Equine & Pet {
 
 type Query {
   ok: Boolean!
-}
-"
+}"
 `;

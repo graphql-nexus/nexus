@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLNamedType, GraphQLScalarTypeConfig } from 'graphql'
+import { assertName, GraphQLNamedType, GraphQLScalarTypeConfig } from 'graphql'
 import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from '../core'
 import { decorateType } from './decorateType'
 import { GraphQLNamedOutputType, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
@@ -31,7 +31,7 @@ export interface NexusScalarTypeConfig<T extends string> extends ScalarBase, Sca
 
 export class NexusScalarTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusScalarTypeConfig<string>) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

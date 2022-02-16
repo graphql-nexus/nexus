@@ -86,9 +86,9 @@ describe('modify', () => {
   })
 
   it('can modify an existing interface field description', async () => {
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           node: __type(name: "Node") {
             fields {
@@ -103,8 +103,8 @@ describe('modify', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(result.data?.node.fields.find((f: { name: string }) => f.name === 'id').description).toEqual(
       'Some Node ID Description'
     )
@@ -114,9 +114,9 @@ describe('modify', () => {
   })
 
   it('can modify an existing interface field resolve', async () => {
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           user: node(id: "User:1") {
             id
@@ -125,17 +125,17 @@ describe('modify', () => {
             id
           }
         }
-      `
-    )
+      `,
+    })
     expect(result.data?.user.id).toEqual('User:1')
     expect(result.data?.throws.id).toEqual(null)
     expect(result.errors?.[0].message).toEqual('Abstract')
   })
 
   it('can add additional field args to an interface field', async () => {
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           withArg: node(id: "AddArg:1") {
             ... on AddArg {
@@ -148,17 +148,17 @@ describe('modify', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
 
     expect(result.data?.withArg.id).toEqual('SomeArg!')
     expect(result.data?.withoutArg.id).toEqual('AddArg:1')
   })
 
   it('can replace an abstract type field inherited from an interface', async () => {
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           node: __type(name: "Node") {
             fields {
@@ -179,8 +179,8 @@ describe('modify', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(result.data?.node.fields.find((f: { name: string }) => f.name === 'subNode').type.name).toEqual(
       'Node'
     )
@@ -190,9 +190,9 @@ describe('modify', () => {
   })
 
   it('can modify nullability of an abstract type field inherited from an interface', async () => {
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           node: __type(name: "Node") {
             fields {
@@ -216,8 +216,8 @@ describe('modify', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
 
     expect(
       result.data?.node.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.name

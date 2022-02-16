@@ -45,16 +45,16 @@ describe('inputObject', () => {
       outputs: false,
       shouldGenerateArtifacts: false,
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           user(input: { boolInput: true, floatInput: 123.4, intInput: 1 }) {
             id
           }
         }
-      `
-    )
+      `,
+    })
     expect(result).toMatchSnapshot()
   })
   it('has asArg for using one-off inputObjects inline', async () => {
@@ -87,16 +87,16 @@ describe('inputObject', () => {
       outputs: false,
       shouldGenerateArtifacts: false,
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           user(input: { boolInput: true, floatInput: 123.4, intInput: 1 }) {
             id
           }
         }
-      `
-    )
+      `,
+    })
     expect(result).toMatchSnapshot()
   })
 })

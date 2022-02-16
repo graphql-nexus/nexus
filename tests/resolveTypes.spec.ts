@@ -30,7 +30,7 @@ describe('custom scalars', () => {
         testDate
       }
     `
-    const result = await graphql(schema, query)
+    const result = await graphql({ schema, source: query })
     expect(result.data!.testDate).toBe(now.getTime())
   })
 })

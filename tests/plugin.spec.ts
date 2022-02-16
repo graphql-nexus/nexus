@@ -62,9 +62,9 @@ describe('plugin', () => {
         },
       },
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           user {
             id
@@ -80,8 +80,8 @@ describe('plugin', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(lifecycleCalls).toMatchSnapshot()
     expect(beforeCalls).toMatchSnapshot()
     expect(afterCalls).toMatchSnapshot()
@@ -213,14 +213,14 @@ describe('plugin', () => {
         }),
       ],
     })
-    await graphql(
+    await graphql({
       schema,
-      `
+      source: `
         {
           testCompose
         }
-      `
-    )
+      `,
+    })
     expect(calls).toMatchSnapshot()
   })
 
@@ -277,9 +277,9 @@ describe('plugin', () => {
         }),
       ],
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           getNode {
             __typename
@@ -289,8 +289,8 @@ describe('plugin', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
   })
 
@@ -425,14 +425,14 @@ describe('plugin', () => {
         }),
       ],
     })
-    await graphql(
+    await graphql({
       schema,
-      `
+      source: `
         {
           testCompose
         }
-      `
-    )
+      `,
+    })
     expect(calls).toMatchSnapshot()
   })
 })

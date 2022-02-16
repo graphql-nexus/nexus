@@ -17,8 +17,7 @@ type Out {
 
 type Query {
   ok: Boolean!
-}
-"
+}"
 `;
 
 exports[`extendInputType should allow extending input objects 1`] = `

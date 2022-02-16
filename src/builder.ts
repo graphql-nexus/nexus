@@ -138,7 +138,6 @@ import {
   isObject,
   objValues,
   UNKNOWN_TYPE_SCALAR,
-  unpack,
 } from './utils'
 import {
   NEXUS_BUILD,
@@ -628,7 +627,7 @@ export class SchemaBuilder {
 
       // If we've used decorateType to wrap, then we can grab the types off
       if (typeDef.extensions?.nexus) {
-        const { asNexusMethod, sourceType } = typeDef.extensions.nexus
+        const { asNexusMethod, sourceType } = Object(typeDef.extensions.nexus)
         if (asNexusMethod) {
           if (isInputType(typeDef)) {
             this.dynamicInputFields[asNexusMethod] = typeDef.name
