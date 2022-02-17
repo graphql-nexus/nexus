@@ -92,7 +92,7 @@ it('defines a field on the mutation type as shorthand', async () => {
     outputs: false,
   })
 
-  expect(GQL.printSchema(GQL.lexicographicSortSchema(schema))).toMatchInlineSnapshot(`
+  expect(GQL.printSchema(GQL.lexicographicSortSchema(schema)).trim()).toMatchInlineSnapshot(`
     "type Query {
       ok: Boolean!
     }

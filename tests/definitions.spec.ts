@@ -1,10 +1,18 @@
 /// <reference types="jest" />
-import { GraphQLEnumType, GraphQLObjectType, lexicographicSortSchema, printSchema, printType } from 'graphql'
-import type { TypeMap } from 'graphql/type/schema'
+import {
+  GraphQLEnumType,
+  GraphQLSchema,
+  GraphQLObjectType,
+  lexicographicSortSchema,
+  printSchema,
+  printType,
+} from 'graphql'
 import { enumType, extendInputType, extendType, idArg, inputObjectType, makeSchema, objectType } from '../src'
 import { list } from '../src/definitions/list'
 import { nonNull } from '../src/definitions/nonNull'
 import { PostObject, UserObject } from './__helpers'
+
+type TypeMap = ReturnType<GraphQLSchema['getTypeMap']>
 
 enum NativeColors {
   RED = 'RED',
@@ -154,7 +162,7 @@ describe('enumType', () => {
         }),
       ],
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 })
 

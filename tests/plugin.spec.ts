@@ -175,7 +175,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('composes the onCreateFieldResolve fns', async () => {
@@ -184,6 +184,7 @@ describe('plugin', () => {
       calls.push(`Before:${name}`)
       return plugin.completeValue(next(root, args, ctx, info), (val) => {
         calls.push(`After:${name} ${val}`)
+        // @ts-expect-error
         return val + 1
       })
     }
@@ -346,7 +347,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('has an plugin.inputObjectTypeDefTypes field where extra properties for inputObjectType can be added', async () => {
@@ -396,6 +397,7 @@ describe('plugin', () => {
       calls.push(`Before:${name}`)
       return plugin.completeValue(next(root, args, ctx, info), (val) => {
         calls.push(`After:${name} ${val}`)
+        // @ts-expect-error
         return val + 1
       })
     }

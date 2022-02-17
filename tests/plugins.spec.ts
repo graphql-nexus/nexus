@@ -79,7 +79,7 @@ describe('onInstall plugins', () => {
           plugins: [createPlugin({ name: 'x', ...xPluginConfig })],
         })
       )
-    )
+    ).trim()
   }
 
   it('is an optional hook', () => {

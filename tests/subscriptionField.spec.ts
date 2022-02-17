@@ -16,7 +16,7 @@ it('defines a field on the mutation type as shorthand', async () => {
     outputs: false,
   })
 
-  expect(printSchema(lexicographicSortSchema(schema))).toMatchInlineSnapshot(`
+  expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchInlineSnapshot(`
     "type Query {
       ok: Boolean!
     }
@@ -70,7 +70,7 @@ it('can be defined as a thunk', async () => {
     outputs: false,
   })
 
-  expect(printSchema(lexicographicSortSchema(schema))).toMatchInlineSnapshot(`
+  expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchInlineSnapshot(`
     "type Query {
       ok: Boolean!
     }
