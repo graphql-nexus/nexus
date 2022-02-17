@@ -62,9 +62,9 @@ describe('plugin', () => {
         },
       },
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           user {
             id
@@ -80,8 +80,8 @@ describe('plugin', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(lifecycleCalls).toMatchSnapshot()
     expect(beforeCalls).toMatchSnapshot()
     expect(afterCalls).toMatchSnapshot()
@@ -175,7 +175,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('composes the onCreateFieldResolve fns', async () => {
@@ -184,6 +184,7 @@ describe('plugin', () => {
       calls.push(`Before:${name}`)
       return plugin.completeValue(next(root, args, ctx, info), (val) => {
         calls.push(`After:${name} ${val}`)
+        // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
         return val + 1
       })
     }
@@ -213,14 +214,14 @@ describe('plugin', () => {
         }),
       ],
     })
-    await graphql(
+    await graphql({
       schema,
-      `
+      source: `
         {
           testCompose
         }
-      `
-    )
+      `,
+    })
     expect(calls).toMatchSnapshot()
   })
 
@@ -277,9 +278,9 @@ describe('plugin', () => {
         }),
       ],
     })
-    const result = await graphql(
+    const result = await graphql({
       schema,
-      `
+      source: `
         {
           getNode {
             __typename
@@ -289,8 +290,8 @@ describe('plugin', () => {
             }
           }
         }
-      `
-    )
+      `,
+    })
     expect(result.data?.getNode).toEqual({ __typename: 'AddsNode', id: 'AddsNode:abc', name: 'test' })
   })
 
@@ -346,7 +347,7 @@ describe('plugin', () => {
         }),
       ],
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('has an plugin.inputObjectTypeDefTypes field where extra properties for inputObjectType can be added', async () => {
@@ -396,6 +397,7 @@ describe('plugin', () => {
       calls.push(`Before:${name}`)
       return plugin.completeValue(next(root, args, ctx, info), (val) => {
         calls.push(`After:${name} ${val}`)
+        // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
         return val + 1
       })
     }
@@ -425,14 +427,14 @@ describe('plugin', () => {
         }),
       ],
     })
-    await graphql(
+    await graphql({
       schema,
-      `
+      source: `
         {
           testCompose
         }
-      `
-    )
+      `,
+    })
     expect(calls).toMatchSnapshot()
   })
 })

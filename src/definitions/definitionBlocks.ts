@@ -126,9 +126,7 @@ export interface OutputScalarConfig<TypeName extends string, FieldName extends s
    * Every field has a resolver and they are the basis for resolving queries at runtime. You do not need to
    * explicitly implement every resolver however. If the [source typing](https://nxs.li/guides/backing-types) includes:
    *
-   * 1. A field whose name matches this one
-   * 2. And whose type is compatible
-   * 3. And is a scalar
+   * 1. A field whose name matches this one 2. And whose type is compatible 3. And is a scalar
    *
    * ...then the default resolver will be available, whose behaviour is to simply return that field from the
    * received source type.
@@ -146,29 +144,29 @@ export interface OutputScalarConfig<TypeName extends string, FieldName extends s
    *   })
    *
    * @param source The [source data](https://nxs.li/guides/source-types) for the GraphQL object that this
-   *   field belongs to, unless this is a root field (any field on a [root operation
-   *   type](https://spec.graphql.org/June2018/#sec-Root-Operation-Types): Query, Mutation, Subscription), in
-   *   which case there is no source data and this will be undefined.
+   *     field belongs to, unless this is a root field (any field on a [root operation
+   *     type](https://spec.graphql.org/June2018/#sec-Root-Operation-Types): Query, Mutation, Subscription),
+   *     in which case there is no source data and this will be undefined.
    * @param args If you have defined arguments on this field then this parameter will contain any arguments
-   *   passed by the client. If you specified default values for any arguments and the client did not
-   *   explicitly pass *any* value (including null) for those arguments then you will see the defaults here.
+   *     passed by the client. If you specified default values for any arguments and the client did not
+   *     explicitly pass *any* value (including null) for those arguments then you will see the defaults here.
    *
-   *   Note that thanks to [Nexus' reflection system](https://nxs.li/guides/reflection) this parameter's type
-   *   will always be type safe.
+   * Note that thanks to [Nexus' reflection system](https://nxs.li/guides/reflection) this parameter's type
+   *     will always be type safe.
    * @param context The context data for this request.
    *
-   *   The context data is typically a singleton scoped to the lifecycle of the request. This means created at
-   *   the beginning of a request and then passed to all the resolvers that execute while resolving the
-   *   request. It is often used to store information like the current user making the request. Nexus is not
-   *   responsible for this however. That is typically something you'll do with e.g.
-   *   [Mercurius](https://mercurius.dev) or [Apollo
-   *   Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
+   * The context data is typically a singleton scoped to the lifecycle of the request. This means created at
+   *     the beginning of a request and then passed to all the resolvers that execute while resolving the
+   *     request. It is often used to store information like the current user making the request. Nexus is
+   *     not responsible for this however. That is typically something you'll do with e.g.
+   *     [Mercurius](https://mercurius.dev) or [Apollo
+   *     Server](https://apollographql.com/docs/apollo-server/api/apollo-server).
    *
-   *   Note that the type here will be whatever you have specified for "contextType" in your makeSchema configuration.
+   * Note that the type here will be whatever you have specified for "contextType" in your makeSchema configuration.
    * @param info The GraphQL resolve info.
    *
-   *   This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
-   *   document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
+   * This is an advanced parameter seldom used. It includes things like the AST of the [GraphQL
+   *     document](https://spec.graphql.org/June2018/#sec-Language.Document) sent by the client.
    */
   resolve?: FieldResolver<TypeName, FieldName>
 }
@@ -486,17 +484,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    *
-   *   This parameter is optional if no resolver is required. No resolver is required if the [source
-   *   typing](https://nxs.li/guides/backing-types):
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
    *
-   *   1. Has a field whose name matches this one
-   *   2. And whose type is compatible
-   *   3. And is a scalar
+   * 1. Has a field whose name matches this one 2. And whose type is compatible 3. And is a scalar
    *
-   *   ...in which case the default resolver will be available whose behaviour is to simply return that field
-   *   from the received source type.
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field
+   *     from the received source type.
    */
   boolean<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
     this.addScalarField(name, 'Boolean', config)
@@ -526,17 +522,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    *
-   *   This parameter is optional if no resolver is required. No resolver is required if the [source
-   *   typing](https://nxs.li/guides/backing-types):
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
    *
-   *   1. Has a field whose name matches this one
-   *   2. And whose type is compatible
-   *   3. And is a scalar
+   * 1. Has a field whose name matches this one 2. And whose type is compatible 3. And is a scalar
    *
-   *   ...in which case the default resolver will be available whose behaviour is to simply return that field
-   *   from the received source type.
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field
+   *     from the received source type.
    */
   string<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
     this.addScalarField(name, 'String', config)
@@ -567,17 +561,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    *
-   *   This parameter is optional if no resolver is required. No resolver is required if the [source
-   *   typing](https://nxs.li/guides/backing-types):
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
    *
-   *   1. Has a field whose name matches this one
-   *   2. And whose type is compatible
-   *   3. And is a scalar
+   * 1. Has a field whose name matches this one 2. And whose type is compatible 3. And is a scalar
    *
-   *   ...in which case the default resolver will be available whose behaviour is to simply return that field
-   *   from the received source type.
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field
+   *     from the received source type.
    */
   id<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
     this.addScalarField(name, 'ID', config)
@@ -606,17 +598,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    *
-   *   This parameter is optional if no resolver is required. No resolver is required if the [source
-   *   typing](https://nxs.li/guides/backing-types):
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
    *
-   *   1. Has a field whose name matches this one
-   *   2. And whose type is compatible
-   *   3. And is a scalar
+   * 1. Has a field whose name matches this one 2. And whose type is compatible 3. And is a scalar
    *
-   *   ...in which case the default resolver will be available whose behaviour is to simply return that field
-   *   from the received source type.
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field
+   *     from the received source type.
    */
   int<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
     this.addScalarField(name, 'Int', config)
@@ -628,8 +618,9 @@ export class OutputDefinitionBlock<TypeName extends string> {
    * Define a field whose type is Float.
    *
    * Float types are [scalars](https://spec.graphql.org/June2018/#sec-Scalars) representing signed
-   * double‐precision fractional values as specified by IEEE 754. They are represented in JavaScript using the
-   * [number primitive type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number).
+   * double‐precision fractional values as specified by IEEE 754. They are represented in JavaScript using
+   * the [number primitive
+   * type](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number).
    *
    * This is a shorthand, equivalent to:
    *
@@ -645,17 +636,15 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    *
-   *   This parameter is optional if no resolver is required. No resolver is required if the [source
-   *   typing](https://nxs.li/guides/backing-types):
+   * This parameter is optional if no resolver is required. No resolver is required if the [source
+   *     typing](https://nxs.li/guides/backing-types):
    *
-   *   1. Has a field whose name matches this one
-   *   2. And whose type is compatible
-   *   3. And is a scalar
+   * 1. Has a field whose name matches this one 2. And whose type is compatible 3. And is a scalar
    *
-   *   ...in which case the default resolver will be available whose behaviour is to simply return that field
-   *   from the received source type.
+   * ...in which case the default resolver will be available whose behaviour is to simply return that field
+   *     from the received source type.
    */
   float<FieldName extends string>(name: FieldName, ...config: ScalarOutSpread<TypeName, FieldName>) {
     this.addScalarField(name, 'Float', config)
@@ -684,7 +673,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *
    * @param name The name of this field. Must conform to the regex pattern: [_A-Za-z][_0-9A-Za-z]*
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    */
   field<FieldName extends string>(name: FieldName, config: FieldOutConfig<TypeName, FieldName>): void
   /**
@@ -710,7 +699,7 @@ export class OutputDefinitionBlock<TypeName extends string> {
    *   })
    *
    * @param config The configuration for things like the field's type, its description, its arguments, its
-   *   resolver, and more. See jsdoc on each field within for details.
+   *     resolver, and more. See jsdoc on each field within for details.
    */
   field<FieldName extends string>(config: FieldOutConfigWithName<TypeName, FieldName>): void
   field<FieldName extends string>(

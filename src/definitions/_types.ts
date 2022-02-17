@@ -25,7 +25,8 @@ import type { RequiredDeeply } from '../typeHelpersInternal'
 
 export type { AbstractTypes }
 
-export type Maybe<T> = T | null
+/** Conveniently represents flow's "Maybe" type https://flow.org/en/docs/types/maybe/ */
+export type Maybe<T> = null | undefined | T
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
@@ -154,7 +155,7 @@ export type NexusGraphQLInterfaceTypeConfig = WithExt<
   NexusInterfaceTypeExtension
 > & { interfaces: () => GraphQLInterfaceType[] }
 
-export type NexusGraphQLSchema = Omit<GraphQLSchema, 'extensions'> & {
+export interface NexusGraphQLSchema extends GraphQLSchema {
   extensions: { nexus: NexusSchemaExtension }
 }
 
@@ -175,8 +176,8 @@ export type NexusFeaturesInput = {
    * types guide](https://nxs.li/guides/abstract-types).
    *
    * If you plan on enabling multiple strategies and you've never done so then please [read the guide about
-   * using multiple strategies](https://nxs.li/guides/abstract-types/using-multiple-strategies) as there are a
-   * few quirks to be aware of.
+   * using multiple strategies](https://nxs.li/guides/abstract-types/using-multiple-strategies) as there are
+   * a few quirks to be aware of.
    *
    * @default {resolveType: true,
    *    __typename: false
@@ -203,16 +204,16 @@ export type NexusFeaturesInput = {
      * the [Discriminant Model Field Strategy](https://nxs.li/guides/abstract-types/discriminant-model-field-strategy).
      *
      * Warning :: When this strategy is enabled in conjunction with other strategies the
-     * "abstractTypeRuntimeChecks" feature will automatically be disabled. This is because it is not practical
-     * at runtime to find out if resolvers will return objects that include the "__typename" field. This
-     * trade-off can be acceptable since the runtime checks are a redundant safety measure over the static
-     * typing. So as long as you are not ignoring static errors related to Nexus' abstract type type checks
-     * then you then you should still have a safe implementation.
+     * "abstractTypeRuntimeChecks" feature will automatically be disabled. This is because it is not
+     * practical at runtime to find out if resolvers will return objects that include the "__typename" field.
+     * This trade-off can be acceptable since the runtime checks are a redundant safety measure over the
+     * static typing. So as long as you are not ignoring static errors related to Nexus' abstract type type
+     * checks then you then you should still have a safe implementation.
      *
      * Furthermore another effect is that statically the other strategies will not appear to be *required*,
-     * but instead *optional*, while only this one will appear required. However, upon implementing any of the
-     * other strategies, this one will not longer be required. This quirk is explained in the guide section
-     * about [using multiple strategies](https://nxs.li/guides/abstract-types/using-multiple-strategies).
+     * but instead *optional*, while only this one will appear required. However, upon implementing any of
+     * the other strategies, this one will not longer be required. This quirk is explained in the guide
+     * section about [using multiple strategies](https://nxs.li/guides/abstract-types/using-multiple-strategies).
      */
     __typename?: boolean
   }
