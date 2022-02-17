@@ -184,7 +184,7 @@ describe('plugin', () => {
       calls.push(`Before:${name}`)
       return plugin.completeValue(next(root, args, ctx, info), (val) => {
         calls.push(`After:${name} ${val}`)
-        // @ts-expect-error
+        // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
         return val + 1
       })
     }
@@ -397,7 +397,7 @@ describe('plugin', () => {
       calls.push(`Before:${name}`)
       return plugin.completeValue(next(root, args, ctx, info), (val) => {
         calls.push(`After:${name} ${val}`)
-        // @ts-expect-error
+        // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
         return val + 1
       })
     }

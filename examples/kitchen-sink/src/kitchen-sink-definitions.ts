@@ -391,8 +391,8 @@ export const MoreQueryFields = extendType({
 
 export const DateScalar = scalarType({
   name: 'Date',
-  serialize: (value: Date) => value.toISOString(),
-  parseValue: (value: string | number) => new Date(value),
+  serialize: (value) => (value as Date).toISOString(),
+  parseValue: (value) => new Date(value as string | number),
   parseLiteral: (ast) => {
     if (ast.kind === 'IntValue' || ast.kind === 'StringValue') {
       const d = new Date(ast.value)

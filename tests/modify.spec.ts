@@ -105,11 +105,11 @@ describe('modify', () => {
         }
       `,
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.node.fields.find((f: { name: string }) => f.name === 'id').description).toEqual(
       'Some Node ID Description'
     )
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.user.fields.find((f: { name: string }) => f.name === 'id').description).toEqual(
       'Some User ID Description'
     )
@@ -129,9 +129,9 @@ describe('modify', () => {
         }
       `,
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.user.id).toEqual('User:1')
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.throws.id).toEqual(null)
     expect(result.errors?.[0].message).toEqual('Abstract')
   })
@@ -155,9 +155,9 @@ describe('modify', () => {
       `,
     })
 
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.withArg.id).toEqual('SomeArg!')
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.withoutArg.id).toEqual('AddArg:1')
   })
 
@@ -187,11 +187,11 @@ describe('modify', () => {
         }
       `,
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.node.fields.find((f: { name: string }) => f.name === 'subNode').type.name).toEqual(
       'Node'
     )
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.user.fields.find((f: { name: string }) => f.name === 'subNode').type.name).toEqual(
       'User'
     )
@@ -228,15 +228,15 @@ describe('modify', () => {
     })
 
     expect(
-      // @ts-expect-error
+      // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
       result.data?.node.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.name
     ).toEqual('String')
     expect(
-      // @ts-expect-error
+      // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
       result.data?.user.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.kind
     ).toEqual('NON_NULL')
     expect(
-      // @ts-expect-error
+      // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
       result.data?.user.fields.find((f: { name: string }) => f.name === 'requiredInSubtype').type.ofType.name
     ).toEqual('String')
   })

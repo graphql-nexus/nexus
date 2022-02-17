@@ -165,7 +165,7 @@ describe('defaults', () => {
         before: 'whatever',
       },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(true)
   })
   it('should provide forward pagination defaults', async () => {
@@ -175,9 +175,9 @@ describe('defaults', () => {
       document: UsersFirst,
       variableValues: { first: 1 },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(nodes.data?.users.edges).toEqual([{ cursor: 'Y3Vyc29yOjA=', node: { id: 'User:1' } }])
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
   })
 })
@@ -218,7 +218,7 @@ describe('basic behavior', () => {
       document: UsersFirstAfter,
       variableValues: { first: 1, after: 'Y3Vyc29yOjA=' },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:1')
   })
 
@@ -232,7 +232,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 9 },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(first.data?.users.pageInfo).toEqual({
       hasNextPage: true,
       hasPreviousPage: false,
@@ -244,11 +244,11 @@ describe('basic behavior', () => {
       document: UsersLastBefore,
       variableValues: {
         last: 3,
-        // @ts-expect-error
+        // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
         before: first.data?.users.pageInfo.endCursor,
       },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.pageInfo).toEqual({
       startCursor: 'cursor:5',
       endCursor: 'cursor:7',
@@ -280,7 +280,7 @@ describe('basic behavior', () => {
         last: 3,
       },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.pageInfo).toEqual({
       startCursor: 'cursor:98',
       endCursor: 'cursor:100',
@@ -313,7 +313,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 10 },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.pageInfo).toEqual({
       endCursor: 'Y3Vyc29yOjk=',
       hasNextPage: false,
@@ -331,7 +331,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 10 },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.nodes).toEqual(lastNodes.data?.users.edges.map((e: any) => e.node))
   })
 
@@ -379,9 +379,9 @@ describe('basic behavior', () => {
         resolve: (...args) => {
           const result = customResolveFn(...args)
           return {
-            // @ts-expect-error
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             ...result,
-            // @ts-expect-error
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             nodes: result.edges.map((e: any) => e.node),
           }
         },
@@ -585,7 +585,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 1000 },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.nodes.length).toEqual(10)
   })
 
@@ -683,7 +683,7 @@ describe('global plugin configuration', () => {
       schema,
       document: UsersAll,
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users?.edges.length).toEqual(10)
   })
 
@@ -1044,7 +1044,7 @@ describe('field level configuration', () => {
       schema,
       document: parse(`{ users(first: 10) { edges { delta } } }`),
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.edges.map((e: any) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 
@@ -1118,9 +1118,9 @@ describe('field level configuration', () => {
         first: 1,
       },
     })
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.pageInfo.hasNextPage).toEqual(true)
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(false)
   })
 })
@@ -1357,7 +1357,7 @@ describe('connectionPlugin extensions', () => {
         {},
         [
           queryField((t) => {
-            // @ts-expect-error
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             t.connectionField('users2', {
               type: User,
               nodes(root: any, args: any, ctx: any, info: any) {
@@ -1415,7 +1415,7 @@ describe('connectionPlugin extensions', () => {
         {},
         [
           queryField((t) => {
-            // @ts-expect-error
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             t.connectionField('users2', {
               type: User,
               nodes(root: any, args: any, ctx: any, info: any) {
@@ -1464,11 +1464,11 @@ describe('iteration', () => {
     })
     const end = new Date().valueOf()
     expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < first
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(nodes.data?.users.edges.length).toEqual(10)
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[9].cursor, 'base64').toString('utf8')).toEqual('cursor:9')
   })
 
@@ -1490,11 +1490,11 @@ describe('iteration', () => {
     })
     const end = new Date().valueOf()
     expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < last
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(nodes.data?.users.edges.length).toEqual(9)
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
-    // @ts-expect-error
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[8].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
   })
 })
