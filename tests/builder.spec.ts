@@ -39,7 +39,7 @@ describe('builder', () => {
         query: OtherQuery,
       },
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('does not add a placeholder Query type when an alternate queryRoot has been defined', () => {
@@ -56,7 +56,7 @@ describe('builder', () => {
         query: OtherQuery,
       },
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('can replace the Mutation root type with an alternate type', () => {
@@ -80,7 +80,7 @@ describe('builder', () => {
         mutation: OtherMutation,
       },
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('can replace the Subscription root type with an alternate type', () => {
@@ -104,7 +104,7 @@ describe('builder', () => {
         subscription: OtherSubscription,
       },
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 })
 
@@ -186,7 +186,7 @@ describe('builder.mergeSchema', () => {
         schema,
       },
     })
-    expect(printSchema(lexicographicSortSchema(finalSchema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(finalSchema)).trim()).toMatchSnapshot()
   })
 
   it('can exclude types from the output schema', () => {
@@ -330,6 +330,6 @@ describe('graphql-js interop', () => {
       types: [Query, NexusViewer],
     })
 
-    expect(printSchema(schema)).toMatchSnapshot()
+    expect(printSchema(schema).trim()).toMatchSnapshot()
   })
 })

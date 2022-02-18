@@ -86,10 +86,10 @@ export interface NexusArgConfig<T extends string> extends NexusAsArgConfig<T> {
    *
    * Types may be expressed in one of three ways:
    *
-   * 1. As string literals matching the name of a builtin scalar.
-   * 2. As string literals matching the name of another type. Thanks to [Nexus' reflection
-   *    system](https://nxs.li/guides/reflection) this is typesafe and autocompletable.
-   * 3. As references to other enums or input object type definitions.
+   * 1. As string literals matching the name of a builtin scalar. 2. As string literals matching the name of
+   * another type. Thanks to [Nexus' reflection
+   *     system](https://nxs.li/guides/reflection) this is typesafe and autocompletable. 3. As references to other
+   * enums or input object type definitions.
    *
    * Type modifier helpers like list() may also be used and in turn accept one of the three methods listed above.
    *
@@ -157,7 +157,7 @@ withNexusSymbol(NexusArgDef, NexusTypes.Arg)
  *   })
  *
  * @param config Configuration for the argument like its type and description. See jsdoc on each config field
- *   for details.
+ *     for details.
  */
 export function arg<T extends string>(config: NexusArgConfig<T>) {
   if (!config.type) {

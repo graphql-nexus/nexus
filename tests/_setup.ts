@@ -27,8 +27,10 @@ export function typeCheck(
 
   const project = new tsm.Project({
     tsConfigFilePath,
-    compilerOptions,
-    addFilesFromTsConfig: true,
+    compilerOptions: {
+      ...compilerOptions,
+      useUnknownInCatchVariables: false,
+    },
   })
 
   if (fileNames.length) {

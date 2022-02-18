@@ -7,33 +7,29 @@ exports[`onInstall plugins does not have access to inline types 1`] = `
 
 type Query {
   bar(inline: Inline): String
-}
-"
+}"
 `;
 
 exports[`onInstall plugins does not see fallback ok-query 1`] = `
 "type Query {
   ok: Boolean!
-}
-"
+}"
 `;
 
 exports[`onInstall plugins has access to top-level types 1`] = `
-"type foo {
-  bar: String
-}
-
-type Query {
+"type Query {
   ok: Boolean!
 }
-"
+
+type foo {
+  bar: String
+}"
 `;
 
 exports[`onInstall plugins may contribute types 1`] = `
 "type Query {
   something: String
-}
-"
+}"
 `;
 
 exports[`runtime config validation checks name is not empty 1`] = `"Plugin \\"\\" is giving an invalid value for property name: empty string"`;
