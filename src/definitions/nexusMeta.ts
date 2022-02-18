@@ -28,7 +28,7 @@ export type NexusMetaBuild = {
 export type NexusMeta = NexusMetaType | NexusMetaBuild
 
 export function isNexusMetaBuild(obj: any): obj is NexusMetaBuild {
-  return obj && typeof ownProp.get(obj, NEXUS_BUILD) === 'function'
+  return Boolean(obj && typeof ownProp.get(obj, NEXUS_BUILD) === 'function')
 }
 
 export function isNexusMetaType(obj: any): obj is NexusMetaType {
@@ -36,11 +36,11 @@ export function isNexusMetaType(obj: any): obj is NexusMetaType {
 }
 
 export function isNexusMetaTypeProp(obj: any): obj is NexusMetaTypeProp {
-  return ownProp.has(obj, NEXUS_TYPE) && isNexusStruct(ownProp.get(obj, NEXUS_TYPE))
+  return Boolean(obj && ownProp.has(obj, NEXUS_TYPE) && isNexusStruct(ownProp.get(obj, NEXUS_TYPE)))
 }
 
 export function isNexusMetaTypeFn(obj: any): obj is NexusMetaTypeFn {
-  return ownProp.has(obj, NEXUS_TYPE) && typeof ownProp.get(obj, NEXUS_TYPE) === 'function'
+  return Boolean(obj && ownProp.has(obj, NEXUS_TYPE) && typeof ownProp.get(obj, NEXUS_TYPE) === 'function')
 }
 
 export function isNexusMeta(obj: any): obj is NexusMetaBuild | NexusMetaTypeFn | NexusMetaType {

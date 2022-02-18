@@ -86,18 +86,17 @@ describe('fieldAuthorizePlugin', () => {
   })
   const mockCtx = { user: { id: 1 } }
   const testField = (field: string, passes = false, schema = testSchema) => {
-    return graphql(
+    return graphql({
       schema,
-      `
+      source: `
         {
           ${field} {
             id
           }
         }
       `,
-      {},
-      mockCtx
-    )
+      contextValue: mockCtx,
+    })
   }
 
   test('field-level authorize passes returning true', async () => {

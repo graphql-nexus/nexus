@@ -26,9 +26,9 @@ describe('objectType', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           {
             user {
               id
@@ -36,8 +36,8 @@ describe('objectType', () => {
               floatField
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
 })

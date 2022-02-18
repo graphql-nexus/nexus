@@ -28,24 +28,18 @@ import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './nexusMet
 import type { NexusUnionTypeDef } from './unionType'
 import { NexusTypes, NexusWrappedSymbol } from './_types'
 
-/**
- * input(named): Nexus only
- */
+/** Input(named): Nexus only */
 export type AllNexusNamedInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>
 
-/**
- * input(named): Nexus + GraphQLInput
- */
+/** Input(named): Nexus + GraphQLInput */
 export type AllNamedInputTypeDefs<T extends string = any> =
   | AllNexusNamedInputTypeDefs<T>
   | Exclude<GraphQLInputType, GraphQLList<any> | GraphQLNonNull<any>>
 
-/**
- * input(all): Nexus + GraphQL
- */
+/** Input(all): Nexus + GraphQL */
 export type AllNexusInputTypeDefs<T extends string = any> =
   | AllNamedInputTypeDefs<T>
   | NexusListDef<any>
@@ -54,9 +48,7 @@ export type AllNexusInputTypeDefs<T extends string = any> =
   | GraphQLList<any>
   | GraphQLNonNull<any>
 
-/**
- * output(named): Nexus only
- */
+/** Output(named): Nexus only */
 export type AllNexusNamedOutputTypeDefs =
   | NexusObjectTypeDef<any>
   | NexusInterfaceTypeDef<any>
@@ -64,33 +56,23 @@ export type AllNexusNamedOutputTypeDefs =
   | NexusEnumTypeDef<any>
   | NexusScalarTypeDef<any>
 
-/**
- * output(all): Nexus only
- */
+/** Output(all): Nexus only */
 export type AllNexusOutputTypeDefs =
   | AllNexusNamedOutputTypeDefs
   | NexusListDef<any>
   | NexusNonNullDef<any>
   | NexusNullDef<any>
 
-/**
- * input + output(named): Nexus only
- */
+/** Input + output(named): Nexus only */
 export type AllNexusNamedTypeDefs = AllNexusNamedInputTypeDefs | AllNexusNamedOutputTypeDefs
 
-/**
- * input + output(all): Nexus only
- */
+/** Input + output(all): Nexus only */
 export type AllNexusTypeDefs = AllNexusOutputTypeDefs | AllNexusInputTypeDefs
 
-/**
- * input + output(all): Nexus only + Name
- */
+/** Input + output(all): Nexus only + Name */
 export type AllNamedTypeDefs = AllNexusNamedTypeDefs | GraphQLNamedType
 
-/**
- * All inputs to list(...)
- */
+/** All inputs to list(...) */
 export type NexusListableTypes =
   | GetGen<'allNamedTypes', string>
   | AllNamedTypeDefs
@@ -101,9 +83,7 @@ export type NexusListableTypes =
   | GraphQLType
   | NexusMetaType
 
-/**
- * All inputs to nonNull(...)
- */
+/** All inputs to nonNull(...) */
 export type NexusNonNullableTypes =
   | GetGen<'allNamedTypes', string>
   | AllNamedTypeDefs
@@ -111,9 +91,7 @@ export type NexusNonNullableTypes =
   | NexusArgDef<any>
   | NexusMetaType
 
-/**
- * All inputs to nullable(...)
- */
+/** All inputs to nullable(...) */
 export type NexusNullableTypes =
   | GetGen<'allNamedTypes', string>
   | AllNamedTypeDefs

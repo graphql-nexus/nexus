@@ -10,7 +10,7 @@ export function decorateType<T extends GraphQLNamedType>(type: T, config: TypeEx
   type.extensions = {
     ...type.extensions,
     nexus: {
-      ...type.extensions?.nexus,
+      ...Object(type.extensions?.nexus),
       ...config,
     },
   }
