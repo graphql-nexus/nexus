@@ -34,7 +34,7 @@ export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   parentTypeConfig: (
     | Omit<NexusGraphQLObjectTypeConfig, 'fields' | 'extensions'>
     | (Omit<NexusGraphQLInterfaceTypeConfig, 'fields' | 'extensions'> & {
-        interfaces: GraphQLInterfaceType[]
+        interfaces: readonly GraphQLInterfaceType[]
       })
   ) & {
     extensions?: Maybe<{ nexus?: { config: TypeExt } }>

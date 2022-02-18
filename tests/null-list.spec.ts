@@ -430,6 +430,7 @@ describe('edges cases', () => {
       Object {
         "astNode": undefined,
         "defaultValue": "Au revoir!",
+        "deprecationReason": undefined,
         "description": "Bonjour !",
         "extensions": Object {
           "nexus": Object {},

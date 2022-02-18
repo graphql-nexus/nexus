@@ -105,6 +105,7 @@ import type {
 import type { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
 import type { DynamicOutputPropertyDef } from './dynamicProperty'
 import {
+  hasNexusExtension,
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
   NexusInterfaceTypeExtension,
@@ -198,8 +199,8 @@ export interface MergeSchemaConfig {
   /**
    * GraphQL Schema to merge into the Nexus type definitions.
    *
-   * We unwrap each type, preserve the "nullable/nonNull" status of any fields &
-   * arguments, and then combine with the local Nexus GraphQL types.
+   * We unwrap each type, preserve the "nullable/nonNull" status of any fields & arguments, and then combine
+   * with the local Nexus GraphQL types.
    *
    * If you have multiple schemas
    */
@@ -207,22 +208,22 @@ export interface MergeSchemaConfig {
   /**
    * If we want to "merge" specific types, provide a list of the types you wish to merge here.
    *
-   * @default ['Query', 'Mutation']
+   * @default 'Query', 'Mutation'
    */
   mergeTypes?: string[] | true
   /**
-   * If there are types that we don't want to include from the external schema in our final
-   * Nexus generated schema, provide them here.
+   * If there are types that we don't want to include from the external schema in our final Nexus generated
+   * schema, provide them here.
    */
   skipTypes?: string[]
   /**
-   * If there are certain "fields" that we want to skip, we can specify
-   * the fields here and we'll ensure they don't get merged into the schema
+   * If there are certain "fields" that we want to skip, we can specify the fields here and we'll ensure they
+   * don't get merged into the schema
    */
   skipFields?: Record<string, string[]>
   /**
-   * If there are certain arguments for any type fields that we want to skip, we can specify
-   * the fields here & ensure they don't get merged into the final schema.
+   * If there are certain arguments for any type fields that we want to skip, we can specify the fields here &
+   * ensure they don't get merged into the final schema.
    *
    * @example
    *   skipArgs: {
@@ -236,11 +237,11 @@ export interface MergeSchemaConfig {
 
 export interface BuilderConfigInput {
   /**
-   * If we have an external schema that we want to "merge into" our local Nexus schema definitions,
-   * we can configure it here.
+   * If we have an external schema that we want to "merge into" our local Nexus schema definitions, we can
+   * configure it here.
    *
-   * If you have more than one schema that needs merging, you can look into using
-   * graphql-tools to pre-merge into a single schema: https://www.graphql-tools.com/docs/schema-merging
+   * If you have more than one schema that needs merging, you can look into using graphql-tools to pre-merge
+   * into a single schema: https://www.graphql-tools.com/docs/schema-merging
    */
   mergeSchema?: MergeSchemaConfig
   /**
@@ -423,24 +424,20 @@ export class SchemaBuilder {
    * processed into concrete types yet.
    */
   private pendingTypeMap: Record<string, AllNexusNamedTypeDefs | null> = {}
-  /**
-   * All "extensions" to types (adding fields on types from many locations)
-   */
+  /** All "extensions" to types (adding fields on types from many locations) */
   private typeExtendMap: Record<string, NexusExtendTypeConfig<string>[] | null> = {}
-  /**
-   * All "extensions" to input types (adding fields on types from many locations)
-   */
+  /** All "extensions" to input types (adding fields on types from many locations) */
   private inputTypeExtendMap: Record<string, NexusExtendInputTypeConfig<string>[] | null> = {}
   /**
-   * When we encounter "named" types from graphql-js, we keep them separate from Nexus definitions.
-   * This way we can have Nexus definitions take precedence without worrying about conflicts,
-   * particularly when we're looking to override behavior from inherited types.
+   * When we encounter "named" types from graphql-js, we keep them separate from Nexus definitions. This way
+   * we can have Nexus definitions take precedence without worrying about conflicts, particularly when we're
+   * looking to override behavior from inherited types.
    */
   private graphqlNamedTypeMap: Record<string, AllNexusNamedTypeDefs> = {}
 
   /**
-   * If we're merging against a remote schema, the types from the schema are kept here,
-   * for fallbacks / merging when we're building the actual Schema
+   * If we're merging against a remote schema, the types from the schema are kept here, for fallbacks /
+   * merging when we're building the actual Schema
    */
   private graphqlMergeSchemaMap: Record<string, AllNexusNamedTypeDefs> = {}
 
@@ -552,8 +549,8 @@ export class SchemaBuilder {
 
   /**
    * Add type takes a Nexus type, or a GraphQL type and pulls it into an internal "type registry". It also
-   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so you
-   * can define types anonymously, without exporting them.
+   * does an initial pass on any types that are referenced on the "types" field and pulls those in too, so
+   * you can define types anonymously, without exporting them.
    */
   private addType = (typeDef: NexusAcceptedTypeDef) => {
     if (isNexusDynamicInputMethod(typeDef)) {
@@ -630,7 +627,7 @@ export class SchemaBuilder {
 
       // If we've used decorateType to wrap, then we can grab the types off
       if (typeDef.extensions?.nexus) {
-        const { asNexusMethod, sourceType } = typeDef.extensions.nexus
+        const { asNexusMethod, sourceType } = Object(typeDef.extensions.nexus)
         if (asNexusMethod) {
           if (isInputType(typeDef)) {
             this.dynamicInputFields[asNexusMethod] = typeDef.name
@@ -1200,7 +1197,7 @@ export class SchemaBuilder {
         name: 'Query',
         fields: {
           ok: {
-            type: GraphQLNonNull(GraphQLBoolean),
+            type: new GraphQLNonNull(GraphQLBoolean),
             resolve: () => true,
           },
         },
@@ -1257,16 +1254,18 @@ export class SchemaBuilder {
         if (modifications[field]) {
           // TODO(tim): Refactor this whole mess
           const { type, field: _field, args, extensions, ...rest } = modifications[field]
-          const extensionConfig: NexusOutputFieldConfig<any, any> = extensions?.nexus?.config ?? {}
+          const extensionConfig: NexusOutputFieldConfig<any, any> = hasNexusExtension(extensions?.nexus)
+            ? extensions?.nexus?.config ?? {}
+            : {}
           interfaceFieldsMap[field] = {
             ...interfaceFieldsMap[field],
             ...rest,
             extensions: {
               ...interfaceField.extensions,
               ...extensions,
-              nexus:
-                interfaceField.extensions?.nexus?.modify(extensionConfig) ??
-                new NexusFieldExtension(extensionConfig),
+              nexus: hasNexusExtension(interfaceField.extensions?.nexus)
+                ? interfaceField.extensions?.nexus?.modify(extensionConfig)
+                : new NexusFieldExtension(extensionConfig),
             },
           }
           if (typeof type !== 'undefined') {
@@ -1708,8 +1707,8 @@ export class SchemaBuilder {
   }
 
   /**
-   * Given a "mergeSchema", gathers all of the types and constructs them
-   * into a map of types that we keep as a "merge schema"
+   * Given a "mergeSchema", gathers all of the types and constructs them into a map of types that we keep as a
+   * "merge schema"
    *
    * @param config
    */

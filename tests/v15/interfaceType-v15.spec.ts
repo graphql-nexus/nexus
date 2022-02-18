@@ -38,6 +38,6 @@ describe('interfaceType', () => {
       },
       null
     )
-    expect(schemaTypes).toMatchSnapshot()
+    expect(schemaTypes.trim()).toMatchSnapshot()
   })
 })

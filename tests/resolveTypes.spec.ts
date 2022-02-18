@@ -8,8 +8,8 @@ describe('custom scalars', () => {
       types: [
         scalarType({
           name: 'Date',
-          serialize: (value) => value.getTime(),
-          parseValue: (value) => new Date(value),
+          serialize: (value) => (value as Date).getTime(),
+          parseValue: (value) => new Date(value as number | string),
           parseLiteral: (ast) => (ast.kind === 'IntValue' ? new Date(ast.value) : null),
           asNexusMethod: 'date',
           sourceType: 'Date',
@@ -30,7 +30,7 @@ describe('custom scalars', () => {
         testDate
       }
     `
-    const result = await graphql(schema, query)
+    const result = await graphql({ schema, source: query })
     expect(result.data!.testDate).toBe(now.getTime())
   })
 })

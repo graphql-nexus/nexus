@@ -50,7 +50,7 @@ describe('modify', () => {
     })
 
     it('should output a valid schema', () => {
-      expect(schemaTypes).toMatchSnapshot()
+      expect(schemaTypes.trim()).toMatchSnapshot()
     })
   })
 })
