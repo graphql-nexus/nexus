@@ -1,4 +1,4 @@
-import { printSchema } from 'graphql'
+import { buildSchema, GraphQLSchema, printSchema } from 'graphql'
 import os from 'os'
 import path from 'path'
 import { objectType } from '../src'
@@ -150,5 +150,17 @@ describe('makeSchema', () => {
       expect(tsTypes).toContain(`import type * as thisFile from "./makeSchema.spec"`)
       expect(tsTypes).toContain(`import type { Context } from "./makeSchema.spec"`)
     })
+  })
+
+  it('is compatible with GraphQL schema types', () => {
+    const someFn = (schema: GraphQLSchema) => {
+      return schema.toConfig()
+    }
+
+    const nexusSchema = makeSchema({
+      types: [],
+    })
+
+    someFn(nexusSchema)
   })
 })
