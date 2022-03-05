@@ -39,17 +39,17 @@ describe('interfaceType', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           {
             user {
               id
               name
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
   it('can extend other interfaces', async () => {
@@ -108,9 +108,9 @@ describe('interfaceType', () => {
       },
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           {
             dog {
               type
@@ -119,8 +119,8 @@ describe('interfaceType', () => {
               breed
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
   it('can implement interfaces in extend types', async () => {
@@ -163,17 +163,17 @@ describe('interfaceType', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           {
             user {
               id
               name
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
   it('can not implement itself', async () => {

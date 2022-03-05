@@ -31,11 +31,9 @@ export interface NullabilityPluginOnGuardedConfig {
   type: GraphQLNullableType
 }
 
-export type NullFallbackValues = Partial<
-  {
-    [K in AllOutputTypes]: (obj: NullabilityPluginFallbackFn) => GetGen2<'rootTypes', K>
-  }
->
+export type NullFallbackValues = Partial<{
+  [K in AllOutputTypes]: (obj: NullabilityPluginFallbackFn) => GetGen2<'rootTypes', K>
+}>
 
 export type NullabilityGuardConfig = {
   /** Whether we should guard against non-null values. Defaults to "true" if NODE_ENV === "production", false otherwise. */

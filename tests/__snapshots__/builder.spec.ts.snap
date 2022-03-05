@@ -16,8 +16,7 @@ type Query {
 
 type RootMutation {
   name: String
-}
-"
+}"
 `;
 
 exports[`builder can replace the Query root type with an alternate type 1`] = `
@@ -31,8 +30,7 @@ type Query {
 
 type RootQuery {
   name: String
-}
-"
+}"
 `;
 
 exports[`builder can replace the Subscription root type with an alternate type 1`] = `
@@ -51,8 +49,7 @@ type RootSubscription {
 
 type Subscription {
   ok: String
-}
-"
+}"
 `;
 
 exports[`builder does not add a placeholder Query type when an alternate queryRoot has been defined 1`] = `
@@ -62,8 +59,7 @@ exports[`builder does not add a placeholder Query type when an alternate queryRo
 
 type RootQuery {
   name: String
-}
-"
+}"
 `;
 
 exports[`builder.mergeSchema Merges Mutation & Query types by default: merged mutation 1`] = `
@@ -125,13 +121,12 @@ type Query {
   userByUuids(uuid: UUID): User
 }
 
+scalar UUID
+
 type User implements ExternalNode & Node {
   id: ID!
   name: String
-}
-
-scalar UUID
-"
+}"
 `;
 
 exports[`builder.mergeSchema can merge with local types: merged 1`] = `
@@ -156,6 +151,5 @@ exports[`graphql-js interop extend types works with GraphQLNamedType (#88) 1`] =
 type Viewer {
   name: String
   age: Int
-}
-"
+}"
 `;

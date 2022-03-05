@@ -82,7 +82,7 @@ describe('makeSchema', () => {
           ],
           outputs: {},
           customPrintSchemaFn: (schema) => {
-            return printSchema(schema, { commentDescriptions: true })
+            return printSchema(schema).trim()
           },
         },
         null

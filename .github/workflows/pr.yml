@@ -4,21 +4,19 @@ on:
   - pull_request
 
 jobs:
-  graphql-14:
+  graphql-15:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
         with:
           node-version: 14.x
       - name: Install Dependencies
-        run: yarn --frozen-lockfile || yarn --frozen-lockfile
-      - name: Check Formatting
-        run: yarn format:ci
-      - name: Install GraphQL@14.x
-        run: yarn add graphql@^14.5.8
+        run: yarn --frozen-lockfile && yarn format:ci
+      - name: Install GraphQL@15.x
+        run: yarn add graphql@^15
       - name: Test
-        run: yarn -s test:ci --testPathIgnorePatterns v15
+        run: yarn -s test:ci
 
   test:
     strategy:

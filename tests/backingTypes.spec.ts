@@ -1,5 +1,6 @@
 import * as path from 'path'
 import { core, enumType, makeSchema, objectType, queryType } from '../src'
+import type { NexusGraphQLSchema } from '../src/core'
 import { A, B } from './_types'
 
 const { TypegenPrinter, TypegenMetadata } = core
@@ -31,7 +32,10 @@ function getSchemaWithConstEnums() {
     types: [
       enumType({
         name: 'B',
-        members: [B.NINE, B.TEN],
+        members: {
+          NINE: B.NINE,
+          TEN: B.TEN,
+        },
       }),
       queryType({
         definition(t) {
@@ -72,7 +76,7 @@ describe('sourceTypes', () => {
   it('can match source types to regular enums', async () => {
     const schema = getSchemaWithNormalEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
-    const typegen = new TypegenPrinter(schema, {
+    const typegen = new TypegenPrinter(schema as NexusGraphQLSchema, {
       ...typegenInfo,
       typegenPath: '',
     })
@@ -84,7 +88,7 @@ describe('sourceTypes', () => {
   it('can match source types for const enums', async () => {
     const schema = getSchemaWithConstEnums()
     const typegenInfo = await metadata.getTypegenInfo(schema)
-    const typegen = new TypegenPrinter(schema, {
+    const typegen = new TypegenPrinter(schema as NexusGraphQLSchema, {
       ...typegenInfo,
       typegenPath: '',
     })
@@ -113,7 +117,7 @@ describe('sourceTypings', () => {
       outputs: false,
     })
     const typegenInfo = await metadata.getTypegenInfo(schema)
-    const typegen = new TypegenPrinter(schema, {
+    const typegen = new TypegenPrinter(schema as NexusGraphQLSchema, {
       ...typegenInfo,
       typegenPath: '',
     })
@@ -141,7 +145,7 @@ describe('sourceTypings', () => {
     })
 
     const typegenInfo = await metadata.getTypegenInfo(schema)
-    const typegen = new TypegenPrinter(schema, {
+    const typegen = new TypegenPrinter(schema as NexusGraphQLSchema, {
       ...typegenInfo,
       typegenPath: '',
     })
@@ -172,7 +176,7 @@ describe('sourceTypings', () => {
     })
 
     const typegenInfo = await metadata.getTypegenInfo(schema)
-    const typegen = new TypegenPrinter(schema, {
+    const typegen = new TypegenPrinter(schema as NexusGraphQLSchema, {
       ...typegenInfo,
       typegenPath: '',
     })

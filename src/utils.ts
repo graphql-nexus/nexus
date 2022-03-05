@@ -234,7 +234,7 @@ function nixifyPathSlashes(path: string): string {
  * Format a path so it is suitable to be used as a module import.
  *
  * - Implicitly relative is made explicitly relative - TypeScript file extension is stripped - Windows slashes
- *   converted into *nix slashes
+ * converted into *nix slashes
  *
  * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
  */
@@ -553,7 +553,7 @@ export function getNexusNamedType(
       namedType = resolveNexusMetaType(namedType)
     }
   }
-  return namedType
+  return namedType as AllNexusNamedTypeDefs | GraphQLNamedType | string
 }
 
 /** Assertion utility with nexus-aware feedback for users. */
@@ -598,12 +598,20 @@ export function graphql15InterfaceConfig<T extends GraphQLInterfaceTypeConfig<an
 }
 
 export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
-  type: T & { getInterfaces?: () => GraphQLInterfaceType[] }
-): T & { getInterfaces(): GraphQLInterfaceType[] } {
+  type: T & { getInterfaces?: () => ReadonlyArray<GraphQLInterfaceType> }
+): T & { getInterfaces(): ReadonlyArray<GraphQLInterfaceType> } {
   if (typeof type.getInterfaces !== 'function') {
     type.getInterfaces = () => []
   }
-  return type as T & { getInterfaces(): GraphQLInterfaceType[] }
+  return type as T & { getInterfaces(): ReadonlyArray<GraphQLInterfaceType> }
+}
+
+/** @internal */
+export function unpack<T extends object>(val: T | (() => T)): T {
+  if (val instanceof Function) {
+    return val()
+  }
+  return val
 }
 
 /**
