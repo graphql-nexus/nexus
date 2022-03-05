@@ -1,4 +1,4 @@
-import { buildSchema, GraphQLSchema, printSchema } from 'graphql'
+import { GraphQLSchema, printSchema } from 'graphql'
 import os from 'os'
 import path from 'path'
 import { objectType } from '../src'
