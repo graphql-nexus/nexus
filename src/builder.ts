@@ -193,6 +193,13 @@ export interface ConfiguredTypegen {
    * @default false
    */
   declareInputs?: boolean
+
+  /**
+   * If "true", uses ReadonlyArray to type array for inputs
+   *
+   * @default false
+   */
+  useReadonlyArrayForInputs?: boolean
 }
 
 export interface MergeSchemaConfig {
@@ -324,7 +331,6 @@ export interface BuilderConfigInput {
     mutation?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
     subscription?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
   }
-  useReadonlyArrayForInputs?: boolean
 }
 
 export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
@@ -369,7 +375,6 @@ export interface TypegenInfo {
    * is not expected to be a direct dependency at the application level.
    */
   nexusSchemaImportId?: string
-  useReadonlyArrayForInputs?: boolean
 }
 
 export type TypeToWalk =

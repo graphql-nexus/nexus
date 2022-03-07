@@ -58,6 +58,7 @@ interface TypegenInfoWithFile extends TypegenInfo {
   globalsPath?: string
   globalsHeaders?: string[]
   declareInputs?: boolean
+  useReadonlyArrayForInputs?: boolean
 }
 
 /**
