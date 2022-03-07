@@ -3,7 +3,7 @@ import { join, relative } from 'path'
 import { core } from '../../src'
 import type { BuilderConfigInput } from '../../src/core'
 
-const { generateSchema, typegenFormatPrettier } = core
+const { generateSchema } = core
 
 type HookSettings = {
   rootDir: string
@@ -29,12 +29,8 @@ export async function generateTypegen(settings: HookSettings) {
     },
     shouldGenerateArtifacts: true,
     plugins: plugins || [],
-    async formatTypegen(source, type) {
-      const prettierConfigPath = require.resolve('../../.prettierrc')
-      const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
-
-      return content.replace("'nexus'", `'${importPath}'`)
-    },
+    prettierConfig: require.resolve('../../.prettierrc'),
+    formatTypegen: (content) => content.replace('from "nexus"', `from '${importPath}'`),
     features: {
       abstractTypeStrategies: {
         resolveType: true,
