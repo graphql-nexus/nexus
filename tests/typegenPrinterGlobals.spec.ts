@@ -19,7 +19,7 @@ describe('typegenPrinter: globals', () => {
       schema: path.join(__dirname, 'typegen-globals/schema.gen.graphql'),
     } as const
 
-    const schema = (await generateSchema({
+    const schema = await generateSchema({
       outputs,
       shouldGenerateArtifacts: true,
       types: [buildSchema(EXAMPLE_SDL)],
@@ -31,7 +31,7 @@ describe('typegenPrinter: globals', () => {
       },
       prettierConfig: require.resolve('../.prettierrc'),
       formatTypegen: (content) => content.replace('from "nexus"', `from "../../src"`),
-    })) as core.NexusGraphQLSchema
+    })
 
     metadata = new TypegenMetadata({
       outputs,
