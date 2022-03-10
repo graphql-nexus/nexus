@@ -278,7 +278,7 @@ export interface BuilderConfigInput {
       }
   /**
    * Whether the schema & types are generated when the server starts. Default is !process.env.NODE_ENV ||
-   * process.env.NODE_ENV === "development"
+   * process.env.NODE_ENV !== "production"
    */
   shouldGenerateArtifacts?: boolean
   /** Register the Source Types */
