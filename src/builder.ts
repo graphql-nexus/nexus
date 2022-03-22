@@ -350,6 +350,11 @@ export type SchemaConfig = BuilderConfigInput & {
    * graphql-js](https://github.com/graphql/graphql-js/blob/master/src/type/__tests__/extensions-test.js)
    */
   extensions?: GraphQLSchemaConfig['extensions']
+  /**
+   * Enable support for `@defer` and `@stream` directives, as [supported in
+   * graphql-js as an experimental feature](https://github.com/graphql/graphql-js/tree/defer-stream#experimental-features)
+   */
+  enableDeferStream?: GraphQLSchemaConfig['enableDeferStream']
 } & NexusGenPluginSchemaConfig
 
 export interface TypegenInfo {
@@ -1785,6 +1790,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
   }
 
   const schema = new GraphQLSchema({
+    enableDeferStream: config.enableDeferStream,
     query: getRootType('query', 'Query'),
     mutation: getRootType('mutation', 'Mutation'),
     subscription: getRootType('subscription', 'Subscription'),

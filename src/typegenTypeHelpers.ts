@@ -28,7 +28,7 @@ export type FieldType<TypeName extends string, FieldName extends string> = GetGe
   FieldName
 >
 
-export type MaybePromise<T> = PromiseLike<T> | T
+export type MaybePromise<T> = (T extends Iterable<infer U> ? AsyncIterable<U> : never) | PromiseLike<T> | T
 
 /**
  * Because the GraphQL field execution algorithm automatically resolves promises at any level of the tree, we
