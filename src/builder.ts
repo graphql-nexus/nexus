@@ -2,6 +2,7 @@ import {
   assertValidName,
   defaultFieldResolver,
   GraphQLBoolean,
+  GraphQLDirective,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
@@ -331,6 +332,26 @@ export interface BuilderConfigInput {
     mutation?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
     subscription?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
   }
+  /**
+   * Allows specifying defined directives to pass to the GraphQLSchema constructor.
+   *
+   * @example
+   *   import {
+   *     GraphQLSchema,
+   *     GraphQLDeferDirective,
+   *     GraphQLStreamDirective,
+   *     specifiedDirectives,
+   *   } from 'graphql';
+   *  const nexusSchema = makeSchema({
+   *    types: [...],
+   *    directives: [
+   *      ...specifiedDirectives,
+   *      GraphQLDeferDirective,
+   *      GraphQLStreamDirective,
+   *    ],
+   *  });
+   */
+  directives?: GraphQLDirective[]
 }
 
 export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
@@ -1800,6 +1821,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
       ...config.extensions,
       nexus: schemaExtension,
     },
+    directives: config.directives ?? undefined,
   }) as NexusGraphQLSchema
 
   onAfterBuildFns.forEach((fn) => fn(schema))
