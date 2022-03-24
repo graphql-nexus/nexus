@@ -44,9 +44,9 @@ export interface NexusGenObjects {
   Post: {
     // root type
     author: NexusGenRootTypes['User'] // User!
-    geo: number[][] // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>> // [[Float!]!]!
     id: string // ID!
-    messyGeo?: Array<number[] | null> | null // [[Float!]]
+    messyGeo?: ReadonlyArray<ReadonlyArray<number> | null> | null // [[Float!]]
     uuid: NexusGenScalars['UUID'] // UUID!
   }
   Query: {}
@@ -57,7 +57,7 @@ export interface NexusGenObjects {
     name: string // String!
     outEnum?: SomeEnum | null // SomeEnum
     phone?: string | null // String
-    posts: NexusGenRootTypes['Post'][] // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']> // [Post!]!
   }
 }
 
@@ -78,19 +78,19 @@ export interface NexusGenFieldTypes {
     // field return type
     createPost: NexusGenRootTypes['Post'] // Post!
     registerClick: NexusGenRootTypes['Query'] // Query!
-    someList: Array<string | null> // [String]!
+    someList: ReadonlyArray<string | null> // [String]!
   }
   Post: {
     // field return type
     author: NexusGenRootTypes['User'] // User!
-    geo: number[][] // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>> // [[Float!]!]!
     id: string // ID!
-    messyGeo: Array<number[] | null> | null // [[Float!]]
+    messyGeo: ReadonlyArray<ReadonlyArray<number> | null> | null // [[Float!]]
     uuid: NexusGenScalars['UUID'] // UUID!
   }
   Query: {
     // field return type
-    posts: NexusGenRootTypes['Post'][] // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']> // [Post!]!
     unionField: NexusGenRootTypes['ExampleUnion'] // ExampleUnion!
     user: NexusGenRootTypes['User'] // User!
   }
@@ -101,7 +101,7 @@ export interface NexusGenFieldTypes {
     name: string // String!
     outEnum: SomeEnum | null // SomeEnum
     phone: string | null // String
-    posts: NexusGenRootTypes['Post'][] // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']> // [Post!]!
   }
   Node: {
     // field return type

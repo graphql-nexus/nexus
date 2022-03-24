@@ -132,6 +132,7 @@ export class TypegenMetadata {
 
     return new TypegenPrinter(schema, {
       declareInputs: false,
+      useReadonlyArrayForInputs: false,
       ...typegenInfo,
       typegenPath,
     }).print()
@@ -139,7 +140,13 @@ export class TypegenMetadata {
 
   /** Generates the type definitions */
   async generateConfiguredTypes(schema: NexusGraphQLSchema, typegen: ConfiguredTypegen) {
-    const { outputPath: typegenPath, globalsPath, globalsHeaders, declareInputs = false } = typegen
+    const {
+      outputPath: typegenPath,
+      globalsPath,
+      globalsHeaders,
+      declareInputs = false,
+      useReadonlyArrayForInputs = false,
+    } = typegen
     const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
 
     return new TypegenPrinter(schema, {
@@ -148,6 +155,7 @@ export class TypegenMetadata {
       globalsPath,
       globalsHeaders,
       declareInputs,
+      useReadonlyArrayForInputs,
     }).printConfigured()
   }
 

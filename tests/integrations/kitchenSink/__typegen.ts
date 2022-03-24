@@ -105,7 +105,7 @@ export interface NexusGenObjects {
   }
   PostConnection: {
     // root type
-    edges?: Array<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
+    edges?: ReadonlyArray<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
     pageInfo: NexusGenRootTypes['PageInfo'] // PageInfo!
     totalCount: number // Int!
   }
@@ -157,7 +157,7 @@ export interface NexusGenFieldTypes {
   }
   PostConnection: {
     // field return type
-    edges: Array<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
+    edges: ReadonlyArray<NexusGenRootTypes['PostEdge'] | null> | null // [PostEdge]
     pageInfo: NexusGenRootTypes['PageInfo'] // PageInfo!
     totalCount: number // Int!
   }
@@ -171,7 +171,7 @@ export interface NexusGenFieldTypes {
     // field return type
     customScalar: NexusGenScalars['MyCustomScalar'] | null // MyCustomScalar
     foo: string | null // String
-    searchPosts: Array<NexusGenRootTypes['Post'] | null> | null // [Post]
+    searchPosts: ReadonlyArray<NexusGenRootTypes['Post'] | null> | null // [Post]
     user: NexusGenRootTypes['User'] | null // User
   }
   Subscription: {
@@ -180,11 +180,11 @@ export interface NexusGenFieldTypes {
     someBooleanFromExtendType: boolean | null // Boolean
     someBooleanFromSubscriptionField: boolean | null // Boolean
     someField: number | null // Int
-    someFields: Array<number | null> | null // [Int]
+    someFields: ReadonlyArray<number | null> | null // [Int]
     someFloat: number | null // Float
     someID: string | null // ID
     someInt: number | null // Int
-    someInts: Array<number | null> | null // [Int]
+    someInts: ReadonlyArray<number | null> | null // [Int]
     someString: string | null // String
   }
   User: {

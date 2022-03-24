@@ -55,9 +55,9 @@ exports[`typegenPrinter should not print roots for fields with resolvers 1`] = `
   Mutation: {};
   Post: { // root type
     author: NexusGenRootTypes['User']; // User!
-    geo: number[][]; // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>>; // [[Float!]!]!
     id: string; // ID!
-    messyGeo?: Array<number[] | null> | null; // [[Float!]]
+    messyGeo?: ReadonlyArray<ReadonlyArray<number> | null> | null; // [[Float!]]
     uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: {};
@@ -84,9 +84,9 @@ exports[`typegenPrinter should print a object type map 1`] = `
   Mutation: {};
   Post: { // root type
     author: NexusGenRootTypes['User']; // User!
-    geo: number[][]; // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>>; // [[Float!]!]!
     id: string; // ID!
-    messyGeo?: Array<number[] | null> | null; // [[Float!]]
+    messyGeo?: ReadonlyArray<ReadonlyArray<number> | null> | null; // [[Float!]]
     uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: {};
@@ -96,7 +96,7 @@ exports[`typegenPrinter should print a object type map 1`] = `
     name: string; // String!
     outEnum?: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone?: string | null; // String
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']>; // [Post!]!
   }
 }"
 `;
@@ -106,17 +106,17 @@ exports[`typegenPrinter should print a return type map 1`] = `
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
     registerClick: NexusGenRootTypes['Query']; // Query!
-    someList: Array<string | null>; // [String]!
+    someList: ReadonlyArray<string | null>; // [String]!
   }
   Post: { // field return type
     author: NexusGenRootTypes['User']; // User!
-    geo: number[][]; // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>>; // [[Float!]!]!
     id: string; // ID!
-    messyGeo: Array<number[] | null> | null; // [[Float!]]
+    messyGeo: ReadonlyArray<ReadonlyArray<number> | null> | null; // [[Float!]]
     uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: { // field return type
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']>; // [Post!]!
     unionField: NexusGenRootTypes['ExampleUnion']; // ExampleUnion!
     user: NexusGenRootTypes['User']; // User!
   }
@@ -126,7 +126,7 @@ exports[`typegenPrinter should print a return type map 1`] = `
     name: string; // String!
     outEnum: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone: string | null; // String
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']>; // [Post!]!
   }
   Node: { // field return type
     id: string; // ID!
@@ -189,9 +189,9 @@ export interface NexusGenObjects {
   Mutation: {};
   Post: { // root type
     author: NexusGenRootTypes['User']; // User!
-    geo: number[][]; // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>>; // [[Float!]!]!
     id: string; // ID!
-    messyGeo?: Array<number[] | null> | null; // [[Float!]]
+    messyGeo?: ReadonlyArray<ReadonlyArray<number> | null> | null; // [[Float!]]
     uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: {};
@@ -201,7 +201,7 @@ export interface NexusGenObjects {
     name: string; // String!
     outEnum?: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone?: string | null; // String
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']>; // [Post!]!
   }
 }
 
@@ -221,17 +221,17 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post']; // Post!
     registerClick: NexusGenRootTypes['Query']; // Query!
-    someList: Array<string | null>; // [String]!
+    someList: ReadonlyArray<string | null>; // [String]!
   }
   Post: { // field return type
     author: NexusGenRootTypes['User']; // User!
-    geo: number[][]; // [[Float!]!]!
+    geo: ReadonlyArray<ReadonlyArray<number>>; // [[Float!]!]!
     id: string; // ID!
-    messyGeo: Array<number[] | null> | null; // [[Float!]]
+    messyGeo: ReadonlyArray<ReadonlyArray<number> | null> | null; // [[Float!]]
     uuid: NexusGenScalars['UUID']; // UUID!
   }
   Query: { // field return type
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']>; // [Post!]!
     unionField: NexusGenRootTypes['ExampleUnion']; // ExampleUnion!
     user: NexusGenRootTypes['User']; // User!
   }
@@ -241,7 +241,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     outEnum: NexusGenEnums['SomeEnum'] | null; // SomeEnum
     phone: string | null; // String
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
+    posts: ReadonlyArray<NexusGenRootTypes['Post']>; // [Post!]!
   }
   Node: { // field return type
     id: string; // ID!
