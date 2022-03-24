@@ -193,6 +193,13 @@ export interface ConfiguredTypegen {
    * @default false
    */
   declareInputs?: boolean
+
+  /**
+   * If "true", uses ReadonlyArray to type array for inputs
+   *
+   * @default false
+   */
+  useReadonlyArrayForInputs?: boolean
 }
 
 export interface MergeSchemaConfig {

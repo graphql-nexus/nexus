@@ -5,15 +5,11 @@
 
 import type { core } from '../../src'
 
-declare global {
-  interface NexusGen extends NexusGenTypes {}
-}
-
 export interface NexusGenInputs {
   CreatePostInput: {
     // input type
     author: string // ID!
-    geo: Array<Array<number | null>> // [[Float]!]!
+    geo: ReadonlyArray<ReadonlyArray<number | null>> // [[Float]!]!
     name: string // String!
   }
   PostFilters: {
@@ -155,7 +151,7 @@ export interface NexusGenArgTypes {
     }
     someList: {
       // args
-      items: Array<string | null> // [String]!
+      items: ReadonlyArray<string | null> // [String]!
     }
   }
   Query: {
@@ -239,13 +235,4 @@ export interface NexusGenTypes {
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf
   abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType
   features: NexusGenFeaturesConfig
-}
-
-declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {}
-  interface NexusGenPluginInputTypeConfig<TypeName extends string> {}
-  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {}
-  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {}
-  interface NexusGenPluginSchemaConfig {}
-  interface NexusGenPluginArgConfig {}
 }

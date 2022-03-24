@@ -40,8 +40,8 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 export interface NexusGenFieldTypes {
   DeclarativeWrappingOutput: {
     // field return type
-    someList: Array<string | null> | null // [String]
-    someListOfLists: string[][] | null // [[String!]!]
+    someList: ReadonlyArray<string | null> | null // [String]
+    someListOfLists: ReadonlyArray<ReadonlyArray<string>> | null // [[String!]!]
     someNullField: string | null // String
     someRequiredField: string // String!
   }
