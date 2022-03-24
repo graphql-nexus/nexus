@@ -181,7 +181,7 @@ describe('makeSchema', () => {
           }),
         ],
       })
-      expect(printSchema(schema)).toMatchSnapshot()
+      expect(printSchema(schema).trim()).toMatchSnapshot()
     })
   })
 })
