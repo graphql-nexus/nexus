@@ -5,7 +5,7 @@ import type { ConfiguredTypegen } from './core'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
 import { typegenAutoConfig } from './typegenAutoConfig'
-import { TypegenFormatFn, typegenFormatPrettier } from './typegenFormatPrettier'
+import { typegenFormatPrettier } from './typegenFormatPrettier'
 import { TypegenPrinter } from './typegenPrinter'
 
 export interface TypegenMetadataConfig
@@ -87,13 +87,12 @@ export class TypegenMetadata {
       util.promisify(fs.unlink),
       util.promisify(fs.mkdir),
     ]
-    let formatTypegen: TypegenFormatFn | null = null
-    if (typeof this.config.formatTypegen === 'function') {
-      formatTypegen = this.config.formatTypegen
-    } else if (this.config.prettierConfig) {
-      formatTypegen = typegenFormatPrettier(this.config.prettierConfig)
-    }
-    const content = typeof formatTypegen === 'function' ? await formatTypegen(output, type) : output
+    const formattedOutput =
+      typeof this.config.formatTypegen === 'function' ? await this.config.formatTypegen(output, type) : output
+    const content = this.config.prettierConfig
+      ? await typegenFormatPrettier(this.config.prettierConfig)(formattedOutput, type)
+      : formattedOutput
+
     const [toSave, existing] = await Promise.all([content, readFile(filePath, 'utf8').catch(() => '')])
     if (toSave !== existing) {
       const dirPath = path.dirname(filePath)

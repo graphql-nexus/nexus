@@ -1,7 +1,7 @@
 import { buildSchema } from 'graphql'
 import * as path from 'path'
 import { core } from '../src'
-import { generateSchema, NexusGraphQLSchema, typegenFormatPrettier } from '../src/core'
+import { generateSchema, NexusGraphQLSchema } from '../src/core'
 import { EXAMPLE_SDL } from './_sdl'
 
 const { TypegenPrinter, TypegenMetadata } = core
@@ -29,12 +29,8 @@ describe('typegenPrinter: globals', () => {
           __typename: true,
         },
       },
-      async formatTypegen(source, type) {
-        const prettierConfigPath = require.resolve('../.prettierrc')
-        const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
-
-        return content.replace("'nexus'", `'../../src'`)
-      },
+      prettierConfig: require.resolve('../.prettierrc'),
+      formatTypegen: (content) => content.replace('from "nexus"', `from "../../src"`),
     })
 
     metadata = new TypegenMetadata({
@@ -99,12 +95,8 @@ describe('typegenPrinter: useReadonlyArrayForInputs', () => {
           __typename: true,
         },
       },
-      async formatTypegen(source, type) {
-        const prettierConfigPath = require.resolve('../.prettierrc')
-        const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
-
-        return content.replace("'nexus'", `'../../src'`)
-      },
+      prettierConfig: require.resolve('../.prettierrc'),
+      formatTypegen: (content) => content.replace('from "nexus"', `from "../../src"`),
     })) as core.NexusGraphQLSchema
 
     metadata = new TypegenMetadata({
