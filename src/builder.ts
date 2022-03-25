@@ -2,7 +2,6 @@ import {
   assertValidName,
   defaultFieldResolver,
   GraphQLBoolean,
-  GraphQLDirective,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
@@ -332,26 +331,6 @@ export interface BuilderConfigInput {
     mutation?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
     subscription?: GetGen<'allOutputTypes', string> | AllNexusOutputTypeDefs
   }
-  /**
-   * Allows specifying defined directives to pass to the GraphQLSchema constructor.
-   *
-   * @example
-   *   import {
-   *     GraphQLSchema,
-   *     GraphQLDeferDirective,
-   *     GraphQLStreamDirective,
-   *     specifiedDirectives,
-   *   } from 'graphql';
-   *  const nexusSchema = makeSchema({
-   *    types: [...],
-   *    directives: [
-   *      ...specifiedDirectives,
-   *      GraphQLDeferDirective,
-   *      GraphQLStreamDirective,
-   *    ],
-   *  });
-   */
-  directives?: GraphQLDirective[]
 }
 
 export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults' | 'features' | 'plugins'> {
@@ -360,7 +339,26 @@ export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults
   plugins: RequiredDeeply<BuilderConfigInput['plugins']>
 }
 
-export type SchemaConfig = BuilderConfigInput & {
+/**
+ * Pick the properties off of the GraphQL schema config that we are supplying, and allow the user to
+ * specify anything else that is defined on the currently used GraphQL schema:
+ *
+ * @example
+ *  const nexusSchema = makeSchema({
+ *    directives: [
+ *      ...specifiedDirectives,
+ *      GraphQLDeferDirective,
+ *      GraphQLStreamDirective,
+ *    ],
+ *    enableDeferStream: true
+ *  });
+ */
+export type AdditionalGraphQLSchemaConfigOptions = Omit<
+  GraphQLSchemaConfig,
+  'query' | 'mutation' | 'subscription' | 'types' | keyof BuilderConfigInput
+>
+
+export interface MakeSchemaOptions extends BuilderConfigInput {
   /**
    * All of the GraphQL types. This is an any for simplicity of developer experience, if it's an object we get
    * the values, if it's an array we flatten out the valid types, ignoring invalid ones.
@@ -373,12 +371,11 @@ export type SchemaConfig = BuilderConfigInput & {
    * @default false
    */
   shouldExitAfterGenerateArtifacts?: boolean
-  /**
-   * Custom extensions, as [supported in
-   * graphql-js](https://github.com/graphql/graphql-js/blob/master/src/type/__tests__/extensions-test.js)
-   */
-  extensions?: GraphQLSchemaConfig['extensions']
-} & NexusGenPluginSchemaConfig
+}
+
+export type SchemaConfig = MakeSchemaOptions &
+  AdditionalGraphQLSchemaConfigOptions &
+  NexusGenPluginSchemaConfig
 
 export interface TypegenInfo {
   /** Headers attached to the generate type output */
@@ -1813,6 +1810,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
   }
 
   const schema = new GraphQLSchema({
+    ...extractGraphQLSchemaOptions(config),
     query: getRootType('query', 'Query'),
     mutation: getRootType('mutation', 'Mutation'),
     subscription: getRootType('subscription', 'Subscription'),
@@ -1821,12 +1819,35 @@ export function makeSchemaInternal(config: SchemaConfig) {
       ...config.extensions,
       nexus: schemaExtension,
     },
-    directives: config.directives ?? undefined,
   }) as NexusGraphQLSchema
 
   onAfterBuildFns.forEach((fn) => fn(schema))
 
   return { schema, missingTypes, finalConfig }
+}
+
+type OmittedVals = Partial<{ [K in keyof MakeSchemaOptions]: never }>
+
+function extractGraphQLSchemaOptions(
+  config: SchemaConfig
+): Partial<AdditionalGraphQLSchemaConfigOptions & OmittedVals> {
+  const {
+    formatTypegen,
+    nonNullDefaults,
+    mergeSchema,
+    outputs,
+    shouldExitAfterGenerateArtifacts,
+    shouldGenerateArtifacts,
+    schemaRoots,
+    sourceTypes,
+    prettierConfig,
+    plugins,
+    customPrintSchemaFn,
+    features,
+    contextType,
+    ...graphqlConfigOpts
+  } = config
+  return graphqlConfigOpts
 }
 
 export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {
