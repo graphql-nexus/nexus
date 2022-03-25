@@ -95,12 +95,8 @@ describe('typegenPrinter: useReadonlyArrayForInputs', () => {
           __typename: true,
         },
       },
-      async formatTypegen(source, type) {
-        const prettierConfigPath = require.resolve('../.prettierrc')
-        const content = await typegenFormatPrettier(prettierConfigPath)(source, type)
-
-        return content.replace("'nexus'", `'../../src'`)
-      },
+      prettierConfig: require.resolve('../.prettierrc'),
+      formatTypegen: (content) => content.replace('from "nexus"', `from "../../src"`),
     })) as core.NexusGraphQLSchema
 
     metadata = new TypegenMetadata({
