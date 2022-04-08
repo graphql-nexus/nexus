@@ -1809,7 +1809,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
     return returnVal
   }
 
-  const schema = new GraphQLSchema({
+  let schema = new GraphQLSchema({
     ...extractGraphQLSchemaOptions(config),
     query: getRootType('query', 'Query'),
     mutation: getRootType('mutation', 'Mutation'),
@@ -1821,7 +1821,9 @@ export function makeSchemaInternal(config: SchemaConfig) {
     },
   }) as NexusGraphQLSchema
 
-  onAfterBuildFns.forEach((fn) => fn(schema))
+  onAfterBuildFns.forEach((fn) => {
+    schema = fn(schema) ?? schema
+  })
 
   return { schema, missingTypes, finalConfig }
 }
