@@ -494,11 +494,11 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   definition(t2) {
                     t2.list.field('edges', {
                       type: edgeName as any,
-                      description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
+                      description: `https://relay.dev/graphql/connections.htm#sec-Edge-Types`,
                     })
                     t2.nonNull.field('pageInfo', {
                       type: 'PageInfo' as any,
-                      description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
+                      description: `https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo`,
                     })
                     if (includeNodesField) {
                       t2.list.field('nodes', {
@@ -530,11 +530,11 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   definition(t2) {
                     t2.field('cursor', {
                       type: cursorType ?? nonNull('String'),
-                      description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
+                      description: 'https://relay.dev/graphql/connections.htm#sec-Cursor',
                     })
                     t2.field('node', {
                       type: targetType,
-                      description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
+                      description: 'https://relay.dev/graphql/connections.htm#sec-Node',
                     })
                     if (pluginExtendEdge) {
                       eachObj(pluginExtendEdge, (val, key) => {
@@ -558,7 +558,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: 'PageInfo',
                   description:
-                    'PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo',
+                    'PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo',
                   definition(t2) {
                     t2.nonNull.field('hasNextPage', {
                       type: 'Boolean',

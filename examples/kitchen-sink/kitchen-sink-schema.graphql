@@ -19,24 +19,24 @@ interface Baz {
 
 type BooleanConnection {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  https://relay.dev/graphql/connections.htm#sec-Edge-Types
   """
   edges: [BooleanEdge]
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
   """
   pageInfo: PageInfo!
 }
 
 type BooleanEdge {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  https://relay.dev/graphql/connections.htm#sec-Cursor
   """
   cursor: String!
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  https://relay.dev/graphql/connections.htm#sec-Node
   """
   node: Boolean
 }
@@ -49,24 +49,24 @@ scalar Date
 
 type DateConnection {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  https://relay.dev/graphql/connections.htm#sec-Edge-Types
   """
   edges: [DateEdge]
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
   """
   pageInfo: PageInfo!
 }
 
 type DateEdge {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  https://relay.dev/graphql/connections.htm#sec-Cursor
   """
   cursor: String!
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  https://relay.dev/graphql/connections.htm#sec-Node
   """
   node: Date
 }
@@ -104,7 +104,7 @@ interface Node {
 }
 
 """
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 """
 type PageInfo {
   """
@@ -306,24 +306,24 @@ type User {
 
 type UserConnection {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  https://relay.dev/graphql/connections.htm#sec-Edge-Types
   """
   edges: [UserEdge]
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
   """
   pageInfo: PageInfo!
 }
 
 type UserEdge {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  https://relay.dev/graphql/connections.htm#sec-Cursor
   """
   cursor: String!
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  https://relay.dev/graphql/connections.htm#sec-Node
   """
   node: User
 }
