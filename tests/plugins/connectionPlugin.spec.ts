@@ -76,7 +76,7 @@ const UsersAll = parse(`query UsersAll { users { ${UsersFieldBody} } }`)
 
 const UsersLast = parse(`query UsersFieldLast($last: Int!) { users(last: $last) { ${UsersFieldBody} } }`)
 const UsersLastBefore = parse(
-  `query UsersFieldLastBefore($last: Int!, $before: String!) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
+  `query UsersFieldLastBefore($last: Int!, $before: String) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
 )
 const UsersFirst = parse(`query UsersFieldFirst($first: Int!) { users(first: $first) { ${UsersFieldBody} } }`)
 const UsersFirstAfter = parse(
@@ -287,23 +287,6 @@ describe('basic behavior', () => {
       hasNextPage: false,
       hasPreviousPage: true,
     })
-  })
-
-  it('cannot paginate backward without a before cursor or a custom cursorFromNodes', async () => {
-    const schema = makeTestSchema({
-      encodeCursor: (str) => str,
-      decodeCursor: (str) => str,
-    })
-    const lastNodes = await execute({
-      schema,
-      document: UsersLast,
-      variableValues: {
-        last: 3,
-      },
-    })
-    expect(lastNodes.errors).toEqual([
-      new GraphQLError(`Cannot paginate backward without a "before" cursor by default.`),
-    ])
   })
 
   it('should resolve pageInfo with basics', async () => {
@@ -1489,12 +1472,58 @@ describe('iteration', () => {
       variableValues: { last: MAX_INT, before: 'Y3Vyc29yOjk=' },
     })
     const end = new Date().valueOf()
+    const users = nodes.data?.users as any
+    const edges = users.edges as any
+
     expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < last
-    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
-    expect(nodes.data?.users.edges.length).toEqual(9)
-    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
-    expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
-    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
-    expect(Buffer.from(nodes.data?.users.edges[8].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+    expect(edges.length).toEqual(9)
+    expect(Buffer.from(edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
+    expect(edges[0].node.id).toEqual('User:1')
+    expect(Buffer.from(edges[8].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+    expect(edges[8].node.id).toEqual('User:9')
+  })
+
+  it('iterates backward correctly when asking for fewer than nodes returned', async () => {
+    let checkArgs = false
+    const schema = makeTestSchema(
+      {},
+      {
+        nodes(root: any, args: any) {
+          if (checkArgs) {
+            expect(args).toEqual({ last: 2, before: '9' })
+            return userNodes.slice(0, Number(args.before))
+          }
+          return userNodes
+        },
+      }
+    )
+
+    const lastNode = await executeOk({
+      schema,
+      document: UsersLastBefore,
+      variableValues: { last: 1 },
+    })
+    checkArgs = true
+
+    const lastNodeUsers = lastNode.data?.users as any
+
+    expect(lastNodeUsers.pageInfo.startCursor).toEqual('Y3Vyc29yOjk=')
+    expect(lastNodeUsers.pageInfo.endCursor).toEqual('Y3Vyc29yOjk=')
+    expect(lastNodeUsers.edges.length).toEqual(1)
+    expect(lastNodeUsers.edges[0].node.id).toEqual('User:10')
+
+    const nodes = await executeOk({
+      schema,
+      document: UsersLastBefore,
+      variableValues: { last: 2, before: lastNodeUsers.pageInfo.startCursor },
+    })
+    const users = nodes.data?.users as any
+    const edges = users.edges as any
+
+    expect(edges.length).toEqual(2)
+    expect(Buffer.from(edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:7')
+    expect(edges[0].node.id).toEqual('User:8')
+    expect(Buffer.from(edges[1].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+    expect(edges[1].node.id).toEqual('User:9')
   })
 })
