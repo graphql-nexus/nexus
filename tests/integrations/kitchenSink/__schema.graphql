@@ -23,7 +23,7 @@ type OfI2 implements I {
 }
 
 """
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 """
 type PageInfo {
   """
@@ -54,12 +54,12 @@ type Post {
 
 type PostConnection {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
+  https://relay.dev/graphql/connections.htm#sec-Edge-Types
   """
   edges: [PostEdge]
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
   """
   pageInfo: PageInfo!
   totalCount: Int!
@@ -67,13 +67,13 @@ type PostConnection {
 
 type PostEdge {
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor
+  https://relay.dev/graphql/connections.htm#sec-Cursor
   """
   cursor: String!
   delta(format: String): String
 
   """
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Node
+  https://relay.dev/graphql/connections.htm#sec-Node
   """
   node: Post
 }
