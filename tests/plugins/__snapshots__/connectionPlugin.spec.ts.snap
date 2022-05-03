@@ -182,14 +182,10 @@ Object {
 
 exports[`basic behavior should adhere to the Relay spec 1`] = `
 "type UserConnection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }"
 `;
@@ -300,14 +296,10 @@ type Query {
 }
 
 type QueryFieldLevel2_Connection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [QueryFieldLevel2_Edge!]!
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
@@ -321,14 +313,10 @@ type QueryFieldLevel2_Edge {
 }
 
 type QueryFieldLevel_Connection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [QueryFieldLevel_Edge!]!
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
@@ -351,14 +339,10 @@ type User {
 }
 
 type UserConnection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge!]!
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
@@ -420,14 +404,10 @@ type User {
 }
 
 type UserConnection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge!]!
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
@@ -446,14 +426,10 @@ exports[`field level configuration can configure edge names per-instance 1`] = `
 
 exports[`field level configuration can configure the connection per-instance 1`] = `
 "type QueryUsers_Connection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
   totalCount: Int
 }"
@@ -461,14 +437,10 @@ exports[`field level configuration can configure the connection per-instance 1`]
 
 exports[`field level configuration can configure the edge per-instance 1`] = `
 "type QueryUsers_Connection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [QueryUsers_Edge]
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }"
 `;
@@ -488,14 +460,10 @@ exports[`field level configuration can define a schema with multiple plugins, an
 "type AnalyticsUserConnection {
   averageCount: Int
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [AnalyticsUserEdge]
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
   totalCount: Int
 }
@@ -568,14 +536,10 @@ type User {
 }
 
 type UserConnection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
@@ -703,14 +667,10 @@ exports[`global plugin configuration allows disabling forward pagination w/ stri
 
 exports[`global plugin configuration can configure additional fields for the connection globally 1`] = `
 "type UserConnection {
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
   totalCount: Int
 }"
