@@ -76,7 +76,7 @@ const UsersAll = parse(`query UsersAll { users { ${UsersFieldBody} } }`)
 
 const UsersLast = parse(`query UsersFieldLast($last: Int!) { users(last: $last) { ${UsersFieldBody} } }`)
 const UsersLastBefore = parse(
-  `query UsersFieldLastBefore($last: Int!, $before: String!) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
+  `query UsersFieldLastBefore($last: Int!, $before: String) { users(last: $last, before: $before) { ${UsersFieldBody} } }`
 )
 const UsersFirst = parse(`query UsersFieldFirst($first: Int!) { users(first: $first) { ${UsersFieldBody} } }`)
 const UsersFirstAfter = parse(
@@ -165,6 +165,7 @@ describe('defaults', () => {
         before: 'whatever',
       },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(true)
   })
   it('should provide forward pagination defaults', async () => {
@@ -174,7 +175,9 @@ describe('defaults', () => {
       document: UsersFirst,
       variableValues: { first: 1 },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(nodes.data?.users.edges).toEqual([{ cursor: 'Y3Vyc29yOjA=', node: { id: 'User:1' } }])
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
   })
 })
@@ -215,6 +218,7 @@ describe('basic behavior', () => {
       document: UsersFirstAfter,
       variableValues: { first: 1, after: 'Y3Vyc29yOjA=' },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:1')
   })
 
@@ -228,6 +232,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 9 },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(first.data?.users.pageInfo).toEqual({
       hasNextPage: true,
       hasPreviousPage: false,
@@ -239,9 +244,11 @@ describe('basic behavior', () => {
       document: UsersLastBefore,
       variableValues: {
         last: 3,
+        // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
         before: first.data?.users.pageInfo.endCursor,
       },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.pageInfo).toEqual({
       startCursor: 'cursor:5',
       endCursor: 'cursor:7',
@@ -273,29 +280,13 @@ describe('basic behavior', () => {
         last: 3,
       },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.pageInfo).toEqual({
       startCursor: 'cursor:98',
       endCursor: 'cursor:100',
       hasNextPage: false,
       hasPreviousPage: true,
     })
-  })
-
-  it('cannot paginate backward without a before cursor or a custom cursorFromNodes', async () => {
-    const schema = makeTestSchema({
-      encodeCursor: (str) => str,
-      decodeCursor: (str) => str,
-    })
-    const lastNodes = await execute({
-      schema,
-      document: UsersLast,
-      variableValues: {
-        last: 3,
-      },
-    })
-    expect(lastNodes.errors).toEqual([
-      new GraphQLError(`Cannot paginate backward without a "before" cursor by default.`),
-    ])
   })
 
   it('should resolve pageInfo with basics', async () => {
@@ -305,6 +296,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 10 },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.pageInfo).toEqual({
       endCursor: 'Y3Vyc29yOjk=',
       hasNextPage: false,
@@ -322,6 +314,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 10 },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(lastNodes.data?.users.nodes).toEqual(lastNodes.data?.users.edges.map((e: any) => e.node))
   })
 
@@ -369,7 +362,9 @@ describe('basic behavior', () => {
         resolve: (...args) => {
           const result = customResolveFn(...args)
           return {
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             ...result,
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             nodes: result.edges.map((e: any) => e.node),
           }
         },
@@ -573,6 +568,7 @@ describe('basic behavior', () => {
       document: UsersFirst,
       variableValues: { first: 1000 },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.nodes.length).toEqual(10)
   })
 
@@ -670,6 +666,7 @@ describe('global plugin configuration', () => {
       schema,
       document: UsersAll,
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users?.edges.length).toEqual(10)
   })
 
@@ -932,7 +929,7 @@ describe('field level configuration', () => {
         output: false,
       },
     })
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('prints the types associated with the connection plugin correctly', async () => {
@@ -986,7 +983,7 @@ describe('field level configuration', () => {
       },
     })
 
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('#450 can extend connection edge with custom field', async () => {
@@ -1030,7 +1027,7 @@ describe('field level configuration', () => {
       schema,
       document: parse(`{ users(first: 10) { edges { delta } } }`),
     })
-
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.edges.map((e: any) => e.delta)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
 
@@ -1041,6 +1038,8 @@ describe('field level configuration', () => {
         scalarType({
           name: 'UUID',
           serialize() {},
+          parseLiteral() {},
+          parseValue() {},
         }),
         scalarType({
           name: 'UUID4',
@@ -1082,7 +1081,7 @@ describe('field level configuration', () => {
       },
     })
 
-    expect(printSchema(lexicographicSortSchema(schema))).toMatchSnapshot()
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 
   it('#479 allows a promise to be returned from pageInfoFromNodes', async () => {
@@ -1102,7 +1101,9 @@ describe('field level configuration', () => {
         first: 1,
       },
     })
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.pageInfo.hasNextPage).toEqual(true)
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(result.data?.users.pageInfo.hasPreviousPage).toEqual(false)
   })
 })
@@ -1339,7 +1340,7 @@ describe('connectionPlugin extensions', () => {
         {},
         [
           queryField((t) => {
-            // @ts-expect-error
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             t.connectionField('users2', {
               type: User,
               nodes(root: any, args: any, ctx: any, info: any) {
@@ -1397,7 +1398,7 @@ describe('connectionPlugin extensions', () => {
         {},
         [
           queryField((t) => {
-            // @ts-expect-error
+            // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
             t.connectionField('users2', {
               type: User,
               nodes(root: any, args: any, ctx: any, info: any) {
@@ -1446,8 +1447,11 @@ describe('iteration', () => {
     })
     const end = new Date().valueOf()
     expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < first
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(nodes.data?.users.edges.length).toEqual(10)
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
+    // @ts-ignore - TODO: change to @ts-expect-error when we drop v15 support
     expect(Buffer.from(nodes.data?.users.edges[9].cursor, 'base64').toString('utf8')).toEqual('cursor:9')
   })
 
@@ -1468,9 +1472,58 @@ describe('iteration', () => {
       variableValues: { last: MAX_INT, before: 'Y3Vyc29yOjk=' },
     })
     const end = new Date().valueOf()
+    const users = nodes.data?.users as any
+    const edges = users.edges as any
+
     expect(end - start).toBeLessThan(1000) // This was taking awhile when looping i < last
-    expect(nodes.data?.users.edges.length).toEqual(9)
-    expect(Buffer.from(nodes.data?.users.edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
-    expect(Buffer.from(nodes.data?.users.edges[8].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+    expect(edges.length).toEqual(9)
+    expect(Buffer.from(edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:0')
+    expect(edges[0].node.id).toEqual('User:1')
+    expect(Buffer.from(edges[8].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+    expect(edges[8].node.id).toEqual('User:9')
+  })
+
+  it('iterates backward correctly when asking for fewer than nodes returned', async () => {
+    let checkArgs = false
+    const schema = makeTestSchema(
+      {},
+      {
+        nodes(root: any, args: any) {
+          if (checkArgs) {
+            expect(args).toEqual({ last: 2, before: '9' })
+            return userNodes.slice(0, Number(args.before))
+          }
+          return userNodes
+        },
+      }
+    )
+
+    const lastNode = await executeOk({
+      schema,
+      document: UsersLastBefore,
+      variableValues: { last: 1 },
+    })
+    checkArgs = true
+
+    const lastNodeUsers = lastNode.data?.users as any
+
+    expect(lastNodeUsers.pageInfo.startCursor).toEqual('Y3Vyc29yOjk=')
+    expect(lastNodeUsers.pageInfo.endCursor).toEqual('Y3Vyc29yOjk=')
+    expect(lastNodeUsers.edges.length).toEqual(1)
+    expect(lastNodeUsers.edges[0].node.id).toEqual('User:10')
+
+    const nodes = await executeOk({
+      schema,
+      document: UsersLastBefore,
+      variableValues: { last: 2, before: lastNodeUsers.pageInfo.startCursor },
+    })
+    const users = nodes.data?.users as any
+    const edges = users.edges as any
+
+    expect(edges.length).toEqual(2)
+    expect(Buffer.from(edges[0].cursor, 'base64').toString('utf8')).toEqual('cursor:7')
+    expect(edges[0].node.id).toEqual('User:8')
+    expect(Buffer.from(edges[1].cursor, 'base64').toString('utf8')).toEqual('cursor:8')
+    expect(edges[1].node.id).toEqual('User:9')
   })
 })

@@ -494,11 +494,11 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   definition(t2) {
                     t2.list.field('edges', {
                       type: edgeName as any,
-                      description: `https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types`,
+                      description: `https://relay.dev/graphql/connections.htm#sec-Edge-Types`,
                     })
                     t2.nonNull.field('pageInfo', {
                       type: 'PageInfo' as any,
-                      description: `https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo`,
+                      description: `https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo`,
                     })
                     if (includeNodesField) {
                       t2.list.field('nodes', {
@@ -530,11 +530,11 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                   definition(t2) {
                     t2.field('cursor', {
                       type: cursorType ?? nonNull('String'),
-                      description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor',
+                      description: 'https://relay.dev/graphql/connections.htm#sec-Cursor',
                     })
                     t2.field('node', {
                       type: targetType,
-                      description: 'https://facebook.github.io/relay/graphql/connections.htm#sec-Node',
+                      description: 'https://relay.dev/graphql/connections.htm#sec-Node',
                     })
                     if (pluginExtendEdge) {
                       eachObj(pluginExtendEdge, (val, key) => {
@@ -558,7 +558,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
                 objectType({
                   name: 'PageInfo',
                   description:
-                    'PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo',
+                    'PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo',
                   definition(t2) {
                     t2.nonNull.field('hasNextPage', {
                       type: 'Boolean',
@@ -722,10 +722,6 @@ export function makeResolveFn(
     }
     if (args.after) {
       formattedArgs.after = decodeCursor(args.after).replace(CURSOR_PREFIX, '')
-    }
-
-    if (args.last && !args.before && cursorFromNode === defaultCursorFromNode) {
-      throw new Error(`Cannot paginate backward without a "before" cursor by default.`)
     }
 
     // Local variable to cache the execution of fetching the nodes,
@@ -978,8 +974,10 @@ function iterateNodes(nodes: any[], args: PaginationArgs, cb: (node: any, i: num
     }
   } else if (typeof args.last === 'number') {
     const len = Math.min(args.last, nodes.length)
+    const startOffset = Math.max(nodes.length - args.last, 0)
+
     for (let i = 0; i < len; i++) {
-      cb(nodes[i], i)
+      cb(nodes[i + startOffset], i)
     }
   } else {
     // Only happens if we have a custom validateArgs that ignores first/last
@@ -1063,14 +1061,9 @@ function defaultCursorFromNode(
   // If we're paginating backward, assume we're working backward from the assumed length
   // e.g. [0...20] (last: 5, before: "cursor:20") -> [cursor:15, cursor:16, cursor:17, cursor:18, cursor:19]
   if (typeof args.last === 'number') {
-    if (args.before) {
-      const offset = parseInt(args.before, 10)
-      const len = Math.min(nodes.length, args.last)
-      cursorIndex = offset - len + index
-    } else {
-      /* istanbul ignore next */
-      throw new Error('Unreachable')
-    }
+    const offset = args.before ? parseInt(args.before, 10) : nodes.length
+    const len = Math.min(nodes.length, args.last)
+    cursorIndex = offset - len + index
   }
   return `${CURSOR_PREFIX}${cursorIndex}`
 }

@@ -10,8 +10,10 @@
     "noUnusedLocals": true,
     "importHelpers": true,
     "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
     "noEmit": true,
-    "importsNotUsedAsValues": "error"
+    "importsNotUsedAsValues": "error",
+    "stripInternal": true
   },
   "exclude": [
     "./examples",

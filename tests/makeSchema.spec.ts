@@ -1,4 +1,4 @@
-import { printSchema } from 'graphql'
+import { DirectiveLocation, GraphQLDirective, GraphQLInt, GraphQLSchema, printSchema } from 'graphql'
 import os from 'os'
 import path from 'path'
 import { objectType } from '../src'
@@ -82,7 +82,7 @@ describe('makeSchema', () => {
           ],
           outputs: {},
           customPrintSchemaFn: (schema) => {
-            return printSchema(schema, { commentDescriptions: true })
+            return printSchema(schema).trim()
           },
         },
         null
@@ -149,6 +149,39 @@ describe('makeSchema', () => {
 
       expect(tsTypes).toContain(`import type * as thisFile from "./makeSchema.spec"`)
       expect(tsTypes).toContain(`import type { Context } from "./makeSchema.spec"`)
+    })
+  })
+
+  it('is compatible with GraphQL schema types', () => {
+    const someFn = (schema: GraphQLSchema) => {
+      return schema.toConfig()
+    }
+
+    const nexusSchema = makeSchema({
+      types: [],
+    })
+
+    someFn(nexusSchema)
+  })
+
+  describe('directives', () => {
+    it('can specify custom directives', async () => {
+      const { schema } = await generateSchema.withArtifacts({
+        types: [],
+        directives: [
+          new GraphQLDirective({
+            name: 'customDirective',
+            locations: [DirectiveLocation.FRAGMENT_DEFINITION],
+            args: {
+              code: {
+                type: GraphQLInt,
+                defaultValue: 42,
+              },
+            },
+          }),
+        ],
+      })
+      expect(printSchema(schema).trim()).toMatchSnapshot()
     })
   })
 })

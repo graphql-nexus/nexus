@@ -2,7 +2,7 @@ import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
 import type { Directives } from '../core'
 import type { GetGen } from '../typegenTypeHelpers'
 import type { NexusObjectTypeDef } from './objectType'
-import { AbstractTypes, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import { AbstractTypes, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface UnionDefinitionBuilder {
   typeName: string
@@ -28,12 +28,12 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
   /** Builds the definition for the union */
   definition(t: UnionDefinitionBlock): void
   /** The description to annotate the GraphQL SDL */
-  description?: string
+  description?: Maybe<string>
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
    */
-  deprecation?: string // | DeprecationInfo;
+  deprecation?: Maybe<string> // | DeprecationInfo;
   /** Source type information for this type */
   sourceType?: SourceTypingDef
   /**
@@ -49,6 +49,8 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
    *   directives: [useDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 } & AbstractTypes.MaybeTypeDefConfigFieldResolveType<TypeName>
 
 export class NexusUnionTypeDef<TypeName extends string> {

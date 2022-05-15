@@ -1,6 +1,6 @@
 {
   "name": "nexus",
-  "version": "0.0.0-dripip",
+  "version": "1.3.0",
   "description": "Scalable, strongly typed GraphQL schema development",
   "keywords": [
     "graphql",
@@ -46,7 +46,6 @@
     "release:pr": "dripip pr",
     "release:preview": "dripip preview",
     "release:stable": "dripip stable",
-    "pretest": "yarn patch-package",
     "test": "yarn test:types && jest --testTimeout 10000",
     "test:ci": "yarn test:types && jest --maxWorkers 2 --coverage --testTimeout 10000",
     "test:debug": "node --inspect-brk $(yarn bin)/jest -i --watch",
@@ -84,27 +83,25 @@
     "dripip": "^0.10.0",
     "eslint": "^6.6.0",
     "get-port": "^5.1.1",
-    "graphql": "^15.3.0",
-    "graphql-relay": "^0.6.0",
-    "graphql-scalars": "^1.2.6",
+    "graphql": "^16.3.0",
+    "graphql-relay": "^0.10.0",
+    "graphql-scalars": "^1.14.1",
     "gulp": "4.0.2",
     "husky": "^1.1.2",
     "jest": "^26.6.3",
     "jest-watch-typeahead": "^0.6.1",
     "lint-staged": "^7.3.0",
-    "patch-package": "6.2.2",
-    "prettier": "^2.3.1",
-    "prettier-plugin-jsdoc": "^0.3.23",
+    "prettier": "^2.5.1",
     "sort-package-json": "^1.22.1",
     "ts-jest": "^26.4.4",
-    "ts-morph": "^8.2.0",
+    "ts-morph": "^13.0.3",
     "ts-node": "^9.0.0",
     "tsd": "^0.13.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^4.1.2"
+    "typescript": "^4.5.5"
   },
   "peerDependencies": {
-    "graphql": "^14.5.8 || 15.x"
+    "graphql": "15.x || 16.x"
   }
 }

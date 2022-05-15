@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`enumType can alias as a nexus method 1`] = `
+"enum ABC {
+  one
+  three
+  two
+}
+
+input Input {
+  inAbc: ABC
+}
+
+type Out {
+  outAbc: ABC
+}
+
+type Query {
+  ok: Boolean!
+}"
+`;
+
 exports[`extendInputType should allow extending input objects 1`] = `
 "input InputTest {
   hello: String

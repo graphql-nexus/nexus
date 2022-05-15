@@ -57,17 +57,17 @@ describe('scalarType', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           {
             user(input: { date: "2020-01-01" }) {
               id
               dateTimeField
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
 

@@ -194,7 +194,7 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
     const builtinScalars = new Set(Object.keys(SCALAR_TYPES))
 
     Object.keys(typeMap).forEach((typeName) => {
-      if (typeName.indexOf('__') === 0) {
+      if (typeName.startsWith('__')) {
         return
       }
       if (typesToIgnore.has(typeName)) {

@@ -50,7 +50,7 @@ export const TupleTypeNode = objectType({
   name: 'TupleTypeNode',
   definition(t) {
     nodeType(t)
-    t.list.field('elementTypes', { type: 'Node' })
+    t.list.field('elements', { type: 'Node' })
   },
 })
 

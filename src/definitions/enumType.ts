@@ -1,7 +1,7 @@
 import { assertValidName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import type { Directives } from './directive'
-import { NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import { Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 type TypeScriptEnumLike = {
   [key: number]: string
@@ -13,12 +13,12 @@ export interface EnumMemberInfo {
   /** The internal representation of the enum */
   value?: string | number | object | boolean
   /** The description to annotate the GraphQL SDL */
-  description?: string
+  description?: Maybe<string>
   /**
    * Info about a field deprecation. Formatted as a string and provided with the deprecated directive on
    * field/enum types and as a comment on input fields.
    */
-  deprecation?: string // | DeprecationInfo;
+  deprecation?: Maybe<string> // | DeprecationInfo;
   /**
    * Custom extensions, as supported in graphql-js
    *
@@ -37,7 +37,7 @@ export interface EnumMemberInfo {
 export interface NexusEnumTypeConfig<TypeName extends string> {
   name: TypeName
   /** The description to annotate the GraphQL SDL */
-  description?: string
+  description?: Maybe<string>
   /** Source type information for this type */
   sourceType?: SourceTypingDef
   /** All members of the enum, either as an array of strings/definition objects, as an object, or as a TypeScript enum */
@@ -58,6 +58,8 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
    *   directives: [useDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
+  /** Adds this type as a method on the Object/Interface definition blocks */
+  asNexusMethod?: string
 }
 
 export class NexusEnumTypeDef<TypeName extends string> {

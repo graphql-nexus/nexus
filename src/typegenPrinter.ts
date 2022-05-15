@@ -28,6 +28,7 @@ import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './defini
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
 import type { StringLike } from './plugin'
+import { hasNexusExtension } from './extensions'
 import {
   eachObj,
   getOwnPackage,
@@ -59,16 +60,16 @@ interface TypegenInfoWithFile extends TypegenInfo {
   globalsPath?: string
   globalsHeaders?: string[]
   declareInputs?: boolean
+  useReadonlyArrayForInputs?: boolean
 }
 
 /**
  * We track and output a few main things:
  *
- * 1. "root" types, or the values that fill the first argument for a given object type
- * 2. "arg" types, the values that are arguments to output fields.
- * 3. "return" types, the values returned from the resolvers... usually just list/nullable variations on the
- *    "root" types for other types
- * 4. The names of all types, grouped by type.
+ * 1. "root" types, or the values that fill the first argument for a given object type 2. "arg" types, the
+ * values that are arguments to output fields. 3. "return" types, the values returned from the resolvers...
+ * usually just list/nullable variations on the
+ *     "root" types for other types 4. The names of all types, grouped by type.
  *
  * - Non-scalar types will get a dedicated "Root" type associated with it
  */
@@ -249,7 +250,7 @@ export class TypegenPrinter {
   }
 
   private printDynamicImport(forGlobal = false) {
-    const { rootTypings } = this.schema.extensions.nexus.config
+    const { sourceTypings } = this.schema.extensions.nexus.config
     const { contextTypeImport } = this.typegenInfo
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
@@ -270,7 +271,7 @@ export class TypegenPrinter {
             : contextTypeImport.export
         )
       }
-      eachObj(rootTypings, (rootType, typeName) => {
+      eachObj(sourceTypings, (rootType, typeName) => {
         if (typeof rootType !== 'string') {
           const importPath = resolveImportPath(rootType, typeName, outputPath)
           importMap[importPath] = importMap[importPath] || new Set()
@@ -416,7 +417,7 @@ export class TypegenPrinter {
 
   private printInheritedFieldMap() {
     const hasInterfaces: (
-      | (GraphQLInterfaceType & { getInterfaces(): GraphQLInterfaceType[] })
+      | (GraphQLInterfaceType & { getInterfaces(): ReadonlyArray<GraphQLInterfaceType> })
       | GraphQLObjectType
     )[] = []
     const withInterfaces = hasInterfaces
@@ -655,7 +656,7 @@ export class TypegenPrinter {
   }
 
   private resolveSourceType(typeName: string): string | undefined {
-    const rootTyping = this.schema.extensions.nexus.config.rootTypings[typeName]
+    const rootTyping = this.schema.extensions.nexus.config.sourceTypings[typeName]
     if (rootTyping) {
       return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
@@ -667,7 +668,7 @@ export class TypegenPrinter {
     // Used in test mocking
     _type: GraphQLObjectType
   ) {
-    if (field.extensions && field.extensions.nexus) {
+    if (field.extensions && hasNexusExtension(field.extensions.nexus)) {
       return field.extensions.nexus.hasDefinedResolver
     }
     return Boolean(field.resolve)
@@ -803,13 +804,13 @@ export class TypegenPrinter {
       if (item.length === 1) {
         if (Array.isArray(item[0])) {
           const toPrint = combine(item[0])
-          return toPrint.indexOf('null') === -1 ? `${toPrint}[]` : `Array<${toPrint}>`
+          return `ReadonlyArray<${toPrint}>`
         }
         return item[0]
       }
       if (Array.isArray(item[1])) {
         const toPrint = combine(item[1])
-        return toPrint.indexOf('null') === -1 ? `${toPrint}[] | null` : `Array<${toPrint}> | null`
+        return `ReadonlyArray<${toPrint}> | null`
       }
       return `${item[1]} | null`
     }
@@ -865,16 +866,23 @@ export class TypegenPrinter {
 
   private argTypeRepresentation(arg: GraphQLInputType): string {
     const argType = this.argTypeArr(arg)
+    const useReadonlyArrayForInputs = !!this.typegenInfo.useReadonlyArrayForInputs
     function combine(item: any[]): string {
       if (item.length === 1) {
         if (Array.isArray(item[0])) {
           const toPrint = combine(item[0])
+          if (useReadonlyArrayForInputs) {
+            return `ReadonlyArray<${toPrint}>`
+          }
           return toPrint.indexOf('null') === -1 ? `${toPrint}[]` : `Array<${toPrint}>`
         }
         return item[0]
       }
       if (Array.isArray(item[1])) {
         const toPrint = combine(item[1])
+        if (useReadonlyArrayForInputs) {
+          return `ReadonlyArray<${toPrint}> | null`
+        }
         return toPrint.indexOf('null') === -1 ? `${toPrint}[] | null` : `Array<${toPrint}> | null`
       }
       return `${item[1]} | null`

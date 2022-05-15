@@ -6,7 +6,7 @@ import type { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
 import { printSchemaWithDirectives } from './printSchemaWithDirectives'
 import { typegenAutoConfig } from './typegenAutoConfig'
-import { TypegenFormatFn, typegenFormatPrettier } from './typegenFormatPrettier'
+import { typegenFormatPrettier } from './typegenFormatPrettier'
 import { TypegenPrinter } from './typegenPrinter'
 
 export interface TypegenMetadataConfig
@@ -96,13 +96,12 @@ export class TypegenMetadata {
       util.promisify(fs.unlink),
       util.promisify(fs.mkdir),
     ]
-    let formatTypegen: TypegenFormatFn | null = null
-    if (typeof this.config.formatTypegen === 'function') {
-      formatTypegen = this.config.formatTypegen
-    } else if (this.config.prettierConfig) {
-      formatTypegen = typegenFormatPrettier(this.config.prettierConfig)
-    }
-    const content = typeof formatTypegen === 'function' ? await formatTypegen(output, type) : output
+    const formattedOutput =
+      typeof this.config.formatTypegen === 'function' ? await this.config.formatTypegen(output, type) : output
+    const content = this.config.prettierConfig
+      ? await typegenFormatPrettier(this.config.prettierConfig)(formattedOutput, type)
+      : formattedOutput
+
     const [toSave, existing] = await Promise.all([content, readFile(filePath, 'utf8').catch(() => '')])
     if (toSave !== existing) {
       const dirPath = path.dirname(filePath)
@@ -143,6 +142,7 @@ export class TypegenMetadata {
 
     return new TypegenPrinter(schema, {
       declareInputs: false,
+      useReadonlyArrayForInputs: false,
       ...typegenInfo,
       typegenPath,
     }).print()
@@ -150,7 +150,13 @@ export class TypegenMetadata {
 
   /** Generates the type definitions */
   async generateConfiguredTypes(schema: NexusGraphQLSchema, typegen: ConfiguredTypegen) {
-    const { outputPath: typegenPath, globalsPath, globalsHeaders, declareInputs = false } = typegen
+    const {
+      outputPath: typegenPath,
+      globalsPath,
+      globalsHeaders,
+      declareInputs = false,
+      useReadonlyArrayForInputs = false,
+    } = typegen
     const typegenInfo = await this.getTypegenInfo(schema, typegenPath)
 
     return new TypegenPrinter(schema, {
@@ -159,6 +165,7 @@ export class TypegenMetadata {
       globalsPath,
       globalsHeaders,
       declareInputs,
+      useReadonlyArrayForInputs,
     }).printConfigured()
   }
 

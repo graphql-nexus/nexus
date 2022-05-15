@@ -5,29 +5,23 @@
 
 import type { core } from '../../src'
 
-export interface CreatePostInput {
-  author: string // ID!
-  geo: Array<Array<number | null>> // [[Float]!]!
-  name: string // String!
-}
-
-export interface PostFilters {
-  order: OrderEnum // OrderEnum!
-  search: string | null // String
-}
-
 export interface NexusGenInputs {
-  CreatePostInput: CreatePostInput
-  PostFilters: PostFilters
+  CreatePostInput: {
+    // input type
+    author: string // ID!
+    geo: ReadonlyArray<ReadonlyArray<number | null>> // [[Float]!]!
+    name: string // String!
+  }
+  PostFilters: {
+    // input type
+    order: NexusGenEnums['OrderEnum'] // OrderEnum!
+    search: string | null // String
+  }
 }
-
-export type OrderEnum = 'ASC' | 'DESC'
-
-export type SomeEnum = 'A' | 'B'
 
 export interface NexusGenEnums {
-  OrderEnum: OrderEnum
-  SomeEnum: SomeEnum
+  OrderEnum: 'ASC' | 'DESC'
+  SomeEnum: 'A' | 'B'
 }
 
 export interface NexusGenScalars {
@@ -55,7 +49,7 @@ export interface NexusGenObjects {
     email: string // String!
     id: string // ID!
     name: string // String!
-    outEnum?: SomeEnum | null // SomeEnum
+    outEnum?: NexusGenEnums['SomeEnum'] | null // SomeEnum
     phone?: string | null // String
     posts: ReadonlyArray<NexusGenRootTypes['Post']> // [Post!]!
   }
@@ -99,7 +93,7 @@ export interface NexusGenFieldTypes {
     email: string // String!
     id: string // ID!
     name: string // String!
-    outEnum: SomeEnum | null // SomeEnum
+    outEnum: NexusGenEnums['SomeEnum'] | null // SomeEnum
     phone: string | null // String
     posts: ReadonlyArray<NexusGenRootTypes['Post']> // [Post!]!
   }
@@ -145,42 +139,36 @@ export interface NexusGenFieldTypeNames {
   }
 }
 
-export interface MutationCreatePostArgs {
-  input: CreatePostInput // CreatePostInput!
-}
-
-export interface MutationRegisterClickArgs {
-  uuid?: NexusGenScalars['UUID'] | null // UUID
-}
-
-export interface MutationSomeListArgs {
-  items: Array<string | null> // [String]!
-}
-
-export interface QueryPostsArgs {
-  filters: PostFilters // PostFilters!
-}
-
-export interface UserNameArgs {
-  prefix?: string | null // String
-}
-
-export interface UserPostsArgs {
-  filters?: PostFilters | null // PostFilters
-}
-
 export interface NexusGenArgTypes {
   Mutation: {
-    createPost: MutationCreatePostArgs
-    registerClick: MutationRegisterClickArgs
-    someList: MutationSomeListArgs
+    createPost: {
+      // args
+      input: NexusGenInputs['CreatePostInput'] // CreatePostInput!
+    }
+    registerClick: {
+      // args
+      uuid?: NexusGenScalars['UUID'] | null // UUID
+    }
+    someList: {
+      // args
+      items: ReadonlyArray<string | null> // [String]!
+    }
   }
   Query: {
-    posts: QueryPostsArgs
+    posts: {
+      // args
+      filters: NexusGenInputs['PostFilters'] // PostFilters!
+    }
   }
   User: {
-    name: UserNameArgs
-    posts: UserPostsArgs
+    name: {
+      // args
+      prefix?: string | null // String
+    }
+    posts: {
+      // args
+      filters?: NexusGenInputs['PostFilters'] | null // PostFilters
+    }
   }
 }
 
@@ -206,12 +194,6 @@ export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = keyof NexusGenUnions
 
-export type NexusGenDirectives = 'TestFieldDirective'
-
-export interface NexusGenDirectiveArgs {
-  TestFieldDirective: {}
-}
-
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
 export type NexusGenAbstractsUsingStrategyResolveType = 'ExampleUnion' | 'Node'
@@ -227,8 +209,6 @@ export type NexusGenFeaturesConfig = {
 export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
-  directives: NexusGenDirectives
-  directiveArgs: NexusGenDirectiveArgs
   rootTypes: NexusGenRootTypes
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars
   argTypes: NexusGenArgTypes

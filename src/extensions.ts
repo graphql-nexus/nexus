@@ -1,10 +1,15 @@
 import { defaultFieldResolver, GraphQLNamedType } from 'graphql'
 import type { DynamicFieldDefs, SchemaConfig } from './builder'
-import type { SourceTypingDef, SourceTypings } from './definitions/_types'
+import type { SourceTypings } from './definitions/_types'
 import type { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import type { NexusInterfaceTypeConfig } from './definitions/interfaceType'
 import type { NexusObjectTypeConfig } from './definitions/objectType'
+
+/** @internal */
+export function hasNexusExtension(val: any): val is any {
+  return Boolean(val)
+}
 
 export type NexusGraphQLNamedType = GraphQLNamedType & {
   extensions?: {
@@ -61,7 +66,7 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
 
 export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
   dynamicFields: DynamicFieldDefs
-  rootTypings: SourceTypings
+  sourceTypings: SourceTypings
 }
 
 /**
@@ -70,11 +75,4 @@ export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> 
  */
 export class NexusSchemaExtension {
   constructor(readonly config: NexusSchemaExtensionConfig) {}
-}
-
-export type NexusScalarExtensions = {
-  nexus: {
-    asNexusMethod?: string
-    sourceType?: SourceTypingDef
-  }
 }

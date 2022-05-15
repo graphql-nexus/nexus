@@ -1,10 +1,18 @@
 /// <reference types="jest" />
-import { GraphQLEnumType, GraphQLObjectType, printType } from 'graphql'
-import type { TypeMap } from 'graphql/type/schema'
+import {
+  GraphQLEnumType,
+  GraphQLSchema,
+  GraphQLObjectType,
+  lexicographicSortSchema,
+  printSchema,
+  printType,
+} from 'graphql'
 import { enumType, extendInputType, extendType, idArg, inputObjectType, makeSchema, objectType } from '../src'
 import { list } from '../src/definitions/list'
 import { nonNull } from '../src/definitions/nonNull'
 import { PostObject, UserObject } from './__helpers'
+
+type TypeMap = ReturnType<GraphQLSchema['getTypeMap']>
 
 enum NativeColors {
   RED = 'RED',
@@ -125,6 +133,36 @@ describe('enumType', () => {
       const typeMap = buildTypes<{ NoMembers: GraphQLEnumType }>([NoMembers])
       expect(typeMap.NoMembers.getValues()).toHaveLength(0)
     }).toThrow('must have at least one member')
+  })
+
+  it('can alias as a nexus method', () => {
+    const out = objectType({
+      name: 'Out',
+      definition(t) {
+        // @ts-ignore
+        t.abc('outAbc')
+      },
+    })
+    const input = inputObjectType({
+      name: 'Input',
+      definition(t) {
+        // @ts-ignore
+        t.abc('inAbc')
+      },
+    })
+
+    const schema = makeSchema({
+      types: [
+        out,
+        input,
+        enumType({
+          name: 'ABC',
+          members: ['one', 'two', 'three'],
+          asNexusMethod: 'abc',
+        }),
+      ],
+    })
+    expect(printSchema(lexicographicSortSchema(schema)).trim()).toMatchSnapshot()
   })
 })
 

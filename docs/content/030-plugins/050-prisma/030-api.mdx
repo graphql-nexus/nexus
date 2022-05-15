@@ -1586,7 +1586,7 @@ queryType({
 
 type Query {
   user(where: UserWhereUniqueInput!): User
-  users(orderBy: UserOrderByInput): [User!]!
+  users(orderBy: [UserOrderByInput!]): [User!]!
 }
 
 type Post {
@@ -1598,7 +1598,7 @@ type Post {
 type User {
   id: Int!
   name: String!
-  posts(orderBy: UserPostsOrderByInput): [Post!]!
+  posts(orderBy: [UserPostsOrderByInput!]): [Post!]!
 }
 
 input UserOrderByInput {
@@ -1625,7 +1625,7 @@ enum OrderByArg {
 
 ```graphql
 query entrypointOrdering {
-  users(orderBy: { name: asc }) {
+  users(orderBy: [{ name: asc }]) {
     id
     name
   }
@@ -1633,7 +1633,7 @@ query entrypointOrdering {
 
 query relationOrdering {
   user(where: { id: 1643 }) {
-    posts(orderBy: { title: dsc }) {
+    posts(orderBy: [{ title: desc }]) {
       title
       body
     }

@@ -1,6 +1,12 @@
 import { GraphQLNamedType, GraphQLSchema, isObjectType, specifiedDirectives } from 'graphql'
 import { isNexusObjectTypeDef } from './definitions/wrapping'
-import { ConfiguredTypegen, SchemaBuilder, SchemaConfig } from './builder'
+import {
+  AdditionalGraphQLSchemaConfigOptions,
+  ConfiguredTypegen,
+  MakeSchemaOptions,
+  SchemaBuilder,
+  SchemaConfig,
+} from './builder'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TypegenMetadata } from './typegenMetadata'
 import { resolveTypegenConfig } from './typegenUtils'
@@ -122,6 +128,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
   } = builder.getFinalTypeMap()
 
   const schema = new GraphQLSchema({
+    ...extractGraphQLSchemaOptions(config),
     query: getRootType('query', 'Query'),
     mutation: getRootType('mutation', 'Mutation'),
     subscription: getRootType('subscription', 'Subscription'),
@@ -137,4 +144,28 @@ export function makeSchemaInternal(config: SchemaConfig) {
   onAfterBuildFns.forEach((fn) => fn(schema))
 
   return { schema, missingTypes, finalConfig, hasSDLDirectives }
+}
+
+type OmittedVals = Partial<{ [K in keyof MakeSchemaOptions]: never }>
+
+function extractGraphQLSchemaOptions(
+  config: SchemaConfig
+): Partial<AdditionalGraphQLSchemaConfigOptions & OmittedVals> {
+  const {
+    formatTypegen,
+    nonNullDefaults,
+    mergeSchema,
+    outputs,
+    shouldExitAfterGenerateArtifacts,
+    shouldGenerateArtifacts,
+    schemaRoots,
+    sourceTypes,
+    prettierConfig,
+    plugins,
+    customPrintSchemaFn,
+    features,
+    contextType,
+    ...graphqlConfigOpts
+  } = config
+  return graphqlConfigOpts
 }

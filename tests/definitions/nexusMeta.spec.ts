@@ -124,9 +124,9 @@ describe('nexusMeta', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           query UserToNexus {
             user {
               id
@@ -140,8 +140,8 @@ describe('nexusMeta', () => {
               }
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
 
@@ -155,9 +155,9 @@ describe('nexusMeta', () => {
       shouldGenerateArtifacts: false,
     })
     expect(
-      await graphql(
+      await graphql({
         schema,
-        `
+        source: `
           query UserToNexus {
             user {
               id
@@ -167,8 +167,8 @@ describe('nexusMeta', () => {
               }
             }
           }
-        `
-      )
+        `,
+      })
     ).toMatchSnapshot()
   })
 })

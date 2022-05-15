@@ -22,7 +22,7 @@
     "apollo-server-testing": "^2.18.1",
     "dedent": "^0.7.0",
     "fullstack-tutorial": "apollographql/fullstack-tutorial.git",
-    "graphql": "^15.3.0",
+    "graphql": "^16.3.0",
     "graphql-tools": "^4.0.7",
     "isemail": "^3.2.0",
     "nexus": "^1.0.0",
@@ -39,6 +39,6 @@
     "node-fetch": "^2.2.1",
     "prettier": "^1.19.1",
     "ts-node-dev": "^1.0.0-pre.30",
-    "typescript": "^3.9"
+    "typescript": "^4.5.5"
   }
 }

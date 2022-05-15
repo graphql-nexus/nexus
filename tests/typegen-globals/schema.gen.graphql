@@ -56,6 +56,8 @@ enum SomeEnum {
   B @deprecated(reason: "This is a deprecation reason for B")
 }
 
+scalar UUID
+
 type User implements Node {
   email: String!
   id: ID!
@@ -73,5 +75,3 @@ type User implements Node {
   phone: String
   posts(filters: PostFilters): [Post!]!
 }
-
-scalar UUID

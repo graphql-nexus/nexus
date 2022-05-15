@@ -34,7 +34,7 @@ export type CreateFieldResolverInfo<FieldExt = any, TypeExt = any> = {
   parentTypeConfig: (
     | Omit<NexusGraphQLObjectTypeConfig, 'fields' | 'extensions'>
     | (Omit<NexusGraphQLInterfaceTypeConfig, 'fields' | 'extensions'> & {
-        interfaces: GraphQLInterfaceType[]
+        interfaces: readonly GraphQLInterfaceType[]
       })
   ) & {
     extensions?: Maybe<{ nexus?: { config: TypeExt } }>
@@ -51,7 +51,7 @@ export interface PluginConfig {
   /** A name for the plugin, useful for errors, etc. */
   name: string
   /** A description for the plugin */
-  description?: string
+  description?: Maybe<string>
   /** Any type definitions we want to add to output field definitions */
   fieldDefTypes?: StringLike | StringLike[]
   /** Any type definitions we want to add to input field definitions */

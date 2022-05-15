@@ -30,20 +30,27 @@ import { NexusTypes, NexusWrappedSymbol } from './_types'
 import type { NexusDirectiveDef } from './directive'
 import type { NexusDirectiveUse } from '../core'
 
+/** Input(named): Nexus only */
 export type AllNexusNamedInputTypeDefs<T extends string = any> =
   | NexusInputObjectTypeDef<T>
   | NexusEnumTypeDef<T>
   | NexusScalarTypeDef<T>
+
+/** Input(named): Nexus + GraphQLInput */
+export type AllNamedInputTypeDefs<T extends string = any> =
+  | AllNexusNamedInputTypeDefs<T>
   | Exclude<GraphQLInputType, GraphQLList<any> | GraphQLNonNull<any>>
 
+/** Input(all): Nexus + GraphQL */
 export type AllNexusInputTypeDefs<T extends string = any> =
-  | AllNexusNamedInputTypeDefs<T>
+  | AllNamedInputTypeDefs<T>
   | NexusListDef<any>
   | NexusNonNullDef<any>
   | NexusNullDef<any>
   | GraphQLList<any>
   | GraphQLNonNull<any>
 
+/** Output(named): Nexus only */
 export type AllNexusNamedOutputTypeDefs =
   | NexusObjectTypeDef<any>
   | NexusInterfaceTypeDef<any>
@@ -51,17 +58,25 @@ export type AllNexusNamedOutputTypeDefs =
   | NexusEnumTypeDef<any>
   | NexusScalarTypeDef<any>
 
+/** Output(all): Nexus only */
 export type AllNexusOutputTypeDefs =
   | AllNexusNamedOutputTypeDefs
   | NexusListDef<any>
   | NexusNonNullDef<any>
   | NexusNullDef<any>
 
+/** Input + output(named): Nexus only */
 export type AllNexusNamedTypeDefs = AllNexusNamedInputTypeDefs | AllNexusNamedOutputTypeDefs
 
+/** Input + output(all): Nexus only */
 export type AllNexusTypeDefs = AllNexusOutputTypeDefs | AllNexusInputTypeDefs
 
+/** Input + output(all): Nexus only + Name */
+export type AllNamedTypeDefs = AllNexusNamedTypeDefs | GraphQLNamedType
+
+/** All inputs to list(...) */
 export type NexusListableTypes =
+  | GetGen<'allNamedTypes', string>
   | AllNamedTypeDefs
   | NexusArgDef<any>
   | NexusListDef<NexusListableTypes>
@@ -70,24 +85,26 @@ export type NexusListableTypes =
   | GraphQLType
   | NexusMetaType
 
+/** All inputs to nonNull(...) */
 export type NexusNonNullableTypes =
+  | GetGen<'allNamedTypes', string>
   | AllNamedTypeDefs
   | NexusListDef<NexusListableTypes>
   | NexusArgDef<any>
   | NexusMetaType
 
+/** All inputs to nullable(...) */
 export type NexusNullableTypes =
+  | GetGen<'allNamedTypes', string>
   | AllNamedTypeDefs
   | NexusListDef<NexusListableTypes>
   | NexusArgDef<any>
   | NexusMetaType
-
-export type AllNamedTypeDefs = GetGen<'allNamedTypes', string> | AllNexusNamedTypeDefs
 
 export type AllNexusNamedArgsDefs<T extends AllInputTypes = AllInputTypes> =
   | T
   | NexusArgDef<T>
-  | AllNexusNamedInputTypeDefs<T>
+  | AllNamedInputTypeDefs<T>
   | GraphQLInputType
 
 export type AllNexusArgsDefs =
@@ -162,6 +179,13 @@ export function isNexusInterfaceTypeDef(obj: any): obj is NexusInterfaceTypeDef<
 }
 export function isNexusArgDef(obj: any): obj is NexusArgDef<AllInputTypes> {
   return isNexusStruct(obj) && obj[NexusWrappedSymbol] === NexusTypes.Arg
+}
+
+export function isNexusNamedOuputTypeDef(obj: any): obj is AllNexusNamedOutputTypeDefs {
+  return isNexusNamedTypeDef(obj) && !isNexusInputObjectTypeDef(obj)
+}
+export function isNexusNamedInputTypeDef(obj: any): obj is AllNexusNamedInputTypeDefs {
+  return isNexusNamedTypeDef(obj) && !isNexusObjectTypeDef(obj) && !isNexusInterfaceTypeDef(obj)
 }
 
 export function isNexusDynamicOutputProperty<T extends string>(obj: any): obj is DynamicOutputPropertyDef<T> {
@@ -255,10 +279,10 @@ export function rewrapAsGraphQLType(baseType: GraphQLNamedType, wrapping: NexusF
   let finalType: GraphQLType = baseType
   wrapping.forEach((wrap) => {
     if (wrap === 'List') {
-      finalType = GraphQLList(finalType)
+      finalType = new GraphQLList(finalType)
     } else if (wrap === 'NonNull') {
       if (!isNonNullType(finalType)) {
-        finalType = GraphQLNonNull(finalType)
+        finalType = new GraphQLNonNull(finalType)
       }
     } else {
       throw new Unreachable(wrap)

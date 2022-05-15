@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import type { NexusGenTypes } from './types.gen'
+import type { NexusGenTypes } from './types-useReadonlyArrayForInputs.gen'
 
 declare global {
   interface NexusGen extends NexusGenTypes {}

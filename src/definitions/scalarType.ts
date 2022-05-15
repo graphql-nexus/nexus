@@ -1,7 +1,8 @@
-import { assertValidName, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
+import { assertValidName, GraphQLNamedType, GraphQLScalarTypeConfig } from 'graphql'
+import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from '../core'
 import { decorateType } from './decorateType'
 import type { Directives } from './directive'
-import { NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import { GraphQLNamedOutputType, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
 
 export interface ScalarBase
   extends Pick<
@@ -11,7 +12,7 @@ export interface ScalarBase
 
 export interface ScalarConfig {
   /** Any deprecation info for this scalar type */
-  deprecation?: string // | DeprecationInfo;
+  deprecation?: Maybe<string> // | DeprecationInfo;
   /** Adds this type as a method on the Object/Interface definition blocks */
   asNexusMethod?: string
   /** Source type information for this type */
@@ -51,13 +52,13 @@ export function scalarType<TypeName extends string>(options: NexusScalarTypeConf
   return new NexusScalarTypeDef(options.name, options)
 }
 
-export function asNexusMethod<T extends GraphQLScalarType>(
-  scalar: T,
+export function asNexusMethod<T extends GraphQLNamedType>(
+  namedType: T,
   methodName: string,
   sourceType?: SourceTypingDef
-): T {
-  return decorateType(scalar, {
+): T extends GraphQLNamedOutputType ? AllNexusOutputTypeDefs : AllNexusInputTypeDefs {
+  return decorateType(namedType, {
     asNexusMethod: methodName,
     sourceType,
-  })
+  }) as any
 }

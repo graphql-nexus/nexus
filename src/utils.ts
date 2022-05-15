@@ -31,9 +31,10 @@ import {
   AllNexusTypeDefs,
   isNexusWrappingType,
   isNexusArgDef,
-  AllNexusNamedInputTypeDefs,
+  AllNamedInputTypeDefs,
 } from './definitions/wrapping'
 import {
+  Maybe,
   MissingType,
   NexusFeatures,
   NexusGraphQLSchema,
@@ -177,7 +178,7 @@ export function groupTypes(schema: GraphQLSchema) {
   Object.keys(schemaTypeMap)
     .sort()
     .forEach((typeName) => {
-      if (typeName.indexOf('__') === 0) {
+      if (typeName.startsWith('__')) {
         return
       }
       const type = schema.getType(typeName)
@@ -233,7 +234,7 @@ function nixifyPathSlashes(path: string): string {
  * Format a path so it is suitable to be used as a module import.
  *
  * - Implicitly relative is made explicitly relative - TypeScript file extension is stripped - Windows slashes
- *   converted into *nix slashes
+ * converted into *nix slashes
  *
  * Do not pass Node module IDs here as they will be treated as relative paths e.g. "react" "@types/react" etc.
  */
@@ -266,7 +267,7 @@ export interface PrintedGenTypingConfig {
   name: string
   optional: boolean
   type: string
-  description?: string
+  description?: Maybe<string>
   imports?: PrintedGenTypingImport[]
 }
 
@@ -517,7 +518,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
 }
 
 /** Given the right hand side of an arg definition, returns the underlying "named type" for us to add to the builder */
-export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNexusNamedInputTypeDefs | string {
+export function getArgNamedType(argDef: AllNexusArgsDefs | string): AllNamedInputTypeDefs | string {
   let finalValue = argDef
   if (typeof finalValue === 'string') {
     return finalValue
@@ -552,7 +553,7 @@ export function getNexusNamedType(
       namedType = resolveNexusMetaType(namedType)
     }
   }
-  return namedType
+  return namedType as AllNexusNamedTypeDefs | GraphQLNamedType | string
 }
 
 /** Assertion utility with nexus-aware feedback for users. */
@@ -597,12 +598,20 @@ export function graphql15InterfaceConfig<T extends GraphQLInterfaceTypeConfig<an
 }
 
 export function graphql15InterfaceType<T extends GraphQLInterfaceType>(
-  type: T & { getInterfaces?: () => GraphQLInterfaceType[] }
-): T & { getInterfaces(): GraphQLInterfaceType[] } {
+  type: T & { getInterfaces?: () => ReadonlyArray<GraphQLInterfaceType> }
+): T & { getInterfaces(): ReadonlyArray<GraphQLInterfaceType> } {
   if (typeof type.getInterfaces !== 'function') {
     type.getInterfaces = () => []
   }
-  return type as T & { getInterfaces(): GraphQLInterfaceType[] }
+  return type as T & { getInterfaces(): ReadonlyArray<GraphQLInterfaceType> }
+}
+
+/** @internal */
+export function unpack<T extends object>(val: T | (() => T)): T {
+  if (val instanceof Function) {
+    return val()
+  }
+  return val
 }
 
 /**
@@ -626,4 +635,11 @@ export const ownProp = {
   get<O extends object, K extends keyof O>(obj: O, key: K): O[K] | undefined {
     return Object.getOwnPropertyDescriptor(obj, key)?.value
   },
+}
+
+export function result<T>(val: T | (() => T)): T {
+  if (val instanceof Function) {
+    return val()
+  }
+  return val as T
 }

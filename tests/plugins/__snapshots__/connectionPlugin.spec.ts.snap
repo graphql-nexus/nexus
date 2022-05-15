@@ -182,31 +182,27 @@ Object {
 
 exports[`basic behavior should adhere to the Relay spec 1`] = `
 "type UserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }"
 `;
 
 exports[`basic behavior should adhere to the Relay spec 2`] = `
 "type UserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
 }"
 `;
 
 exports[`basic behavior should adhere to the Relay spec 3`] = `
 "\\"\\"\\"
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 \\"\\"\\"
 type PageInfo {
   \\"\\"\\"
@@ -233,7 +229,7 @@ type PageInfo {
 
 exports[`field level configuration #515 - custom non-string cursor type 1`] = `
 "\\"\\"\\"
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 \\"\\"\\"
 type PageInfo {
   \\"\\"\\"
@@ -299,47 +295,43 @@ type Query {
   ): UserConnection!
 }
 
-type QueryFieldLevel_Connection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
-  edges: [QueryFieldLevel_Edge!]!
-
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
-  pageInfo: PageInfo!
-}
-
-type QueryFieldLevel_Edge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
-  cursor: UUID!
-  delta: Int!
-
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
-  node: User!
-}
-
 type QueryFieldLevel2_Connection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [QueryFieldLevel2_Edge!]!
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
 type QueryFieldLevel2_Edge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: UUID4!
   delta: Int!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User!
 }
+
+type QueryFieldLevel_Connection {
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
+  edges: [QueryFieldLevel_Edge!]!
+
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
+  pageInfo: PageInfo!
+}
+
+type QueryFieldLevel_Edge {
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  cursor: UUID!
+  delta: Int!
+
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
+  node: User!
+}
+
+scalar UUID
+
+scalar UUID4
 
 type User {
   id: ID!
@@ -347,35 +339,26 @@ type User {
 }
 
 type UserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge!]!
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
 type UserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: UUID!
   delta: Int!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User!
-}
-
-scalar UUID
-
-scalar UUID4
-"
+}"
 `;
 
 exports[`field level configuration #670 should explicitly state nullability for connectionPlugin args & fields 1`] = `
 "\\"\\"\\"
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 \\"\\"\\"
 type PageInfo {
   \\"\\"\\"
@@ -421,25 +404,20 @@ type User {
 }
 
 type UserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge!]!
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
 type UserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User!
-}
-"
+}"
 `;
 
 exports[`field level configuration can configure connection names per-instance 1`] = `"QueryUsersTestFieldConnection"`;
@@ -448,14 +426,10 @@ exports[`field level configuration can configure edge names per-instance 1`] = `
 
 exports[`field level configuration can configure the connection per-instance 1`] = `
 "type QueryUsers_Connection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
   totalCount: Int
 }"
@@ -463,24 +437,20 @@ exports[`field level configuration can configure the connection per-instance 1`]
 
 exports[`field level configuration can configure the edge per-instance 1`] = `
 "type QueryUsers_Connection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [QueryUsers_Edge]
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }"
 `;
 
 exports[`field level configuration can configure the edge per-instance 2`] = `
 "type QueryUsers_Edge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
   role: String
 }"
@@ -490,28 +460,24 @@ exports[`field level configuration can define a schema with multiple plugins, an
 "type AnalyticsUserConnection {
   averageCount: Int
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [AnalyticsUserEdge]
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
   totalCount: Int
 }
 
 type AnalyticsUserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
 }
 
 \\"\\"\\"
-PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+PageInfo cursor, as defined in https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 \\"\\"\\"
 type PageInfo {
   \\"\\"\\"
@@ -536,19 +502,6 @@ type PageInfo {
 }
 
 type Query {
-  users(
-    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
-    after: String
-
-    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
-    before: String
-
-    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
-    last: Int
-  ): UserConnection
   userStats(
     \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
     after: String
@@ -562,6 +515,19 @@ type Query {
     \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
     last: Int
   ): AnalyticsUserConnection
+  users(
+    \\"\\"\\"Returns the elements in the list that come after the specified cursor\\"\\"\\"
+    after: String
+
+    \\"\\"\\"Returns the elements in the list that come before the specified cursor\\"\\"\\"
+    before: String
+
+    \\"\\"\\"Returns the first n elements from the list.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Returns the last n elements from the list.\\"\\"\\"
+    last: Int
+  ): UserConnection
 }
 
 type User {
@@ -570,25 +536,20 @@ type User {
 }
 
 type UserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
 }
 
 type UserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
-}
-"
+}"
 `;
 
 exports[`field level configuration can define additional args for the connection 1`] = `
@@ -706,14 +667,10 @@ exports[`global plugin configuration allows disabling forward pagination w/ stri
 
 exports[`global plugin configuration can configure additional fields for the connection globally 1`] = `
 "type UserConnection {
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Edge-Types\\"\\"\\"
   edges: [UserEdge]
 
-  \\"\\"\\"
-  https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-  \\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo\\"\\"\\"
   pageInfo: PageInfo!
   totalCount: Int
 }"
@@ -721,10 +678,10 @@ exports[`global plugin configuration can configure additional fields for the con
 
 exports[`global plugin configuration can configure additional fields for the edge globally 1`] = `
 "type UserEdge {
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Cursor\\"\\"\\"
   cursor: String!
 
-  \\"\\"\\"https://facebook.github.io/relay/graphql/connections.htm#sec-Node\\"\\"\\"
+  \\"\\"\\"https://relay.dev/graphql/connections.htm#sec-Node\\"\\"\\"
   node: User
   createdAt: String
 }"
