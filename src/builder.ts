@@ -1,7 +1,9 @@
 import {
   assertValidName,
+  ASTKindToNode,
   defaultFieldResolver,
   GraphQLBoolean,
+  GraphQLDirective,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
@@ -27,6 +29,7 @@ import {
   GraphQLString,
   GraphQLType,
   GraphQLUnionType,
+  isDirective,
   isInputObjectType,
   isInputType,
   isInterfaceType,
@@ -67,6 +70,8 @@ import {
   AllNexusNamedTypeDefs,
   AllNexusOutputTypeDefs,
   finalizeWrapping,
+  isNexusDirective,
+  isNexusDirectiveUse,
   isNexusDynamicInputMethod,
   isNexusDynamicOutputMethod,
   isNexusDynamicOutputProperty,
@@ -93,11 +98,11 @@ import {
 import type {
   MissingType,
   NexusFeaturesInput,
+  NexusGraphQLDirectiveConfig,
   NexusGraphQLFieldConfig,
   NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
   NexusGraphQLObjectTypeConfig,
-  NexusGraphQLSchema,
   NonNullConfig,
   SourceTypings,
   TypingImport,
@@ -136,7 +141,6 @@ import {
   invariantGuard,
   isArray,
   isObject,
-  objValues,
   UNKNOWN_TYPE_SCALAR,
 } from './utils'
 import {
@@ -147,6 +151,13 @@ import {
   NexusMeta,
   resolveNexusMetaType,
 } from './definitions/nexusMeta'
+import {
+  DirectiveASTKinds,
+  Directives,
+  maybeAddDirectiveUses,
+  NexusDirectiveConfig,
+  NexusDirectiveDef,
+} from './definitions/directive'
 import { rebuildNamedType, RebuildConfig } from './rebuildType'
 
 type NexusShapedOutput = {
@@ -337,6 +348,13 @@ export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults
   nonNullDefaults: RequiredDeeply<BuilderConfigInput['nonNullDefaults']>
   features: RequiredDeeply<BuilderConfigInput['features']>
   plugins: RequiredDeeply<BuilderConfigInput['plugins']>
+  /**
+   * A list of directives / directive uses (with args) for the schema definition
+   *
+   * @example
+   *   schemaDirectives: [addDirective('ExampleDirective', { arg: true })]
+   */
+  schemaDirectives?: Directives
 }
 
 /**
@@ -399,6 +417,7 @@ export type TypeToWalk =
   | { type: 'input'; value: NexusShapedInput }
   | { type: 'object'; value: NexusShapedOutput }
   | { type: 'interface'; value: NexusInterfaceTypeConfig<any> }
+  | { type: 'directive'; value: NexusDirectiveConfig }
 
 export type DynamicInputFields = Record<string, DynamicInputMethodDef<string> | string>
 
@@ -417,7 +436,12 @@ export type DynamicBlockDef =
   | DynamicOutputMethodDef<string>
   | DynamicOutputPropertyDef<string>
 
-export type NexusAcceptedTypeDef = TypeDef | DynamicBlockDef | NexusMeta
+export type NexusAcceptedTypeDef =
+  | TypeDef
+  | DynamicBlockDef
+  | NexusMeta
+  | NexusDirectiveDef
+  | GraphQLDirective
 
 export type PluginBuilderLens = {
   hasType: SchemaBuilder['hasType']
@@ -470,6 +494,18 @@ export class SchemaBuilder {
   private dynamicOutputFields: DynamicOutputFields = {}
   private dynamicOutputProperties: DynamicOutputProperties = {}
   private plugins: NexusPlugin[] = []
+
+  /** All GraphQL Directives */
+  private directivesMap: Record<string, GraphQLDirective> = {}
+
+  /** All Directives that are defined */
+  private pendingDirectives: Record<string, NexusDirectiveConfig> = {}
+
+  /** All Schema Directives */
+  // private schemaDirectives: GraphQLDirective[] = []
+
+  /** Whether we have used any custom directives within the schema construction */
+  private hasSDLDirectives: boolean = false
 
   /** All types that need to be traversed for children types */
   private typesToWalk: TypeToWalk[] = []
@@ -591,6 +627,16 @@ export class SchemaBuilder {
       return
     }
 
+    if (isNexusDirective(typeDef)) {
+      this.typesToWalk.push({ type: 'directive', value: typeDef.value })
+      const existingDirective = this.pendingDirectives[typeDef.value.name]
+      if (existingDirective && existingDirective !== typeDef.value) {
+        console.error(new Error(`Already have a directive named ${typeDef.value.name}`))
+      }
+      this.pendingDirectives[typeDef.value.name] = typeDef.value
+      return
+    }
+
     if (isNexusMeta(typeDef)) {
       this.addToNexusMeta(typeDef)
       return
@@ -639,6 +685,11 @@ export class SchemaBuilder {
       if (isNexusScalarTypeDef(typeDef) && typeDef.value.sourceType) {
         this.sourceTypings[typeDef.name] = typeDef.value.sourceType
       }
+    }
+
+    if (isDirective(typeDef)) {
+      this.addDirective(typeDef)
+      return
     }
 
     // If it's a concrete GraphQL type, we handle it directly by convering the
@@ -709,6 +760,7 @@ export class SchemaBuilder {
         this.graphqlMergeSchemaMap = this.handleMergeSchema({ schema: types })
       } else {
         this.addTypes(types.getTypeMap())
+        this.addTypes(types.getDirectives())
       }
       return
     }
@@ -725,6 +777,8 @@ export class SchemaBuilder {
       isNexusExtendTypeDef(types) ||
       isNexusExtendInputTypeDef(types) ||
       isNamedType(types) ||
+      isDirective(types) ||
+      isNexusDirective(types) ||
       isNexusDynamicInputMethod(types) ||
       isNexusDynamicOutputMethod(types) ||
       isNexusDynamicOutputProperty(types) ||
@@ -765,6 +819,9 @@ export class SchemaBuilder {
           break
         case 'object':
           this.walkOutputType(obj.value)
+          break
+        case 'directive':
+          this.walkDirectiveDef(obj.value)
           break
         default:
           casesHandled(obj)
@@ -884,6 +941,10 @@ export class SchemaBuilder {
     if (!this.pendingTypeMap.Query && !this.config.schemaRoots?.query && !this.typeExtendMap.Query) {
       this.pendingTypeMap.Query = null as any
     }
+    Object.keys(this.pendingDirectives).forEach((key) => {
+      const directiveDef = this.pendingDirectives[key]
+      this.directivesMap[directiveDef.name] = this.buildDirective(directiveDef)
+    })
     Object.keys(this.pendingTypeMap).forEach((key) => {
       if (this.typesToWalk.length > 0) {
         this.walkTypes()
@@ -944,6 +1005,9 @@ export class SchemaBuilder {
       schemaExtension: this.schemaExtension!,
       missingTypes: this.missingTypes,
       onAfterBuildFns: this.onAfterBuildFns,
+      customDirectives: this.directivesMap,
+      hasSDLDirectives: this.hasSDLDirectives,
+      schemaDirectives: this.maybeAddDirectiveUses('SCHEMA', this.config.schemaDirectives),
     }
   }
 
@@ -987,6 +1051,7 @@ export class SchemaBuilder {
         ...config.extensions,
         nexus: new NexusInputObjectTypeExtension(config),
       },
+      ...this.maybeAddDirectiveUses('INPUT_OBJECT', config.directives),
     }
     return this.finalize(new GraphQLInputObjectType(inputObjectTypeConfig))
   }
@@ -1036,6 +1101,7 @@ export class SchemaBuilder {
         ...config.extensions,
         nexus: new NexusObjectTypeExtension(config),
       },
+      ...this.maybeAddDirectiveUses('OBJECT', config.directives),
     }
     return this.finalize(new GraphQLObjectType(objectTypeConfig))
   }
@@ -1079,6 +1145,7 @@ export class SchemaBuilder {
         ...config.extensions,
         nexus: new NexusInterfaceTypeExtension(config),
       },
+      ...this.maybeAddDirectiveUses('INTERFACE', config.directives),
     }
     return this.finalize(new GraphQLInterfaceType(interfaceTypeConfig))
   }
@@ -1101,6 +1168,43 @@ export class SchemaBuilder {
       }
     })
     return field
+  }
+
+  private addDirective(kind: Directives[number]) {
+    if (isNexusDirectiveUse(kind)) {
+      if (kind.config && !this.pendingDirectives[kind.name]) {
+        this.directivesMap[kind.name] = this.buildDirective(kind.config)
+      }
+    } else if (isDirective(kind)) {
+      this.directivesMap[kind.name] = kind
+    } else if (isNexusDirective(kind)) {
+      this.directivesMap[kind.value.name] = this.buildDirective(kind.value)
+    }
+  }
+
+  private buildDirective(config: NexusDirectiveConfig) {
+    return new GraphQLDirective({
+      name: config.name,
+      args: config.args ? this.buildArgs(config.args, config, 'directive') : undefined,
+      locations: config.locations as any, // any is a hack to make this work with v15 and 16
+      isRepeatable: config.isRepeatable,
+      extensions: config.extensions,
+      description: config.description,
+    })
+  }
+
+  private maybeAddDirectiveUses<Kind extends DirectiveASTKinds>(kind: Kind, directives?: Directives) {
+    if (!directives) {
+      return
+    }
+    for (const directive of directives) {
+      this.addDirective(directive)
+    }
+    const result = maybeAddDirectiveUses(kind, directives, this.directivesMap)
+    if (result) {
+      this.hasSDLDirectives = true
+    }
+    return result
   }
 
   private buildEnumType(config: NexusEnumTypeConfig<any>) {
@@ -1153,6 +1257,7 @@ export class SchemaBuilder {
           ...config.extensions,
           nexus: config.extensions?.nexus ?? {},
         },
+        ...this.maybeAddDirectiveUses('ENUM', config.directives),
       })
     )
   }
@@ -1181,6 +1286,7 @@ export class SchemaBuilder {
           ...config.extensions,
           nexus: config.extensions?.nexus ?? {},
         },
+        ...this.maybeAddDirectiveUses('UNION', config.directives),
       })
     )
   }
@@ -1196,6 +1302,7 @@ export class SchemaBuilder {
           ...config.extensions,
           nexus: config.extensions?.nexus ?? {},
         },
+        ...this.maybeAddDirectiveUses('SCALAR', config.directives),
       })
     )
   }
@@ -1378,6 +1485,7 @@ export class SchemaBuilder {
         ...fieldConfig.extensions,
         nexus: fieldExtension,
       },
+      ...this.maybeAddDirectiveUses('FIELD_DEFINITION', fieldConfig.directives),
     }
     return {
       resolve: this.makeFinalResolver(
@@ -1424,12 +1532,13 @@ export class SchemaBuilder {
         ...fieldConfig.extensions,
         nexus: fieldConfig.extensions?.nexus ?? {},
       },
+      ...this.maybeAddDirectiveUses('INPUT_FIELD_DEFINITION', fieldConfig.directives),
     }
   }
 
   private buildArgs(
     args: ArgsRecord,
-    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig,
+    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig | NexusGraphQLDirectiveConfig,
     fieldName: string
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {}
@@ -1461,6 +1570,7 @@ export class SchemaBuilder {
           ...finalArgDef.extensions,
           nexus: finalArgDef.extensions?.nexus ?? {},
         },
+        ...this.maybeAddDirectiveUses('ARGUMENT_DEFINITION', finalArgDef.directives),
       }
     }
     return allArgs
@@ -1562,6 +1672,12 @@ export class SchemaBuilder {
       }
     }
     return this.missingType(type, fromObject)
+  }
+
+  private walkDirectiveDef(def: NexusDirectiveConfig) {
+    if (def.args) {
+      this.traverseArgs(def.args)
+    }
   }
 
   private walkInputType<T extends NexusShapedInput>(obj: T) {
@@ -1738,8 +1854,12 @@ export class SchemaBuilder {
    * @param config
    */
   private handleMergeSchema(config: MergeSchemaConfig) {
-    const { types } = config.schema.toConfig()
+    const { types, directives } = config.schema.toConfig()
     const mergedTypes: Record<string, AllNexusNamedTypeDefs> = {}
+
+    for (const directive of directives) {
+      this.addDirective(directive)
+    }
 
     // We don't need to worry about capturing any types while walking,
     // because we have the entire schema
@@ -1780,74 +1900,9 @@ export interface BuildTypes<TypeMapDefs extends Record<string, GraphQLNamedType>
   missingTypes: Record<string, MissingType>
   schemaExtension: NexusSchemaExtension
   onAfterBuildFns: SchemaBuilder['onAfterBuildFns']
-}
-
-/** Builds the schema, we may return more than just the schema from this one day. */
-export function makeSchemaInternal(config: SchemaConfig) {
-  const builder = new SchemaBuilder(config)
-  builder.addTypes(config.types)
-  if (config.schemaRoots) {
-    builder.addTypes(config.schemaRoots)
-  }
-  const { finalConfig, typeMap, missingTypes, schemaExtension, onAfterBuildFns } = builder.getFinalTypeMap()
-
-  function getRootType(rootType: 'query' | 'mutation' | 'subscription', defaultType: string) {
-    const rootTypeVal = config.schemaRoots?.[rootType] ?? defaultType
-    let returnVal: null | GraphQLNamedType = null
-    if (typeof rootTypeVal === 'string') {
-      returnVal = typeMap[rootTypeVal]
-    } else if (rootTypeVal) {
-      if (isNexusObjectTypeDef(rootTypeVal)) {
-        returnVal = typeMap[rootTypeVal.name]
-      } else if (isObjectType(rootTypeVal)) {
-        returnVal = typeMap[rootTypeVal.name]
-      }
-    }
-    if (returnVal && !isObjectType(returnVal)) {
-      throw new Error(`Expected ${rootType} to be a objectType, saw ${returnVal.constructor.name}`)
-    }
-    return returnVal
-  }
-
-  const schema = new GraphQLSchema({
-    ...extractGraphQLSchemaOptions(config),
-    query: getRootType('query', 'Query'),
-    mutation: getRootType('mutation', 'Mutation'),
-    subscription: getRootType('subscription', 'Subscription'),
-    types: objValues(typeMap),
-    extensions: {
-      ...config.extensions,
-      nexus: schemaExtension,
-    },
-  }) as NexusGraphQLSchema
-
-  onAfterBuildFns.forEach((fn) => fn(schema))
-
-  return { schema, missingTypes, finalConfig }
-}
-
-type OmittedVals = Partial<{ [K in keyof MakeSchemaOptions]: never }>
-
-function extractGraphQLSchemaOptions(
-  config: SchemaConfig
-): Partial<AdditionalGraphQLSchemaConfigOptions & OmittedVals> {
-  const {
-    formatTypegen,
-    nonNullDefaults,
-    mergeSchema,
-    outputs,
-    shouldExitAfterGenerateArtifacts,
-    shouldGenerateArtifacts,
-    schemaRoots,
-    sourceTypes,
-    prettierConfig,
-    plugins,
-    customPrintSchemaFn,
-    features,
-    contextType,
-    ...graphqlConfigOpts
-  } = config
-  return graphqlConfigOpts
+  customDirectives: Record<string, GraphQLDirective>
+  hasSDLDirectives: boolean
+  schemaDirectives?: Partial<{ astNode: ASTKindToNode['SchemaDefinition'] }>
 }
 
 export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {

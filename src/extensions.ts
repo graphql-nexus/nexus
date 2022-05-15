@@ -5,6 +5,7 @@ import type { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import type { NexusInterfaceTypeConfig } from './definitions/interfaceType'
 import type { NexusObjectTypeConfig } from './definitions/objectType'
+import type { Directives } from './core'
 
 /** @internal */
 export function hasNexusExtension(val: any): val is any {
@@ -67,6 +68,7 @@ export class NexusInterfaceTypeExtension<TypeName extends string = any> {
 export interface NexusSchemaExtensionConfig extends Omit<SchemaConfig, 'types'> {
   dynamicFields: DynamicFieldDefs
   sourceTypings: SourceTypings
+  schemaDirectives?: Directives
 }
 
 /**

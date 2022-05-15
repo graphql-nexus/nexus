@@ -1,8 +1,10 @@
 export const EXAMPLE_SDL = `
+directive @TestFieldDirective on FIELD_DEFINITION
+
 scalar UUID
 
 type Query {
-  user: User!
+  user: User! @TestFieldDirective
   posts(filters: PostFilters!): [Post!]!
   unionField: ExampleUnion!
 }

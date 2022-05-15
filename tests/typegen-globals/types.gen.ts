@@ -206,6 +206,12 @@ export type NexusGenScalarNames = keyof NexusGenScalars
 
 export type NexusGenUnionNames = keyof NexusGenUnions
 
+export type NexusGenDirectives = 'TestFieldDirective'
+
+export interface NexusGenDirectiveArgs {
+  TestFieldDirective: {}
+}
+
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
 export type NexusGenAbstractsUsingStrategyResolveType = 'ExampleUnion' | 'Node'
@@ -221,6 +227,8 @@ export type NexusGenFeaturesConfig = {
 export interface NexusGenTypes {
   context: any
   inputTypes: NexusGenInputs
+  directives: NexusGenDirectives
+  directiveArgs: NexusGenDirectiveArgs
   rootTypes: NexusGenRootTypes
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars
   argTypes: NexusGenArgTypes

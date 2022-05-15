@@ -13,6 +13,7 @@ import type {
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql'
+import type { NexusDirectiveConfig } from '../core'
 import type {
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
@@ -53,6 +54,8 @@ export enum NexusTypes {
   PrintedGenTypingImport = 'PrintedGenTypingImport',
   Scalar = 'Scalar',
   Union = 'Union',
+  Directive = 'Directive',
+  DirectiveUse = 'DirectiveUse',
 }
 
 export interface DeprecationInfo {
@@ -154,6 +157,8 @@ export type NexusGraphQLInterfaceTypeConfig = WithExt<
   GraphQLInterfaceTypeConfig<any, any>,
   NexusInterfaceTypeExtension
 > & { interfaces: () => GraphQLInterfaceType[] }
+
+export type NexusGraphQLDirectiveConfig = WithExt<NexusDirectiveConfig, NexusInputObjectTypeExtension>
 
 export interface NexusGraphQLSchema extends GraphQLSchema {
   extensions: {

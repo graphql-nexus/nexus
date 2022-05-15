@@ -1,6 +1,7 @@
 import { assertValidName, GraphQLObjectType } from 'graphql'
 import type { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
+import type { Directives } from './directive'
 import type { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
 import { AbstractTypes, Maybe, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
 
@@ -189,6 +190,13 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
    *     jsDoc for more detail.
    */
   definition(t: ObjectDefinitionBlock<TypeName>): void
+  /**
+   * A list of directives / directive uses (with args) for the object type definition
+   *
+   * @example
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
+   */
+  directives?: Directives
   /** Adds this type as a method on the Object/Interface definition blocks */
   asNexusMethod?: string
 } & AbstractTypes.MaybeTypeDefConfigFieldIsTypeOf<TypeName> &

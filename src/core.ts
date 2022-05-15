@@ -3,6 +3,7 @@
 export * from './builder'
 export * from './makeSchema'
 export * from './definitions/args'
+export * from './definitions/directive'
 export * from './definitions/decorateType'
 export * from './definitions/definitionBlocks'
 export * from './definitions/enumType'
