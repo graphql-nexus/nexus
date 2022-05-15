@@ -153,7 +153,7 @@ export class TypegenPrinter {
 
   private printDirectives() {
     const customDirectives = this.schema.getDirectives().filter((d) => !isSpecifiedDirective(d))
-    const schemaDirectiveArgs: Record<string, GraphQLArgument[] | undefined> = {}
+    const schemaDirectiveArgs: Record<string, readonly GraphQLArgument[] | undefined> = {}
 
     // Gather the mappings between directives, locations, etc.
     customDirectives.forEach((d) => {

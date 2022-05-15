@@ -13,6 +13,7 @@ import type {
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql'
+import type { NexusDirectiveConfig } from '../core'
 import type {
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
@@ -156,6 +157,8 @@ export type NexusGraphQLInterfaceTypeConfig = WithExt<
   GraphQLInterfaceTypeConfig<any, any>,
   NexusInterfaceTypeExtension
 > & { interfaces: () => GraphQLInterfaceType[] }
+
+export type NexusGraphQLDirectiveConfig = WithExt<NexusDirectiveConfig, any>
 
 export interface NexusGraphQLSchema extends GraphQLSchema {
   extensions: {

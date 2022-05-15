@@ -3,9 +3,11 @@ import {
   assertValidName,
   astFromValue,
   ASTKindToNode,
+  DirectiveLocation,
   DirectiveNode,
   GraphQLDirective,
   GraphQLDirectiveConfig,
+  Kind,
 } from 'graphql'
 import { GetGen, GetGen2, NexusWrappedSymbol } from '../core'
 import type { MaybeReadonlyArray } from '../typeHelpersInternal'
@@ -38,7 +40,7 @@ export interface NexusDirectiveConfig<DirectiveName extends string = string> {
   /** The description to annotate the GraphQL SDL */
   description?: string
   /** Valid locations that this directive may be used */
-  locations: MaybeReadonlyArray<SchemaLocationEnum>
+  locations: MaybeReadonlyArray<SchemaLocationEnum | DirectiveLocation>
   /** Whether the directive can be repeated */
   isRepeatable?: Maybe<boolean> | undefined
   /**
@@ -79,7 +81,7 @@ export interface NexusDirectiveDef<DirectiveName extends string = string> {
   [NexusWrappedSymbol]: 'Directive'
 }
 
-export class NexusDirectiveUse<DirectiveName extends string = string> {
+export class NexusDirectiveUse<DirectiveName extends string | DirectiveLocation = string> {
   constructor(
     readonly name: DirectiveName,
     readonly args: MaybeArgsFor<DirectiveName>[0] | undefined,
@@ -120,17 +122,17 @@ export function addDirective<DirectiveName extends GetGen<'directives', string>>
 }
 
 const DirectiveASTKindMapping = {
-  SCALAR: 'ScalarTypeDefinition',
-  SCHEMA: 'SchemaDefinition',
-  OBJECT: 'ObjectTypeDefinition',
-  FIELD_DEFINITION: 'FieldDefinition',
-  ARGUMENT_DEFINITION: 'InputValueDefinition',
-  INTERFACE: 'InterfaceTypeDefinition',
-  UNION: 'UnionTypeDefinition',
-  ENUM: 'EnumTypeDefinition',
-  ENUM_VALUE: 'EnumValueDefinition',
-  INPUT_OBJECT: 'InputObjectTypeDefinition',
-  INPUT_FIELD_DEFINITION: 'InputValueDefinition',
+  SCALAR: Kind.SCALAR_TYPE_DEFINITION, // 'ScalarTypeDefinition',
+  SCHEMA: Kind.SCHEMA_DEFINITION, // 'SchemaDefinition',
+  OBJECT: Kind.OBJECT_TYPE_DEFINITION, // 'ObjectTypeDefinition',
+  FIELD_DEFINITION: Kind.FIELD_DEFINITION, // 'FieldDefinition',
+  ARGUMENT_DEFINITION: Kind.INPUT_VALUE_DEFINITION, // 'InputValueDefinition',
+  INTERFACE: Kind.INTERFACE_TYPE_DEFINITION, // 'InterfaceTypeDefinition',
+  UNION: Kind.UNION_TYPE_DEFINITION, // 'UnionTypeDefinition',
+  ENUM: Kind.ENUM_TYPE_DEFINITION, // 'EnumTypeDefinition',
+  ENUM_VALUE: Kind.ENUM_VALUE_DEFINITION, // 'EnumValueDefinition',
+  INPUT_OBJECT: Kind.INPUT_OBJECT_TYPE_DEFINITION, // 'InputObjectTypeDefinition',
+  INPUT_FIELD_DEFINITION: Kind.INPUT_VALUE_DEFINITION, // 'InputValueDefinition',
 } as const
 
 type DirectiveASTKindMapping = typeof DirectiveASTKindMapping
@@ -168,9 +170,9 @@ export function maybeAddDirectiveUses<
         const args = isNexusDirectiveUse(d) ? directiveArgs(d, directiveDef) : undefined
 
         return {
-          kind: 'Directive',
+          kind: Kind.DIRECTIVE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: directiveName,
           },
           arguments: args,
@@ -180,8 +182,11 @@ export function maybeAddDirectiveUses<
   } as any
 }
 
-function assertValidDirectiveFor(kind: DirectiveASTKinds, directiveDef: GraphQLDirective) {
-  if (!directiveDef.locations.includes(kind)) {
+function assertValidDirectiveFor(
+  kind: DirectiveASTKinds | DirectiveLocation,
+  directiveDef: GraphQLDirective
+) {
+  if (!directiveDef.locations.includes(kind as DirectiveLocation)) {
     throw new Error(`Directive ${directiveDef.name} cannot be applied to ${kind}`)
   }
 }
@@ -200,9 +205,9 @@ function directiveArgs(
       throw new Error(`Unable to get ast for ${key}`)
     }
     return {
-      kind: 'Argument',
+      kind: Kind.ARGUMENT,
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: key,
       },
       value,

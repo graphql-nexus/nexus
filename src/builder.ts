@@ -2,7 +2,7 @@ import {
   assertValidName,
   ASTKindToNode,
   defaultFieldResolver,
-  DirectiveLocationEnum,
+  DirectiveLocation,
   GraphQLBoolean,
   GraphQLDirective,
   GraphQLEnumType,
@@ -99,6 +99,7 @@ import {
 import type {
   MissingType,
   NexusFeaturesInput,
+  NexusGraphQLDirectiveConfig,
   NexusGraphQLFieldConfig,
   NexusGraphQLInputObjectTypeConfig,
   NexusGraphQLInterfaceTypeConfig,
@@ -1186,7 +1187,7 @@ export class SchemaBuilder {
     return new GraphQLDirective({
       name: config.name,
       args: config.args ? this.buildArgs(config.args, config, 'directive') : undefined,
-      locations: config.locations as Array<DirectiveLocationEnum>,
+      locations: config.locations as ReadonlyArray<DirectiveLocation>,
       isRepeatable: config.isRepeatable,
       extensions: config.extensions,
       description: config.description,
@@ -1538,7 +1539,7 @@ export class SchemaBuilder {
 
   private buildArgs(
     args: ArgsRecord,
-    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig | NexusDirectiveConfig,
+    typeConfig: NexusGraphQLObjectTypeConfig | NexusGraphQLInterfaceTypeConfig | NexusGraphQLDirectiveConfig,
     fieldName: string
   ): GraphQLFieldConfigArgumentMap {
     const allArgs: GraphQLFieldConfigArgumentMap = {}

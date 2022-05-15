@@ -1,7 +1,7 @@
 /** Conveniently represents flow's "Maybe" type https://flow.org/en/docs/types/maybe/ */
 type Maybe<T> = null | undefined | T
 
-import { DirectiveNode, print } from 'graphql'
+import { DirectiveNode, Kind, print } from 'graphql'
 import { printBlockString, invariant, inspect } from './graphqlInternal'
 
 import type { GraphQLSchema } from 'graphql'
@@ -146,7 +146,7 @@ function printScalar(type: GraphQLScalarType): string {
 
 function printImplementedInterfaces(
   // & getInterfaces added for GraphQL 14 types
-  type: (GraphQLObjectType | GraphQLInterfaceType) & { getInterfaces?: () => GraphQLInterfaceType[] }
+  type: (GraphQLObjectType | GraphQLInterfaceType) & { getInterfaces?: () => readonly GraphQLInterfaceType[] }
 ): string {
   const interfaces = type.getInterfaces?.()
   return interfaces?.length ? ' implements ' + interfaces.map((i) => i.name).join(' & ') : ''
@@ -268,7 +268,7 @@ function printDeprecated(reason: Maybe<string>): string {
     return ''
   }
   if (reason !== DEFAULT_DEPRECATION_REASON) {
-    const astValue = print({ kind: 'StringValue', value: reason })
+    const astValue = print({ kind: Kind.STRING, value: reason })
     return ` @deprecated(reason: ${astValue})`
   }
   return ' @deprecated'
@@ -282,7 +282,7 @@ function printSpecifiedByURL(
   if (specifiedByURL == null) {
     return ''
   }
-  const astValue = print({ kind: 'StringValue', value: specifiedByURL })
+  const astValue = print({ kind: Kind.STRING, value: specifiedByURL })
   return ` @specifiedBy(url: ${astValue})`
 }
 
