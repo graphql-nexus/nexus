@@ -80,7 +80,7 @@ jobs:
 
   release-canary:
     needs: [test, test-examples]
-    uses: prisma-labs/dripip/.github/workflows/release.yml@master
+    uses: prisma-labs/dripip@master
     secrets:
       npmToken: ${{secrets.NPM_TOKEN}}
       githubToken: ${{secrets.GITHUB_TOKEN}}
