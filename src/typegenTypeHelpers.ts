@@ -181,7 +181,7 @@ export type GenTypesShapeKeys =
 export type GenTypesShape = Record<GenTypesShapeKeys, any>
 
 export type GetGen<K extends GenTypesShapeKeys, Fallback = any> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
+  ? K extends keyof GenTypes
     ? GenTypes[K]
     : Fallback
   : Fallback
@@ -204,10 +204,8 @@ export type GetGen3<
   : Fallback
 
 export type HasGen<K extends GenTypesShapeKeys> = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? true
-      : false
+  ? K extends keyof GenTypes
+    ? true
     : false
   : false
 
@@ -215,11 +213,9 @@ export type HasGen2<
   K extends GenTypesShapeKeys,
   K2 extends Extract<keyof GenTypesShape[K], string>
 > = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? K2 extends keyof GenTypes[K]
-        ? true
-        : false
+  ? K extends keyof GenTypes
+    ? K2 extends keyof GenTypes[K]
+      ? true
       : false
     : false
   : false
@@ -229,12 +225,10 @@ export type HasGen3<
   K2 extends Extract<keyof GenTypesShape[K], string>,
   K3 extends Extract<keyof GenTypesShape[K][K2], string>
 > = NexusGen extends infer GenTypes
-  ? GenTypes extends GenTypesShape
-    ? K extends keyof GenTypes
-      ? K2 extends keyof GenTypes[K]
-        ? K3 extends keyof GenTypes[K][K2]
-          ? true
-          : false
+  ? K extends keyof GenTypes
+    ? K2 extends keyof GenTypes[K]
+      ? K3 extends keyof GenTypes[K][K2]
+        ? true
         : false
       : false
     : false
