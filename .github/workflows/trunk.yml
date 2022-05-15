@@ -80,7 +80,18 @@ jobs:
 
   release-canary:
     needs: [test, test-examples]
-    uses: prisma-labs/dripip/.github/workflows/release.yml@master
-    secrets:
-      npmToken: ${{secrets.NPM_TOKEN}}
-      githubToken: ${{secrets.GITHUB_TOKEN}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile || yarn --frozen-lockfile
+      - name: Release Canary
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          yarn -s dripip preview --json > result.json
+          jq '.' < result.json
