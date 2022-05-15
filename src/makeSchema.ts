@@ -94,6 +94,7 @@ generateSchema.withArtifacts = async (
 export function makeSchemaInternal(config: SchemaConfig) {
   const builder = new SchemaBuilder(config)
   builder.addTypes(config.types)
+  builder.addTypes(config.directives)
   if (config.schemaRoots) {
     builder.addTypes(config.schemaRoots)
   }

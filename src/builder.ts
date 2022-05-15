@@ -141,7 +141,6 @@ import {
   invariantGuard,
   isArray,
   isObject,
-  objValues,
   UNKNOWN_TYPE_SCALAR,
 } from './utils'
 import {
@@ -353,7 +352,7 @@ export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults
    * A list of directives / directive uses (with args) for the schema definition
    *
    * @example
-   *   directives: [addDirective('ExampleDirective', { arg: true })]
+   *   schemaDirectives: [addDirective('ExampleDirective', { arg: true })]
    */
   schemaDirectives?: Directives
 }
@@ -989,7 +988,6 @@ export class SchemaBuilder {
         dynamicOutputFields: this.dynamicOutputFields,
         dynamicOutputProperties: this.dynamicOutputProperties,
       },
-      directives: objValues(this.directivesMap),
       sourceTypings: this.sourceTypings,
     })
   }
@@ -1856,8 +1854,12 @@ export class SchemaBuilder {
    * @param config
    */
   private handleMergeSchema(config: MergeSchemaConfig) {
-    const { types } = config.schema.toConfig()
+    const { types, directives } = config.schema.toConfig()
     const mergedTypes: Record<string, AllNexusNamedTypeDefs> = {}
+
+    for (const directive of directives) {
+      this.addDirective(directive)
+    }
 
     // We don't need to worry about capturing any types while walking,
     // because we have the entire schema
