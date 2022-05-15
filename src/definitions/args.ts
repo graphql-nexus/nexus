@@ -52,7 +52,7 @@ export type CommonArgConfig = {
    * A list of directives / directive uses (with args) for the arg definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
 } & NexusGenPluginArgConfig

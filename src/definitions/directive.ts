@@ -97,22 +97,22 @@ export function directive<DirectiveName extends string>(
 
   config = Object.freeze(config)
 
-  function useDirective(...args: MaybeArgsFor<DirectiveName>) {
+  function addDirective(...args: MaybeArgsFor<DirectiveName>) {
     return new NexusDirectiveUse(config.name, args[0], config)
   }
 
-  useDirective[NexusWrappedSymbol] = NexusTypes.Directive as 'Directive'
+  addDirective[NexusWrappedSymbol] = NexusTypes.Directive as 'Directive'
 
-  useDirective.value = config
+  addDirective.value = config
 
-  return useDirective
+  return addDirective
 }
 
 type MaybeArgsFor<DirectiveName extends string> = GetGen2<'directiveArgs', DirectiveName> extends object
   ? [GetGen2<'directiveArgs', DirectiveName>]
   : []
 
-export function useDirective<DirectiveName extends GetGen<'directives', string>>(
+export function addDirective<DirectiveName extends GetGen<'directives', string>>(
   directiveName: DirectiveName,
   ...args: MaybeArgsFor<DirectiveName>
 ) {

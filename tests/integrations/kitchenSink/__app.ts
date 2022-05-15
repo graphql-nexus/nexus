@@ -21,7 +21,7 @@ import {
   stringArg,
   subscriptionField,
   subscriptionType,
-  useDirective,
+  addDirective,
 } from '../../../src'
 import { mockStream } from '../../__helpers'
 import './__typegen'
@@ -316,7 +316,7 @@ export const Subscription = subscriptionType({
       resolve: (event: string) => {
         return event
       },
-      directives: [useDirective('TestFieldDirective', { bool: true })],
+      directives: [addDirective('TestFieldDirective', { bool: true })],
     })
     t.float('someFloat', {
       subscribe() {

@@ -27,7 +27,7 @@ export interface ScalarConfig {
    * A list of directives / directive uses (with args) for the scalar type definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
 }

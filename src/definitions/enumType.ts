@@ -29,7 +29,7 @@ export interface EnumMemberInfo {
    * A list of directives / directive uses (with args) for the enum member definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
 }
@@ -55,7 +55,7 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
    * A list of directives / directive uses (with args) for the enum type definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
   /** Adds this type as a method on the Object/Interface definition blocks */

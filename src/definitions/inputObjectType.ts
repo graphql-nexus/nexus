@@ -26,7 +26,7 @@ export type NexusInputObjectTypeConfig<TypeName extends string> = {
    * A list of directives / directive uses (with args) for the input object type definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
   /** Adds this type as a method on the Object/Interface definition blocks */

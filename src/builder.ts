@@ -353,9 +353,9 @@ export interface BuilderConfig extends Omit<BuilderConfigInput, 'nonNullDefaults
    * A list of directives / directive uses (with args) for the schema definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
-  directives?: Directives
+  schemaDirectives?: Directives
 }
 
 /**
@@ -1009,7 +1009,7 @@ export class SchemaBuilder {
       onAfterBuildFns: this.onAfterBuildFns,
       customDirectives: this.directivesMap,
       hasSDLDirectives: this.hasSDLDirectives,
-      schemaDirectives: this.maybeAddDirectiveUses('SCHEMA', this.config.directives),
+      schemaDirectives: this.maybeAddDirectiveUses('SCHEMA', this.config.schemaDirectives),
     }
   }
 
@@ -1900,7 +1900,7 @@ export interface BuildTypes<TypeMapDefs extends Record<string, GraphQLNamedType>
   onAfterBuildFns: SchemaBuilder['onAfterBuildFns']
   customDirectives: Record<string, GraphQLDirective>
   hasSDLDirectives: boolean
-  schemaDirectives: Partial<{ astNode: ASTKindToNode['SchemaDefinition'] }>
+  schemaDirectives?: Partial<{ astNode: ASTKindToNode['SchemaDefinition'] }>
 }
 
 export function setConfigDefaults(config: BuilderConfigInput): BuilderConfig {

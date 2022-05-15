@@ -108,7 +108,7 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
    * A list of directives / directive uses (with args) for the output field definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
@@ -126,7 +126,7 @@ export type CommonInputFieldConfig<TypeName extends string, FieldName extends st
    * A list of directives / directive uses (with args) for the input field definition
    *
    * @example
-   *   directives: [useDirective('ExampleDirective', { arg: true })]
+   *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
 } & NexusGenPluginFieldConfig<TypeName, FieldName> &
