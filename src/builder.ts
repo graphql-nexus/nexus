@@ -2,7 +2,6 @@ import {
   assertValidName,
   ASTKindToNode,
   defaultFieldResolver,
-  DirectiveLocation,
   GraphQLBoolean,
   GraphQLDirective,
   GraphQLEnumType,
@@ -160,6 +159,7 @@ import {
   NexusDirectiveDef,
 } from './definitions/directive'
 import { rebuildNamedType, RebuildConfig } from './rebuildType'
+import type { DirectiveLocationCompat, ReadonlyArrayVersion16 } from './v15TypeCompat'
 
 type NexusShapedOutput = {
   name: string
@@ -1187,7 +1187,7 @@ export class SchemaBuilder {
     return new GraphQLDirective({
       name: config.name,
       args: config.args ? this.buildArgs(config.args, config, 'directive') : undefined,
-      locations: config.locations as ReadonlyArray<DirectiveLocation>,
+      locations: config.locations as ReadonlyArrayVersion16<DirectiveLocationCompat>,
       isRepeatable: config.isRepeatable,
       extensions: config.extensions,
       description: config.description,

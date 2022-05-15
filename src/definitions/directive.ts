@@ -3,7 +3,6 @@ import {
   assertValidName,
   astFromValue,
   ASTKindToNode,
-  DirectiveLocation,
   DirectiveNode,
   GraphQLDirective,
   GraphQLDirectiveConfig,
@@ -12,6 +11,7 @@ import {
 import { GetGen, GetGen2, NexusWrappedSymbol } from '../core'
 import type { MaybeReadonlyArray } from '../typeHelpersInternal'
 import { mapObj } from '../utils'
+import type { DirectiveLocationCompat, ReadonlyArrayVersion16 } from '../v15TypeCompat'
 import type { ArgsRecord } from './args'
 import { isNexusDirective, isNexusDirectiveUse } from './wrapping'
 import { Maybe, NexusTypes, withNexusSymbol } from './_types'
@@ -40,7 +40,7 @@ export interface NexusDirectiveConfig<DirectiveName extends string = string> {
   /** The description to annotate the GraphQL SDL */
   description?: string
   /** Valid locations that this directive may be used */
-  locations: MaybeReadonlyArray<SchemaLocationEnum | DirectiveLocation>
+  locations: ReadonlyArrayVersion16<SchemaLocationEnum | DirectiveLocationCompat>
   /** Whether the directive can be repeated */
   isRepeatable?: Maybe<boolean> | undefined
   /**
@@ -81,7 +81,7 @@ export interface NexusDirectiveDef<DirectiveName extends string = string> {
   [NexusWrappedSymbol]: 'Directive'
 }
 
-export class NexusDirectiveUse<DirectiveName extends string | DirectiveLocation = string> {
+export class NexusDirectiveUse<DirectiveName extends string | DirectiveLocationCompat = any> {
   constructor(
     readonly name: DirectiveName,
     readonly args: MaybeArgsFor<DirectiveName>[0] | undefined,
@@ -183,10 +183,10 @@ export function maybeAddDirectiveUses<
 }
 
 function assertValidDirectiveFor(
-  kind: DirectiveASTKinds | DirectiveLocation,
+  kind: DirectiveASTKinds | DirectiveLocationCompat,
   directiveDef: GraphQLDirective
 ) {
-  if (!directiveDef.locations.includes(kind as DirectiveLocation)) {
+  if (!directiveDef.locations.includes(kind as DirectiveLocationCompat)) {
     throw new Error(`Directive ${directiveDef.name} cannot be applied to ${kind}`)
   }
 }
