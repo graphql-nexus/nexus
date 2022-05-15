@@ -159,7 +159,6 @@ import {
   NexusDirectiveDef,
 } from './definitions/directive'
 import { rebuildNamedType, RebuildConfig } from './rebuildType'
-import type { DirectiveLocationCompat, ReadonlyArrayVersion16 } from './v15TypeCompat'
 
 type NexusShapedOutput = {
   name: string
@@ -1187,7 +1186,7 @@ export class SchemaBuilder {
     return new GraphQLDirective({
       name: config.name,
       args: config.args ? this.buildArgs(config.args, config, 'directive') : undefined,
-      locations: config.locations as ReadonlyArrayVersion16<DirectiveLocationCompat>,
+      locations: config.locations as any, // any is a hack to make this work with v15 and 16
       isRepeatable: config.isRepeatable,
       extensions: config.extensions,
       description: config.description,

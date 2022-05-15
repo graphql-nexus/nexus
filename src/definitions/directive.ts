@@ -11,14 +11,26 @@ import {
 import { GetGen, GetGen2, NexusWrappedSymbol } from '../core'
 import type { MaybeReadonlyArray } from '../typeHelpersInternal'
 import { mapObj } from '../utils'
-import type { DirectiveLocationCompat, ReadonlyArrayVersion16 } from '../v15TypeCompat'
 import type { ArgsRecord } from './args'
 import { isNexusDirective, isNexusDirectiveUse } from './wrapping'
 import { Maybe, NexusTypes, withNexusSymbol } from './_types'
 
 export type Directives = MaybeReadonlyArray<NexusDirectiveDef | GraphQLDirective | NexusDirectiveUse>
 
-export const SchemaLocation = [
+export const RequestDirectiveLocation = [
+  /** Request Definitions */
+  'QUERY',
+  'MUTATION',
+  'SUBSCRIPTION',
+  'FIELD',
+  'FRAGMENT_DEFINITION',
+  'FRAGMENT_SPREAD',
+  'INLINE_FRAGMENT',
+  'VARIABLE_DEFINITION',
+]
+
+export const SchemaDirectiveLocation = [
+  /** Type System Definitions */
   'SCHEMA',
   'SCALAR',
   'OBJECT',
@@ -32,7 +44,9 @@ export const SchemaLocation = [
   'INPUT_FIELD_DEFINITION',
 ] as const
 
-export type SchemaLocationEnum = typeof SchemaLocation[number]
+export type SchemaDirectiveLocationEnum = typeof SchemaDirectiveLocation[number]
+
+export type RequestDirectiveLocationEnum = typeof RequestDirectiveLocation[number]
 
 export interface NexusDirectiveConfig<DirectiveName extends string = string> {
   /** Name of the directive */
@@ -40,7 +54,7 @@ export interface NexusDirectiveConfig<DirectiveName extends string = string> {
   /** The description to annotate the GraphQL SDL */
   description?: string
   /** Valid locations that this directive may be used */
-  locations: ReadonlyArrayVersion16<SchemaLocationEnum | DirectiveLocationCompat>
+  locations: MaybeReadonlyArray<SchemaDirectiveLocationEnum | RequestDirectiveLocationEnum>
   /** Whether the directive can be repeated */
   isRepeatable?: Maybe<boolean> | undefined
   /**
@@ -81,7 +95,7 @@ export interface NexusDirectiveDef<DirectiveName extends string = string> {
   [NexusWrappedSymbol]: 'Directive'
 }
 
-export class NexusDirectiveUse<DirectiveName extends string | DirectiveLocationCompat = any> {
+export class NexusDirectiveUse<DirectiveName extends string = string> {
   constructor(
     readonly name: DirectiveName,
     readonly args: MaybeArgsFor<DirectiveName>[0] | undefined,
@@ -183,10 +197,10 @@ export function maybeAddDirectiveUses<
 }
 
 function assertValidDirectiveFor(
-  kind: DirectiveASTKinds | DirectiveLocationCompat,
-  directiveDef: GraphQLDirective
+  kind: DirectiveASTKinds,
+  directiveDef: GraphQLDirective & { locations: readonly any[] } // any is a hack to make this work w/ v15 & 16
 ) {
-  if (!directiveDef.locations.includes(kind as DirectiveLocationCompat)) {
+  if (!directiveDef.locations.includes(kind)) {
     throw new Error(`Directive ${directiveDef.name} cannot be applied to ${kind}`)
   }
 }

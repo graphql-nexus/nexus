@@ -46,7 +46,7 @@ export const fieldDirective = directive({
 
 export const testAllDirective = directive({
   name: 'TestAllDirective',
-  locations: core.SchemaLocation,
+  locations: core.SchemaDirectiveLocation,
   description: 'Testing directive in all positions',
 })
 
@@ -61,7 +61,7 @@ export const testRequiredArgDirective = directive({
 
 export const testRepeatableDirective = directive({
   name: 'TestRepeatableDirective',
-  locations: core.SchemaLocation,
+  locations: core.SchemaDirectiveLocation,
   description: 'Testing a repeatable directive',
   isRepeatable: true,
 })

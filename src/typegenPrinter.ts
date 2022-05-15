@@ -23,7 +23,7 @@ import {
   isUnionType,
 } from 'graphql'
 import type { TypegenInfo } from './builder'
-import { SchemaLocation } from './definitions/directive'
+import { SchemaDirectiveLocation } from './definitions/directive'
 import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
@@ -158,7 +158,7 @@ export class TypegenPrinter {
     // Gather the mappings between directives, locations, etc.
     customDirectives.forEach((d) => {
       d.locations.forEach((l) => {
-        if (SchemaLocation.includes(l as any)) {
+        if (SchemaDirectiveLocation.includes(l as any)) {
           schemaDirectiveArgs[d.name] = d.args ?? undefined
         }
       })
