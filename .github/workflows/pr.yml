@@ -38,7 +38,7 @@ jobs:
         run: yarn -s test:ci
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '10.x'
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '14.x'
         with:
           directory: ./coverage
 
