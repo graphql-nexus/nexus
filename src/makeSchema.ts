@@ -19,14 +19,14 @@ import { assertNoMissingTypes, objValues, runAbstractTypeRuntimeChecks } from '.
  * Requires at least one type be named "Query", which will be used as the root query type.
  */
 export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
-  const { schema, missingTypes, finalConfig, hasSDLDirectives } = makeSchemaInternal(config)
+  const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   const sdl = typegenConfig.outputs.schema
   const typegen = typegenConfig.outputs.typegen
   if (sdl || typegen) {
     // Generating in the next tick allows us to use the schema
     // in the optional thunk for the typegen config
-    const typegenPromise = new TypegenMetadata(typegenConfig).generateArtifacts(schema, hasSDLDirectives)
+    const typegenPromise = new TypegenMetadata(typegenConfig).generateArtifacts(schema)
     if (config.shouldExitAfterGenerateArtifacts) {
       let typegenPath = '(not enabled)'
       if (typegenConfig.outputs.typegen) {
@@ -59,9 +59,9 @@ export function makeSchema(config: SchemaConfig): NexusGraphQLSchema {
 
 /** Like makeSchema except that typegen is always run and waited upon. */
 export async function generateSchema(config: SchemaConfig): Promise<NexusGraphQLSchema> {
-  const { schema, missingTypes, finalConfig, hasSDLDirectives } = makeSchemaInternal(config)
+  const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
-  await new TypegenMetadata(typegenConfig).generateArtifacts(schema, hasSDLDirectives)
+  await new TypegenMetadata(typegenConfig).generateArtifacts(schema)
   assertNoMissingTypes(schema, missingTypes)
   runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return schema
@@ -80,11 +80,11 @@ generateSchema.withArtifacts = async (
   tsTypes: string
   globalTypes: string | null
 }> => {
-  const { schema, missingTypes, finalConfig, hasSDLDirectives } = makeSchemaInternal(config)
+  const { schema, missingTypes, finalConfig } = makeSchemaInternal(config)
   const typegenConfig = resolveTypegenConfig(finalConfig)
   const { schemaTypes, tsTypes, globalTypes } = await new TypegenMetadata(
     typegenConfig
-  ).generateArtifactContents(schema, typegen, hasSDLDirectives)
+  ).generateArtifactContents(schema, typegen)
   assertNoMissingTypes(schema, missingTypes)
   runAbstractTypeRuntimeChecks(schema, finalConfig.features)
   return { schema, schemaTypes, tsTypes, globalTypes }
@@ -125,7 +125,6 @@ export function makeSchemaInternal(config: SchemaConfig) {
     onAfterBuildFns,
     customDirectives,
     schemaDirectives,
-    hasSDLDirectives,
   } = builder.getFinalTypeMap()
 
   const schema = new GraphQLSchema({
@@ -144,7 +143,7 @@ export function makeSchemaInternal(config: SchemaConfig) {
 
   onAfterBuildFns.forEach((fn) => fn(schema))
 
-  return { schema, missingTypes, finalConfig, hasSDLDirectives }
+  return { schema, missingTypes, finalConfig }
 }
 
 type OmittedVals = Partial<{ [K in keyof MakeSchemaOptions]: never }>
