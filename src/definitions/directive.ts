@@ -27,7 +27,7 @@ export const RequestDirectiveLocation = [
   'FRAGMENT_SPREAD',
   'INLINE_FRAGMENT',
   'VARIABLE_DEFINITION',
-]
+] as const
 
 export const SchemaDirectiveLocation = [
   /** Type System Definitions */
