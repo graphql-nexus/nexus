@@ -997,13 +997,6 @@ export class SchemaBuilder {
     this.checkForInterfaceCircularDependencies()
     this.buildNexusTypes()
 
-    // Call the finalTypeMap values as a side-effect, in order to check for the existence of SDL directives
-    Object.values(this.finalTypeMap).forEach((v) => {
-      if (isObjectType(v) || isInterfaceType(v) || isInputObjectType(v)) {
-        v.getFields()
-      }
-    })
-
     return {
       finalConfig: this.config,
       typeMap: this.finalTypeMap,
