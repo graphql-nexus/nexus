@@ -504,9 +504,6 @@ export class SchemaBuilder {
   /** All Schema Directives */
   // private schemaDirectives: GraphQLDirective[] = []
 
-  /** Whether we have used any custom directives within the schema construction */
-  private hasSDLDirectives: boolean = false
-
   /** All types that need to be traversed for children types */
   private typesToWalk: TypeToWalk[] = []
 
@@ -999,14 +996,21 @@ export class SchemaBuilder {
     this.beforeBuildTypes()
     this.checkForInterfaceCircularDependencies()
     this.buildNexusTypes()
+
+    // Call the finalTypeMap values as a side-effect, in order to check for the existence of SDL directives
+    Object.values(this.finalTypeMap).forEach((v) => {
+      if (isObjectType(v) || isInterfaceType(v) || isInputObjectType(v)) {
+        v.getFields()
+      }
+    })
+
     return {
       finalConfig: this.config,
       typeMap: this.finalTypeMap,
-      schemaExtension: this.schemaExtension!,
+      schemaExtension: this.schemaExtension,
       missingTypes: this.missingTypes,
       onAfterBuildFns: this.onAfterBuildFns,
       customDirectives: this.directivesMap,
-      hasSDLDirectives: this.hasSDLDirectives,
       schemaDirectives: this.maybeAddDirectiveUses('SCHEMA', this.config.schemaDirectives),
     }
   }
@@ -1200,11 +1204,7 @@ export class SchemaBuilder {
     for (const directive of directives) {
       this.addDirective(directive)
     }
-    const result = maybeAddDirectiveUses(kind, directives, this.directivesMap)
-    if (result) {
-      this.hasSDLDirectives = true
-    }
-    return result
+    return maybeAddDirectiveUses(kind, directives, this.directivesMap)
   }
 
   private buildEnumType(config: NexusEnumTypeConfig<any>) {
@@ -1901,7 +1901,6 @@ export interface BuildTypes<TypeMapDefs extends Record<string, GraphQLNamedType>
   schemaExtension: NexusSchemaExtension
   onAfterBuildFns: SchemaBuilder['onAfterBuildFns']
   customDirectives: Record<string, GraphQLDirective>
-  hasSDLDirectives: boolean
   schemaDirectives?: Partial<{ astNode: ASTKindToNode['SchemaDefinition'] }>
 }
 
