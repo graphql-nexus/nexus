@@ -28,7 +28,7 @@ import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './defini
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
 import type { StringLike } from './plugin'
-import { hasNexusExtension } from './extensions'
+import { hasNexusExtension, isNexusFieldExtension } from './extensions'
 import {
   eachObj,
   getOwnPackage,
@@ -641,8 +641,17 @@ export class TypegenPrinter {
       } else {
         eachObj(type.getFields(), (field) => {
           const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {})
-          if (!this.hasResolver(field, type)) {
-            if (typeof obj !== 'string') {
+          const fieldSourceType = this.fieldSourceType(field, type)
+          if (typeof obj !== 'string') {
+            if (Array.isArray(fieldSourceType)) {
+              for (const field of fieldSourceType) {
+                obj[field.name] = [field.optional ? '?:' : ':', field.type]
+              }
+            } else if (typeof fieldSourceType === 'object') {
+              obj[field.name] = [fieldSourceType.optional ? '?:' : ':', fieldSourceType.type]
+            } else if (fieldSourceType) {
+              obj[field.name] = [':', fieldSourceType]
+            } else if (!this.hasResolver(field, type)) {
               obj[field.name] = [
                 this.argSeparator(field.type as GraphQLInputType, false),
                 this.printOutputType(field.type),
@@ -661,6 +670,17 @@ export class TypegenPrinter {
       return typeof rootTyping === 'string' ? rootTyping : rootTyping.export
     }
     return (this.typegenInfo.sourceTypeMap as any)[typeName]
+  }
+
+  private fieldSourceType(
+    field: GraphQLField<any, any>,
+    // Used in test mocking
+    _type: GraphQLObjectType
+  ) {
+    if (field.extensions && isNexusFieldExtension(field.extensions.nexus)) {
+      return field.extensions.nexus.sourceType
+    }
+    return undefined
   }
 
   private hasResolver(

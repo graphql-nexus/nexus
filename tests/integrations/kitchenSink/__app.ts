@@ -26,6 +26,19 @@ import {
 import { mockStream } from '../../__helpers'
 import './__typegen'
 
+export const Node = interfaceType({
+  name: 'Node',
+  definition(t) {
+    t.nonNull.id('id', {
+      resolve: (source, args, ctx, info) => `${info.parentType.name}:${source.id}`,
+      sourceType: 'number',
+    })
+  },
+  resolveType(obj: any) {
+    return obj.__typename
+  },
+})
+
 export const typeDirective = directive({
   name: 'TestTypeDirective',
   locations: ['OBJECT', 'INTERFACE', 'ENUM', 'SCALAR'],
@@ -116,11 +129,19 @@ export const i2 = objectType({
     extensionAdditionFromTypeConfig: true,
   },
   definition(t) {
+    t.implements(Node)
     t.implements('I')
     t.modify('hello', {
       extensions: {
         extensionAdditionFromModifyMethod: true,
       },
+    })
+    t.string('composite', {
+      resolve: (source) => `${source.fieldA} ${source.fieldB}`,
+      sourceType: [
+        { name: 'fieldA', type: 'string' },
+        { name: 'fieldB', type: 'string' },
+      ],
     })
   },
 })
@@ -180,8 +201,12 @@ export const Post = objectType({
 export const User = objectType({
   name: 'User',
   definition(t) {
-    t.string('firstName')
-    t.string('lastName')
+    t.string('firstName', {
+      sourceType: 'string',
+    })
+    t.string('lastName', {
+      sourceType: 'string',
+    })
     t.connectionField('posts', {
       type: Post,
       nodes() {
@@ -206,8 +231,11 @@ export const User = objectType({
         },
       },
     })
+    t.string('telephone', {
+      sourceType: { type: 'string', optional: true },
+      resolve: (source) => (source.telephone ? `+1 ${source.telephone}` : null),
+    })
   },
-  sourceType: `{ firstName: string, lastName: string }`,
 })
 
 export const Query = extendType({

@@ -111,7 +111,35 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
    *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
+  /**
+   * Defines a typing for the field, overriding the default behavior to default to the scalar,
+   * and omit the field if a resolver exists. Most useful in situations where we have a resolver
+   * but we still want the field defined on the output type.
+   *
+   * @example
+   *   sourceType: 'string | number'
+   */
+  sourceType?: string | FieldSourceType | NamedFieldSourceType[]
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
+
+export interface FieldSourceType {
+  /**
+   * String representing the TypeScript type output as the value
+   */
+  type: string
+  /**
+   * If true, marks the field as optional `?:`
+   * @default false
+   */
+  optional?: boolean
+}
+
+export interface NamedFieldSourceType extends FieldSourceType {
+  /**
+   * Property name in the output TypeScript field
+   */
+  name: string
+}
 
 export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {
   /** The default value for the field, if any */
