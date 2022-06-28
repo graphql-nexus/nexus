@@ -1,4 +1,3 @@
-import { defaultTypeResolver } from 'graphql'
 import {
   arg,
   booleanArg,

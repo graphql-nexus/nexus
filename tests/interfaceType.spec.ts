@@ -292,6 +292,7 @@ it('extensions are inherited and deeply merged by field modifications', () => {
         "foo2": true,
       },
       "nexus": NexusFieldExtension {
+        "_type": "NexusFieldExtension",
         "config": Object {
           "configFor": "outputField",
           "extensions": Object {
@@ -305,6 +306,7 @@ it('extensions are inherited and deeply merged by field modifications', () => {
           "wrapping": undefined,
         },
         "hasDefinedResolver": false,
+        "sourceType": undefined,
       },
     }
   `)
