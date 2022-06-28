@@ -90,6 +90,7 @@ export interface NexusGenObjects {
   OfI2: {
     // root type
     hello?: string | null // String
+    id: number
   }
   PageInfo: {
     // root type
@@ -122,6 +123,7 @@ export interface NexusGenObjects {
 
 export interface NexusGenInterfaces {
   I: NexusGenRootTypes['OfI'] | NexusGenRootTypes['OfI2']
+  Node: NexusGenRootTypes['OfI2']
 }
 
 export interface NexusGenUnions {}
@@ -142,6 +144,7 @@ export interface NexusGenFieldTypes {
   OfI2: {
     // field return type
     hello: string | null // String
+    id: string // ID!
   }
   PageInfo: {
     // field return type
@@ -197,6 +200,10 @@ export interface NexusGenFieldTypes {
     // field return type
     hello: string | null // String
   }
+  Node: {
+    // field return type
+    id: string // ID!
+  }
 }
 
 export interface NexusGenFieldTypeNames {
@@ -211,6 +218,7 @@ export interface NexusGenFieldTypeNames {
   OfI2: {
     // field return type name
     hello: 'String'
+    id: 'ID'
   }
   PageInfo: {
     // field return type name
@@ -266,6 +274,10 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     hello: 'String'
   }
+  Node: {
+    // field return type name
+    id: 'ID'
+  }
 }
 
 export interface NexusGenArgTypes {
@@ -306,11 +318,12 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {
   I: 'OfI' | 'OfI2'
+  Node: 'OfI2'
 }
 
 export interface NexusGenTypeInterfaces {
   OfI: 'I'
-  OfI2: 'I'
+  OfI2: 'I' | 'Node'
 }
 
 export type NexusGenObjectNames = keyof NexusGenObjects
@@ -348,7 +361,7 @@ export interface NexusGenDirectiveArgs {
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never
 
-export type NexusGenAbstractsUsingStrategyResolveType = 'I'
+export type NexusGenAbstractsUsingStrategyResolveType = 'I' | 'Node'
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

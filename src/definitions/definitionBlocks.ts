@@ -111,6 +111,15 @@ export type CommonOutputFieldConfig<TypeName extends string, FieldName extends s
    *   directives: [addDirective('ExampleDirective', { arg: true })]
    */
   directives?: Directives
+  /**
+   * Defines a typing for the field, overriding the default behavior to default to the scalar,
+   * and omit the field if a resolver exists. Most useful in situations where we have a resolver
+   * but we still want the field defined on the output type.
+   *
+   * @example
+   *   sourceType: 'string | number'
+   */
+  sourceType?: string
 } & NexusGenPluginFieldConfig<TypeName, FieldName>
 
 export type CommonInputFieldConfig<TypeName extends string, FieldName extends string> = CommonFieldConfig & {

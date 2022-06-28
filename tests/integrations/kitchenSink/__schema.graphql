@@ -39,12 +39,17 @@ No-Op scalar for testing purposes only
 """
 scalar MyCustomScalar @TestAllDirective
 
+interface Node {
+  id: ID!
+}
+
 type OfI implements I @TestTypeDirective {
   hello: String @TestFieldDirective(bool: true)
 }
 
-type OfI2 implements I {
+type OfI2 implements I & Node {
   hello: String @TestFieldDirective(bool: true)
+  id: ID!
 }
 
 """

@@ -1,3 +1,4 @@
+import { defaultTypeResolver } from 'graphql'
 import {
   arg,
   booleanArg,
@@ -25,6 +26,19 @@ import {
 } from '../../../src'
 import { mockStream } from '../../__helpers'
 import './__typegen'
+
+export const Node = interfaceType({
+  name: 'Node',
+  definition(t) {
+    t.nonNull.id('id', {
+      resolve: (source, args, ctx, info) => `${info.parentType.name}:${source.id}`,
+      sourceType: 'number',
+    })
+  },
+  resolveType(obj: any) {
+    return obj.__typename
+  },
+})
 
 export const typeDirective = directive({
   name: 'TestTypeDirective',
@@ -116,6 +130,7 @@ export const i2 = objectType({
     extensionAdditionFromTypeConfig: true,
   },
   definition(t) {
+    t.implements(Node)
     t.implements('I')
     t.modify('hello', {
       extensions: {

@@ -12,6 +12,10 @@ export function hasNexusExtension(val: any): val is any {
   return Boolean(val)
 }
 
+export function isNexusFieldExtension(val: any): val is NexusFieldExtension {
+  return Boolean(val?._type === 'NexusFieldExtension')
+}
+
 export type NexusGraphQLNamedType = GraphQLNamedType & {
   extensions?: {
     nexus?: {
@@ -24,13 +28,17 @@ export type NexusTypeExtensions = NexusObjectTypeExtension | NexusInterfaceTypeE
 
 /** Container object living on `fieldDefinition.extensions.nexus` */
 export class NexusFieldExtension<TypeName extends string = any, FieldName extends string = any> {
+  readonly _type = 'NexusFieldExtension' as const
   readonly config: Omit<NexusOutputFieldConfig<TypeName, FieldName>, 'resolve'>
   /** Whether the user has provided a custom "resolve" function, or whether we're using GraphQL's defaultResolver */
   readonly hasDefinedResolver: boolean
+  readonly sourceType: string | undefined
+
   constructor(config: NexusOutputFieldConfig<TypeName, FieldName>) {
     const { resolve, ...rest } = config
     this.config = rest
     this.hasDefinedResolver = Boolean(resolve && resolve !== defaultFieldResolver)
+    this.sourceType = rest.sourceType
   }
   /** Called when there are modifications on the interface fields */
   modify(modifications: Partial<NexusOutputFieldConfig<any, any>>) {
@@ -40,6 +48,7 @@ export class NexusFieldExtension<TypeName extends string = any, FieldName extend
 
 /** Container object living on `inputObjectType.extensions.nexus` */
 export class NexusInputObjectTypeExtension<TypeName extends string = any> {
+  readonly _type = 'NexusInputObjectTypeExtension' as const
   readonly config: Omit<NexusInputObjectTypeConfig<TypeName>, 'definition'>
   constructor(config: NexusInputObjectTypeConfig<TypeName>) {
     const { definition, ...rest } = config
@@ -49,6 +58,7 @@ export class NexusInputObjectTypeExtension<TypeName extends string = any> {
 
 /** Container object living on `objectType.extensions.nexus` */
 export class NexusObjectTypeExtension<TypeName extends string = any> {
+  readonly _type = 'NexusObjectTypeExtension' as const
   readonly config: Omit<NexusObjectTypeConfig<TypeName>, 'definition' | 'isTypeOf'>
   constructor(config: NexusObjectTypeConfig<TypeName>) {
     const { definition, ...rest } = config
@@ -58,6 +68,7 @@ export class NexusObjectTypeExtension<TypeName extends string = any> {
 
 /** Container object living on `interfaceType.extensions.nexus` */
 export class NexusInterfaceTypeExtension<TypeName extends string = any> {
+  readonly _type = 'NexusInterfaceTypeExtension' as const
   readonly config: Omit<NexusInterfaceTypeConfig<TypeName>, 'definition' | 'resolveType'>
   constructor(config: NexusInterfaceTypeConfig<TypeName>) {
     const { definition, ...rest } = config
