@@ -89,6 +89,8 @@ export interface NexusGenObjects {
   }
   OfI2: {
     // root type
+    fieldA: string
+    fieldB: string
     hello?: string | null // String
     id: number
   }
@@ -118,7 +120,12 @@ export interface NexusGenObjects {
   }
   Query: {}
   Subscription: {}
-  User: { firstName: string; lastName: string }
+  User: {
+    // root type
+    firstName: string
+    lastName: string
+    telephone?: string
+  }
 }
 
 export interface NexusGenInterfaces {
@@ -143,6 +150,7 @@ export interface NexusGenFieldTypes {
   }
   OfI2: {
     // field return type
+    composite: string | null // String
     hello: string | null // String
     id: string // ID!
   }
@@ -195,6 +203,7 @@ export interface NexusGenFieldTypes {
     firstName: string | null // String
     lastName: string | null // String
     posts: NexusGenRootTypes['PostConnection'] | null // PostConnection
+    telephone: string | null // String
   }
   I: {
     // field return type
@@ -217,6 +226,7 @@ export interface NexusGenFieldTypeNames {
   }
   OfI2: {
     // field return type name
+    composite: 'String'
     hello: 'String'
     id: 'ID'
   }
@@ -269,6 +279,7 @@ export interface NexusGenFieldTypeNames {
     firstName: 'String'
     lastName: 'String'
     posts: 'PostConnection'
+    telephone: 'String'
   }
   I: {
     // field return type name

@@ -48,6 +48,7 @@ type OfI implements I @TestTypeDirective {
 }
 
 type OfI2 implements I & Node {
+  composite: String
   hello: String @TestFieldDirective(bool: true)
   id: ID!
 }
@@ -161,6 +162,7 @@ type User {
     """
     last: Int
   ): PostConnection
+  telephone: String
 }
 
 enum UserStatus {

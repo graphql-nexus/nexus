@@ -136,6 +136,13 @@ export const i2 = objectType({
         extensionAdditionFromModifyMethod: true,
       },
     })
+    t.string('composite', {
+      resolve: (source) => `${source.fieldA} ${source.fieldB}`,
+      sourceType: [
+        { name: 'fieldA', type: 'string' },
+        { name: 'fieldB', type: 'string' },
+      ],
+    })
   },
 })
 
@@ -194,8 +201,12 @@ export const Post = objectType({
 export const User = objectType({
   name: 'User',
   definition(t) {
-    t.string('firstName')
-    t.string('lastName')
+    t.string('firstName', {
+      sourceType: 'string',
+    })
+    t.string('lastName', {
+      sourceType: 'string',
+    })
     t.connectionField('posts', {
       type: Post,
       nodes() {
@@ -220,8 +231,11 @@ export const User = objectType({
         },
       },
     })
+    t.string('telephone', {
+      sourceType: { type: 'string', optional: true },
+      resolve: (source) => (source.telephone ? `+1 ${source.telephone}` : null),
+    })
   },
-  sourceType: `{ firstName: string, lastName: string }`,
 })
 
 export const Query = extendType({

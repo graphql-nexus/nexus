@@ -5,7 +5,7 @@ import type { NexusOutputFieldConfig } from './definitions/definitionBlocks'
 import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
 import type { NexusInterfaceTypeConfig } from './definitions/interfaceType'
 import type { NexusObjectTypeConfig } from './definitions/objectType'
-import type { Directives } from './core'
+import type { Directives, FieldSourceType, NamedFieldSourceType } from './core'
 
 /** @internal */
 export function hasNexusExtension(val: any): val is any {
@@ -32,7 +32,7 @@ export class NexusFieldExtension<TypeName extends string = any, FieldName extend
   readonly config: Omit<NexusOutputFieldConfig<TypeName, FieldName>, 'resolve'>
   /** Whether the user has provided a custom "resolve" function, or whether we're using GraphQL's defaultResolver */
   readonly hasDefinedResolver: boolean
-  readonly sourceType: string | undefined
+  readonly sourceType: string | FieldSourceType | NamedFieldSourceType[] | undefined
 
   constructor(config: NexusOutputFieldConfig<TypeName, FieldName>) {
     const { resolve, ...rest } = config

@@ -643,7 +643,13 @@ export class TypegenPrinter {
           const obj = (rootTypeMap[type.name] = rootTypeMap[type.name] || {})
           const fieldSourceType = this.fieldSourceType(field, type)
           if (typeof obj !== 'string') {
-            if (fieldSourceType) {
+            if (Array.isArray(fieldSourceType)) {
+              for (const field of fieldSourceType) {
+                obj[field.name] = [field.optional ? '?:' : ':', field.type]
+              }
+            } else if (typeof fieldSourceType === 'object') {
+              obj[field.name] = [fieldSourceType.optional ? '?:' : ':', fieldSourceType.type]
+            } else if (fieldSourceType) {
               obj[field.name] = [':', fieldSourceType]
             } else if (!this.hasResolver(field, type)) {
               obj[field.name] = [
