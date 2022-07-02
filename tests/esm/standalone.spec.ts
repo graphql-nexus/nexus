@@ -9,14 +9,13 @@ describe('standalone esm', () => {
       bundle: true,
       format: 'esm',
       target: 'esnext',
-      minify: true,
+      // minify: true,
       mainFields: ['module', 'main'],
       external: ['path', 'fs', 'prettier'],
       entryPoints: [path.join(__dirname, 'esm-entry.js')],
       outdir: path.join(__dirname, 'out'),
       outExtension: { '.js': '.mjs' },
       metafile: true,
-      // write: false,
     })
 
     const context = vm.createContext()
