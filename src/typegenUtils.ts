@@ -68,6 +68,8 @@ export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadat
 
 function defaultShouldGenerateArtifacts() {
   return Boolean(
-    typeof process === 'object' && (!process.env.NODE_ENV || process.env.NODE_ENV !== 'production')
+    typeof process === 'object' &&
+      typeof process.cwd === 'function' &&
+      (!process.env.NODE_ENV || process.env.NODE_ENV !== 'production')
   )
 }
