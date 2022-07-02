@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -22,7 +21,6 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import * as Path from 'path'
 import { decorateType } from './definitions/decorateType'
 import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './definitions/nexusMeta'
 import {
@@ -42,6 +40,7 @@ import {
   TypingImport,
   withNexusSymbol,
 } from './definitions/_types'
+import { nodeImports } from './node'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
   return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]))
@@ -150,7 +149,7 @@ export function eachObj<T>(obj: Record<string, T>, iter: (val: T, key: string, i
 export const isObject = (obj: any): boolean => obj !== null && typeof obj === 'object'
 
 export const assertAbsolutePath = (pathName: string, property: string) => {
-  if (!Path.isAbsolute(pathName)) {
+  if (!nodeImports().path.isAbsolute(pathName)) {
     throw new Error(`Expected path for "${property}" to be an absolute path, saw "${pathName}"`)
   }
   return pathName
@@ -221,7 +220,7 @@ export function isPromiseLike(value: any): value is PromiseLike<any> {
 export const typeScriptFileExtension = /(\.d)?\.ts$/
 
 function makeRelativePathExplicitlyRelative(path: string) {
-  if (Path.isAbsolute(path)) return path
+  if (nodeImports().path.isAbsolute(path)) return path
   if (path.startsWith('./')) return path
   return `./${path}`
 }
@@ -243,6 +242,7 @@ export function formatPathForModuleImport(path: string) {
 }
 
 export function relativePathTo(absolutePath: string, fromPath: string): string {
+  const Path = nodeImports().path
   const filename = Path.basename(absolutePath)
   const relative = Path.relative(Path.dirname(fromPath), Path.dirname(absolutePath))
   return formatPathForModuleImport(Path.join(relative, filename))
@@ -477,20 +477,18 @@ export function casesHandled(x: never): never {
   throw new Error(`A case was not handled for value: "${x}"`)
 }
 
-/** Quickly log objects */
-export function dump(x: any) {
-  console.log(require('util').inspect(x, { depth: null }))
-}
-
 function isNodeModule(path: string) {
   // Avoid treating absolute windows paths as Node packages e.g. D:/a/b/c
-  return !Path.isAbsolute(path) && /^([A-z0-9@])/.test(path)
+  return !nodeImports().path.isAbsolute(path) && /^([A-z0-9@])/.test(path)
 }
 
 export function resolveImportPath(rootType: TypingImport, typeName: string, outputPath: string) {
   const rootTypePath = rootType.module
 
-  if (typeof rootTypePath !== 'string' || (!Path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))) {
+  if (
+    typeof rootTypePath !== 'string' ||
+    (!nodeImports().path.isAbsolute(rootTypePath) && !isNodeModule(rootTypePath))
+  ) {
     throw new Error(
       `Expected an absolute path or Node package for the root typing path of the type "${typeName}", saw "${rootTypePath}"`
     )
@@ -502,7 +500,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
     } catch (e) {
       throw new Error(`Module "${rootTypePath}" for the type "${typeName}" does not exist`)
     }
-  } else if (!fs.existsSync(rootTypePath)) {
+  } else if (!nodeImports().fs.existsSync(rootTypePath)) {
     throw new Error(`Root typing path "${rootTypePath}" for the type "${typeName}" does not exist`)
   }
 
@@ -510,7 +508,7 @@ export function resolveImportPath(rootType: TypingImport, typeName: string, outp
     return rootTypePath
   }
 
-  if (Path.isAbsolute(rootTypePath)) {
+  if (nodeImports().path.isAbsolute(rootTypePath)) {
     return relativePathTo(rootTypePath, outputPath)
   }
 

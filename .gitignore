@@ -5,4 +5,4 @@ examples/*/dist
 website/static/playground-dist
 yarn-error.log
 coverage/*
-.out
+tests/esm/out/

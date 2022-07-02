@@ -1,8 +1,8 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
-import * as path from 'path'
 import type { TypegenInfo } from './builder'
 import type { TypingImport } from './definitions/_types'
 import { TYPEGEN_HEADER } from './lang'
+import { nodeImports } from './node'
 import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils'
 
 /** Any common types / constants that would otherwise be circular-imported */
@@ -129,16 +129,12 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
       }
     })
 
+    const path = nodeImports().path
     const typeSources = await Promise.all(
       options.modules.map(async (source) => {
         // Keeping all of this in here so if we don't have any sources
         // e.g. in the Playground, it doesn't break things.
 
-        // Yeah, this doesn't exist in Node 6, but since this is a new
-        // lib and Node 6 is close to EOL so if you really need it, open a PR :)
-        const fs = require('fs') as typeof import('fs')
-        const util = require('util') as typeof import('util')
-        const readFile = util.promisify(fs.readFile)
         const { module: pathOrModule, glob = true, onlyTypes, alias, typeMatch } = source
         if (path.isAbsolute(pathOrModule) && path.extname(pathOrModule) !== '.ts') {
           return console.warn(
@@ -154,7 +150,7 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
           if (path.extname(resolvedPath) !== '.ts') {
             resolvedPath = findTypingForFile(resolvedPath, pathOrModule)
           }
-          fileContents = await readFile(resolvedPath, 'utf-8')
+          fileContents = String(await nodeImports().fs.promises.readFile(resolvedPath, 'utf-8'))
         } catch (e) {
           if (e instanceof Error && e.message.indexOf('Cannot find module') !== -1) {
             console.error(`GraphQL Nexus: Unable to find file or module ${pathOrModule}, skipping`)
@@ -277,7 +273,7 @@ export function typegenAutoConfig(options: SourceTypesConfigOptions, contextType
 function findTypingForFile(absolutePath: string, pathOrModule: string) {
   // First try to find the "d.ts" adjacent to the file
   try {
-    const typeDefPath = absolutePath.replace(path.extname(absolutePath), '.d.ts')
+    const typeDefPath = absolutePath.replace(nodeImports().path.extname(absolutePath), '.d.ts')
     require.resolve(typeDefPath)
     return typeDefPath
   } catch (e) {
