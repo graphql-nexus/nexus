@@ -1,9 +1,9 @@
 import { GraphQLSchema, lexicographicSortSchema } from 'graphql'
-import * as path from 'path'
 import type { BuilderConfigInput, TypegenInfo } from './builder'
 import type { ConfiguredTypegen } from './core'
 import type { NexusGraphQLSchema } from './definitions/_types'
 import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
+import { nodeImports } from './node'
 import { printSchemaWithDirectives } from './printSchemaWithDirectives'
 import { typegenAutoConfig } from './typegenAutoConfig'
 import { typegenFormatPrettier } from './typegenFormatPrettier'
@@ -75,30 +75,26 @@ export class TypegenMetadata {
   }
 
   async writeFile(type: 'schema' | 'types', output: string, filePath: string) {
-    if (typeof filePath !== 'string' || !path.isAbsolute(filePath)) {
+    if (typeof filePath !== 'string' || !nodeImports().path.isAbsolute(filePath)) {
       return Promise.reject(
         new Error(`Expected an absolute path to output the Nexus ${type}, saw ${filePath}`)
       )
     }
-    const fs = require('fs') as typeof import('fs')
-    const util = require('util') as typeof import('util')
-    const [readFile, writeFile, removeFile, mkdir] = [
-      util.promisify(fs.readFile),
-      util.promisify(fs.writeFile),
-      util.promisify(fs.unlink),
-      util.promisify(fs.mkdir),
-    ]
+    const fs = nodeImports().fs
     const formattedOutput =
       typeof this.config.formatTypegen === 'function' ? await this.config.formatTypegen(output, type) : output
     const content = this.config.prettierConfig
       ? await typegenFormatPrettier(this.config.prettierConfig)(formattedOutput, type)
       : formattedOutput
 
-    const [toSave, existing] = await Promise.all([content, readFile(filePath, 'utf8').catch(() => '')])
+    const [toSave, existing] = await Promise.all([
+      content,
+      fs.promises.readFile(filePath, 'utf8').catch(() => ''),
+    ])
     if (toSave !== existing) {
-      const dirPath = path.dirname(filePath)
+      const dirPath = nodeImports().path.dirname(filePath)
       try {
-        await mkdir(dirPath, { recursive: true })
+        await fs.promises.mkdir(dirPath, { recursive: true })
       } catch (e) {
         if (e.code !== 'EEXIST') {
           throw e
@@ -108,14 +104,14 @@ export class TypegenMetadata {
       // apparently. See issue motivating this logic here:
       // https://github.com/graphql-nexus/schema/issues/247.
       try {
-        await removeFile(filePath)
+        await fs.promises.unlink(filePath)
       } catch (e) {
         /* istanbul ignore next */
         if (e.code !== 'ENOENT' && e.code !== 'ENOTDIR') {
           throw e
         }
       }
-      return writeFile(filePath, toSave)
+      return fs.promises.writeFile(filePath, toSave)
     }
   }
 

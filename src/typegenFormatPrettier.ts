@@ -1,5 +1,5 @@
-import * as path from 'path'
 import type * as Prettier from 'prettier'
+import { nodeImports } from './node'
 
 export type TypegenFormatFn = (content: string, type: 'types' | 'schema') => string | Promise<string>
 
@@ -21,6 +21,8 @@ export function typegenFormatPrettier(prettierConfig: string | object): TypegenF
     }
 
     let prettierConfigResolved: Prettier.Options
+
+    const path = nodeImports().path
 
     if (typeof prettierConfig === 'string') {
       /* istanbul ignore if */
