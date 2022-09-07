@@ -16,7 +16,6 @@ const MediaType = unionType({
   definition(t) {
     t.members('Post', 'Image', 'Card')
   },
-  resolveType: (item) => item.name,
 })
 ```
 
