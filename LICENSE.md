@@ -1,4 +1,4 @@
-(c) 2018-2019 Tim Griesser
+(c) 2018-2022 Tim Griesser
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
