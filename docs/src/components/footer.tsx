@@ -214,8 +214,7 @@ const Footer = ({ footerProps }: FooterViewProps) => {
               }
             </div>
 
-            <p className="social-text">Prisma © 2018-2020</p>
-            <p>Made with ❤️ in Berlin</p>
+            <p className="social-text">Tim Griesser © 2018-2020</p>
           </div>
         </SocialWrapper>
       </div>
