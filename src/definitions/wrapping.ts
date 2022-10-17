@@ -8,27 +8,27 @@ import {
   isListType,
   isNonNullType,
 } from 'graphql'
-import type { DynamicInputMethodDef, DynamicOutputMethodDef } from '../dynamicMethod'
-import type { DynamicOutputPropertyDef } from '../dynamicProperty'
-import type { NexusPlugin } from '../plugin'
-import type { AllInputTypes, GetGen } from '../typegenTypeHelpers'
-import { PrintedGenTyping, PrintedGenTypingImport, Unreachable } from '../utils'
-import { NexusArgDef, arg } from './args'
-import type { NexusEnumTypeDef } from './enumType'
-import type { NexusExtendInputTypeDef } from './extendInputType'
-import type { NexusExtendTypeDef } from './extendType'
-import type { NexusInputObjectTypeDef } from './inputObjectType'
-import type { NexusInterfaceTypeDef } from './interfaceType'
-import { list, NexusListDef } from './list'
-import { NexusNonNullDef, nonNull } from './nonNull'
-import { NexusNullDef, nullable } from './nullable'
-import type { NexusObjectTypeDef } from './objectType'
-import type { NexusScalarTypeDef } from './scalarType'
-import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './nexusMeta'
-import type { NexusUnionTypeDef } from './unionType'
-import { NexusTypes, NexusWrappedSymbol } from './_types'
-import type { NexusDirectiveDef } from './directive'
-import type { NexusDirectiveUse } from '../core'
+import type { DynamicInputMethodDef, DynamicOutputMethodDef } from '../dynamicMethod.js'
+import type { DynamicOutputPropertyDef } from '../dynamicProperty.js'
+import type { NexusPlugin } from '../plugin.js'
+import type { AllInputTypes, GetGen } from '../typegenTypeHelpers.js'
+import { PrintedGenTyping, PrintedGenTypingImport, Unreachable } from '../utils.js'
+import { NexusArgDef, arg } from './args.js'
+import type { NexusEnumTypeDef } from './enumType.js'
+import type { NexusExtendInputTypeDef } from './extendInputType.js'
+import type { NexusExtendTypeDef } from './extendType.js'
+import type { NexusInputObjectTypeDef } from './inputObjectType.js'
+import type { NexusInterfaceTypeDef } from './interfaceType.js'
+import { list, NexusListDef } from './list.js'
+import { NexusNonNullDef, nonNull } from './nonNull.js'
+import { NexusNullDef, nullable } from './nullable.js'
+import type { NexusObjectTypeDef } from './objectType.js'
+import type { NexusScalarTypeDef } from './scalarType.js'
+import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './nexusMeta.js'
+import type { NexusUnionTypeDef } from './unionType.js'
+import { NexusTypes, NexusWrappedSymbol } from './_types.js'
+import type { NexusDirectiveDef } from './directive.js'
+import type { NexusDirectiveUse } from '../core.js'
 
 /** Input(named): Nexus only */
 export type AllNexusNamedInputTypeDefs<T extends string = any> =
@@ -301,7 +301,7 @@ export function normalizeArgWrapping(argVal: AllNexusArgsDefs): NexusArgDef<AllI
     return argVal
   }
   if (isNexusWrappingType(argVal)) {
-    let { namedType, wrapping } = unwrapNexusDef(argVal)
+    const { namedType, wrapping } = unwrapNexusDef(argVal)
     if (isNexusArgDef(namedType)) {
       const config = namedType.value
       return arg({ ...config, type: applyNexusWrapping(config.type, wrapping) })
@@ -342,7 +342,7 @@ export function finalizeWrapping(
   typeWrapping: NexusWrapKind[] | ReadonlyArray<NexusWrapKind>,
   chainWrapping?: NexusWrapKind[]
 ): NexusFinalWrapKind[] {
-  let finalChain: NexusFinalWrapKind[] = []
+  const finalChain: NexusFinalWrapKind[] = []
   const allWrapping = typeWrapping.concat(chainWrapping ?? [])
   // Ensure the first item is wrapped, if we're not guarding
   if (nonNullDefault && (!allWrapping[0] || allWrapping[0] === 'List')) {

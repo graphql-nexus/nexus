@@ -1,8 +1,8 @@
-import type { BuilderConfigInput } from './builder'
-import type { ConfiguredTypegen } from './core'
-import { nodeImports } from './node'
-import type { TypegenMetadataConfig } from './typegenMetadata'
-import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils'
+import type { BuilderConfigInput } from './builder.js'
+import type { ConfiguredTypegen } from './core.js'
+import { nodeImports } from './node.js'
+import type { TypegenMetadataConfig } from './typegenMetadata.js'
+import { assertAbsolutePath, getOwnPackage, isProductionStage } from './utils.js'
 
 /** Normalizes the builder config into the config we need for typegen */
 export function resolveTypegenConfig(config: BuilderConfigInput): TypegenMetadataConfig {

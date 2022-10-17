@@ -1,5 +1,5 @@
 import type * as Prettier from 'prettier'
-import { nodeImports } from './node'
+import { nodeImports } from './node.js'
 
 export type TypegenFormatFn = (content: string, type: 'types' | 'schema') => string | Promise<string>
 

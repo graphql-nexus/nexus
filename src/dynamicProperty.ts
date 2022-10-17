@@ -1,7 +1,7 @@
-import type { SchemaBuilder } from './builder'
-import type { OutputDefinitionBlock } from './definitions/definitionBlocks'
-import { NexusTypes, withNexusSymbol } from './definitions/_types'
-import type { BaseExtensionConfig } from './dynamicMethod'
+import type { SchemaBuilder } from './builder.js'
+import type { OutputDefinitionBlock } from './definitions/definitionBlocks.js'
+import { NexusTypes, withNexusSymbol } from './definitions/_types.js'
+import type { BaseExtensionConfig } from './dynamicMethod.js'
 
 export type OutputPropertyFactoryConfig<T> = {
   stage: 'walk' | 'build'

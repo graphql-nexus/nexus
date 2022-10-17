@@ -1,16 +1,16 @@
 import { GraphQLNamedType, GraphQLSchema, isObjectType, specifiedDirectives } from 'graphql'
-import { isNexusObjectTypeDef } from './definitions/wrapping'
+import { isNexusObjectTypeDef } from './definitions/wrapping.js'
 import {
   AdditionalGraphQLSchemaConfigOptions,
   ConfiguredTypegen,
   MakeSchemaOptions,
   SchemaBuilder,
   SchemaConfig,
-} from './builder'
-import type { NexusGraphQLSchema } from './definitions/_types'
-import { TypegenMetadata } from './typegenMetadata'
-import { resolveTypegenConfig } from './typegenUtils'
-import { assertNoMissingTypes, objValues, runAbstractTypeRuntimeChecks } from './utils'
+} from './builder.js'
+import type { NexusGraphQLSchema } from './definitions/_types.js'
+import { TypegenMetadata } from './typegenMetadata.js'
+import { resolveTypegenConfig } from './typegenUtils.js'
+import { assertNoMissingTypes, objValues, runAbstractTypeRuntimeChecks } from './utils.js'
 
 /**
  * Defines the GraphQL schema, by combining the GraphQL types defined by the GraphQL Nexus layer or any

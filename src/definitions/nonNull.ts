@@ -1,12 +1,17 @@
 import { isNonNullType, isType } from 'graphql'
-import { isNexusMeta } from './nexusMeta'
-import { isNexusNonNullTypeDef, isNexusNullTypeDef, isNexusStruct, NexusNonNullableTypes } from './wrapping'
-import { NexusTypes, withNexusSymbol } from './_types'
+import { isNexusMeta } from './nexusMeta.js'
+import {
+  isNexusNonNullTypeDef,
+  isNexusNullTypeDef,
+  isNexusStruct,
+  NexusNonNullableTypes,
+} from './wrapping.js'
+import { NexusTypes, withNexusSymbol } from './_types.js'
 
 export class NexusNonNullDef<TypeName extends NexusNonNullableTypes> {
   // @ts-ignore
   // Required field for TS to differentiate NonNull from Null from List
-  private _isNexusNonNullDef: boolean = true
+  private _isNexusNonNullDef = true
 
   constructor(readonly ofNexusType: TypeName) {
     if (

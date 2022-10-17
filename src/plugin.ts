@@ -1,5 +1,5 @@
 import type { GraphQLFieldResolver, GraphQLInterfaceType, GraphQLResolveInfo, GraphQLSchema } from 'graphql'
-import type { PluginBuilderLens, SchemaConfig } from './builder'
+import type { PluginBuilderLens, SchemaConfig } from './builder.js'
 import {
   Maybe,
   NexusGraphQLFieldConfig,
@@ -8,18 +8,18 @@ import {
   NexusTypes,
   Omit,
   withNexusSymbol,
-} from './definitions/_types'
+} from './definitions/_types.js'
 import type {
   InputDefinitionBlock,
   NexusOutputFieldDef,
   NexusInputFieldDef,
 } from './definitions/definitionBlocks'
-import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
-import type { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType'
-import type { NexusSchemaExtension } from './extensions'
-import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils'
-import type { NexusFinalArgConfig } from './definitions/args'
-import type { UnwrapPromise } from './typeHelpersInternal'
+import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType.js'
+import type { NexusObjectTypeConfig, ObjectDefinitionBlock } from './definitions/objectType.js'
+import type { NexusSchemaExtension } from './extensions.js'
+import { isPromiseLike, PrintedGenTyping, PrintedGenTypingImport, venn } from './utils.js'
+import type { NexusFinalArgConfig } from './definitions/args.js'
+import type { UnwrapPromise } from './typeHelpersInternal.js'
 
 export { PluginBuilderLens }
 

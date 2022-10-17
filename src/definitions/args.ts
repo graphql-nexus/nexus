@@ -1,8 +1,8 @@
 import type { GraphQLScalarTypeConfig } from 'graphql'
-import type { AllInputTypes, GetGen2 } from '../typegenTypeHelpers'
-import type { Directives } from './directive'
-import type { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping'
-import { Maybe, NexusTypes, withNexusSymbol } from './_types'
+import type { AllInputTypes, GetGen2 } from '../typegenTypeHelpers.js'
+import type { Directives } from './directive.js'
+import type { AllNexusArgsDefs, AllNexusInputTypeDefs } from './wrapping.js'
+import { Maybe, NexusTypes, withNexusSymbol } from './_types.js'
 
 export type ArgsRecord = Record<string, AllNexusArgsDefs>
 

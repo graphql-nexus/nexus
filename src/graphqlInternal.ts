@@ -198,7 +198,7 @@ export function getBlockStringIndentation(value: string): number {
  *
  * @internal
  */
-export function printBlockString(value: string, preferMultipleLines: boolean = false): string {
+export function printBlockString(value: string, preferMultipleLines = false): string {
   const isSingleLine = !value.includes('\n')
   const hasLeadingSpace = value[0] === ' ' || value[0] === '\t'
   const hasTrailingQuote = value[value.length - 1] === '"'

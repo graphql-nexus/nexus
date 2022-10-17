@@ -1,5 +1,5 @@
 import type { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLInputFieldConfig } from 'graphql'
-import { messages } from '../messages'
+import { messages } from '../messages.js'
 import type {
   AllInputTypes,
   FieldResolver,
@@ -8,11 +8,11 @@ import type {
   HasGen3,
   NeedsResolver,
 } from '../typegenTypeHelpers'
-import type { ArgsRecord } from './args'
-import type { Directives } from './directive'
-import type { NexusMetaType } from './nexusMeta'
-import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
-import type { BaseScalars, Maybe } from './_types'
+import type { ArgsRecord } from './args.js'
+import type { Directives } from './directive.js'
+import type { NexusMetaType } from './nexusMeta.js'
+import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping.js'
+import type { BaseScalars, Maybe } from './_types.js'
 
 export interface CommonFieldConfig {
   /** The description to annotate the GraphQL SDL */
@@ -814,7 +814,7 @@ export type NexusInputFieldDef = NexusInputFieldConfig<string, string> & {
   parentType: string
 }
 
-export interface InputDefinitionBlock<TypeName extends string> extends NexusGenCustomInputMethods<TypeName> {}
+export type InputDefinitionBlock<TypeName extends string> = NexusGenCustomInputMethods<TypeName>
 
 export class InputDefinitionBlock<TypeName extends string> {
   readonly typeName: string

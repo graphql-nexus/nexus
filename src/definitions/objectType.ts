@@ -1,9 +1,16 @@
 import { assertValidName, GraphQLObjectType } from 'graphql'
-import type { InterfaceFieldsFor } from '../typegenTypeHelpers'
-import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import type { Directives } from './directive'
-import type { FieldModification, FieldModificationDef, Implemented } from './interfaceType'
-import { AbstractTypes, Maybe, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
+import type { InterfaceFieldsFor } from '../typegenTypeHelpers.js'
+import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks.js'
+import type { Directives } from './directive.js'
+import type { FieldModification, FieldModificationDef, Implemented } from './interfaceType.js'
+import {
+  AbstractTypes,
+  Maybe,
+  NexusTypes,
+  NonNullConfig,
+  SourceTypingDef,
+  withNexusSymbol,
+} from './_types.js'
 
 export interface ObjectDefinitionBuilder extends OutputDefinitionBuilder {
   addInterfaces(toAdd: Implemented[]): void

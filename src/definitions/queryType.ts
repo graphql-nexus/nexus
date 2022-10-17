@@ -1,4 +1,4 @@
-import { NexusObjectTypeConfig, objectType } from './objectType'
+import { NexusObjectTypeConfig, objectType } from './objectType.js'
 
 /**
  * [2018 GraphQL Spec](https://spec.graphql.org/June2018/#sec-Query)

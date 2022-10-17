@@ -1,21 +1,21 @@
 import { defaultFieldResolver, GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql'
-import { ArgsRecord, intArg, stringArg } from '../definitions/args'
+import { ArgsRecord, intArg, stringArg } from '../definitions/args.js'
 import type {
   CommonFieldConfig,
   FieldOutConfig,
   FieldOutConfigWithName,
-} from '../definitions/definitionBlocks'
-import { NexusNonNullDef, nonNull } from '../definitions/nonNull'
-import { NexusNullDef, nullable } from '../definitions/nullable'
-import { ObjectDefinitionBlock, objectType } from '../definitions/objectType'
+} from '../definitions/definitionBlocks.js'
+import { NexusNonNullDef, nonNull } from '../definitions/nonNull.js'
+import { NexusNullDef, nullable } from '../definitions/nullable.js'
+import { ObjectDefinitionBlock, objectType } from '../definitions/objectType.js'
 import {
   AllNexusNamedOutputTypeDefs,
   AllNexusOutputTypeDefs,
   applyNexusWrapping,
-} from '../definitions/wrapping'
-import type { NonNullConfig } from '../definitions/_types'
-import { dynamicOutputMethod } from '../dynamicMethod'
-import { completeValue, plugin } from '../plugin'
+} from '../definitions/wrapping.js'
+import type { NonNullConfig } from '../definitions/_types.js'
+import { dynamicOutputMethod } from '../dynamicMethod.js'
+import { completeValue, plugin } from '../plugin.js'
 import type {
   ArgsValue,
   FieldTypeName,
@@ -24,9 +24,16 @@ import type {
   MaybePromiseDeep,
   ResultValue,
   SourceValue,
-} from '../typegenTypeHelpers'
-import type { MaybePromiseLike } from '../typeHelpersInternal'
-import { eachObj, getOwnPackage, isPromiseLike, mapObj, pathToArray, printedGenTypingImport } from '../utils'
+} from '../typegenTypeHelpers.js'
+import type { MaybePromiseLike } from '../typeHelpersInternal.js'
+import {
+  eachObj,
+  getOwnPackage,
+  isPromiseLike,
+  mapObj,
+  pathToArray,
+  printedGenTypingImport,
+} from '../utils.js'
 
 export interface ConnectionPluginConfig {
   /**
@@ -416,7 +423,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
     //   type: User
     // })
     onInstall(b) {
-      let dynamicConfig = []
+      const dynamicConfig = []
 
       const {
         additionalArgs = {},
@@ -928,7 +935,7 @@ function provideArgs(block: ObjectDefinitionBlock<any>, fn: () => void) {
       | [name: string, config: FieldOutConfig<any, string>]
       | [config: FieldOutConfigWithName<any, string>]
   ) {
-    let config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
+    const config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
 
     const { resolve = defaultFieldResolver } = config
 
@@ -950,7 +957,7 @@ function provideSourceAndArgs(block: ObjectDefinitionBlock<any>, fn: () => void)
       | [name: string, config: FieldOutConfig<any, string>]
       | [config: FieldOutConfigWithName<any, string>]
   ) {
-    let config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
+    const config = args.length === 2 ? { name: args[0], ...args[1] } : args[0]
 
     const { resolve = defaultFieldResolver } = config
 

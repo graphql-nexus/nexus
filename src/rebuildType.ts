@@ -17,19 +17,19 @@ import {
   isUnionType,
   defaultTypeResolver,
 } from 'graphql'
-import type { MergeSchemaConfig } from './builder'
-import { arg, ArgsRecord } from './definitions/args'
-import type { InputDefinitionBlock } from './definitions/definitionBlocks'
-import { enumType } from './definitions/enumType'
-import { inputObjectType } from './definitions/inputObjectType'
-import { InterfaceDefinitionBlock, interfaceType } from './definitions/interfaceType'
-import { ObjectDefinitionBlock, objectType } from './definitions/objectType'
-import { scalarType } from './definitions/scalarType'
-import { unionType } from './definitions/unionType'
-import { AllNexusArgsDefs, applyNexusWrapping, unwrapGraphQLDef } from './definitions/wrapping'
-import type { Maybe, SourceTypingDef } from './definitions/_types'
-import type { GetGen } from './typegenTypeHelpers'
-import { graphql15InterfaceConfig, Unreachable } from './utils'
+import type { MergeSchemaConfig } from './builder.js'
+import { arg, ArgsRecord } from './definitions/args.js'
+import type { InputDefinitionBlock } from './definitions/definitionBlocks.js'
+import { enumType } from './definitions/enumType.js'
+import { inputObjectType } from './definitions/inputObjectType.js'
+import { InterfaceDefinitionBlock, interfaceType } from './definitions/interfaceType.js'
+import { ObjectDefinitionBlock, objectType } from './definitions/objectType.js'
+import { scalarType } from './definitions/scalarType.js'
+import { unionType } from './definitions/unionType.js'
+import { AllNexusArgsDefs, applyNexusWrapping, unwrapGraphQLDef } from './definitions/wrapping.js'
+import type { Maybe, SourceTypingDef } from './definitions/_types.js'
+import type { GetGen } from './typegenTypeHelpers.js'
+import { graphql15InterfaceConfig, Unreachable } from './utils.js'
 
 export interface RebuildConfig extends Omit<MergeSchemaConfig, 'schema'> {
   captureLeafType?: (type: GraphQLNamedType) => void

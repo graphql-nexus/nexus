@@ -1,12 +1,12 @@
-import type { NexusFinalArgConfig } from '../definitions/args'
-import type { NexusInputFieldDef, NexusOutputFieldDef } from '../definitions/definitionBlocks'
-import { list } from '../definitions/list'
-import { nonNull } from '../definitions/nonNull'
-import { nullable } from '../definitions/nullable'
-import { plugin } from '../plugin'
-import { printedGenTyping } from '../utils'
-import { isNexusWrappingType } from '../definitions/wrapping'
-import { messages } from '../messages'
+import type { NexusFinalArgConfig } from '../definitions/args.js'
+import type { NexusInputFieldDef, NexusOutputFieldDef } from '../definitions/definitionBlocks.js'
+import { list } from '../definitions/list.js'
+import { nonNull } from '../definitions/nonNull.js'
+import { nullable } from '../definitions/nullable.js'
+import { plugin } from '../plugin.js'
+import { printedGenTyping } from '../utils.js'
+import { isNexusWrappingType } from '../definitions/wrapping.js'
+import { messages } from '../messages.js'
 
 interface DeclarativeWrappingApi {
   nullable?: boolean
@@ -60,7 +60,7 @@ export type DeclarativeWrappingPluginConfig = {
 }
 
 export const declarativeWrappingPlugin = (config: DeclarativeWrappingPluginConfig = {}) => {
-  let hasWarned = false
+  const hasWarned = false
 
   return plugin({
     name: 'declarativeWrapping',
@@ -119,7 +119,7 @@ export const declarativeWrappingPlugin = (config: DeclarativeWrappingPluginConfi
     }
     if (config.disable || config.shouldWarn) {
       const d = field as NexusFinalArgConfig | NexusOutputFieldDef | NexusInputFieldDef
-      let location =
+      const location =
         d.configFor === 'arg'
           ? `'${d.parentType}.${d.fieldName}' field's '${d.argName}' argument`
           : `'${d.parentType}.${d.type}' field`
@@ -139,11 +139,11 @@ export const declarativeWrappingPlugin = (config: DeclarativeWrappingPluginConfi
       isNexusWrappingType(field.type) &&
       (field.list != null || field.nullable != null || field.required != null)
     ) {
-      let errorStr =
+      const errorStr =
         field.configFor === 'arg'
           ? `the arg '${field.argName}' of the field '${field.parentType}.${field.fieldName}'.`
           : `the field '${field.parentType}.${field.name}'.`
-      let usedProp = field.list != null ? 'list' : field.nullable != null ? 'nullable' : 'required'
+      const usedProp = field.list != null ? 'list' : field.nullable != null ? 'nullable' : 'required'
       throw new Error(
         `[declarativeWrappingPlugin] It looks like you used \`${usedProp}\` and wrapped the type of ` +
           errorStr +
@@ -168,7 +168,7 @@ export const declarativeWrappingPlugin = (config: DeclarativeWrappingPluginConfi
     }
     /* istanbul ignore if */
     if (field.required != null && field.nullable != null) {
-      let errorSuffix =
+      const errorSuffix =
         field.configFor === 'arg'
           ? ` on ${field.parentType}.${field.fieldName} arg ${field.argName}`
           : ` on ${field.parentType}.${field.name}`

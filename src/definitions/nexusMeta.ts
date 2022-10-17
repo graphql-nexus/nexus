@@ -1,7 +1,7 @@
-import { ownProp } from '../utils'
-import type { NexusInterfaceTypeDef } from './interfaceType'
-import type { NexusObjectTypeDef } from './objectType'
-import { isNexusStruct, isNexusInterfaceTypeDef, isNexusObjectTypeDef } from './wrapping'
+import { ownProp } from '../utils.js'
+import type { NexusInterfaceTypeDef } from './interfaceType.js'
+import type { NexusObjectTypeDef } from './objectType.js'
+import { isNexusStruct, isNexusInterfaceTypeDef, isNexusObjectTypeDef } from './wrapping.js'
 
 /** Symbol marking an object as something that can provide Nexus schema definitions */
 export const NEXUS_TYPE = Symbol.for('@nexus/meta/NEXUS_TYPE')

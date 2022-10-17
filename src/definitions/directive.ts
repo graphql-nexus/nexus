@@ -8,12 +8,12 @@ import {
   GraphQLDirectiveConfig,
   Kind,
 } from 'graphql'
-import { GetGen, GetGen2, NexusWrappedSymbol } from '../core'
-import type { MaybeReadonlyArray } from '../typeHelpersInternal'
-import { mapObj } from '../utils'
-import type { ArgsRecord } from './args'
-import { isNexusDirective, isNexusDirectiveUse } from './wrapping'
-import { Maybe, NexusTypes, withNexusSymbol } from './_types'
+import { GetGen, GetGen2, NexusWrappedSymbol } from '../core.js'
+import type { MaybeReadonlyArray } from '../typeHelpersInternal.js'
+import { mapObj } from '../utils.js'
+import type { ArgsRecord } from './args.js'
+import { isNexusDirective, isNexusDirectiveUse } from './wrapping.js'
+import { Maybe, NexusTypes, withNexusSymbol } from './_types.js'
 
 export type Directives = MaybeReadonlyArray<NexusDirectiveDef | GraphQLDirective | NexusDirectiveUse>
 

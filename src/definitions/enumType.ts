@@ -1,7 +1,7 @@
 import { assertValidName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
-import { arg, NexusArgDef, NexusAsArgConfig } from './args'
-import type { Directives } from './directive'
-import { Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import { arg, NexusArgDef, NexusAsArgConfig } from './args.js'
+import type { Directives } from './directive.js'
+import { Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types.js'
 
 type TypeScriptEnumLike = {
   [key: number]: string

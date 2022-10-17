@@ -1,11 +1,11 @@
 import { defaultFieldResolver, GraphQLNamedType } from 'graphql'
-import type { DynamicFieldDefs, SchemaConfig } from './builder'
-import type { SourceTypings } from './definitions/_types'
-import type { NexusOutputFieldConfig } from './definitions/definitionBlocks'
-import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
-import type { NexusInterfaceTypeConfig } from './definitions/interfaceType'
-import type { NexusObjectTypeConfig } from './definitions/objectType'
-import type { Directives, FieldSourceType, NamedFieldSourceType } from './core'
+import type { DynamicFieldDefs, SchemaConfig } from './builder.js'
+import type { SourceTypings } from './definitions/_types.js'
+import type { NexusOutputFieldConfig } from './definitions/definitionBlocks.js'
+import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType.js'
+import type { NexusInterfaceTypeConfig } from './definitions/interfaceType.js'
+import type { NexusObjectTypeConfig } from './definitions/objectType.js'
+import type { Directives, FieldSourceType, NamedFieldSourceType } from './core.js'
 
 /** @internal */
 export function hasNexusExtension(val: any): val is any {

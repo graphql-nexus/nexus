@@ -1,5 +1,5 @@
 import type { GraphQLNamedType } from 'graphql'
-import type { SourceTypingDef } from './_types'
+import type { SourceTypingDef } from './_types.js'
 
 export interface TypeExtensionConfig {
   asNexusMethod?: string

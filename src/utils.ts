@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs'
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -21,8 +22,8 @@ import {
   isWrappingType,
   specifiedScalarTypes,
 } from 'graphql'
-import { decorateType } from './definitions/decorateType'
-import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './definitions/nexusMeta'
+import { decorateType } from './definitions/decorateType.js'
+import { isNexusMetaType, NexusMetaType, resolveNexusMetaType } from './definitions/nexusMeta.js'
 import {
   AllNexusArgsDefs,
   AllNexusNamedTypeDefs,
@@ -30,7 +31,7 @@ import {
   isNexusWrappingType,
   isNexusArgDef,
   AllNamedInputTypeDefs,
-} from './definitions/wrapping'
+} from './definitions/wrapping.js'
 import {
   Maybe,
   MissingType,
@@ -39,8 +40,8 @@ import {
   NexusTypes,
   TypingImport,
   withNexusSymbol,
-} from './definitions/_types'
-import { nodeImports } from './node'
+} from './definitions/_types.js'
+import { nodeImports } from './node.js'
 
 export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => {
   return type.getInterfaces().some((i) => Boolean(i.getFields()[fieldName]))
@@ -54,14 +55,14 @@ export const isInterfaceField = (type: GraphQLObjectType, fieldName: string) => 
  * Given an invalid input string and a list of valid options, returns a filtered list of valid options sorted
  * based on their similarity with the input.
  */
-export function suggestionList(input: string = '', options: string[] = []): string[] {
-  var optionsByDistance = Object.create(null)
-  var oLength = options.length
-  var inputThreshold = input.length / 2
+export function suggestionList(input = '', options: string[] = []): string[] {
+  const optionsByDistance = Object.create(null)
+  const oLength = options.length
+  const inputThreshold = input.length / 2
 
-  for (var i = 0; i < oLength; i++) {
-    var distance = lexicalDistance(input, options[i])
-    var threshold = Math.max(inputThreshold, options[i].length / 2, 1)
+  for (let i = 0; i < oLength; i++) {
+    const distance = lexicalDistance(input, options[i])
+    const threshold = Math.max(inputThreshold, options[i].length / 2, 1)
 
     if (distance <= threshold) {
       optionsByDistance[options[i]] = distance
@@ -111,7 +112,7 @@ function lexicalDistance(aStr: string, bStr: string): number {
 
   for (i = 1; i <= aLength; i++) {
     for (j = 1; j <= bLength; j++) {
-      var cost = a[i - 1] === b[j - 1] ? 0 : 1
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1
       d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost)
 
       if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
@@ -469,7 +470,8 @@ export function pathToArray(infoPath: GraphQLResolveInfo['path']): Array<string 
 }
 
 export function getOwnPackage(): { name: string } {
-  return require('../package.json')
+  const pkg = readFileSync(`${process.env.PWD}/package.json`, 'utf-8')
+  return JSON.parse(pkg)
 }
 
 /** Use this to make assertion at end of if-else chain that all members of a union have been accounted for. */

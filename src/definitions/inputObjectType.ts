@@ -1,8 +1,8 @@
 import { assertValidName, GraphQLInputObjectTypeConfig } from 'graphql'
-import { arg, NexusArgDef, NexusAsArgConfig } from './args'
-import type { InputDefinitionBlock } from './definitionBlocks'
-import type { Directives } from './directive'
-import { Maybe, NexusTypes, NonNullConfig, withNexusSymbol } from './_types'
+import { arg, NexusArgDef, NexusAsArgConfig } from './args.js'
+import type { InputDefinitionBlock } from './definitionBlocks.js'
+import type { Directives } from './directive.js'
+import { Maybe, NexusTypes, NonNullConfig, withNexusSymbol } from './_types.js'
 
 export type NexusInputObjectTypeConfig<TypeName extends string> = {
   /** Name of the input object type */

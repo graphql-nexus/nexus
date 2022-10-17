@@ -1,14 +1,13 @@
 import { assertValidName, GraphQLNamedType, GraphQLScalarTypeConfig } from 'graphql'
-import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from '../core'
-import { decorateType } from './decorateType'
-import type { Directives } from './directive'
-import { GraphQLNamedOutputType, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs } from '../core.js'
+import { decorateType } from './decorateType.js'
+import type { Directives } from './directive.js'
+import { GraphQLNamedOutputType, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types.js'
 
-export interface ScalarBase
-  extends Pick<
-    GraphQLScalarTypeConfig<any, any>,
-    'description' | 'serialize' | 'parseValue' | 'parseLiteral'
-  > {}
+export type ScalarBase = Pick<
+  GraphQLScalarTypeConfig<any, any>,
+  'description' | 'serialize' | 'parseValue' | 'parseLiteral'
+>
 
 export interface ScalarConfig {
   /** Any deprecation info for this scalar type */

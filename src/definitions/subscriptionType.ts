@@ -1,9 +1,9 @@
 import type { GraphQLResolveInfo } from 'graphql'
-import type { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers'
-import type { IsEqual } from '../typeHelpersInternal'
-import type { CommonOutputFieldConfig } from './definitionBlocks'
-import { objectType } from './objectType'
-import type { AllNexusOutputTypeDefs } from './wrapping'
+import type { ArgsValue, GetGen, MaybePromise, MaybePromiseDeep, ResultValue } from '../typegenTypeHelpers.js'
+import type { IsEqual } from '../typeHelpersInternal.js'
+import type { CommonOutputFieldConfig } from './definitionBlocks.js'
+import { objectType } from './objectType.js'
+import type { AllNexusOutputTypeDefs } from './wrapping.js'
 
 export type IsSubscriptionType<T> = IsEqual<T, 'Subscription'>
 
