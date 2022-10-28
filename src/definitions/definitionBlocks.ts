@@ -13,6 +13,7 @@ import type { Directives } from './directive'
 import type { NexusMetaType } from './nexusMeta'
 import type { AllNexusInputTypeDefs, AllNexusOutputTypeDefs, NexusWrapKind } from './wrapping'
 import type { BaseScalars, Maybe } from './_types'
+import type { IsSubscriptionType, SubscriptionTypeConfigBase } from './subscriptionType'
 
 export interface CommonFieldConfig {
   /** The description to annotate the GraphQL SDL */
@@ -353,6 +354,8 @@ export type FieldOutConfig<TypeName extends string, FieldName extends string> =
         resolve: FieldResolver<TypeName, FieldName>
       }
     : NexusOutputFieldConfig<TypeName, FieldName>
+  &
+  IsSubscriptionType<TypeName> extends true ? SubscriptionTypeConfigBase<FieldName> : {}
 
 // prettier-ignore
 export type FieldOutConfigWithName<TypeName extends string, FieldName extends string> =
@@ -361,6 +364,8 @@ export type FieldOutConfigWithName<TypeName extends string, FieldName extends st
         resolve: FieldResolver<TypeName, FieldName>
       }
     : NexusOutputFieldConfigWithName<TypeName, FieldName>
+  &
+  IsSubscriptionType<TypeName> extends true ? SubscriptionTypeConfigBase<FieldName> : {}
 
 export interface OutputDefinitionBuilder {
   typeName: string

@@ -178,6 +178,7 @@ export function rebuildOutputDefinition(
       description: fieldConfig.description,
       deprecation: fieldConfig.deprecationReason,
       extensions: fieldConfig.extensions,
+      subscribe: fieldConfig.subscribe,
       args: rebuildArgs(typeName, fieldName, fieldConfig.args ?? {}, config),
       resolve: fieldConfig.resolve,
     })
