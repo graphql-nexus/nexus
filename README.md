@@ -34,7 +34,7 @@ Note you must also add `graphql`. Nexus pins to it as a [peer dependency](https:
 
 ```ts
 import { queryType, stringArg, makeSchema } from 'nexus'
-import { GraphQLServer } from 'graphql-yoga'
+import { createServer } from '@graphql-yoga/node'
 
 const Query = queryType({
   definition(t) {
@@ -53,11 +53,13 @@ const schema = makeSchema({
   },
 })
 
-const server = new GraphQLServer({
+const server = createServer({
   schema,
 })
 
-server.start(() => `Server is running on http://localhost:4000`)
+server.start().then(() => {
+  console.log(`Server is running on http://localhost:4000`)
+})
 ```
 
 More examples can be found in the [`/examples`](./examples) directory:
