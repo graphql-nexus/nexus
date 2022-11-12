@@ -255,11 +255,8 @@ export class TypegenPrinter {
     const imports: string[] = []
     const importMap: Record<string, Set<string>> = {}
     const outputPath = this.typegenInfo.typegenPath
-    const nexusSchemaImportId = this.typegenInfo.nexusSchemaImportId ?? getOwnPackage().name
 
-    if (!this.printImports[nexusSchemaImportId]) {
-      this.maybeAddCoreImport(forGlobal)
-    }
+    this.maybeAddCoreImport(forGlobal)
 
     if (!forGlobal) {
       if (contextTypeImport) {
@@ -320,6 +317,7 @@ export class TypegenPrinter {
 
     if (shouldAdd) {
       this.printImports[nexusSchemaImportId] = {
+        ...this.printImports[nexusSchemaImportId],
         core: true,
       }
     }
