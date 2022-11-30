@@ -31,18 +31,28 @@ import {
 
 import { astFromValue } from 'graphql'
 
-export function printSchemaWithDirectives(schema: GraphQLSchema): string {
-  return printFilteredSchemaWithDirectives(schema, (n) => !isSpecifiedDirective(n), isDefinedType)
+type DirectiveFilter = (directive: GraphQLDirective) => boolean
+type TypeFilter = (type: GraphQLNamedType) => boolean
+
+export type Filters = {
+  isEnvironmentDefinedDirective?: DirectiveFilter
+  isEnvironmentDefinedType?: TypeFilter
 }
 
-function isDefinedType(type: GraphQLNamedType): boolean {
-  return !isSpecifiedScalarType(type) && !isIntrospectionType(type)
+export function printSchemaWithDirectives(schema: GraphQLSchema, filters?: Filters): string {
+  const directiveFilter: DirectiveFilter = (directive) =>
+    !isSpecifiedDirective(directive) && (!filters?.isEnvironmentDefinedDirective?.(directive) ?? true)
+  const typeFilter: TypeFilter = (type) =>
+    !isSpecifiedScalarType(type) &&
+    !isIntrospectionType(type) &&
+    (!filters?.isEnvironmentDefinedType?.(type) ?? true)
+  return printFilteredSchemaWithDirectives(schema, directiveFilter, typeFilter)
 }
 
 function printFilteredSchemaWithDirectives(
   schema: GraphQLSchema,
-  directiveFilter: (type: GraphQLDirective) => boolean,
-  typeFilter: (type: GraphQLNamedType) => boolean
+  directiveFilter: DirectiveFilter,
+  typeFilter: TypeFilter
 ): string {
   const directives = schema.getDirectives().filter(directiveFilter)
   const types = Object.values(schema.getTypeMap()).filter(typeFilter)

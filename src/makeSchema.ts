@@ -162,6 +162,7 @@ function extractGraphQLSchemaOptions(
     sourceTypes,
     prettierConfig,
     plugins,
+    filters,
     customPrintSchemaFn,
     features,
     contextType,

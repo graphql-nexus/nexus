@@ -119,7 +119,7 @@ export class TypegenMetadata {
   generateSchemaFile(schema: GraphQLSchema): string {
     let printedSchema = this.config.customPrintSchemaFn
       ? this.config.customPrintSchemaFn(schema)
-      : printSchemaWithDirectives(schema)
+      : printSchemaWithDirectives(schema, this.config.filters)
     return [SDL_HEADER, printedSchema].join('\n\n')
   }
 

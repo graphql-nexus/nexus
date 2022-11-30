@@ -159,6 +159,7 @@ import {
   NexusDirectiveDef,
 } from './definitions/directive'
 import { rebuildNamedType, RebuildConfig } from './rebuildType'
+import type { Filters } from './printSchemaWithDirectives'
 
 type NexusShapedOutput = {
   name: string
@@ -324,6 +325,11 @@ export interface BuilderConfigInput {
   plugins?: NexusPlugin[]
   /** Provide if you wish to customize the behavior of the schema printing. Otherwise, uses `printSchema` from graphql-js */
   customPrintSchemaFn?: typeof printSchema
+  /** Add filters to skip defining directives / types for the usecase when they are already available within the environment for e.g
+   * with AWS AppSync, we have scaler type `AWS Timestamp` already defined, similary directives like `aws_lambda` are already
+   * available etc.
+   */
+  filters?: Filters
   /** Customize and toggle on or off various features of Nexus. */
   features?: NexusFeaturesInput
   /**
