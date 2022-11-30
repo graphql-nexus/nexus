@@ -1,9 +1,11 @@
 import { DirectiveLocation, GraphQLDirective, GraphQLInt, GraphQLSchema, printSchema } from 'graphql'
 import os from 'os'
 import path from 'path'
-import { objectType } from '../src'
+import { directive, objectType, scalarType } from '../src'
 import { generateSchema, makeSchema } from '../src/makeSchema'
 import { queryField } from '../src/definitions/queryField'
+import { readFile } from 'fs'
+import { promisify } from 'util'
 
 export type Test = {
   id: string
@@ -182,6 +184,80 @@ describe('makeSchema', () => {
         ],
       })
       expect(printSchema(schema).trim()).toMatchSnapshot()
+    })
+  })
+
+  describe('filters', () => {
+    it('can specify custom filters for directives', async () => {
+      const pathToSchema = path.join(os.tmpdir(), '/schema1.graphql')
+
+      const awsLambdaDirective = directive({
+        name: 'aws_lambda',
+        locations: ['OBJECT'],
+      })
+
+      const someOtherDirective = directive({
+        name: 'some_other_directive',
+        locations: ['OBJECT'],
+      })
+
+      const random = objectType({
+        name: 'Random',
+        directives: [awsLambdaDirective, someOtherDirective],
+        definition(t) {
+          t.nonNull.string('randomId')
+        },
+      })
+
+      await makeSchema({
+        types: [random],
+        filters: {
+          isEnvironmentDefinedDirective: (directive) => {
+            return directive.name === 'aws_lambda'
+          },
+        },
+        outputs: {
+          schema: pathToSchema,
+        },
+      })
+
+      const graphql = await promisify(readFile)(pathToSchema, 'utf-8')
+      expect(graphql.trim()).toMatchSnapshot()
+    })
+
+    it('can specify custom filters for types', async () => {
+      const pathToSchema = path.join(os.tmpdir(), '/schema2.graphql')
+
+      const awsTimestampScaler = scalarType({
+        name: 'AWSTimestamp',
+      })
+
+      const someOtherScaler = scalarType({
+        name: 'some_other_scaler',
+      })
+
+      const random = objectType({
+        name: 'Random',
+        definition(t) {
+          t.field('expiry', { type: awsTimestampScaler })
+          t.field('expiry2', { type: someOtherScaler })
+        },
+      })
+
+      await makeSchema({
+        types: [random],
+        filters: {
+          isEnvironmentDefinedType: (type) => {
+            return type.name === 'AWSTimestamp'
+          },
+        },
+        outputs: {
+          schema: pathToSchema,
+        },
+      })
+
+      const graphql = await promisify(readFile)(pathToSchema, 'utf-8')
+      expect(graphql.trim()).toMatchSnapshot()
     })
   })
 })
