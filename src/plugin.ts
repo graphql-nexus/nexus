@@ -176,7 +176,7 @@ export type MiddlewareFn = (
 export function composeMiddlewareFns<T>(
   middlewareFns: MiddlewareFn[],
   resolver: GraphQLFieldResolver<any, any>
-) {
+): GraphQLFieldResolver<any, any> {
   let lastResolver = resolver
   for (const middleware of middlewareFns.reverse()) {
     const currentNext = middleware
