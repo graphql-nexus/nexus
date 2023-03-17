@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import type { core, connectionPluginCore } from '../../../src'
+import type { connectionPluginCore, core } from '../../../src'
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     /**

@@ -408,7 +408,7 @@ export const connectionPlugin = (connectionPluginConfig?: ConnectionPluginConfig
     fieldDefTypes: [
       printedGenTypingImport({
         module: connectionPluginConfig?.nexusSchemaImportId ?? getOwnPackage().name,
-        bindings: ['core', 'connectionPluginCore'],
+        bindings: ['connectionPluginCore'],
       }),
     ],
     // Defines the field added to the definition block:
