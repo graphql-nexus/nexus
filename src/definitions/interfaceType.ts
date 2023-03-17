@@ -1,9 +1,16 @@
 import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
-import type { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers'
-import type { ArgsRecord } from './args'
-import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
-import type { Directives } from './directive'
-import { AbstractTypes, Maybe, NexusTypes, NonNullConfig, SourceTypingDef, withNexusSymbol } from './_types'
+import type { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers.js'
+import type { ArgsRecord } from './args.js'
+import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks.js'
+import type { Directives } from './directive.js'
+import {
+  AbstractTypes,
+  Maybe,
+  NexusTypes,
+  NonNullConfig,
+  SourceTypingDef,
+  withNexusSymbol,
+} from './_types.js'
 
 export type Implemented = GetGen<'interfaceNames'> | NexusInterfaceTypeDef<any>
 

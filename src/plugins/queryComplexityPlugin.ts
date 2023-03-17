@@ -1,7 +1,7 @@
 import type { GraphQLField } from 'graphql'
-import type { ArgsValue, GetGen, SourceValue } from '../core'
-import { plugin } from '../plugin'
-import { printedGenTyping, printedGenTypingImport } from '../utils'
+import type { ArgsValue, GetGen, SourceValue } from '../core.js'
+import { plugin } from '../plugin.js'
+import { printedGenTyping, printedGenTypingImport } from '../utils.js'
 
 const QueryComplexityImport = printedGenTypingImport({
   module: 'nexus/dist/plugins/queryComplexityPlugin',

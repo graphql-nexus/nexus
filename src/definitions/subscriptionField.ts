@@ -1,5 +1,5 @@
-import { extendType, NexusExtendTypeDef } from './extendType'
-import type { SubscriptionBuilder, SubscriptionTypeConfig } from './subscriptionType'
+import { extendType, NexusExtendTypeDef } from './extendType.js'
+import type { SubscriptionBuilder, SubscriptionTypeConfig } from './subscriptionType.js'
 
 export type SubscriptionFieldConfig<FieldName extends string, Event> =
   | SubscriptionTypeConfig<FieldName, Event>

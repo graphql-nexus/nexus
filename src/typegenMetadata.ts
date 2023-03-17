@@ -1,13 +1,13 @@
 import { GraphQLSchema, lexicographicSortSchema } from 'graphql'
-import type { BuilderConfigInput, TypegenInfo } from './builder'
-import type { ConfiguredTypegen } from './core'
-import type { NexusGraphQLSchema } from './definitions/_types'
-import { SDL_HEADER, TYPEGEN_HEADER } from './lang'
-import { nodeImports } from './node'
-import { printSchemaWithDirectives } from './printSchemaWithDirectives'
-import { typegenAutoConfig } from './typegenAutoConfig'
-import { typegenFormatPrettier } from './typegenFormatPrettier'
-import { TypegenPrinter } from './typegenPrinter'
+import type { BuilderConfigInput, TypegenInfo } from './builder.js'
+import type { ConfiguredTypegen } from './core.js'
+import type { NexusGraphQLSchema } from './definitions/_types.js'
+import { SDL_HEADER, TYPEGEN_HEADER } from './lang.js'
+import { nodeImports } from './node.js'
+import { printSchemaWithDirectives } from './printSchemaWithDirectives.js'
+import { typegenAutoConfig } from './typegenAutoConfig.js'
+import { typegenFormatPrettier } from './typegenFormatPrettier.js'
+import { TypegenPrinter } from './typegenPrinter.js'
 
 export interface TypegenMetadataConfig
   extends Omit<BuilderConfigInput, 'outputs' | 'shouldGenerateArtifacts'> {
@@ -117,7 +117,7 @@ export class TypegenMetadata {
 
   /** Generates the schema, adding any directives as necessary */
   generateSchemaFile(schema: GraphQLSchema): string {
-    let printedSchema = this.config.customPrintSchemaFn
+    const printedSchema = this.config.customPrintSchemaFn
       ? this.config.customPrintSchemaFn(schema)
       : printSchemaWithDirectives(schema)
     return [SDL_HEADER, printedSchema].join('\n\n')

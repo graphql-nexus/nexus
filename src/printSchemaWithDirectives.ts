@@ -2,7 +2,7 @@
 type Maybe<T> = null | undefined | T
 
 import { DirectiveNode, Kind, print } from 'graphql'
-import { printBlockString, invariant, inspect } from './graphqlInternal'
+import { printBlockString, invariant, inspect } from './graphqlInternal.js'
 
 import type { GraphQLSchema } from 'graphql'
 import type { GraphQLDirective } from 'graphql'
@@ -219,7 +219,7 @@ function printBlock(items: ReadonlyArray<string>): string {
   return items.length !== 0 ? ' {\n' + items.join('\n') + '\n}' : ''
 }
 
-function printArgs(args: ReadonlyArray<GraphQLArgument>, indentation: string = ''): string {
+function printArgs(args: ReadonlyArray<GraphQLArgument>, indentation = ''): string {
   if (args.length === 0) {
     return ''
   }
@@ -288,8 +288,8 @@ function printSpecifiedByURL(
 
 function printDescription(
   def: { readonly description?: Maybe<string> },
-  indentation: string = '',
-  firstInBlock: boolean = true
+  indentation = '',
+  firstInBlock = true
 ): string {
   const { description } = def
   if (description == null) {

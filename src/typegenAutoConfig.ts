@@ -1,9 +1,9 @@
 import { GraphQLNamedType, GraphQLSchema, isOutputType } from 'graphql'
-import type { TypegenInfo } from './builder'
-import type { TypingImport } from './definitions/_types'
-import { TYPEGEN_HEADER } from './lang'
-import { nodeImports } from './node'
-import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils'
+import type { TypegenInfo } from './builder.js'
+import type { TypingImport } from './definitions/_types.js'
+import { TYPEGEN_HEADER } from './lang.js'
+import { nodeImports } from './node.js'
+import { getOwnPackage, log, objValues, relativePathTo, typeScriptFileExtension } from './utils.js'
 
 /** Any common types / constants that would otherwise be circular-imported */
 export const SCALAR_TYPES = {

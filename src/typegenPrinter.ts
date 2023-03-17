@@ -22,13 +22,13 @@ import {
   isSpecifiedScalarType,
   isUnionType,
 } from 'graphql'
-import type { TypegenInfo } from './builder'
-import { SchemaDirectiveLocation } from './definitions/directive'
-import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping'
-import type { NexusGraphQLSchema } from './definitions/_types'
-import { TYPEGEN_HEADER } from './lang'
-import type { StringLike } from './plugin'
-import { hasNexusExtension, isNexusFieldExtension } from './extensions'
+import type { TypegenInfo } from './builder.js'
+import { SchemaDirectiveLocation } from './definitions/directive.js'
+import { isNexusPrintedGenTyping, isNexusPrintedGenTypingImport } from './definitions/wrapping.js'
+import type { NexusGraphQLSchema } from './definitions/_types.js'
+import { TYPEGEN_HEADER } from './lang.js'
+import type { StringLike } from './plugin.js'
+import { hasNexusExtension, isNexusFieldExtension } from './extensions.js'
 import {
   eachObj,
   getOwnPackage,
@@ -40,7 +40,7 @@ import {
   PrintedGenTypingImport,
   relativePathTo,
   resolveImportPath,
-} from './utils'
+} from './utils.js'
 
 const SpecifiedScalars = {
   ID: 'string',
@@ -172,7 +172,7 @@ export class TypegenPrinter {
 
     // Print the mappings of the directive names -> args
     // NexusGenDirectiveArgs
-    let directiveArgs = [`export interface NexusGenDirectiveArgs {`]
+    const directiveArgs = [`export interface NexusGenDirectiveArgs {`]
 
     eachObj(schemaDirectiveArgs, (val, key) => {
       if (val) {
@@ -291,7 +291,7 @@ export class TypegenPrinter {
       if (def) {
         idents.push(def)
       }
-      let bindings: string[] = []
+      const bindings: string[] = []
       eachObj(rest, (alias, binding) => {
         bindings.push(alias !== true ? `${binding} as ${alias}` : `${binding}`)
       })

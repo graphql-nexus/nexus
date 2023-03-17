@@ -41,28 +41,28 @@ import {
   isWrappingType,
   printSchema,
 } from 'graphql'
-import type { ArgsRecord, NexusFinalArgConfig } from './definitions/args'
+import type { ArgsRecord, NexusFinalArgConfig } from './definitions/args.js'
 import {
   InputDefinitionBlock,
   NexusInputFieldDef,
   NexusOutputFieldConfig,
   NexusOutputFieldDef,
   OutputDefinitionBlock,
-} from './definitions/definitionBlocks'
-import type { NexusEnumTypeConfig } from './definitions/enumType'
-import type { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitions/extendInputType'
-import type { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType'
-import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType'
+} from './definitions/definitionBlocks.js'
+import type { NexusEnumTypeConfig } from './definitions/enumType.js'
+import type { NexusExtendInputTypeConfig, NexusExtendInputTypeDef } from './definitions/extendInputType.js'
+import type { NexusExtendTypeConfig, NexusExtendTypeDef } from './definitions/extendType.js'
+import type { NexusInputObjectTypeConfig } from './definitions/inputObjectType.js'
 import {
   FieldModificationDef,
   Implemented,
   InterfaceDefinitionBlock,
   NexusInterfaceTypeConfig,
   NexusInterfaceTypeDef,
-} from './definitions/interfaceType'
-import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType'
-import type { NexusScalarTypeConfig } from './definitions/scalarType'
-import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType'
+} from './definitions/interfaceType.js'
+import { NexusObjectTypeConfig, NexusObjectTypeDef, ObjectDefinitionBlock } from './definitions/objectType.js'
+import type { NexusScalarTypeConfig } from './definitions/scalarType.js'
+import { NexusUnionTypeConfig, UnionDefinitionBlock, UnionMembers } from './definitions/unionType.js'
 import {
   AllNexusArgsDefs,
   AllNexusNamedInputTypeDefs,
@@ -94,7 +94,7 @@ import {
   rewrapAsGraphQLType,
   unwrapGraphQLDef,
   unwrapNexusDef,
-} from './definitions/wrapping'
+} from './definitions/wrapping.js'
 import type {
   MissingType,
   NexusFeaturesInput,
@@ -106,9 +106,9 @@ import type {
   NonNullConfig,
   SourceTypings,
   TypingImport,
-} from './definitions/_types'
-import type { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod'
-import type { DynamicOutputPropertyDef } from './dynamicProperty'
+} from './definitions/_types.js'
+import type { DynamicInputMethodDef, DynamicOutputMethodDef } from './dynamicMethod.js'
+import type { DynamicOutputPropertyDef } from './dynamicProperty.js'
 import {
   hasNexusExtension,
   NexusFieldExtension,
@@ -116,21 +116,21 @@ import {
   NexusInterfaceTypeExtension,
   NexusObjectTypeExtension,
   NexusSchemaExtension,
-} from './extensions'
-import { messages } from './messages'
+} from './extensions.js'
+import { messages } from './messages.js'
 import {
   composeMiddlewareFns,
   CreateFieldResolverInfo,
   MiddlewareFn,
   NexusPlugin,
   PluginConfig,
-} from './plugin'
-import { declarativeWrappingPlugin } from './plugins'
-import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin'
-import type { SourceTypesConfigOptions } from './typegenAutoConfig'
-import type { TypegenFormatFn } from './typegenFormatPrettier'
-import type { AbstractTypeResolver, GetGen } from './typegenTypeHelpers'
-import type { RequiredDeeply } from './typeHelpersInternal'
+} from './plugin.js'
+import { declarativeWrappingPlugin } from './plugins/index.js'
+import { fieldAuthorizePlugin } from './plugins/fieldAuthorizePlugin.js'
+import type { SourceTypesConfigOptions } from './typegenAutoConfig.js'
+import type { TypegenFormatFn } from './typegenFormatPrettier.js'
+import type { AbstractTypeResolver, GetGen } from './typegenTypeHelpers.js'
+import type { RequiredDeeply } from './typeHelpersInternal.js'
 import {
   casesHandled,
   consoleWarn,
@@ -142,7 +142,7 @@ import {
   isArray,
   isObject,
   UNKNOWN_TYPE_SCALAR,
-} from './utils'
+} from './utils.js'
 import {
   NEXUS_BUILD,
   isNexusMetaBuild,
@@ -150,15 +150,15 @@ import {
   isNexusMetaType,
   NexusMeta,
   resolveNexusMetaType,
-} from './definitions/nexusMeta'
+} from './definitions/nexusMeta.js'
 import {
   DirectiveASTKinds,
   Directives,
   maybeAddDirectiveUses,
   NexusDirectiveConfig,
   NexusDirectiveDef,
-} from './definitions/directive'
-import { rebuildNamedType, RebuildConfig } from './rebuildType'
+} from './definitions/directive.js'
+import { rebuildNamedType, RebuildConfig } from './rebuildType.js'
 
 type NexusShapedOutput = {
   name: string
@@ -1105,7 +1105,7 @@ export class SchemaBuilder {
 
   private buildInterfaceType(config: NexusInterfaceTypeConfig<any>) {
     const { name, description } = config
-    let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
+    const resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
 
     const fields: NexusOutputFieldDef[] = []
     const interfaces: Implemented[] = []
@@ -1257,7 +1257,7 @@ export class SchemaBuilder {
 
   private buildUnionType(config: NexusUnionTypeConfig<any>) {
     let members: UnionMembers | undefined
-    let resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
+    const resolveType: AbstractTypeResolver<string> | undefined = (config as any).resolveType
 
     config.definition(
       new UnionDefinitionBlock({
@@ -1305,7 +1305,7 @@ export class SchemaBuilder {
     return type
   }
 
-  private missingType(typeName: string, fromObject: boolean = false): GraphQLNamedType {
+  private missingType(typeName: string, fromObject = false): GraphQLNamedType {
     invariantGuard(typeName)
     if (this.onMissingTypeFns.length) {
       for (let i = 0; i < this.onMissingTypeFns.length; i++) {
@@ -1619,7 +1619,7 @@ export class SchemaBuilder {
 
   private getOrBuildType(
     type: string | AllNexusNamedTypeDefs | GraphQLNamedType,
-    fromObject: boolean = false
+    fromObject = false
   ): GraphQLNamedType {
     invariantGuard(type)
 

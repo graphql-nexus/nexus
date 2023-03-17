@@ -17,8 +17,8 @@ import {
   isScalarType,
   isSpecifiedScalarType,
 } from 'graphql'
-import { eachObj, GroupedTypes, groupTypes, isInterfaceField, objValues } from './utils'
-import { unwrapGraphQLDef, NexusFinalWrapKind } from './definitions/wrapping'
+import { eachObj, GroupedTypes, groupTypes, isInterfaceField, objValues } from './utils.js'
+import { unwrapGraphQLDef, NexusFinalWrapKind } from './definitions/wrapping.js'
 
 export function convertSDL(sdl: string, commonjs: null | boolean = false, json = JSON) {
   try {
@@ -112,7 +112,7 @@ export class SDLConverter {
     const { namedType, wrapping } = unwrapGraphQLDef(field.type)
     let prefix = 't.'
 
-    let typeString: string | undefined = undefined
+    const typeString: string | undefined = undefined
 
     ;[...wrapping].reverse().forEach((w) => {
       if (w === 'List') {
@@ -204,7 +204,7 @@ export class SDLConverter {
       str += `${type.toString().toLowerCase()}Arg(`
     }
     const metaToAdd = []
-    let wrappedType = type.name
+    const wrappedType = type.name
 
     if (isArg) {
       metaToAdd.push(`type: ${this.addWrapping(wrappedType, wrapping)}`)

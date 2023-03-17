@@ -1,5 +1,5 @@
 import type { GraphQLResolveInfo } from 'graphql'
-import type { Maybe } from './definitions/_types'
+import type { Maybe } from './definitions/_types.js'
 import type {
   AbstractTypeResolver,
   GetGen,
@@ -8,7 +8,7 @@ import type {
   MaybePromise,
   SourceValue,
 } from './typegenTypeHelpers'
-import type { ConditionalKeys, ConditionalPick, ValueOf } from './typeHelpersInternal'
+import type { ConditionalKeys, ConditionalPick, ValueOf } from './typeHelpersInternal.js'
 
 /**
  * Returns a union of all the type names of the members of an abstract type

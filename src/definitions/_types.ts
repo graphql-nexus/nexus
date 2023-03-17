@@ -13,7 +13,7 @@ import type {
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql'
-import type { NexusDirectiveConfig } from '../core'
+import type { NexusDirectiveConfig } from '../core.js'
 import type {
   NexusFieldExtension,
   NexusInputObjectTypeExtension,
@@ -21,8 +21,8 @@ import type {
   NexusObjectTypeExtension,
   NexusSchemaExtension,
 } from '../extensions'
-import type * as AbstractTypes from '../typegenAbstractTypes'
-import type { RequiredDeeply } from '../typeHelpersInternal'
+import type * as AbstractTypes from '../typegenAbstractTypes.js'
+import type { RequiredDeeply } from '../typeHelpersInternal.js'
 
 export type { AbstractTypes }
 

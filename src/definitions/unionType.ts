@@ -1,8 +1,8 @@
 import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
-import type { Directives } from '../core'
-import type { GetGen } from '../typegenTypeHelpers'
-import type { NexusObjectTypeDef } from './objectType'
-import { AbstractTypes, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
+import type { Directives } from '../core.js'
+import type { GetGen } from '../typegenTypeHelpers.js'
+import type { NexusObjectTypeDef } from './objectType.js'
+import { AbstractTypes, Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types.js'
 
 export interface UnionDefinitionBuilder {
   typeName: string
