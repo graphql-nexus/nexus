@@ -381,7 +381,7 @@ export function runAbstractTypeRuntimeChecks(schema: NexusGraphQLSchema, feature
 
     // if some isTypeOf or resolveType implementations are missing but isTypeOf and resolveType strategy enabled
     if (
-      (resolveTypeImplemented === false || typesWithoutIsTypeOf.length > 0) &&
+      (resolveTypeImplemented === false && typesWithoutIsTypeOf.length > 0) &&
       features.abstractTypeStrategies.isTypeOf === true &&
       features.abstractTypeStrategies.resolveType === true
     ) {
