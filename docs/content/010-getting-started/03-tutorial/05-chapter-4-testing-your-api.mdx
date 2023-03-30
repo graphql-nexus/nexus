@@ -100,7 +100,7 @@ touch tests/__helpers.ts
 ```ts
 // tests/__helpers.ts                                            // 1
 import { ServerInfo } from "apollo-server";
-import getPort, { makeRange } from "get-port";
+import getPort, { portNumbers } from "get-port";
 import { GraphQLClient } from "graphql-request";
 import { server } from "../api/server";
 
@@ -132,7 +132,7 @@ function graphqlTestContext() {
 
   return {
     async before() {
-      const port = await getPort({ port: makeRange(4000, 6000) });  // 4
+      const port = await getPort({ port: portNumbers(4000, 6000) });  // 4
       serverInstance = await server.listen({ port });               // 5
 
       return new GraphQLClient(`http://localhost:${port}`);         // 6
