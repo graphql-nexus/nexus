@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLObjectType } from 'graphql'
+import { assertName, GraphQLObjectType } from 'graphql'
 import type { InterfaceFieldsFor } from '../typegenTypeHelpers'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
 import type { Directives } from './directive'
@@ -204,7 +204,7 @@ export type NexusObjectTypeConfig<TypeName extends string> = {
 
 export class NexusObjectTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusObjectTypeConfig<TypeName>) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

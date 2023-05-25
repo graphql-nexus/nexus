@@ -1,6 +1,6 @@
 import {
   ArgumentNode,
-  assertValidName,
+  assertName,
   astFromValue,
   ASTKindToNode,
   DirectiveNode,
@@ -109,7 +109,7 @@ withNexusSymbol(NexusDirectiveUse, NexusTypes.DirectiveUse)
 export function directive<DirectiveName extends string>(
   config: NexusDirectiveConfig<DirectiveName>
 ): NexusDirectiveDef<DirectiveName> {
-  assertValidName(config.name)
+  assertName(config.name)
 
   config = Object.freeze(config)
 

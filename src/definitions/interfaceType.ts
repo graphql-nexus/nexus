@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLInterfaceTypeConfig } from 'graphql'
+import { assertName, GraphQLInterfaceTypeConfig } from 'graphql'
 import type { FieldResolver, GetGen, InterfaceFieldsFor, ModificationType } from '../typegenTypeHelpers'
 import type { ArgsRecord } from './args'
 import { OutputDefinitionBlock, OutputDefinitionBuilder } from './definitionBlocks'
@@ -89,7 +89,7 @@ export class InterfaceDefinitionBlock<TypeName extends string> extends OutputDef
 
 export class NexusInterfaceTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusInterfaceTypeConfig<TypeName>) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLUnionTypeConfig } from 'graphql'
+import { assertName, GraphQLUnionTypeConfig } from 'graphql'
 import type { Directives } from '../core'
 import type { GetGen } from '../typegenTypeHelpers'
 import type { NexusObjectTypeDef } from './objectType'
@@ -55,7 +55,7 @@ export type NexusUnionTypeConfig<TypeName extends string> = {
 
 export class NexusUnionTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusUnionTypeConfig<TypeName>) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

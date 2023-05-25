@@ -1,4 +1,4 @@
-import { assertValidName } from 'graphql'
+import { assertName } from 'graphql'
 import type { GetGen } from '../typegenTypeHelpers'
 import type { InputDefinitionBlock } from './definitionBlocks'
 import { NexusTypes, withNexusSymbol } from './_types'
@@ -10,7 +10,7 @@ export interface NexusExtendInputTypeConfig<TypeName extends string> {
 
 export class NexusExtendInputTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusExtendInputTypeConfig<any> & { name: string }) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config
