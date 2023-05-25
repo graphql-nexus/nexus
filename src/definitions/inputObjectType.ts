@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLInputObjectTypeConfig } from 'graphql'
+import { assertName, GraphQLInputObjectTypeConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import type { InputDefinitionBlock } from './definitionBlocks'
 import type { Directives } from './directive'
@@ -35,7 +35,7 @@ export type NexusInputObjectTypeConfig<TypeName extends string> = {
 
 export class NexusInputObjectTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusInputObjectTypeConfig<any>) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

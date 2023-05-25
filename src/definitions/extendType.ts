@@ -1,4 +1,4 @@
-import { assertValidName } from 'graphql'
+import { assertName } from 'graphql'
 import type { AllOutputTypesPossible } from '../typegenTypeHelpers'
 import type { ObjectDefinitionBlock } from './objectType'
 import type { IsSubscriptionType, SubscriptionBuilder } from './subscriptionType'
@@ -34,7 +34,7 @@ export class NexusExtendTypeDef<TypeName extends string> {
     readonly name: TypeName,
     protected config: NexusExtendTypeConfig<TypeName> & { name: TypeName }
   ) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

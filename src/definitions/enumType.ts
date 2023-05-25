@@ -1,4 +1,4 @@
-import { assertValidName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
+import { assertName, GraphQLEnumTypeConfig, GraphQLEnumValueConfig } from 'graphql'
 import { arg, NexusArgDef, NexusAsArgConfig } from './args'
 import type { Directives } from './directive'
 import { Maybe, NexusTypes, SourceTypingDef, withNexusSymbol } from './_types'
@@ -64,7 +64,7 @@ export interface NexusEnumTypeConfig<TypeName extends string> {
 
 export class NexusEnumTypeDef<TypeName extends string> {
   constructor(readonly name: TypeName, protected config: NexusEnumTypeConfig<string>) {
-    assertValidName(name)
+    assertName(name)
   }
   get value() {
     return this.config

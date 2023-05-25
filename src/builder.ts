@@ -1,5 +1,5 @@
 import {
-  assertValidName,
+  assertName,
   ASTKindToNode,
   defaultFieldResolver,
   GraphQLBoolean,
@@ -1228,7 +1228,7 @@ export class SchemaBuilder {
         // See: https://www.typescriptlang.org/docs/handbook/enums.html
         .filter((key) => isNaN(+key))
         .forEach((key) => {
-          assertValidName(key)
+          assertName(key)
 
           values[key] = {
             value: (members as Record<string, string | number | symbol>)[key],
