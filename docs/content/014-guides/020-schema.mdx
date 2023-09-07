@@ -188,7 +188,7 @@ queryType({
     t.field('anyAlpha', {
       type: 'Alpha',
       resolve(t) {
-        return Math.random() > 0.1 : 'Zeta' : 'Yolo'
+        return Math.random() > 0.1 ? 'Zeta' : 'Yolo'
       }
     })
     t.field('alphas', {
