@@ -1,12 +1,12 @@
 # GraphQL Nexus Examples
 
-All of these example can be run at once:
+All of these examples can be run at once:
 
 With Yarn:
 
 ```
-git clone https://github.com/graphql-nexus/schema.git
-cd schema
+git clone https://github.com/graphql-nexus/nexus.git
+cd nexus
 yarn
 yarn examples
 ```
@@ -14,8 +14,8 @@ yarn examples
 or NPM:
 
 ```
-git clone https://github.com/graphql-nexus/schema.git
-cd schema
+git clone https://github.com/graphql-nexus/nexus.git
+cd nexus
 npm i
 npm run examples
 ```
@@ -36,4 +36,4 @@ npm run examples
 - [kitchen-sink](kitchen-sink)
 - [with-prisma](with-prisma)
 
-> The `with-prisma` example is not included when all examples are ran at once. You can try it by following the instructions in its [README](with-prisma) instead.
+> The `with-prisma` example is not included when all examples are run at once. You can try it by following the instructions in its [README](with-prisma) instead.
