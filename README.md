@@ -3,7 +3,38 @@
 [![trunk](https://github.com/graphql-nexus/nexus/workflows/trunk/badge.svg)](https://github.com/graphql-nexus/nexus/actions/workflows/trunk.yml)
 [![npm version](https://badge.fury.io/js/nexus.svg)](https://badge.fury.io/js/nexus)
 
-Declarative, code-first and strongly typed GraphQL schema construction for TypeScript & JavaScript.
+Declarative, code-first, and strongly typed GraphQL schema construction for TypeScript and JavaScript.
+
+## Why this repo is worth sharing on X
+
+- **Makes GraphQL schema design feel like normal TypeScript** instead of a separate SDL workflow.
+- **Gives you end-to-end type safety** while still producing a standard `GraphQLSchema`.
+- **Stays ergonomic for real projects** with plugins, reusable abstractions, and interop with the GraphQL ecosystem.
+- **Works well as a reference for code-first GraphQL design** in TypeScript and JavaScript.
+
+## TL;DR
+
+> Nexus is a code-first GraphQL schema builder for TypeScript and JavaScript that combines strong typing, expressive APIs, and compatibility with vanilla `graphql-js`.
+
+## Suggested X / Twitter post
+
+```text
+If you like GraphQL but hate duplicating schema logic across SDL + resolvers, Nexus is still a great pattern to study.
+
+- code-first schema construction
+- strong TypeScript inference
+- plugin system
+- outputs a normal GraphQLSchema
+
+Clean repo for GraphQL/TS builders:
+https://github.com/graphql-nexus/nexus
+```
+
+## Quick links
+
+- **Docs**: http://nexusjs.org/
+- **Examples**: [examples/](./examples)
+- **SDL converter**: https://nexusjs.org/converter
 
 ## Installation
 
